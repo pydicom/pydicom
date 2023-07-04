@@ -21,8 +21,14 @@ def main() -> None:
     version_rows = [("platform", platform.platform()), ("Python", sys.version)]
 
     modules = (
-        "pydicom", "gdcm", "jpeg_ls", "numpy", "PIL", "pylibjpeg",
-        "openjpeg", "libjpeg",
+        "pydicom",
+        "gdcm",
+        "jpeg_ls",
+        "numpy",
+        "PIL",
+        "pylibjpeg",
+        "openjpeg",
+        "libjpeg",
     )
     for module in modules:
         try:

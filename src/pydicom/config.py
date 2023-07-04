@@ -90,8 +90,7 @@ def DS_numpy(use_numpy: bool = True) -> None:
 
     if use_DS_decimal and use_numpy:
         raise ValueError(
-            "Cannot use numpy arrays to read DS elements"
-            "if `use_DS_decimal` is True"
+            "Cannot use numpy arrays to read DS elements" "if `use_DS_decimal` is True"
         )
     use_DS_numpy = use_numpy
 
@@ -120,9 +119,7 @@ def DS_decimal(use_Decimal_boolean: bool = True) -> None:
     use_DS_decimal = use_Decimal_boolean
 
     if use_DS_decimal and use_DS_numpy:
-        raise ValueError(
-            "Cannot set use_DS_decimal True " "if use_DS_numpy is True"
-        )
+        raise ValueError("Cannot set use_DS_decimal True " "if use_DS_numpy is True")
 
     import pydicom.valuerep
 
@@ -192,9 +189,7 @@ class Settings:
         self._reading_validation_mode: int | None = None
         # in future version, writing invalid values will raise by default,
         # currently the default value depends on enforce_valid_values
-        self._writing_validation_mode: int | None = (
-            RAISE if _use_future else None
-        )
+        self._writing_validation_mode: int | None = RAISE if _use_future else None
         self._infer_sq_for_un_vr: bool = True
 
     @property

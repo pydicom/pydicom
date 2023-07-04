@@ -33,6 +33,7 @@ import warnings
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -44,8 +45,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
 
 
-HANDLER_NAME = 'Numpy Overlay'
-DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
+HANDLER_NAME = "Numpy Overlay"
+DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
 
 
 def is_available() -> bool:
@@ -56,7 +57,7 @@ def is_available() -> bool:
     return HAVE_NP
 
 
-def get_expected_length(elem: dict[str, Any], unit: str = 'bytes') -> int:
+def get_expected_length(elem: dict[str, Any], unit: str = "bytes") -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
 
@@ -92,10 +93,10 @@ def get_expected_length(elem: dict[str, Any], unit: str = 'bytes') -> int:
         The expected length of the *Overlay Data* in either whole bytes or
         pixels, excluding the NULL trailing padding byte for odd length data.
     """
-    length: int = elem['OverlayRows'] * elem['OverlayColumns']
-    length *= elem['NumberOfFramesInOverlay']
+    length: int = elem["OverlayRows"] * elem["OverlayColumns"]
+    length *= elem["NumberOfFramesInOverlay"]
 
-    if unit == 'pixels':
+    if unit == "pixels":
         return length
 
     # Determine the nearest whole number of bytes needed to contain
@@ -104,9 +105,7 @@ def get_expected_length(elem: dict[str, Any], unit: str = 'bytes') -> int:
     return length // 8 + (length % 8 > 0)
 
 
-def reshape_overlay_array(
-    elem: dict[str, Any], arr: "np.ndarray"
-) -> "np.ndarray":
+def reshape_overlay_array(elem: dict[str, Any], arr: "np.ndarray") -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     .. versionadded:: 1.4
@@ -151,9 +150,9 @@ def reshape_overlay_array(
     if not HAVE_NP:
         raise ImportError("Numpy is required to reshape the overlay array.")
 
-    nr_frames = elem['NumberOfFramesInOverlay']
-    nr_rows = elem['OverlayRows']
-    nr_columns = elem['OverlayColumns']
+    nr_frames = elem["NumberOfFramesInOverlay"]
+    nr_rows = elem["OverlayRows"]
+    nr_columns = elem["OverlayColumns"]
 
     if nr_frames < 1:
         raise ValueError(
@@ -199,10 +198,10 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
 
     # Check required elements
     elem = {
-        'OverlayData': ds.get((group, 0x3000), None),
-        'OverlayBitsAllocated': ds.get((group, 0x0100), None),
-        'OverlayRows': ds.get((group, 0x0010), None),
-        'OverlayColumns': ds.get((group, 0x0011), None),
+        "OverlayData": ds.get((group, 0x3000), None),
+        "OverlayBitsAllocated": ds.get((group, 0x0100), None),
+        "OverlayRows": ds.get((group, 0x0010), None),
+        "OverlayColumns": ds.get((group, 0x0011), None),
     }
 
     missing = [kk for kk, vv in elem.items() if vv is None]
@@ -218,24 +217,22 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     # Add in if not present
     nr_frames: Optional["DataElement"] = ds.get((group, 0x0015), None)
     if nr_frames is None:
-        elem_values['NumberOfFramesInOverlay'] = 1
+        elem_values["NumberOfFramesInOverlay"] = 1
     else:
-        elem_values['NumberOfFramesInOverlay'] = nr_frames.value
+        elem_values["NumberOfFramesInOverlay"] = nr_frames.value
 
     # Calculate the expected length of the pixel data (in bytes)
     #   Note: this does NOT include the trailing null byte for odd length data
     expected_len = get_expected_length(elem_values)
 
     # Check that the actual length of the pixel data is as expected
-    actual_length = len(cast(bytes, elem_values['OverlayData']))
+    actual_length = len(cast(bytes, elem_values["OverlayData"]))
 
     # Correct for the trailing NULL byte padding for odd length data
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
-            warnings.warn(
-                "The overlay data length is odd and misses a padding byte."
-            )
+            warnings.warn("The overlay data length is odd and misses a padding byte.")
         else:
             raise ValueError(
                 "The length of the overlay data in the dataset "
@@ -253,9 +250,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
         )
 
     # Unpack the pixel data into a 1D ndarray, skipping any trailing padding
-    nr_pixels = get_expected_length(elem_values, unit='pixels')
-    arr = cast(
-        "np.ndarray", unpack_bits(elem_values['OverlayData'])[:nr_pixels]
-    )
+    nr_pixels = get_expected_length(elem_values, unit="pixels")
+    arr = cast("np.ndarray", unpack_bits(elem_values["OverlayData"])[:nr_pixels])
 
     return reshape_overlay_array(elem_values, arr)

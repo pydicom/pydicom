@@ -6,18 +6,20 @@ from pathlib import Path
 
 
 _size_factors = {
-    "kb": 1000, "mb": 1000 * 1000, "gb": 1000 * 1000 * 1000,
-    "kib": 1024, "mib": 1024 * 1024, "gib": 1024 * 1024 * 1024,
+    "kb": 1000,
+    "mb": 1000 * 1000,
+    "gb": 1000 * 1000 * 1000,
+    "kib": 1024,
+    "mib": 1024 * 1024,
+    "gib": 1024 * 1024 * 1024,
 }
 
 
-def size_in_bytes(
-    expr: int | float | str | None
-) -> None | float | int:
+def size_in_bytes(expr: int | float | str | None) -> None | float | int:
     """Return the number of bytes for `defer_size` argument in
     :func:`~pydicom.filereader.dcmread`.
     """
-    if expr is None or expr == float('inf'):
+    if expr is None or expr == float("inf"):
         return None
 
     if isinstance(expr, int | float):
@@ -53,6 +55,6 @@ def is_dicom(file_path: str | Path) -> bool:
     filereader.read_preamble
     filereader.read_partial
     """
-    with open(file_path, 'rb') as fp:
+    with open(file_path, "rb") as fp:
         fp.read(128)  # preamble
         return fp.read(4) == b"DICM"

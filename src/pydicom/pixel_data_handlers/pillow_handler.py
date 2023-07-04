@@ -13,12 +13,14 @@ if TYPE_CHECKING:  # pragma: no cover
 
 try:
     import numpy
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
     from PIL import Image, features
+
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")
     HAVE_JPEG2K = features.check_codec("jpg_2000")
@@ -31,11 +33,15 @@ from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_parameters
 from pydicom.uid import (
-    UID, JPEG2000, JPEG2000Lossless, JPEGBaseline8Bit, JPEGExtended12Bit
+    UID,
+    JPEG2000,
+    JPEG2000Lossless,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
 )
 
 
-logger = logging.getLogger('pydicom')
+logger = logging.getLogger("pydicom")
 
 
 PillowJPEG2000TransferSyntaxes = [JPEG2000, JPEG2000Lossless]
@@ -45,10 +51,10 @@ PillowSupportedTransferSyntaxes = (
 )
 
 
-HANDLER_NAME = 'Pillow'
+HANDLER_NAME = "Pillow"
 DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
-    'PIL': ('https://python-pillow.org/', 'Pillow'),
+    "numpy": ("http://www.numpy.org/", "NumPy"),
+    "PIL": ("https://python-pillow.org/", "Pillow"),
 }
 
 
@@ -89,9 +95,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
 
 def _decompress_single_frame(
-    data: bytes,
-    transfer_syntax: str,
-    photometric_interpretation: str
+    data: bytes, transfer_syntax: str, photometric_interpretation: str
 ) -> "Image":
     """Decompresses a single frame of an encapsulated Pixel Data element.
 
@@ -119,16 +123,20 @@ def _decompress_single_frame(
     # space prior to compression, setting the value of "mode" to YCbCr
     # signals Pillow to not apply any color transformation upon
     # decompression.
-    if (transfer_syntax in PillowJPEGTransferSyntaxes and
-            photometric_interpretation == 'RGB'):
-        if 'adobe_transform' not in image.info:
-            color_mode = 'YCbCr'
-            image.tile = [(
-                'jpeg',
-                image.tile[0][1],
-                image.tile[0][2],
-                (color_mode, ''),
-            )]
+    if (
+        transfer_syntax in PillowJPEGTransferSyntaxes
+        and photometric_interpretation == "RGB"
+    ):
+        if "adobe_transform" not in image.info:
+            color_mode = "YCbCr"
+            image.tile = [
+                (
+                    "jpeg",
+                    image.tile[0][1],
+                    image.tile[0][2],
+                    (color_mode, ""),
+                )
+            ]
             image.mode = color_mode
             image.rawmode = color_mode
     return image
@@ -187,7 +195,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     columns = cast(int, ds.Columns)
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
-    nr_frames = getattr(ds, 'NumberOfFrames', 1) or 1
+    nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
 
     pixel_bytes = bytearray()
     if nr_frames > 1:
@@ -195,31 +203,25 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         # multiple compressed frames
         for frame in decode_data_sequence(ds.PixelData):
             im = _decompress_single_frame(
-                frame,
-                transfer_syntax,
-                photometric_interpretation
+                frame, transfer_syntax, photometric_interpretation
             )
-            if 'YBR' in photometric_interpretation:
-                im.draft('YCbCr', (rows, columns))
+            if "YBR" in photometric_interpretation:
+                im.draft("YCbCr", (rows, columns))
             pixel_bytes.extend(im.tobytes())
 
             if not j2k_precision:
                 params = get_j2k_parameters(frame)
-                j2k_precision = cast(
-                    int, params.setdefault("precision", bits_stored)
-                )
+                j2k_precision = cast(int, params.setdefault("precision", bits_stored))
                 j2k_sign = params.setdefault("is_signed", None)
 
     else:
         # single compressed frame
         pixel_data = defragment_data(ds.PixelData)
         im = _decompress_single_frame(
-            pixel_data,
-            transfer_syntax,
-            photometric_interpretation
+            pixel_data, transfer_syntax, photometric_interpretation
         )
-        if 'YBR' in photometric_interpretation:
-            im.draft('YCbCr', (rows, columns))
+        if "YBR" in photometric_interpretation:
+            im.draft("YCbCr", (rows, columns))
         pixel_bytes.extend(im.tobytes())
 
         params = get_j2k_parameters(pixel_data)
@@ -251,14 +253,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
                 if ds.PixelRepresentation == 1:
                     # Pillow converts signed data to unsigned
                     #   so we need to undo this conversion
-                    arr -= 2**(bits_allocated - 1)
+                    arr -= 2 ** (bits_allocated - 1)
 
                 if shift:
                     arr = numpy.right_shift(arr, shift)
         else:
             # Corrections based on dataset elements
             if ds.PixelRepresentation == 1:
-                arr -= 2**(bits_allocated - 1)
+                arr -= 2 ** (bits_allocated - 1)
 
             if shift:
                 arr = numpy.right_shift(arr, shift)

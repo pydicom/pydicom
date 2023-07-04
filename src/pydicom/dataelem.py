@@ -9,18 +9,22 @@ A DataElement has a tag,
 
 import base64
 import json
-from typing import (
-    Optional, Any, TYPE_CHECKING, NamedTuple
-)
+from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
-from pydicom.datadict import (dictionary_has_tag, dictionary_description,
-                              dictionary_keyword, dictionary_is_retired,
-                              private_dictionary_description, dictionary_VR,
-                              repeater_has_tag, private_dictionary_VR)
+from pydicom.datadict import (
+    dictionary_has_tag,
+    dictionary_description,
+    dictionary_keyword,
+    dictionary_is_retired,
+    private_dictionary_description,
+    dictionary_VR,
+    repeater_has_tag,
+    private_dictionary_VR,
+)
 from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter, BulkDataType
 from pydicom.multival import MultiValue
@@ -29,8 +33,15 @@ from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    PersonName, BYTES_VR, AMBIGUOUS_VR, STR_VR, ALLOW_BACKSLASH,
-    DEFAULT_CHARSET_VR, LONG_VALUE_VR, VR as VR_, validate_value
+    PersonName,
+    BYTES_VR,
+    AMBIGUOUS_VR,
+    STR_VR,
+    ALLOW_BACKSLASH,
+    DEFAULT_CHARSET_VR,
+    LONG_VALUE_VR,
+    VR as VR_,
+    validate_value,
 )
 
 if config.have_numpy:
@@ -158,7 +169,7 @@ class DataElement:
         file_value_tell: int | None = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: int | None = None
+        validation_mode: int | None = None,
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -204,7 +215,7 @@ class DataElement:
             VR == VR_.UN
             and not tag.is_private
             and config.replace_un_with_known_vr
-            and (is_undefined_length or value is None or len(value) < 0xffff)
+            and (is_undefined_length or value is None or len(value) < 0xFFFF)
         ):
             try:
                 VR = dictionary_VR(tag)
@@ -236,7 +247,9 @@ class DataElement:
         vr: str,
         value: Any,
         value_key: str | None,
-        bulk_data_uri_handler: Callable[[str, str, str], BulkDataType] | Callable[[str], BulkDataType] | None = None
+        bulk_data_uri_handler: Callable[[str, str, str], BulkDataType]
+        | Callable[[str], BulkDataType]
+        | None = None,
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
@@ -280,14 +293,13 @@ class DataElement:
             return cls(tag=tag, value=elem_value, VR=vr)
         except Exception as exc:
             raise ValueError(
-                f"Data element '{tag}' could not be loaded from JSON: "
-                f"{elem_value}"
+                f"Data element '{tag}' could not be loaded from JSON: " f"{elem_value}"
             ) from exc
 
     def to_json_dict(
         self,
         bulk_data_element_handler: Callable[["DataElement"], str] | None,
-        bulk_data_threshold: int
+        bulk_data_threshold: int,
     ) -> dict[str, Any]:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
@@ -312,34 +324,30 @@ class DataElement:
         dict
             Mapping representing a JSON encoded data element as ``{str: Any}``.
         """
-        json_element: dict[str, Any] = {'vr': self.VR}
+        json_element: dict[str, Any] = {"vr": self.VR}
         if self.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR_.US_SS}:
             if not self.is_empty:
                 binary_value = self.value
-                encoded_value = base64.b64encode(binary_value).decode('utf-8')
+                encoded_value = base64.b64encode(binary_value).decode("utf-8")
                 if (
                     bulk_data_element_handler is not None
                     and len(encoded_value) > bulk_data_threshold
                 ):
-                    json_element['BulkDataURI'] = (
-                        bulk_data_element_handler(self)
-                    )
+                    json_element["BulkDataURI"] = bulk_data_element_handler(self)
                 else:
-                    logger.info(
-                        f"encode bulk data element '{self.name}' inline"
-                    )
-                    json_element['InlineBinary'] = encoded_value
+                    logger.info(f"encode bulk data element '{self.name}' inline")
+                    json_element["InlineBinary"] = encoded_value
         elif self.VR == VR_.SQ:
             # recursive call to get sequence item JSON dicts
             value = [
                 ds.to_json(
                     bulk_data_element_handler=bulk_data_element_handler,
                     bulk_data_threshold=bulk_data_threshold,
-                    dump_handler=lambda d: d
+                    dump_handler=lambda d: d,
                 )
                 for ds in self.value
             ]
-            json_element['Value'] = value
+            json_element["Value"] = value
         elif self.VR == VR_.PN:
             if not self.is_empty:
                 elem_value = []
@@ -348,29 +356,29 @@ class DataElement:
                 else:
                     value = [self.value]
                 for v in value:
-                    comps = {'Alphabetic': v.components[0]}
+                    comps = {"Alphabetic": v.components[0]}
                     if len(v.components) > 1:
-                        comps['Ideographic'] = v.components[1]
+                        comps["Ideographic"] = v.components[1]
                     if len(v.components) > 2:
-                        comps['Phonetic'] = v.components[2]
+                        comps["Phonetic"] = v.components[2]
                     elem_value.append(comps)
-                json_element['Value'] = elem_value
+                json_element["Value"] = elem_value
         elif self.VR == VR_.AT:
             if not self.is_empty:
                 value = self.value
                 if self.VM == 1:
                     value = [value]
-                json_element['Value'] = [format(v, '08X') for v in value]
+                json_element["Value"] = [format(v, "08X") for v in value]
         else:
             if not self.is_empty:
                 if self.VM > 1:
                     value = self.value
                 else:
                     value = [self.value]
-                json_element['Value'] = [v for v in value]
-        if 'Value' in json_element:
-            json_element['Value'] = jsonrep.convert_to_python_number(
-                json_element['Value'], self.VR
+                json_element["Value"] = [v for v in value]
+        if "Value" in json_element:
+            json_element["Value"] = jsonrep.convert_to_python_number(
+                json_element["Value"], self.VR
             )
         return json_element
 
@@ -378,7 +386,7 @@ class DataElement:
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Callable[["DataElement"], str] | None = None,
-        dump_handler: Callable[[dict[str, Any]], str] | None = None
+        dump_handler: Callable[[dict[str, Any]], str] | None = None,
     ) -> str:
         """Return a JSON representation of the :class:`DataElement`.
 
@@ -409,6 +417,7 @@ class DataElement:
         --------
         Dataset.to_json
         """
+
         def json_dump(d: dict[str, Any]) -> str:
             return json.dumps(d, sort_keys=True)
 
@@ -493,6 +502,7 @@ class DataElement:
         """
         if self.VR == VR_.SQ:  # a sequence - leave it alone
             from pydicom.sequence import Sequence
+
             if isinstance(val, Sequence):
                 return val
 
@@ -505,8 +515,7 @@ class DataElement:
             return self._convert(val)
         if len(val) == 1:
             return self._convert(val[0])
-        return MultiValue(self._convert, val,
-                          validation_mode=self.validation_mode)
+        return MultiValue(self._convert, val, validation_mode=self.validation_mode)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
@@ -519,22 +528,16 @@ class DataElement:
             return pydicom.valuerep.IS(val, self.validation_mode)
 
         if self.VR == VR_.DA and config.datetime_conversion:
-            return pydicom.valuerep.DA(
-                val, validation_mode=self.validation_mode
-            )
+            return pydicom.valuerep.DA(val, validation_mode=self.validation_mode)
 
         if self.VR == VR_.DS:
             return pydicom.valuerep.DS(val, False, self.validation_mode)
 
         if self.VR == VR_.DT and config.datetime_conversion:
-            return pydicom.valuerep.DT(
-                val, validation_mode=self.validation_mode
-            )
+            return pydicom.valuerep.DT(val, validation_mode=self.validation_mode)
 
         if self.VR == VR_.TM and config.datetime_conversion:
-            return pydicom.valuerep.TM(
-                val, validation_mode=self.validation_mode
-            )
+            return pydicom.valuerep.TM(val, validation_mode=self.validation_mode)
 
         if self.VR == VR_.UI:
             return UID(val, self.validation_mode) if val is not None else None
@@ -570,9 +573,8 @@ class DataElement:
 
             # tag and VR match, now check the value
             if config.have_numpy and isinstance(self.value, numpy.ndarray):
-                return (
-                    len(self.value) == len(other.value)
-                    and numpy.allclose(self.value, other.value)
+                return len(self.value) == len(other.value) and numpy.allclose(
+                    self.value, other.value
                 )
 
             return self.value == other.value
@@ -585,7 +587,7 @@ class DataElement:
 
     def __str__(self) -> str:
         """Return :class:`str` representation of the element."""
-        value = self.repval or ''
+        value = self.repval or ""
         name = f"{self.name[:self.descripWidth]:<{self.descripWidth}}"
 
         if self.showVR:
@@ -619,9 +621,7 @@ class DataElement:
         try:
             return self.value[key]
         except TypeError:
-            raise TypeError(
-                "DataElement value is unscriptable (not a Sequence)"
-            )
+            raise TypeError("DataElement value is unscriptable (not a Sequence)")
 
     @property
     def name(self) -> str:
@@ -714,7 +714,7 @@ class DataElement:
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
 
-        return ''
+        return ""
 
     def __repr__(self) -> str:
         """Return the representation of the element."""
@@ -723,6 +723,7 @@ class DataElement:
 
 class RawDataElement(NamedTuple):
     """Container for the data from a raw (mostly) undecoded element."""
+
     tag: BaseTag
     VR: str | None
     length: int
@@ -762,7 +763,7 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
         return VR_.LO
 
     # invalid private tags are handled as UN
-    if ds is not None and (tag.element & 0xff00):
+    if ds is not None and (tag.element & 0xFF00):
         private_creator_tag = tag.group << 16 | (tag.element >> 8)
         private_creator = ds.get(private_creator_tag, "")
         if private_creator:
@@ -777,7 +778,7 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
 def DataElement_from_raw(
     raw_data_element: RawDataElement,
     encoding: str | MutableSequence[str] | None = None,
-    dataset: Optional["Dataset"] = None
+    dataset: Optional["Dataset"] = None,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -806,14 +807,13 @@ def DataElement_from_raw(
     # (for SQ parsing)
 
     from pydicom.values import convert_value
+
     raw = raw_data_element
 
     # If user has hooked into conversion of raw values, call his/her routine
     if config.data_element_callback:
         raw = config.data_element_callback(
-            raw_data_element,
-            encoding=encoding,
-            **config.data_element_callback_kwargs
+            raw_data_element, encoding=encoding, **config.data_element_callback_kwargs
         )
 
     vr = raw.VR
@@ -841,7 +841,7 @@ def DataElement_from_raw(
         # see also DataElement.__init__()
         if raw.tag.is_private:
             vr = _private_vr_for_tag(dataset, raw.tag)
-        elif raw.value is None or len(raw.value) < 0xffff:
+        elif raw.value is None or len(raw.value) < 0xFFFF:
             try:
                 vr = dictionary_VR(raw.tag)
             except KeyError:

@@ -3,10 +3,7 @@
 or any list of items that must all be the same type.
 """
 
-from typing import (
-    overload, Any, cast,
-    TypeVar
-)
+from typing import overload, Any, cast, TypeVar
 from collections.abc import Iterable, Callable, MutableSequence, Iterator
 
 from pydicom import config
@@ -33,7 +30,7 @@ class MultiValue(MutableSequence[_ItemType]):
         self,
         type_constructor: Callable[[_T], _ItemType],
         iterable: Iterable[_T],
-        validation_mode: int | None = None
+        validation_mode: int | None = None,
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
         item in the :class:`MultiValue` has the same type.
@@ -56,8 +53,10 @@ class MultiValue(MutableSequence[_ItemType]):
         def DS_IS_constructor(x: _T) -> _ItemType:
             return (  # type: ignore[no-any-return]
                 self.type_constructor(  # type: ignore[has-type]
-                    x, validation_mode=validation_mode)
-                if x != '' else cast(_ItemType, x)
+                    x, validation_mode=validation_mode
+                )
+                if x != ""
+                else cast(_ItemType, x)
             )
 
         if validation_mode is None:
@@ -83,7 +82,7 @@ class MultiValue(MutableSequence[_ItemType]):
         self._list.extend([self.type_constructor(x) for x in val])
 
     def __iadd__(  # type: ignore[override]
-            self, other: Iterable[_T]
+        self, other: Iterable[_T]
     ) -> MutableSequence[_ItemType]:
         """Implement MultiValue() += Iterable[Any]."""
         self._list += [self.type_constructor(x) for x in other]
@@ -93,15 +92,14 @@ class MultiValue(MutableSequence[_ItemType]):
         return self._list == other
 
     @overload
-    def __getitem__(self, index: int) -> _ItemType: pass  # pragma: no cover
+    def __getitem__(self, index: int) -> _ItemType:
+        pass  # pragma: no cover
 
     @overload
     def __getitem__(self, index: slice) -> MutableSequence[_ItemType]:
         pass  # pragma: no cover
 
-    def __getitem__(
-        self, index: slice | int
-    ) -> MutableSequence[_ItemType] | _ItemType:
+    def __getitem__(self, index: slice | int) -> MutableSequence[_ItemType] | _ItemType:
         return self._list[index]
 
     def insert(self, position: int, val: _T) -> None:
@@ -117,7 +115,8 @@ class MultiValue(MutableSequence[_ItemType]):
         return self._list != other
 
     @overload
-    def __setitem__(self, idx: int, val: _T) -> None: pass  # pragma: no cover
+    def __setitem__(self, idx: int, val: _T) -> None:
+        pass  # pragma: no cover
 
     @overload
     def __setitem__(self, idx: slice, val: Iterable[_T]) -> None:
@@ -140,10 +139,8 @@ class MultiValue(MutableSequence[_ItemType]):
 
     def __str__(self) -> str:
         if not self:
-            return ''
-        lines = (
-            f"{x!r}" if isinstance(x, str | bytes) else str(x) for x in self
-        )
+            return ""
+        lines = (f"{x!r}" if isinstance(x, str | bytes) else str(x) for x in self)
         return f"[{', '.join(lines)}]"
 
     __repr__ = __str__

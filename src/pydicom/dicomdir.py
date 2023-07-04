@@ -77,10 +77,11 @@ class DicomDir(FileDataset):
                 msg = "SOP Class is not Media Storage Directory (DICOMDIR)"
                 raise InvalidDicomError(msg)
         if is_implicit_VR or not is_little_endian:
-            msg = ('Invalid transfer syntax for DICOMDIR - '
-                   'Explicit Little Endian expected.')
-            if (config.settings.reading_validation_mode ==
-                    config.RAISE):
+            msg = (
+                "Invalid transfer syntax for DICOMDIR - "
+                "Explicit Little Endian expected."
+            )
+            if config.settings.reading_validation_mode == config.RAISE:
                 raise InvalidDicomError(msg)
             warnings.warn(msg, UserWarning)
         FileDataset.__init__(
@@ -90,7 +91,7 @@ class DicomDir(FileDataset):
             preamble,
             file_meta,
             is_implicit_VR=is_implicit_VR,
-            is_little_endian=is_little_endian
+            is_little_endian=is_little_endian,
         )
 
         self.patient_records: list[Dataset] = []
@@ -114,7 +115,7 @@ class DicomDir(FileDataset):
             sibling_list = [record]
             current_record = record
             while (
-                'OffsetOfTheNextDirectoryRecord' in current_record
+                "OffsetOfTheNextDirectoryRecord" in current_record
                 and current_record.OffsetOfTheNextDirectoryRecord
             ):
                 offset_of_next = current_record.OffsetOfTheNextDirectoryRecord
@@ -138,15 +139,14 @@ class DicomDir(FileDataset):
         # Find the children of each record
         for record in records:
             record.children = []
-            if 'OffsetOfReferencedLowerLevelDirectoryEntity' in record:
-                child_offset = (
-                    record.OffsetOfReferencedLowerLevelDirectoryEntity
-                )
+            if "OffsetOfReferencedLowerLevelDirectoryEntity" in record:
+                child_offset = record.OffsetOfReferencedLowerLevelDirectoryEntity
                 if child_offset:
                     child = map_offset_to_record[child_offset]
                     record.children = get_siblings(child, map_offset_to_record)
 
         self.patient_records = [
-            record for record in records
-            if getattr(record, 'DirectoryRecordType') == 'PATIENT'
+            record
+            for record in records
+            if getattr(record, "DirectoryRecordType") == "PATIENT"
         ]

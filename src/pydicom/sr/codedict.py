@@ -39,10 +39,7 @@ def _filtered(source: Iterable[str], filters: Iterable[str]) -> list[str]:
     filters = [f.lower() for f in filters]
 
     return sorted(
-        set(
-            val for val in source
-            if any((f in val.lower()) for f in filters)
-        )
+        set(val for val in source if any((f in val.lower()) for f in filters))
     )
 
 
@@ -64,13 +61,8 @@ class _CID_Dict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        meths = {
-            v[0] for v in inspect.getmembers(type(self), inspect.isroutine)
-        }
-        props = {
-            v[0]
-            for v in inspect.getmembers(type(self), inspect.isdatadescriptor)
-        }
+        meths = {v[0] for v in inspect.getmembers(type(self), inspect.isroutine)}
+        props = {v[0] for v in inspect.getmembers(type(self), inspect.isdatadescriptor)}
         sr_names = set(self.dir())
 
         return sorted(props | meths | sr_names)
@@ -84,9 +76,7 @@ class _CID_Dict:
         ]
 
         if not matches:
-            raise AttributeError(
-                f"'{name}' not found in CID {self.cid}"
-            )
+            raise AttributeError(f"'{name}' not found in CID {self.cid}")
 
         if len(matches) > 1:
             # Should never happen, but just in case
@@ -96,24 +86,20 @@ class _CID_Dict:
             )
 
         scheme = matches[0]
-        identifiers = cast(
-            dict[str, tuple[str, list[int]]], CONCEPTS[scheme][name]
-        )
+        identifiers = cast(dict[str, tuple[str, list[int]]], CONCEPTS[scheme][name])
         # Almost always only one code per identifier
         if len(identifiers) == 1:
             code, val = list(identifiers.items())[0]
         else:
             _matches = [
-                (code, val) for code, val in identifiers.items()
-                if self.cid in val[1]
+                (code, val) for code, val in identifiers.items() if self.cid in val[1]
             ]
             if len(_matches) > 1:
                 # Rare, but multiple codes may end up with the same identifier
                 # See CID 12300 for example
                 codes = ", ".join([f"'{v[0]}'" for v in _matches])
                 raise AttributeError(
-                    f"'{name}' has multiple code matches in CID {self.cid}: "
-                    f"{codes}"
+                    f"'{name}' has multiple code matches in CID {self.cid}: " f"{codes}"
                 )
 
             code, val = _matches[0]
@@ -139,16 +125,8 @@ class _CID_Dict:
     def __str__(self) -> str:
         """Return a str representation of the instance."""
         s = [f"CID {self.cid} ({name_for_cid[self.cid]})"]
-        s.append(
-            self.str_format.format(
-                "Attribute", "Code value", "Scheme", "Meaning"
-            )
-        )
-        s.append(
-            self.str_format.format(
-                "---------", "----------", "------", "-------"
-            )
-        )
+        s.append(self.str_format.format("Attribute", "Code value", "Scheme", "Meaning"))
+        s.append(self.str_format.format("---------", "----------", "------", "-------"))
         s.append(
             "\n".join(
                 self.str_format.format(name, *concept)
@@ -222,6 +200,7 @@ class _CodesDict:
     >>> code.meaning
     'Fontanel of skull'
     """
+
     def __init__(self, scheme: str | None = None) -> None:
         """Create a new CodesDict.
 
@@ -240,13 +219,8 @@ class _CodesDict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        meths = {
-            v[0] for v in inspect.getmembers(type(self), inspect.isroutine)
-        }
-        props = {
-            v[0]
-            for v in inspect.getmembers(type(self), inspect.isdatadescriptor)
-        }
+        meths = {v[0] for v in inspect.getmembers(type(self), inspect.isroutine)}
+        props = {v[0] for v in inspect.getmembers(type(self), inspect.isdatadescriptor)}
         sr_names = set(self.dir())
 
         return sorted(props | meths | sr_names)
@@ -296,10 +270,7 @@ class _CodesDict:
 
         # else try to find in this scheme
         try:
-            val = cast(
-                dict[str, tuple[str, list[int]]],
-                self._dict[self.scheme][name]
-            )
+            val = cast(dict[str, tuple[str, list[int]]], self._dict[self.scheme][name])
         except KeyError:
             raise AttributeError(
                 f"Unknown code name '{name}' for scheme '{self.scheme}'"

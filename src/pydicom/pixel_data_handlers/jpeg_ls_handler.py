@@ -7,12 +7,14 @@ from typing import TYPE_CHECKING, cast
 
 try:
     import numpy
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
     import jpeg_ls
+
     HAVE_JPEGLS = True
 except ImportError:
     HAVE_JPEGLS = False
@@ -25,11 +27,11 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-HANDLER_NAME = 'JPEG-LS'
+HANDLER_NAME = "JPEG-LS"
 
 DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
-    'jpeg_ls': ('https://github.com/pydicom/pyjpegls', 'pyjpegls'),
+    "numpy": ("http://www.numpy.org/", "NumPy"),
+    "jpeg_ls": ("https://github.com/pydicom/pyjpegls", "pyjpegls"),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [
@@ -108,11 +110,11 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
     if nr_frames > 1:
         for src in decode_data_sequence(ds.PixelData):
-            frame = jpeg_ls.decode(numpy.frombuffer(src, dtype='u1'))
+            frame = jpeg_ls.decode(numpy.frombuffer(src, dtype="u1"))
             pixel_bytes.extend(frame.tobytes())
     else:
         src = defragment_data(ds.PixelData)
-        frame = jpeg_ls.decode(numpy.frombuffer(src, dtype='u1'))
+        frame = jpeg_ls.decode(numpy.frombuffer(src, dtype="u1"))
         pixel_bytes.extend(frame.tobytes())
 
     arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))

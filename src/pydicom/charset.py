@@ -4,15 +4,14 @@
 import codecs
 import re
 from typing import (
-    TYPE_CHECKING, cast,
+    TYPE_CHECKING,
+    cast,
 )
 from collections.abc import MutableSequence, Sequence
 import warnings
 
 from pydicom import config
-from pydicom.valuerep import (
-    TEXT_VR_DELIMS, PersonName, VR, CUSTOMIZABLE_CHARSET_VR
-)
+from pydicom.valuerep import TEXT_VR_DELIMS, PersonName, VR, CUSTOMIZABLE_CHARSET_VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
@@ -24,86 +23,84 @@ default_encoding = "iso8859"
 # Map DICOM Specific Character Set to python equivalent
 # https://docs.python.org/3/library/codecs.html#standard-encodings
 python_encoding = {
-
     # default character set for DICOM
-    '': default_encoding,
-
+    "": default_encoding,
     # alias for latin_1 too (iso_ir_6 exists as an alias to 'ascii')
-    'ISO_IR 6': default_encoding,
-    'ISO_IR 13': 'shift_jis',
-    'ISO_IR 100': 'latin_1',
-    'ISO_IR 101': 'iso8859_2',
-    'ISO_IR 109': 'iso8859_3',
-    'ISO_IR 110': 'iso8859_4',
-    'ISO_IR 126': 'iso_ir_126',  # Greek
-    'ISO_IR 127': 'iso_ir_127',  # Arabic
-    'ISO_IR 138': 'iso_ir_138',  # Hebrew
-    'ISO_IR 144': 'iso_ir_144',  # Russian
-    'ISO_IR 148': 'iso_ir_148',  # Turkish
-    'ISO_IR 166': 'iso_ir_166',  # Thai
-    'ISO 2022 IR 6': 'iso8859',  # alias for latin_1 too
-    'ISO 2022 IR 13': 'shift_jis',
-    'ISO 2022 IR 87': 'iso2022_jp',
-    'ISO 2022 IR 100': 'latin_1',
-    'ISO 2022 IR 101': 'iso8859_2',
-    'ISO 2022 IR 109': 'iso8859_3',
-    'ISO 2022 IR 110': 'iso8859_4',
-    'ISO 2022 IR 126': 'iso_ir_126',
-    'ISO 2022 IR 127': 'iso_ir_127',
-    'ISO 2022 IR 138': 'iso_ir_138',
-    'ISO 2022 IR 144': 'iso_ir_144',
-    'ISO 2022 IR 148': 'iso_ir_148',
-    'ISO 2022 IR 149': 'euc_kr',
-    'ISO 2022 IR 159': 'iso2022_jp_2',
-    'ISO 2022 IR 166': 'iso_ir_166',
-    'ISO 2022 IR 58': 'iso_ir_58',
-    'ISO_IR 192': 'UTF8',  # from Chinese example, 2008 PS3.5 Annex J p1-4
-    'GB18030': 'GB18030',
-    'ISO 2022 GBK': 'GBK',  # from DICOM correction CP1234
-    'ISO 2022 58': 'GB2312',  # from DICOM correction CP1234
-    'GBK': 'GBK',  # from DICOM correction CP1234
+    "ISO_IR 6": default_encoding,
+    "ISO_IR 13": "shift_jis",
+    "ISO_IR 100": "latin_1",
+    "ISO_IR 101": "iso8859_2",
+    "ISO_IR 109": "iso8859_3",
+    "ISO_IR 110": "iso8859_4",
+    "ISO_IR 126": "iso_ir_126",  # Greek
+    "ISO_IR 127": "iso_ir_127",  # Arabic
+    "ISO_IR 138": "iso_ir_138",  # Hebrew
+    "ISO_IR 144": "iso_ir_144",  # Russian
+    "ISO_IR 148": "iso_ir_148",  # Turkish
+    "ISO_IR 166": "iso_ir_166",  # Thai
+    "ISO 2022 IR 6": "iso8859",  # alias for latin_1 too
+    "ISO 2022 IR 13": "shift_jis",
+    "ISO 2022 IR 87": "iso2022_jp",
+    "ISO 2022 IR 100": "latin_1",
+    "ISO 2022 IR 101": "iso8859_2",
+    "ISO 2022 IR 109": "iso8859_3",
+    "ISO 2022 IR 110": "iso8859_4",
+    "ISO 2022 IR 126": "iso_ir_126",
+    "ISO 2022 IR 127": "iso_ir_127",
+    "ISO 2022 IR 138": "iso_ir_138",
+    "ISO 2022 IR 144": "iso_ir_144",
+    "ISO 2022 IR 148": "iso_ir_148",
+    "ISO 2022 IR 149": "euc_kr",
+    "ISO 2022 IR 159": "iso2022_jp_2",
+    "ISO 2022 IR 166": "iso_ir_166",
+    "ISO 2022 IR 58": "iso_ir_58",
+    "ISO_IR 192": "UTF8",  # from Chinese example, 2008 PS3.5 Annex J p1-4
+    "GB18030": "GB18030",
+    "ISO 2022 GBK": "GBK",  # from DICOM correction CP1234
+    "ISO 2022 58": "GB2312",  # from DICOM correction CP1234
+    "GBK": "GBK",  # from DICOM correction CP1234
 }
 
 # these encodings cannot be used with code extensions
 # see DICOM Standard, Part 3, Table C.12-5
 # and DICOM Standard, Part 5, Section 6.1.2.5.4, item d
-STAND_ALONE_ENCODINGS = ('ISO_IR 192', 'GBK', 'GB18030')
+STAND_ALONE_ENCODINGS = ("ISO_IR 192", "GBK", "GB18030")
 
 # the escape character used to mark the start of escape sequences
-ESC = b'\x1b'
+ESC = b"\x1b"
 
 # Map Python encodings to escape sequences as defined in PS3.3 in tables
 # C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
 CODES_TO_ENCODINGS = {
-    ESC + b'(B': default_encoding,  # used to switch to ASCII G0 code element
-    ESC + b'-A': 'latin_1',
-    ESC + b')I': 'shift_jis',  # switches to ISO-IR 13
-    ESC + b'(J': 'shift_jis',  # switches to ISO-IR 14 (shift_jis handles both)
-    ESC + b'$B': 'iso2022_jp',
-    ESC + b'-B': 'iso8859_2',
-    ESC + b'-C': 'iso8859_3',
-    ESC + b'-D': 'iso8859_4',
-    ESC + b'-F': 'iso_ir_126',
-    ESC + b'-G': 'iso_ir_127',
-    ESC + b'-H': 'iso_ir_138',
-    ESC + b'-L': 'iso_ir_144',
-    ESC + b'-M': 'iso_ir_148',
-    ESC + b'-T': 'iso_ir_166',
-    ESC + b'$)C': 'euc_kr',
-    ESC + b'$(D': 'iso2022_jp_2',
-    ESC + b'$)A': 'iso_ir_58',
+    ESC + b"(B": default_encoding,  # used to switch to ASCII G0 code element
+    ESC + b"-A": "latin_1",
+    ESC + b")I": "shift_jis",  # switches to ISO-IR 13
+    ESC + b"(J": "shift_jis",  # switches to ISO-IR 14 (shift_jis handles both)
+    ESC + b"$B": "iso2022_jp",
+    ESC + b"-B": "iso8859_2",
+    ESC + b"-C": "iso8859_3",
+    ESC + b"-D": "iso8859_4",
+    ESC + b"-F": "iso_ir_126",
+    ESC + b"-G": "iso_ir_127",
+    ESC + b"-H": "iso_ir_138",
+    ESC + b"-L": "iso_ir_144",
+    ESC + b"-M": "iso_ir_148",
+    ESC + b"-T": "iso_ir_166",
+    ESC + b"$)C": "euc_kr",
+    ESC + b"$(D": "iso2022_jp_2",
+    ESC + b"$)A": "iso_ir_58",
 }
 
 ENCODINGS_TO_CODES = {v: k for k, v in CODES_TO_ENCODINGS.items()}
-ENCODINGS_TO_CODES['shift_jis'] = ESC + b')I'
+ENCODINGS_TO_CODES["shift_jis"] = ESC + b")I"
 
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
-handled_encodings = ('iso2022_jp', 'iso2022_jp_2', 'iso_ir_58')
+handled_encodings = ("iso2022_jp", "iso2022_jp_2", "iso_ir_58")
 
 
-def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
+def _encode_to_jis_x_0201(value: str, errors: str = "strict") -> bytes:
     """Convert a unicode string into JIS X 0201 byte string using shift_jis
     encodings.
     shift_jis is a superset of jis_x_0201. So we can regard the encoded value
@@ -132,29 +129,30 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
         JIS X 0201.
     """
 
-    encoder_class = codecs.getincrementalencoder('shift_jis')
+    encoder_class = codecs.getincrementalencoder("shift_jis")
     encoder = encoder_class()
 
     # If errors is not strict, this function is used as fallback.
     # In this case, we use only ISO IR 14 to encode given value
     # without escape sequence.
-    if errors != 'strict' or value == '':
-        encoded = b''
+    if errors != "strict" or value == "":
+        encoded = b""
         for c in value:
             try:
                 b = encoder.encode(c)
             except UnicodeEncodeError:
-                b = b'?'
+                b = b"?"
 
             if len(b) != 1 or 0x80 <= ord(b):
-                b = b'?'
+                b = b"?"
             encoded += b
         return encoded
 
     encoded = encoder.encode(value[0])
     if len(encoded) != 1:
         raise UnicodeEncodeError(
-            'shift_jis', value, 0, len(value), 'illegal multibyte sequence')
+            "shift_jis", value, 0, len(value), "illegal multibyte sequence"
+        )
 
     msb = ord(encoded) & 0x80  # msb is 1 for ISO IR 13, 0 for ISO IR 14
     for i, c in enumerate(value[1:], 1):
@@ -165,26 +163,26 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
             e.end = len(value)
             raise e
         if len(b) != 1 or ((ord(b) & 0x80) ^ msb) != 0:
-            character_set = 'ISO IR 14' if msb == 0 else 'ISO IR 13'
-            msg = f'Given character is out of {character_set}'
-            raise UnicodeEncodeError('shift_jis', value, i, len(value), msg)
+            character_set = "ISO IR 14" if msb == 0 else "ISO IR 13"
+            msg = f"Given character is out of {character_set}"
+            raise UnicodeEncodeError("shift_jis", value, i, len(value), msg)
         encoded += b
 
     return encoded
 
 
-def _encode_to_jis_x_0208(value: str, errors: str = 'strict') -> bytes:
+def _encode_to_jis_x_0208(value: str, errors: str = "strict") -> bytes:
     """Convert a unicode string into JIS X 0208 encoded bytes."""
-    return _encode_to_given_charset(value, 'ISO 2022 IR 87', errors=errors)
+    return _encode_to_given_charset(value, "ISO 2022 IR 87", errors=errors)
 
 
-def _encode_to_jis_x_0212(value: str, errors: str = 'strict') -> bytes:
+def _encode_to_jis_x_0212(value: str, errors: str = "strict") -> bytes:
     """Convert a unicode string into JIS X 0212 encoded bytes."""
-    return _encode_to_given_charset(value, 'ISO 2022 IR 159', errors=errors)
+    return _encode_to_given_charset(value, "ISO 2022 IR 159", errors=errors)
 
 
 def _encode_to_given_charset(
-    value: str, character_set: str, errors: str = 'strict'
+    value: str, character_set: str, errors: str = "strict"
 ) -> bytes:
     """Encode a unicode string using the given character set.
 
@@ -219,7 +217,7 @@ def _encode_to_given_charset(
     encoding = python_encoding[character_set]
     # If errors is not strict, this function is used as fallback.
     # So keep the tail escape sequence of encoded for backward compatibility.
-    if errors != 'strict':
+    if errors != "strict":
         return value.encode(encoding, errors=errors)
 
     encoder_class = codecs.getincrementalencoder(encoding)
@@ -228,8 +226,8 @@ def _encode_to_given_charset(
     encoded = encoder.encode(value[0])
     if not encoded.startswith(ENCODINGS_TO_CODES[encoding]):
         raise UnicodeEncodeError(
-            encoding, value, 0, len(value),
-            f'Given character is out of {character_set}')
+            encoding, value, 0, len(value), f"Given character is out of {character_set}"
+        )
 
     for i, c in enumerate(value[1:], 1):
         try:
@@ -240,8 +238,12 @@ def _encode_to_given_charset(
             raise e
         if b[:1] == ESC:
             raise UnicodeEncodeError(
-                encoding, value, i, len(value),
-                f'Given character is out of {character_set}')
+                encoding,
+                value,
+                i,
+                len(value),
+                f"Given character is out of {character_set}",
+            )
         encoded += b
     return encoded
 
@@ -249,7 +251,7 @@ def _encode_to_given_charset(
 def _get_escape_sequence_for_encoding(
     encoding: str, encoded: bytes | None = None
 ) -> bytes:
-    """ Return an escape sequence corresponding to the given encoding. If
+    """Return an escape sequence corresponding to the given encoding. If
     encoding is 'shift_jis', return 'ESC)I' or 'ESC(J' depending on the first
     byte of encoded.
 
@@ -267,10 +269,10 @@ def _get_escape_sequence_for_encoding(
         Escape sequence for encoded value.
     """
 
-    ESC_ISO_IR_14 = ESC + b'(J'
-    ESC_ISO_IR_13 = ESC + b')I'
+    ESC_ISO_IR_14 = ESC + b"(J"
+    ESC_ISO_IR_13 = ESC + b")I"
 
-    if encoding == 'shift_jis':
+    if encoding == "shift_jis":
         if encoded is None:
             return ESC_ISO_IR_14
 
@@ -279,23 +281,21 @@ def _get_escape_sequence_for_encoding(
             return ESC_ISO_IR_13
 
         return ESC_ISO_IR_14
-    return ENCODINGS_TO_CODES.get(encoding, b'')
+    return ENCODINGS_TO_CODES.get(encoding, b"")
 
 
 # These encodings need escape sequence to handle alphanumeric characters.
-need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso2022_jp_2')
+need_tail_escape_sequence_encodings = ("iso2022_jp", "iso2022_jp_2")
 
 
 custom_encoders = {
-    'shift_jis': _encode_to_jis_x_0201,
-    'iso2022_jp': _encode_to_jis_x_0208,
-    'iso2022_jp_2': _encode_to_jis_x_0212
+    "shift_jis": _encode_to_jis_x_0201,
+    "iso2022_jp": _encode_to_jis_x_0208,
+    "iso2022_jp_2": _encode_to_jis_x_0212,
 }
 
 
-def decode_bytes(
-    value: bytes, encodings: Sequence[str], delimiters: set[int]
-) -> str:
+def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
     .. versionadded:: 1.2
@@ -355,7 +355,7 @@ def decode_bytes(
                 f"'{first_encoding}' - using replacement characters in "
                 "decoded string"
             )
-            return value.decode(first_encoding, errors='replace')
+            return value.decode(first_encoding, errors="replace")
 
     # Each part of the value that starts with an escape sequence is decoded
     # separately. If it starts with an escape sequence, the
@@ -366,15 +366,14 @@ def decode_bytes(
     # The following regex splits the value into these parts, by matching
     # the substring until the first escape character, and subsequent
     # substrings starting with an escape character.
-    regex = b'(^[^\x1b]+|[\x1b][^\x1b]*)'
+    regex = b"(^[^\x1b]+|[\x1b][^\x1b]*)"
     fragments: list[bytes] = re.findall(regex, value)
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
-    return ''.join([
-        _decode_fragment(fragment, encodings, delimiters)
-        for fragment in fragments
-    ])
+    return "".join(
+        [_decode_fragment(fragment, encodings, delimiters) for fragment in fragments]
+    )
 
 
 decode_string = decode_bytes
@@ -439,7 +438,7 @@ def _decode_fragment(
             f"{', '.join(encodings)} - using replacement characters in "
             "decoded string"
         )
-        return byte_str.decode(encodings[0], errors='replace')
+        return byte_str.decode(encodings[0], errors="replace")
 
 
 def _decode_escaped_fragment(
@@ -450,8 +449,8 @@ def _decode_escaped_fragment(
     See `_decode_fragment` for parameter description and more information.
     """
     # all 4-character escape codes start with one of two character sets
-    seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
-    encoding = CODES_TO_ENCODINGS.get(byte_str[:seq_length], '')
+    seq_length = 4 if byte_str.startswith((b"\x1b$(", b"\x1b$)")) else 3
+    encoding = CODES_TO_ENCODINGS.get(byte_str[:seq_length], "")
     if encoding in encodings or encoding == default_encoding:
         if encoding in handled_encodings:
             # Python strips the escape sequences for this encoding.
@@ -465,15 +464,13 @@ def _decode_escaped_fragment(
         # If a delimiter occurs in the string, it resets the encoding.
         # The following returns the first occurrence of a delimiter in
         # the byte string, or None if it does not contain any.
-        index = next(
-            (idx for idx, ch in enumerate(byte_str) if ch in delimiters),
-            None
-        )
+        index = next((idx for idx, ch in enumerate(byte_str) if ch in delimiters), None)
         if index is not None:
             # the part of the string after the first delimiter
             # is decoded with the first encoding
-            return (byte_str[:index].decode(encoding) +
-                    byte_str[index:].decode(encodings[0]))
+            return byte_str[:index].decode(encoding) + byte_str[index:].decode(
+                encodings[0]
+            )
 
         # No delimiter - use the encoding defined by the escape code
         return byte_str.decode(encoding)
@@ -484,7 +481,7 @@ def _decode_escaped_fragment(
         raise ValueError(msg)
 
     warnings.warn(msg + f" - using encoding {encodings[0]}")
-    return byte_str.decode(encodings[0], errors='replace')
+    return byte_str.decode(encodings[0], errors="replace")
 
 
 def encode_string(value: str, encodings: Sequence[str]) -> bytes:
@@ -523,7 +520,8 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
 
             if i > 0 and encoding not in handled_encodings:
                 escape_sequence = _get_escape_sequence_for_encoding(
-                        encoding, encoded=encoded)
+                    encoding, encoded=encoded
+                )
                 encoded = escape_sequence + encoded
             if encoding in need_tail_escape_sequence_encodings:
                 encoded += _get_escape_sequence_for_encoding(encodings[0])
@@ -544,10 +542,11 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
         # force raising a valid UnicodeEncodeError
         value.encode(encodings[0])
 
-    warnings.warn("Failed to encode value with encodings: {} - using "
-                  "replacement characters in encoded string"
-                  .format(', '.join(encodings)))
-    return _encode_string_impl(value, encodings[0], errors='replace')
+    warnings.warn(
+        "Failed to encode value with encodings: {} - using "
+        "replacement characters in encoded string".format(", ".join(encodings))
+    )
+    return _encode_string_impl(value, encodings[0], errors="replace")
 
 
 def _encode_string_parts(value: str, encodings: Sequence[str]) -> bytes:
@@ -605,12 +604,10 @@ def _encode_string_parts(value: str, encodings: Sequence[str]) -> bytes:
             )
 
         # encode the part that can be encoded with the found encoding
-        encoded_part = _encode_string_impl(
-            unencoded_part[:max_index], best_encoding
-        )
+        encoded_part = _encode_string_impl(unencoded_part[:max_index], best_encoding)
         if best_encoding not in handled_encodings:
             encoded += _get_escape_sequence_for_encoding(
-                    best_encoding, encoded=encoded_part
+                best_encoding, encoded=encoded_part
             )
         encoded += encoded_part
         # set remaining unencoded part of the string and handle that
@@ -622,9 +619,7 @@ def _encode_string_parts(value: str, encodings: Sequence[str]) -> bytes:
     return bytes(encoded)
 
 
-def _encode_string_impl(
-    value: str, encoding: str, errors: str = 'strict'
-) -> bytes:
+def _encode_string_impl(value: str, encoding: str, errors: str = "strict") -> bytes:
     """Convert a unicode string into a byte string.
 
     If given encoding is in `custom_encoders`, use a corresponding
@@ -650,9 +645,7 @@ def _encode_string_impl(
 #       is not present in a sequence item then it is inherited from its parent.
 
 
-def convert_encodings(
-    encodings: None | str | MutableSequence[str]
-) -> list[str]:
+def convert_encodings(encodings: None | str | MutableSequence[str]) -> list[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
@@ -691,7 +684,7 @@ def convert_encodings(
         ``RAISE``.
     """
 
-    encodings = encodings or ['']
+    encodings = encodings or [""]
     if isinstance(encodings, str):
         encodings = [encodings]
     else:
@@ -699,21 +692,17 @@ def convert_encodings(
         # in place so copy it
         encodings = encodings[:]
         if not encodings[0]:
-            encodings[0] = 'ISO_IR 6'
+            encodings[0] = "ISO_IR 6"
 
     py_encodings = []
     for encoding in encodings:
         try:
             py_encodings.append(python_encoding[encoding])
         except KeyError:
-            py_encodings.append(
-                _python_encoding_for_corrected_encoding(encoding)
-            )
+            py_encodings.append(_python_encoding_for_corrected_encoding(encoding))
 
     if len(encodings) > 1:
-        py_encodings = _handle_illegal_standalone_encodings(
-            encodings, py_encodings
-        )
+        py_encodings = _handle_illegal_standalone_encodings(encodings, py_encodings)
 
     return py_encodings
 
@@ -729,12 +718,11 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
     """
     # standard encodings
     patched = None
-    if re.match('^ISO[^_]IR', encoding) is not None:
-        patched = 'ISO_IR' + encoding[6:]
+    if re.match("^ISO[^_]IR", encoding) is not None:
+        patched = "ISO_IR" + encoding[6:]
     # encodings with code extensions
-    elif re.match('^(?=ISO.2022.IR.)(?!ISO 2022 IR )',
-                  encoding) is not None:
-        patched = 'ISO 2022 IR ' + encoding[12:]
+    elif re.match("^(?=ISO.2022.IR.)(?!ISO 2022 IR )", encoding) is not None:
+        patched = "ISO 2022 IR " + encoding[12:]
 
     if patched:
         # handle encoding patched for common spelling errors
@@ -792,7 +780,7 @@ def _handle_illegal_standalone_encodings(
                 f"Value '{encodings[0]}' for Specific Character Set does not "
                 f"allow code extensions, ignoring: {', '.join(encodings[1:])}"
             ),
-            stacklevel=2
+            stacklevel=2,
         )
         return py_encodings[:1]
 
@@ -803,7 +791,7 @@ def _handle_illegal_standalone_encodings(
                     f"Value '{encoding}' cannot be used as code "
                     "extension, ignoring it"
                 ),
-                stacklevel=2
+                stacklevel=2,
             )
             del py_encodings[i + 1]
 
@@ -829,7 +817,7 @@ def decode_element(
         return
 
     if not dicom_character_set:
-        dicom_character_set = ['ISO_IR 6']
+        dicom_character_set = ["ISO_IR 6"]
 
     encodings = convert_encodings(dicom_character_set)
 
@@ -841,9 +829,7 @@ def decode_element(
             elem.value = cast(PersonName, elem.value).decode(encodings)
         else:
             # elem.value: Iterable[PersonName |  bytes]
-            elem.value = [
-                cast(PersonName, vv).decode(encodings) for vv in elem.value
-            ]
+            elem.value = [cast(PersonName, vv).decode(encodings) for vv in elem.value]
     elif elem.VR in CUSTOMIZABLE_CHARSET_VR:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
@@ -857,8 +843,6 @@ def decode_element(
                 if isinstance(value, str):
                     output.append(value)
                 else:
-                    output.append(
-                        decode_bytes(value, encodings, TEXT_VR_DELIMS)
-                    )
+                    output.append(decode_bytes(value, encodings, TEXT_VR_DELIMS))
 
             elem.value = output

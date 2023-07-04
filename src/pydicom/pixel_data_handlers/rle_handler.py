@@ -43,6 +43,7 @@ import warnings
 try:
     import numpy as np
     import numpy
+
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
@@ -56,8 +57,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-HANDLER_NAME = 'RLE Lossless'
-DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
+HANDLER_NAME = "RLE Lossless"
+DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 
@@ -96,7 +97,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     return False
 
 
-def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
+def get_pixeldata(ds: "Dataset", rle_segment_order: str = ">") -> "np.ndarray":
     """Return an :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
@@ -137,8 +138,14 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
         )
 
     # Check required elements
-    required_elements = ['PixelData', 'BitsAllocated', 'Rows', 'Columns',
-                         'PixelRepresentation', 'SamplesPerPixel']
+    required_elements = [
+        "PixelData",
+        "BitsAllocated",
+        "Rows",
+        "Columns",
+        "PixelRepresentation",
+        "SamplesPerPixel",
+    ]
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
@@ -148,7 +155,7 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
 
     nr_bits = cast(int, ds.BitsAllocated)
     nr_samples = cast(int, ds.SamplesPerPixel)
-    nr_frames = cast(int, getattr(ds, 'NumberOfFrames', 1) or 1)
+    nr_frames = cast(int, getattr(ds, "NumberOfFrames", 1) or 1)
     rows = cast(int, ds.Rows)
     cols = cast(int, ds.Columns)
 
@@ -167,7 +174,7 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
             cols,
             nr_samples,
             nr_bits,
-            rle_segment_order
+            rle_segment_order,
         )
         pixel_data.extend(frame)
 
@@ -233,17 +240,17 @@ def _parse_rle_header(header: bytes) -> list[int]:
     DICOM Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`
     """
     if len(header) != 64:
-        raise ValueError('The RLE header can only be 64 bytes long')
+        raise ValueError("The RLE header can only be 64 bytes long")
 
-    nr_segments = unpack('<L', header[:4])[0]
+    nr_segments = unpack("<L", header[:4])[0]
     if nr_segments > 15:
         raise ValueError(
-            "The RLE header specifies an invalid number of segments ({})"
-            .format(nr_segments)
+            "The RLE header specifies an invalid number of segments ({})".format(
+                nr_segments
+            )
         )
 
-    offsets = unpack(f'<{nr_segments}L',
-                     header[4:4 * (nr_segments + 1)])
+    offsets = unpack(f"<{nr_segments}L", header[4 : 4 * (nr_segments + 1)])
 
     return list(offsets)
 
@@ -254,7 +261,7 @@ def _rle_decode_frame(
     columns: int,
     nr_samples: int,
     nr_bits: int,
-    segment_order: str = '>'
+    segment_order: str = ">",
 ) -> bytearray:
     """Decodes a single frame of RLE encoded data.
 
@@ -326,13 +333,13 @@ def _rle_decode_frame(
     stride = bytes_per_sample * rows * columns
     for sample_number in range(nr_samples):
         le_gen = range(bytes_per_sample)
-        byte_offsets = le_gen if segment_order == '<' else reversed(le_gen)
+        byte_offsets = le_gen if segment_order == "<" else reversed(le_gen)
         for byte_offset in byte_offsets:
             # Decode the segment
             ii = sample_number * bytes_per_sample + byte_offset
             # ii is 1, 0, 3, 2, 5, 4 for the example above
             # This is where the segment order correction occurs
-            segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
+            segment = _rle_decode_segment(data[offsets[ii] : offsets[ii + 1]])
 
             # Check that the number of decoded bytes is correct
             actual_length = len(segment)
@@ -348,15 +355,15 @@ def _rle_decode_frame(
                     f"- {actual_length} vs. {rows * columns} bytes expected"
                 )
 
-            if segment_order == '>':
+            if segment_order == ">":
                 byte_offset = bytes_per_sample - byte_offset - 1
 
             # For 100 pixel/plane, 32-bit, 3 sample data, `start` will be
             #   0, 1, 2, 3, 400, 401, 402, 403, 800, 801, 802, 803
             start = byte_offset + (sample_number * stride)
-            decoded[start:start + stride:bytes_per_sample] = (
-                segment[:rows * columns]
-            )
+            decoded[start : start + stride : bytes_per_sample] = segment[
+                : rows * columns
+            ]
 
     return decoded
 
@@ -388,11 +395,11 @@ def _rle_decode_segment(data: bytes) -> bytearray:
                 # Extend by copying the next byte (-N + 1) times
                 # however since using uint8 instead of int8 this will be
                 # (256 - N + 1) times
-                result_extend(data[pos:pos + 1] * (258 - header_byte))
+                result_extend(data[pos : pos + 1] * (258 - header_byte))
                 pos += 1
             elif header_byte < 129:
                 # Extend by literally copying the next (N + 1) bytes
-                result_extend(data[pos:pos + header_byte])
+                result_extend(data[pos : pos + header_byte])
                 pos += header_byte
 
     except IndexError:
@@ -447,17 +454,17 @@ def rle_encode_frame(arr: "numpy.ndarray") -> bytes:
 
     dtype = arr.dtype
     kwargs = {
-        'bits_allocated': arr.dtype.itemsize * 8,
-        'rows': shape[0],
-        'columns': shape[1],
-        'samples_per_pixel': 3 if len(shape) == 3 else 1,
-        'byteorder': '<',
+        "bits_allocated": arr.dtype.itemsize * 8,
+        "rows": shape[0],
+        "columns": shape[1],
+        "samples_per_pixel": 3 if len(shape) == 3 else 1,
+        "byteorder": "<",
     }
 
-    sys_endianness = '<' if sys.byteorder == 'little' else '>'
+    sys_endianness = "<" if sys.byteorder == "little" else ">"
     byteorder = dtype.byteorder
-    byteorder = sys_endianness if byteorder == '=' else byteorder
-    if byteorder == '>':
-        arr = arr.astype(dtype.newbyteorder('<'))
+    byteorder = sys_endianness if byteorder == "=" else byteorder
+    if byteorder == ">":
+        arr = arr.astype(dtype.newbyteorder("<"))
 
     return _encode_frame(arr.tobytes(), **kwargs)

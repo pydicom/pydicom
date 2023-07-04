@@ -50,8 +50,8 @@ def add_dict_entry(
     VR: str,
     keyword: str,
     description: str,
-    VM: str = '1',
-    is_retired: str = ''
+    VM: str = "1",
+    is_retired: str = "",
 ) -> None:
     """Update the DICOM dictionary with a new non-private entry.
 
@@ -141,7 +141,8 @@ def add_dict_entries(
     if any([BaseTag(tag).is_private for tag in new_entries_dict]):
         raise ValueError(
             'Private tags cannot be added using "add_dict_entries" - '
-            'use "add_private_dict_entries" instead')
+            'use "add_private_dict_entries" instead'
+        )
 
     # Update the dictionary itself
     DicomDictionary.update(new_entries_dict)
@@ -151,7 +152,7 @@ def add_dict_entries(
 
 
 def add_private_dict_entry(
-    private_creator: str, tag: int, VR: str, description: str, VM: str = '1'
+    private_creator: str, tag: int, VR: str, description: str, VM: str = "1"
 ) -> None:
     """Update the private DICOM dictionary with a new entry.
 
@@ -185,13 +186,12 @@ def add_private_dict_entry(
     add_private_dict_entries
         Add or update multiple entries at once.
     """
-    new_dict_val = (VR, VM, description, '')
+    new_dict_val = (VR, VM, description, "")
     add_private_dict_entries(private_creator, {tag: new_dict_val})
 
 
 def add_private_dict_entries(
-    private_creator: str,
-    new_entries_dict: dict[int, tuple[str, str, str, str]]
+    private_creator: str, new_entries_dict: dict[int, tuple[str, str, str, str]]
 ) -> None:
     """Update pydicom's private DICOM tag dictionary with new entries.
 
@@ -305,7 +305,7 @@ def dictionary_is_retired(tag: TagType) -> bool:
     KeyError
         If the tag is not present in the DICOM data dictionary.
     """
-    return 'retired' in get_entry(tag)[3].lower()
+    return "retired" in get_entry(tag)[3].lower()
 
 
 def dictionary_VR(tag: TagType) -> str:
@@ -448,9 +448,7 @@ def keyword_for_tag(tag: TagType) -> str:
 
 
 # Provide for the 'reverse' lookup. Given the keyword, what is the tag?
-keyword_dict: dict[str, int] = {
-    dictionary_keyword(tag): tag for tag in DicomDictionary
-}
+keyword_dict: dict[str, int] = {dictionary_keyword(tag): tag for tag in DicomDictionary}
 
 
 def tag_for_keyword(keyword: str) -> int | None:
@@ -486,7 +484,7 @@ def repeater_has_tag(tag: int) -> bool:
         ``True`` if the tag is a non-private element tag present in the
         official DICOM repeaters data dictionary, ``False`` otherwise.
     """
-    return (mask_match(tag) in RepeatersDictionary)
+    return mask_match(tag) in RepeatersDictionary
 
 
 REPEATER_KEYWORDS = [val[4] for val in RepeatersDictionary.values()]
@@ -511,9 +509,7 @@ def repeater_has_keyword(keyword: str) -> bool:
 
 # PRIVATE DICTIONARY handling
 # functions in analogy with those of main DICOM dict
-def get_private_entry(
-    tag: TagType, private_creator: str
-) -> tuple[str, str, str, str]:
+def get_private_entry(tag: TagType, private_creator: str) -> tuple[str, str, str, str]:
     """Return an entry from the private dictionary corresponding to `tag`.
 
     Parameters
@@ -547,12 +543,13 @@ def get_private_entry(
         private_dict = private_dictionaries[private_creator]
     except KeyError as exc:
         raise KeyError(
-            f"Private creator '{private_creator}' not in the private "
-            "dictionary"
+            f"Private creator '{private_creator}' not in the private " "dictionary"
         ) from exc
     except TypeError as exc:
-        msg = (f"{tag.private_creator} '{private_creator}' "
-               f"is not a valid private creator")
+        msg = (
+            f"{tag.private_creator} '{private_creator}' "
+            f"is not a valid private creator"
+        )
         warnings.warn(msg)
         raise KeyError(msg) from exc
 
@@ -566,7 +563,7 @@ def get_private_entry(
     keys = [
         f"{group_str}{elem_str}",
         f"{group_str}xx{elem_str[-2:]}",
-        f"{group_str[:2]}xxxx{elem_str[-2:]}"
+        f"{group_str[:2]}xxxx{elem_str[-2:]}",
     ]
     keys = [k for k in keys if k in private_dict]
     if not keys:

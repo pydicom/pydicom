@@ -4,9 +4,7 @@
 Sequence is a list of pydicom Dataset objects.
 """
 from copy import deepcopy
-from typing import (
-    cast, overload,
-    Any)
+from typing import cast, overload, Any
 from collections.abc import Iterable, MutableSequence
 import weakref
 import warnings
@@ -19,7 +17,7 @@ from pydicom.multival import MultiValue
 def validate_dataset(elem: object) -> Dataset:
     """Check that `elem` is a :class:`~pydicom.dataset.Dataset` instance."""
     if not isinstance(elem, Dataset):
-        raise TypeError('Sequence contents must be Dataset instances.')
+        raise TypeError("Sequence contents must be Dataset instances.")
 
     return elem
 
@@ -51,7 +49,7 @@ class Sequence(MultiValue[Dataset]):
         # that the actual issue is that their Dataset needs to be INSIDE an
         # iterable object
         if isinstance(iterable, Dataset):
-            raise TypeError('The Sequence constructor requires an iterable')
+            raise TypeError("The Sequence constructor requires an iterable")
 
         # the parent dataset
         self._parent_dataset: "weakref.ReferenceType[Dataset] | None" = None
@@ -90,7 +88,7 @@ class Sequence(MultiValue[Dataset]):
             ds.parent_seq = copied  # type:ignore
         return copied
 
-    def __iadd__(    # type: ignore[override]
+    def __iadd__(  # type: ignore[override]
         self, other: Iterable[Dataset]
     ) -> MutableSequence[Dataset]:
         """Implement Sequence() += [Dataset()]."""
@@ -103,9 +101,7 @@ class Sequence(MultiValue[Dataset]):
 
         return result
 
-    def insert(    # type: ignore[override]
-        self, position: int, val: Dataset
-    ) -> None:
+    def insert(self, position: int, val: Dataset) -> None:  # type: ignore[override]
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
         super().insert(position, val)
         val.parent_seq = self  # type: ignore
@@ -140,8 +136,7 @@ class Sequence(MultiValue[Dataset]):
             raise AttributeError("Future: Sequence.parent is removed in v3.x")
         else:
             warnings.warn(
-                "Sequence.parent will be removed in pydicom 3.0",
-                DeprecationWarning
+                "Sequence.parent will be removed in pydicom 3.0", DeprecationWarning
             )
             return self.parent_dataset
 
@@ -155,8 +150,7 @@ class Sequence(MultiValue[Dataset]):
             raise AttributeError("Future: Sequence.parent is removed in v3.x")
         else:
             warnings.warn(
-                "Sequence.parent will be removed in pydicom 3.0",
-                DeprecationWarning
+                "Sequence.parent will be removed in pydicom 3.0", DeprecationWarning
             )
             self.parent_dataset = value  # type:ignore
 
@@ -168,9 +162,7 @@ class Sequence(MultiValue[Dataset]):
     def __setitem__(self, idx: slice, val: Iterable[Dataset]) -> None:
         pass  # pragma: no cover
 
-    def __setitem__(
-        self, idx: slice | int, val: Iterable[Dataset] | Dataset
-    ) -> None:
+    def __setitem__(self, idx: slice | int, val: Iterable[Dataset] | Dataset) -> None:
         """Set the parent :class:`~pydicom.dataset.Dataset` to the new
         :class:`Sequence` item
         """
@@ -197,14 +189,14 @@ class Sequence(MultiValue[Dataset]):
     def __getstate__(self) -> dict[str, Any]:
         if self.parent_dataset is not None:
             s = self.__dict__.copy()
-            s['_parent_dataset'] = s['_parent_dataset']()
+            s["_parent_dataset"] = s["_parent_dataset"]()
             return s
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
     def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
-        if self.__dict__['_parent_dataset'] is not None:
-            self.__dict__['_parent_dataset'] = weakref.ref(
-                self.__dict__['_parent_dataset']
+        if self.__dict__["_parent_dataset"] is not None:
+            self.__dict__["_parent_dataset"] = weakref.ref(
+                self.__dict__["_parent_dataset"]
             )

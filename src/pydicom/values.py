@@ -5,10 +5,8 @@
 
 import re
 from io import BytesIO
-from struct import (unpack, calcsize)
-from typing import (
-    Union, cast, Any
-)
+from struct import unpack, calcsize
+from typing import Union, cast, Any
 from collections.abc import MutableSequence
 
 # don't import datetime_conversion directly
@@ -20,16 +18,24 @@ from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
-from pydicom.tag import (Tag, TupleTag, BaseTag)
+from pydicom.tag import Tag, TupleTag, BaseTag
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, CUSTOMIZABLE_CHARSET_VR,
-    VR as VR_, validate_value
+    MultiString,
+    DA,
+    DT,
+    TM,
+    TEXT_VR_DELIMS,
+    IS,
+    CUSTOMIZABLE_CHARSET_VR,
+    VR as VR_,
+    validate_value,
 )
 
 try:
     import numpy
+
     have_numpy = True
 except ImportError:
     have_numpy = False
@@ -37,9 +43,7 @@ except ImportError:
 from pydicom.valuerep import PersonName
 
 
-def convert_tag(
-    byte_string: bytes, is_little_endian: bool, offset: int = 0
-) -> BaseTag:
+def convert_tag(byte_string: bytes, is_little_endian: bool, offset: int = 0) -> BaseTag:
     """Return a decoded :class:`BaseTag<pydicom.tag.BaseTag>` from the encoded
     `byte_string`.
 
@@ -58,14 +62,12 @@ def convert_tag(
         The decoded tag.
     """
     fmt = "<HH" if is_little_endian else ">HH"
-    value = cast(tuple[int, int], unpack(fmt, byte_string[offset:offset + 4]))
+    value = cast(tuple[int, int], unpack(fmt, byte_string[offset : offset + 4]))
     return TupleTag(value)
 
 
 def convert_AE_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> str | MutableSequence[str]:
     """Return a decoded 'AE' value.
 
@@ -86,7 +88,7 @@ def convert_AE_string(
         The decoded 'AE' value without non-significant spaces.
     """
     # Differs from convert_string because leading spaces are non-significant
-    values = byte_string.decode(default_encoding).split('\\')
+    values = byte_string.decode(default_encoding).split("\\")
     values = [s.strip() for s in values]
     if len(values) == 1:
         return values[0]
@@ -95,9 +97,7 @@ def convert_AE_string(
 
 
 def convert_ATvalue(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> BaseTag | MutableSequence[BaseTag]:
     """Return a decoded 'AT' value.
 
@@ -122,15 +122,14 @@ def convert_ATvalue(
     # length > 4
     if length % 4 != 0:
         logger.warning(
-            "Expected length to be multiple of 4 for VR 'AT', "
-            f"got length {length}"
+            "Expected length to be multiple of 4 for VR 'AT', " f"got length {length}"
         )
     return MultiValue(
         Tag,
         [
             convert_tag(byte_string, is_little_endian, offset=x)
             for x in range(0, length, 4)
-        ]
+        ],
     )
 
 
@@ -139,9 +138,7 @@ def _DA_from_str(value: str) -> DA:
 
 
 def convert_DA_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> str | DA | MutableSequence[str] | MutableSequence[DA]:
     """Return a decoded 'DA' value.
 
@@ -173,12 +170,12 @@ def convert_DA_string(
 
 
 def convert_DS_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> Union[
-    pydicom.valuerep.DSclass, MutableSequence[pydicom.valuerep.DSclass],
-    "numpy.float64", "numpy.ndarray"
+    pydicom.valuerep.DSclass,
+    MutableSequence[pydicom.valuerep.DSclass],
+    "numpy.float64",
+    "numpy.ndarray",
 ]:
     """Return a decoded 'DS' value.
 
@@ -227,14 +224,14 @@ def convert_DS_string(
         if not have_numpy:
             raise ImportError("use_DS_numpy set but numpy not installed")
         # Check for valid characters. Numpy ignores many
-        regex = r'[ \\0-9\.+eE-]*\Z'
+        regex = r"[ \\0-9\.+eE-]*\Z"
         if re.match(regex, num_string) is None:
             raise ValueError(
                 "DS: char(s) not in repertoire: '{}'".format(
-                    re.sub(regex[:-2], '', num_string)
+                    re.sub(regex[:-2], "", num_string)
                 )
             )
-        value = numpy.fromstring(num_string, dtype='f8', sep="\\")
+        value = numpy.fromstring(num_string, dtype="f8", sep="\\")
         if len(value) == 1:  # Don't use array for one number
             return value[0]
 
@@ -247,17 +244,13 @@ def _DT_from_str(value: str) -> DT:
     value = value.rstrip()
     length = len(value)
     if length < 4 or length > 26:
-        logger.warning(
-            f"Expected length between 4 and 26, got length {length}"
-        )
+        logger.warning(f"Expected length between 4 and 26, got length {length}")
 
     return DT(value)
 
 
 def convert_DT_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> str | DT | MutableSequence[str] | MutableSequence[DT]:
     """Return a decoded 'DT' value.
 
@@ -289,9 +282,7 @@ def convert_DT_string(
 
 
 def convert_IS_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> Union[IS, MutableSequence[IS], "numpy.int64", "numpy.ndarray"]:
     """Return a decoded 'IS' value.
 
@@ -333,14 +324,14 @@ def convert_IS_string(
         if not have_numpy:
             raise ImportError("use_IS_numpy set but numpy not installed")
         # Check for valid characters. Numpy ignores many
-        regex = r'[ \\0-9\.+-]*\Z'
+        regex = r"[ \\0-9\.+-]*\Z"
         if re.match(regex, num_string) is None:
             raise ValueError(
                 "IS: char(s) not in repertoire: '{}'".format(
-                    re.sub(regex[:-2], '', num_string)
+                    re.sub(regex[:-2], "", num_string)
                 )
             )
-        value = numpy.fromstring(num_string, dtype='i8', sep=chr(92))  # 92:'\'
+        value = numpy.fromstring(num_string, dtype="i8", sep=chr(92))  # 92:'\'
         if len(value) == 1:  # Don't use array for one number
             return cast("numpy.int64", value[0])
 
@@ -350,9 +341,7 @@ def convert_IS_string(
 
 
 def convert_numbers(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str
+    byte_string: bytes, is_little_endian: bool, struct_format: str
 ) -> str | int | float | MutableSequence[int] | MutableSequence[float]:
     """Return a decoded numerical VR value.
 
@@ -380,7 +369,7 @@ def convert_numbers(
         If `byte_string` encodes multiple values then a list of the decoded
         values will be returned.
     """
-    endianChar = '><'[is_little_endian]
+    endianChar = "><"[is_little_endian]
 
     # "=" means use 'standard' size, needed on 64-bit systems.
     bytes_per_value = calcsize("=" + struct_format)
@@ -397,14 +386,12 @@ def convert_numbers(
         )
 
     format_string = f"{endianChar}{length // bytes_per_value}{struct_format}"
-    value: tuple[int, ...] | tuple[float, ...] = (
-        unpack(format_string, byte_string)
-    )
+    value: tuple[int, ...] | tuple[float, ...] = unpack(format_string, byte_string)
 
     # if the number is empty, then return the empty
     # string rather than empty list
     if len(value) == 0:
-        return ''
+        return ""
 
     if len(value) == 1:
         return value[0]
@@ -414,18 +401,14 @@ def convert_numbers(
 
 
 def convert_OBvalue(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> bytes:
     """Return encoded 'OB' value as :class:`bytes`."""
     return byte_string
 
 
 def convert_OWvalue(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> bytes:
     """Return the encoded 'OW' value as :class:`bytes`.
 
@@ -436,9 +419,7 @@ def convert_OWvalue(
 
 
 def convert_OVvalue(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> bytes:
     """Return the encoded 'OV' value as :class:`bytes`.
 
@@ -477,18 +458,16 @@ def convert_PN(
         person_name.encode()
         return person_name.decode()
 
-    stripped_string = byte_string.rstrip(b'\x00 ')
+    stripped_string = byte_string.rstrip(b"\x00 ")
     decoded_value = decode_bytes(stripped_string, encodings, TEXT_VR_DELIMS)
-    value_splitted = decoded_value.split('\\')
+    value_splitted = decoded_value.split("\\")
     if len(value_splitted) == 1:
         return get_valtype(value_splitted[0])
     return MultiValue(get_valtype, value_splitted)
 
 
 def convert_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> str | MutableSequence[str]:
     """Return a decoded string VR value.
 
@@ -513,8 +492,7 @@ def convert_string(
 
 
 def convert_text(
-    byte_string: bytes, encodings: list[str] | None = None,
-    vr: str | None = None
+    byte_string: bytes, encodings: list[str] | None = None, vr: str | None = None
 ) -> str | MutableSequence[str]:
     """Return a decoded text VR value.
 
@@ -534,11 +512,11 @@ def convert_text(
     str or list of str
         The decoded value(s).
     """
+
     def handle_value(v: str) -> str:
         if vr is not None:
-            validate_value(
-                vr, v, config.settings.reading_validation_mode)
-        return v.rstrip('\0 ')
+            validate_value(vr, v, config.settings.reading_validation_mode)
+        return v.rstrip("\0 ")
 
     encodings = encodings or [default_encoding]
     decoded_string = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
@@ -546,12 +524,14 @@ def convert_text(
     as_strings = [handle_value(value) for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
-    return MultiValue(str, as_strings,
-                      validation_mode=config.settings.reading_validation_mode)
+    return MultiValue(
+        str, as_strings, validation_mode=config.settings.reading_validation_mode
+    )
 
 
 def convert_single_string(
-    byte_string: bytes, encodings: list[str] | None = None,
+    byte_string: bytes,
+    encodings: list[str] | None = None,
     vr: str | None = None,
 ) -> str:
     """Return decoded text, ignoring backslashes and trailing spaces.
@@ -573,9 +553,8 @@ def convert_single_string(
     encodings = encodings or [default_encoding]
     value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
     if vr is not None:
-        validate_value(
-            vr, value, config.settings.reading_validation_mode)
-    return value.rstrip('\0 ')
+        validate_value(vr, value, config.settings.reading_validation_mode)
+    return value.rstrip("\0 ")
 
 
 def convert_SQ(
@@ -583,7 +562,7 @@ def convert_SQ(
     is_implicit_VR: bool,
     is_little_endian: bool,
     encoding: list[str] | None = None,
-    offset: int = 0
+    offset: int = 0,
 ) -> Sequence:
     """Return a decoded 'SQ' value.
 
@@ -608,8 +587,9 @@ def convert_SQ(
     """
     encodings = encoding or [default_encoding]
     fp = BytesIO(byte_string)
-    seq = read_sequence(fp, is_implicit_VR, is_little_endian,
-                        len(byte_string), encodings, offset)
+    seq = read_sequence(
+        fp, is_implicit_VR, is_little_endian, len(byte_string), encodings, offset
+    )
     return seq
 
 
@@ -617,17 +597,13 @@ def _TM_from_str(value: str) -> TM:
     value = value.rstrip()
     length = len(value)
     if (length < 2 or length > 16) and length != 0:
-        logger.warning(
-            f"Expected length between 2 and 16, got length {length}"
-        )
+        logger.warning(f"Expected length between 2 and 16, got length {length}")
 
     return TM(value)
 
 
 def convert_TM_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> str | TM | MutableSequence[str] | MutableSequence[TM]:
     """Return a decoded 'TM' value.
 
@@ -659,9 +635,7 @@ def convert_TM_string(
 
 
 def convert_UI(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> pydicom.uid.UID | MutableSequence[pydicom.uid.UID]:
     """Return a decoded 'UI' value.
 
@@ -683,22 +657,18 @@ def convert_UI(
     """
     # Convert to str and remove any trailing nulls or spaces
     value = byte_string.decode(default_encoding)
-    return MultiString(value.rstrip('\0 '), pydicom.uid.UID)
+    return MultiString(value.rstrip("\0 "), pydicom.uid.UID)
 
 
 def convert_UN(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> bytes:
     """Return the encoded 'UN' value as :class:`bytes`."""
     return byte_string
 
 
 def convert_UR_string(
-    byte_string: bytes,
-    is_little_endian: bool,
-    struct_format: str | None = None
+    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
 ) -> str:
     """Return a decoded 'UR' value.
 
@@ -725,7 +695,7 @@ def convert_UR_string(
 def convert_value(
     VR: str,
     raw_data_element: RawDataElement,
-    encodings: str | MutableSequence[str] | None = None
+    encodings: str | MutableSequence[str] | None = None,
 ) -> Any | MutableSequence[Any]:
     """Return the element value decoded using the appropriate decoder.
 
@@ -749,7 +719,7 @@ def convert_value(
         char_range = list(range(65, 91)) + list(range(97, 123))
         # If the VR characters are outside that range then print hex values
         if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
-            VR = ' '.join([f'0x{ord(ch):02x}' for ch in VR])
+            VR = " ".join([f"0x{ord(ch):02x}" for ch in VR])
         raise NotImplementedError(f"Unknown Value Representation '{VR}'")
 
     if raw_data_element.length == 0:
@@ -793,7 +763,7 @@ def convert_value(
             is_implicit_VR,
             is_little_endian,
             encodings,
-            raw_data_element.value_tell
+            raw_data_element.value_tell,
         )
     except ValueError:
         if config.settings.reading_validation_mode == config.RAISE:
@@ -818,9 +788,28 @@ def convert_value(
 
 
 convert_retry_VR_order = [
-    VR_.SH, VR_.UL, VR_.SL, VR_.US, VR_.SS, VR_.FL, VR_.FD, VR_.OF, VR_.OB,
-    VR_.UI, VR_.DA, VR_.TM, VR_.PN, VR_.IS, VR_.DS, VR_.LT, VR_.SQ, VR_.UN,
-    VR_.AT, VR_.OW, VR_.DT, VR_.UT,
+    VR_.SH,
+    VR_.UL,
+    VR_.SL,
+    VR_.US,
+    VR_.SS,
+    VR_.FL,
+    VR_.FD,
+    VR_.OF,
+    VR_.OB,
+    VR_.UI,
+    VR_.DA,
+    VR_.TM,
+    VR_.PN,
+    VR_.IS,
+    VR_.DS,
+    VR_.LT,
+    VR_.SQ,
+    VR_.UN,
+    VR_.AT,
+    VR_.OW,
+    VR_.DT,
+    VR_.UT,
 ]
 # converters map a VR to the function
 # to read the value(s). for convert_numbers,
@@ -835,8 +824,8 @@ converters = {
     VR_.DA: convert_DA_string,
     VR_.DS: convert_DS_string,
     VR_.DT: convert_DT_string,
-    VR_.FD: (convert_numbers, 'd'),
-    VR_.FL: (convert_numbers, 'f'),
+    VR_.FD: (convert_numbers, "d"),
+    VR_.FL: (convert_numbers, "f"),
     VR_.IS: convert_IS_string,
     VR_.LO: convert_text,
     VR_.LT: convert_single_string,
@@ -848,20 +837,20 @@ converters = {
     VR_.OV: convert_OVvalue,
     VR_.PN: convert_PN,
     VR_.SH: convert_text,
-    VR_.SL: (convert_numbers, 'l'),
+    VR_.SL: (convert_numbers, "l"),
     VR_.SQ: convert_SQ,
-    VR_.SS: (convert_numbers, 'h'),
+    VR_.SS: (convert_numbers, "h"),
     VR_.ST: convert_single_string,
-    VR_.SV: (convert_numbers, 'q'),
+    VR_.SV: (convert_numbers, "q"),
     VR_.TM: convert_TM_string,
     VR_.UC: convert_text,
     VR_.UI: convert_UI,
-    VR_.UL: (convert_numbers, 'L'),
+    VR_.UL: (convert_numbers, "L"),
     VR_.UN: convert_UN,
     VR_.UR: convert_UR_string,
-    VR_.US: (convert_numbers, 'H'),
+    VR_.US: (convert_numbers, "H"),
     VR_.UT: convert_single_string,
-    VR_.UV: (convert_numbers, 'Q'),
+    VR_.UV: (convert_numbers, "Q"),
     VR_.OB_OW: convert_OBvalue,
     VR_.US_SS: convert_OWvalue,
     VR_.US_OW: convert_OWvalue,

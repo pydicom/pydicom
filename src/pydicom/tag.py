@@ -116,6 +116,7 @@ def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
         except ValueError:
             # Try a DICOM keyword
             from pydicom.datadict import tag_for_keyword
+
             long_value = tag_for_keyword(arg)
             if long_value is None:
                 raise ValueError(
@@ -146,6 +147,7 @@ class BaseTag(int):
 
     Tags are represented as an :class:`int`.
     """
+
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
@@ -213,7 +215,7 @@ class BaseTag(int):
     @property
     def element(self) -> int:
         """Return the tag's element number as :class:`int`."""
-        return self & 0xffff
+        return self & 0xFFFF
 
     elem = element  # alternate syntax
 
@@ -237,7 +239,7 @@ class BaseTag(int):
 
         .. versionadded:: 2.4
         """
-        return BaseTag((self & 0xffff0000) | self.element >> 8)
+        return BaseTag((self & 0xFFFF0000) | self.element >> 8)
 
 
 def TupleTag(group_elem: tuple[int, int]) -> BaseTag:

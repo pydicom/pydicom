@@ -3,15 +3,20 @@
 
 from importlib import import_module
 import sys
-from typing import (
-    Union, cast,
-    TYPE_CHECKING, Any
-)
+from typing import Union, cast, TYPE_CHECKING, Any
 from collections.abc import Callable, Iterator, Iterable
 
 from pydicom.uid import (
-    UID, JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLosslessP14, JPEGLosslessSV1,
-    JPEGLSLossless, JPEGLSNearLossless, JPEG2000Lossless, JPEG2000, RLELossless
+    UID,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
+    JPEGLosslessP14,
+    JPEGLosslessSV1,
+    JPEGLSLossless,
+    JPEGLSNearLossless,
+    JPEG2000Lossless,
+    JPEG2000,
+    RLELossless,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -35,6 +40,7 @@ class Encoder:
 
     .. versionadded:: 2.2
     """
+
     def __init__(self, uid: UID) -> None:
         """Create a new data encoder.
 
@@ -51,8 +57,8 @@ class Encoder:
         self._unavailable: dict[str, tuple[str, ...]] = {}
         # Default encoding options
         self._defaults = {
-            'transfer_syntax_uid': self.UID,  # Intended transfer syntax
-            'byteorder': '<',  # Byte ordering of `src` passed to plugins
+            "transfer_syntax_uid": self.UID,  # Intended transfer syntax
+            "byteorder": "<",  # Byte ordering of `src` passed to plugins
         }
 
     def add_plugin(self, label: str, import_path: tuple[str, str]) -> None:
@@ -78,9 +84,7 @@ class Encoder:
             ``ENCODER_DEPENDENCIES`` aren't found in the module.
         """
         if label in self._available or label in self._unavailable:
-            raise ValueError(
-                f"'{self.name}' already has a plugin named '{label}'"
-            )
+            raise ValueError(f"'{self.name}' already has a plugin named '{label}'")
 
         module = import_module(import_path[0])
 
@@ -96,22 +100,25 @@ class Encoder:
     def _check_kwargs(kwargs: dict[str, int | str]) -> None:
         """Raise TypeError if `kwargs` is missing required keys."""
         required_keys = [
-            'rows', 'columns', 'samples_per_pixel', 'bits_allocated',
-            'bits_stored', 'pixel_representation',
-            'photometric_interpretation', 'number_of_frames'
+            "rows",
+            "columns",
+            "samples_per_pixel",
+            "bits_allocated",
+            "bits_stored",
+            "pixel_representation",
+            "photometric_interpretation",
+            "number_of_frames",
         ]
         missing = [f"'{key}'" for key in required_keys if key not in kwargs]
         if missing:
-            raise TypeError(
-                f"Missing expected arguments: {', '.join(missing)}"
-            )
+            raise TypeError(f"Missing expected arguments: {', '.join(missing)}")
 
     def encode(
         self,
         src: "bytes | numpy.ndarray | Dataset",
         idx: int | None = None,
-        encoding_plugin: str = '',
-        decoding_plugin: str = '',
+        encoding_plugin: str = "",
+        decoding_plugin: str = "",
         **kwargs: Any,
     ) -> bytes:
         """Return an encoded frame of the pixel data in `src` as
@@ -202,7 +209,7 @@ class Encoder:
         self,
         arr: "numpy.ndarray",
         idx: int | None = None,
-        encoding_plugin: str = '',
+        encoding_plugin: str = "",
         **kwargs: Any,
     ) -> bytes:
         """Return a single encoded frame from `arr`."""
@@ -211,7 +218,7 @@ class Encoder:
         if len(arr.shape) > 4:
             raise ValueError(f"Unable to encode {len(arr.shape)}D ndarrays")
 
-        if kwargs.get('number_of_frames', 1) > 1 or len(arr.shape) == 4:
+        if kwargs.get("number_of_frames", 1) > 1 or len(arr.shape) == 4:
             if idx is None:
                 raise ValueError(
                     "The frame 'idx' is required for multi-frame pixel data"
@@ -226,7 +233,7 @@ class Encoder:
         self,
         src: bytes,
         idx: int | None = None,
-        encoding_plugin: str = '',
+        encoding_plugin: str = "",
         **kwargs: Any,
     ) -> bytes:
         """Return a single encoded frame from `src`.
@@ -237,10 +244,10 @@ class Encoder:
         """
         self._check_kwargs(kwargs)
 
-        rows: int = kwargs['rows']
-        columns: int = kwargs['columns']
-        samples_per_pixel: int = kwargs['samples_per_pixel']
-        bits_allocated: int = kwargs['bits_allocated']
+        rows: int = kwargs["rows"]
+        columns: int = kwargs["columns"]
+        samples_per_pixel: int = kwargs["samples_per_pixel"]
+        bits_allocated: int = kwargs["bits_allocated"]
         bytes_allocated = bits_allocated // 8
 
         # Expected length of a single frame
@@ -257,29 +264,25 @@ class Encoder:
 
         # Single frame with matching length or with padding
         if whole_frames == 1:
-            return self._process(
-                src[:expected_len], plugin=encoding_plugin, **kwargs
-            )
+            return self._process(src[:expected_len], plugin=encoding_plugin, **kwargs)
 
         # Multiple frames
         if idx is not None:
             frame_offset = idx * expected_len
             return self._process(
-                src[frame_offset:frame_offset + expected_len],
+                src[frame_offset : frame_offset + expected_len],
                 plugin=encoding_plugin,
-                **kwargs
+                **kwargs,
             )
 
-        raise ValueError(
-            "The frame 'idx' is required for multi-frame pixel data"
-        )
+        raise ValueError("The frame 'idx' is required for multi-frame pixel data")
 
     def _encode_dataset(
         self,
         ds: "Dataset",
         idx: int | None = None,
-        encoding_plugin: str = '',
-        decoding_plugin: str = '',
+        encoding_plugin: str = "",
+        decoding_plugin: str = "",
         **kwargs: Any,
     ) -> bytes:
         """Return a single encoded frame from the *Pixel Data* in `ds`."""
@@ -288,9 +291,7 @@ class Encoder:
 
         tsyntax = ds.file_meta.TransferSyntaxUID
         if not tsyntax.is_compressed:
-            return self._encode_bytes(
-                ds.PixelData, idx, encoding_plugin, **kwargs
-            )
+            return self._encode_bytes(ds.PixelData, idx, encoding_plugin, **kwargs)
 
         # Pixel Data is compressed
         raise ValueError(
@@ -326,8 +327,8 @@ class Encoder:
     def iter_encode(
         self,
         src: "bytes | numpy.ndarray | Dataset",
-        encoding_plugin: str = '',
-        decoding_plugin: str = '',
+        encoding_plugin: str = "",
+        decoding_plugin: str = "",
         **kwargs: Any,
     ) -> Iterator[bytes]:
         """Yield encoded frames of the pixel data in  `src` as :class:`bytes`.
@@ -399,16 +400,16 @@ class Encoder:
         from pydicom.dataset import Dataset
 
         if isinstance(src, Dataset):
-            nr_frames = cast(str | None, src.get('NumberOfFrames', 1))
+            nr_frames = cast(str | None, src.get("NumberOfFrames", 1))
             for idx in range(int(nr_frames or 1)):
                 yield self._encode_dataset(
                     src, idx, encoding_plugin, decoding_plugin, **kwargs
                 )
         elif isinstance(src, np.ndarray):
-            for idx in range(kwargs.get('number_of_frames', 1)):
+            for idx in range(kwargs.get("number_of_frames", 1)):
                 yield self._encode_array(src, idx, encoding_plugin, **kwargs)
         elif isinstance(src, bytes):
-            for idx in range(kwargs.get('number_of_frames', 1)):
+            for idx in range(kwargs.get("number_of_frames", 1)):
                 yield self._encode_bytes(src, idx, encoding_plugin, **kwargs)
         else:
             raise TypeError(
@@ -442,8 +443,13 @@ class Encoder:
             * ``'photometric_interpretation'``: :class:`str`
         """
         required = [
-            "Rows", "Columns", "SamplesPerPixel", "BitsAllocated",
-            "BitsStored", "PixelRepresentation", "PhotometricInterpretation"
+            "Rows",
+            "Columns",
+            "SamplesPerPixel",
+            "BitsAllocated",
+            "BitsStored",
+            "PixelRepresentation",
+            "PhotometricInterpretation",
         ]
         missing = [f"'{kw}'" for kw in required if kw not in ds]
         if missing:
@@ -468,17 +474,17 @@ class Encoder:
         photometric_interpretation = cast(str, ds.PhotometricInterpretation)
 
         # IS, may be missing, None or "1", "2", ...
-        nr_frames = cast(str | None, ds.get('NumberOfFrames', 1))
+        nr_frames = cast(str | None, ds.get("NumberOfFrames", 1))
 
         return {
-            'rows': rows,
-            'columns': columns,
-            'samples_per_pixel': samples_per_pixel,
-            'number_of_frames': int(nr_frames or 1),
-            'bits_allocated': bits_allocated,
-            'bits_stored': bits_stored,
-            'pixel_representation': pixel_representation,
-            'photometric_interpretation': photometric_interpretation,
+            "rows": rows,
+            "columns": columns,
+            "samples_per_pixel": samples_per_pixel,
+            "number_of_frames": int(nr_frames or 1),
+            "bits_allocated": bits_allocated,
+            "bits_stored": bits_stored,
+            "pixel_representation": pixel_representation,
+            "photometric_interpretation": photometric_interpretation,
         }
 
     @property
@@ -493,9 +499,7 @@ class Encoder:
                 #   other reasons
                 s.append(f"{label} - plugin indicating it is unavailable")
             elif len(deps) > 1:
-                s.append(
-                    f"{label} - requires {', '.join(deps[:-1])} and {deps[-1]}"
-                )
+                s.append(f"{label} - requires {', '.join(deps[:-1])} and {deps[-1]}")
             else:
                 s.append(f"{label} - requires {deps[0]}")
 
@@ -543,13 +547,13 @@ class Encoder:
         bytes
             The pixel data in `arr` converted to little-endian ordered bytes.
         """
-        rows: int = kwargs['rows']
-        cols: int = kwargs['columns']
-        samples_per_pixel: int = kwargs['samples_per_pixel']
-        bits_allocated: int = kwargs['bits_allocated']
+        rows: int = kwargs["rows"]
+        cols: int = kwargs["columns"]
+        samples_per_pixel: int = kwargs["samples_per_pixel"]
+        bits_allocated: int = kwargs["bits_allocated"]
         bytes_allocated = bits_allocated // 8
-        bits_stored: int = kwargs['bits_stored']
-        pixel_repr: int = kwargs['pixel_representation']
+        bits_stored: int = kwargs["bits_stored"]
+        pixel_repr: int = kwargs["pixel_representation"]
 
         shape = arr.shape
         dims = len(shape)
@@ -564,7 +568,7 @@ class Encoder:
 
         # Check shape/length of `arr` matches
         valid_shapes = {
-            1: (rows * cols * samples_per_pixel, ),
+            1: (rows * cols * samples_per_pixel,),
             2: (rows, cols),
             3: (rows, cols, samples_per_pixel),
         }
@@ -584,17 +588,16 @@ class Encoder:
 
         ui = [
             np.issubdtype(dtype, np.unsignedinteger),
-            np.issubdtype(dtype, np.signedinteger)
+            np.issubdtype(dtype, np.signedinteger),
         ]
         if not any(ui):
             raise ValueError(
-                f"Unable to encode as the ndarray's dtype '{dtype}' is "
-                "not supported"
+                f"Unable to encode as the ndarray's dtype '{dtype}' is " "not supported"
             )
 
         # Check *Pixel Representation* is consistent with `arr`
         if not ui[pixel_repr]:
-            s = ['unsigned', 'signed'][pixel_repr]
+            s = ["unsigned", "signed"][pixel_repr]
             raise ValueError(
                 f"Unable to encode as the ndarray's dtype '{dtype}' is "
                 f"not consistent with pixel representation '{pixel_repr}' "
@@ -625,22 +628,22 @@ class Encoder:
         self._validate_encoding_profile(**kwargs)
 
         # Convert the array to the required byte order (little-endian)
-        sys_endianness = '<' if sys.byteorder == 'little' else '>'
+        sys_endianness = "<" if sys.byteorder == "little" else ">"
         # `byteorder` may be
         #   '|': none available, such as for 8 bit -> ignore
         #   '=': native system endianness -> change to '<' or '>'
         #   '<' or '>': little or big
         byteorder = dtype.byteorder
-        byteorder = sys_endianness if byteorder == '=' else byteorder
-        if byteorder == '>':
-            arr = arr.astype(dtype.newbyteorder('<'))
+        byteorder = sys_endianness if byteorder == "=" else byteorder
+        if byteorder == ">":
+            arr = arr.astype(dtype.newbyteorder("<"))
 
         return cast(bytes, arr.tobytes())  #  type:ignore[redundant-cast]
 
     def _process(
         self,
         src: bytes,
-        plugin: str = '',
+        plugin: str = "",
         **kwargs: Any,
     ) -> bytes:
         """Return an encoded frame from `src` as :class:`bytes`.
@@ -672,21 +675,16 @@ class Encoder:
             The encoded pixel data frame.
         """
         if not self.is_available:
-            missing = "\n".join(
-                [f"    {s}" for s in self.missing_dependencies]
-            )
+            missing = "\n".join([f"    {s}" for s in self.missing_dependencies])
             raise RuntimeError(
                 f"Unable to encode because the encoding plugins are missing "
                 f"dependencies:\n{missing}"
             )
 
-        all_plugins = (
-            list(self._unavailable.keys()) + list(self._available.keys())
-        )
+        all_plugins = list(self._unavailable.keys()) + list(self._available.keys())
         if plugin and plugin not in all_plugins:
             raise ValueError(
-                f"No plugin named '{plugin}' has been added to the "
-                f"'{self.name}'"
+                f"No plugin named '{plugin}' has been added to the " f"'{self.name}'"
             )
 
         if plugin and plugin in self._unavailable:
@@ -720,7 +718,7 @@ class Encoder:
             except Exception as exc:
                 failure_messages.append(f"{name}: {str(exc)}")
 
-        messages = '\n  '.join(failure_messages)
+        messages = "\n  ".join(failure_messages)
         raise RuntimeError(
             "Unable to encode as exceptions were raised by all the "
             f"available plugins:\n  {messages}"
@@ -764,13 +762,13 @@ class Encoder:
             return
 
         # Test each profile and see if it matches `kwargs`
-        for (pi, spp, px_repr, bits_a, bits_s) in ENCODING_PROFILES[self.UID]:
+        for pi, spp, px_repr, bits_a, bits_s in ENCODING_PROFILES[self.UID]:
             try:
-                assert kwargs['photometric_interpretation'] == pi
-                assert kwargs['samples_per_pixel'] == spp
-                assert kwargs['pixel_representation'] in px_repr
-                assert kwargs['bits_allocated'] in bits_a
-                assert kwargs['bits_stored'] in bits_s
+                assert kwargs["photometric_interpretation"] == pi
+                assert kwargs["samples_per_pixel"] == spp
+                assert kwargs["pixel_representation"] in px_repr
+                assert kwargs["bits_allocated"] in bits_a
+                assert kwargs["bits_stored"] in bits_s
             except AssertionError as exc:
                 continue
 
@@ -793,95 +791,98 @@ class Encoder:
 ProfileType = tuple[str, int, Iterable[int], Iterable[int], Iterable[int]]
 ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
     JPEGBaseline8Bit: [  # 1.2.840.10008.1.2.4.50: Table 8.2.1-1 in PS3.5
-        ("MONOCHROME1", 1, (0, ), (8, ), (8, )),
-        ("MONOCHROME2", 1, (0, ), (8, ), (8, )),
-        ("YBR_FULL_422", 3, (0, ), (8, ), (8, )),
-        ("RGB", 3, (0, ), (8, ), (8, )),
+        ("MONOCHROME1", 1, (0,), (8,), (8,)),
+        ("MONOCHROME2", 1, (0,), (8,), (8,)),
+        ("YBR_FULL_422", 3, (0,), (8,), (8,)),
+        ("RGB", 3, (0,), (8,), (8,)),
     ],
     JPEGExtended12Bit: [  # 1.2.840.10008.1.2.4.51: Table 8.2.1-1 in PS3.5
-        ("MONOCHROME1", 1, (0, ), (8, ), (8, )),
-        ("MONOCHROME1", 1, (0, ), (16, ), (12, )),
-        ("MONOCHROME2", 1, (0, ), (8, ), (8, )),
-        ("MONOCHROME2", 1, (0, ), (16, ), (12, )),
+        ("MONOCHROME1", 1, (0,), (8,), (8,)),
+        ("MONOCHROME1", 1, (0,), (16,), (12,)),
+        ("MONOCHROME2", 1, (0,), (8,), (8,)),
+        ("MONOCHROME2", 1, (0,), (16,), (12,)),
     ],
     JPEGLosslessP14: [  # 1.2.840.10008.1.2.4.57: Table 8.2.1-2 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
         ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
-        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
-        ("YBR_FULL", 3, (0, ), (8, 16), range(1, 17)),
-        ("RGB", 3, (0, ), (8, 16), range(1, 17)),
+        ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
+        ("YBR_FULL", 3, (0,), (8, 16), range(1, 17)),
+        ("RGB", 3, (0,), (8, 16), range(1, 17)),
     ],
     JPEGLosslessSV1: [  # 1.2.840.10008.1.2.4.70: Table 8.2.1-2 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
         ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
-        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
-        ("YBR_FULL", 3, (0, ), (8, 16), range(1, 17)),
-        ("RGB", 3, (0, ), (8, 16), range(1, 17)),
+        ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
+        ("YBR_FULL", 3, (0,), (8, 16), range(1, 17)),
+        ("RGB", 3, (0,), (8, 16), range(1, 17)),
     ],
     JPEGLSLossless: [  # 1.2.840.10008.1.2.4.80: Table 8.2.3-1 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16), range(2, 17)),
         ("MONOCHROME2", 1, (0, 1), (8, 16), range(2, 17)),
-        ("PALETTE COLOR", 1, (0, ), (8, 16), range(2, 17)),
-        ("YBR_FULL", 3, (0, ), (8, ), range(2, 9)),
-        ("RGB", 3, (0, ), (8, 16), range(2, 17)),
+        ("PALETTE COLOR", 1, (0,), (8, 16), range(2, 17)),
+        ("YBR_FULL", 3, (0,), (8,), range(2, 9)),
+        ("RGB", 3, (0,), (8, 16), range(2, 17)),
     ],
     JPEGLSNearLossless: [  # 1.2.840.10008.1.2.4.81: Table 8.2.3-1 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16), range(2, 17)),
         ("MONOCHROME2", 1, (0, 1), (8, 16), range(2, 17)),
-        ("YBR_FULL", 3, (0, ), (8, ), range(2, 9)),
-        ("RGB", 3, (0, ), (8, 16), range(2, 17)),
+        ("YBR_FULL", 3, (0,), (8,), range(2, 9)),
+        ("RGB", 3, (0,), (8, 16), range(2, 17)),
     ],
     JPEG2000Lossless: [  # 1.2.840.10008.1.2.4.90: Table 8.2.4-1 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
         ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
-        ("YBR_RCT", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
-        ("RGB", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
-        ("YBR_FULL", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
+        ("YBR_RCT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
+        ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
     ],
     JPEG2000: [  # 1.2.840.10008.1.2.4.91: Table 8.2.4-1 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
         ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("YBR_RCT", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
-        ("YBR_ICT", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
-        ("RGB", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
-        ("YBR_FULL", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_RCT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_ICT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
+        ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
     ],
     RLELossless: [  # 1.2.840.10008.1.2.5: Table 8.2.2-1 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
         ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
-        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
-        ("YBR_FULL", 3, (0, ), (8, ), range(1, 9)),
-        ("RGB", 3, (0, ), (8, 16), range(1, 17)),
+        ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
+        ("YBR_FULL", 3, (0,), (8,), range(1, 9)),
+        ("RGB", 3, (0,), (8, 16), range(1, 17)),
     ],
 }
 
 # Encoder names should be f"{UID.keyword}Encoder"
 RLELosslessEncoder = Encoder(RLELossless)
 RLELosslessEncoder.add_plugin(
-    'gdcm', ('pydicom.encoders.gdcm', 'encode_pixel_data'),
+    "gdcm",
+    ("pydicom.encoders.gdcm", "encode_pixel_data"),
 )
 RLELosslessEncoder.add_plugin(
-    'pylibjpeg', ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
+    "pylibjpeg",
+    ("pydicom.encoders.pylibjpeg", "encode_pixel_data"),
 )
 RLELosslessEncoder.add_plugin(
-    'pydicom', ('pydicom.encoders.native', '_encode_frame'),
+    "pydicom",
+    ("pydicom.encoders.native", "_encode_frame"),
 )
 
 
 # Available pixel data encoders
 _PIXEL_DATA_ENCODERS = {
     # UID: (encoder, 'versionadded')
-    RLELossless: (RLELosslessEncoder, '2.2'),
+    RLELossless: (RLELosslessEncoder, "2.2"),
 }
 
 
 def _build_encoder_docstrings() -> None:
     """Override the default Encoder docstring."""
     plugin_doc_links = {
-        'pydicom': ":ref:`pydicom <encoder_plugin_pydicom>`",
-        'pylibjpeg': ":ref:`pylibjpeg <encoder_plugin_pylibjpeg>`",
-        'gdcm': ":ref:`gdcm <encoder_plugin_gdcm>`",
+        "pydicom": ":ref:`pydicom <encoder_plugin_pydicom>`",
+        "pylibjpeg": ":ref:`pylibjpeg <encoder_plugin_pylibjpeg>`",
+        "gdcm": ":ref:`gdcm <encoder_plugin_gdcm>`",
     }
 
     for enc, versionadded in _PIXEL_DATA_ENCODERS.values():

@@ -4,10 +4,7 @@
 from io import BytesIO
 from struct import unpack, pack
 from types import TracebackType
-from typing import (
-    BinaryIO, cast, TextIO,
-    Any
-)
+from typing import BinaryIO, cast, TextIO, Any
 from collections.abc import Callable
 
 try:
@@ -20,16 +17,17 @@ from pydicom.tag import Tag, BaseTag, TagType
 
 # Customise the type hints for read() and seek()
 class Reader(Protocol):
-    def __call__(self, size: int = -1) -> bytes: ...
+    def __call__(self, size: int = -1) -> bytes:
+        ...
 
 
 class Seeker(Protocol):
-    def __call__(self, offset: int, whence: int = 0) -> int: ...
+    def __call__(self, offset: int, whence: int = 0) -> int:
+        ...
 
 
 class DicomIO:
-    """File object which holds transfer syntax info and anything else we need.
-    """
+    """File object which holds transfer syntax info and anything else we need."""
 
     # number of times to read if don't get requested bytes
     max_read_attempts = 3
@@ -46,8 +44,7 @@ class DicomIO:
         self.tell: Callable[[], int]
 
     def read_le_tag(self) -> tuple[int, int]:
-        """Read and return two unsigned shorts (little endian) from the file.
-        """
+        """Read and return two unsigned shorts (little endian) from the file."""
         bytes_read = self.read(4, need_exact_length=True)
         return cast(tuple[int, int], unpack(b"<HH", bytes_read))
 
@@ -65,8 +62,7 @@ class DicomIO:
         self.write_US(tag.element)
 
     def read_leUS(self) -> int:
-        """Return an unsigned short from the file with little endian byte order
-        """
+        """Return an unsigned short from the file with little endian byte order"""
         val: tuple[int, ...] = unpack(b"<H", self.read(2))
         return val[0]
 
@@ -80,9 +76,7 @@ class DicomIO:
         val: tuple[int, ...] = unpack(b"<L", self.read(4))
         return val[0]
 
-    def read(
-        self, length: int | None = None, need_exact_length: bool = False
-    ) -> bytes:
+    def read(self, length: int | None = None, need_exact_length: bool = False) -> bytes:
         """Reads the required length, returns EOFError if gets less
 
         If length is ``None``, then read all bytes
@@ -169,10 +163,7 @@ class DicomIO:
 
 class DicomFileLike(DicomIO):
     def __init__(
-        self,
-        file_like_obj: TextIO | BinaryIO | BytesIO,
-        *args: Any,
-        **kwargs: Any
+        self, file_like_obj: TextIO | BinaryIO | BytesIO, *args: Any, **kwargs: Any
     ) -> None:
         super().__init__(*args, **kwargs)
         self.parent = file_like_obj
@@ -181,7 +172,7 @@ class DicomFileLike(DicomIO):
         self.seek = getattr(file_like_obj, "seek", self.no_seek)
         self.tell = file_like_obj.tell
         self.close = file_like_obj.close
-        self.name: str = getattr(file_like_obj, 'name', '<no filename>')
+        self.name: str = getattr(file_like_obj, "name", "<no filename>")
 
     def no_write(self, bytes_read: bytes) -> int:
         """Used for file-like objects where no write is available"""
@@ -201,10 +192,8 @@ class DicomFileLike(DicomIO):
     def __exit__(
         self,
         *exc_info: tuple[
-            type[BaseException] | None,
-            BaseException | None,
-            TracebackType | None
-        ]
+            type[BaseException] | None, BaseException | None, TracebackType | None
+        ],
     ) -> None:
         self.close()
 

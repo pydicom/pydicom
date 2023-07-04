@@ -56,12 +56,14 @@ if TYPE_CHECKING:  # pragma: no cover
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
     import pylibjpeg
+
     HAVE_PYLIBJPEG = True
 except ImportError:
     HAVE_PYLIBJPEG = False
@@ -75,18 +77,21 @@ if HAVE_PYLIBJPEG:
 
 try:
     import openjpeg
+
     HAVE_OPENJPEG = True
 except ImportError:
     HAVE_OPENJPEG = False
 
 try:
     import libjpeg
+
     HAVE_LIBJPEG = True
 except ImportError:
     HAVE_LIBJPEG = False
 
 try:
     import rle
+
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
@@ -94,7 +99,10 @@ except ImportError:
 from pydicom import config
 from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import (
-    pixel_dtype, get_expected_length, reshape_pixel_array, get_j2k_parameters
+    pixel_dtype,
+    get_expected_length,
+    reshape_pixel_array,
+    get_j2k_parameters,
 )
 from pydicom.uid import (
     JPEGBaseline8Bit,
@@ -106,7 +114,7 @@ from pydicom.uid import (
     JPEG2000Lossless,
     JPEG2000,
     RLELossless,
-    UID
+    UID,
 )
 
 
@@ -123,13 +131,11 @@ _LIBJPEG_SYNTAXES = [
     JPEGLosslessP14,
     JPEGLosslessSV1,
     JPEGLSLossless,
-    JPEGLSNearLossless
+    JPEGLSNearLossless,
 ]
 _OPENJPEG_SYNTAXES = [JPEG2000Lossless, JPEG2000]
 _RLE_SYNTAXES = [RLELossless]
-SUPPORTED_TRANSFER_SYNTAXES = (
-    _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES + _RLE_SYNTAXES
-)
+SUPPORTED_TRANSFER_SYNTAXES = _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES + _RLE_SYNTAXES
 
 DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
 
@@ -192,9 +198,7 @@ def as_array(ds: "Dataset") -> "np.ndarray":
     return reshape_pixel_array(ds, get_pixeldata(ds))
 
 
-def generate_frames(
-    ds: "Dataset", reshape: bool = True
-) -> Iterable["np.ndarray"]:
+def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray"]:
     """Yield a *Pixel Data* frame from `ds` as an :class:`~numpy.ndarray`.
 
     .. versionadded:: 2.1
@@ -240,8 +244,13 @@ def generate_frames(
 
     # Check required elements
     required_elements = [
-        "BitsAllocated", "Rows", "Columns", "PixelRepresentation",
-        "SamplesPerPixel", "PhotometricInterpretation", "PixelData",
+        "BitsAllocated",
+        "Rows",
+        "Columns",
+        "PixelRepresentation",
+        "SamplesPerPixel",
+        "PhotometricInterpretation",
+        "PixelData",
     ]
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
@@ -263,15 +272,10 @@ def generate_frames(
     for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
         arr = decoder(frame, pixel_module)
 
-        if (
-            tsyntax in [JPEG2000, JPEG2000Lossless]
-            and config.APPLY_J2K_CORRECTIONS
-        ):
+        if tsyntax in [JPEG2000, JPEG2000Lossless] and config.APPLY_J2K_CORRECTIONS:
             param = get_j2k_parameters(frame)
-            j2k_sign = param.setdefault('is_signed', True)
-            j2k_precision = cast(
-                int, param.setdefault('precision', bits_stored)
-            )
+            j2k_sign = param.setdefault("is_signed", True)
+            j2k_precision = cast(int, param.setdefault("precision", bits_stored))
             shift = bits_allocated - j2k_precision
             if shift and not j2k_sign and j2k_sign != ds.PixelRepresentation:
                 # Convert unsigned J2K data to 2s complement
@@ -319,13 +323,13 @@ def get_pixeldata(ds: "Dataset") -> "np.ndarray":
     numpy.ndarray
         The contents of (7FE0,0010) *Pixel Data* as a 1D array.
     """
-    expected_len = get_expected_length(ds, 'pixels')
+    expected_len = get_expected_length(ds, "pixels")
     frame_len = expected_len // getattr(ds, "NumberOfFrames", 1)
     # Empty destination array for our decoded pixel data
     arr = np.empty(expected_len, pixel_dtype(ds))
 
     generate_offsets = range(0, expected_len, frame_len)
     for frame, offset in zip(generate_frames(ds, False), generate_offsets):
-        arr[offset:offset + frame_len] = frame
+        arr[offset : offset + frame_len] = frame
 
     return arr

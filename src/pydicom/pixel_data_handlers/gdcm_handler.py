@@ -13,6 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 try:
     import numpy
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -20,8 +21,9 @@ except ImportError:
 try:
     import gdcm
     from gdcm import DataElement
+
     HAVE_GDCM = True
-    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, 'SetByteStringValue')
+    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, "SetByteStringValue")
 except ImportError:
     HAVE_GDCM = False
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
@@ -31,15 +33,17 @@ from pydicom.encaps import generate_pixel_data
 import pydicom.uid
 from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
 from pydicom.pixel_data_handlers.util import (
-    get_expected_length, pixel_dtype, get_j2k_parameters
+    get_expected_length,
+    pixel_dtype,
+    get_j2k_parameters,
 )
 
 
-HANDLER_NAME = 'GDCM'
+HANDLER_NAME = "GDCM"
 
 DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
-    'gdcm': ('http://gdcm.sourceforge.net/wiki/index.php/Main_Page', 'GDCM'),
+    "numpy": ("http://www.numpy.org/", "NumPy"),
+    "gdcm": ("http://gdcm.sourceforge.net/wiki/index.php/Main_Page", "GDCM"),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [
@@ -106,16 +110,12 @@ def create_data_element(ds: "Dataset") -> "DataElement":
         The converted *Pixel Data* element.
     """
     tsyntax = ds.file_meta.TransferSyntaxUID
-    data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
+    data_element = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
     if tsyntax.is_compressed:
-        if getattr(ds, 'NumberOfFrames', 1) > 1:
-            pixel_data_sequence = (
-                pydicom.encaps.decode_data_sequence(ds.PixelData)
-            )
+        if getattr(ds, "NumberOfFrames", 1) > 1:
+            pixel_data_sequence = pydicom.encaps.decode_data_sequence(ds.PixelData)
         else:
-            pixel_data_sequence = [
-                pydicom.encaps.defragment_data(ds.PixelData)
-            ]
+            pixel_data_sequence = [pydicom.encaps.defragment_data(ds.PixelData)]
 
         fragments = gdcm.SequenceOfFragments.New()
         for pixel_data in pixel_data_sequence:
@@ -145,17 +145,13 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     gdcm.Image
     """
     image = gdcm.Image()
-    number_of_frames = getattr(ds, 'NumberOfFrames', 1)
+    number_of_frames = getattr(ds, "NumberOfFrames", 1)
     image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
     image.SetDimensions((ds.Columns, ds.Rows, number_of_frames))
     image.SetDataElement(data_element)
 
-    pi_type = gdcm.PhotometricInterpretation.GetPIType(
-        ds.PhotometricInterpretation
-    )
-    image.SetPhotometricInterpretation(
-        gdcm.PhotometricInterpretation(pi_type)
-    )
+    pi_type = gdcm.PhotometricInterpretation.GetPIType(ds.PhotometricInterpretation)
+    image.SetPhotometricInterpretation(gdcm.PhotometricInterpretation(pi_type))
 
     tsyntax = ds.file_meta.TransferSyntaxUID
     ts_type = gdcm.TransferSyntax.GetTSType(str.__str__(tsyntax))
@@ -165,10 +161,10 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
         ds.BitsAllocated,
         ds.BitsStored,
         ds.HighBit,
-        ds.PixelRepresentation
+        ds.PixelRepresentation,
     )
     image.SetPixelFormat(pixel_format)
-    if 'PlanarConfiguration' in ds:
+    if "PlanarConfiguration" in ds:
         image.SetPlanarConfiguration(ds.PlanarConfiguration)
 
     return image
@@ -190,7 +186,7 @@ def _get_pixel_str_fileio(ds: "Dataset") -> str:
         The UTF-8 encoded pixel data.
     """
     reader = gdcm.ImageReader()
-    fname = getattr(ds, 'filename', None)
+    fname = getattr(ds, "filename", None)
     if fname and isinstance(fname, str):
         reader.SetFileName(fname)
         if not reader.Read():
@@ -204,7 +200,7 @@ def _get_pixel_str_fileio(ds: "Dataset") -> str:
     new = ds.group_dataset(0x0028)
     new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
     new.file_meta = ds.file_meta
-    with NamedTemporaryFile('wb', delete=False) as t:
+    with NamedTemporaryFile("wb", delete=False) as t:
         new.save_as(t)
 
     reader.SetFileName(t.name)
@@ -261,7 +257,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
     expected_length_bytes = get_expected_length(ds)
-    if ds.PhotometricInterpretation == 'YBR_FULL_422':
+    if ds.PhotometricInterpretation == "YBR_FULL_422":
         # GDCM has already resampled the pixel data, see PS3.3 C.7.6.3.1.2
         expected_length_bytes = expected_length_bytes // 2 * 3
 
@@ -278,7 +274,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     numpy_dtype = pixel_dtype(ds)
     arr = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
 
-    expected_length_pixels = get_expected_length(ds, 'pixels')
+    expected_length_pixels = get_expected_length(ds, "pixels")
     if arr.size != expected_length_pixels:
         raise AttributeError(
             f"Amount of pixel data {arr.size} does not match the "
@@ -286,17 +282,12 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         )
 
     tsyntax = ds.file_meta.TransferSyntaxUID
-    if (
-        config.APPLY_J2K_CORRECTIONS
-        and tsyntax in [JPEG2000, JPEG2000Lossless]
-    ):
-        nr_frames = getattr(ds, 'NumberOfFrames', 1)
+    if config.APPLY_J2K_CORRECTIONS and tsyntax in [JPEG2000, JPEG2000Lossless]:
+        nr_frames = getattr(ds, "NumberOfFrames", 1)
         codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
 
         params = get_j2k_parameters(codestream)
-        j2k_precision = cast(
-            int, params.setdefault("precision", ds.BitsStored)
-        )
+        j2k_precision = cast(int, params.setdefault("precision", ds.BitsStored))
         j2k_sign = params.setdefault("is_signed", None)
 
         if not j2k_sign and ds.PixelRepresentation == 1:

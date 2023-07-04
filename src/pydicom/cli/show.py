@@ -12,9 +12,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     subparser = subparsers.add_parser(
         "show", description="Display all or part of a DICOM file"
     )
-    subparser.add_argument(
-        "filespec", help=filespec_help, type=filespec_parser
-    )
+    subparser.add_argument("filespec", help=filespec_help, type=filespec_parser)
     subparser.add_argument(
         "-x",
         "--exclude-private",
@@ -36,9 +34,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 def do_command(args: argparse.Namespace) -> None:
     if len(args.filespec) != 1:
-        raise NotImplementedError(
-            "Show can only work on a single DICOM file input"
-        )
+        raise NotImplementedError("Show can only work on a single DICOM file input")
 
     ds, element_val = args.filespec[0]
     if not element_val:
@@ -79,9 +75,7 @@ def quiet_rtplan(ds: Dataset) -> str | None:
             descr = fraction_group.get("FractionGroupDescription", "")
             fractions = fraction_group.get("NumberOfFractionsPlanned")
             fxn_info = f"{fractions} fraction(s) planned" if fractions else ""
-            lines.append(
-                f"Fraction Group {fraction_group_num} {descr} {fxn_info}"
-            )
+            lines.append(f"Fraction Group {fraction_group_num} {descr} {fxn_info}")
             num_brachy = fraction_group.get("NumberOfBrachyApplicationSetups")
             lines.append(f"   Brachy Application Setups: {num_brachy}")
             for refd_beam in fraction_group.ReferencedBeamSequence:
@@ -112,20 +106,15 @@ def quiet_rtplan(ds: Dataset) -> str | None:
                 bld = cp.get("BeamLimitingDeviceAngle")
                 couch = cp.get("PatientSupportAngle")
                 line += (
-                    f" energy {energy} gantry {gantry}, coll {bld}, "
-                    f"couch {couch}"
+                    f" energy {energy} gantry {gantry}, coll {bld}, " f"couch {couch}"
                 )
-
 
         wedges = beam.get("NumberOfWedges")
         comps = beam.get("NumberOfCompensators")
         boli = beam.get("NumberOfBoli")
         blocks = beam.get("NumberOfBlocks")
 
-        line += (
-            f" ({wedges} wedges, {comps} comps, {boli} boli,"
-            f" {blocks} blocks)"
-        )
+        line += f" ({wedges} wedges, {comps} comps, {boli} boli," f" {blocks} blocks)"
 
         lines.append(line)
 
