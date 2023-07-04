@@ -2524,9 +2524,7 @@ class Dataset:
     def to_json_dict(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[
-            Callable[[DataElement], str]
-        ] = None,  # noqa
+        bulk_data_element_handler: Callable[[DataElement], str] | None = None,  # noqa
         suppress_invalid_tags: bool = False,
     ) -> dict[str, Any]:
         """Return a dictionary representation of the :class:`Dataset`
@@ -2576,9 +2574,7 @@ class Dataset:
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[
-            Callable[[DataElement], str]
-        ] = None,  # noqa
+        bulk_data_element_handler: Callable[[DataElement], str] | None = None,  # noqa
         dump_handler: Callable[[dict[str, Any]], str] | None = None,
         suppress_invalid_tags: bool = False,
     ) -> str:
@@ -2947,7 +2943,7 @@ class FileMetaDataset(Dataset):
 
         if not isinstance(init_value, Dataset | dict):
             raise TypeError(
-                "Argument must be a dict or Dataset, not {}".format(type(init_value))
+                f"Argument must be a dict or Dataset, not {type(init_value)}"
             )
 
         non_group2 = [Tag(tag) for tag in init_value.keys() if Tag(tag).group != 2]

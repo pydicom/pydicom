@@ -27,7 +27,7 @@ ds = pydicom.dcmread(filename)
 
 # get the pixel information into a numpy array
 data = ds.pixel_array
-print("The image has {} x {} voxels".format(data.shape[0], data.shape[1]))
+print(f"The image has {data.shape[0]} x {data.shape[1]} voxels")
 data_downsampling = data[::8, ::8]
 print(
     "The downsampled image has {} x {} voxels".format(

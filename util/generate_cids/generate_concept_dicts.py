@@ -241,7 +241,7 @@ def write_concepts(concepts, cid_concepts, cid_lists, name_for_cid):
         f_cid.write("name_for_cid = {}\n")
         f_cid.write("cid_concepts = {}\n")
         for cid, value in cid_lists.items():
-            f_cid.write("\nname_for_cid[{}] = '{}'\n".format(cid, name_for_cid[cid]))
+            f_cid.write(f"\nname_for_cid[{cid}] = '{name_for_cid[cid]}'\n")
             f_cid.write(f"cid_concepts[{cid}] = \\\n")
             pprint(value, f_cid)
 
