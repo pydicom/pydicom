@@ -3,9 +3,7 @@
 
 import base64
 from inspect import signature
-from typing import (
-    Optional, TypeAlias, Union, Any, cast, TYPE_CHECKING
-)
+from typing import Optional, TypeAlias, Union, Any, cast, TYPE_CHECKING
 from collections.abc import Callable
 import warnings
 
@@ -15,7 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary')
+JSON_VALUE_KEYS = ("Value", "BulkDataURI", "InlineBinary")
 
 
 def convert_to_python_number(value: Any, vr: str) -> Any:
@@ -59,9 +57,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
 
     if isinstance(value, list | tuple):
         return [
-            number_type(v) if v is not None
-            else empty_value_for_VR(vr)
-            for v in value
+            number_type(v) if v is not None else empty_value_for_VR(vr) for v in value
         ]
 
     return number_type(value)
@@ -101,7 +97,9 @@ class JsonDataElementConverter:
         vr: str,
         value: JSONValueType,
         value_key: str | None,
-        bulk_data_uri_handler: BulkDataHandlerType | Callable[[str], BulkDataType] | None = None
+        bulk_data_uri_handler: BulkDataHandlerType
+        | Callable[[str], BulkDataType]
+        | None = None,
     ) -> None:
         """Create a new converter instance.
 
@@ -164,11 +162,10 @@ class JsonDataElementConverter:
         if self.value_key is None:
             return empty_value_for_VR(self.vr)
 
-        if self.value_key == 'Value':
+        if self.value_key == "Value":
             if not isinstance(self.value, list):
                 raise TypeError(
-                    f"'{self.value_key}' of data element '{self.tag}' must "
-                    "be a list"
+                    f"'{self.value_key}' of data element '{self.tag}' must " "be a list"
                 )
 
             if not self.value:
@@ -190,7 +187,7 @@ class JsonDataElementConverter:
         if isinstance(value, list):
             value = value[0]
 
-        if self.value_key == 'InlineBinary':
+        if self.value_key == "InlineBinary":
             # The `value` should be a base64 encoded str
             if not isinstance(value, str):
                 raise TypeError(
@@ -201,7 +198,7 @@ class JsonDataElementConverter:
 
             return base64.b64decode(value)  # bytes
 
-        if self.value_key == 'BulkDataURI':
+        if self.value_key == "BulkDataURI":
             # The `value` should be a URI as a str
             if not isinstance(value, str):
                 raise TypeError(
@@ -212,7 +209,7 @@ class JsonDataElementConverter:
 
             if self.bulk_data_element_handler is None:
                 warnings.warn(
-                    'No bulk data URI handler provided for retrieval '
+                    "No bulk data URI handler provided for retrieval "
                     f'of value of data element "{self.tag}"'
                 )
                 return empty_value_for_VR(self.vr)
@@ -257,9 +254,7 @@ class JsonDataElementConverter:
             try:
                 return int(value, 16)
             except ValueError:
-                warnings.warn(
-                    f"Invalid value '{value}' for AT element - ignoring it"
-                )
+                warnings.warn(f"Invalid value '{value}' for AT element - ignoring it")
 
             return None
 
@@ -290,22 +285,16 @@ class JsonDataElementConverter:
 
         value = {} if value is None else value
         for key, val in value.items():
-            if 'vr' not in val:
-                raise KeyError(
-                    f"Data element '{self.tag}' must have key 'vr'"
-                )
+            if "vr" not in val:
+                raise KeyError(f"Data element '{self.tag}' must have key 'vr'")
 
-            vr = val['vr']
-            unique_value_keys = tuple(
-                set(val.keys()) & set(JSON_VALUE_KEYS)
-            )
+            vr = val["vr"]
+            unique_value_keys = tuple(set(val.keys()) & set(JSON_VALUE_KEYS))
 
             if not unique_value_keys:
                 # data element with no value
                 elem = DataElement(
-                    tag=int(key, 16),
-                    value=empty_value_for_VR(vr),
-                    VR=vr
+                    tag=int(key, 16), value=empty_value_for_VR(vr), VR=vr
                 )
             else:
                 value_key = unique_value_keys[0]
@@ -315,7 +304,7 @@ class JsonDataElementConverter:
                     vr,
                     val[value_key],
                     value_key,
-                    self.bulk_data_element_handler
+                    self.bulk_data_element_handler,
                 )
             ds.add(elem)
 
@@ -347,18 +336,18 @@ class JsonDataElementConverter:
             )
             return value
 
-        if 'Phonetic' in value:
-            comps = ['', '', '']
-        elif 'Ideographic' in value:
-            comps = ['', '']
+        if "Phonetic" in value:
+            comps = ["", "", ""]
+        elif "Ideographic" in value:
+            comps = ["", ""]
         else:
-            comps = ['']
+            comps = [""]
 
-        if 'Alphabetic' in value:
-            comps[0] = value['Alphabetic']
-        if 'Ideographic' in value:
-            comps[1] = value['Ideographic']
-        if 'Phonetic' in value:
-            comps[2] = value['Phonetic']
+        if "Alphabetic" in value:
+            comps[0] = value["Alphabetic"]
+        if "Ideographic" in value:
+            comps[1] = value["Ideographic"]
+        if "Phonetic" in value:
+            comps[2] = value["Phonetic"]
 
-        return '='.join(comps)
+        return "=".join(comps)

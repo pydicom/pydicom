@@ -33,6 +33,7 @@ from collections.abc import Generator
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -41,19 +42,19 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-HANDLER_NAME = 'Numpy Waveform'
-DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
+HANDLER_NAME = "Numpy Waveform"
+DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
 WAVEFORM_DTYPES = {
-    (8, 'SB'): 'int8',
-    (8, 'UB'): 'uint8',
-    (8, 'MB'): 'uint8',
-    (8, 'AB'): 'uint8',
-    (16, 'SS'): 'int16',
-    (16, 'US'): 'uint16',
-    (32, 'SL'): 'int32',
-    (32, 'UL'): 'uint32',
-    (64, 'SV'): 'int64',
-    (64, 'UV'): 'uint64',
+    (8, "SB"): "int8",
+    (8, "UB"): "uint8",
+    (8, "MB"): "uint8",
+    (8, "AB"): "uint8",
+    (16, "SS"): "int16",
+    (16, "US"): "uint16",
+    (32, "SL"): "int32",
+    (32, "UL"): "uint32",
+    (64, "SV"): "int64",
+    (64, "UV"): "uint64",
 }
 
 
@@ -91,16 +92,18 @@ def generate_multiplex(
         The waveform data for a multiplex group as an :class:`~numpy.ndarray`
         with shape (samples, channels).
     """
-    if 'WaveformSequence' not in ds:
+    if "WaveformSequence" not in ds:
         raise AttributeError(
             "No (5400,0100) Waveform Sequence element found in the dataset"
         )
 
     for ii, item in enumerate(cast(list["Dataset"], ds.WaveformSequence)):
         required_elements = [
-            'NumberOfWaveformChannels', 'NumberOfWaveformSamples',
-            'WaveformBitsAllocated', 'WaveformSampleInterpretation',
-            'WaveformData'
+            "NumberOfWaveformChannels",
+            "NumberOfWaveformSamples",
+            "WaveformBitsAllocated",
+            "WaveformSampleInterpretation",
+            "WaveformData",
         ]
         missing = [elem for elem in required_elements if elem not in item]
         if missing:
@@ -121,30 +124,24 @@ def generate_multiplex(
         # Waveform Data is ordered as (C = channel, S = sample):
         # C1S1, C2S1, ..., CnS1, C1S2, ..., CnS2, ..., C1Sm, ..., CnSm
         dtype = WAVEFORM_DTYPES[(bits_allocated, sample_interpretation)]
-        arr = np.frombuffer(
-            cast(bytes, item.WaveformData)[:expected_len], dtype=dtype
-        )
+        arr = np.frombuffer(cast(bytes, item.WaveformData)[:expected_len], dtype=dtype)
         # Reshape to (samples, channels) and make writeable
         arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
         if not as_raw:
             # Apply correction factor (if possible)
-            arr = arr.astype('float')
+            arr = arr.astype("float")
             seq = cast(list["Dataset"], item.ChannelDefinitionSequence)
             for jj, ch in enumerate(seq):
                 baseline = ch.get("ChannelBaseline", 0.0)
                 sensitivity = ch.get("ChannelSensitivity", 1.0)
                 correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
-                arr[..., jj] = (
-                    arr[..., jj] * sensitivity * correction + baseline
-                )
+                arr[..., jj] = arr[..., jj] * sensitivity * correction + baseline
 
         yield arr
 
 
-def multiplex_array(
-    ds: "Dataset", index: int, as_raw: bool = True
-) -> "np.ndarray":
+def multiplex_array(ds: "Dataset", index: int, as_raw: bool = True) -> "np.ndarray":
     """Return an :class:`~numpy.ndarray` for the multiplex group in the
     *Waveform Sequence* at `index`.
 
@@ -170,16 +167,18 @@ def multiplex_array(
         The waveform data for a multiplex group as an :class:`~numpy.ndarray`
         with shape (samples, channels).
     """
-    if 'WaveformSequence' not in ds:
+    if "WaveformSequence" not in ds:
         raise AttributeError(
             "No (5400,0100) Waveform Sequence element found in the dataset"
         )
 
     item = cast(list["Dataset"], ds.WaveformSequence)[index]
     required_elements = [
-        'NumberOfWaveformChannels', 'NumberOfWaveformSamples',
-        'WaveformBitsAllocated', 'WaveformSampleInterpretation',
-        'WaveformData'
+        "NumberOfWaveformChannels",
+        "NumberOfWaveformSamples",
+        "WaveformBitsAllocated",
+        "WaveformSampleInterpretation",
+        "WaveformData",
     ]
     missing = [elem for elem in required_elements if elem not in item]
     if missing:
@@ -200,22 +199,18 @@ def multiplex_array(
     # Waveform Data is ordered as (C = channel, S = sample):
     # C1S1, C2S1, ..., CnS1, C1S2, ..., CnS2, ..., C1Sm, ..., CnSm
     dtype = WAVEFORM_DTYPES[(bits_allocated, sample_interpretation)]
-    arr = np.frombuffer(
-        cast(bytes, item.WaveformData)[:expected_len], dtype=dtype
-    )
+    arr = np.frombuffer(cast(bytes, item.WaveformData)[:expected_len], dtype=dtype)
     # Reshape to (samples, channels) and make writeable
     arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
     if not as_raw:
         # Apply correction factor (if possible)
-        arr = arr.astype('float')
+        arr = arr.astype("float")
         seq = cast(list["Dataset"], item.ChannelDefinitionSequence)
         for jj, ch in enumerate(seq):
             baseline = ch.get("ChannelBaseline", 0.0)
             sensitivity = ch.get("ChannelSensitivity", 1.0)
             correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
-            arr[..., jj] = (
-                arr[..., jj] * sensitivity * correction + baseline
-            )
+            arr[..., jj] = arr[..., jj] * sensitivity * correction + baseline
 
     return cast("np.ndarray", arr)

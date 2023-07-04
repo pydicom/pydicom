@@ -5,9 +5,7 @@ from argparse import ArgumentTypeError
 
 import pytest
 
-from pydicom.cli.main import (
-    filespec_parser, eval_element, main, filespec_parts
-)
+from pydicom.cli.main import filespec_parser, eval_element, main, filespec_parts
 
 
 bad_elem_specs = (
@@ -40,9 +38,7 @@ class TestFilespec:
     @pytest.mark.parametrize("missing_element", missing_elements)
     def test_elem_not_exists(self, missing_element):
         """CLI filespec elements not in the dataset raise an error"""
-        with pytest.raises(
-            ArgumentTypeError, match=r".* is not in the dataset"
-        ):
+        with pytest.raises(ArgumentTypeError, match=r".* is not in the dataset"):
             filespec_parser(f"pydicom::rtplan.dcm::{missing_element}")
 
     @pytest.mark.parametrize("bad_index", bad_indexes)

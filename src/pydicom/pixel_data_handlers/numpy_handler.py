@@ -55,22 +55,25 @@ import warnings
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 from pydicom.pixel_data_handlers.util import (
-    pixel_dtype, get_expected_length, unpack_bits
+    pixel_dtype,
+    get_expected_length,
+    unpack_bits,
 )
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
-HANDLER_NAME = 'Numpy'
+HANDLER_NAME = "Numpy"
 
 DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    "numpy": ("http://www.numpy.org/", "NumPy"),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [
@@ -168,7 +171,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         )
 
     # Check required elements
-    keywords = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
+    keywords = ["PixelData", "FloatPixelData", "DoubleFloatPixelData"]
     px_keyword = [kw for kw in keywords if kw in ds]
     if len(px_keyword) != 1:
         raise AttributeError(
@@ -180,12 +183,15 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     # Attributes required by both Floating Point Image Pixel Module Attributes
     # and Image Pixel Description Macro Attributes
     required_elements = [
-        'BitsAllocated', 'Rows', 'Columns',
-        'SamplesPerPixel', 'PhotometricInterpretation'
+        "BitsAllocated",
+        "Rows",
+        "Columns",
+        "SamplesPerPixel",
+        "PhotometricInterpretation",
     ]
-    if px_keyword[0] == 'PixelData':
+    if px_keyword[0] == "PixelData":
         # Attributes required by Image Pixel Description Macro Attributes
-        required_elements.extend(['PixelRepresentation', 'BitsStored'])
+        required_elements.extend(["PixelRepresentation", "BitsStored"])
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
@@ -193,7 +199,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
             "elements are missing from the dataset: " + ", ".join(missing)
         )
     if ds.SamplesPerPixel > 1:
-        if not hasattr(ds, 'PlanarConfiguration'):
+        if not hasattr(ds, "PlanarConfiguration"):
             raise AttributeError(
                 "Unable to convert the pixel data as the following "
                 "conditionally required element is missing from the dataset: "
@@ -222,19 +228,19 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
                 "The length of the pixel data in the dataset ({} bytes) "
                 "doesn't match the expected length ({} bytes). "
                 "The dataset may be corrupted or there may be an issue "
-                "with the pixel data handler."
-                .format(actual_length, padded_expected_len)
+                "with the pixel data handler.".format(
+                    actual_length, padded_expected_len
+                )
             )
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
         msg = (
             "The length of the pixel data in the dataset ({} bytes) indicates "
             "it contains excess padding. {} bytes will be removed from the "
-            "end of the data"
-            .format(actual_length, actual_length - expected_len)
+            "end of the data".format(actual_length, actual_length - expected_len)
         )
         # PS 3.3, Annex C.7.6.3
-        if ds.PhotometricInterpretation == 'YBR_FULL_422':
+        if ds.PhotometricInterpretation == "YBR_FULL_422":
             # Check to ensure we do have subsampled YBR 422 data
             ybr_full_length = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
             # >= as may also include excess padding
@@ -252,15 +258,17 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     # Unpack the pixel data into a 1D ndarray
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
-        nr_pixels = get_expected_length(ds, unit='pixels')
-        arr = cast(
-            "np.ndarray", unpack_bits(pixel_data, as_array=True)[:nr_pixels]
-        )
+        nr_pixels = get_expected_length(ds, unit="pixels")
+        arr = cast("np.ndarray", unpack_bits(pixel_data, as_array=True)[:nr_pixels])
     else:
         # Skip the trailing padding byte(s) if present
         dtype = pixel_dtype(ds, as_float=("Float" in px_keyword[0]))
-        if (not ds.is_little_endian and dtype.itemsize == 1 and
-                px_keyword[0] == "PixelData" and ds[0x7FE00010].VR == "OW"):
+        if (
+            not ds.is_little_endian
+            and dtype.itemsize == 1
+            and px_keyword[0] == "PixelData"
+            and ds[0x7FE00010].VR == "OW"
+        ):
             # handle the rare case that 1 byte pixels are encoded as OW
             # in Big Endian transfer syntax
             # Note: the host Endianness does not matter here; to be read
@@ -271,7 +279,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
             arr = np.frombuffer(b[:expected_len], dtype=dtype)
         else:
             arr = np.frombuffer(pixel_data[:expected_len], dtype=dtype)
-        if ds.PhotometricInterpretation == 'YBR_FULL_422':
+        if ds.PhotometricInterpretation == "YBR_FULL_422":
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
             # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
             out = np.zeros(expected_len // 2 * 3, dtype=dtype)

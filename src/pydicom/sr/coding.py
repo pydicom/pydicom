@@ -12,6 +12,7 @@ class Code(NamedTuple):
 
     ..versionadded: 1.4
     """
+
     value: str
     scheme_designator: str
     meaning: str

@@ -26,9 +26,25 @@ import os.path
 import re
 from types import TracebackType
 from typing import (
-    Optional, TypeAlias, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, TYPE_CHECKING
+    Optional,
+    TypeAlias,
+    Union,
+    Any,
+    cast,
+    BinaryIO,
+    AnyStr,
+    TypeVar,
+    overload,
+    TYPE_CHECKING,
 )
-from collections.abc import ValuesView, Iterator, Callable, MutableSequence, MutableMapping, Set
+from collections.abc import (
+    ValuesView,
+    Iterator,
+    Callable,
+    MutableSequence,
+    MutableMapping,
+    Set,
+)
 import warnings
 import weakref
 
@@ -45,18 +61,27 @@ from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
 from pydicom.datadict import (
-    dictionary_VR, tag_for_keyword, keyword_for_tag, repeater_has_keyword
+    dictionary_VR,
+    tag_for_keyword,
+    keyword_for_tag,
+    repeater_has_keyword,
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.pixel_data_handlers.util import (
-    convert_color_space, reshape_pixel_array, get_image_pixel_ids
+    convert_color_space,
+    reshape_pixel_array,
+    get_image_pixel_ids,
 )
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType
 from pydicom.uid import (
-    ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
-    RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+    RLELossless,
+    PYDICOM_IMPLEMENTATION_UID,
+    UID,
 )
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
@@ -90,10 +115,7 @@ class PrivateBlock:
     """
 
     def __init__(
-        self,
-        key: tuple[int, str],
-        dataset: "Dataset",
-        private_creator_element: int
+        self, key: tuple[int, str], dataset: "Dataset", private_creator_element: int
     ) -> None:
         """Initializes an object corresponding to a private tag block.
 
@@ -130,8 +152,8 @@ class PrivateBlock:
         ValueError
             If `element_offset` is too large.
         """
-        if element_offset > 0xff:
-            raise ValueError('Element offset must be less than 256')
+        if element_offset > 0xFF:
+            raise ValueError("Element offset must be less than 256")
         return Tag(self.group, self.block_start + element_offset)
 
     def __contains__(self, element_offset: int) -> bool:
@@ -204,20 +226,22 @@ class PrivateBlock:
         self.dataset[tag].private_creator = self.private_creator
 
 
-def _dict_equal(
-    a: "Dataset", b: Any, exclude: list[str] | None = None
-) -> bool:
+def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
     """Common method for Dataset.__eq__ and FileDataset.__eq__
 
     Uses .keys() as needed because Dataset iter return items not keys
     `exclude` is used in FileDataset__eq__ ds.__dict__ compare, which
     would also compare the wrapped _dict member (entire dataset) again.
     """
-    return (len(a) == len(b) and
-            all(key in b for key in a.keys()) and
-            all(a[key] == b[key] for key in a.keys()
-                if exclude is None or key not in exclude)
-            )
+    return (
+        len(a) == len(b)
+        and all(key in b for key in a.keys())
+        and all(
+            a[key] == b[key]
+            for key in a.keys()
+            if exclude is None or key not in exclude
+        )
+    )
 
 
 _DatasetValue = DataElement | RawDataElement
@@ -366,12 +390,13 @@ class Dataset:
         and *Little Endian Explicit VR* or *Big Endian Explicit VR* (depending
         on ``Dataset.is_little_endian``) if ``False``.
     """
+
     indent_chars = "   "
 
     def __init__(self, *args: _DatasetType, **kwargs: Any) -> None:
         """Create a new :class:`Dataset` instance."""
         self._parent_encoding: list[str] = kwargs.get(
-            'parent_encoding', default_encoding
+            "parent_encoding", default_encoding
         )
 
         self._dict: MutableMapping[BaseTag, _DatasetValue]
@@ -441,8 +466,7 @@ class Dataset:
             raise AttributeError("Future: Dataset.parent is removed in v3.x")
         else:
             warnings.warn(
-                "Dataset.parent will be removed in pydicom 3.0",
-                DeprecationWarning
+                "Dataset.parent will be removed in pydicom 3.0", DeprecationWarning
             )
 
             parent_ref = self.parent_seq
@@ -461,8 +485,7 @@ class Dataset:
             raise AttributeError("Future: Dataset.parent is removed in v3.x")
         else:
             warnings.warn(
-                "Dataset.parent will be removed in pydicom 3.0",
-                DeprecationWarning
+                "Dataset.parent will be removed in pydicom 3.0", DeprecationWarning
             )
         self._parent = weakref.ref(value)
 
@@ -470,7 +493,7 @@ class Dataset:
         cls = self.__class__
         copied = cls.__new__(cls)
         if memo:
-            memo[id(self)] = copied   # add the new class to the memo
+            memo[id(self)] = copied  # add the new class to the memo
         # Insert a deepcopy of all instance attributes
         copied.__dict__.update(copy.deepcopy(self.__dict__, memo))
         # Manually update the weakref to be correct
@@ -487,7 +510,7 @@ class Dataset:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: TracebackType | None
+        exc_tb: TracebackType | None,
     ) -> bool | None:
         """Method invoked on exit from a with statement."""
         # Returning anything other than True will re-raise any exceptions
@@ -789,16 +812,12 @@ class Dataset:
 
     @overload
     def get(
-        self,
-        key: int | tuple[int, int] | BaseTag,
-        default: Any | None = None
+        self, key: int | tuple[int, int] | BaseTag, default: Any | None = None
     ) -> DataElement:
         pass  # pragma: no cover
 
     def get(
-        self,
-        key: str | int | tuple[int, int] | BaseTag,
-        default: Any | None = None
+        self, key: str | int | tuple[int, int] | BaseTag, default: Any | None = None
     ) -> Any | DataElement:
         """Simulate ``dict.get()`` to handle element tags and keywords.
 
@@ -899,7 +918,7 @@ class Dataset:
                 return self[tag].value
 
         # no tag or tag not contained in the dataset
-        if name == '_dict':
+        if name == "_dict":
             # special handling for contained dict, needed for pickle
             return {}
         # Try the base class attribute getter (fix for issue 332)
@@ -922,9 +941,7 @@ class Dataset:
     def __getitem__(self, key: TagType) -> DataElement:
         pass  # pragma: no cover
 
-    def __getitem__(
-        self, key: "slice | TagType"
-    ) -> "Dataset | DataElement":
+    def __getitem__(self, key: "slice | TagType") -> "Dataset | DataElement":
         """Operator for ``Dataset[key]`` request.
 
         Any deferred data elements will be read in and an attempt will be made
@@ -991,10 +1008,7 @@ class Dataset:
                 from pydicom.filereader import read_deferred_data_element
 
                 elem = read_deferred_data_element(
-                    self.fileobj_type,
-                    self.filename,
-                    self.timestamp,
-                    elem
+                    self.fileobj_type, self.filename, self.timestamp, elem
                 )
 
             if tag != BaseTag(0x00080005):
@@ -1007,9 +1021,8 @@ class Dataset:
             # If the Element has an ambiguous VR, try to correct it
             if self[tag].VR in AMBIGUOUS_VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
-                self[tag] = correct_ambiguous_vr_element(
-                    self[tag], self, elem[6]
-                )
+
+                self[tag] = correct_ambiguous_vr_element(self[tag], self, elem[6])
 
         return cast(DataElement, self._dict.get(tag))
 
@@ -1054,6 +1067,7 @@ class Dataset:
             If the private creator tag is not found in the given group and
             the `create` parameter is ``False``.
         """
+
         def new_block(element: int) -> PrivateBlock:
             block = PrivateBlock(key, self, element)
             self._private_blocks[key] = block
@@ -1064,35 +1078,27 @@ class Dataset:
             return self._private_blocks[key]
 
         if not private_creator:
-            raise ValueError('Private creator must have a value')
+            raise ValueError("Private creator must have a value")
 
         if group % 2 == 0:
-            raise ValueError(
-                'Tag must be private if private creator is given')
+            raise ValueError("Tag must be private if private creator is given")
 
         # find block with matching private creator
         block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
-        data_el = next(
-            (
-                elem for elem in block if elem.value == private_creator
-            ),
-            None
-        )
+        data_el = next((elem for elem in block if elem.value == private_creator), None)
         if data_el is not None:
             return new_block(data_el.tag.element)
 
         if not create:
             # not found and shall not be created - raise
-            raise KeyError(
-                f"Private creator '{private_creator}' not found")
+            raise KeyError(f"Private creator '{private_creator}' not found")
 
         # private creator not existing - find first unused private block
         # and add the private creator
         first_free_el = next(
-            el for el in range(0x10, 0x100)
-            if Tag(group, el) not in self._dict
+            el for el in range(0x10, 0x100) if Tag(group, el) not in self._dict
         )
-        self.add_new(Tag(group, first_free_el), 'LO', private_creator)
+        self.add_new(Tag(group, first_free_el), "LO", private_creator)
         return new_block(first_free_el)
 
     def private_creators(self, group: int) -> list[str]:
@@ -1125,7 +1131,7 @@ class Dataset:
             If `group` is not a private group.
         """
         if group % 2 == 0:
-            raise ValueError('Group must be an odd number')
+            raise ValueError("Group must be an odd number")
 
         block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
         return [x.value for x in block]
@@ -1247,7 +1253,7 @@ class Dataset:
         self,
         is_implicit_vr: bool | None,
         is_little_endian: bool | None,
-        character_encoding: None | str | MutableSequence[str]
+        character_encoding: None | str | MutableSequence[str],
     ) -> None:
         """Set the values for the original transfer syntax and encoding.
 
@@ -1274,7 +1280,7 @@ class Dataset:
         Dataset
             A :class:`Dataset` containing elements of the group specified.
         """
-        return self[(group, 0x0000):(group + 1, 0x0000)]  # type: ignore[misc]
+        return self[(group, 0x0000) : (group + 1, 0x0000)]  # type: ignore[misc]
 
     def __iter__(self) -> Iterator[DataElement]:
         """Iterate through the top-level of the Dataset, yielding DataElements.
@@ -1387,9 +1393,7 @@ class Dataset:
         """
         return self._dict.popitem()
 
-    def setdefault(
-        self, key: TagType, default: Any | None = None
-    ) -> DataElement:
+    def setdefault(self, key: TagType, default: Any | None = None) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
 
         Examples
@@ -1444,14 +1448,11 @@ class Dataset:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if (config.settings.writing_validation_mode ==
-                            config.RAISE):
+                    if config.settings.writing_validation_mode == config.RAISE:
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN
-                    warnings.warn(
-                        f"Unknown DICOM tag {tag} - setting VR to 'UN'"
-                    )
+                    warnings.warn(f"Unknown DICOM tag {tag} - setting VR to 'UN'")
 
             default = DataElement(tag, vr, default)
 
@@ -1459,7 +1460,7 @@ class Dataset:
 
         return default
 
-    def convert_pixel_data(self, handler_name: str = '') -> None:
+    def convert_pixel_data(self, handler_name: str = "") -> None:
         """Convert pixel data to a :class:`numpy.ndarray` internally.
 
         Parameters
@@ -1515,14 +1516,14 @@ class Dataset:
         """
         # handle some variations in name
         handler_name = name.lower()
-        if not handler_name.endswith('_handler'):
-            handler_name += '_handler'
-        if handler_name == 'numpy_handler':
-            handler_name = 'np_handler'
-        if handler_name == 'jpeg_ls_handler':
+        if not handler_name.endswith("_handler"):
+            handler_name += "_handler"
+        if handler_name == "numpy_handler":
+            handler_name = "np_handler"
+        if handler_name == "jpeg_ls_handler":
             # the name in config differs from the actual handler name
             # we allow both
-            handler_name = 'jpegls_handler'
+            handler_name = "jpegls_handler"
         if not hasattr(pydicom.config, handler_name):
             raise ValueError(f"'{name}' is not a known handler name")
 
@@ -1552,9 +1553,9 @@ class Dataset:
         # Find all possible handlers that support the transfer syntax
         ts = self.file_meta.TransferSyntaxUID
         possible_handlers = [
-            hh for hh in pydicom.config.pixel_data_handlers
-            if hh is not None
-            and hh.supports_transfer_syntax(ts)
+            hh
+            for hh in pydicom.config.pixel_data_handlers
+            if hh is not None and hh.supports_transfer_syntax(ts)
         ]
 
         # No handlers support the transfer syntax
@@ -1568,10 +1569,7 @@ class Dataset:
 
         # Handlers that both support the transfer syntax and have their
         #   dependencies met
-        available_handlers = [
-            hh for hh in possible_handlers
-            if hh.is_available()
-        ]
+        available_handlers = [hh for hh in possible_handlers if hh.is_available()]
 
         # There are handlers that support the transfer syntax but none of them
         #   can be used as missing dependencies
@@ -1589,12 +1587,9 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(
-                    f"{hh.HANDLER_NAME} "
-                    f"(req. {', '.join(names)})"
-                )
+                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
 
-            raise RuntimeError(msg + ', '.join(pkg_msg))
+            raise RuntimeError(msg + ", ".join(pkg_msg))
 
         last_exception = None
         for handler in available_handlers:
@@ -1602,9 +1597,7 @@ class Dataset:
                 self._do_pixel_data_conversion(handler)
                 return
             except Exception as exc:
-                logger.debug(
-                    "Exception raised by pixel data handler", exc_info=exc
-                )
+                logger.debug("Exception raised by pixel data handler", exc_info=exc)
                 last_exception = exc
 
         # The only way to get to this point is if we failed to get the pixel
@@ -1616,8 +1609,9 @@ class Dataset:
             "Unable to decode the pixel data using the following handlers: {}."
             "Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
-            "be able to decode the data"
-            .format(", ".join([str(hh) for hh in available_handlers]))
+            "be able to decode the data".format(
+                ", ".join([str(hh) for hh in available_handlers])
+            )
         )
         raise last_exception  # type: ignore[misc]
 
@@ -1633,7 +1627,7 @@ class Dataset:
         #   convert the color space from YCbCr to RGB
         if handler.needs_to_convert_to_RGB(self):
             self._pixel_array = convert_color_space(
-                self._pixel_array, 'YBR_FULL', 'RGB'
+                self._pixel_array, "YBR_FULL", "RGB"
             )
 
         self._pixel_id = get_image_pixel_ids(self)
@@ -1642,8 +1636,8 @@ class Dataset:
         self,
         transfer_syntax_uid: str,
         arr: Optional["numpy.ndarray"] = None,
-        encoding_plugin: str = '',
-        decoding_plugin: str = '',
+        encoding_plugin: str = "",
+        decoding_plugin: str = "",
         encapsulate_ext: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -1741,9 +1735,7 @@ class Dataset:
         # Raises NotImplementedError if `uid` is not supported
         encoder = get_encoder(uid)
         if not encoder.is_available:
-            missing = "\n".join(
-                [f"    {s}" for s in encoder.missing_dependencies]
-            )
+            missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
             raise RuntimeError(
                 f"The '{uid.name}' encoder is unavailable because its "
                 f"encoding plugins are missing dependencies:\n"
@@ -1756,15 +1748,13 @@ class Dataset:
                 self,
                 encoding_plugin=encoding_plugin,
                 decoding_plugin=decoding_plugin,
-                **kwargs
+                **kwargs,
             )
         else:
             # Encode from an uncompressed pixel data array
             kwargs.update(encoder.kwargs_from_ds(self))
             frame_iterator = encoder.iter_encode(
-                arr,
-                encoding_plugin=encoding_plugin,
-                **kwargs
+                arr, encoding_plugin=encoding_plugin, **kwargs
             )
 
         # Encode!
@@ -1774,21 +1764,23 @@ class Dataset:
         nr_frames = getattr(self, "NumberOfFrames", 1) or 1
         total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
         if encapsulate_ext or total > 2**32 - 1:
-            (self.PixelData,
-             self.ExtendedOffsetTable,
-             self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)
+            (
+                self.PixelData,
+                self.ExtendedOffsetTable,
+                self.ExtendedOffsetTableLengths,
+            ) = encapsulate_extended(encoded)
         else:
             self.PixelData = encapsulate(encoded)
 
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
-        self['PixelData'].is_undefined_length = True
+        self["PixelData"].is_undefined_length = True
 
         # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
         self.is_implicit_VR = False
         self.is_little_endian = True
 
         # Set the correct *Transfer Syntax UID*
-        if not hasattr(self, 'file_meta'):
+        if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
 
         self.file_meta.TransferSyntaxUID = uid
@@ -1797,7 +1789,7 @@ class Dataset:
         if self.SamplesPerPixel > 1:
             self.PlanarConfiguration: int = 1 if uid == RLELossless else 0
 
-    def decompress(self, handler_name: str = '') -> None:
+    def decompress(self, handler_name: str = "") -> None:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
@@ -1843,22 +1835,24 @@ class Dataset:
         self.convert_pixel_data(handler_name)
         self.is_decompressed = True
         # May have been undefined length pixel data, but won't be now
-        if 'PixelData' in self:
-            self[0x7fe00010].is_undefined_length = False
+        if "PixelData" in self:
+            self[0x7FE00010].is_undefined_length = False
 
         # Make sure correct Transfer Syntax is set
         # According to the dicom standard PS3.5 section A.4,
         # all compressed files must have been explicit VR, little endian
         # First check if was a compressed file
         if (
-            hasattr(self, 'file_meta')
+            hasattr(self, "file_meta")
             and self.file_meta.TransferSyntaxUID.is_compressed
         ):
             # Check that current file as read does match expected
             if not self.is_little_endian or self.is_implicit_VR:
-                msg = ("Current dataset does not match expected ExplicitVR "
-                       "LittleEndian transfer syntax from a compressed "
-                       "transfer syntax")
+                msg = (
+                    "Current dataset does not match expected ExplicitVR "
+                    "LittleEndian transfer syntax from a compressed "
+                    "transfer syntax"
+                )
                 raise NotImplementedError(msg)
 
             # All is as expected, updated the Transfer Syntax
@@ -1888,10 +1882,7 @@ class Dataset:
 
         from pydicom.config import overlay_data_handlers
 
-        available_handlers = [
-            hh for hh in overlay_data_handlers
-            if hh.is_available()
-        ]
+        available_handlers = [hh for hh in overlay_data_handlers if hh.is_available()]
         if not available_handlers:
             # For each of the handlers we want to find which
             #   dependencies are missing
@@ -1906,12 +1897,9 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(
-                    f"{hh.HANDLER_NAME} "
-                    f"(req. {', '.join(names)})"
-                )
+                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
 
-            raise RuntimeError(msg + ', '.join(pkg_msg))
+            raise RuntimeError(msg + ", ".join(pkg_msg))
 
         last_exception = None
         for handler in available_handlers:
@@ -1920,17 +1908,16 @@ class Dataset:
                 func = handler.get_overlay_array
                 return cast("numpy.ndarray", func(self, group))
             except Exception as exc:
-                logger.debug(
-                    "Exception raised by overlay data handler", exc_info=exc
-                )
+                logger.debug("Exception raised by overlay data handler", exc_info=exc)
                 last_exception = exc
 
         logger.info(
             "Unable to decode the overlay data using the following handlers: "
             "{}. Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
-            "be able to decode the data"
-            .format(", ".join([str(hh) for hh in available_handlers]))
+            "be able to decode the data".format(
+                ", ".join([str(hh) for hh in available_handlers])
+            )
         )
 
         raise last_exception  # type: ignore[misc]
@@ -1986,13 +1973,15 @@ class Dataset:
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
     default_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
-    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"  # noqa
+    default_sequence_element_format = (
+        "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"  # noqa
+    )
 
     def formatted_lines(
         self,
         element_format: str = default_element_format,
         sequence_element_format: str = default_sequence_element_format,
-        indent_format: str | None = None
+        indent_format: str | None = None,
     ) -> Iterator[str]:
         """Iterate through the :class:`Dataset` yielding formatted :class:`str`
         for each element.
@@ -2018,8 +2007,12 @@ class Dataset:
             A string representation of an element.
         """
         exclusion = (
-            'from_json', 'to_json', 'to_json_dict', 'clear', 'description',
-            'validate',
+            "from_json",
+            "to_json",
+            "to_json_dict",
+            "clear",
+            "description",
+            "validate",
         )
         for elem in self.iterall():
             # Get all the attributes possible for this data element (e.g.
@@ -2028,20 +2021,19 @@ class Dataset:
             #   string
             elem_dict = {
                 attr: (
-                    getattr(elem, attr)() if callable(getattr(elem, attr))
+                    getattr(elem, attr)()
+                    if callable(getattr(elem, attr))
                     else getattr(elem, attr)
                 )
-                for attr in dir(elem) if not attr.startswith("_")
-                and attr not in exclusion
+                for attr in dir(elem)
+                if not attr.startswith("_") and attr not in exclusion
             }
             if elem.VR == VR_.SQ:
                 yield sequence_element_format % elem_dict
             else:
                 yield element_format % elem_dict
 
-    def _pretty_str(
-        self, indent: int = 0, top_level_only: bool = False
-    ) -> str:
+    def _pretty_str(self, indent: int = 0, top_level_only: bool = False) -> str:
         """Return a string of the DataElements in the Dataset, with indented
         levels.
 
@@ -2074,7 +2066,8 @@ class Dataset:
 
         # Display file meta, if configured to do so, and have a non-empty one
         if (
-            hasattr(self, "file_meta") and self.file_meta
+            hasattr(self, "file_meta")
+            and self.file_meta
             and pydicom.config.show_file_meta
         ):
             strings.append(f"{'Dataset.file_meta ':-<49}")
@@ -2112,7 +2105,7 @@ class Dataset:
     def save_as(
         self,
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
-        write_like_original: bool = True
+        write_like_original: bool = True,
     ) -> None:
         """Write the :class:`Dataset` to `filename`.
 
@@ -2160,12 +2153,13 @@ class Dataset:
         elif not self.is_little_endian and not self.is_implicit_VR:
             self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
         elif not self.is_little_endian and self.is_implicit_VR:
-            raise NotImplementedError("Implicit VR Big Endian is not a "
-                                      "supported Transfer Syntax.")
+            raise NotImplementedError(
+                "Implicit VR Big Endian is not a " "supported Transfer Syntax."
+            )
 
-        if 'SOPClassUID' in self:
+        if "SOPClassUID" in self:
             self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
-        if 'SOPInstanceUID' in self:
+        if "SOPInstanceUID" in self:
             self.file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
         if enforce_standard:
             validate_file_meta(self.file_meta, enforce_standard=True)
@@ -2247,14 +2241,12 @@ class Dataset:
             warnings.warn(
                 "Starting in pydicom 3.0, Dataset.file_meta must be a "
                 "FileMetaDataset class instance",
-                DeprecationWarning
+                DeprecationWarning,
             )
 
         self.__dict__["file_meta"] = value
 
-    def __setitem__(
-        self, key: "slice | TagType", elem: _DatasetValue
-    ) -> None:
+    def __setitem__(self, key: "slice | TagType", elem: _DatasetValue) -> None:
         """Operator for ``Dataset[key] = elem``.
 
         Parameters
@@ -2274,7 +2266,7 @@ class Dataset:
         """
         if isinstance(key, slice):
             raise NotImplementedError(
-                'Slicing is not supported when setting Dataset items'
+                "Slicing is not supported when setting Dataset items"
             )
 
         try:
@@ -2294,8 +2286,7 @@ class Dataset:
 
         if key != elem_tag:
             raise ValueError(
-                f"The key '{key}' doesn't match the 'DataElement' tag "
-                f"'{elem_tag}'"
+                f"The key '{key}' doesn't match the 'DataElement' tag " f"'{elem_tag}'"
             )
 
         if elem_tag.is_private:
@@ -2305,9 +2296,7 @@ class Dataset:
             private_creator_tag = Tag(elem_tag.group, private_block)
             if private_creator_tag in self and elem_tag != private_creator_tag:
                 if isinstance(elem, RawDataElement):
-                    elem = DataElement_from_raw(
-                        elem, self._character_set, self
-                    )
+                    elem = DataElement_from_raw(elem, self._character_set, self)
                 elem.private_creator = self[private_creator_tag].value
 
         self._dict[elem_tag] = elem
@@ -2321,10 +2310,7 @@ class Dataset:
                 elem.value.parent_dataset = self  # type:ignore
 
     def _slice_dataset(
-        self,
-        start: "TagType | None",
-        stop: "TagType | None",
-        step: int | None
+        self, start: "TagType | None", stop: "TagType | None", step: int | None
     ) -> list[BaseTag]:
         """Return the element tags in the Dataset that match the slice.
 
@@ -2388,7 +2374,7 @@ class Dataset:
         return self._pretty_str()
 
     def top(self) -> str:
-        """Return a :class:`str` representation of the top level elements. """
+        """Return a :class:`str` representation of the top level elements."""
         return self._pretty_str(top_level_only=True)
 
     def trait_names(self) -> list[str]:
@@ -2431,9 +2417,7 @@ class Dataset:
                     yield from ds.iterall()
 
     def walk(
-        self,
-        callback: Callable[["Dataset", DataElement], None],
-        recursive: bool = True
+        self, callback: Callable[["Dataset", DataElement], None], recursive: bool = True
     ) -> None:
         """Iterate through the :class:`Dataset's<Dataset>` elements and run
         `callback` on each.
@@ -2466,7 +2450,6 @@ class Dataset:
         """
         taglist = sorted(self._dict.keys())
         for tag in taglist:
-
             with tag_in_exception(tag):
                 data_element = self[tag]
                 callback(self, data_element)  # self = this Dataset
@@ -2481,7 +2464,11 @@ class Dataset:
     def from_json(
         cls: type["Dataset"],
         json_dataset: dict[str, Any] | str | bytes | bytearray,
-        bulk_data_uri_handler: Callable[[str, str, str], None | str | int | float | bytes] | Callable[[str], None | str | int | float | bytes] | None = None
+        bulk_data_uri_handler: Callable[
+            [str, str, str], None | str | int | float | bytes
+        ]
+        | Callable[[str], None | str | int | float | bytes]
+        | None = None,
     ) -> "Dataset":
         """Return a :class:`Dataset` from a DICOM JSON Model object.
 
@@ -2518,13 +2505,13 @@ class Dataset:
             # `mapping` is Dict[str, Any] and should have keys 'vr' and at most
             #   one of ('Value', 'BulkDataURI', 'InlineBinary') but may have
             #   none of those if the element's VM is 0
-            vr = mapping['vr']
+            vr = mapping["vr"]
             unique_value_keys = tuple(
                 set(mapping.keys()) & set(jsonrep.JSON_VALUE_KEYS)
             )
             if len(unique_value_keys) == 0:
                 value_key = None
-                value = ['']
+                value = [""]
             else:
                 value_key = unique_value_keys[0]
                 value = mapping[value_key]
@@ -2537,7 +2524,7 @@ class Dataset:
     def to_json_dict(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
+        bulk_data_element_handler: Callable[[DataElement], str] | None = None,  # noqa
         suppress_invalid_tags: bool = False,
     ) -> dict[str, Any]:
         """Return a dictionary representation of the :class:`Dataset`
@@ -2567,18 +2554,15 @@ class Dataset:
             :class:`Dataset` representation based on the DICOM JSON Model.
         """
         json_dataset = {}
-        context = (
-            config.strict_reading() if suppress_invalid_tags
-            else nullcontext()
-        )
+        context = config.strict_reading() if suppress_invalid_tags else nullcontext()
         with context:
             for key in self.keys():
-                json_key = f'{key:08X}'
+                json_key = f"{key:08X}"
                 try:
                     data_element = self[key]
                     json_dataset[json_key] = data_element.to_json_dict(
                         bulk_data_element_handler=bulk_data_element_handler,
-                        bulk_data_threshold=bulk_data_threshold
+                        bulk_data_threshold=bulk_data_threshold,
                     )
                 except Exception as exc:
                     logger.error(f"Error while processing tag {json_key}")
@@ -2590,7 +2574,7 @@ class Dataset:
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
+        bulk_data_element_handler: Callable[[DataElement], str] | None = None,  # noqa
         dump_handler: Callable[[dict[str, Any]], str] | None = None,
         suppress_invalid_tags: bool = False,
     ) -> str:
@@ -2637,6 +2621,7 @@ class Dataset:
         >>> ds.to_json(dump_handler=my_json_dumps)
         """
         if dump_handler is None:
+
             def json_dump(d: Any) -> str:
                 return json.dumps(d, sort_keys=True)
 
@@ -2646,7 +2631,7 @@ class Dataset:
             self.to_json_dict(
                 bulk_data_threshold,
                 bulk_data_element_handler,
-                suppress_invalid_tags=suppress_invalid_tags
+                suppress_invalid_tags=suppress_invalid_tags,
             )
         )
 
@@ -2655,17 +2640,15 @@ class Dataset:
     def __getstate__(self) -> dict[str, Any]:
         if self.parent_seq is not None:
             s = self.__dict__.copy()
-            s['_parent_seq'] = s['_parent_seq']()
+            s["_parent_seq"] = s["_parent_seq"]()
             return s
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
     def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
-        if self.__dict__['_parent_seq'] is not None:
-            self.__dict__['_parent_seq'] = weakref.ref(
-                self.__dict__['_parent_seq']
-            )
+        if self.__dict__["_parent_seq"] is not None:
+            self.__dict__["_parent_seq"] = weakref.ref(self.__dict__["_parent_seq"])
 
     __repr__ = __str__
 
@@ -2710,7 +2693,7 @@ class FileDataset(Dataset):
         preamble: bytes | None = None,
         file_meta: Optional["FileMetaDataset"] = None,
         is_implicit_VR: bool = True,
-        is_little_endian: bool = True
+        is_little_endian: bool = True,
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
@@ -2763,9 +2746,7 @@ class FileDataset(Dataset):
             if hasattr(filename_or_obj, "name"):
                 filename = filename_or_obj.name
             elif hasattr(filename_or_obj, "filename"):
-                filename = (
-                    filename_or_obj.filename
-                )
+                filename = filename_or_obj.filename
             else:
                 # e.g. came from BytesIO or something file-like
                 self.filename = filename_or_obj
@@ -2783,16 +2764,22 @@ class FileDataset(Dataset):
         and copies all other attributes using `copy_function`.
         """
         copied = self.__class__(
-            self.filename, self, self.preamble, self.file_meta,
-            self.is_implicit_VR, self.is_little_endian
+            self.filename,
+            self,
+            self.preamble,
+            self.file_meta,
+            self.is_implicit_VR,
+            self.is_little_endian,
         )
         filename = self.filename
         if filename is not None and not isinstance(filename, str):
-            warnings.warn("The 'filename' attribute of the dataset is a "
-                          "file-like object and will be set to None "
-                          "in the copied object")
+            warnings.warn(
+                "The 'filename' attribute of the dataset is a "
+                "file-like object and will be set to None "
+                "in the copied object"
+            )
             self.filename = None  # type: ignore[assignment]
-        for (k, v) in self.__dict__.items():
+        for k, v in self.__dict__.items():
             copied.__dict__[k] = copy_function(v)
 
         self.filename = filename
@@ -2863,19 +2850,22 @@ def validate_file_meta(
     # Check that no non-Group 2 Elements are present
     for elem in file_meta.elements():
         if elem.tag.group != 0x0002:
-            raise ValueError("Only File Meta Information Group (0002,eeee) "
-                             "elements must be present in 'file_meta'.")
+            raise ValueError(
+                "Only File Meta Information Group (0002,eeee) "
+                "elements must be present in 'file_meta'."
+            )
 
     if enforce_standard:
-        if 'FileMetaInformationVersion' not in file_meta:
-            file_meta.FileMetaInformationVersion = b'\x00\x01'
+        if "FileMetaInformationVersion" not in file_meta:
+            file_meta.FileMetaInformationVersion = b"\x00\x01"
 
-        if 'ImplementationClassUID' not in file_meta:
+        if "ImplementationClassUID" not in file_meta:
             file_meta.ImplementationClassUID = UID(PYDICOM_IMPLEMENTATION_UID)
 
-        if 'ImplementationVersionName' not in file_meta:
-            file_meta.ImplementationVersionName = (
-                'PYDICOM ' + ".".join(str(x) for x in __version_info__))
+        if "ImplementationVersionName" not in file_meta:
+            file_meta.ImplementationVersionName = "PYDICOM " + ".".join(
+                str(x) for x in __version_info__
+            )
 
         # Check that required File Meta Information elements are present
         missing = []
@@ -2883,10 +2873,11 @@ def validate_file_meta(
             if Tag(0x0002, element) not in file_meta:
                 missing.append(Tag(0x0002, element))
         if missing:
-            msg = ("Missing required File Meta Information elements from "
-                   "'file_meta':\n")
+            msg = (
+                "Missing required File Meta Information elements from " "'file_meta':\n"
+            )
             for tag in missing:
-                msg += f'\t{tag} {keyword_for_tag(tag)}\n'
+                msg += f"\t{tag} {keyword_for_tag(tag)}\n"
             raise ValueError(msg[:-1])  # Remove final newline
 
 
@@ -2952,21 +2943,15 @@ class FileMetaDataset(Dataset):
 
         if not isinstance(init_value, Dataset | dict):
             raise TypeError(
-                "Argument must be a dict or Dataset, not {}".format(
-                    type(init_value)
-                )
+                f"Argument must be a dict or Dataset, not {type(init_value)}"
             )
 
-        non_group2 = [
-            Tag(tag) for tag in init_value.keys() if Tag(tag).group != 2
-        ]
+        non_group2 = [Tag(tag) for tag in init_value.keys() if Tag(tag).group != 2]
         if non_group2:
             msg = "Attempted to set non-group 2 elements: {}"
             raise ValueError(msg.format(non_group2))
 
-    def __setitem__(
-        self, key: "slice | TagType", value: _DatasetValue
-    ) -> None:
+    def __setitem__(self, key: "slice | TagType", value: _DatasetValue) -> None:
         """Override parent class to only allow setting of group 2 elements.
 
         Parameters

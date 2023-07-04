@@ -39,8 +39,8 @@ def adapt_dataset_from_bytes(blob):
     dataset = dcmread(BytesIO(blob))
     # do some interesting stuff
     dataset.is_little_endian = False
-    dataset.PatientName = 'Bond^James'
-    dataset.PatientID = '007'
+    dataset.PatientName = "Bond^James"
+    dataset.PatientID = "007"
     return dataset
 
 
@@ -55,7 +55,7 @@ class DummyDataBase:
         return self._blobs.get(name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
@@ -72,13 +72,13 @@ if __name__ == '__main__':
     # - convert the dataset to bytes
     ds_bytes = write_dataset_to_bytes(dataset)
     # - save the bytes in some storage
-    db.save('dataset', ds_bytes)
+    db.save("dataset", ds_bytes)
 
     # Convert a byte array to a dataset:
     # - get the bytes from storage
-    read_bytes = db.load('dataset')
+    read_bytes = db.load("dataset")
     # - convert the bytes into a dataset and do something interesting with it
     read_dataset = adapt_dataset_from_bytes(read_bytes)
     print(read_dataset)
     # - you can write your dataset to a file if wanted
-    dcmwrite(file_path + '_new', read_dataset)
+    dcmwrite(file_path + "_new", read_dataset)

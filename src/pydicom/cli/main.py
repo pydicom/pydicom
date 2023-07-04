@@ -29,9 +29,7 @@ re_kywd_or_item = (
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
 )
 
-re_file_spec_object = re.compile(
-    re_kywd_or_item + r"(\." + re_kywd_or_item + r")*$"
-)
+re_file_spec_object = re.compile(re_kywd_or_item + r"(\." + re_kywd_or_item + r")*$")
 
 filespec_help = (
     "File specification, in format [pydicom::]filename[::element]. "
@@ -54,9 +52,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
             f"Data element '{element}' is not in the dataset"
         )
     except IndexError as e:
-        raise argparse.ArgumentTypeError(
-            f"'{element}' has an index error: {str(e)}"
-        )
+        raise argparse.ArgumentTypeError(f"'{element}' has an index error: {str(e)}")
 
 
 def filespec_parts(filespec: str) -> tuple[str, str, str]:
@@ -163,9 +159,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         )
         raise argparse.ArgumentTypeError(f"File '{filename}' not found{extra}")
     except Exception as e:
-        raise argparse.ArgumentTypeError(
-            f"Error reading '{filename}': {str(e)}"
-        )
+        raise argparse.ArgumentTypeError(f"Error reading '{filename}': {str(e)}")
 
     if not element:
         return [(ds, None)]
@@ -215,13 +209,11 @@ def main(args: list[str] | None = None) -> None:
 
     parser = argparse.ArgumentParser(
         prog="pydicom",
-        description=f"pydicom command line utilities (Python {py_version})"
+        description=f"pydicom command line utilities (Python {py_version})",
     )
     subparsers = parser.add_subparsers(help="subcommand help")
 
-    help_parser = subparsers.add_parser(
-        "help", help="display help for subcommands"
-    )
+    help_parser = subparsers.add_parser("help", help="display help for subcommands")
     help_parser.add_argument(
         "subcommand", nargs="?", help="Subcommand to show help for"
     )

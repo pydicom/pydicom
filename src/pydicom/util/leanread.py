@@ -4,9 +4,7 @@
 import os
 from struct import Struct, unpack
 from types import TracebackType
-from typing import (
-    cast, BinaryIO
-)
+from typing import cast, BinaryIO
 from collections.abc import Iterator, Callable
 
 from pydicom.misc import size_in_bytes
@@ -16,16 +14,14 @@ from pydicom.uid import UID
 from pydicom.valuerep import EXPLICIT_VR_LENGTH_32
 
 
-extra_length_VRs_b = tuple(vr.encode('ascii') for vr in EXPLICIT_VR_LENGTH_32)
-ExplicitVRLittleEndian = b'1.2.840.10008.1.2.1'
-ImplicitVRLittleEndian = b'1.2.840.10008.1.2'
-DeflatedExplicitVRLittleEndian = b'1.2.840.10008.1.2.1.99'
-ExplicitVRBigEndian = b'1.2.840.10008.1.2.2'
+extra_length_VRs_b = tuple(vr.encode("ascii") for vr in EXPLICIT_VR_LENGTH_32)
+ExplicitVRLittleEndian = b"1.2.840.10008.1.2.1"
+ImplicitVRLittleEndian = b"1.2.840.10008.1.2"
+DeflatedExplicitVRLittleEndian = b"1.2.840.10008.1.2.1.99"
+ExplicitVRBigEndian = b"1.2.840.10008.1.2.2"
 
 
-_ElementType = tuple[
-    tuple[int, int], bytes | None, int, bytes | None, int
-]
+_ElementType = tuple[tuple[int, int], bytes | None, int, bytes | None, int]
 
 
 class dicomfile:
@@ -48,7 +44,7 @@ class dicomfile:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: TracebackType | None
+        exc_tb: TracebackType | None,
     ) -> bool | None:
         self.fobj.close()
 
@@ -63,13 +59,13 @@ class dicomfile:
             self.fobj,
             is_implicit_VR=False,
             is_little_endian=True,
-            stop_when=lambda group, elem: group != 2
+            stop_when=lambda group, elem: group != 2,
         )
 
         for elem in file_meta:
             if elem[0] == (0x0002, 0x0010):
                 value = cast(bytes, elem[3])
-                tsyntax = UID(value.strip(b" \0").decode('ascii'))
+                tsyntax = UID(value.strip(b" \0").decode("ascii"))
 
             yield elem
 
@@ -92,7 +88,7 @@ def data_element_generator(
     defer_size: str | int | float | None = None,
 ) -> Iterator[_ElementType]:
     """:return: (tag, VR, length, value, value_tell,
-                                 is_implicit_VR, is_little_endian)
+    is_implicit_VR, is_little_endian)
     """
     endian_chr = "<" if is_little_endian else ">"
 
@@ -159,7 +155,7 @@ def data_element_generator(
             #   identified as a Sequence
             if vr is None:
                 try:
-                    vr = dictionary_VR((group, elem)).encode('ascii')
+                    vr = dictionary_VR((group, elem)).encode("ascii")
                 except KeyError:
                     # Look ahead to see if it consists of items and
                     # is thus a SQ
@@ -172,12 +168,11 @@ def data_element_generator(
                     # Rewind the file
                     fp.seek(fp_tell() - 4)
                     if next_tag == ItemTag:
-                        vr = b'SQ'
+                        vr = b"SQ"
 
-            if vr == b'SQ':
+            if vr == b"SQ":
                 yield ((group, elem), vr, length, None, value_tell)
             else:
                 raise NotImplementedError(
-                    "This reader does not handle undefined length except "
-                    "for SQ"
+                    "This reader does not handle undefined length except " "for SQ"
                 )

@@ -34,21 +34,22 @@ def absorb_delimiter_item(
         fp.seek(fp.tell() - 8)
         return
 
-    logger.debug("%04x: Found Delimiter '%s'", fp.tell() - 8,
-                 dictionary_description(delimiter))
+    logger.debug(
+        "%04x: Found Delimiter '%s'", fp.tell() - 8, dictionary_description(delimiter)
+    )
 
     if length == 0:
         logger.debug("%04x: Read 0 bytes after delimiter", fp.tell() - 4)
     else:
-        logger.debug("%04x: Expected 0x00000000 after delimiter, found 0x%x",
-                     fp.tell() - 4, length)
+        logger.debug(
+            "%04x: Expected 0x00000000 after delimiter, found 0x%x",
+            fp.tell() - 4,
+            length,
+        )
 
 
 def find_bytes(
-    fp: BinaryIO,
-    bytes_to_find: bytes,
-    read_size: int = 128,
-    rewind: bool = True
+    fp: BinaryIO, bytes_to_find: bytes, read_size: int = 128, rewind: bool = True
 ) -> int | None:
     """Read in the file until a specific byte sequence found.
 
@@ -109,7 +110,7 @@ def read_undefined_length_value(
     is_little_endian: bool,
     delimiter_tag: BaseTag,
     defer_size: int | float | None = None,
-    read_size: int = 1024 * 8
+    read_size: int = 1024 * 8,
 ) -> bytes | None:
     """Read until `delimiter_tag` and return the value up to that point.
 
@@ -194,12 +195,16 @@ def read_undefined_length_value(
             fp.seek(chunk_start + index + 4)  # rewind to end of delimiter
             length = fp.read(4)
             if length != b"\0\0\0\0":
-                msg = ("Expected 4 zero bytes after undefined length delimiter"
-                       " at pos {0:04x}")
+                msg = (
+                    "Expected 4 zero bytes after undefined length delimiter"
+                    " at pos {0:04x}"
+                )
                 logger.error(msg.format(fp.tell() - 4))
         elif eof:
             fp.seek(data_start)
-            raise EOFError(f"End of file reached before delimiter {delimiter_tag!r} found")
+            raise EOFError(
+                f"End of file reached before delimiter {delimiter_tag!r} found"
+            )
         else:
             # rewind a bit in case delimiter crossed read_size boundary
             fp.seek(fp.tell() - search_rewind)
@@ -251,9 +256,9 @@ def _try_read_encapsulated_pixel_data(
         tag_format = b">HH"
         length_format = b">L"
 
-    sequence_delimiter_bytes = pack(tag_format,
-                                    SequenceDelimiterTag.group,
-                                    SequenceDelimiterTag.elem)
+    sequence_delimiter_bytes = pack(
+        tag_format, SequenceDelimiterTag.group, SequenceDelimiterTag.elem
+    )
     item_bytes = pack(tag_format, ItemTag.group, ItemTag.elem)
 
     data_start = fp.tell()
@@ -268,7 +273,8 @@ def _try_read_encapsulated_pixel_data(
                 "End of input encountered while parsing undefined length "
                 "value as encapsulated pixel data. Unable to find tag at "
                 "position 0x%x. Falling back to byte by byte scan.",
-                fp.tell() - len(tag_bytes))
+                fp.tell() - len(tag_bytes),
+            )
             fp.seek(data_start)
             return (False, None)
         byte_count += 4
@@ -287,7 +293,9 @@ def _try_read_encapsulated_pixel_data(
                     "value as encapsulated pixel data. Unable to find length "
                     "for tag %s at position 0x%x. Falling back to byte by "
                     "byte scan.",
-                    ItemTag, fp.tell()-len(length_bytes))
+                    ItemTag,
+                    fp.tell() - len(length_bytes),
+                )
                 fp.seek(data_start)
                 return (False, None)
             byte_count += 4
@@ -300,7 +308,10 @@ def _try_read_encapsulated_pixel_data(
                     "Too-long length %04x for tag %s at position 0x%x found "
                     "while parsing undefined length value as encapsulated "
                     "pixel data. Falling back to byte-by-byte scan.",
-                    length, ItemTag, fp.tell()-8)
+                    length,
+                    ItemTag,
+                    fp.tell() - 8,
+                )
                 fp.seek(data_start)
                 return (False, None)
             byte_count += length
@@ -309,14 +320,15 @@ def _try_read_encapsulated_pixel_data(
                 "Unknown tag bytes %s at position 0x%x found "
                 "while parsing undefined length value as encapsulated "
                 "pixel data. Falling back to byte-by-byte scan.",
-                tag_bytes.hex(), fp.tell()-4)
+                tag_bytes.hex(),
+                fp.tell() - 4,
+            )
             fp.seek(data_start)
             return (False, None)
 
     length = fp.read(4)
     if length != b"\0\0\0\0":
-        msg = ("Expected 4 zero bytes after undefined length delimiter "
-               "at pos {0:04x}")
+        msg = "Expected 4 zero bytes after undefined length delimiter " "at pos {0:04x}"
         logger.debug(msg.format(fp.tell() - 4))
 
     if defer_size is not None and defer_size <= byte_count:
@@ -334,7 +346,7 @@ def find_delimiter(
     delimiter: BaseTag,
     is_little_endian: bool,
     read_size: int = 128,
-    rewind: bool = True
+    rewind: bool = True,
 ) -> int | None:
     """Return file position where 4-byte delimiter is located.
 
@@ -359,9 +371,8 @@ def find_delimiter(
     if not is_little_endian:
         struct_format = ">H"
     delimiter = Tag(delimiter)
-    bytes_to_find = (
-        pack(struct_format, delimiter.group)
-        + pack(struct_format, delimiter.elem)
+    bytes_to_find = pack(struct_format, delimiter.group) + pack(
+        struct_format, delimiter.elem
     )
 
     return find_bytes(fp, bytes_to_find, read_size=read_size, rewind=rewind)
@@ -372,7 +383,7 @@ def length_of_undefined_length(
     delimiter: BaseTag,
     is_little_endian: bool,
     read_size: int = 128,
-    rewind: bool = True
+    rewind: bool = True,
 ) -> int | None:
     """Search through the file to find the delimiter and return the length
     of the data element.
@@ -401,9 +412,7 @@ def length_of_undefined_length(
     the calling routine must handle that. Delimiter must be 4 bytes long.
     """
     data_start = fp.tell()
-    delimiter_pos = find_delimiter(
-        fp, delimiter, is_little_endian, rewind=rewind
-    )
+    delimiter_pos = find_delimiter(fp, delimiter, is_little_endian, rewind=rewind)
     if delimiter_pos is not None:
         return delimiter_pos - data_start
 
@@ -411,7 +420,7 @@ def length_of_undefined_length(
 
 
 def path_from_pathlike(
-    file_object: PathType | BinaryIO | DicomFileLike
+    file_object: PathType | BinaryIO | DicomFileLike,
 ) -> str | BinaryIO:
     """Returns the path if `file_object` is a path-like object, otherwise the
     original `file_object`.

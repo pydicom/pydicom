@@ -10,19 +10,22 @@ import shutil
 import pytest
 
 from pydicom.data import (
-    get_charset_files, get_testdata_files, get_palette_files, fetch_data_files
+    get_charset_files,
+    get_testdata_files,
+    get_palette_files,
+    fetch_data_files,
 )
 from pydicom.data.data_manager import (
-    DATA_ROOT, get_testdata_file, external_data_sources
+    DATA_ROOT,
+    get_testdata_file,
+    external_data_sources,
 )
 from pydicom.data import download
-from pydicom.data.download import (
-    get_data_dir, calculate_file_hash, get_cached_filehash
-)
+from pydicom.data.download import get_data_dir, calculate_file_hash, get_cached_filehash
 
 
 EXT_PYDICOM = False
-if 'pydicom-data' in external_data_sources():
+if "pydicom-data" in external_data_sources():
     EXT_PYDICOM = True
 
 
@@ -42,16 +45,14 @@ class TestGetData:
 
         # If pydicom-data is available locally
         ext_path = None
-        if 'pydicom-data' in external_data_sources():
-            ext_path = os.fspath(
-                external_data_sources()['pydicom-data'].data_path
-            )
+        if "pydicom-data" in external_data_sources():
+            ext_path = os.fspath(external_data_sources()["pydicom-data"].data_path)
 
         # Test base locations
-        charbase = os.path.join(DATA_ROOT, 'charset_files')
+        charbase = os.path.join(DATA_ROOT, "charset_files")
         assert os.path.exists(charbase)
 
-        testbase = os.path.join(DATA_ROOT, 'test_files')
+        testbase = os.path.join(DATA_ROOT, "test_files")
         assert os.path.exists(testbase)
 
         # Test file get
@@ -64,7 +65,7 @@ class TestGetData:
         # Test that subdirectory files included
         testdata = get_testdata_files()
         bases = [basename(x) for x in testdata]
-        assert '2693' in bases
+        assert "2693" in bases
         assert 70 < len(testdata)
 
         # The files should be from their respective bases
@@ -88,25 +89,25 @@ class TestGetData:
 
     def test_get_dataset_pattern(self):
         """Test that pattern is working properly."""
-        pattern = 'CT_small*'
+        pattern = "CT_small*"
         filename = get_testdata_files(pattern)
-        assert filename[0].endswith('CT_small.dcm')
+        assert filename[0].endswith("CT_small.dcm")
 
-        pattern = 'chrX1*'
+        pattern = "chrX1*"
         filename = get_charset_files(pattern)
-        assert filename[0].endswith('chrX1.dcm')
+        assert filename[0].endswith("chrX1.dcm")
 
     def test_get_testdata_file(self):
         """Test that file name is working properly."""
-        p = Path(get_testdata_file('DICOMDIR'))
+        p = Path(get_testdata_file("DICOMDIR"))
         assert "DICOMDIR" == p.name.upper()
 
     def test_get_palette_files(self):
         """Test data_manager.get_palette_files."""
-        palbase = os.path.join(DATA_ROOT, 'palettes')
+        palbase = os.path.join(DATA_ROOT, "palettes")
         assert os.path.exists(palbase)
 
-        palettes = get_palette_files('*.dcm')
+        palettes = get_palette_files("*.dcm")
         assert 8 == len(palettes)
 
         for x in palettes:
@@ -130,8 +131,8 @@ class TestExternalDataSource:
         shutil.copy(self.dpath / "PYTEST_BACKUP", p)
         os.remove(self.dpath / "PYTEST_BACKUP")
 
-        if 'mylib' in external_data_sources():
-            del external_data_sources()['mylib']
+        if "mylib" in external_data_sources():
+            del external_data_sources()["mylib"]
 
     def as_posix(self, path):
         """Return `path` as a posix path"""
@@ -152,7 +153,7 @@ class TestExternalDataSource:
     def test_get_testdata_file_external_hash_mismatch(self):
         """Test that the external source is not used when hash is not OK."""
         p = self.dpath / "693_UNCI.dcm"
-        with open(p, 'wb') as f:
+        with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
         ext_hash = calculate_file_hash(p)
@@ -173,10 +174,9 @@ class TestExternalDataSource:
 
     def test_get_testdata_file_external_ignore_hash(self):
         """Test that non-pydicom-data external source ignores hash check."""
-        external_data_sources()['mylib'] = external_data_sources()[
-            'pydicom-data']
+        external_data_sources()["mylib"] = external_data_sources()["pydicom-data"]
         p = self.dpath / "693_UNCI.dcm"
-        with open(p, 'wb') as f:
+        with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
         ext_hash = calculate_file_hash(p)
@@ -224,7 +224,7 @@ class TestExternalDataSource:
     def test_get_testdata_files_hash_mismatch(self):
         """Test that the external source is not used when hash is not OK."""
         p = self.dpath / "693_UNCI.dcm"
-        with open(p, 'wb') as f:
+        with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
         ext_hash = calculate_file_hash(p)
@@ -237,10 +237,9 @@ class TestExternalDataSource:
 
     def test_get_testdata_files_external_ignore_hash(self):
         """Test that non-pydicom-data external source ignores hash check."""
-        external_data_sources()['mylib'] = external_data_sources()[
-            'pydicom-data']
+        external_data_sources()["mylib"] = external_data_sources()["pydicom-data"]
         p = self.dpath / "693_UNCI.dcm"
-        with open(p, 'wb') as f:
+        with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
         ext_hash = calculate_file_hash(p)
@@ -270,8 +269,7 @@ class TestDownload:
         """Test a network outage when using get_testdata_file."""
         fname = "693_UNCI.dcm"
         msg = (
-            r"A download failure occurred while attempting to "
-            r"retrieve 693_UNCI.dcm"
+            r"A download failure occurred while attempting to " r"retrieve 693_UNCI.dcm"
         )
         with pytest.warns(UserWarning, match=msg):
             assert get_testdata_file(fname) is None

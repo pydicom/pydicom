@@ -31,6 +31,7 @@ import warnings
 
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
+
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     from pydicom.filereader import read_file
@@ -42,13 +43,15 @@ from pydicom.sequence import Sequence
 
 from ._version import __version__, __version_info__, __dicom_version__
 
-__all__ = ['DataElement',
-           'Dataset',
-           'FileDataset',
-           'Sequence',
-           'dcmread',
-           'dcmwrite',
-           'read_file',
-           'write_file',
-           '__version__',
-           '__version_info__']
+__all__ = [
+    "DataElement",
+    "Dataset",
+    "FileDataset",
+    "Sequence",
+    "dcmread",
+    "dcmwrite",
+    "read_file",
+    "write_file",
+    "__version__",
+    "__version_info__",
+]

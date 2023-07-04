@@ -1,4 +1,3 @@
-
 import os
 import sys
 from pathlib import Path
@@ -12,34 +11,60 @@ from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filebase import DicomBytesIO
 from pydicom.fileset import (
-    FileSet, FileInstance, RecordNode, is_conformant_file_id,
-    generate_filename, _define_patient, _define_study, _define_series,
-    _define_image, _PREFIXES
+    FileSet,
+    FileInstance,
+    RecordNode,
+    is_conformant_file_id,
+    generate_filename,
+    _define_patient,
+    _define_study,
+    _define_series,
+    _define_image,
+    _PREFIXES,
 )
 from pydicom.filewriter import write_dataset
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import (
-    ExplicitVRLittleEndian, generate_uid, ImplicitVRLittleEndian,
-    MediaStorageDirectoryStorage, ComputedRadiographyImageStorage,
-    CTImageStorage, RTBeamsTreatmentRecordStorage, RTPlanStorage,
-    GrayscaleSoftcopyPresentationStateStorage, BasicTextSRStorage,
-    KeyObjectSelectionDocumentStorage, MRSpectroscopyStorage,
-    HangingProtocolStorage, EncapsulatedPDFStorage, ColorPaletteStorage,
-    GenericImplantTemplateStorage, ImplantAssemblyTemplateStorage,
-    ImplantTemplateGroupStorage, TwelveLeadECGWaveformStorage,
-    RawDataStorage, SpatialRegistrationStorage, SpatialFiducialsStorage,
-    RealWorldValueMappingStorage, StereometricRelationshipStorage,
-    LensometryMeasurementsStorage, SurfaceSegmentationStorage,
-    TractographyResultsStorage, SurfaceScanMeshStorage, RTDoseStorage,
-    ContentAssessmentResultsStorage, RTStructureSetStorage,
-    RTBeamsDeliveryInstructionStorage, CArmPhotonElectronRadiationStorage,
+    ExplicitVRLittleEndian,
+    generate_uid,
+    ImplicitVRLittleEndian,
+    MediaStorageDirectoryStorage,
+    ComputedRadiographyImageStorage,
+    CTImageStorage,
+    RTBeamsTreatmentRecordStorage,
+    RTPlanStorage,
+    GrayscaleSoftcopyPresentationStateStorage,
+    BasicTextSRStorage,
+    KeyObjectSelectionDocumentStorage,
+    MRSpectroscopyStorage,
+    HangingProtocolStorage,
+    EncapsulatedPDFStorage,
+    ColorPaletteStorage,
+    GenericImplantTemplateStorage,
+    ImplantAssemblyTemplateStorage,
+    ImplantTemplateGroupStorage,
+    TwelveLeadECGWaveformStorage,
+    RawDataStorage,
+    SpatialRegistrationStorage,
+    SpatialFiducialsStorage,
+    RealWorldValueMappingStorage,
+    StereometricRelationshipStorage,
+    LensometryMeasurementsStorage,
+    SurfaceSegmentationStorage,
+    TractographyResultsStorage,
+    SurfaceScanMeshStorage,
+    RTDoseStorage,
+    ContentAssessmentResultsStorage,
+    RTStructureSetStorage,
+    RTBeamsDeliveryInstructionStorage,
+    CArmPhotonElectronRadiationStorage,
 )
 
 
-TEST_FILE = get_testdata_file('DICOMDIR')
+TEST_FILE = get_testdata_file("DICOMDIR")
 TINY_ALPHA_FILESET = get_testdata_file("TINY_ALPHA/DICOMDIR")
-IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
-BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
+IMPLICIT_TEST_FILE = get_testdata_file("DICOMDIR-implicit")
+BIGENDIAN_TEST_FILE = get_testdata_file("DICOMDIR-bigEnd")
 
 
 @pytest.fixture
@@ -61,7 +86,7 @@ def dicomdir_copy():
     src = Path(TEST_FILE).parent
     dst = Path(t.name)
 
-    shutil.copyfile(src / 'DICOMDIR', dst / 'DICOMDIR')
+    shutil.copyfile(src / "DICOMDIR", dst / "DICOMDIR")
     shutil.copytree(src / "77654033", dst / "77654033")
     shutil.copytree(src / "98892003", dst / "98892003")
     shutil.copytree(src / "98892001", dst / "98892001")
@@ -103,9 +128,7 @@ def custom_leaf():
     image.ReferencedFileID = None
     image.ReferencedSOPClassUIDInFile = ct.SOPClassUID
     image.ReferencedSOPInstanceUIDInFile = ct.SOPInstanceUID
-    image.ReferencedTransferSyntaxUIDInFile = (
-        ct.file_meta.TransferSyntaxUID
-    )
+    image.ReferencedTransferSyntaxUIDInFile = ct.file_meta.TransferSyntaxUID
     image = RecordNode(image)
 
     image.parent = series
@@ -118,6 +141,7 @@ def custom_leaf():
 @pytest.fixture
 def private(dicomdir):
     """Return a DICOMDIR dataset with PRIVATE records."""
+
     def write_record(ds):
         """Return `ds` as explicit little encoded bytes."""
         fp = DicomBytesIO()
@@ -144,7 +168,11 @@ def private(dicomdir):
     bottom = private_record()
     bottom.ReferencedSOPClassUIDInFile = "1.2.3.4"
     bottom.ReferencedFileID = [
-        "TINY_ALPHA", "PT000000", "ST000000", "SE000000", "IM000000"
+        "TINY_ALPHA",
+        "PT000000",
+        "ST000000",
+        "SE000000",
+        "IM000000",
     ]
     bottom.ReferencedSOPInstanceUIDInFile = (
         "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187"
@@ -289,10 +317,7 @@ def write_fs(fs, path=None):
     """
     fs.write(path)
     path = Path(fs.path)
-    paths = [
-        p for p in path.glob('**/*')
-        if p.is_file() and p.name != 'DICOMDIR'
-    ]
+    paths = [p for p in path.glob("**/*") if p.is_file() and p.name != "DICOMDIR"]
     return dcmread(path / "DICOMDIR"), sorted(paths)
 
 
@@ -310,10 +335,7 @@ def copy_fs(fs, path, as_implicit=False):
     """
     path = Path(path)
     fs = fs.copy(path, force_implicit=as_implicit)
-    paths = [
-        p for p in path.glob('**/*')
-        if p.is_file() and p.name != 'DICOMDIR'
-    ]
+    paths = [p for p in path.glob("**/*") if p.is_file() and p.name != "DICOMDIR"]
     return fs, dcmread(path / "DICOMDIR"), sorted(paths)
 
 
@@ -323,8 +345,8 @@ def temporary_fs(ds):
     src = Path(ds.filename).parent
     dst = Path(t.name)
 
-    shutil.copyfile(src / 'DICOMDIR', dst / 'DICOMDIR')
-    for d in src.glob('*'):
+    shutil.copyfile(src / "DICOMDIR", dst / "DICOMDIR")
+    for d in src.glob("*"):
         if d.is_dir():
             shutil.copytree(d, dst / d.name)
 
@@ -334,16 +356,36 @@ def temporary_fs(ds):
 def test_is_conformant_file_id():
     """Test conformant and non-conformant File ID paths"""
     bad = [
-        "aBCDEF123", "aBCD1234", "ABCD!", "1234)", " ",
-        "1/2/3/4/5/6/7/8/9", "لنزار", "ABCD.DCM", "123 ABCD"
+        "aBCDEF123",
+        "aBCD1234",
+        "ABCD!",
+        "1234)",
+        " ",
+        "1/2/3/4/5/6/7/8/9",
+        "لنزار",
+        "ABCD.DCM",
+        "123 ABCD",
     ]
     for p in bad:
         assert not is_conformant_file_id(Path(p))
 
     good = [
-        "ACBDEFGH", "12345678", "1/2/3/4/5/6/7/8", "0", "9", "A", "Z",
-        "ABCD1234", "1234ABCD", "_", "_ABCD", "ABCD_", "AB_CD", "________",
-        "A_______", "_______1"
+        "ACBDEFGH",
+        "12345678",
+        "1/2/3/4/5/6/7/8",
+        "0",
+        "9",
+        "A",
+        "Z",
+        "ABCD1234",
+        "1234ABCD",
+        "_",
+        "_ABCD",
+        "ABCD_",
+        "AB_CD",
+        "________",
+        "A_______",
+        "_______1",
     ]
     for p in good:
         assert is_conformant_file_id(Path(p))
@@ -357,92 +399,90 @@ def test_prefixes():
 
 class TestGenerateFilename:
     """Tests for generate_filename()."""
+
     def test_numeric(self):
         """Test generating numeric suffixes."""
         gen = generate_filename(start=0, alphanumeric=False)
-        assert '00000000' == next(gen)
-        assert '00000001' == next(gen)
-        assert '00000002' == next(gen)
-        assert '00000003' == next(gen)
-        assert '00000004' == next(gen)
-        assert '00000005' == next(gen)
-        assert '00000006' == next(gen)
-        assert '00000007' == next(gen)
-        assert '00000008' == next(gen)
-        assert '00000009' == next(gen)
-        assert '00000010' == next(gen)
+        assert "00000000" == next(gen)
+        assert "00000001" == next(gen)
+        assert "00000002" == next(gen)
+        assert "00000003" == next(gen)
+        assert "00000004" == next(gen)
+        assert "00000005" == next(gen)
+        assert "00000006" == next(gen)
+        assert "00000007" == next(gen)
+        assert "00000008" == next(gen)
+        assert "00000009" == next(gen)
+        assert "00000010" == next(gen)
 
     def test_numeric_prefix(self):
         """Test prefix for numeric filenames."""
         for ii in range(1, 8):
             prefix = "A" * ii
-            gen = generate_filename(
-                prefix="A" * ii, start=0, alphanumeric=False
-            )
-            assert prefix + '0' * (8 - ii) == next(gen)
+            gen = generate_filename(prefix="A" * ii, start=0, alphanumeric=False)
+            assert prefix + "0" * (8 - ii) == next(gen)
 
     def test_numeric_start(self):
         """Test start point with numeric suffixes."""
         gen = generate_filename(start=10, alphanumeric=False)
-        assert '00000010' == next(gen)
-        assert '00000011' == next(gen)
-        assert '00000012' == next(gen)
+        assert "00000010" == next(gen)
+        assert "00000011" == next(gen)
+        assert "00000012" == next(gen)
 
     def test_alphanumeric(self):
         """Test generating alphanumeric suffixes."""
         gen = generate_filename(start=0, alphanumeric=True)
-        assert '00000000' == next(gen)
-        assert '00000001' == next(gen)
-        assert '00000002' == next(gen)
-        assert '00000003' == next(gen)
-        assert '00000004' == next(gen)
-        assert '00000005' == next(gen)
-        assert '00000006' == next(gen)
-        assert '00000007' == next(gen)
-        assert '00000008' == next(gen)
-        assert '00000009' == next(gen)
-        assert '0000000A' == next(gen)
+        assert "00000000" == next(gen)
+        assert "00000001" == next(gen)
+        assert "00000002" == next(gen)
+        assert "00000003" == next(gen)
+        assert "00000004" == next(gen)
+        assert "00000005" == next(gen)
+        assert "00000006" == next(gen)
+        assert "00000007" == next(gen)
+        assert "00000008" == next(gen)
+        assert "00000009" == next(gen)
+        assert "0000000A" == next(gen)
         for ii in range(24):
             next(gen)
-        assert '0000000Z' == next(gen)
-        assert '00000010' == next(gen)
+        assert "0000000Z" == next(gen)
+        assert "00000010" == next(gen)
 
     def test_alphanumeric_prefix(self):
         """Test length of the suffixes."""
         for ii in range(1, 8):
             prefix = "A" * ii
-            gen = generate_filename(
-                prefix="A" * ii, start=0, alphanumeric=True
-            )
-            assert prefix + '0' * (8 - ii) == next(gen)
-            assert prefix + '0' * (7 - ii) + '1' == next(gen)
-            assert prefix + '0' * (7 - ii) + '2' == next(gen)
-            assert prefix + '0' * (7 - ii) + '3' == next(gen)
-            assert prefix + '0' * (7 - ii) + '4' == next(gen)
-            assert prefix + '0' * (7 - ii) + '5' == next(gen)
-            assert prefix + '0' * (7 - ii) + '6' == next(gen)
-            assert prefix + '0' * (7 - ii) + '7' == next(gen)
-            assert prefix + '0' * (7 - ii) + '8' == next(gen)
-            assert prefix + '0' * (7 - ii) + '9' == next(gen)
-            assert prefix + '0' * (7 - ii) + 'A' == next(gen)
+            gen = generate_filename(prefix="A" * ii, start=0, alphanumeric=True)
+            assert prefix + "0" * (8 - ii) == next(gen)
+            assert prefix + "0" * (7 - ii) + "1" == next(gen)
+            assert prefix + "0" * (7 - ii) + "2" == next(gen)
+            assert prefix + "0" * (7 - ii) + "3" == next(gen)
+            assert prefix + "0" * (7 - ii) + "4" == next(gen)
+            assert prefix + "0" * (7 - ii) + "5" == next(gen)
+            assert prefix + "0" * (7 - ii) + "6" == next(gen)
+            assert prefix + "0" * (7 - ii) + "7" == next(gen)
+            assert prefix + "0" * (7 - ii) + "8" == next(gen)
+            assert prefix + "0" * (7 - ii) + "9" == next(gen)
+            assert prefix + "0" * (7 - ii) + "A" == next(gen)
 
     def test_alphanumeric_start(self):
         """Test start point with alphanumeric suffixes."""
         gen = generate_filename(start=10, alphanumeric=True)
-        assert '0000000A' == next(gen)
-        assert '0000000B' == next(gen)
-        assert '0000000C' == next(gen)
+        assert "0000000A" == next(gen)
+        assert "0000000B" == next(gen)
+        assert "0000000C" == next(gen)
 
     def test_long_prefix_raises(self):
         """Test too long a prefix."""
         msg = r"The 'prefix' must be less than 8 characters long"
         with pytest.raises(ValueError, match=msg):
-            next(generate_filename('A' * 8))
+            next(generate_filename("A" * 8))
 
 
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestRecordNode:
     """Tests for RecordNode."""
+
     def test_root(self, private):
         """Tests the root node."""
         fs = FileSet(private)
@@ -681,7 +721,7 @@ class TestRecordNode:
         fs = FileSet(private)
         node = fs._instances[0].node
         fs._instances[0].node._record.add_new(0x00080000, "UL", 128)
-        fs._instances[0].node._record.PatientSex = 'F'
+        fs._instances[0].node._record.PatientSex = "F"
         fs, ds, paths = copy_fs(fs, tdir.name)
         item = ds.DirectoryRecordSequence[3]
         assert 0x00080000 not in item
@@ -724,6 +764,7 @@ class TestRecordNode:
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileInstance:
     """Tests for FileInstance."""
+
     def test_getattr(self, dicomdir):
         """Test FileInstance.__getattribute__."""
         fs = FileSet(dicomdir)
@@ -796,7 +837,7 @@ class TestFileInstance:
         assert Tag(0x00080020) in instance
         assert (0x0008, 0x0020) in instance
         assert "0x00080020" in instance
-        assert 'bad' not in instance
+        assert "bad" not in instance
 
     def test_is_private(self, private):
         """Test FileInstance.is_private"""
@@ -845,21 +886,19 @@ class TestFileInstance:
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_addition
-        assert (
-            Path(fs._stage['path']) / Path(instance.SOPInstanceUID)
-        ) == Path(instance.path)
+        assert (Path(fs._stage["path"]) / Path(instance.SOPInstanceUID)) == Path(
+            instance.path
+        )
         assert isinstance(instance.path, str)
 
     def test_path_move(self, dicomdir):
         """Test FileInstance.path for an instance to be move."""
         fs = FileSet(dicomdir)
-        assert fs._stage['~']
+        assert fs._stage["~"]
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_moving
-        assert (
-            Path(fs.path) / Path(*instance.ReferencedFileID)
-        ) == Path(instance.path)
+        assert (Path(fs.path) / Path(*instance.ReferencedFileID)) == Path(instance.path)
         assert isinstance(instance.path, str)
 
     def test_path_removal(self, dicomdir, tdir):
@@ -869,9 +908,7 @@ class TestFileInstance:
         fs.remove(instance)
         assert instance.is_staged
         assert instance.for_removal
-        assert (
-            Path(fs.path) / Path(*instance.ReferencedFileID)
-        ) == Path(instance.path)
+        assert (Path(fs.path) / Path(*instance.ReferencedFileID)) == Path(instance.path)
         assert isinstance(instance.path, str)
 
     def test_load(self, ct, tdir):
@@ -907,7 +944,7 @@ class TestFileInstance:
         assert instance.for_moving
         assert fs.is_staged
         # At least one instance needs to be moved
-        assert fs._stage['~']
+        assert fs._stage["~"]
         ds = instance.load()
         assert isinstance(ds, Dataset)
         sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
@@ -976,7 +1013,7 @@ class TestFileInstance:
         fs = FileSet(dicomdir)
         assert fs.is_staged
         # At least one instance needs to be moved
-        assert fs._stage['~']
+        assert fs._stage["~"]
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_moving
@@ -1005,9 +1042,7 @@ class TestFileInstance:
         for node in instance.node.reverse():
             assert node.record_type == "PRIVATE"
 
-        path = os.fspath(
-            Path("TINY_ALPHA/PT000000/ST000000/SE000000/IM000000")
-        )
+        path = os.fspath(Path("TINY_ALPHA/PT000000/ST000000/SE000000/IM000000"))
         assert path in instances[-1].path
 
         assert "1.2.3.4" == instance.SOPClassUID
@@ -1020,6 +1055,7 @@ class TestFileInstance:
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet:
     """Tests for FileSet."""
+
     def test_empty(self):
         """Test an new and empty File-set."""
         fs = FileSet()
@@ -1109,7 +1145,7 @@ class TestFileSet:
         fs = FileSet()
         assert fs.descriptor_file_id is None
         assert fs.is_staged
-        fs._stage['^'] = False  # Override
+        fs._stage["^"] = False  # Override
         assert not fs.is_staged
         fs.descriptor_file_id = None
         assert not fs.is_staged
@@ -1123,10 +1159,10 @@ class TestFileSet:
         assert "A" * 16 == fs.descriptor_file_id
         fs.descriptor_file_id = None
         assert fs.descriptor_file_id is None
-        fs.descriptor_file_id = ['A'] * 8
-        assert ['A'] * 8 == fs.descriptor_file_id
+        fs.descriptor_file_id = ["A"] * 8
+        assert ["A"] * 8 == fs.descriptor_file_id
         fs.descriptor_file_id = ["A", "", "B", "C"]
-        assert ['A', 'B', 'C'] == fs.descriptor_file_id
+        assert ["A", "B", "C"] == fs.descriptor_file_id
 
         # Test exceptions
         msg = r"The 'DescriptorFileID' must be a str, list of str, or None"
@@ -1137,11 +1173,11 @@ class TestFileSet:
             r"components, each between 0 and 16 characters long"
         )
         with pytest.raises(ValueError, match=msg):
-            fs.descriptor_file_id = ['A'] * 9
+            fs.descriptor_file_id = ["A"] * 9
         with pytest.raises(ValueError, match=msg):
-            fs.descriptor_file_id = ['A' * 17]
+            fs.descriptor_file_id = ["A" * 17]
         with pytest.raises(ValueError, match=msg):
-            fs.descriptor_file_id = ['A', 1]
+            fs.descriptor_file_id = ["A", 1]
         msg = (
             r"Each 'File-set Descriptor File ID' component has a "
             r"maximum length of 16 characters"
@@ -1149,7 +1185,7 @@ class TestFileSet:
         with pytest.raises(ValueError, match=msg):
             fs.descriptor_file_id = "A" * 17
 
-        assert ['A', 'B', 'C'] == fs.descriptor_file_id
+        assert ["A", "B", "C"] == fs.descriptor_file_id
 
     def test_descriptor_and_charset_written(self, tdir):
         """Test that the File-set Descriptor File ID gets written."""
@@ -1167,8 +1203,8 @@ class TestFileSet:
         assert fs.descriptor_file_id is None
         assert "FileSetDescriptorFileID" not in ds
         assert fs.is_staged
-        fs._stage['^'] = False  # Override
-        fs._stage['~'] = {}
+        fs._stage["^"] = False  # Override
+        fs._stage["~"] = {}
         assert not fs.is_staged
         fs.descriptor_file_id = None
         assert "FileSetDescriptorFileID" not in ds
@@ -1186,16 +1222,16 @@ class TestFileSet:
         fs.descriptor_file_id = None
         assert fs.descriptor_file_id is None
         assert ds.FileSetDescriptorFileID is None
-        fs.descriptor_file_id = ['A'] * 8
-        assert ['A'] * 8 == fs.descriptor_file_id
-        assert ['A'] * 8 == ds.FileSetDescriptorFileID
+        fs.descriptor_file_id = ["A"] * 8
+        assert ["A"] * 8 == fs.descriptor_file_id
+        assert ["A"] * 8 == ds.FileSetDescriptorFileID
 
     def test_descriptor_charset(self):
         """Test FileSet.descriptor_character_set."""
         fs = FileSet()
         assert fs.descriptor_character_set is None
         assert fs.is_staged
-        fs._stage['^'] = False  # Override
+        fs._stage["^"] = False  # Override
         assert not fs.is_staged
         fs.descriptor_character_set = None
         assert not fs.is_staged
@@ -1211,8 +1247,8 @@ class TestFileSet:
         assert fs.descriptor_character_set is None
         assert "SpecificCharacterSetOfFileSetDescriptorFile" not in ds
         assert fs.is_staged
-        fs._stage['^'] = False  # Override
-        fs._stage['~'] = {}
+        fs._stage["^"] = False  # Override
+        fs._stage["~"] = {}
         assert not fs.is_staged
         fs.descriptor_character_set = None
         assert "SpecificCharacterSetOfFileSetDescriptorFile" not in ds
@@ -1226,8 +1262,11 @@ class TestFileSet:
         """Test setting the File-set's path."""
         fs = FileSet()
         assert fs.path is None
-        msg = (r"can't set attribute" if sys.version_info < (3, 11)
-               else r"property 'path' of 'FileSet' object has no setter")
+        msg = (
+            r"can't set attribute"
+            if sys.version_info < (3, 11)
+            else r"property 'path' of 'FileSet' object has no setter"
+        )
         with pytest.raises(AttributeError, match=msg):
             fs.path = tdir.name
 
@@ -1256,9 +1295,7 @@ class TestFileSet:
         """Test writing an empty File-set."""
         fs = FileSet()
         uid = fs.UID
-        msg = (
-            r"The path to the root directory is required for a new File-set"
-        )
+        msg = r"The path to the root directory is required for a new File-set"
         with pytest.raises(ValueError, match=msg):
             fs.write()
 
@@ -1266,7 +1303,7 @@ class TestFileSet:
         fs.write(path)
 
         # Should be the DICOMDIR file
-        contents = list(path.glob('**/*'))
+        contents = list(path.glob("**/*"))
         assert "DICOMDIR" == contents[0].name
         assert 1 == len(contents)
 
@@ -1293,8 +1330,7 @@ class TestFileSet:
         s = str(fs)
         assert "Managed instances" in s
         assert (
-            "PATIENT: PatientID='1CT1', "
-            "PatientName='CompressedSamples^CT1'"
+            "PATIENT: PatientID='1CT1', " "PatientName='CompressedSamples^CT1'"
         ) in s
         assert (
             "STUDY: StudyDate=20040119, StudyTime=072730, "
@@ -1310,12 +1346,8 @@ class TestFileSet:
         assert 1 == len(fs)
 
         # Test the DICOMDIR
-        assert 398 == (
-            ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
-        )
-        assert 398 == (
-            ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
-        )
+        assert 398 == (ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity)
+        assert 398 == (ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity)
 
         seq = ds.DirectoryRecordSequence
         assert 4 == len(seq)
@@ -1357,7 +1389,7 @@ class TestFileSet:
         item = seq[3]
         assert item.seq_item_tell == 852
         assert "IMAGE" == item.DirectoryRecordType
-        assert ['PT000000', 'ST000000', 'SE000000', 'IM000000'] == (
+        assert ["PT000000", "ST000000", "SE000000", "IM000000"] == (
             item.ReferencedFileID
         )
         assert ct.SOPInstanceUID == item.ReferencedSOPInstanceUIDInFile
@@ -1506,7 +1538,7 @@ class TestFileSet:
         assert 1 == len(fs.find(SOPInstanceUID=ct.SOPInstanceUID))
         assert fs.is_staged
         instance = fs._instances[0]
-        assert instance.SOPInstanceUID in fs._stage['+']
+        assert instance.SOPInstanceUID in fs._stage["+"]
 
         ds, paths = write_fs(fs, tdir.name)
         assert 1 == len(paths)
@@ -1521,7 +1553,7 @@ class TestFileSet:
         assert 1 == len(fs.find(SOPInstanceUID=ct.SOPInstanceUID))
         assert fs.is_staged
         instance = fs._instances[0]
-        assert instance.SOPInstanceUID in fs._stage['+']
+        assert instance.SOPInstanceUID in fs._stage["+"]
 
         ds, paths = write_fs(fs, tdir.name)
         assert 1 == len(paths)
@@ -1543,9 +1575,7 @@ class TestFileSet:
         ds.ReferencedFileID = None
         ds.ReferencedSOPClassUIDInFile = ct.SOPClassUID
         ds.ReferencedSOPInstanceUIDInFile = ct.SOPInstanceUID
-        ds.ReferencedTransferSyntaxUIDInFile = (
-            ct.file_meta.TransferSyntaxUID
-        )
+        ds.ReferencedTransferSyntaxUIDInFile = ct.file_meta.TransferSyntaxUID
         private = RecordNode(ds)
         private.parent = patient
 
@@ -1558,7 +1588,7 @@ class TestFileSet:
         assert 1 == len(fs.find(SOPInstanceUID=ct.SOPInstanceUID))
         assert fs.is_staged
         instance = fs._instances[0]
-        assert instance.SOPInstanceUID in fs._stage['+']
+        assert instance.SOPInstanceUID in fs._stage["+"]
 
         ds, paths = write_fs(fs, tdir.name)
         assert 1 == len(paths)
@@ -1588,9 +1618,7 @@ class TestFileSet:
         top._record.ReferencedFileID = None
         top._record.ReferencedSOPClassUIDInFile = ct.SOPClassUID
         top._record.ReferencedSOPInstanceUIDInFile = ct.SOPInstanceUID
-        top._record.ReferencedTransferSyntaxUIDInFile = (
-            ct.file_meta.TransferSyntaxUID
-        )
+        top._record.ReferencedTransferSyntaxUIDInFile = ct.file_meta.TransferSyntaxUID
         assert 8 == top.depth
 
         fs = FileSet()
@@ -1709,21 +1737,21 @@ class TestFileSet:
         fs.add(ct)
         fs.add(get_testdata_file("MR_small.dcm"))
 
-        for p in list(Path(TINY_ALPHA_FILESET).parent.glob('**/*'))[::2]:
-            if p.is_file() and p.name not in ['DICOMDIR', 'README']:
+        for p in list(Path(TINY_ALPHA_FILESET).parent.glob("**/*"))[::2]:
+            if p.is_file() and p.name not in ["DICOMDIR", "README"]:
                 fs.add(p)
 
         instance = fs._instances[-1]
         ds = dcmread(get_testdata_file("rtdose.dcm"))
-        ds.PatientID = '12345678'
-        ds.InstanceNumber = '1'
+        ds.PatientID = "12345678"
+        ds.InstanceNumber = "1"
         ds.StudyInstanceUID = instance.StudyInstanceUID
         ds.SeriesInstanceUID = instance.SeriesInstanceUID
         fs.add(ds)
 
         ds = dcmread(get_testdata_file("rtplan.dcm"))
-        ds.PatientID = '12345678'
-        ds.InstanceNumber = '1'
+        ds.PatientID = "12345678"
+        ds.InstanceNumber = "1"
         ds.StudyInstanceUID = instance.StudyInstanceUID
         ds.SeriesInstanceUID = instance.SeriesInstanceUID
         fs.add(ds)
@@ -1800,8 +1828,8 @@ class TestFileSet:
         for instance in fs:
             fs.remove(instance)
 
-        for p in list(Path(TINY_ALPHA_FILESET).parent.glob('**/*'))[1:40:2]:
-            if p.is_file() and p.name not in ['DICOMDIR', 'README']:
+        for p in list(Path(TINY_ALPHA_FILESET).parent.glob("**/*"))[1:40:2]:
+            if p.is_file() and p.name not in ["DICOMDIR", "README"]:
                 fs.add(p)
 
         ref = (
@@ -1841,14 +1869,14 @@ class TestFileSet:
         """Test that the update structure comment appears."""
         fs = FileSet(dicomdir)
         assert (
-            "Changes staged for write(): DICOMDIR update, directory "
-            "structure update"
+            "Changes staged for write(): DICOMDIR update, directory " "structure update"
         ) in str(fs)
 
 
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Load:
     """Tests for a loaded File-set."""
+
     def test_write_dicomdir(self, dicomdir):
         """Test DICOMDIR writing"""
         fs = FileSet(dicomdir)
@@ -1860,12 +1888,8 @@ class TestFileSet_Load:
 
         new = dcmread(out)
         assert dicomdir.DirectoryRecordSequence == new.DirectoryRecordSequence
-        assert (
-            396 == new.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
-        )
-        assert (
-            3126 == new.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
-        )
+        assert 396 == new.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
+        assert 3126 == new.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
 
     def test_write_new_path(self, dicomdir):
         """Test writing to a new path."""
@@ -1880,7 +1904,7 @@ class TestFileSet_Load:
 
     def test_bad_sop_class_raises(self, dicomdir):
         """Test loading using non-DICOMDIR."""
-        dicomdir.file_meta.MediaStorageSOPClassUID = '1.2.3'
+        dicomdir.file_meta.MediaStorageSOPClassUID = "1.2.3"
         msg = (
             r"Unable to load the File-set as the supplied dataset is "
             r"not a 'Media Storage Directory' instance"
@@ -1890,7 +1914,7 @@ class TestFileSet_Load:
 
     def test_bad_filename_raises(self, dicomdir):
         """Test loading with a bad path."""
-        dicomdir.filename = 'bad'
+        dicomdir.filename = "bad"
         msg = (
             r"Unable to load the File-set as the 'filename' attribute "
             r"for the DICOMDIR dataset is not a valid path: "
@@ -1914,10 +1938,10 @@ class TestFileSet_Load:
         """Tests for FileSet.find()."""
         fs = FileSet(dicomdir)
         assert 31 == len(fs.find())
-        assert 7 == len(fs.find(PatientID='77654033'))
-        assert 24 == len(fs.find(PatientID='98890234'))
+        assert 7 == len(fs.find(PatientID="77654033"))
+        assert 24 == len(fs.find(PatientID="98890234"))
 
-        matches = fs.find(PatientID='98890234', StudyDate="20030505")
+        matches = fs.find(PatientID="98890234", StudyDate="20030505")
         assert 17 == len(matches)
         for ii in matches:
             assert isinstance(ii, FileInstance)
@@ -1934,28 +1958,24 @@ class TestFileSet_Load:
             r"to expand the search to the corresponding SOP instances"
         )
         with pytest.warns(UserWarning, match=msg):
-            results = fs.find(
-                load=False, PhotometricInterpretation="MONOCHROME1"
-            )
+            results = fs.find(load=False, PhotometricInterpretation="MONOCHROME1")
             assert not results
 
-        results = fs.find(
-            load=True, PhotometricInterpretation="MONOCHROME1"
-        )
+        results = fs.find(load=True, PhotometricInterpretation="MONOCHROME1")
         assert 3 == len(results)
 
     def test_find_values(self, private):
         """Test searching the FileSet for element values."""
         fs = FileSet(private)
         expected = {
-            "PatientID": ['77654033', '98890234'],
+            "PatientID": ["77654033", "98890234"],
             "StudyDescription": [
-                'XR C Spine Comp Min 4 Views',
-                'CT, HEAD/BRAIN WO CONTRAST',
-                '',
-                'Carotids',
-                'Brain',
-                'Brain-MRA',
+                "XR C Spine Comp Min 4 Views",
+                "CT, HEAD/BRAIN WO CONTRAST",
+                "",
+                "Carotids",
+                "Brain",
+                "Brain-MRA",
             ],
         }
         for k, v in expected.items():
@@ -1968,7 +1988,7 @@ class TestFileSet_Load:
         search_element = "PhotometricInterpretation"
         msg = (
             r"None of the records in the DICOMDIR dataset contain "
-            fr"\['{search_element}'\], consider using the 'load' parameter "
+            rf"\['{search_element}'\], consider using the 'load' parameter "
             r"to expand the search to the corresponding SOP instances"
         )
         with pytest.warns(UserWarning, match=msg):
@@ -1976,16 +1996,17 @@ class TestFileSet_Load:
             assert not results
 
         assert fs.find_values(search_element, load=True) == [
-            'MONOCHROME1', 'MONOCHROME2'
+            "MONOCHROME1",
+            "MONOCHROME2",
         ]
 
         with pytest.warns(UserWarning, match=msg):
             results = fs.find_values([search_element], load=False)
             assert not results[search_element]
 
-        assert (
-            fs.find_values([search_element], load=True)
-        ) == {search_element: ['MONOCHROME1', 'MONOCHROME2']}
+        assert (fs.find_values([search_element], load=True)) == {
+            search_element: ["MONOCHROME1", "MONOCHROME2"]
+        }
 
     def test_empty_file_id(self, dicomdir):
         """Test loading a record with an empty File ID."""
@@ -2046,9 +2067,7 @@ class TestFileSet_Load:
         assert [] == fs.find(SeriesInstanceUID=seq[2].SeriesInstanceUID)
         for ii in range(3, 9, 2):
             assert "IMAGE" == seq[ii].DirectoryRecordType
-            assert [] == fs.find(
-                SOPInstanceUID=seq[ii].ReferencedSOPInstanceUIDInFile
-            )
+            assert [] == fs.find(SOPInstanceUID=seq[ii].ReferencedSOPInstanceUIDInFile)
 
     def test_load_orphans_no_file_id(self, private):
         """Test loading orphaned records without a valid File ID."""
@@ -2062,15 +2081,9 @@ class TestFileSet_Load:
 
         assert 31 == len(fs)
         assert "IMAGE" == seq[5].DirectoryRecordType
-        assert [] == fs.find(
-            SOPInstanceUID=seq[5].ReferencedSOPInstanceUIDInFile
-        )
-        assert 1 == len(
-            fs.find(SOPInstanceUID=seq[3].ReferencedSOPInstanceUIDInFile)
-        )
-        assert 1 == len(
-            fs.find(SOPInstanceUID=seq[7].ReferencedSOPInstanceUIDInFile)
-        )
+        assert [] == fs.find(SOPInstanceUID=seq[5].ReferencedSOPInstanceUIDInFile)
+        assert 1 == len(fs.find(SOPInstanceUID=seq[3].ReferencedSOPInstanceUIDInFile))
+        assert 1 == len(fs.find(SOPInstanceUID=seq[7].ReferencedSOPInstanceUIDInFile))
 
     def test_load_orphans_private(self, private):
         """Test loading an orphaned PRIVATE record."""
@@ -2079,9 +2092,7 @@ class TestFileSet_Load:
         fs = FileSet()
         fs.load(private)
         assert 32 == len(fs)
-        assert 1 == len(
-            fs.find(SOPInstanceUID=seq[-1].ReferencedSOPInstanceUIDInFile)
-        )
+        assert 1 == len(fs.find(SOPInstanceUID=seq[-1].ReferencedSOPInstanceUIDInFile))
 
     def test_load_dicomdir_big_endian(self, dicomdir, tdir):
         """Test loading a big endian DICOMDIR"""
@@ -2127,7 +2138,7 @@ class TestFileSet_Load:
 
     def test_load_dicomdir_reordered(self, dicomdir):
         """Test loading DICOMDIR-reordered"""
-        ds = dcmread(get_testdata_file('DICOMDIR-reordered'))
+        ds = dcmread(get_testdata_file("DICOMDIR-reordered"))
         fs = FileSet(ds)
         ref = FileSet(dicomdir)
         assert len(ref) == len(fs)
@@ -2136,7 +2147,7 @@ class TestFileSet_Load:
 
     def test_load_dicomdir_no_offset(self, dicomdir):
         """Test loading DICOMDIR-nooffset"""
-        ds = dcmread(get_testdata_file('DICOMDIR-nooffset'))
+        ds = dcmread(get_testdata_file("DICOMDIR-nooffset"))
         fs = FileSet(ds)
         ref = FileSet(dicomdir)
         assert len(ref) == len(fs)
@@ -2154,6 +2165,7 @@ class TestFileSet_Load:
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Modify:
     """Tests for a modified File-set."""
+
     def setup_method(self):
         self.fn = FileSet.__len__
 
@@ -2165,14 +2177,14 @@ class TestFileSet_Modify:
         t, ds = dicomdir_copy
         fs = FileSet(ds)
         ds, paths = write_fs(fs)
-        assert not fs._stage['^']
+        assert not fs._stage["^"]
         fs.descriptor_file_id = ["1", "2", "3"]
-        assert fs._stage['^']
-        assert not fs._stage['~']
-        assert not fs._stage['+']
-        assert not fs._stage['-']
+        assert fs._stage["^"]
+        assert not fs._stage["~"]
+        assert not fs._stage["+"]
+        assert not fs._stage["-"]
         fs.write()
-        assert not fs._stage['^']
+        assert not fs._stage["^"]
         ds = dcmread(Path(fs.path) / "DICOMDIR")
         assert ["1", "2", "3"] == ds.FileSetDescriptorFileID
 
@@ -2181,9 +2193,9 @@ class TestFileSet_Modify:
         tdir, ds = dicomdir_copy
         assert "FileSetDescriptorFileID" not in ds
         fs = FileSet(ds)
-        assert fs._stage['~']
-        assert not fs._stage['+']
-        assert not fs._stage['-']
+        assert fs._stage["~"]
+        assert not fs._stage["+"]
+        assert not fs._stage["-"]
         fs.descriptor_file_id = ["1", "2", "3"]
         fs.write(use_existing=True)
         t = Path(tdir.name)
@@ -2199,9 +2211,9 @@ class TestFileSet_Modify:
         assert "FileSetDescriptorFileID" not in ds
         fs = FileSet(ds)
         fs.add(ct)
-        assert fs._stage['~']
-        assert fs._stage['+']
-        assert not fs._stage['-']
+        assert fs._stage["~"]
+        assert fs._stage["+"]
+        assert not fs._stage["-"]
         fs.descriptor_file_id = ["1", "2", "3"]
         msg = (
             r"'Fileset.write\(\)' called with 'use_existing' but additions to "
@@ -2215,15 +2227,15 @@ class TestFileSet_Modify:
         fs = FileSet(dicomdir)
         fs.add(ct)
         instance = fs.find(SOPInstanceUID=ct.SOPInstanceUID)[0]
-        assert instance.SOPInstanceUID in fs._stage['+']
+        assert instance.SOPInstanceUID in fs._stage["+"]
         assert instance in fs
 
         path = instance._stage_path
         instance._stage_path = Path(fs.path) / "BADFILE"
         fs.remove(instance)
         assert instance not in fs
-        assert instance.SOPInstanceUID not in fs._stage['-']
-        assert instance.SOPInstanceUID not in fs._stage['+']
+        assert instance.SOPInstanceUID not in fs._stage["-"]
+        assert instance.SOPInstanceUID not in fs._stage["+"]
         # File should still exist
         assert path.exists()
 
@@ -2322,21 +2334,21 @@ class TestFileSet_Modify:
         tdir, ds = dicomdir_copy
         assert 52 == len(ds.DirectoryRecordSequence)
         fs = FileSet(ds)
-        orig_paths = [p for p in fs._path.glob('**/*') if p.is_file()]
+        orig_paths = [p for p in fs._path.glob("**/*") if p.is_file()]
         instance = fs._instances[0]
         assert Path(instance.path) in orig_paths
         fs.remove(instance)
         orig_file_ids = [ii.ReferencedFileID for ii in fs]
         fs.write(use_existing=True)
         assert 50 == len(fs._ds.DirectoryRecordSequence)
-        paths = [p for p in fs._path.glob('**/*') if p.is_file()]
+        paths = [p for p in fs._path.glob("**/*") if p.is_file()]
         assert orig_file_ids == [ii.ReferencedFileID for ii in fs]
         assert Path(instance.path) not in paths
         assert sorted(orig_paths)[1:] == sorted(paths)
-        assert {} == fs._stage['-']
-        assert not fs._stage['^']
-        assert {} == fs._stage['+']
-        assert fs._stage['~']
+        assert {} == fs._stage["-"]
+        assert not fs._stage["^"]
+        assert {} == fs._stage["+"]
+        assert fs._stage["~"]
 
     def test_write_use_existing_raises(self, dicomdir, ct):
         """Test write() with use_existing raises if additions."""
@@ -2437,7 +2449,7 @@ class TestFileSet_Modify:
     def test_remove_list(self, dicomdir, tdir):
         """Test remove using a list of instances."""
         fs = FileSet(dicomdir)
-        instances = fs.find(StudyDescription='XR C Spine Comp Min 4 Views')
+        instances = fs.find(StudyDescription="XR C Spine Comp Min 4 Views")
         fs.remove(instances)
         assert 28 == len(fs)
 
@@ -2470,12 +2482,13 @@ class TestFileSet_Modify:
 
         ds = dcmread(Path(t.name) / "DICOMDIR")
         item = ds.DirectoryRecordSequence[-1]
-        assert item.ReferencedFileID == ['98892003', 'MR700', '4648']
+        assert item.ReferencedFileID == ["98892003", "MR700", "4648"]
 
 
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Copy:
     """Tests for copying a File-set."""
+
     def setup_method(self):
         self.orig = FileSet.__len__
 
@@ -2493,12 +2506,10 @@ class TestFileSet_Copy:
         fs.descriptor_character_set = "ISO_IR 100"
         cp, ds, paths = copy_fs(fs, tdir.name)
         assert 31 == len(paths)
-        assert (
-            ('PT000000', 'ST000000', 'SE000000', 'IM000000')
-        ) == paths[0].parts[-4:]
-        assert (
-            ('PT000001', 'ST000003', 'SE000002', 'IM000006')
-        ) == paths[-1].parts[-4:]
+        assert (("PT000000", "ST000000", "SE000000", "IM000000")) == paths[0].parts[-4:]
+        assert (("PT000001", "ST000003", "SE000002", "IM000006")) == paths[-1].parts[
+            -4:
+        ]
 
         # Check existing File-set remains the same
         assert "NEW ID" == fs.ID
@@ -2507,12 +2518,12 @@ class TestFileSet_Copy:
         assert dicomdir.file_meta.MediaStorageSOPInstanceUID == fs.UID
         assert "README" == fs.descriptor_file_id
         assert "ISO_IR 100" == fs.descriptor_character_set
-        assert not bool(fs._stage['+'])
-        assert not bool(fs._stage['-'])
+        assert not bool(fs._stage["+"])
+        assert not bool(fs._stage["-"])
         assert fs.is_staged
-        paths = list(orig_root.glob('98892001/**/*'))
-        paths += list(orig_root.glob('98892003/**/*'))
-        paths += list(orig_root.glob('77654033/**/*'))
+        paths = list(orig_root.glob("98892001/**/*"))
+        paths += list(orig_root.glob("98892003/**/*"))
+        paths += list(orig_root.glob("77654033/**/*"))
         paths = [p for p in paths if p.is_file()]
 
         # Test new File-set
@@ -2550,8 +2561,8 @@ class TestFileSet_Copy:
         assert dicomdir.file_meta.MediaStorageSOPInstanceUID == fs.UID
         assert fs.descriptor_file_id is None
         assert fs.descriptor_character_set is None
-        assert not bool(fs._stage['+'])
-        assert not bool(fs._stage['-'])
+        assert not bool(fs._stage["+"])
+        assert not bool(fs._stage["-"])
 
         assert 31 == len(paths)
 
@@ -2565,6 +2576,7 @@ class TestFileSet_Copy:
 
     def test_file_id(self, tiny, tdir):
         """Test that the File IDs character sets switch correctly."""
+
         def my_len(self):
             return 10**6 + 1
 
@@ -2596,9 +2608,9 @@ class TestFileSet_Copy:
         fs.add(ct)
         cp, ds, paths = copy_fs(fs, tdir.name)
         assert 51 == len(paths)
-        assert (
-            ('PT000001', 'ST000000', 'SE000000', 'IM000000')
-        ) == paths[-1].parts[-4:]
+        assert (("PT000001", "ST000000", "SE000000", "IM000000")) == paths[-1].parts[
+            -4:
+        ]
         assert 51 == len(cp)
         assert not cp.is_staged
         instances = cp.find(PatientID="1CT1")
@@ -2608,8 +2620,8 @@ class TestFileSet_Copy:
         # Test addition is still staged in original fs
         assert fs.is_staged
         assert 51 == len(fs)
-        assert 1 == len(fs._stage['+'])
-        assert ct.SOPInstanceUID in fs._stage['+']
+        assert 1 == len(fs._stage["+"])
+        assert ct.SOPInstanceUID in fs._stage["+"]
 
     def test_removals(self, tiny, tdir):
         """Test that additions get added when copying."""
@@ -2623,9 +2635,9 @@ class TestFileSet_Copy:
 
         cp, ds, paths = copy_fs(fs, tdir.name)
         assert 49 == len(paths)
-        assert (
-            ('PT000000', 'ST000000', 'SE000000', 'IM000048')
-        ) == paths[-1].parts[-4:]
+        assert (("PT000000", "ST000000", "SE000000", "IM000048")) == paths[-1].parts[
+            -4:
+        ]
         assert not cp.is_staged
         names = [p.name for p in paths]
         assert 49 == len(names)
@@ -2636,8 +2648,8 @@ class TestFileSet_Copy:
 
         # Test removal is still staged in original fs
         assert fs.is_staged
-        assert 1 == len(fs._stage['-'])
-        assert uid in fs._stage['-']
+        assert 1 == len(fs._stage["-"])
+        assert uid in fs._stage["-"]
 
     def test_additions_removals(self, tiny, ct, tdir):
         """Test copying with additions and removals."""
@@ -2660,17 +2672,13 @@ class TestFileSet_Copy:
         # Test written instances
         parts = [p.parts for p in paths]
         assert 47 == len(parts)
-        assert 'IM000000' == parts[0][-1]
-        assert 'IM000044' == parts[44][-1]
+        assert "IM000000" == parts[0][-1]
+        assert "IM000044" == parts[44][-1]
         for ii in range(45):
-            assert ('PT000000', 'ST000000', 'SE000000') == parts[ii][-4:-1]
+            assert ("PT000000", "ST000000", "SE000000") == parts[ii][-4:-1]
 
-        assert (
-            ('PT000001', 'ST000000', 'SE000000', 'IM000000') == parts[45][-4:]
-        )
-        assert (
-            ('PT000002', 'ST000000', 'SE000000', 'IM000000') == parts[46][-4:]
-        )
+        assert ("PT000001", "ST000000", "SE000000", "IM000000") == parts[45][-4:]
+        assert ("PT000002", "ST000000", "SE000000", "IM000000") == parts[46][-4:]
 
         # Test copied fileset
         assert not cp.is_staged
@@ -2679,13 +2687,13 @@ class TestFileSet_Copy:
         for instance in instances:
             matches = cp.find(SOPInstanceUID=instance.SOPInstanceUID)
             assert 0 == len(matches)
-            assert instance.SOPInstanceUID not in cp._stage['-']
+            assert instance.SOPInstanceUID not in cp._stage["-"]
 
         # Test original fileset
         assert fs.is_staged
         for instance in instances:
-            assert instance.SOPInstanceUID in fs._stage['-']
-        assert 2 == len(fs._stage['+'])
+            assert instance.SOPInstanceUID in fs._stage["-"]
+        assert 2 == len(fs._stage["+"])
         assert 1 == len(fs.find(SOPInstanceUID=ct.SOPInstanceUID))
         assert 1 == len(fs.find(SOPInstanceUID=mr.SOPInstanceUID))
 
@@ -2743,9 +2751,7 @@ def test_one_level_record(rtype, sop, dummy, tdir):
     assert rtype == leaf.DirectoryRecordType
     assert sop == leaf.ReferencedSOPClassUIDInFile
     assert ds.SOPInstanceUID == leaf.ReferencedSOPInstanceUIDInFile
-    assert ds.file_meta.TransferSyntaxUID == (
-        leaf.ReferencedTransferSyntaxUIDInFile
-    )
+    assert ds.file_meta.TransferSyntaxUID == (leaf.ReferencedTransferSyntaxUIDInFile)
     file_id = list(paths[0].relative_to(fs.path).parts)
     assert file_id == [leaf.ReferencedFileID]
     assert Dataset(ds) == dcmread(paths[0])
@@ -2766,7 +2772,7 @@ def test_four_level_record(rtype, sop, modality, kw, dummy, tdir):
     if kw == "RTPlanLabel":
         setattr(ds, kw, "Value")
     elif kw == "EncapsulatedDocument":
-        setattr(ds, kw, b'\x00\x01')
+        setattr(ds, kw, b"\x00\x01")
 
     fs = FileSet()
     fs.add(ds)
@@ -2786,9 +2792,7 @@ def test_four_level_record(rtype, sop, modality, kw, dummy, tdir):
     assert rtype == leaf.DirectoryRecordType
     assert sop == leaf.ReferencedSOPClassUIDInFile
     assert ds.SOPInstanceUID == leaf.ReferencedSOPInstanceUIDInFile
-    assert ds.file_meta.TransferSyntaxUID == (
-        leaf.ReferencedTransferSyntaxUIDInFile
-    )
+    assert ds.file_meta.TransferSyntaxUID == (leaf.ReferencedTransferSyntaxUIDInFile)
     file_id = list(paths[0].relative_to(fs.path).parts)
     assert file_id == leaf.ReferencedFileID
     assert Dataset(ds) == dcmread(paths[0])

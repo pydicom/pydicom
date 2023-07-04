@@ -46,7 +46,6 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
-
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
@@ -239,7 +238,7 @@ class UID(str):
 # Their service was used to obtain the following root UID for pydicom:
 PYDICOM_ROOT_UID = "1.2.826.0.1.3680043.8.498."
 """pydicom's root UID ``'1.2.826.0.1.3680043.8.498.'``"""
-PYDICOM_IMPLEMENTATION_UID = UID(f'{PYDICOM_ROOT_UID}1')
+PYDICOM_IMPLEMENTATION_UID = UID(f"{PYDICOM_ROOT_UID}1")
 """
 pydicom's (0002,0012) *Implementation Class UID*
 ``'1.2.826.0.1.3680043.8.498.1'``
@@ -342,9 +341,7 @@ JPEGTransferSyntaxes = [
 JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
 """JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
 
-JPEG2000TransferSyntaxes = [
-    JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC
-]
+JPEG2000TransferSyntaxes = [JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
 MPEGTransferSyntaxes = [
@@ -474,353 +471,415 @@ def generate_uid(
 # Only auto-generated Storage SOP Class UIDs below - do not edit manually
 
 
-MediaStorageDirectoryStorage = UID('1.2.840.10008.1.3.10')  # noqa
+MediaStorageDirectoryStorage = UID("1.2.840.10008.1.3.10")  # noqa
 """1.2.840.10008.1.3.10"""
-ComputedRadiographyImageStorage = UID('1.2.840.10008.5.1.4.1.1.1')  # noqa
+ComputedRadiographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.1"""
-DigitalXRayImageStorageForPresentation = UID('1.2.840.10008.5.1.4.1.1.1.1')  # noqa
+DigitalXRayImageStorageForPresentation = UID("1.2.840.10008.5.1.4.1.1.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.1.1"""
-DigitalXRayImageStorageForProcessing = UID('1.2.840.10008.5.1.4.1.1.1.1.1')  # noqa
+DigitalXRayImageStorageForProcessing = UID("1.2.840.10008.5.1.4.1.1.1.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.1.1.1"""
-DigitalMammographyXRayImageStorageForPresentation = UID('1.2.840.10008.5.1.4.1.1.1.2')  # noqa
+DigitalMammographyXRayImageStorageForPresentation = UID(
+    "1.2.840.10008.5.1.4.1.1.1.2"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.1.2"""
-DigitalMammographyXRayImageStorageForProcessing = UID('1.2.840.10008.5.1.4.1.1.1.2.1')  # noqa
+DigitalMammographyXRayImageStorageForProcessing = UID(
+    "1.2.840.10008.5.1.4.1.1.1.2.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.1.2.1"""
-DigitalIntraOralXRayImageStorageForPresentation = UID('1.2.840.10008.5.1.4.1.1.1.3')  # noqa
+DigitalIntraOralXRayImageStorageForPresentation = UID(
+    "1.2.840.10008.5.1.4.1.1.1.3"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.1.3"""
-DigitalIntraOralXRayImageStorageForProcessing = UID('1.2.840.10008.5.1.4.1.1.1.3.1')  # noqa
+DigitalIntraOralXRayImageStorageForProcessing = UID(
+    "1.2.840.10008.5.1.4.1.1.1.3.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.1.3.1"""
-EncapsulatedPDFStorage = UID('1.2.840.10008.5.1.4.1.1.104.1')  # noqa
+EncapsulatedPDFStorage = UID("1.2.840.10008.5.1.4.1.1.104.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.104.1"""
-EncapsulatedCDAStorage = UID('1.2.840.10008.5.1.4.1.1.104.2')  # noqa
+EncapsulatedCDAStorage = UID("1.2.840.10008.5.1.4.1.1.104.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.104.2"""
-EncapsulatedSTLStorage = UID('1.2.840.10008.5.1.4.1.1.104.3')  # noqa
+EncapsulatedSTLStorage = UID("1.2.840.10008.5.1.4.1.1.104.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.104.3"""
-EncapsulatedOBJStorage = UID('1.2.840.10008.5.1.4.1.1.104.4')  # noqa
+EncapsulatedOBJStorage = UID("1.2.840.10008.5.1.4.1.1.104.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.104.4"""
-EncapsulatedMTLStorage = UID('1.2.840.10008.5.1.4.1.1.104.5')  # noqa
+EncapsulatedMTLStorage = UID("1.2.840.10008.5.1.4.1.1.104.5")  # noqa
 """1.2.840.10008.5.1.4.1.1.104.5"""
-GrayscaleSoftcopyPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.1')  # noqa
+GrayscaleSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.11.1"""
-SegmentedVolumeRenderingVolumetricPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.10')  # noqa
+SegmentedVolumeRenderingVolumetricPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.10"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.10"""
-MultipleVolumeRenderingVolumetricPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.11')  # noqa
+MultipleVolumeRenderingVolumetricPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.11"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.11"""
-ColorSoftcopyPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.2')  # noqa
+ColorSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.11.2"""
-PseudoColorSoftcopyPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.3')  # noqa
+PseudoColorSoftcopyPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.3"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.3"""
-BlendingSoftcopyPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.4')  # noqa
+BlendingSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.11.4"""
-XAXRFGrayscaleSoftcopyPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.5')  # noqa
+XAXRFGrayscaleSoftcopyPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.5"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.5"""
-GrayscalePlanarMPRVolumetricPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.6')  # noqa
+GrayscalePlanarMPRVolumetricPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.6"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.6"""
-CompositingPlanarMPRVolumetricPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.7')  # noqa
+CompositingPlanarMPRVolumetricPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.7"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.7"""
-AdvancedBlendingPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.8')  # noqa
+AdvancedBlendingPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.8")  # noqa
 """1.2.840.10008.5.1.4.1.1.11.8"""
-VolumeRenderingVolumetricPresentationStateStorage = UID('1.2.840.10008.5.1.4.1.1.11.9')  # noqa
+VolumeRenderingVolumetricPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.9"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.11.9"""
-XRayAngiographicImageStorage = UID('1.2.840.10008.5.1.4.1.1.12.1')  # noqa
+XRayAngiographicImageStorage = UID("1.2.840.10008.5.1.4.1.1.12.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.12.1"""
-EnhancedXAImageStorage = UID('1.2.840.10008.5.1.4.1.1.12.1.1')  # noqa
+EnhancedXAImageStorage = UID("1.2.840.10008.5.1.4.1.1.12.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.12.1.1"""
-XRayRadiofluoroscopicImageStorage = UID('1.2.840.10008.5.1.4.1.1.12.2')  # noqa
+XRayRadiofluoroscopicImageStorage = UID("1.2.840.10008.5.1.4.1.1.12.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.12.2"""
-EnhancedXRFImageStorage = UID('1.2.840.10008.5.1.4.1.1.12.2.1')  # noqa
+EnhancedXRFImageStorage = UID("1.2.840.10008.5.1.4.1.1.12.2.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.12.2.1"""
-PositronEmissionTomographyImageStorage = UID('1.2.840.10008.5.1.4.1.1.128')  # noqa
+PositronEmissionTomographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.128")  # noqa
 """1.2.840.10008.5.1.4.1.1.128"""
-LegacyConvertedEnhancedPETImageStorage = UID('1.2.840.10008.5.1.4.1.1.128.1')  # noqa
+LegacyConvertedEnhancedPETImageStorage = UID("1.2.840.10008.5.1.4.1.1.128.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.128.1"""
-XRay3DAngiographicImageStorage = UID('1.2.840.10008.5.1.4.1.1.13.1.1')  # noqa
+XRay3DAngiographicImageStorage = UID("1.2.840.10008.5.1.4.1.1.13.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.13.1.1"""
-XRay3DCraniofacialImageStorage = UID('1.2.840.10008.5.1.4.1.1.13.1.2')  # noqa
+XRay3DCraniofacialImageStorage = UID("1.2.840.10008.5.1.4.1.1.13.1.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.13.1.2"""
-BreastTomosynthesisImageStorage = UID('1.2.840.10008.5.1.4.1.1.13.1.3')  # noqa
+BreastTomosynthesisImageStorage = UID("1.2.840.10008.5.1.4.1.1.13.1.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.13.1.3"""
-BreastProjectionXRayImageStorageForPresentation = UID('1.2.840.10008.5.1.4.1.1.13.1.4')  # noqa
+BreastProjectionXRayImageStorageForPresentation = UID(
+    "1.2.840.10008.5.1.4.1.1.13.1.4"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.13.1.4"""
-BreastProjectionXRayImageStorageForProcessing = UID('1.2.840.10008.5.1.4.1.1.13.1.5')  # noqa
+BreastProjectionXRayImageStorageForProcessing = UID(
+    "1.2.840.10008.5.1.4.1.1.13.1.5"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.13.1.5"""
-EnhancedPETImageStorage = UID('1.2.840.10008.5.1.4.1.1.130')  # noqa
+EnhancedPETImageStorage = UID("1.2.840.10008.5.1.4.1.1.130")  # noqa
 """1.2.840.10008.5.1.4.1.1.130"""
-BasicStructuredDisplayStorage = UID('1.2.840.10008.5.1.4.1.1.131')  # noqa
+BasicStructuredDisplayStorage = UID("1.2.840.10008.5.1.4.1.1.131")  # noqa
 """1.2.840.10008.5.1.4.1.1.131"""
-IntravascularOpticalCoherenceTomographyImageStorageForPresentation = UID('1.2.840.10008.5.1.4.1.1.14.1')  # noqa
+IntravascularOpticalCoherenceTomographyImageStorageForPresentation = UID(
+    "1.2.840.10008.5.1.4.1.1.14.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.14.1"""
-IntravascularOpticalCoherenceTomographyImageStorageForProcessing = UID('1.2.840.10008.5.1.4.1.1.14.2')  # noqa
+IntravascularOpticalCoherenceTomographyImageStorageForProcessing = UID(
+    "1.2.840.10008.5.1.4.1.1.14.2"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.14.2"""
-CTImageStorage = UID('1.2.840.10008.5.1.4.1.1.2')  # noqa
+CTImageStorage = UID("1.2.840.10008.5.1.4.1.1.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.2"""
-EnhancedCTImageStorage = UID('1.2.840.10008.5.1.4.1.1.2.1')  # noqa
+EnhancedCTImageStorage = UID("1.2.840.10008.5.1.4.1.1.2.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.2.1"""
-LegacyConvertedEnhancedCTImageStorage = UID('1.2.840.10008.5.1.4.1.1.2.2')  # noqa
+LegacyConvertedEnhancedCTImageStorage = UID("1.2.840.10008.5.1.4.1.1.2.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.2.2"""
-NuclearMedicineImageStorage = UID('1.2.840.10008.5.1.4.1.1.20')  # noqa
+NuclearMedicineImageStorage = UID("1.2.840.10008.5.1.4.1.1.20")  # noqa
 """1.2.840.10008.5.1.4.1.1.20"""
-CTDefinedProcedureProtocolStorage = UID('1.2.840.10008.5.1.4.1.1.200.1')  # noqa
+CTDefinedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.1"""
-CTPerformedProcedureProtocolStorage = UID('1.2.840.10008.5.1.4.1.1.200.2')  # noqa
+CTPerformedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.2"""
-ProtocolApprovalStorage = UID('1.2.840.10008.5.1.4.1.1.200.3')  # noqa
+ProtocolApprovalStorage = UID("1.2.840.10008.5.1.4.1.1.200.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.3"""
-XADefinedProcedureProtocolStorage = UID('1.2.840.10008.5.1.4.1.1.200.7')  # noqa
+XADefinedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.7"""
-XAPerformedProcedureProtocolStorage = UID('1.2.840.10008.5.1.4.1.1.200.8')  # noqa
+XAPerformedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.8")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.8"""
-UltrasoundMultiFrameImageStorage = UID('1.2.840.10008.5.1.4.1.1.3.1')  # noqa
+UltrasoundMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.3.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.3.1"""
-ParametricMapStorage = UID('1.2.840.10008.5.1.4.1.1.30')  # noqa
+ParametricMapStorage = UID("1.2.840.10008.5.1.4.1.1.30")  # noqa
 """1.2.840.10008.5.1.4.1.1.30"""
-MRImageStorage = UID('1.2.840.10008.5.1.4.1.1.4')  # noqa
+MRImageStorage = UID("1.2.840.10008.5.1.4.1.1.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.4"""
-EnhancedMRImageStorage = UID('1.2.840.10008.5.1.4.1.1.4.1')  # noqa
+EnhancedMRImageStorage = UID("1.2.840.10008.5.1.4.1.1.4.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.4.1"""
-MRSpectroscopyStorage = UID('1.2.840.10008.5.1.4.1.1.4.2')  # noqa
+MRSpectroscopyStorage = UID("1.2.840.10008.5.1.4.1.1.4.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.4.2"""
-EnhancedMRColorImageStorage = UID('1.2.840.10008.5.1.4.1.1.4.3')  # noqa
+EnhancedMRColorImageStorage = UID("1.2.840.10008.5.1.4.1.1.4.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.4.3"""
-LegacyConvertedEnhancedMRImageStorage = UID('1.2.840.10008.5.1.4.1.1.4.4')  # noqa
+LegacyConvertedEnhancedMRImageStorage = UID("1.2.840.10008.5.1.4.1.1.4.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.4.4"""
-RTImageStorage = UID('1.2.840.10008.5.1.4.1.1.481.1')  # noqa
+RTImageStorage = UID("1.2.840.10008.5.1.4.1.1.481.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.1"""
-RTPhysicianIntentStorage = UID('1.2.840.10008.5.1.4.1.1.481.10')  # noqa
+RTPhysicianIntentStorage = UID("1.2.840.10008.5.1.4.1.1.481.10")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.10"""
-RTSegmentAnnotationStorage = UID('1.2.840.10008.5.1.4.1.1.481.11')  # noqa
+RTSegmentAnnotationStorage = UID("1.2.840.10008.5.1.4.1.1.481.11")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.11"""
-RTRadiationSetStorage = UID('1.2.840.10008.5.1.4.1.1.481.12')  # noqa
+RTRadiationSetStorage = UID("1.2.840.10008.5.1.4.1.1.481.12")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.12"""
-CArmPhotonElectronRadiationStorage = UID('1.2.840.10008.5.1.4.1.1.481.13')  # noqa
+CArmPhotonElectronRadiationStorage = UID("1.2.840.10008.5.1.4.1.1.481.13")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.13"""
-TomotherapeuticRadiationStorage = UID('1.2.840.10008.5.1.4.1.1.481.14')  # noqa
+TomotherapeuticRadiationStorage = UID("1.2.840.10008.5.1.4.1.1.481.14")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.14"""
-RoboticArmRadiationStorage = UID('1.2.840.10008.5.1.4.1.1.481.15')  # noqa
+RoboticArmRadiationStorage = UID("1.2.840.10008.5.1.4.1.1.481.15")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.15"""
-RTRadiationRecordSetStorage = UID('1.2.840.10008.5.1.4.1.1.481.16')  # noqa
+RTRadiationRecordSetStorage = UID("1.2.840.10008.5.1.4.1.1.481.16")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.16"""
-RTRadiationSalvageRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.17')  # noqa
+RTRadiationSalvageRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.17")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.17"""
-TomotherapeuticRadiationRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.18')  # noqa
+TomotherapeuticRadiationRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.18")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.18"""
-CArmPhotonElectronRadiationRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.19')  # noqa
+CArmPhotonElectronRadiationRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.19")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.19"""
-RTDoseStorage = UID('1.2.840.10008.5.1.4.1.1.481.2')  # noqa
+RTDoseStorage = UID("1.2.840.10008.5.1.4.1.1.481.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.2"""
-RoboticRadiationRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.20')  # noqa
+RoboticRadiationRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.20")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.20"""
-RTRadiationSetDeliveryInstructionStorage = UID('1.2.840.10008.5.1.4.1.1.481.21')  # noqa
+RTRadiationSetDeliveryInstructionStorage = UID("1.2.840.10008.5.1.4.1.1.481.21")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.21"""
-RTTreatmentPreparationStorage = UID('1.2.840.10008.5.1.4.1.1.481.22')  # noqa
+RTTreatmentPreparationStorage = UID("1.2.840.10008.5.1.4.1.1.481.22")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.22"""
-RTStructureSetStorage = UID('1.2.840.10008.5.1.4.1.1.481.3')  # noqa
+RTStructureSetStorage = UID("1.2.840.10008.5.1.4.1.1.481.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.3"""
-RTBeamsTreatmentRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.4')  # noqa
+RTBeamsTreatmentRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.4"""
-RTPlanStorage = UID('1.2.840.10008.5.1.4.1.1.481.5')  # noqa
+RTPlanStorage = UID("1.2.840.10008.5.1.4.1.1.481.5")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.5"""
-RTBrachyTreatmentRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.6')  # noqa
+RTBrachyTreatmentRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.6")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.6"""
-RTTreatmentSummaryRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.7')  # noqa
+RTTreatmentSummaryRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.7"""
-RTIonPlanStorage = UID('1.2.840.10008.5.1.4.1.1.481.8')  # noqa
+RTIonPlanStorage = UID("1.2.840.10008.5.1.4.1.1.481.8")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.8"""
-RTIonBeamsTreatmentRecordStorage = UID('1.2.840.10008.5.1.4.1.1.481.9')  # noqa
+RTIonBeamsTreatmentRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.9")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.9"""
-DICOSCTImageStorage = UID('1.2.840.10008.5.1.4.1.1.501.1')  # noqa
+DICOSCTImageStorage = UID("1.2.840.10008.5.1.4.1.1.501.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.501.1"""
-DICOSDigitalXRayImageStorageForPresentation = UID('1.2.840.10008.5.1.4.1.1.501.2.1')  # noqa
+DICOSDigitalXRayImageStorageForPresentation = UID(
+    "1.2.840.10008.5.1.4.1.1.501.2.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.501.2.1"""
-DICOSDigitalXRayImageStorageForProcessing = UID('1.2.840.10008.5.1.4.1.1.501.2.2')  # noqa
+DICOSDigitalXRayImageStorageForProcessing = UID(
+    "1.2.840.10008.5.1.4.1.1.501.2.2"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.501.2.2"""
-DICOSThreatDetectionReportStorage = UID('1.2.840.10008.5.1.4.1.1.501.3')  # noqa
+DICOSThreatDetectionReportStorage = UID("1.2.840.10008.5.1.4.1.1.501.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.501.3"""
-DICOS2DAITStorage = UID('1.2.840.10008.5.1.4.1.1.501.4')  # noqa
+DICOS2DAITStorage = UID("1.2.840.10008.5.1.4.1.1.501.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.501.4"""
-DICOS3DAITStorage = UID('1.2.840.10008.5.1.4.1.1.501.5')  # noqa
+DICOS3DAITStorage = UID("1.2.840.10008.5.1.4.1.1.501.5")  # noqa
 """1.2.840.10008.5.1.4.1.1.501.5"""
-DICOSQuadrupoleResonanceStorage = UID('1.2.840.10008.5.1.4.1.1.501.6')  # noqa
+DICOSQuadrupoleResonanceStorage = UID("1.2.840.10008.5.1.4.1.1.501.6")  # noqa
 """1.2.840.10008.5.1.4.1.1.501.6"""
-UltrasoundImageStorage = UID('1.2.840.10008.5.1.4.1.1.6.1')  # noqa
+UltrasoundImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.6.1"""
-EnhancedUSVolumeStorage = UID('1.2.840.10008.5.1.4.1.1.6.2')  # noqa
+EnhancedUSVolumeStorage = UID("1.2.840.10008.5.1.4.1.1.6.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.6.2"""
-EddyCurrentImageStorage = UID('1.2.840.10008.5.1.4.1.1.601.1')  # noqa
+EddyCurrentImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.601.1"""
-EddyCurrentMultiFrameImageStorage = UID('1.2.840.10008.5.1.4.1.1.601.2')  # noqa
+EddyCurrentMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.601.2"""
-RawDataStorage = UID('1.2.840.10008.5.1.4.1.1.66')  # noqa
+RawDataStorage = UID("1.2.840.10008.5.1.4.1.1.66")  # noqa
 """1.2.840.10008.5.1.4.1.1.66"""
-SpatialRegistrationStorage = UID('1.2.840.10008.5.1.4.1.1.66.1')  # noqa
+SpatialRegistrationStorage = UID("1.2.840.10008.5.1.4.1.1.66.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.66.1"""
-SpatialFiducialsStorage = UID('1.2.840.10008.5.1.4.1.1.66.2')  # noqa
+SpatialFiducialsStorage = UID("1.2.840.10008.5.1.4.1.1.66.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.66.2"""
-DeformableSpatialRegistrationStorage = UID('1.2.840.10008.5.1.4.1.1.66.3')  # noqa
+DeformableSpatialRegistrationStorage = UID("1.2.840.10008.5.1.4.1.1.66.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.66.3"""
-SegmentationStorage = UID('1.2.840.10008.5.1.4.1.1.66.4')  # noqa
+SegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.66.4"""
-SurfaceSegmentationStorage = UID('1.2.840.10008.5.1.4.1.1.66.5')  # noqa
+SurfaceSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.5")  # noqa
 """1.2.840.10008.5.1.4.1.1.66.5"""
-TractographyResultsStorage = UID('1.2.840.10008.5.1.4.1.1.66.6')  # noqa
+TractographyResultsStorage = UID("1.2.840.10008.5.1.4.1.1.66.6")  # noqa
 """1.2.840.10008.5.1.4.1.1.66.6"""
-RealWorldValueMappingStorage = UID('1.2.840.10008.5.1.4.1.1.67')  # noqa
+RealWorldValueMappingStorage = UID("1.2.840.10008.5.1.4.1.1.67")  # noqa
 """1.2.840.10008.5.1.4.1.1.67"""
-SurfaceScanMeshStorage = UID('1.2.840.10008.5.1.4.1.1.68.1')  # noqa
+SurfaceScanMeshStorage = UID("1.2.840.10008.5.1.4.1.1.68.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.68.1"""
-SurfaceScanPointCloudStorage = UID('1.2.840.10008.5.1.4.1.1.68.2')  # noqa
+SurfaceScanPointCloudStorage = UID("1.2.840.10008.5.1.4.1.1.68.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.68.2"""
-SecondaryCaptureImageStorage = UID('1.2.840.10008.5.1.4.1.1.7')  # noqa
+SecondaryCaptureImageStorage = UID("1.2.840.10008.5.1.4.1.1.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.7"""
-MultiFrameSingleBitSecondaryCaptureImageStorage = UID('1.2.840.10008.5.1.4.1.1.7.1')  # noqa
+MultiFrameSingleBitSecondaryCaptureImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.7.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.7.1"""
-MultiFrameGrayscaleByteSecondaryCaptureImageStorage = UID('1.2.840.10008.5.1.4.1.1.7.2')  # noqa
+MultiFrameGrayscaleByteSecondaryCaptureImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.7.2"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.7.2"""
-MultiFrameGrayscaleWordSecondaryCaptureImageStorage = UID('1.2.840.10008.5.1.4.1.1.7.3')  # noqa
+MultiFrameGrayscaleWordSecondaryCaptureImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.7.3"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.7.3"""
-MultiFrameTrueColorSecondaryCaptureImageStorage = UID('1.2.840.10008.5.1.4.1.1.7.4')  # noqa
+MultiFrameTrueColorSecondaryCaptureImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.7.4"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.7.4"""
-VLEndoscopicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.1')  # noqa
+VLEndoscopicImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.1"""
-VideoEndoscopicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.1.1')  # noqa
+VideoEndoscopicImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.1.1"""
-VLMicroscopicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.2')  # noqa
+VLMicroscopicImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.2"""
-VideoMicroscopicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.2.1')  # noqa
+VideoMicroscopicImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.2.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.2.1"""
-VLSlideCoordinatesMicroscopicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.3')  # noqa
+VLSlideCoordinatesMicroscopicImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.3"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.3"""
-VLPhotographicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.4')  # noqa
+VLPhotographicImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.4"""
-VideoPhotographicImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.4.1')  # noqa
+VideoPhotographicImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.4.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.4.1"""
-OphthalmicPhotography8BitImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.1')  # noqa
+OphthalmicPhotography8BitImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.1"""
-OphthalmicPhotography16BitImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.2')  # noqa
+OphthalmicPhotography16BitImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.2"""
-StereometricRelationshipStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.3')  # noqa
+StereometricRelationshipStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.3"""
-OphthalmicTomographyImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.4')  # noqa
+OphthalmicTomographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.4"""
-WideFieldOphthalmicPhotographyStereographicProjectionImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.5')  # noqa
+WideFieldOphthalmicPhotographyStereographicProjectionImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.5.5"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.5"""
-WideFieldOphthalmicPhotography3DCoordinatesImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.6')  # noqa
+WideFieldOphthalmicPhotography3DCoordinatesImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.5.6"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.6"""
-OphthalmicOpticalCoherenceTomographyEnFaceImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.7')  # noqa
+OphthalmicOpticalCoherenceTomographyEnFaceImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.5.7"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.7"""
-OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.5.8')  # noqa
+OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.5.8"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.5.8"""
-VLWholeSlideMicroscopyImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.6')  # noqa
+VLWholeSlideMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.6")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.6"""
-DermoscopicPhotographyImageStorage = UID('1.2.840.10008.5.1.4.1.1.77.1.7')  # noqa
+DermoscopicPhotographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.7"""
-LensometryMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.78.1')  # noqa
+LensometryMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.1"""
-AutorefractionMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.78.2')  # noqa
+AutorefractionMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.2"""
-KeratometryMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.78.3')  # noqa
+KeratometryMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.3"""
-SubjectiveRefractionMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.78.4')  # noqa
+SubjectiveRefractionMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.4"""
-VisualAcuityMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.78.5')  # noqa
+VisualAcuityMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.5")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.5"""
-SpectaclePrescriptionReportStorage = UID('1.2.840.10008.5.1.4.1.1.78.6')  # noqa
+SpectaclePrescriptionReportStorage = UID("1.2.840.10008.5.1.4.1.1.78.6")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.6"""
-OphthalmicAxialMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.78.7')  # noqa
+OphthalmicAxialMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.7"""
-IntraocularLensCalculationsStorage = UID('1.2.840.10008.5.1.4.1.1.78.8')  # noqa
+IntraocularLensCalculationsStorage = UID("1.2.840.10008.5.1.4.1.1.78.8")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.8"""
-MacularGridThicknessAndVolumeReportStorage = UID('1.2.840.10008.5.1.4.1.1.79.1')  # noqa
+MacularGridThicknessAndVolumeReportStorage = UID("1.2.840.10008.5.1.4.1.1.79.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.79.1"""
-OphthalmicVisualFieldStaticPerimetryMeasurementsStorage = UID('1.2.840.10008.5.1.4.1.1.80.1')  # noqa
+OphthalmicVisualFieldStaticPerimetryMeasurementsStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.80.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.80.1"""
-OphthalmicThicknessMapStorage = UID('1.2.840.10008.5.1.4.1.1.81.1')  # noqa
+OphthalmicThicknessMapStorage = UID("1.2.840.10008.5.1.4.1.1.81.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.81.1"""
-CornealTopographyMapStorage = UID('1.2.840.10008.5.1.4.1.1.82.1')  # noqa
+CornealTopographyMapStorage = UID("1.2.840.10008.5.1.4.1.1.82.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.82.1"""
-BasicTextSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.11')  # noqa
+BasicTextSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.11")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.11"""
-EnhancedSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.22')  # noqa
+EnhancedSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.22")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.22"""
-ComprehensiveSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.33')  # noqa
+ComprehensiveSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.33")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.33"""
-Comprehensive3DSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.34')  # noqa
+Comprehensive3DSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.34")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.34"""
-ExtensibleSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.35')  # noqa
+ExtensibleSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.35")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.35"""
-ProcedureLogStorage = UID('1.2.840.10008.5.1.4.1.1.88.40')  # noqa
+ProcedureLogStorage = UID("1.2.840.10008.5.1.4.1.1.88.40")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.40"""
-MammographyCADSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.50')  # noqa
+MammographyCADSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.50")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.50"""
-KeyObjectSelectionDocumentStorage = UID('1.2.840.10008.5.1.4.1.1.88.59')  # noqa
+KeyObjectSelectionDocumentStorage = UID("1.2.840.10008.5.1.4.1.1.88.59")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.59"""
-ChestCADSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.65')  # noqa
+ChestCADSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.65")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.65"""
-XRayRadiationDoseSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.67')  # noqa
+XRayRadiationDoseSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.67")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.67"""
-RadiopharmaceuticalRadiationDoseSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.68')  # noqa
+RadiopharmaceuticalRadiationDoseSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.68")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.68"""
-ColonCADSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.69')  # noqa
+ColonCADSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.69")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.69"""
-ImplantationPlanSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.70')  # noqa
+ImplantationPlanSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.70")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.70"""
-AcquisitionContextSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.71')  # noqa
+AcquisitionContextSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.71")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.71"""
-SimplifiedAdultEchoSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.72')  # noqa
+SimplifiedAdultEchoSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.72")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.72"""
-PatientRadiationDoseSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.73')  # noqa
+PatientRadiationDoseSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.73")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.73"""
-PlannedImagingAgentAdministrationSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.74')  # noqa
+PlannedImagingAgentAdministrationSRStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.88.74"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.88.74"""
-PerformedImagingAgentAdministrationSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.75')  # noqa
+PerformedImagingAgentAdministrationSRStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.88.75"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.88.75"""
-EnhancedXRayRadiationDoseSRStorage = UID('1.2.840.10008.5.1.4.1.1.88.76')  # noqa
+EnhancedXRayRadiationDoseSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.76")  # noqa
 """1.2.840.10008.5.1.4.1.1.88.76"""
-TwelveLeadECGWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.1.1')  # noqa
+TwelveLeadECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.1"""
-GeneralECGWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.1.2')  # noqa
+GeneralECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.2"""
-AmbulatoryECGWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.1.3')  # noqa
+AmbulatoryECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.3"""
-HemodynamicWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.2.1')  # noqa
+HemodynamicWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.2.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.2.1"""
-CardiacElectrophysiologyWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.3.1')  # noqa
+CardiacElectrophysiologyWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.3.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.3.1"""
-BasicVoiceAudioWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.4.1')  # noqa
+BasicVoiceAudioWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.4.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.4.1"""
-GeneralAudioWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.4.2')  # noqa
+GeneralAudioWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.4.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.4.2"""
-ArterialPulseWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.5.1')  # noqa
+ArterialPulseWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.5.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.5.1"""
-RespiratoryWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.6.1')  # noqa
+RespiratoryWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.6.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.6.1"""
-MultichannelRespiratoryWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.6.2')  # noqa
+MultichannelRespiratoryWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.6.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.6.2"""
-RoutineScalpElectroencephalogramWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.7.1')  # noqa
+RoutineScalpElectroencephalogramWaveformStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.9.7.1"
+)  # noqa
 """1.2.840.10008.5.1.4.1.1.9.7.1"""
-ElectromyogramWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.7.2')  # noqa
+ElectromyogramWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.7.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.7.2"""
-ElectrooculogramWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.7.3')  # noqa
+ElectrooculogramWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.7.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.7.3"""
-SleepElectroencephalogramWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.7.4')  # noqa
+SleepElectroencephalogramWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.7.4")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.7.4"""
-BodyPositionWaveformStorage = UID('1.2.840.10008.5.1.4.1.1.9.8.1')  # noqa
+BodyPositionWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.8.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.8.1"""
-ContentAssessmentResultsStorage = UID('1.2.840.10008.5.1.4.1.1.90.1')  # noqa
+ContentAssessmentResultsStorage = UID("1.2.840.10008.5.1.4.1.1.90.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.90.1"""
-MicroscopyBulkSimpleAnnotationsStorage = UID('1.2.840.10008.5.1.4.1.1.91.1')  # noqa
+MicroscopyBulkSimpleAnnotationsStorage = UID("1.2.840.10008.5.1.4.1.1.91.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.91.1"""
-RTBrachyApplicationSetupDeliveryInstructionStorage = UID('1.2.840.10008.5.1.4.34.10')  # noqa
+RTBrachyApplicationSetupDeliveryInstructionStorage = UID(
+    "1.2.840.10008.5.1.4.34.10"
+)  # noqa
 """1.2.840.10008.5.1.4.34.10"""
-RTBeamsDeliveryInstructionStorage = UID('1.2.840.10008.5.1.4.34.7')  # noqa
+RTBeamsDeliveryInstructionStorage = UID("1.2.840.10008.5.1.4.34.7")  # noqa
 """1.2.840.10008.5.1.4.34.7"""
-HangingProtocolStorage = UID('1.2.840.10008.5.1.4.38.1')  # noqa
+HangingProtocolStorage = UID("1.2.840.10008.5.1.4.38.1")  # noqa
 """1.2.840.10008.5.1.4.38.1"""
-ColorPaletteStorage = UID('1.2.840.10008.5.1.4.39.1')  # noqa
+ColorPaletteStorage = UID("1.2.840.10008.5.1.4.39.1")  # noqa
 """1.2.840.10008.5.1.4.39.1"""
-GenericImplantTemplateStorage = UID('1.2.840.10008.5.1.4.43.1')  # noqa
+GenericImplantTemplateStorage = UID("1.2.840.10008.5.1.4.43.1")  # noqa
 """1.2.840.10008.5.1.4.43.1"""
-ImplantAssemblyTemplateStorage = UID('1.2.840.10008.5.1.4.44.1')  # noqa
+ImplantAssemblyTemplateStorage = UID("1.2.840.10008.5.1.4.44.1")  # noqa
 """1.2.840.10008.5.1.4.44.1"""
-ImplantTemplateGroupStorage = UID('1.2.840.10008.5.1.4.45.1')  # noqa
+ImplantTemplateGroupStorage = UID("1.2.840.10008.5.1.4.45.1")  # noqa
 """1.2.840.10008.5.1.4.45.1"""

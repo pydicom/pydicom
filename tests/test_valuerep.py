@@ -22,8 +22,20 @@ from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
 from pydicom.filereader import read_dataset
 from pydicom.tag import Tag
 from pydicom.valuerep import (
-    DS, IS, DSfloat, DSdecimal, ISfloat, PersonName, VR, STANDARD_VR,
-    AMBIGUOUS_VR, STR_VR, BYTES_VR, FLOAT_VR, INT_VR, LIST_VR
+    DS,
+    IS,
+    DSfloat,
+    DSdecimal,
+    ISfloat,
+    PersonName,
+    VR,
+    STANDARD_VR,
+    AMBIGUOUS_VR,
+    STR_VR,
+    BYTES_VR,
+    FLOAT_VR,
+    INT_VR,
+    LIST_VR,
 )
 from pydicom.values import convert_value
 
@@ -35,19 +47,17 @@ default_encoding = "iso8859"
 @pytest.fixture(params=(True, False))
 def enforce_valid_both_fixture(request):
     """Fixture to run tests with enforce_valid_values with both True and False
-       and ensure it is reset afterwards regardless of whether test succeeds.
+    and ensure it is reset afterwards regardless of whether test succeeds.
     """
     orig_reading_validation_mode = settings.reading_validation_mode
-    settings.reading_validation_mode = (
-        config.RAISE if request.param
-        else config.WARN
-    )
+    settings.reading_validation_mode = config.RAISE if request.param else config.WARN
     yield
     settings.reading_validation_mode = orig_reading_validation_mode
 
 
 class TestTM:
     """Unit tests for pickling TM"""
+
     def test_pickling(self):
         # Check that a pickled TM is read back properly
         tm = pydicom.valuerep.TM("212223")
@@ -77,34 +87,33 @@ class TestTM:
         assert repr(pydicom.valuerep.TM("2122")) == '"2122"'
         assert str(pydicom.valuerep.TM("21")) == "21"
         assert str(pydicom.valuerep.TM(time(21, 22, 23))) == "212223"
-        assert str(pydicom.valuerep.TM(
-            time(21, 22, 23, 24))) == "212223.000024"
+        assert str(pydicom.valuerep.TM(time(21, 22, 23, 24))) == "212223.000024"
         assert str(pydicom.valuerep.TM(time(1, 2, 3))) == "010203"
         assert repr(pydicom.valuerep.TM(time(1, 2, 3))) == '"010203"'
 
     def test_new_empty_str(self):
         """Test converting an empty string."""
-        assert pydicom.valuerep.TM('') is None
+        assert pydicom.valuerep.TM("") is None
 
     def test_new_str_conversion(self):
         """Test converting strings to times."""
-        tm = pydicom.valuerep.TM('00')
+        tm = pydicom.valuerep.TM("00")
         assert tm == time(0, 0, 0)
-        tm = pydicom.valuerep.TM('23')
+        tm = pydicom.valuerep.TM("23")
         assert tm == time(23, 0, 0)
         msg = r"Unable to convert non-conformant value '24' to 'TM' object"
         with pytest.raises(ValueError, match=msg):
-            pydicom.valuerep.TM('24')
+            pydicom.valuerep.TM("24")
 
-        tm = pydicom.valuerep.TM('0000')
+        tm = pydicom.valuerep.TM("0000")
         assert tm == time(0, 0, 0)
-        tm = pydicom.valuerep.TM('2359')
+        tm = pydicom.valuerep.TM("2359")
         assert tm == time(23, 59, 0)
         msg = r"Unable to convert non-conformant value '2360' to 'TM' object"
         with pytest.raises(ValueError, match=msg):
-            pydicom.valuerep.TM('2360')
+            pydicom.valuerep.TM("2360")
 
-        tm = pydicom.valuerep.TM('000000')
+        tm = pydicom.valuerep.TM("000000")
         assert tm == time(0, 0, 0)
         # Valid DICOM TM seconds range is 0..60, but time is 0..59
         msg = (
@@ -112,12 +121,12 @@ class TestTM:
             r"seconds component, changing to '59'"
         )
         with pytest.warns(UserWarning, match=msg):
-            tm = pydicom.valuerep.TM('235960')
+            tm = pydicom.valuerep.TM("235960")
         assert tm == time(23, 59, 59)
 
         msg = r"Unable to convert non-conformant value '235' to 'TM' object"
         with pytest.raises(ValueError, match=msg):
-            pydicom.valuerep.TM('235')
+            pydicom.valuerep.TM("235")
 
     def test_new_obj_conversion(self):
         """Test other conversion attempts."""
@@ -136,7 +145,7 @@ class TestTM:
     def test_comparison(self):
         tm = pydicom.valuerep.TM("010203.123456")
         tm_object = time(1, 2, 3, 123456)
-        assert tm == tm # noqa: PLR0124 Need to check equality with self
+        assert tm == tm  # noqa: PLR0124 Need to check equality with self
         assert tm != 1
         assert tm == tm_object
         assert tm_object == tm
@@ -169,6 +178,7 @@ class TestTM:
 
 class TestDT:
     """Unit tests for pickling DT"""
+
     def test_pickling(self):
         # Check that a pickled DT is read back properly
         dt = pydicom.valuerep.DT("19111213212123")
@@ -195,7 +205,7 @@ class TestDT:
         assert str(dt) == str(loaded_dt)
 
     def test_pickling_dt_from_datetime_with_timezone(self):
-        tz_info = timezone(timedelta(seconds=-23400), '-0630')
+        tz_info = timezone(timedelta(seconds=-23400), "-0630")
         dt_object = datetime(2022, 12, 31, 23, 59, 59, 42, tzinfo=tz_info)
         dt = pydicom.valuerep.DT(dt_object)
         assert dt.original_string == "20221231235959.000042-0630"
@@ -206,7 +216,7 @@ class TestDT:
 
     def test_new_empty_str(self):
         """Test converting an empty string."""
-        assert pydicom.valuerep.DT('') is None
+        assert pydicom.valuerep.DT("") is None
 
     def test_new_obj_conversion(self):
         """Test other conversion attempts."""
@@ -230,14 +240,11 @@ class TestDT:
             r"seconds component, changing to '59'"
         )
         with pytest.warns(UserWarning, match=msg):
-            dt = pydicom.valuerep.DT('20010101235960')
+            dt = pydicom.valuerep.DT("20010101235960")
         assert str(dt) == "20010101235960"
         assert dt == datetime(2001, 1, 1, 23, 59, 59)
 
-        msg = (
-            r"Unable to convert non-conformant value 'a2000,00,00' to 'DT' "
-            r"object"
-        )
+        msg = r"Unable to convert non-conformant value 'a2000,00,00' to 'DT' " r"object"
         with pytest.raises(ValueError, match=msg):
             pydicom.valuerep.DT("a2000,00,00")
 
@@ -248,11 +255,11 @@ class TestDT:
         assert str(pydicom.valuerep.DT("19111213212123")) == "19111213212123"
         assert str(pydicom.valuerep.DA("1001.02.03")) == "1001.02.03"
         assert repr(pydicom.valuerep.DA("1001.02.03")) == '"1001.02.03"'
-        tz_info = timezone(timedelta(seconds=21600), '+0600')
+        tz_info = timezone(timedelta(seconds=21600), "+0600")
         dt = datetime(2022, 1, 2, 8, 9, 7, 123456, tzinfo=tz_info)
         assert str(pydicom.valuerep.DT(dt)) == "20220102080907.123456+0600"
         assert repr(pydicom.valuerep.DT(dt)) == '"20220102080907.123456+0600"'
-        tz_info = timezone(timedelta(seconds=-23400), '-0630')
+        tz_info = timezone(timedelta(seconds=-23400), "-0630")
         dt = datetime(2022, 12, 31, 23, 59, 59, 42, tzinfo=tz_info)
         assert str(pydicom.valuerep.DT(dt)) == "20221231235959.000042-0630"
         assert repr(pydicom.valuerep.DT(dt)) == '"20221231235959.000042-0630"'
@@ -260,7 +267,7 @@ class TestDT:
     def test_comparison(self):
         dt = pydicom.valuerep.DT("19111213212123")
         dt_object = datetime(1911, 12, 13, 21, 21, 23)
-        assert dt == dt # noqa: PLR0124 Need to check equality with self
+        assert dt == dt  # noqa: PLR0124 Need to check equality with self
         assert dt != 1
         assert dt == dt_object
         assert dt_object == dt
@@ -282,7 +289,7 @@ class TestDT:
 
     def test_datetime_behavior(self):
         """Test that DT behaves like datetime."""
-        tz_info = timezone(timedelta(seconds=-23400), '-0630')
+        tz_info = timezone(timedelta(seconds=-23400), "-0630")
         dt_object = datetime(2022, 12, 31, 23, 59, 59, 42, tzinfo=tz_info)
         dt = pydicom.valuerep.DT(dt_object)
         assert dt == dt_object
@@ -300,6 +307,7 @@ class TestDT:
 
 class TestDA:
     """Unit tests for pickling DA"""
+
     def test_pickling(self):
         # Check that a pickled DA is read back properly
         x = pydicom.valuerep.DA("19111213")
@@ -336,7 +344,7 @@ class TestDA:
     def test_comparison(self):
         da = pydicom.valuerep.DA("19111213")
         da_object = date(1911, 12, 13)
-        assert da == da # noqa: PLR0124 Need to check equality with self
+        assert da == da  # noqa: PLR0124 Need to check equality with self
         assert da != 1
         assert da == da_object
         assert hash(da) == hash(da_object)
@@ -371,34 +379,35 @@ class TestDA:
 
 class TestIsValidDS:
     """Unit tests for the is_valid_ds function."""
+
     @pytest.mark.parametrize(
-        's',
+        "s",
         [
-            '1',
-            '3.14159265358979',
-            '-1234.456e78',
-            '1.234E-5',
-            '1.234E+5',
-            '+1',
-            '    42',  # leading spaces allowed
-            '42    ',  # trailing spaces allowed
-        ]
+            "1",
+            "3.14159265358979",
+            "-1234.456e78",
+            "1.234E-5",
+            "1.234E+5",
+            "+1",
+            "    42",  # leading spaces allowed
+            "42    ",  # trailing spaces allowed
+        ],
     )
     def test_valid(self, s: str):
         """Various valid decimal strings."""
         assert pydicom.valuerep.is_valid_ds(s)
 
     @pytest.mark.parametrize(
-        's',
+        "s",
         [
-            'nan',
-            '-inf',
-            '3.141592653589793',  # too long
-            '1,000',              # no commas
-            '1 000',              # no embedded spaces
-            '127.0.0.1',          # not a number
-            '1.e'                 # not a number
-        ]
+            "nan",
+            "-inf",
+            "3.141592653589793",  # too long
+            "1,000",  # no commas
+            "1 000",  # no embedded spaces
+            "127.0.0.1",  # not a number
+            "1.e",  # not a number
+        ],
     )
     def test_invalid(self, s: str):
         """Various invalid decimal strings."""
@@ -407,6 +416,7 @@ class TestIsValidDS:
 
 class TestTruncateFloatForDS:
     """Unit tests for float truncation function"""
+
     def check_valid(self, s: str) -> bool:
         # Use the pydicom test function
         if not pydicom.valuerep.is_valid_ds(s):
@@ -414,14 +424,14 @@ class TestTruncateFloatForDS:
 
         # Disallow floats ending in '.' since this may not be correctly
         # interpreted
-        if s.endswith('.'):
+        if s.endswith("."):
             return False
 
         # Otherwise return True
         return True
 
     @pytest.mark.parametrize(
-        'val,expected_str',
+        "val,expected_str",
         [
             [1.0, "1.0"],
             [0.0, "0.0"],
@@ -429,39 +439,35 @@ class TestTruncateFloatForDS:
             [0.123, "0.123"],
             [-0.321, "-0.321"],
             [0.00001, "1e-05"],
-            [3.14159265358979323846, '3.14159265358979'],
-            [-3.14159265358979323846, '-3.1415926535898'],
-            [5.3859401928763739403e-7, '5.3859401929e-07'],
-            [-5.3859401928763739403e-7, '-5.385940193e-07'],
-            [1.2342534378125532912998323e10, '12342534378.1255'],
-            [6.40708699858767842501238e13, '64070869985876.8'],
-            [1.7976931348623157e+308, '1.797693135e+308'],
-        ]
+            [3.14159265358979323846, "3.14159265358979"],
+            [-3.14159265358979323846, "-3.1415926535898"],
+            [5.3859401928763739403e-7, "5.3859401929e-07"],
+            [-5.3859401928763739403e-7, "-5.385940193e-07"],
+            [1.2342534378125532912998323e10, "12342534378.1255"],
+            [6.40708699858767842501238e13, "64070869985876.8"],
+            [1.7976931348623157e308, "1.797693135e+308"],
+        ],
     )
     def test_auto_format(self, val: float, expected_str: str):
         """Test truncation of some basic values."""
         assert pydicom.valuerep.format_number_as_ds(val) == expected_str
 
-    @pytest.mark.parametrize(
-        'exp', [-101, -100, 100, 101] + list(range(-16, 17))
-    )
+    @pytest.mark.parametrize("exp", [-101, -100, 100, 101] + list(range(-16, 17)))
     def test_powers_of_pi(self, exp: int):
         """Raise pi to various powers to test truncation."""
-        val = math.pi * 10 ** exp
+        val = math.pi * 10**exp
         s = pydicom.valuerep.format_number_as_ds(val)
         assert self.check_valid(s)
 
-    @pytest.mark.parametrize(
-        'exp', [-101, -100, 100, 101] + list(range(-16, 17))
-    )
+    @pytest.mark.parametrize("exp", [-101, -100, 100, 101] + list(range(-16, 17)))
     def test_powers_of_negative_pi(self, exp: int):
         """Raise negative pi to various powers to test truncation."""
-        val = -math.pi * 10 ** exp
+        val = -math.pi * 10**exp
         s = pydicom.valuerep.format_number_as_ds(val)
         assert self.check_valid(s)
 
     @pytest.mark.parametrize(
-        'val', [float('-nan'), float('nan'), float('-inf'), float('inf')]
+        "val", [float("-nan"), float("nan"), float("-inf"), float("inf")]
     )
     def test_invalid(self, val: float):
         """Test non-finite floating point numbers raise an error"""
@@ -471,14 +477,14 @@ class TestTruncateFloatForDS:
     def test_wrong_type(self):
         """Test calling with a string raises an error"""
         with pytest.raises(
-                TypeError,
-                match="'val' must be of type float or decimal.Decimal"
+            TypeError, match="'val' must be of type float or decimal.Decimal"
         ):
-            pydicom.valuerep.format_number_as_ds('1.0')
+            pydicom.valuerep.format_number_as_ds("1.0")
 
 
 class TestDS:
     """Unit tests for DS values"""
+
     def test_empty_value(self):
         assert DS(None) is None
         assert DS("") == ""
@@ -495,6 +501,7 @@ class TestDS:
 
 class TestDSfloat:
     """Unit tests for pickling DSfloat"""
+
     def test_pickling(self, enforce_valid_both_fixture):
         # Check that a pickled DSFloat is read back properly
         x = DSfloat(9.0)
@@ -506,27 +513,27 @@ class TestDSfloat:
 
     def test_new_empty(self, enforce_valid_both_fixture):
         """Test passing an empty value."""
-        assert isinstance(DSfloat(''), str)
-        assert DSfloat('') == ''
+        assert isinstance(DSfloat(""), str)
+        assert DSfloat("") == ""
         assert DSfloat(None) is None
 
     def test_str_value(self, enforce_valid_both_fixture):
         """Test creating using str"""
-        assert DSfloat('1.20') == 1.2
-        assert DSfloat('1.20') == 1.20
-        assert DSfloat('1.20 ') == 1.2
-        assert DSfloat('1.20 ') == 1.20
-        assert DSfloat('1.20') != '1.2'
-        assert DSfloat('1.20') == '1.20'
-        assert DSfloat('1.20 ') == '1.20'
+        assert DSfloat("1.20") == 1.2
+        assert DSfloat("1.20") == 1.20
+        assert DSfloat("1.20 ") == 1.2
+        assert DSfloat("1.20 ") == 1.20
+        assert DSfloat("1.20") != "1.2"
+        assert DSfloat("1.20") == "1.20"
+        assert DSfloat("1.20 ") == "1.20"
 
     def test_str(self, enforce_valid_both_fixture):
         """Test DSfloat.__str__()."""
         val = DSfloat(1.1)
-        assert str(val) == '1.1'
+        assert str(val) == "1.1"
 
         val = DSfloat("1.1")
-        assert str(val) == '1.1'
+        assert str(val) == "1.1"
 
     def test_repr(self, enforce_valid_both_fixture):
         """Test DSfloat.__repr__()."""
@@ -536,11 +543,11 @@ class TestDSfloat:
         val = DSfloat("1.1")
         assert repr(val) == "'1.1'"
         assert repr(val) == repr("1.1")
-        assert repr(val) == repr('1.1')
+        assert repr(val) == repr("1.1")
 
     def test_DSfloat(self, enforce_valid_both_fixture):
         """Test creating a value using DSfloat."""
-        x = DSfloat('1.2345')
+        x = DSfloat("1.2345")
         y = DSfloat(x)
         assert x == y
         assert y == x
@@ -549,7 +556,7 @@ class TestDSfloat:
 
     def test_DSdecimal(self, enforce_valid_both_fixture):
         """Test creating a value using DSdecimal."""
-        x = DSdecimal('1.2345')
+        x = DSdecimal("1.2345")
         y = DSfloat(x)
         assert 1.2345 == y
         assert "1.2345" == y.original_string
@@ -561,8 +568,8 @@ class TestDSfloat:
         # Float representation should be unaltered by truncation
         assert x == math.pi
         # String representations should be correctly formatted
-        assert str(x) == '3.14159265358979'
-        assert repr(x) == repr('3.14159265358979')
+        assert str(x) == "3.14159265358979"
+        assert repr(x) == repr("3.14159265358979")
 
     def test_auto_format_from_invalid_DS(self, disable_value_validation):
         """Test truncating floats"""
@@ -575,41 +582,39 @@ class TestDSfloat:
         # Float representation should be unaltered by truncation
         assert y == math.pi
         # String representations should be correctly formatted
-        assert str(y) == '3.14159265358979'
+        assert str(y) == "3.14159265358979"
         assert repr(y) == repr("3.14159265358979")
 
     def test_auto_format_invalid_string(self, enforce_valid_both_fixture):
         """If the user supplies an invalid string, this should be formatted."""
-        x = DSfloat('3.141592653589793', auto_format=True)
+        x = DSfloat("3.141592653589793", auto_format=True)
 
         # Float representation should be unaltered by truncation
-        assert x == float('3.141592653589793')
+        assert x == float("3.141592653589793")
         # String representations should be correctly formatted
-        assert str(x) == '3.14159265358979'
+        assert str(x) == "3.14159265358979"
         assert repr(x) == repr("3.14159265358979")
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
-        x = DSfloat('1.234e-1', auto_format=True)
+        x = DSfloat("1.234e-1", auto_format=True)
 
         # Float representation should be correct
         assert x == 0.1234
         # String representations should be unaltered
-        assert str(x) == '1.234e-1'
+        assert str(x) == "1.234e-1"
         assert repr(x) == repr("1.234e-1")
 
     def test_enforce_valid_values_length(self):
         """Test that errors are raised when length is too long."""
         with pytest.raises(OverflowError):
-            valuerep.DSfloat('3.141592653589793',
-                             validation_mode=config.RAISE)
+            valuerep.DSfloat("3.141592653589793", validation_mode=config.RAISE)
 
     def test_handle_missing_leading_zero(self):
         """Test that no error is raised with maximum length DS string
         without leading zero."""
         # Regression test for #1632
-        valuerep.DSfloat(".002006091181818",
-                         validation_mode=config.RAISE)
+        valuerep.DSfloat(".002006091181818", validation_mode=config.RAISE)
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
@@ -619,19 +624,23 @@ class TestDSfloat:
         assert y == x
         assert y.auto_format
         assert math.pi == y
-        assert str(y) == '3.14159265358979'
+        assert str(y) == "3.14159265358979"
         assert repr(y) == repr("3.14159265358979")
 
     @pytest.mark.parametrize(
-        'val',
+        "val",
         [
-            'nan', '-nan', 'inf', '-inf', float('nan'), float('-nan'),
-            float('-inf'), float('inf')
-        ]
+            "nan",
+            "-nan",
+            "inf",
+            "-inf",
+            float("nan"),
+            float("-nan"),
+            float("-inf"),
+            float("inf"),
+        ],
     )
-    def test_enforce_valid_values_value(
-        self, val: float | str
-    ):
+    def test_enforce_valid_values_value(self, val: float | str):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
             valuerep.DSfloat(val, validation_mode=config.RAISE)
@@ -675,7 +684,7 @@ class TestDSfloat:
     def test_hash(self):
         """Test hash(DSfloat)"""
         assert hash(DSfloat(1.2345)) == hash(1.2345)
-        assert hash(DSfloat('1.2345')) == hash(1.2345)
+        assert hash(DSfloat("1.2345")) == hash(1.2345)
 
 
 class TestDSdecimal:
@@ -687,6 +696,7 @@ class TestDSdecimal:
         config.allow_DS_float = old_value
 
     """Unit tests for pickling DSdecimal"""
+
     def test_pickling(self):
         # Check that a pickled DSdecimal is read back properly
         # DSdecimal actually prefers original_string when
@@ -707,27 +717,27 @@ class TestDSdecimal:
 
     def test_new_empty(self):
         """Test passing an empty value."""
-        assert DSdecimal('') == ''
-        assert DSdecimal('  ') == '  '
+        assert DSdecimal("") == ""
+        assert DSdecimal("  ") == "  "
         assert DSdecimal(None) is None
 
     def test_str_value(self):
         """Test creating using str"""
         # Not equal because float(1.2) != Decimal('1.2')
-        assert DSdecimal('1.20') != 1.2
-        assert DSdecimal('1.20') != 1.20
+        assert DSdecimal("1.20") != 1.2
+        assert DSdecimal("1.20") != 1.20
         # Decimal(1.2) is different to Decimal('1.2')
-        assert DSdecimal('1.20') == Decimal('1.2')
-        assert DSdecimal('1.20') == Decimal('1.20')
-        assert DSdecimal('1.20 ') == Decimal('1.2')
-        assert DSdecimal('1.20 ') == Decimal('1.20')
-        assert DSdecimal('1.20') != '1.2'
-        assert DSdecimal('1.20') == '1.20'
-        assert DSdecimal('1.20 ') == '1.20'
+        assert DSdecimal("1.20") == Decimal("1.2")
+        assert DSdecimal("1.20") == Decimal("1.20")
+        assert DSdecimal("1.20 ") == Decimal("1.2")
+        assert DSdecimal("1.20 ") == Decimal("1.20")
+        assert DSdecimal("1.20") != "1.2"
+        assert DSdecimal("1.20") == "1.20"
+        assert DSdecimal("1.20 ") == "1.20"
 
     def test_DSfloat(self):
         """Test creating a value using DSfloat."""
-        x = DSdecimal('1.2345')
+        x = DSdecimal("1.2345")
         y = DSdecimal(x)
         assert x == y
         assert y == x
@@ -736,25 +746,29 @@ class TestDSdecimal:
 
     def test_DSdecimal(self, allow_ds_float):
         """Test creating a value using DSdecimal."""
-        x = DSfloat('1.2345')
+        x = DSfloat("1.2345")
         y = DSdecimal(x)
         assert Decimal(1.2345) == y
         assert "1.2345" == y.original_string
 
     def test_repr(self):
         """Test repr(DSdecimal)."""
-        x = DSdecimal('1.2345')
-        assert repr(x) == repr('1.2345')
+        x = DSdecimal("1.2345")
+        assert repr(x) == repr("1.2345")
 
     def test_string_too_long(self):
-        msg = ("Values for elements with a VR of 'DS' values must be <= 16 "
-               "characters long. Use a smaller string, *")
+        msg = (
+            "Values for elements with a VR of 'DS' values must be <= 16 "
+            "characters long. Use a smaller string, *"
+        )
         with pytest.warns(UserWarning, match=msg):
             x = DSdecimal(Decimal(math.pi), auto_format=False)
 
     def test_string_too_long_raises(self, enforce_valid_values):
-        msg = ("Values for elements with a VR of 'DS' values must be <= 16 "
-               "characters long. Use a smaller string, *")
+        msg = (
+            "Values for elements with a VR of 'DS' values must be <= 16 "
+            "characters long. Use a smaller string, *"
+        )
         with pytest.raises(OverflowError, match=msg):
             x = DSdecimal(Decimal(math.pi), auto_format=False)
 
@@ -765,11 +779,12 @@ class TestDSdecimal:
         # Decimal representation should be unaltered by truncation
         assert x == Decimal(math.pi)
         # String representations should be correctly formatted
-        assert str(x) == '3.14159265358979'
+        assert str(x) == "3.14159265358979"
         assert repr(x) == repr("3.14159265358979")
 
-    def test_auto_format_from_invalid_DS(self, allow_ds_float,
-                                         disable_value_validation):
+    def test_auto_format_from_invalid_DS(
+        self, allow_ds_float, disable_value_validation
+    ):
         """Test truncating floats"""
         # A DSdecimal that has a non-valid string representation
         x = DSdecimal(math.pi)
@@ -780,42 +795,45 @@ class TestDSdecimal:
         # Float representation should be unaltered by truncation
         assert y == math.pi
         # String representations should be correctly formatted
-        assert str(y) == '3.14159265358979'
+        assert str(y) == "3.14159265358979"
         assert repr(y) == repr("3.14159265358979")
 
     def test_auto_format_invalid_string(self, enforce_valid_both_fixture):
         """If the user supplies an invalid string, this should be formatted."""
-        x = DSdecimal('3.141592653589793', auto_format=True)
+        x = DSdecimal("3.141592653589793", auto_format=True)
 
         # Decimal representation should be unaltered by truncation
-        assert x == Decimal('3.141592653589793')
+        assert x == Decimal("3.141592653589793")
         # String representations should be correctly formatted
-        assert str(x) == '3.14159265358979'
+        assert str(x) == "3.14159265358979"
         assert repr(x) == repr("3.14159265358979")
 
     @pytest.mark.parametrize(
-        'val',
+        "val",
         [
-            'NaN', '-NaN', 'Infinity', '-Infinity', Decimal('NaN'),
-            Decimal('-NaN'), Decimal('-Infinity'), Decimal('Infinity')
-        ]
+            "NaN",
+            "-NaN",
+            "Infinity",
+            "-Infinity",
+            Decimal("NaN"),
+            Decimal("-NaN"),
+            Decimal("-Infinity"),
+            Decimal("Infinity"),
+        ],
     )
-    def test_enforce_valid_values_value(
-        self, val: Decimal | str
-    ):
+    def test_enforce_valid_values_value(self, val: Decimal | str):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSdecimal(val,
-                               validation_mode=config.RAISE)
+            valuerep.DSdecimal(val, validation_mode=config.RAISE)
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
-        x = DSdecimal('1.234e-1', auto_format=True)
+        x = DSdecimal("1.234e-1", auto_format=True)
 
         # Decimal representation should be correct
-        assert x == Decimal('1.234e-1')
+        assert x == Decimal("1.234e-1")
         # String representations should be unaltered
-        assert str(x) == '1.234e-1'
+        assert str(x) == "1.234e-1"
         assert repr(x) == repr("1.234e-1")
 
     def test_DSdecimal_auto_format(self, allow_ds_float):
@@ -826,7 +844,7 @@ class TestDSdecimal:
         assert y == x
         assert y.auto_format
         assert math.pi == y
-        assert str(y) == '3.14159265358979'
+        assert str(y) == "3.14159265358979"
         assert repr(y) == repr("3.14159265358979")
 
     def test_comparison_operators(self, allow_ds_float):
@@ -868,11 +886,12 @@ class TestDSdecimal:
     def test_hash(self, allow_ds_float, disable_value_validation):
         """Test hash(DSdecimal)"""
         assert hash(DSdecimal(1.2345)) == hash(Decimal(1.2345))
-        assert hash(DSdecimal('1.2345')) == hash(Decimal('1.2345'))
+        assert hash(DSdecimal("1.2345")) == hash(Decimal("1.2345"))
 
 
 class TestIS:
     """Unit tests for IS"""
+
     def test_empty_value(self):
         assert IS(None) is None
         assert IS("") == ""
@@ -880,9 +899,9 @@ class TestIS:
 
     def test_str_value(self):
         """Test creating using str"""
-        assert IS('1') == 1
-        assert IS('1 ') == 1
-        assert IS(' 1 ') == 1
+        assert IS("1") == 1
+        assert IS("1 ") == 1
+        assert IS(" 1 ") == 1
 
     def test_valid_value(self, disable_value_validation):
         assert 42 == IS(42)
@@ -948,25 +967,25 @@ class TestIS:
     def test_str(self, disable_value_validation):
         """Test IS.__str__()."""
         val = IS(1)
-        assert str(val) == '1'
+        assert str(val) == "1"
 
         val = IS("1")
-        assert str(val) == '1'
+        assert str(val) == "1"
 
         val = IS("1.0")
-        assert str(val) == '1.0'
+        assert str(val) == "1.0"
 
     def test_repr(self, disable_value_validation):
         """Test IS.__repr__()."""
         val = IS(1)
-        assert repr(val) == repr('1')
+        assert repr(val) == repr("1")
 
         val = IS("1")
-        assert repr(val) == repr('1')
+        assert repr(val) == repr("1")
         assert repr(val) == repr("1")
 
         val = IS("1.0")
-        assert str(val) == '1.0'
+        assert str(val) == "1.0"
 
     def test_comparison_operators(self):
         """Tests for the comparison operators"""
@@ -1006,12 +1025,13 @@ class TestIS:
     def test_hash(self):
         """Test hash(IS)"""
         assert hash(IS(1)) == hash(1)
-        assert hash(IS('1')) == hash(1)
+        assert hash(IS("1")) == hash(1)
 
 
 class TestBadValueRead:
     """Unit tests for handling a bad value for a VR
-       (a string in a number VR here)"""
+    (a string in a number VR here)"""
+
     def setup_method(self):
         class TagLike:
             pass
@@ -1037,8 +1057,7 @@ class TestBadValueRead:
         # no fallback VR succeeded, returned original value untranslated
         assert b"1A" == convert_value("IS", self.tag)
 
-    def test_read_bad_value_in_VR_enforce_valid_value(
-            self, enforce_valid_values):
+    def test_read_bad_value_in_VR_enforce_valid_value(self, enforce_valid_values):
         # found a conversion
         assert "1A" == convert_value("SH", self.tag)
         # invalid literal for base 10
@@ -1048,7 +1067,8 @@ class TestBadValueRead:
 
 class TestDecimalString:
     """Unit tests unique to the use of DS class
-       derived from python Decimal"""
+    derived from python Decimal"""
+
     @pytest.fixture(autouse=True)
     def ds_decimal(self):
         original = config.use_DS_decimal
@@ -1123,8 +1143,11 @@ class TestPersonName:
             "\033$)C\373\363^\033$)C\321\316\324\327="
             "\033$)C\310\253^\033$)C\261\346\265\277"
         )
-        assert ("Hong", "Gildong", "Andrews") == \
-               (pn.family_name, pn.given_name, pn.middle_name)
+        assert ("Hong", "Gildong", "Andrews") == (
+            pn.family_name,
+            pn.given_name,
+            pn.middle_name,
+        )
         assert "Hong^Gildong^Andrews" == pn.alphabetic
         assert "\033$)C\373\363^\033$)C\321\316\324\327" == pn.ideographic
         assert "\033$)C\310\253^\033$)C\261\346\265\277" == pn.phonetic
@@ -1133,7 +1156,7 @@ class TestPersonName:
         """PN: Formatting works..."""
         pn = PersonName("Family^Given")
         assert pn.family_comma_given() == "Family, Given"
-        s = pn.formatted('%(family_name)s, %(given_name)s')
+        s = pn.formatted("%(family_name)s, %(given_name)s")
         assert s == "Family, Given"
 
     def test_unicode_kr(self):
@@ -1195,9 +1218,7 @@ class TestPersonName:
 
     def test_unicode_jp_from_unicode(self):
         """A person name initialized from unicode is already decoded"""
-        pn = PersonName(
-            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
-        )
+        pn = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
         assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
         assert "山田^太郎" == pn.ideographic
         assert "やまだ^たろう" == pn.phonetic
@@ -1229,12 +1250,8 @@ class TestPersonName:
         pn3 = PersonName("John^Doe", encodings=default_encoding)
         assert hash(pn1) != hash(pn3)
 
-        pn1 = PersonName(
-            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
-        )
-        pn2 = PersonName(
-            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
-        )
+        pn1 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn2 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
         assert hash(pn1) == hash(pn2)
 
     def test_next(self):
@@ -1245,9 +1262,7 @@ class TestPersonName:
         assert next(pn1_itr) == "J"
 
         # Test getting multiple characters
-        pn2 = PersonName(
-            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
-        )
+        pn2 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
         pn2_itr = iter(pn2)
         assert next(pn2_itr) == "Y"
         assert next(pn2_itr) == "a"
@@ -1305,13 +1320,13 @@ class TestPersonName:
 
         # "Hong^Gildong=洪^吉洞=홍^길동"
         pn = PersonName.from_named_components(
-            family_name='Hong',
-            given_name='Gildong',
-            family_name_ideographic=b'\033$)C\373\363',
-            given_name_ideographic=b'\033$)C\321\316\324\327',
-            family_name_phonetic=b'\033$)C\310\253',
-            given_name_phonetic=b'\033$)C\261\346\265\277',
-            encodings=[default_encoding, 'euc_kr'],
+            family_name="Hong",
+            given_name="Gildong",
+            family_name_ideographic=b"\033$)C\373\363",
+            given_name_ideographic=b"\033$)C\321\316\324\327",
+            family_name_phonetic=b"\033$)C\310\253",
+            given_name_phonetic=b"\033$)C\261\346\265\277",
+            encodings=[default_encoding, "euc_kr"],
         )
         pn = pn.decode()
         assert len(pn) == 12 + 1 + 4 + 1 + 4
@@ -1319,27 +1334,27 @@ class TestPersonName:
     def test_from_named_components(self):
         # Example from DICOM standard, part 5, sect 6.2.1.1
         pn = PersonName.from_named_components(
-            family_name='Adams',
-            given_name='John Robert Quincy',
-            name_prefix='Rev.',
-            name_suffix='B.A. M.Div.'
+            family_name="Adams",
+            given_name="John Robert Quincy",
+            name_prefix="Rev.",
+            name_suffix="B.A. M.Div.",
         )
-        assert pn == 'Adams^John Robert Quincy^^Rev.^B.A. M.Div.'
-        assert pn.family_name == 'Adams'
-        assert pn.given_name == 'John Robert Quincy'
-        assert pn.name_prefix == 'Rev.'
-        assert pn.name_suffix == 'B.A. M.Div.'
+        assert pn == "Adams^John Robert Quincy^^Rev.^B.A. M.Div."
+        assert pn.family_name == "Adams"
+        assert pn.given_name == "John Robert Quincy"
+        assert pn.name_prefix == "Rev."
+        assert pn.name_suffix == "B.A. M.Div."
 
     def test_from_named_components_kr_from_bytes(self):
         # Example name from PS3.5-2008 section I.2 p. 108
         pn = PersonName.from_named_components(
-            family_name='Hong',
-            given_name='Gildong',
-            family_name_ideographic=b'\033$)C\373\363',
-            given_name_ideographic=b'\033$)C\321\316\324\327',
-            family_name_phonetic=b'\033$)C\310\253',
-            given_name_phonetic=b'\033$)C\261\346\265\277',
-            encodings=[default_encoding, 'euc_kr'],
+            family_name="Hong",
+            given_name="Gildong",
+            family_name_ideographic=b"\033$)C\373\363",
+            given_name_ideographic=b"\033$)C\321\316\324\327",
+            family_name_phonetic=b"\033$)C\310\253",
+            given_name_phonetic=b"\033$)C\261\346\265\277",
+            encodings=[default_encoding, "euc_kr"],
         )
         pn = pn.decode()
         assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
@@ -1349,13 +1364,13 @@ class TestPersonName:
     def test_from_named_components_kr_from_unicode(self):
         # Example name from PS3.5-2008 section I.2 p. 108
         pn = PersonName.from_named_components(
-            family_name='Hong',
-            given_name='Gildong',
-            family_name_ideographic='洪',
-            given_name_ideographic='吉洞',
-            family_name_phonetic='홍',
-            given_name_phonetic='길동',
-            encodings=[default_encoding, 'euc_kr'],
+            family_name="Hong",
+            given_name="Gildong",
+            family_name_ideographic="洪",
+            given_name_ideographic="吉洞",
+            family_name_phonetic="홍",
+            given_name_phonetic="길동",
+            encodings=[default_encoding, "euc_kr"],
         )
         pn = pn.decode()
         assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
@@ -1365,13 +1380,13 @@ class TestPersonName:
     def test_from_named_components_jp_from_bytes(self):
         # Example name from PS3.5-2008 section H  p. 98
         pn = PersonName.from_named_components(
-            family_name='Yamada',
-            given_name='Tarou',
-            family_name_ideographic=b'\033$B;3ED\033(B',
-            given_name_ideographic=b'\033$BB@O:\033(B',
-            family_name_phonetic=b'\033$B$d$^$@\033(B',
-            given_name_phonetic=b'\033$B$?$m$&\033(B',
-            encodings=[default_encoding, 'iso2022_jp'],
+            family_name="Yamada",
+            given_name="Tarou",
+            family_name_ideographic=b"\033$B;3ED\033(B",
+            given_name_ideographic=b"\033$BB@O:\033(B",
+            family_name_phonetic=b"\033$B$d$^$@\033(B",
+            given_name_phonetic=b"\033$B$?$m$&\033(B",
+            encodings=[default_encoding, "iso2022_jp"],
         )
         pn = pn.decode()
         assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
@@ -1381,13 +1396,13 @@ class TestPersonName:
     def test_from_named_components_jp_from_unicode(self):
         # Example name from PS3.5-2008 section H  p. 98
         pn = PersonName.from_named_components(
-            family_name='Yamada',
-            given_name='Tarou',
-            family_name_ideographic='山田',
-            given_name_ideographic='太郎',
-            family_name_phonetic='やまだ',
-            given_name_phonetic='たろう',
-            encodings=[default_encoding, 'iso2022_jp'],
+            family_name="Yamada",
+            given_name="Tarou",
+            family_name_ideographic="山田",
+            given_name_ideographic="太郎",
+            family_name_phonetic="やまだ",
+            given_name_phonetic="たろう",
+            encodings=[default_encoding, "iso2022_jp"],
         )
         pn = pn.decode()
         assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
@@ -1399,31 +1414,32 @@ class TestPersonName:
         # A horse whose responsible organization is named ABC Farms, and whose
         # name is "Running On Water"
         pn = PersonName.from_named_components_veterinary(
-            responsible_party_name='ABC Farms',
-            patient_name='Running on Water',
+            responsible_party_name="ABC Farms",
+            patient_name="Running on Water",
         )
-        assert pn == 'ABC Farms^Running on Water'
-        assert pn.family_name == 'ABC Farms'
-        assert pn.given_name == 'Running on Water'
+        assert pn == "ABC Farms^Running on Water"
+        assert pn.family_name == "ABC Farms"
+        assert pn.given_name == "Running on Water"
 
     def test_from_named_components_with_separator(self):
         # If the names already include separator chars
         # a ValueError should be raised
         with pytest.raises(ValueError):
-            PersonName.from_named_components(given_name='Yamada^Tarou')
+            PersonName.from_named_components(given_name="Yamada^Tarou")
 
     def test_from_named_components_with_separator_from_bytes(self):
         # If the names already include separator chars
         # a ValueError should be raised
         with pytest.raises(ValueError):
             PersonName.from_named_components(
-                family_name_ideographic=b'\033$B;3ED\033(B^\033$BB@O:\033(B',
-                encodings=[default_encoding, 'iso2022_jp'],
+                family_name_ideographic=b"\033$B;3ED\033(B^\033$BB@O:\033(B",
+                encodings=[default_encoding, "iso2022_jp"],
             )
 
 
 class TestDateTime:
     """Unit tests for DA, DT, TM conversion to datetime objects"""
+
     def setup_method(self):
         config.datetime_conversion = True
 
@@ -1525,44 +1541,44 @@ def test_person_name_unicode_warns():
 
 VALUE_REFERENCE = [
     # (VR, Python setter type, (VM 0 values), (VM >= 1 values), keyword)
-    ("AE", str, (None, ""), ("foo", "bar"), 'Receiver'),
-    ("AS", str, (None, ""), ("foo", "bar"), 'PatientAge'),
-    ("AT", int, (None, ), (0, 2**32 - 1), 'OffendingElement'),
-    ("CS", str, (None, ""), ("foo", "bar"), 'QualityControlSubject'),
-    ("DA", str, (None, ""), ("20010203", "20020304"), 'PatientBirthDate'),
-    ("DS", str, (None, ""), ("-1.5", "3.2"), 'PatientWeight'),
-    ("DS", int, (None, ""), (-1, 3), 'PatientWeight'),
-    ("DS", float, (None, ""), (-1.5, 3.2), 'PatientWeight'),
-    ("DT", str, (None, ""), ("20010203040506", "2000"), 'AcquisitionDateTime'),
-    ("FD", float, (None, ), (-1.5, 3.2), 'RealWorldValueLUTData'),
-    ("FL", float, (None, ), (-1.5, 3.2), 'VectorAccuracy'),
-    ("IS", str, (None, ""), ("0", "25"), 'BeamNumber'),
-    ("IS", int, (None, ""), (0, 25), 'BeamNumber'),
-    ("IS", float, (None, ""), (0.0, 25.0), 'BeamNumber'),
-    ("LO", str, (None, ""), ("foo", "bar"), 'DataSetSubtype'),
-    ("LT", str, (None, ""), ("foo", "bar"), 'ExtendedCodeMeaning'),
-    ("OB", bytes, (None, b""), (b"\x00\x01", ), 'FillPattern'),
-    ("OD", bytes, (None, b""), (b"\x00\x01", ), 'DoubleFloatPixelData'),
-    ("OF", bytes, (None, b""), (b"\x00\x01", ), 'UValueData'),
-    ("OL", bytes, (None, b""), (b"\x00\x01", ), 'TrackPointIndexList'),
-    ("OV", bytes, (None, b""), (b"\x00\x01", ), 'SelectorOVValue'),
-    ("OW", bytes, (None, b""), (b"\x00\x01", ), 'TrianglePointIndexList'),
-    ("PN", str, (None, ""), ("foo", "bar"), 'PatientName'),
-    ("SH", str, (None, ""), ("foo", "bar"), 'CodeValue'),
-    ("SL", int, (None, ), (-2**31, 2**31 - 1), 'RationalNumeratorValue'),
-    ("SQ", list, ([], ), (Dataset(), Dataset()), 'BeamSequence'),
-    ("SS", int, (None, ), (-2**15, 2**15 - 1), 'SelectorSSValue'),
-    ("ST", str, (None, ""), ("foo", "bar"), 'InstitutionAddress'),
-    ("SV", int, (None, ), (-2**63, 2**63 - 1), 'SelectorSVValue'),
-    ("TM", str, (None, ""), ("123456", "000000"), 'StudyTime'),
-    ("UC", str, (None, ""), ("foo", "bar"), 'LongCodeValue'),
-    ("UI", str, (None, ""), ("foo", "bar"), 'SOPClassUID'),
-    ("UL", int, (None, ), (0, 2**32 - 1), 'SimpleFrameList'),
-    ("UN", bytes, (None, b""), (b"\x00\x01", ), 'SelectorUNValue'),
-    ("UR", str, (None, ""), ("foo", "bar"), 'CodingSchemeURL'),
-    ("US", int, (None, ), (0, 2**16 - 1), 'SourceAcquisitionBeamNumber'),
-    ("UT", str, (None, ""), ("foo", "bar"), 'StrainAdditionalInformation'),
-    ("UV", int, (None, ), (0, 2**64 - 1), 'SelectorUVValue')
+    ("AE", str, (None, ""), ("foo", "bar"), "Receiver"),
+    ("AS", str, (None, ""), ("foo", "bar"), "PatientAge"),
+    ("AT", int, (None,), (0, 2**32 - 1), "OffendingElement"),
+    ("CS", str, (None, ""), ("foo", "bar"), "QualityControlSubject"),
+    ("DA", str, (None, ""), ("20010203", "20020304"), "PatientBirthDate"),
+    ("DS", str, (None, ""), ("-1.5", "3.2"), "PatientWeight"),
+    ("DS", int, (None, ""), (-1, 3), "PatientWeight"),
+    ("DS", float, (None, ""), (-1.5, 3.2), "PatientWeight"),
+    ("DT", str, (None, ""), ("20010203040506", "2000"), "AcquisitionDateTime"),
+    ("FD", float, (None,), (-1.5, 3.2), "RealWorldValueLUTData"),
+    ("FL", float, (None,), (-1.5, 3.2), "VectorAccuracy"),
+    ("IS", str, (None, ""), ("0", "25"), "BeamNumber"),
+    ("IS", int, (None, ""), (0, 25), "BeamNumber"),
+    ("IS", float, (None, ""), (0.0, 25.0), "BeamNumber"),
+    ("LO", str, (None, ""), ("foo", "bar"), "DataSetSubtype"),
+    ("LT", str, (None, ""), ("foo", "bar"), "ExtendedCodeMeaning"),
+    ("OB", bytes, (None, b""), (b"\x00\x01",), "FillPattern"),
+    ("OD", bytes, (None, b""), (b"\x00\x01",), "DoubleFloatPixelData"),
+    ("OF", bytes, (None, b""), (b"\x00\x01",), "UValueData"),
+    ("OL", bytes, (None, b""), (b"\x00\x01",), "TrackPointIndexList"),
+    ("OV", bytes, (None, b""), (b"\x00\x01",), "SelectorOVValue"),
+    ("OW", bytes, (None, b""), (b"\x00\x01",), "TrianglePointIndexList"),
+    ("PN", str, (None, ""), ("foo", "bar"), "PatientName"),
+    ("SH", str, (None, ""), ("foo", "bar"), "CodeValue"),
+    ("SL", int, (None,), (-(2**31), 2**31 - 1), "RationalNumeratorValue"),
+    ("SQ", list, ([],), (Dataset(), Dataset()), "BeamSequence"),
+    ("SS", int, (None,), (-(2**15), 2**15 - 1), "SelectorSSValue"),
+    ("ST", str, (None, ""), ("foo", "bar"), "InstitutionAddress"),
+    ("SV", int, (None,), (-(2**63), 2**63 - 1), "SelectorSVValue"),
+    ("TM", str, (None, ""), ("123456", "000000"), "StudyTime"),
+    ("UC", str, (None, ""), ("foo", "bar"), "LongCodeValue"),
+    ("UI", str, (None, ""), ("foo", "bar"), "SOPClassUID"),
+    ("UL", int, (None,), (0, 2**32 - 1), "SimpleFrameList"),
+    ("UN", bytes, (None, b""), (b"\x00\x01",), "SelectorUNValue"),
+    ("UR", str, (None, ""), ("foo", "bar"), "CodingSchemeURL"),
+    ("US", int, (None,), (0, 2**16 - 1), "SourceAcquisitionBeamNumber"),
+    ("UT", str, (None, ""), ("foo", "bar"), "StrainAdditionalInformation"),
+    ("UV", int, (None,), (0, 2**64 - 1), "SelectorUVValue"),
 ]
 
 
@@ -1579,7 +1595,7 @@ def test_set_value(vr, pytype, vm0, vmN, keyword, disable_value_validation):
         assert value == elem.value
 
     # Test VM = 1
-    if vr != 'SQ':
+    if vr != "SQ":
         ds = Dataset()
         value = vmN[0]
         setattr(ds, keyword, value)
@@ -1592,14 +1608,14 @@ def test_set_value(vr, pytype, vm0, vmN, keyword, disable_value_validation):
     value = vmN[0]
     setattr(ds, keyword, [value])
     elem = ds[keyword]
-    if vr == 'SQ':
+    if vr == "SQ":
         assert elem.value[0] == value
         assert value == elem.value[0]
     else:
         assert elem.value == value
         assert value == elem.value
 
-    if vr[0] == 'O' or vr == 'UN':
+    if vr[0] == "O" or vr == "UN":
         return
 
     # Test VM > 1

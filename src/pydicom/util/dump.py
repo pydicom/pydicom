@@ -115,9 +115,7 @@ def pretty_print(
     next_indent = indent_chars * (indent_level + 1)
     for elem in ds:
         if elem.VR == VR.SQ:  # a sequence
-            print(
-                f"{indent}{elem.tag} {elem.name} -- {len(elem.value)} item(s)"
-            )
+            print(f"{indent}{elem.tag} {elem.name} -- {len(elem.value)} item(s)")
             for dataset in elem.value:
                 pretty_print(dataset, indent_level + 1)
                 print(next_indent + "---------")

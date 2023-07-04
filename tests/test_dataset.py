@@ -556,7 +556,7 @@ class TestDataset:
         d = Dataset()
         d.SOPInstanceUID = "1.2.3.4"
         d.PatientName = "Test"
-        assert d == d # noqa: PLR0124 Need to check equality with self
+        assert d == d  # noqa: PLR0124 Need to check equality with self
 
         e = Dataset()
         e.PatientName = "Test"
@@ -594,7 +594,7 @@ class TestDataset:
         """when dataset has private elements"""
         d = Dataset()
         d_elem = DataElement(0x01110001, "PN", "Private")
-        assert d == d # noqa: PLR0124 Need to check equality with self
+        assert d == d  # noqa: PLR0124 Need to check equality with self
         d.add(d_elem)
 
         e = Dataset()
@@ -615,7 +615,7 @@ class TestDataset:
         beam_seq.PatientID = "1234"
         beam_seq.PatientName = "ANON"
         d.BeamSequence.append(beam_seq)
-        assert d == d # noqa: PLR0124 Need to check equality with self
+        assert d == d  # noqa: PLR0124 Need to check equality with self
 
         e = Dataset()
         e.SOPInstanceUID = "1.2.3.4"
@@ -658,7 +658,7 @@ class TestDataset:
         )
         with pytest.warns(UserWarning, match=msg):
             d.SOPEustaceUID = "1.2.3.4"
-        assert d == d # noqa: PLR0124 Need to check equality with self
+        assert d == d  # noqa: PLR0124 Need to check equality with self
 
         e = Dataset()
         with pytest.warns(UserWarning, match=msg):
@@ -677,7 +677,7 @@ class TestDataset:
         e.PatientName = "ANON"
         assert d == e
         assert e == d
-        assert e == e # noqa: PLR0124 Need to check equality with self
+        assert e == e  # noqa: PLR0124 Need to check equality with self
 
         e.PatientName = "ANONY"
         assert not d == e
@@ -689,7 +689,7 @@ class TestDataset:
         d.SOPInstanceUID = "1.2.3.4"
         d.PatientName = "Test"
         d.foo = "foo"
-        assert d == d # noqa: PLR0124 Need to check equality with self
+        assert d == d  # noqa: PLR0124 Need to check equality with self
 
         e = Dataset()
         e.PatientName = "Test"
@@ -700,7 +700,7 @@ class TestDataset:
         """Test inequality operator"""
         d = Dataset()
         d.SOPInstanceUID = "1.2.3.4"
-        assert not d != d # noqa: PLR0124 Need to check inequality with self
+        assert not d != d  # noqa: PLR0124 Need to check inequality with self
 
         e = Dataset()
         e.SOPInstanceUID = "1.2.3.5"
@@ -1974,6 +1974,7 @@ class TestFileDataset:
 
     def test_deepcopy_dataset_subclass(self):
         """Regression test for #1813."""
+
         class MyDatasetSubclass(pydicom.Dataset):
             pass
 

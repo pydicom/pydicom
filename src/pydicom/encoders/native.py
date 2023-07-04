@@ -38,14 +38,14 @@ def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
     bytes
         An RLE encoded frame.
     """
-    if kwargs.get('byteorder', '<') == '>':
+    if kwargs.get("byteorder", "<") == ">":
         raise ValueError(
             "Unsupported option for the 'pydicom' encoding plugin: "
             f"\"byteorder = '{kwargs['byteorder']}'\""
         )
 
-    samples_per_pixel = kwargs['samples_per_pixel']
-    bits_allocated = kwargs['bits_allocated']
+    samples_per_pixel = kwargs["samples_per_pixel"]
+    bits_allocated = kwargs["bits_allocated"]
     bytes_allocated = bits_allocated // 8
 
     nr_segments = bytes_allocated * samples_per_pixel
@@ -66,17 +66,17 @@ def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
             seg_lengths.append(len(segment))
 
     # Add the number of segments to the header
-    rle_header = bytearray(pack('<L', len(seg_lengths)))
+    rle_header = bytearray(pack("<L", len(seg_lengths)))
 
     # Add the segment offsets, starting at 64 for the first segment
     # We don't need an offset to any data at the end of the last segment
     offsets = [64]
     for ii, length in enumerate(seg_lengths[:-1]):
         offsets.append(offsets[ii] + length)
-    rle_header.extend(pack(f'<{len(offsets)}L', *offsets))
+    rle_header.extend(pack(f"<{len(offsets)}L", *offsets))
 
     # Add trailing padding to make up the rest of the header (if required)
-    rle_header.extend(b'\x00' * (64 - len(rle_header)))
+    rle_header.extend(b"\x00" * (64 - len(rle_header)))
 
     return bytes(rle_header + rle_data)
 
@@ -102,12 +102,12 @@ def _encode_segment(src: bytes, **kwargs: Any) -> bytearray:
         to be even length.
     """
     out = bytearray()
-    row_length = kwargs['columns']
+    row_length = kwargs["columns"]
     for idx in range(0, len(src), row_length):
-        out.extend(_encode_row(src[idx:idx + row_length]))
+        out.extend(_encode_row(src[idx : idx + row_length]))
 
     # Pad odd length data with a trailing 0x00 byte
-    out.extend(b'\x00' * (len(out) % 2))
+    out.extend(b"\x00" * (len(out) % 2))
 
     return out
 
@@ -147,7 +147,7 @@ def _encode_row(src: bytes) -> bytes:
                 for idx in range(nr_full_runs):
                     idx *= 128
                     out_append(127)
-                    out_extend(literal[idx:idx + 128])
+                    out_extend(literal[idx : idx + 128])
 
                 if len_partial_run:
                     out_append(len_partial_run - 1)
@@ -168,8 +168,8 @@ def _encode_row(src: bytes) -> bytes:
 
     # Final literal run if literal isn't followed by a replicate run
     for ii in range(0, len(literal), 128):
-        _run = literal[ii:ii + 128]
+        _run = literal[ii : ii + 128]
         out_append(len(_run) - 1)
         out_extend(_run)
 
-    return pack(f'{len(out)}B', *out)
+    return pack(f"{len(out)}B", *out)

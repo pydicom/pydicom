@@ -21,22 +21,19 @@ from pydicom import dcmread
 from pydicom.data import get_testdata_file
 
 # fetch the path to the test data
-path = get_testdata_file('DICOMDIR')
+path = get_testdata_file("DICOMDIR")
 ds = dcmread(path)
 root_dir = Path(ds.filename).resolve().parent
-print(f'Root directory: {root_dir}\n')
+print(f"Root directory: {root_dir}\n")
 
 # Iterate through the PATIENT records
 for patient in ds.patient_records:
     print(
-        f"PATIENT: PatientID={patient.PatientID}, "
-        f"PatientName={patient.PatientName}"
+        f"PATIENT: PatientID={patient.PatientID}, " f"PatientName={patient.PatientName}"
     )
 
     # Find all the STUDY records for the patient
-    studies = [
-        ii for ii in patient.children if ii.DirectoryRecordType == "STUDY"
-    ]
+    studies = [ii for ii in patient.children if ii.DirectoryRecordType == "STUDY"]
     for study in studies:
         descr = study.StudyDescription or "(no value available)"
         print(
@@ -45,20 +42,13 @@ for patient in ds.patient_records:
         )
 
         # Find all the SERIES records in the study
-        all_series = [
-            ii for ii in study.children if ii.DirectoryRecordType == "SERIES"
-        ]
+        all_series = [ii for ii in study.children if ii.DirectoryRecordType == "SERIES"]
         for series in all_series:
             # Find all the IMAGE records in the series
-            images = [
-                ii for ii in series.children
-                if ii.DirectoryRecordType == "IMAGE"
-            ]
-            plural = ('', 's')[len(images) > 1]
+            images = [ii for ii in series.children if ii.DirectoryRecordType == "IMAGE"]
+            plural = ("", "s")[len(images) > 1]
 
-            descr = getattr(
-                series, "SeriesDescription", "(no value available)"
-            )
+            descr = getattr(series, "SeriesDescription", "(no value available)")
             print(
                 f"{'  ' * 2}SERIES: SeriesNumber={series.SeriesNumber}, "
                 f"Modality={series.Modality}, SeriesDescription={descr} - "

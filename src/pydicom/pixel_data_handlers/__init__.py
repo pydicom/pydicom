@@ -1,4 +1,3 @@
-
 from pydicom.pixel_data_handlers.util import (
     apply_color_lut,
     apply_modality_lut,

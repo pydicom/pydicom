@@ -7,7 +7,7 @@ import warnings
 
 import pydicom.config
 from pydicom.filebase import DicomBytesIO, DicomFileLike
-from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
+from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 
 # Functions for parsing encapsulated data
@@ -76,7 +76,7 @@ def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
 
     tag = Tag(fp.read_tag())
 
-    if tag != 0xfffee000:
+    if tag != 0xFFFEE000:
         raise ValueError(
             f"Unexpected tag '{tag}' when parsing the Basic Table Offset item"
         )
@@ -137,9 +137,7 @@ def get_nr_fragments(fp: DicomFileLike) -> int:
     return nr_fragments
 
 
-def generate_pixel_data_fragment(
-    fp: DicomFileLike
-) -> Generator[bytes, None, None]:
+def generate_pixel_data_fragment(fp: DicomFileLike) -> Generator[bytes, None, None]:
     """Yield the encapsulated pixel data fragments.
 
     For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
@@ -253,7 +251,7 @@ def generate_pixel_data_frame(
     DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
     for fragmented_frame in generate_pixel_data(bytestream, nr_frames):
-        yield b''.join(fragmented_frame)
+        yield b"".join(fragmented_frame)
 
 
 def generate_pixel_data(
@@ -365,7 +363,7 @@ def generate_pixel_data(
                 # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker
                 # Should be the last two bytes of a frame
                 # May fail if no EOI/EOC marker or not JPEG
-                eoi_marker = b'\xff\xd9'
+                eoi_marker = b"\xff\xd9"
                 frame = []
                 frame_nr = 0
                 for fragment in generate_pixel_data_fragment(fp):
@@ -418,7 +416,6 @@ def decode_data_sequence(data: bytes) -> list[bytes]:
     """
     # Convert data into a memory-mapped file
     with DicomBytesIO(data) as fp:
-
         # DICOM standard requires this
         fp.is_little_endian = True
         BasicOffsetTable = read_item(fp)  # NOQA
@@ -479,45 +476,38 @@ def read_item(fp: DicomFileLike) -> bytes | None:
     # No more items, time for sequence to stop reading
     if tag == SequenceDelimiterTag:
         length = fp.read_UL()
-        logger.debug(
-            "%04x: Sequence Delimiter, length 0x%x",
-            fp.tell() - 8,
-            length)
+        logger.debug("%04x: Sequence Delimiter, length 0x%x", fp.tell() - 8, length)
 
         if length != 0:
             logger.warning(
                 "Expected 0x00000000 after delimiter, found 0x%x,"
                 " at data position 0x%x",
                 length,
-                fp.tell() - 4)
+                fp.tell() - 4,
+            )
         return None
 
     if tag != ItemTag:
         logger.warning(
-            "Expected Item with tag %s at data position 0x%x",
-            ItemTag,
-            fp.tell() - 4)
+            "Expected Item with tag %s at data position 0x%x", ItemTag, fp.tell() - 4
+        )
         length = fp.read_UL()
     else:
         length = fp.read_UL()
-        logger.debug(
-            "%04x: Item, length 0x%x",
-            fp.tell() - 8,
-            length)
+        logger.debug("%04x: Item, length 0x%x", fp.tell() - 8, length)
 
     if length == 0xFFFFFFFF:
         raise ValueError(
             "Encapsulated data fragment had Undefined Length"
-            " at data position 0x{:x}".format(fp.tell() - 4 ))
+            " at data position 0x{:x}".format(fp.tell() - 4)
+        )
 
     item_data = fp.read(length)
     return item_data
 
 
 # Functions for encapsulating data
-def fragment_frame(
-    frame: bytes, nr_fragments: int = 1
-) -> Generator[bytes, None, None]:
+def fragment_frame(frame: bytes, nr_fragments: int = 1) -> Generator[bytes, None, None]:
     """Yield one or more fragments from `frame`.
 
     .. versionadded:: 1.2
@@ -556,8 +546,7 @@ def fragment_frame(
     # Add 1 to fix odd length frames not being caught
     if nr_fragments > (frame_length + 1) / 2.0:
         raise ValueError(
-            "Too many fragments requested (the minimum fragment size is "
-            "2 bytes)"
+            "Too many fragments requested (the minimum fragment size is " "2 bytes)"
         )
 
     length = int(frame_length / nr_fragments)
@@ -568,7 +557,7 @@ def fragment_frame(
 
     # 1st to (N-1)th fragment
     for offset in range(0, length * (nr_fragments - 1), length):
-        yield frame[offset:offset + length]
+        yield frame[offset : offset + length]
 
     # Nth fragment
     offset = length * (nr_fragments - 1)
@@ -576,7 +565,7 @@ def fragment_frame(
 
     # Pad last fragment if needed to make it even
     if (frame_length - offset) % 2:
-        fragment += b'\x00'
+        fragment += b"\x00"
 
     yield fragment
 
@@ -604,9 +593,9 @@ def itemize_fragment(fragment: bytes) -> bytes:
       a 4 byte length.
     """
     # item tag (fffe,e000)
-    item = b'\xFE\xFF\x00\xE0'
+    item = b"\xFE\xFF\x00\xE0"
     # fragment length '<I' little endian, 4 byte unsigned int
-    item += pack('<I', len(fragment))
+    item += pack("<I", len(fragment))
     # fragment data
     item += fragment
 
@@ -616,9 +605,7 @@ def itemize_fragment(fragment: bytes) -> bytes:
 itemise_fragment = itemize_fragment
 
 
-def itemize_frame(
-    frame: bytes, nr_fragments: int = 1
-) -> Generator[bytes, None, None]:
+def itemize_frame(frame: bytes, nr_fragments: int = 1) -> Generator[bytes, None, None]:
     """Yield items generated from `frame`.
 
     .. versionadded:: 1.2
@@ -716,7 +703,7 @@ def encapsulate(
 
     # Add the Basic Offset Table Item
     # Add the tag
-    output.extend(b'\xFE\xFF\x00\xE0')
+    output.extend(b"\xFE\xFF\x00\xE0")
     if has_bot:
         # Check that the 2**32 - 1 limit in BOT item lengths won't be exceeded
         total = (nr_frames - 1) * 8 + sum([len(f) for f in frames[:-1]])
@@ -730,12 +717,12 @@ def encapsulate(
             )
 
         # Add the length
-        output.extend(pack('<I', 4 * nr_frames))
+        output.extend(pack("<I", 4 * nr_frames))
         # Reserve 4 x len(frames) bytes for the offsets
-        output.extend(b'\xFF\xFF\xFF\xFF' * nr_frames)
+        output.extend(b"\xFF\xFF\xFF\xFF" * nr_frames)
     else:
         # Add the length
-        output.extend(pack('<I', 0))
+        output.extend(pack("<I", 0))
 
     bot_offsets = [0]
     for ii, frame in enumerate(frames):
@@ -750,7 +737,7 @@ def encapsulate(
 
     if has_bot:
         # Go back and write the frame offsets - don't need the last offset
-        output[8:8 + 4 * nr_frames] = pack(f"<{nr_frames}I", *bot_offsets[:-1])
+        output[8 : 8 + 4 * nr_frames] = pack(f"<{nr_frames}I", *bot_offsets[:-1])
 
     return bytes(output)
 

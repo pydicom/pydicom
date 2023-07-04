@@ -11,7 +11,7 @@ def retry(
     tries: int = 4,
     delay: int = 3,
     backoff: int = 2,
-    logger: logging.Logger | None = None
+    logger: logging.Logger | None = None,
 ) -> Callable[[Callable], Any]:
     """Retry calling the decorated function using an exponential backoff.
 
@@ -34,8 +34,8 @@ def retry(
     logger : logging.Logger, optional
         The logger to use. If ``None`` (default), print to stdout.
     """
-    def deco_retry(f: Callable) -> Any:
 
+    def deco_retry(f: Callable) -> Any:
         @wraps(f)
         def f_retry(*args: Any, **kwargs: Any) -> Any:
             mtries, mdelay = tries, delay

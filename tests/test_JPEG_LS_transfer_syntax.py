@@ -120,9 +120,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax:
         b = self.mr_small.pixel_array
         a_mean = a.mean()
         b_mean = b.mean()
-        msg = (
-            f"using GDCM Decoded pixel data is not all {b_mean} (mean == {a_mean})"
-        )
+        msg = f"using GDCM Decoded pixel data is not all {b_mean} (mean == {a_mean})"
         assert a_mean == b_mean, msg
 
     @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
@@ -132,9 +130,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax:
         b = self.emri_small.pixel_array
         a_mean = a.mean()
         b_mean = b.mean()
-        msg = (
-            f"using GDCM Decoded pixel data is not all {b_mean} (mean == {a_mean})"
-        )
+        msg = f"using GDCM Decoded pixel data is not all {b_mean} (mean == {a_mean})"
         assert a_mean == b_mean, msg
 
     @pytest.mark.skipif(not HAVE_JPEGLS, reason=jpeg_ls_missing_message)
@@ -144,9 +140,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax:
         b = self.mr_small.pixel_array
         a_mean = a.mean()
         b_mean = b.mean()
-        msg = (
-            f"using jpeg_ls decoded pixel data is not all {b_mean} (mean == {a_mean})"
-        )
+        msg = f"using jpeg_ls decoded pixel data is not all {b_mean} (mean == {a_mean})"
         assert a_mean == b_mean, msg
 
     @pytest.mark.skipif(not HAVE_JPEGLS, reason=jpeg_ls_missing_message)
@@ -156,9 +150,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax:
         b = self.emri_small.pixel_array
         a_mean = a.mean()
         b_mean = b.mean()
-        msg = (
-            f"using jpeg_ls decoded pixel data is not all {b_mean} (mean == {a_mean})"
-        )
+        msg = f"using jpeg_ls decoded pixel data is not all {b_mean} (mean == {a_mean})"
         assert a_mean == b_mean, msg
 
     def test_read_mr_without_any_handler(self):

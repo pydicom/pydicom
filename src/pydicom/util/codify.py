@@ -83,7 +83,7 @@ def code_dataelem(
     dataset_name: str = "ds",
     exclude_size: int | None = None,
     include_private: bool = False,
-    var_names: deque | None = None
+    var_names: deque | None = None,
 ) -> str:
     """Code lines for a single DICOM data element
 
@@ -110,8 +110,7 @@ def code_dataelem(
 
     if dataelem.VR == VR.SQ:
         return code_sequence(
-            dataelem, dataset_name, exclude_size, include_private,
-            var_names=var_names
+            dataelem, dataset_name, exclude_size, include_private, var_names=var_names
         )
 
     # If in DICOM dictionary, set using the keyword
@@ -124,7 +123,7 @@ def code_dataelem(
 
     # If the value representation of the data element is AT (Attribute Tag),
     # then format it as a tag
-    if dataelem.VR == 'AT':
+    if dataelem.VR == "AT":
         valuerep = tag_repr(dataelem.value)
     else:
         valuerep = repr(dataelem.value)
@@ -267,7 +266,7 @@ def code_dataset(
     exclude_size: int | None = None,
     include_private: bool = False,
     is_file_meta: bool = False,
-    var_names: deque | None = None
+    var_names: deque | None = None,
 ) -> str:
     """Return Python code for creating `ds`.
 
@@ -308,8 +307,7 @@ def code_dataset(
             continue
         # Otherwise code the line and add it to the lines list
         code_line = code_dataelem(
-            dataelem, dataset_name, exclude_size, include_private,
-            var_names=var_names
+            dataelem, dataset_name, exclude_size, include_private, var_names=var_names
         )
         lines.append(code_line)
         # Add blank line if just coded a sequence
@@ -324,9 +322,7 @@ def code_dataset(
 
 
 def code_file(
-    filename: str,
-    exclude_size: int | None = None,
-    include_private: bool = False
+    filename: str, exclude_size: int | None = None, include_private: bool = False
 ) -> str:
     """Write a complete source code file to recreate a DICOM file
 
@@ -354,9 +350,7 @@ def code_file(
 
 
 def code_file_from_dataset(
-    ds: Dataset,
-    exclude_size: int | None = None,
-    include_private: bool = False
+    ds: Dataset, exclude_size: int | None = None, include_private: bool = False
 ) -> str:
     """Write a complete source code file to recreate a DICOM file
 
@@ -394,7 +388,7 @@ def code_file_from_dataset(
     lines.append("")
 
     # Code the file_meta information
-    if hasattr(ds, 'file_meta'):
+    if hasattr(ds, "file_meta"):
         lines.append("# File meta info data elements")
         code_meta = code_dataset(
             ds.file_meta,
@@ -415,7 +409,7 @@ def code_file_from_dataset(
     lines.append("")
 
     # Add the file meta to the dataset, and set transfer syntax
-    if hasattr(ds, 'file_meta'):
+    if hasattr(ds, "file_meta"):
         lines.append("ds.file_meta = file_meta")
     lines.append("ds.is_implicit_VR = " + str(ds.is_implicit_VR))
     lines.append("ds.is_little_endian = " + str(ds.is_little_endian))
@@ -471,9 +465,7 @@ def set_parser_arguments(
 def do_codify(args: argparse.Namespace) -> None:
     # Convert the requested dataset to python/pydicom code lines
     if len(args.filespec) != 1:
-        raise NotImplementedError(
-            "Codify can only work on a single DICOM file input"
-        )
+        raise NotImplementedError("Codify can only work on a single DICOM file input")
 
     ds, element = args.filespec[0]
     filename = ds.filename
@@ -493,9 +485,7 @@ def do_codify(args: argparse.Namespace) -> None:
     else:
         base, _ = os.path.splitext(filename)
         save_as_filename = base + "_from_codify" + ".dcm"
-    save_line = (
-        f"\nds.save_as(r'{save_as_filename}', write_like_original=False)"
-    )
+    save_line = f"\nds.save_as(r'{save_as_filename}', write_like_original=False)"
     code_str += save_line
 
     # Write the code lines to specified file or to standard output

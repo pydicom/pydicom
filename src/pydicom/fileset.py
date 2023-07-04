@@ -7,9 +7,7 @@ from pathlib import Path
 import re
 import shutil
 from tempfile import TemporaryDirectory
-from typing import (
-    Optional, Union, Any, cast
-)
+from typing import Optional, Union, Any, cast
 from collections.abc import Iterator, Iterable, Callable
 import warnings
 
@@ -19,9 +17,7 @@ from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.filereader import dcmread
-from pydicom.filewriter import (
-    write_dataset, write_data_element, write_file_meta_info
-)
+from pydicom.filewriter import write_dataset, write_data_element, write_file_meta_info
 from pydicom.tag import Tag, BaseTag
 import pydicom.uid as sop
 from pydicom.uid import (
@@ -114,7 +110,7 @@ def generate_filename(
     idx = start
     b = len(chars)
     length = 8 - len(prefix)
-    while idx < b ** length:
+    while idx < b**length:
         n = idx
         suffix = ""
         while n:
@@ -157,7 +153,7 @@ def is_conformant_file_id(path: Path) -> bool:
         return False
 
     # Characters in the path are ASCII
-    chars = ''.join(parts)
+    chars = "".join(parts)
     try:
         chars.encode(encoding="ascii", errors="strict")
     except UnicodeEncodeError:
@@ -182,6 +178,7 @@ class RecordNode(Iterable["RecordNode"]):
         :class:`~pydicom.fileset.FileInstance` for the corresponding SOP
         Instance.
     """
+
     def __init__(self, record: Dataset | None = None) -> None:
         """Create a new ``RecordNode``.
 
@@ -242,9 +239,7 @@ class RecordNode(Iterable["RecordNode"]):
     def component(self) -> str:
         """Return a File ID component as :class:`str` for the current node."""
         if self.is_root:
-            raise ValueError(
-                "The root node doesn't contribute a File ID component"
-            )
+            raise ValueError("The root node doesn't contribute a File ID component")
 
         prefix = _PREFIXES[self.record_type]
         if self.record_type == "PRIVATE":
@@ -326,7 +321,7 @@ class RecordNode(Iterable["RecordNode"]):
         fp.is_little_endian = True
         fp.is_implicit_VR = force_implicit
 
-        encoding = self._record.get('SpecificCharacterSet', default_encoding)
+        encoding = self._record.get("SpecificCharacterSet", default_encoding)
 
         for tag in sorted(self._record.keys()):
             if tag.element == 0 and tag.group > 6:
@@ -403,8 +398,7 @@ class RecordNode(Iterable["RecordNode"]):
         return False
 
     def __iter__(self) -> Iterator["RecordNode"]:
-        """Yield this node (unless it's the root node) and all nodes below it.
-        """
+        """Yield this node (unless it's the root node) and all nodes below it."""
         if not self.is_root:
             yield self
 
@@ -461,7 +455,7 @@ class RecordNode(Iterable["RecordNode"]):
         if node is not None and self not in node.children:
             node.children.append(self)
 
-    def prettify(self, indent_char: str = '  ') -> list[str]:
+    def prettify(self, indent_char: str = "  ") -> list[str]:
         """Return the tree structure as a list of pretty strings, starting at
         the current node (unless the current node is the root node).
 
@@ -470,6 +464,7 @@ class RecordNode(Iterable["RecordNode"]):
         indent_char : str, optional
             The characters to use to indent each level of the tree.
         """
+
         def leaf_summary(node: "RecordNode", indent_char: str) -> list[str]:
             """Summarize the leaves at the current level."""
             # Examples:
@@ -487,15 +482,13 @@ class RecordNode(Iterable["RecordNode"]):
                     # All leaves should have a corresponding FileInstance
                     add = len(
                         [
-                            ii for ii in nr
+                            ii
+                            for ii in nr
                             if cast(FileInstance, ii.instance).for_addition
                         ]
                     )
                     rm = len(
-                        [
-                            ii for ii in nr
-                            if cast(FileInstance, ii.instance).for_removal
-                        ]
+                        [ii for ii in nr if cast(FileInstance, ii.instance).for_removal]
                     )
                     initial = len(nr) - add
                     result = len(nr) - rm
@@ -504,10 +497,10 @@ class RecordNode(Iterable["RecordNode"]):
                     if (add or rm) and initial > 0:
                         changes.append(f"{initial} initial")
                     if add:
-                        plural = 's' if add > 1 else ''
+                        plural = "s" if add > 1 else ""
                         changes.append(f"{add} addition{plural}")
                     if rm:
-                        plural = 's' if rm > 1 else ''
+                        plural = "s" if rm > 1 else ""
                         changes.append(f"{rm} removal{plural}")
 
                     summary = (
@@ -579,9 +572,7 @@ class RecordNode(Iterable["RecordNode"]):
         keywords = ["DirectoryRecordType"]
         missing = [kw for kw in keywords if kw not in ds]
         if missing:
-            msg = (
-                f"{msg} one or more required elements: {', '.join(missing)}"
-            )
+            msg = f"{msg} one or more required elements: {', '.join(missing)}"
             raise ValueError(msg)
 
         if _NEXT_OFFSET not in ds:
@@ -643,10 +634,7 @@ class RecordNode(Iterable["RecordNode"]):
 
         s = []
         if self.record_type == "PATIENT":
-            s += [
-                f"PatientID='{ds.PatientID}'",
-                f"PatientName='{ds.PatientName}'"
-            ]
+            s += [f"PatientID='{ds.PatientID}'", f"PatientName='{ds.PatientName}'"]
         elif self.record_type == "STUDY":
             s += [f"StudyDate={ds.StudyDate}", f"StudyTime={ds.StudyTime}"]
             if getattr(ds, "StudyDescription", None):
@@ -680,6 +668,7 @@ class RecordNode(Iterable["RecordNode"]):
 
 class RootNode(RecordNode):
     """The root node for the File-set's record tree."""
+
     def __init__(self, fs: "FileSet") -> None:
         """Create a new root node.
 
@@ -711,6 +700,7 @@ class FileInstance:
     node : pydicom.fileset.RecordNode
         The leaf record that references this instance.
     """
+
     def __init__(self, node: RecordNode) -> None:
         """Create a new FileInstance.
 
@@ -719,12 +709,13 @@ class FileInstance:
         node : pydicom.fileset.RecordNode
             The record that references this instance.
         """
+
         class Flags:
             add: bool
             remove: bool
 
         self._flags = Flags()
-        self._apply_stage('x')
+        self._apply_stage("x")
         self._stage_path: Path | None = None
         self.node = node
 
@@ -739,22 +730,20 @@ class FileInstance:
             File-set, or to reset the staging, respectively.
         """
         # Clear flags
-        if flag == 'x':
+        if flag == "x":
             self._flags.add = False
             self._flags.remove = False
             self._stage_path = None
-        elif flag == '+':
+        elif flag == "+":
             # remove + add = no change
             if self._flags.remove:
                 self._flags.remove = False
                 self._stage_path = None
             else:
                 self._flags.add = True
-                self._stage_path = (
-                    self.file_set._stage['path'] / self.SOPInstanceUID
-                )
+                self._stage_path = self.file_set._stage["path"] / self.SOPInstanceUID
 
-        elif flag == '-':
+        elif flag == "-":
             # add + remove = no change
             if self._flags.add:
                 self._flags.add = False
@@ -789,9 +778,7 @@ class FileInstance:
     def FileID(self) -> str:
         """Return the File ID of the referenced instance."""
         root = self.node.root
-        components = [
-            ii.component for ii in self.node.reverse() if ii is not root
-        ]
+        components = [ii.component for ii in self.node.reverse() if ii is not root]
         return os.fspath(Path(*components[::-1]))
 
     @property
@@ -820,9 +807,7 @@ class FileInstance:
             file_id = self.FileID.split(os.path.sep)
             return [self.ReferencedFileID] != file_id
 
-        return cast(
-            bool, self.ReferencedFileID != self.FileID.split(os.path.sep)
-        )
+        return cast(bool, self.ReferencedFileID != self.FileID.split(os.path.sep))
 
     @property
     def for_removal(self) -> bool:
@@ -957,6 +942,7 @@ DSPathType = Dataset | str | os.PathLike
 
 class FileSet:
     """Representation of a DICOM File-set."""
+
     def __init__(self, ds: DSPathType | None = None) -> None:
         """Create or load a File-set.
 
@@ -975,13 +961,13 @@ class FileSet:
 
         # For tracking changes to the File-set
         self._stage: dict[str, Any] = {
-            't': TemporaryDirectory(),
-            '+': {},  # instances staged for addition
-            '-': {},  # instances staged for removal
-            '~': False,  # instances staged for moving
-            '^': False,  # a File-set Identification module element has changed
+            "t": TemporaryDirectory(),
+            "+": {},  # instances staged for addition
+            "-": {},  # instances staged for removal
+            "~": False,  # instances staged for moving
+            "^": False,  # a File-set Identification module element has changed
         }
-        self._stage["path"] = Path(self._stage['t'].name)
+        self._stage["path"] = Path(self._stage["t"].name)
 
         # The DICOMDIR instance, not guaranteed to be up-to-date
         self._ds = Dataset()
@@ -1039,11 +1025,11 @@ class FileSet:
 
         # If staged for removal, keep instead - check this now because
         #   `have_instance` is False when instance staged for removal
-        if key in self._stage['-']:
-            instance = self._stage['-'][key]
-            del self._stage['-'][key]
+        if key in self._stage["-"]:
+            instance = self._stage["-"][key]
+            del self._stage["-"][key]
             self._instances.append(instance)
-            instance._apply_stage('+')
+            instance._apply_stage("+")
 
             return cast(FileInstance, instance)
 
@@ -1070,16 +1056,14 @@ class FileSet:
         self._tree.add(node)
 
         # Save the dataset to the stage
-        self._stage['+'][instance.SOPInstanceUID] = instance
+        self._stage["+"][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
-        instance._apply_stage('+')
+        instance._apply_stage("+")
         ds.save_as(instance.path, write_like_original=False)
 
         return cast(FileInstance, instance)
 
-    def add_custom(
-        self, ds_or_path: DSPathType, leaf: RecordNode
-    ) -> FileInstance:
+    def add_custom(self, ds_or_path: DSPathType, leaf: RecordNode) -> FileInstance:
         """Stage an instance for addition to the File-set using custom records.
 
         This method allows you to add a SOP instance and customize the
@@ -1178,11 +1162,11 @@ class FileSet:
 
         # If staged for removal, keep instead - check this now because
         #   `have_instance` is False when instance staged for removal
-        if key in self._stage['-']:
-            instance = self._stage['-'][key]
-            del self._stage['-'][key]
+        if key in self._stage["-"]:
+            instance = self._stage["-"][key]
+            del self._stage["-"][key]
             self._instances.append(instance)
-            instance._apply_stage('+')
+            instance._apply_stage("+")
 
             return cast(FileInstance, instance)
 
@@ -1193,18 +1177,16 @@ class FileSet:
         leaf._record.ReferencedFileID = None
         leaf._record.ReferencedSOPClassUIDInFile = ds.SOPClassUID
         leaf._record.ReferencedSOPInstanceUIDInFile = key
-        leaf._record.ReferencedTransferSyntaxUIDInFile = (
-            ds.file_meta.TransferSyntaxUID
-        )
+        leaf._record.ReferencedTransferSyntaxUIDInFile = ds.file_meta.TransferSyntaxUID
 
         instance = FileInstance(leaf)
         leaf.instance = instance
         self._tree.add(leaf)
 
         # Save the dataset to the stage
-        self._stage['+'][instance.SOPInstanceUID] = instance
+        self._stage["+"][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
-        instance._apply_stage('+')
+        instance._apply_stage("+")
         ds.save_as(instance.path, write_like_original=False)
 
         return cast(FileInstance, instance)
@@ -1221,17 +1203,15 @@ class FileSet:
         self._charset = None
 
         # Clean and reset the stage
-        self._stage['+'] = {}
-        self._stage['-'] = {}
-        self._stage['~'] = False
-        self._stage['^'] = False
-        self._stage['t'].cleanup()
-        self._stage['t'] = TemporaryDirectory()
-        self._stage['path'] = Path(self._stage['t'].name)
+        self._stage["+"] = {}
+        self._stage["-"] = {}
+        self._stage["~"] = False
+        self._stage["^"] = False
+        self._stage["t"].cleanup()
+        self._stage["t"] = TemporaryDirectory()
+        self._stage["path"] = Path(self._stage["t"].name)
 
-    def copy(
-        self, path: str | os.PathLike, force_implicit: bool = False
-    ) -> "FileSet":
+    def copy(self, path: str | os.PathLike, force_implicit: bool = False) -> "FileSet":
         """Copy the File-set to a new root directory and return the copied
         File-set.
 
@@ -1257,9 +1237,7 @@ class FileSet:
 
         path = Path(path)
         if self.path and Path(self.path) == path:
-            raise ValueError(
-                "Cannot copy the File-set as the 'path' is unchanged"
-            )
+            raise ValueError("Cannot copy the File-set as the 'path' is unchanged")
 
         if len(self) > 10**6:
             self._use_alphanumeric = True
@@ -1271,7 +1249,7 @@ class FileSet:
 
         # Removals are detached from the tree
         detached_nodes = []
-        for instance in self._stage['-'].values():
+        for instance in self._stage["-"].values():
             detached_nodes.append(instance.node)
             self._tree.remove(instance.node)
             continue
@@ -1282,17 +1260,13 @@ class FileSet:
             dst = path / Path(instance.FileID)
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(instance.path, dst)
-            instance.node._record.ReferencedFileID = (
-                instance.FileID.split(os.path.sep)
-            )
+            instance.node._record.ReferencedFileID = instance.FileID.split(os.path.sep)
 
         # Create the DICOMDIR file
-        p = path / 'DICOMDIR'
-        with open(p, 'wb') as fp:
+        p = path / "DICOMDIR"
+        with open(p, "wb") as fp:
             f = DicomFileLike(fp)
-            self._write_dicomdir(
-                f, copy_safe=True, force_implicit=force_implicit
-            )
+            self._write_dicomdir(f, copy_safe=True, force_implicit=force_implicit)
 
         # Reset the *Referenced File ID* values
         # The order here doesn't matter because removed instances aren't
@@ -1367,12 +1341,11 @@ class FileSet:
         self._charset = val
         if self._ds:
             self._ds.SpecificCharacterSetOfFileSetDescriptorFile = val
-        self._stage['^'] = True
+        self._stage["^"] = True
 
     @property
     def descriptor_file_id(self) -> str | None:
-        """Return the *File-set Descriptor File ID* (if available) or ``None``.
-        """
+        """Return the *File-set Descriptor File ID* (if available) or ``None``."""
         return self._descriptor
 
     @descriptor_file_id.setter
@@ -1435,7 +1408,7 @@ class FileSet:
         self._descriptor = val
         if self._ds:
             self._ds.FileSetDescriptorFileID = self._descriptor
-        self._stage['^'] = True
+        self._stage["^"] = True
 
     def find(self, load: bool = False, **kwargs: Any) -> list[FileInstance]:
         """Return matching instances in the File-set
@@ -1506,7 +1479,7 @@ class FileSet:
         self,
         elements: str | int | list[str | int],
         instances: list[FileInstance] | None = None,
-        load: bool = False
+        load: bool = False,
     ) -> list[Any] | dict[str | int, list[Any]]:
         """Return a list of unique values for given element(s).
 
@@ -1535,9 +1508,7 @@ class FileSet:
         """
         element_list = elements if isinstance(elements, list) else [elements]
         has_element = {element: False for element in element_list}
-        results: dict[str | int, list[Any]] = {
-            element: [] for element in element_list
-        }
+        results: dict[str | int, list[Any]] = {element: [] for element in element_list}
         iter_instances = instances or iter(self)
         instance: Dataset | FileInstance
         for instance in iter_instances:
@@ -1554,9 +1525,7 @@ class FileSet:
                 if val not in results[element]:
                     results[element].append(val)
 
-        missing_elements = [
-            element for element, v in has_element.items() if not v
-        ]
+        missing_elements = [element for element, v in has_element.items() if not v]
         if not load and missing_elements:
             warnings.warn(
                 "None of the records in the DICOMDIR dataset contain "
@@ -1595,16 +1564,14 @@ class FileSet:
             self._id = val
             if self._ds:
                 self._ds.FileSetID = val
-            self._stage['^'] = True
+            self._stage["^"] = True
         else:
-            raise ValueError(
-                "The maximum length of the 'File-set ID' is 16 characters"
-            )
+            raise ValueError("The maximum length of the 'File-set ID' is 16 characters")
 
     @property
     def is_staged(self) -> bool:
         """Return ``True`` if the File-set is new or has changes staged."""
-        return any(self._stage[c] for c in '+-^~')
+        return any(self._stage[c] for c in "+-^~")
 
     def __iter__(self) -> Iterator[FileInstance]:
         """Yield :class:`~pydicom.fileset.FileInstance` from the File-set."""
@@ -1679,19 +1646,14 @@ class FileSet:
 
         self.clear()
         self._id = cast(str | None, ds.get("FileSetID", None))
-        uid = cast(
-            UID | None, ds.file_meta.get("MediaStorageSOPInstanceUID")
-        )
+        uid = cast(UID | None, ds.file_meta.get("MediaStorageSOPInstanceUID"))
         if not uid:
             uid = generate_uid()
             ds.file_meta.MediaStorageSOPInstanceUID = uid
         self._uid = uid
-        self._descriptor = cast(
-            str | None, ds.get("FileSetDescriptorFileID", None)
-        )
+        self._descriptor = cast(str | None, ds.get("FileSetDescriptorFileID", None))
         self._charset = cast(
-            str | None,
-            ds.get("SpecificCharacterSetOfFileSetDescriptorFile", None)
+            str | None, ds.get("SpecificCharacterSetOfFileSetDescriptorFile", None)
         )
         self._path = path.parent
         self._ds = ds
@@ -1722,16 +1684,13 @@ class FileSet:
             # If the instance's existing directory structure doesn't match
             #   the pydicom semantics then stage for movement
             if instance.for_moving:
-                self._stage['~'] = True
+                self._stage["~"] = True
 
         for instance in bad_instances:
             self._instances.remove(instance)
 
     def _parse_records(
-        self,
-        ds: Dataset,
-        include_orphans: bool,
-        raise_orphans: bool = False
+        self, ds: Dataset, include_orphans: bool, raise_orphans: bool = False
     ) -> None:
         """Parse the records in an existing DICOMDIR.
 
@@ -1797,9 +1756,7 @@ class FileSet:
             return
 
         if raise_orphans:
-            raise ValueError(
-                "The DICOMDIR contains orphaned directory records"
-            )
+            raise ValueError("The DICOMDIR contains orphaned directory records")
 
         # DICOMDIR contains orphaned records
         # Determine which nodes are both orphaned and reference an instance
@@ -1883,9 +1840,7 @@ class FileSet:
             record.ReferencedFileID = None
             record.ReferencedSOPClassUIDInFile = ds.SOPClassUID
             record.ReferencedSOPInstanceUIDInFile = ds.SOPInstanceUID
-            record.ReferencedTransferSyntaxUIDInFile = (
-                ds.file_meta.TransferSyntaxUID
-            )
+            record.ReferencedTransferSyntaxUIDInFile = ds.file_meta.TransferSyntaxUID
 
             yield record
             return
@@ -1919,15 +1874,11 @@ class FileSet:
         leaf.ReferencedFileID = None
         leaf.ReferencedSOPClassUIDInFile = ds.SOPClassUID
         leaf.ReferencedSOPInstanceUIDInFile = ds.SOPInstanceUID
-        leaf.ReferencedTransferSyntaxUIDInFile = (
-            ds.file_meta.TransferSyntaxUID
-        )
+        leaf.ReferencedTransferSyntaxUIDInFile = ds.file_meta.TransferSyntaxUID
 
         yield from records
 
-    def remove(
-        self, instance: FileInstance | list[FileInstance]
-    ) -> None:
+    def remove(self, instance: FileInstance | list[FileInstance]) -> None:
         """Stage instance(s) for removal from the File-set.
 
         If the instance has been staged for addition to the File-set, calling
@@ -1948,22 +1899,22 @@ class FileSet:
             raise ValueError("No such instance in the File-set")
 
         # If staged for addition, no longer add
-        if instance.SOPInstanceUID in self._stage['+']:
+        if instance.SOPInstanceUID in self._stage["+"]:
             leaf = instance.node
             del leaf.parent[leaf]
-            del self._stage['+'][instance.SOPInstanceUID]
+            del self._stage["+"][instance.SOPInstanceUID]
             # Delete file from stage
             try:
                 Path(instance.path).unlink()
             except FileNotFoundError:
                 pass
-            instance._apply_stage('-')
+            instance._apply_stage("-")
             self._instances.remove(instance)
 
         # Stage for removal if not already done
-        elif instance.SOPInstanceUID not in self._stage['-']:
-            instance._apply_stage('-')
-            self._stage['-'][instance.SOPInstanceUID] = instance
+        elif instance.SOPInstanceUID not in self._stage["-"]:
+            instance._apply_stage("-")
+            self._stage["-"][instance.SOPInstanceUID] = instance
             self._instances.remove(instance)
 
     def __str__(self) -> str:
@@ -1989,25 +1940,25 @@ class FileSet:
             else:
                 changes.append("DICOMDIR update")
 
-            if self._stage['~']:
+            if self._stage["~"]:
                 changes.append("directory structure update")
 
-            if self._stage['+']:
-                suffix = 's' if len(self._stage['+']) > 1 else ''
+            if self._stage["+"]:
+                suffix = "s" if len(self._stage["+"]) > 1 else ""
                 changes.append(f"{len(self._stage['+'])} addition{suffix}")
-            if self._stage['-']:
-                suffix = 's' if len(self._stage['-']) > 1 else ''
+            if self._stage["-"]:
+                suffix = "s" if len(self._stage["-"]) > 1 else ""
                 changes.append(f"{len(self._stage['-'])} removal{suffix}")
 
             s.append(f"  Changes staged for write(): {', '.join(changes)}")
 
         if not self._tree.children:
-            return '\n'.join(s)
+            return "\n".join(s)
 
         s.append("\n  Managed instances:")
         s.extend([f"    {ii}" for ii in self._tree.prettify()])
 
-        return '\n'.join(s)
+        return "\n".join(s)
 
     @property
     def UID(self) -> UID:
@@ -2032,13 +1983,13 @@ class FileSet:
         if self._ds:
             self._ds.file_meta.MediaStorageSOPInstanceUID = uid
 
-        self._stage['^'] = True
+        self._stage["^"] = True
 
     def write(
         self,
         path: str | os.PathLike | None = None,
         use_existing: bool = False,
-        force_implicit: bool = False
+        force_implicit: bool = False,
     ) -> None:
         """Write the File-set, or changes to the File-set, to the file system.
 
@@ -2095,8 +2046,7 @@ class FileSet:
         """
         if not path and self.path is None:
             raise ValueError(
-                "The path to the root directory is required for a "
-                "new File-set"
+                "The path to the root directory is required for a " "new File-set"
             )
 
         if path and self.path:
@@ -2113,11 +2063,11 @@ class FileSet:
             return
 
         # Path to the DICOMDIR file
-        p = cast(Path, self._path) / 'DICOMDIR'
+        p = cast(Path, self._path) / "DICOMDIR"
 
         # Re-use the existing directory structure if only moves or removals
         #   are required and `use_existing` is True
-        major_change = bool(self._stage['+'])
+        major_change = bool(self._stage["+"])
         if use_existing and major_change:
             raise ValueError(
                 "'Fileset.write()' called with 'use_existing' but additions "
@@ -2125,7 +2075,7 @@ class FileSet:
             )
 
         if not use_existing:
-            major_change |= self._stage['~']
+            major_change |= self._stage["~"]
 
         # Worst case scenario if all instances in one directory
         if len(self) > 10**6:
@@ -2138,7 +2088,7 @@ class FileSet:
 
         # Remove the removals - must be first because the File IDs will be
         #   incorrect with the removals still in the tree
-        for instance in self._stage['-'].values():
+        for instance in self._stage["-"].values():
             try:
                 Path(instance.path).unlink()
             except FileNotFoundError:
@@ -2146,7 +2096,7 @@ class FileSet:
             self._tree.remove(instance.node)
 
         if use_existing and not major_change:
-            with open(p, 'wb') as fp:
+            with open(p, "wb") as fp:
                 f = DicomFileLike(fp)
                 self._write_dicomdir(f, force_implicit=force_implicit)
 
@@ -2160,22 +2110,19 @@ class FileSet:
         #   and copy any to the stage
         fout = {Path(ii.FileID) for ii in self}
         fin = {
-            ii.node._file_id for ii in self
-            if ii.SOPInstanceUID not in self._stage['+']
+            ii.node._file_id for ii in self if ii.SOPInstanceUID not in self._stage["+"]
         }
         collisions = fout & fin
         for instance in [ii for ii in self if ii.node._file_id in collisions]:
-            self._stage['+'][instance.SOPInstanceUID] = instance
-            instance._apply_stage('+')
-            shutil.copyfile(
-                self._path / instance.node._file_id, instance.path
-            )
+            self._stage["+"][instance.SOPInstanceUID] = instance
+            instance._apply_stage("+")
+            shutil.copyfile(self._path / instance.node._file_id, instance.path)
 
         for instance in self:
             dst = self._path / instance.FileID
             dst.parent.mkdir(parents=True, exist_ok=True)
             fn: Callable
-            if instance.SOPInstanceUID in self._stage['+']:
+            if instance.SOPInstanceUID in self._stage["+"]:
                 src = instance.path
                 fn = shutil.copyfile
             else:
@@ -2183,12 +2130,10 @@ class FileSet:
                 fn = shutil.move
 
             fn(os.fspath(src), os.fspath(dst))
-            instance.node._record.ReferencedFileID = (
-                instance.FileID.split(os.path.sep)
-            )
+            instance.node._record.ReferencedFileID = instance.FileID.split(os.path.sep)
 
         # Create the DICOMDIR file
-        with open(p, 'wb') as fp:
+        with open(p, "wb") as fp:
             f = DicomFileLike(fp)
             self._write_dicomdir(f, force_implicit=force_implicit)
 
@@ -2197,10 +2142,7 @@ class FileSet:
         self.load(p, raise_orphans=True)
 
     def _write_dicomdir(
-        self,
-        fp: DicomFileLike,
-        copy_safe: bool = False,
-        force_implicit: bool = False
+        self, fp: DicomFileLike, copy_safe: bool = False, force_implicit: bool = False
     ) -> None:
         """Encode and write the File-set's DICOMDIR dataset.
 
@@ -2238,7 +2180,7 @@ class FileSet:
         last_elem.value = 0
 
         # Write the preamble, DICM marker and File Meta
-        fp.write(b'\x00' * 128 + b'DICM')
+        fp.write(b"\x00" * 128 + b"DICM")
         write_file_meta_info(fp, ds.file_meta, enforce_standard=True)
 
         # Write the dataset
@@ -2319,16 +2261,12 @@ def _check_dataset(ds: Dataset, keywords: list[str]) -> None:
         tag = Tag(cast(int, tag_for_keyword(kw)))
         name = dictionary_description(tag)
         if kw not in ds:
-            raise ValueError(
-                f"The instance's {tag} '{name}' element is missing"
-            )
+            raise ValueError(f"The instance's {tag} '{name}' element is missing")
 
         if ds[kw].VM != 0:
             continue
 
-        raise ValueError(
-            f"The instance's {tag} '{name}' element cannot be empty"
-        )
+        raise ValueError(f"The instance's {tag} '{name}' element cannot be empty")
 
 
 def _define_patient(ds: Dataset) -> Dataset:
@@ -2435,9 +2373,11 @@ def _define_presentation(ds: Dataset) -> Dataset:
     _check_dataset(
         ds,
         [
-            "PresentationCreationDate", "PresentationCreationTime",
-            "InstanceNumber", "ContentLabel"
-        ]
+            "PresentationCreationDate",
+            "PresentationCreationTime",
+            "InstanceNumber",
+            "ContentLabel",
+        ],
     )
 
     record = Dataset()
@@ -2463,9 +2403,13 @@ def _define_sr_document(ds: Dataset) -> Dataset:
     _check_dataset(
         ds,
         [
-            "InstanceNumber", "CompletionFlag", "VerificationFlag",
-            "ContentDate", "ContentTime", "ConceptNameCodeSequence",
-        ]
+            "InstanceNumber",
+            "CompletionFlag",
+            "VerificationFlag",
+            "ContentDate",
+            "ContentTime",
+            "ConceptNameCodeSequence",
+        ],
     )
 
     record = Dataset()
@@ -2490,9 +2434,11 @@ def _define_key_object_doc(ds: Dataset) -> Dataset:
     _check_dataset(
         ds,
         [
-            "InstanceNumber", "ContentDate", "ContentTime",
+            "InstanceNumber",
+            "ContentDate",
+            "ContentTime",
             "ConceptNameCodeSequence",
-        ]
+        ],
     )
 
     record = Dataset()
@@ -2512,10 +2458,16 @@ def _define_spectroscopy(ds: Dataset) -> Dataset:
     _check_dataset(
         ds,
         [
-            "ImageType", "ContentDate", "ContentTime", "InstanceNumber",
-            "NumberOfFrames", "Rows", "Columns", "DataPointRows",
-            "DataPointColumns"
-        ]
+            "ImageType",
+            "ContentDate",
+            "ContentTime",
+            "InstanceNumber",
+            "NumberOfFrames",
+            "Rows",
+            "Columns",
+            "DataPointRows",
+            "DataPointColumns",
+        ],
     )
 
     record = Dataset()
@@ -2526,9 +2478,7 @@ def _define_spectroscopy(ds: Dataset) -> Dataset:
     if "ReferencedImageEvidenceSequence" in ds:
         _check_dataset(ds, ["ReferencedImageEvidenceSequence"])
 
-        record.ReferencedImageEvidenceSequence = (
-            ds.ReferencedImageEvidenceSequence
-        )
+        record.ReferencedImageEvidenceSequence = ds.ReferencedImageEvidenceSequence
 
     record.NumberOfFrames = ds.NumberOfFrames
     record.Rows = ds.Rows
@@ -2544,20 +2494,20 @@ def _define_hanging_protocol(ds: Dataset) -> Dataset:
     _check_dataset(
         ds,
         [
-            "HangingProtocolCreator", "HangingProtocolCreationDateTime",
-            "HangingProtocolDefinitionSequence", "NumberOfPriorsReferenced",
-        ]
+            "HangingProtocolCreator",
+            "HangingProtocolCreationDateTime",
+            "HangingProtocolDefinitionSequence",
+            "NumberOfPriorsReferenced",
+        ],
     )
 
     record = Dataset()
     record.HangingProtocolCreator = ds.HangingProtocolCreator
     record.HangingProtocolCreationDateTime = ds.HangingProtocolCreationDateTime
-    record.HangingProtocolDefinitionSequence = (
-        ds.HangingProtocolDefinitionSequence
-    )
+    record.HangingProtocolDefinitionSequence = ds.HangingProtocolDefinitionSequence
     record.NumberOfPriorsReferenced = ds.NumberOfPriorsReferenced
-    record.HangingProtocolUserIdentificationCodeSequence = (
-        ds.get("HangingProtocolUserIdentificationCodeSequence", [])
+    record.HangingProtocolUserIdentificationCodeSequence = ds.get(
+        "HangingProtocolUserIdentificationCodeSequence", []
     )
 
     return record
@@ -2611,11 +2561,7 @@ def _define_implant(ds: Dataset) -> Dataset:
 def _define_implant_assy(ds: Dataset) -> Dataset:
     """Return a IMPLANT ASSY directory record from `ds`."""
     _check_dataset(
-        ds,
-        [
-            "ImplantAssemblyTemplateName", "Manufacturer",
-            "ProcedureTypeCodeSequence"
-        ]
+        ds, ["ImplantAssemblyTemplateName", "Manufacturer", "ProcedureTypeCodeSequence"]
     )
 
     record = Dataset()
@@ -2628,10 +2574,7 @@ def _define_implant_assy(ds: Dataset) -> Dataset:
 
 def _define_implant_group(ds: Dataset) -> Dataset:
     """Return a IMPLANT GROUP directory record from `ds`."""
-    _check_dataset(
-        ds,
-        ["ImplantTemplateGroupName", "ImplantTemplateGroupIssuer"]
-    )
+    _check_dataset(ds, ["ImplantTemplateGroupName", "ImplantTemplateGroupIssuer"])
 
     record = Dataset()
     record.ImplantTemplateGroupName = ds.ImplantTemplateGroupName
@@ -2696,10 +2639,7 @@ def _define_generic_content(ds: Dataset) -> Dataset:
 
 def _define_generic_content_id(ds: Dataset) -> Dataset:
     """Return a generic content identification directory record from `ds`."""
-    _check_dataset(
-        ds,
-        ["InstanceNumber", "ContentDate", "ContentTime", "ContentLabel"]
-    )
+    _check_dataset(ds, ["InstanceNumber", "ContentDate", "ContentTime", "ContentLabel"])
 
     # Content Identification Macro
     record = Dataset()

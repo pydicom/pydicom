@@ -117,7 +117,8 @@ def get_external_sources() -> dict:
 
     # Prefer pydicom-data as the source
     sources = {
-        vv.name: vv.load()() for vv in entry_points(group="pydicom.data.external_sources")
+        vv.name: vv.load()()
+        for vv in entry_points(group="pydicom.data.external_sources")
     }
     out = {}
     if "pydicom-data" in sources:

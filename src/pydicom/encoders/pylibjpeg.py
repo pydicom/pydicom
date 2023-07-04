@@ -7,13 +7,14 @@ from pydicom.uid import RLELossless
 
 try:
     from pylibjpeg.utils import get_pixel_data_encoders
+
     HAVE_PYLJ = True
 except ImportError:
     HAVE_PYLJ = False
 
 
 ENCODER_DEPENDENCIES = {
-    RLELossless: ('numpy', 'pylibjpeg', 'pylibjpeg-rle'),
+    RLELossless: ("numpy", "pylibjpeg", "pylibjpeg-rle"),
 }
 
 
@@ -32,7 +33,7 @@ def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
     bytes
         The encoded image data.
     """
-    encoder = get_pixel_data_encoders()[kwargs['transfer_syntax_uid']]
+    encoder = get_pixel_data_encoders()[kwargs["transfer_syntax_uid"]]
 
     return cast(bytes, encoder(src, **kwargs))
 

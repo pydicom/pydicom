@@ -6,13 +6,14 @@ from pydicom.uid import RLELossless
 
 try:
     import gdcm
+
     HAVE_GDCM = True
 except ImportError:
     HAVE_GDCM = False
 
 
 ENCODER_DEPENDENCIES = {
-    RLELossless: ('gdcm', ),
+    RLELossless: ("gdcm",),
 }
 
 
@@ -51,13 +52,13 @@ def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
     bytes
         The encoded image data.
     """
-    if kwargs['byteorder'] != '<':
+    if kwargs["byteorder"] != "<":
         raise ValueError(
             "Unsupported option for the 'gdcm' encoding plugin: "
             f"\"byteorder = '{kwargs['byteorder']}'\""
         )
 
-    return _ENCODERS[kwargs['transfer_syntax_uid']](src, **kwargs)
+    return _ENCODERS[kwargs["transfer_syntax_uid"]](src, **kwargs)
 
 
 def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
@@ -85,17 +86,17 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         The encoded image data.
     """
     # Check the parameters are valid for RLE encoding with GDCM
-    rows = kwargs['rows']
-    columns = kwargs['columns']
-    samples_per_pixel = kwargs['samples_per_pixel']
-    number_of_frames = kwargs['number_of_frames']
-    pixel_representation = kwargs['pixel_representation']
-    bits_allocated = kwargs['bits_allocated']
-    bits_stored = kwargs['bits_stored']
-    photometric_interpretation = kwargs['photometric_interpretation']
+    rows = kwargs["rows"]
+    columns = kwargs["columns"]
+    samples_per_pixel = kwargs["samples_per_pixel"]
+    number_of_frames = kwargs["number_of_frames"]
+    pixel_representation = kwargs["pixel_representation"]
+    bits_allocated = kwargs["bits_allocated"]
+    bits_stored = kwargs["bits_stored"]
+    photometric_interpretation = kwargs["photometric_interpretation"]
 
     # Bug up to v3.0.9 (Apr 2021) in handling 32-bit, 3 sample/px data
-    gdcm_version = [int(c) for c in gdcm.Version.GetVersion().split('.')]
+    gdcm_version = [int(c) for c in gdcm.Version.GetVersion().split(".")]
     if gdcm_version < [3, 0, 10]:
         if bits_allocated == 32 and samples_per_pixel == 3:
             raise RuntimeError(
@@ -109,9 +110,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         )
 
     # Create a gdcm.Image with the uncompressed `src` data
-    pi = gdcm.PhotometricInterpretation.GetPIType(
-        photometric_interpretation
-    )
+    pi = gdcm.PhotometricInterpretation.GetPIType(photometric_interpretation)
 
     # GDCM's null photometric interpretation gets used for invalid values
     if pi == gdcm.PhotometricInterpretation.PI_END:
@@ -129,9 +128,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     image = writer.GetImage()
     image.SetNumberOfDimensions(2)
     image.SetDimensions((columns, rows, 1))
-    image.SetPhotometricInterpretation(
-        gdcm.PhotometricInterpretation(pi)
-    )
+    image.SetPhotometricInterpretation(gdcm.PhotometricInterpretation(pi))
     image.SetTransferSyntax(gdcm.TransferSyntax(ts))
 
     pixel_format = gdcm.PixelFormat(
@@ -139,7 +136,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         bits_allocated,
         bits_stored,
         bits_stored - 1,
-        pixel_representation
+        pixel_representation,
     )
     image.SetPixelFormat(pixel_format)
     if samples_per_pixel > 1:
@@ -155,7 +152,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     converter = gdcm.ImageChangeTransferSyntax()
 
     # Set up the converter with the intended transfer syntax...
-    rle = gdcm.TransferSyntax.GetTSType(kwargs['transfer_syntax_uid'])
+    rle = gdcm.TransferSyntax.GetTSType(kwargs["transfer_syntax_uid"])
     converter.SetTransferSyntax(gdcm.TransferSyntax(rle))
     # ...and image to be converted
     converter.SetInput(image)
@@ -187,6 +184,4 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     return cast(bytes, fragment.encode("utf-8", "surrogateescape"))
 
 
-_ENCODERS = {
-    RLELossless: _rle_encode
-}
+_ENCODERS = {RLELossless: _rle_encode}

@@ -38,6 +38,7 @@ RTDOSE_RLE_15F = get_testdata_file("rtdose_rle.dcm")
 
 class TimeRLEDecodeFrame:
     """Time tests for rle_handler._rle_decode_frame."""
+
     def setup(self):
         # MONOCHROME2, 64x64, 1 sample/pixel, 16 bits allocated, 12 bits stored
         self.ds = dcmread(EMRI_RLE_10F)
@@ -49,25 +50,30 @@ class TimeRLEDecodeFrame:
     def time_decode_16bit_1sample_1frame(self):
         """Time decoding the pixel data from a single RLE frame."""
         for ii in range(self.no_runs):
-            _rle_decode_frame(self.frames[0],
-                              self.ds.Rows,
-                              self.ds.Columns,
-                              self.ds.SamplesPerPixel,
-                              self.ds.BitsAllocated)
+            _rle_decode_frame(
+                self.frames[0],
+                self.ds.Rows,
+                self.ds.Columns,
+                self.ds.SamplesPerPixel,
+                self.ds.BitsAllocated,
+            )
 
     def time_decode_16bit_1sample_10frame(self):
         """Time decoding the pixel data from 10 RLE frames."""
         for ii in range(self.no_runs):
             for frame in self.frames:
-                _rle_decode_frame(frame,
-                                  self.ds.Rows,
-                                  self.ds.Columns,
-                                  self.ds.SamplesPerPixel,
-                                  self.ds.BitsAllocated)
+                _rle_decode_frame(
+                    frame,
+                    self.ds.Rows,
+                    self.ds.Columns,
+                    self.ds.SamplesPerPixel,
+                    self.ds.BitsAllocated,
+                )
 
 
 class TimeGetPixelData:
     """Time tests for rle_handler.get_pixeldata."""
+
     def setup(self):
         """Setup the test"""
         self.ds_8_1_1 = dcmread(OB_RLE_1F)

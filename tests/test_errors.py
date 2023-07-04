@@ -10,8 +10,9 @@ def test_message():
     """Test InvalidDicomError with a message"""
 
     def _test():
-        raise InvalidDicomError('test msg')
-    with pytest.raises(InvalidDicomError, match='test msg'):
+        raise InvalidDicomError("test msg")
+
+    with pytest.raises(InvalidDicomError, match="test msg"):
         _test()
 
 
@@ -20,7 +21,8 @@ def test_no_message():
 
     def _test():
         raise InvalidDicomError
-    with pytest.raises(InvalidDicomError,
-                       match='The specified file is not a valid DICOM '
-                             'file.'):
+
+    with pytest.raises(
+        InvalidDicomError, match="The specified file is not a valid DICOM " "file."
+    ):
         _test()

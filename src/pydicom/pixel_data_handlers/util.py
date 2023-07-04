@@ -3,14 +3,13 @@
 
 from struct import unpack, unpack_from
 from sys import byteorder
-from typing import (
-    Optional, Union, TYPE_CHECKING, cast
-)
+from typing import Optional, Union, TYPE_CHECKING, cast
 from collections.abc import Iterable, ByteString
 import warnings
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -30,9 +29,7 @@ _UNPACK_LUT: dict[int, bytes] = {
 
 
 def apply_color_lut(
-    arr: "np.ndarray",
-    ds: Optional["Dataset"] = None,
-    palette: str | UID | None = None
+    arr: "np.ndarray", ds: Optional["Dataset"] = None, palette: str | UID | None = None
 ) -> "np.ndarray":
     """Apply a color palette lookup table to `arr`.
 
@@ -90,26 +87,26 @@ def apply_color_lut(
     if palette:
         # Well-known palettes are all 8-bits per entry
         datasets = {
-            '1.2.840.10008.1.5.1': 'hotiron.dcm',
-            '1.2.840.10008.1.5.2': 'pet.dcm',
-            '1.2.840.10008.1.5.3': 'hotmetalblue.dcm',
-            '1.2.840.10008.1.5.4': 'pet20step.dcm',
-            '1.2.840.10008.1.5.5': 'spring.dcm',
-            '1.2.840.10008.1.5.6': 'summer.dcm',
-            '1.2.840.10008.1.5.7': 'fall.dcm',
-            '1.2.840.10008.1.5.8': 'winter.dcm',
+            "1.2.840.10008.1.5.1": "hotiron.dcm",
+            "1.2.840.10008.1.5.2": "pet.dcm",
+            "1.2.840.10008.1.5.3": "hotmetalblue.dcm",
+            "1.2.840.10008.1.5.4": "pet20step.dcm",
+            "1.2.840.10008.1.5.5": "spring.dcm",
+            "1.2.840.10008.1.5.6": "summer.dcm",
+            "1.2.840.10008.1.5.7": "fall.dcm",
+            "1.2.840.10008.1.5.8": "winter.dcm",
         }
         if not UID(palette).is_valid:
             try:
                 uids = {
-                    'HOT_IRON': '1.2.840.10008.1.5.1',
-                    'PET': '1.2.840.10008.1.5.2',
-                    'HOT_METAL_BLUE': '1.2.840.10008.1.5.3',
-                    'PET_20_STEP': '1.2.840.10008.1.5.4',
-                    'SPRING': '1.2.840.10008.1.5.5',
-                    'SUMMER': '1.2.840.10008.1.5.6',
-                    'FALL': '1.2.840.10008.1.5.8',
-                    'WINTER': '1.2.840.10008.1.5.7',
+                    "HOT_IRON": "1.2.840.10008.1.5.1",
+                    "PET": "1.2.840.10008.1.5.2",
+                    "HOT_METAL_BLUE": "1.2.840.10008.1.5.3",
+                    "PET_20_STEP": "1.2.840.10008.1.5.4",
+                    "SPRING": "1.2.840.10008.1.5.5",
+                    "SUMMER": "1.2.840.10008.1.5.6",
+                    "FALL": "1.2.840.10008.1.5.8",
+                    "WINTER": "1.2.840.10008.1.5.7",
                 }
                 palette = uids[palette]
             except KeyError:
@@ -117,6 +114,7 @@ def apply_color_lut(
 
         try:
             from pydicom import dcmread
+
             fname = datasets[palette]
             ds = dcmread(get_palette_files(fname)[0])
         except KeyError:
@@ -126,13 +124,13 @@ def apply_color_lut(
 
     # C.8.16.2.1.1.1: Supplemental Palette Color LUT
     # TODO: Requires greyscale visualisation pipeline
-    if getattr(ds, 'PixelPresentation', None) in ['MIXED', 'COLOR']:
+    if getattr(ds, "PixelPresentation", None) in ["MIXED", "COLOR"]:
         raise ValueError(
             "Use of this function with the Supplemental Palette Color Lookup "
             "Table Module is not currently supported"
         )
 
-    if 'RedPaletteColorLookupTableDescriptor' not in ds:
+    if "RedPaletteColorLookupTableDescriptor" not in ds:
         raise ValueError("No suitable Palette Color Lookup Table Module found")
 
     # All channels are supposed to be identical
@@ -144,37 +142,35 @@ def apply_color_lut(
     first_map = lut_desc[1]
     # Actual bit depth may be larger (8 bit entries in 16 bits allocated)
     nominal_depth = lut_desc[2]
-    dtype = np.dtype(f'uint{nominal_depth:.0f}')
+    dtype = np.dtype(f"uint{nominal_depth:.0f}")
 
     luts = []
-    if 'RedPaletteColorLookupTableData' in ds:
+    if "RedPaletteColorLookupTableData" in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
         r_lut = cast(bytes, ds.RedPaletteColorLookupTableData)
         g_lut = cast(bytes, ds.GreenPaletteColorLookupTableData)
         b_lut = cast(bytes, ds.BluePaletteColorLookupTableData)
         a_lut = cast(
-            bytes | None,
-            getattr(ds, 'AlphaPaletteColorLookupTableData', None)
+            bytes | None, getattr(ds, "AlphaPaletteColorLookupTableData", None)
         )
 
         actual_depth = len(r_lut) / nr_entries * 8
-        dtype = np.dtype(f'uint{actual_depth:.0f}')
+        dtype = np.dtype(f"uint{actual_depth:.0f}")
 
         for lut_bytes in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
             luts.append(np.frombuffer(lut_bytes, dtype=dtype))
-    elif 'SegmentedRedPaletteColorLookupTableData' in ds:
+    elif "SegmentedRedPaletteColorLookupTableData" in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
         r_lut = cast(bytes, ds.SegmentedRedPaletteColorLookupTableData)
         g_lut = cast(bytes, ds.SegmentedGreenPaletteColorLookupTableData)
         b_lut = cast(bytes, ds.SegmentedBluePaletteColorLookupTableData)
         a_lut = cast(
-            bytes | None,
-            getattr(ds, 'SegmentedAlphaPaletteColorLookupTableData', None)
+            bytes | None, getattr(ds, "SegmentedAlphaPaletteColorLookupTableData", None)
         )
 
-        endianness = '<' if ds.is_little_endian else '>'
+        endianness = "<" if ds.is_little_endian else ">"
         byte_depth = nominal_depth // 8
-        fmt = 'B' if byte_depth == 1 else 'H'
+        fmt = "B" if byte_depth == 1 else "H"
         actual_depth = nominal_depth
 
         for seg in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
@@ -258,13 +254,13 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         first_map = cast(list[int], item.LUTDescriptor)[1]
         nominal_depth = cast(list[int], item.LUTDescriptor)[2]
 
-        dtype = f'uint{nominal_depth}'
+        dtype = f"uint{nominal_depth}"
 
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
-        if item['LUTData'].VR == VR.OW:
-            endianness = '<' if ds.is_little_endian else '>'
-            unpack_fmt = f'{endianness}{nr_entries}H'
+        if item["LUTData"].VR == VR.OW:
+            endianness = "<" if ds.is_little_endian else ">"
+            unpack_fmt = f"{endianness}{nr_entries}H"
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
             unc_data = cast(list[int], item.LUTData)
@@ -281,7 +277,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
         return lut_data[clipped_iv]
-    elif 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
+    elif "RescaleSlope" in ds and "RescaleIntercept" in ds:
         arr = arr.astype(np.float64) * cast(float, ds.RescaleSlope)
         arr += cast(float, ds.RescaleIntercept)
 
@@ -289,10 +285,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
 
 def apply_voi_lut(
-    arr: "np.ndarray",
-    ds: "Dataset",
-    index: int = 0,
-    prefer_lut: bool = True
+    arr: "np.ndarray", ds: "Dataset", index: int = 0, prefer_lut: bool = True
 ) -> "np.ndarray":
     """Apply a VOI lookup table or windowing operation to `arr`.
 
@@ -350,15 +343,15 @@ def apply_voi_lut(
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     valid_voi = False
-    if ds.get('VOILUTSequence'):
+    if ds.get("VOILUTSequence"):
         ds.VOILUTSequence = cast(list["Dataset"], ds.VOILUTSequence)
         valid_voi = None not in [
-            ds.VOILUTSequence[0].get('LUTDescriptor', None),
-            ds.VOILUTSequence[0].get('LUTData', None)
+            ds.VOILUTSequence[0].get("LUTDescriptor", None),
+            ds.VOILUTSequence[0].get("LUTData", None),
         ]
     valid_windowing = None not in [
-        ds.get('WindowCenter', None),
-        ds.get('WindowWidth', None)
+        ds.get("WindowCenter", None),
+        ds.get("WindowWidth", None),
     ]
 
     if valid_voi and valid_windowing:
@@ -376,9 +369,7 @@ def apply_voi_lut(
     return arr
 
 
-def apply_voi(
-    arr: "np.ndarray", ds: "Dataset", index: int = 0
-) -> "np.ndarray":
+def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     """Apply a VOI lookup table to `arr`.
 
     .. versionadded:: 2.1
@@ -416,13 +407,12 @@ def apply_voi(
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if not ds.get('VOILUTSequence'):
+    if not ds.get("VOILUTSequence"):
         return arr
 
     if not np.issubdtype(arr.dtype, np.integer):
         warnings.warn(
-            "Applying a VOI LUT on a float input array may give "
-            "incorrect results"
+            "Applying a VOI LUT on a float input array may give " "incorrect results"
         )
 
     # VOI LUT Sequence contains one or more items
@@ -434,9 +424,9 @@ def apply_voi(
     # PS3.3 C.8.11.3.1.5: may be 8, 10-16
     nominal_depth = lut_descriptor[2]
     if nominal_depth in list(range(10, 17)):
-        dtype = 'uint16'
+        dtype = "uint16"
     elif nominal_depth == 8:
-        dtype = 'uint8'
+        dtype = "uint8"
     else:
         raise NotImplementedError(
             f"'{nominal_depth}' bits per LUT entry is not supported"
@@ -444,9 +434,9 @@ def apply_voi(
 
     # Ambiguous VR, US or OW
     unc_data: Iterable[int]
-    if item['LUTData'].VR == VR.OW:
-        endianness = '<' if ds.is_little_endian else '>'
-        unpack_fmt = f'{endianness}{nr_entries}H'
+    if item["LUTData"].VR == VR.OW:
+        endianness = "<" if ds.is_little_endian else ">"
+        unpack_fmt = f"{endianness}{nr_entries}H"
         unc_data = unpack_from(unpack_fmt, cast(bytes, item.LUTData))
     else:
         unc_data = cast(list[int], item.LUTData)
@@ -465,9 +455,7 @@ def apply_voi(
     return cast("np.ndarray", lut_data[clipped_iv])
 
 
-def apply_windowing(
-    arr: "np.ndarray", ds: "Dataset", index: int = 0
-) -> "np.ndarray":
+def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     """Apply a windowing operation to `arr`.
 
     .. versionadded:: 2.1
@@ -513,7 +501,7 @@ def apply_windowing(
     if "WindowWidth" not in ds and "WindowCenter" not in ds:
         return arr
 
-    if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
+    if ds.PhotometricInterpretation not in ["MONOCHROME1", "MONOCHROME2"]:
         raise ValueError(
             "When performing a windowing operation only 'MONOCHROME1' and "
             "'MONOCHROME2' are allowed for (0028,0004) Photometric "
@@ -521,14 +509,12 @@ def apply_windowing(
         )
 
     # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
-    voi_func = cast(str, getattr(ds, 'VOILUTFunction', 'LINEAR')).upper()
+    voi_func = cast(str, getattr(ds, "VOILUTFunction", "LINEAR")).upper()
     # VR DS, VM 1-n
-    elem = ds['WindowCenter']
-    center = (
-        cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
-    )
+    elem = ds["WindowCenter"]
+    center = cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
     center = cast(float, center)
-    elem = ds['WindowWidth']
+    elem = ds["WindowWidth"]
     width = cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
     width = cast(float, width)
 
@@ -537,7 +523,7 @@ def apply_windowing(
     ds.BitsStored = cast(int, ds.BitsStored)
     y_min: float
     y_max: float
-    if ds.get('ModalityLUTSequence'):
+    if ds.get("ModalityLUTSequence"):
         # Unsigned - see PS3.3 C.11.1.1.1
         y_min = 0
         item = cast(list["Dataset"], ds.ModalityLUTSequence)[0]
@@ -549,11 +535,11 @@ def apply_windowing(
         y_max = 2**ds.BitsStored - 1
     else:
         # Signed
-        y_min = -2**(ds.BitsStored - 1)
-        y_max = 2**(ds.BitsStored - 1) - 1
+        y_min = -(2 ** (ds.BitsStored - 1))
+        y_max = 2 ** (ds.BitsStored - 1) - 1
 
-    slope = ds.get('RescaleSlope', None)
-    intercept = ds.get('RescaleIntercept', None)
+    slope = ds.get("RescaleSlope", None)
+    intercept = ds.get("RescaleIntercept", None)
     if slope is not None and intercept is not None:
         ds.RescaleSlope = cast(float, ds.RescaleSlope)
         ds.RescaleIntercept = cast(float, ds.RescaleIntercept)
@@ -562,11 +548,11 @@ def apply_windowing(
         y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
 
     y_range = y_max - y_min
-    arr = arr.astype('float64')
+    arr = arr.astype("float64")
 
-    if voi_func in ['LINEAR', 'LINEAR_EXACT']:
+    if voi_func in ["LINEAR", "LINEAR_EXACT"]:
         # PS3.3 C.11.2.1.2.1 and C.11.2.1.3.2
-        if voi_func == 'LINEAR':
+        if voi_func == "LINEAR":
             if width < 1:
                 raise ValueError(
                     "The (0028,1051) Window Width must be greater than or "
@@ -587,10 +573,8 @@ def apply_windowing(
         arr[below] = y_min
         arr[above] = y_max
         if between.any():
-            arr[between] = (
-                ((arr[between] - center) / width + 0.5) * y_range + y_min
-            )
-    elif voi_func == 'SIGMOID':
+            arr[between] = ((arr[between] - center) / width + 0.5) * y_range + y_min
+    elif voi_func == "SIGMOID":
         # PS3.3 C.11.2.1.3.1
         if width <= 0:
             raise ValueError(
@@ -600,9 +584,7 @@ def apply_windowing(
 
         arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
     else:
-        raise ValueError(
-            f"Unsupported (0028,1056) VOI LUT Function value '{voi_func}'"
-        )
+        raise ValueError(f"Unsupported (0028,1056) VOI LUT Function value '{voi_func}'")
 
     return arr
 
@@ -652,25 +634,26 @@ def convert_color_space(
       <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
       Section 7
     """
+
     def _no_change(arr: "np.ndarray") -> "np.ndarray":
         return arr
 
     _converters = {
-        'YBR_FULL_422': {
-            'YBR_FULL_422': _no_change,
-            'YBR_FULL': _no_change,
-            'RGB': _convert_YBR_FULL_to_RGB,
+        "YBR_FULL_422": {
+            "YBR_FULL_422": _no_change,
+            "YBR_FULL": _no_change,
+            "RGB": _convert_YBR_FULL_to_RGB,
         },
-        'YBR_FULL': {
-            'YBR_FULL': _no_change,
-            'YBR_FULL_422': _no_change,
-            'RGB': _convert_YBR_FULL_to_RGB,
+        "YBR_FULL": {
+            "YBR_FULL": _no_change,
+            "YBR_FULL_422": _no_change,
+            "RGB": _convert_YBR_FULL_to_RGB,
         },
-        'RGB': {
-            'RGB': _no_change,
-            'YBR_FULL': _convert_RGB_to_YBR_FULL,
-            'YBR_FULL_422': _convert_RGB_to_YBR_FULL,
-        }
+        "RGB": {
+            "RGB": _no_change,
+            "YBR_FULL": _convert_RGB_to_YBR_FULL,
+            "YBR_FULL_422": _convert_RGB_to_YBR_FULL,
+        },
     }
     try:
         converter = _converters[current][desired]
@@ -713,10 +696,12 @@ def _convert_RGB_to_YBR_FULL(arr: "np.ndarray") -> "np.ndarray":
     orig_dtype = arr.dtype
 
     rgb_to_ybr = np.asarray(
-        [[+0.299, -0.299 / 1.772, +0.701 / 1.402],
-         [+0.587, -0.587 / 1.772, -0.587 / 1.402],
-         [+0.114, +0.886 / 1.772, -0.114 / 1.402]],
-        dtype=np.float32
+        [
+            [+0.299, -0.299 / 1.772, +0.701 / 1.402],
+            [+0.587, -0.587 / 1.772, -0.587 / 1.402],
+            [+0.114, +0.886 / 1.772, -0.114 / 1.402],
+        ],
+        dtype=np.float32,
     )
 
     arr = np.matmul(arr, rgb_to_ybr, dtype=np.float32)
@@ -753,10 +738,12 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
     orig_dtype = arr.dtype
 
     ybr_to_rgb = np.asarray(
-        [[1.000, 1.000, 1.000],
-         [0.000, -0.114 * 1.772 / 0.587, 1.772],
-         [1.402, -0.299 * 1.402 / 0.587, 0.000]],
-        dtype=np.float32
+        [
+            [1.000, 1.000, 1.000],
+            [0.000, -0.114 * 1.772 / 0.587, 1.772],
+            [1.402, -0.299 * 1.402 / 0.587, 0.000],
+        ],
+        dtype=np.float32,
     )
 
     arr = arr.astype(np.float32)
@@ -799,11 +786,13 @@ def dtype_corrected_for_endianness(
         endianness.
     """
     if is_little_endian is None:
-        raise ValueError("Dataset attribute 'is_little_endian' "
-                         "has to be set before writing the dataset")
+        raise ValueError(
+            "Dataset attribute 'is_little_endian' "
+            "has to be set before writing the dataset"
+        )
 
-    if is_little_endian != (byteorder == 'little'):
-        return numpy_dtype.newbyteorder('S')
+    if is_little_endian != (byteorder == "little"):
+        return numpy_dtype.newbyteorder("S")
 
     return numpy_dtype
 
@@ -838,16 +827,16 @@ def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
     step_src = n_bytes * 4
     step_dst = n_bytes * 6
     for ii in range(n_bytes):
-        c_b = src[2 * n_bytes + ii::step_src]
-        c_r = src[3 * n_bytes + ii::step_src]
+        c_b = src[2 * n_bytes + ii :: step_src]
+        c_r = src[3 * n_bytes + ii :: step_src]
 
-        dst[0 * n_bytes + ii::step_dst] = src[0 * n_bytes + ii::step_src]
-        dst[1 * n_bytes + ii::step_dst] = c_b
-        dst[2 * n_bytes + ii::step_dst] = c_r
+        dst[0 * n_bytes + ii :: step_dst] = src[0 * n_bytes + ii :: step_src]
+        dst[1 * n_bytes + ii :: step_dst] = c_b
+        dst[2 * n_bytes + ii :: step_dst] = c_r
 
-        dst[3 * n_bytes + ii::step_dst] = src[1 * n_bytes + ii::step_src]
-        dst[4 * n_bytes + ii::step_dst] = c_b
-        dst[5 * n_bytes + ii::step_dst] = c_r
+        dst[3 * n_bytes + ii :: step_dst] = src[1 * n_bytes + ii :: step_src]
+        dst[4 * n_bytes + ii :: step_dst] = c_b
+        dst[5 * n_bytes + ii :: step_dst] = c_r
 
     return bytes(dst)
 
@@ -856,7 +845,7 @@ def _expand_segmented_lut(
     data: tuple[int, ...],
     fmt: str,
     nr_segments: int | None = None,
-    last_value: int | None = None
+    last_value: int | None = None,
 ) -> list[int]:
     """Return a list containing the expanded lookup table data.
 
@@ -889,7 +878,7 @@ def _expand_segmented_lut(
     """
     # Indirect segment byte offset is dependent on endianness for 8-bit
     # Little endian: e.g. 0x0302 0x0100, big endian, e.g. 0x0203 0x0001
-    indirect_ii = [3, 2, 1, 0] if '<' in fmt else [2, 3, 0, 1]
+    indirect_ii = [3, 2, 1, 0] if "<" in fmt else [2, 3, 0, 1]
 
     lut: list[int] = []
     offset = 0
@@ -903,7 +892,7 @@ def _expand_segmented_lut(
 
         if opcode == 0:
             # C.7.9.2.1: Discrete segment
-            lut.extend(data[offset:offset + length])
+            lut.extend(data[offset : offset + length])
             offset += length
         elif opcode == 1:
             # C.7.9.2.2: Linear segment
@@ -935,7 +924,7 @@ def _expand_segmented_lut(
                     "the first segment cannot be an indirect segment"
                 )
 
-            if 'B' in fmt:
+            if "B" in fmt:
                 # 8-bit segment entries
                 ii = [data[offset + vv] for vv in indirect_ii]
                 byte_offset = (ii[0] << 8 | ii[1]) << 16 | (ii[2] << 8 | ii[3])
@@ -945,9 +934,7 @@ def _expand_segmented_lut(
                 byte_offset = data[offset + 1] << 16 | data[offset]
                 offset += 2
 
-            lut.extend(
-                _expand_segmented_lut(data[byte_offset:], fmt, length, lut[-1])
-            )
+            lut.extend(_expand_segmented_lut(data[byte_offset:], fmt, length, lut[-1]))
         else:
             raise ValueError(
                 "Error expanding a segmented palette lookup table: "
@@ -961,7 +948,7 @@ def _expand_segmented_lut(
     return lut
 
 
-def get_expected_length(ds: "Dataset", unit: str = 'bytes') -> int:
+def get_expected_length(ds: "Dataset", unit: str = "bytes") -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Pixel
     Data*.
 
@@ -1012,7 +999,7 @@ def get_expected_length(ds: "Dataset", unit: str = 'bytes') -> int:
     length = rows * columns * samples_per_pixel
     length *= get_nr_frames(ds)
 
-    if unit == 'pixels':
+    if unit == "pixels":
         return length
 
     # Correct for the number of bytes per pixel
@@ -1025,7 +1012,7 @@ def get_expected_length(ds: "Dataset", unit: str = 'bytes') -> int:
         length *= bits_allocated // 8
 
     # DICOM Standard, Part 4, Annex C.7.6.3.1.2
-    if ds.PhotometricInterpretation == 'YBR_FULL_422':
+    if ds.PhotometricInterpretation == "YBR_FULL_422":
         length = length // 3 * 2
 
     return length
@@ -1079,10 +1066,18 @@ def get_image_pixel_ids(ds: "Dataset") -> dict[str, int]:
 
     """
     keywords = [
-        'SamplesPerPixel', 'PhotometricInterpretation', 'PlanarConfiguration',
-        'NumberOfFrames', 'Rows', 'Columns', 'BitsAllocated', 'BitsStored',
-        'PixelRepresentation', 'FloatPixelData', 'DoubleFloatPixelData',
-        'PixelData'
+        "SamplesPerPixel",
+        "PhotometricInterpretation",
+        "PlanarConfiguration",
+        "NumberOfFrames",
+        "Rows",
+        "Columns",
+        "BitsAllocated",
+        "BitsStored",
+        "PixelRepresentation",
+        "FloatPixelData",
+        "DoubleFloatPixelData",
+        "PixelData",
     ]
 
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
@@ -1107,11 +1102,11 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
     """
     try:
         # First 2 bytes must be the SOC marker - if not then wrong format
-        if codestream[0:2] != b'\xff\x4f':
+        if codestream[0:2] != b"\xff\x4f":
             return {}
 
         # SIZ is required to be the second marker - Figure A-3 in 15444-1
-        if codestream[2:4] != b'\xff\x51':
+        if codestream[2:4] != b"\xff\x51":
             return {}
 
         # See 15444-1 A.5.1 for format of the SIZ box and contents
@@ -1140,12 +1135,14 @@ def get_nr_frames(ds: "Dataset") -> int:
     int
         An integer for the NumberOfFrames or 1 if NumberOfFrames is None
     """
-    nr_frames: int | None = getattr(ds, 'NumberOfFrames', 1)
+    nr_frames: int | None = getattr(ds, "NumberOfFrames", 1)
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
     if nr_frames is None:
-        warnings.warn("A value of None for (0028,0008) 'Number of Frames' is "
-                      "non-conformant. It's recommended that this value be "
-                      "changed to 1")
+        warnings.warn(
+            "A value of None for (0028,0008) 'Number of Frames' is "
+            "non-conformant. It's recommended that this value be "
+            "changed to 1"
+        )
         nr_frames = 1
 
     return nr_frames
@@ -1210,11 +1207,11 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     if arr.shape[0] % 8:
         arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
 
-    arr = np.packbits(arr.astype('u1'), bitorder="little")
+    arr = np.packbits(arr.astype("u1"), bitorder="little")
 
     packed: bytes = arr.tobytes()
     if pad:
-        return packed + b'\x00' if len(packed) % 2 else packed
+        return packed + b"\x00" if len(packed) % 2 else packed
 
     return packed
 
@@ -1275,9 +1272,9 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         #   0x0001 - 2's complement (signed int)
         pixel_repr = cast(int, ds.PixelRepresentation)
         if pixel_repr == 0:
-            dtype_str = 'uint'
+            dtype_str = "uint"
         elif pixel_repr == 1:
-            dtype_str = 'int'
+            dtype_str = "int"
         else:
             raise ValueError(
                 "Unable to determine the data type to use to contain the "
@@ -1285,7 +1282,7 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
                 "Pixel Representation' is invalid"
             )
     else:
-        dtype_str = 'float'
+        dtype_str = "float"
 
     # (0028,0100) Bits Allocated, US, 1
     #   The number of bits allocated for each pixel sample
@@ -1293,7 +1290,7 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     #   For bit packed data we use uint8
     bits_allocated = cast(int, ds.BitsAllocated)
     if bits_allocated == 1:
-        dtype_str = 'uint8'
+        dtype_str = "uint8"
     elif bits_allocated > 0 and bits_allocated % 8 == 0:
         dtype_str += str(bits_allocated)
     else:
@@ -1313,9 +1310,9 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         )
 
     # Correct for endianness of the system vs endianness of the dataset
-    if ds.is_little_endian != (byteorder == 'little'):
+    if ds.is_little_endian != (byteorder == "little"):
         # 'S' swap from current to opposite
-        dtype = dtype.newbyteorder('S')
+        dtype = dtype.newbyteorder("S")
 
     return dtype
 
@@ -1421,15 +1418,17 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
     # Valid values for Planar Configuration are dependent on transfer syntax
     if nr_samples > 1:
         transfer_syntax = ds.file_meta.TransferSyntaxUID
-        if transfer_syntax in ['1.2.840.10008.1.2.4.50',
-                               '1.2.840.10008.1.2.4.57',
-                               '1.2.840.10008.1.2.4.70',
-                               '1.2.840.10008.1.2.4.80',
-                               '1.2.840.10008.1.2.4.81',
-                               '1.2.840.10008.1.2.4.90',
-                               '1.2.840.10008.1.2.4.91']:
+        if transfer_syntax in [
+            "1.2.840.10008.1.2.4.50",
+            "1.2.840.10008.1.2.4.57",
+            "1.2.840.10008.1.2.4.70",
+            "1.2.840.10008.1.2.4.80",
+            "1.2.840.10008.1.2.4.81",
+            "1.2.840.10008.1.2.4.90",
+            "1.2.840.10008.1.2.4.91",
+        ]:
             planar_configuration = 0
-        elif transfer_syntax in ['1.2.840.10008.1.2.5']:
+        elif transfer_syntax in ["1.2.840.10008.1.2.5"]:
             planar_configuration = 1
         else:
             planar_configuration = ds.PlanarConfiguration
@@ -1471,9 +1470,7 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
     return arr
 
 
-def unpack_bits(
-    src: bytes, as_array: bool = True
-) -> "np.ndarray | bytes":
+def unpack_bits(src: bytes, as_array: bool = True) -> "np.ndarray | bytes":
     """Unpack the bit-packed data in `src`.
 
     Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay

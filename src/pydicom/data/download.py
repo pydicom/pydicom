@@ -24,6 +24,7 @@ try:
     import tqdm
 
     if HAVE_REQUESTS is False:
+
         class DownloadProgressBar(tqdm.tqdm):
             def update_to(
                 self, b: int = 1, bsize: int = 1, tsize: int | None = None
@@ -81,7 +82,7 @@ def get_config_dir() -> pathlib.Path:
 
 @retry.retry(
     (urllib.error.HTTPError, urllib.error.URLError),
-    exc_msg=("Installing the `requests` package may help")
+    exc_msg=("Installing the `requests` package may help"),
 )
 def download_with_progress(url: str, fpath: pathlib.Path) -> None:
     """Download the file at `url` to `fpath` with a progress bar.
@@ -101,9 +102,12 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
             total_size_in_bytes = int(r.headers.get("content-length", 0))
             with open(fpath, "wb") as file:
                 for data in tqdm.tqdm(
-                    r.iter_content(chunk_size=4096), total=total_size_in_bytes,
-                    unit="B", unit_scale=True, miniters=1,
-                    desc=url.split("/")[-1]
+                    r.iter_content(chunk_size=4096),
+                    total=total_size_in_bytes,
+                    unit="B",
+                    unit_scale=True,
+                    miniters=1,
+                    desc=url.split("/")[-1],
                 ):
                     file.write(data)
         else:
@@ -113,12 +117,9 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
     else:
         if USE_PROGRESS_BAR:
             with DownloadProgressBar(
-                unit="B", unit_scale=True, miniters=1,
-                desc=url.split("/")[-1]
+                unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
             ) as t:
-                urllib.request.urlretrieve(
-                    url, filename, reporthook=t.update_to
-                )
+                urllib.request.urlretrieve(url, filename, reporthook=t.update_to)
         else:
             urllib.request.urlretrieve(url, filename)
 
@@ -164,9 +165,7 @@ def get_url(filename: str) -> str:
     try:
         return urls[filename.lower()]
     except KeyError:
-        raise ValueError(
-            "The file provided isn't within pydicom's urls.json record."
-        )
+        raise ValueError("The file provided isn't within pydicom's urls.json record.")
 
 
 def data_path_with_download(
@@ -174,7 +173,7 @@ def data_path_with_download(
     check_hash: bool = True,
     redownload_on_hash_mismatch: bool = True,
     url: str | None = None,
-    quiet: bool = True
+    quiet: bool = True,
 ) -> pathlib.Path:
     """Return the absolute path to the cached file with `filename`.
 
@@ -227,9 +226,7 @@ def data_path_with_download(
                     filename, redownload_on_hash_mismatch=False
                 )
 
-            raise ValueError(
-                "The file on disk does not match the recorded hash."
-            )
+            raise ValueError("The file on disk does not match the recorded hash.")
 
     return filepath.resolve()
 
