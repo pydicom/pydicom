@@ -11,7 +11,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import warnings
 
-from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
 from pydicom.uid import generate_uid
