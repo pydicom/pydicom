@@ -24,7 +24,7 @@ Analyse differences between DICOM files
 
 This examples illustrates how to find the differences between two DICOM files.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-40
+.. GENERATED FROM PYTHON SOURCE LINES 9-41
 
 
 
@@ -725,11 +725,12 @@ This examples illustrates how to find the differences between two DICOM files.
 
     print(__doc__)
 
-    filename_mr = get_testdata_file('MR_small.dcm')
-    filename_ct = get_testdata_file('CT_small.dcm')
+    filename_mr = get_testdata_file("MR_small.dcm")
+    filename_ct = get_testdata_file("CT_small.dcm")
 
-    datasets = tuple([pydicom.dcmread(filename, force=True)
-                      for filename in (filename_mr, filename_ct)])
+    datasets = tuple(
+        [pydicom.dcmread(filename, force=True) for filename in (filename_mr, filename_ct)]
+    )
 
     # difflib compare functions require a list of lines, each terminated with
     # newline character massage the string representation of each dicom dataset
@@ -749,7 +750,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.118 seconds)
+   **Total running time of the script:** ( 0 minutes  0.102 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:

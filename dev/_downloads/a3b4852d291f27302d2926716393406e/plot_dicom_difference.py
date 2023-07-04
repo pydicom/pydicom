@@ -17,11 +17,12 @@ from pydicom.data import get_testdata_file
 
 print(__doc__)
 
-filename_mr = get_testdata_file('MR_small.dcm')
-filename_ct = get_testdata_file('CT_small.dcm')
+filename_mr = get_testdata_file("MR_small.dcm")
+filename_ct = get_testdata_file("CT_small.dcm")
 
-datasets = tuple([pydicom.dcmread(filename, force=True)
-                  for filename in (filename_mr, filename_ct)])
+datasets = tuple(
+    [pydicom.dcmread(filename, force=True) for filename in (filename_mr, filename_ct)]
+)
 
 # difflib compare functions require a list of lines, each terminated with
 # newline character massage the string representation of each dicom dataset

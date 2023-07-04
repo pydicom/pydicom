@@ -128,7 +128,8 @@ to download the full example code</p>
 <p>This example is a starting point to anonymize DICOM data.</p>
 <p>It shows how to read data and replace tags: person names, patient id,
 optionally remove curves and private tags, and write the results in a new file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Darcy Mason</span>
+<span class="c1">#           Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
 
@@ -142,11 +143,10 @@ optionally remove curves and private tags, and write the results in a new file.<
 </div>
 <section id="anonymize-a-single-file">
 <h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_elements</span></a> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;PatientBirthDate&#39;</span><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_elements</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PatientID&quot;</span><span class="p">,</span> <span class="s2">&quot;PatientBirthDate&quot;</span><span class="p">]</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">de</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_elements</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">de</span></a><span class="p">))</span>
 </pre></div>
@@ -181,23 +181,22 @@ also some other tags such that patient ID, etc.</p>
 </div>
 <p>Data elements of type 3 (optional) can be easily deleted using <code class="docutils literal notranslate"><span class="pre">del</span></code> or
 <code class="docutils literal notranslate"><span class="pre">delattr</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="s1">&#39;OtherPatientIDs&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
-    <span class="nb">delattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;OtherPatientIDs&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="s2">&quot;OtherPatientIDs&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+    <span class="nb">delattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;OtherPatientIDs&quot;</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="s1">&#39;OtherPatientIDsSequence&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+<span class="k">if</span> <span class="s2">&quot;OtherPatientIDsSequence&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
     <span class="k">del</span> <span class="n">dataset</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span>
 </pre></div>
 </div>
 <p>For data elements of type 2, this is possible to blank it by assigning a
 blank string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a> <span class="o">=</span> <span class="s1">&#39;PatientBirthDate&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a> <span class="o">=</span> <span class="s2">&quot;PatientBirthDate&quot;</span>
 <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;19000101&#39;</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;19000101&quot;</span>
 </pre></div>
 </div>
 <p>Finally, this is possible to store the image</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_elements</span></a> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;PatientBirthDate&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_elements</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PatientID&quot;</span><span class="p">,</span> <span class="s2">&quot;PatientBirthDate&quot;</span><span class="p">]</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">de</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_elements</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">de</span></a><span class="p">))</span>
 

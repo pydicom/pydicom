@@ -24,7 +24,7 @@ Read a DICOM File-set
 
 This example shows how to read and interact with a DICOM File-set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-123
+.. GENERATED FROM PYTHON SOURCE LINES 9-120
 
 
 
@@ -103,7 +103,7 @@ This example shows how to read and interact with a DICOM File-set.
     Found 0 instances with PhotometricInterpretation='MONOCHROME1' without loading the stored instances and 3 instances with loading
 
     Original File-set still at /root/project/src/pydicom/data/test_files/dicomdirtests
-    File-set copied to /tmp/tmpy1c4svcf and contains the following files:
+    File-set copied to /tmp/tmpz8ec28cm and contains the following files:
       DICOMDIR
       PT000000/ST000000/SE000000/IM000000
       PT000000/ST000000/SE000001/IM000000
@@ -159,7 +159,7 @@ This example shows how to read and interact with a DICOM File-set.
 
     warnings.filterwarnings("ignore")
 
-    path = get_testdata_file('DICOMDIR')
+    path = get_testdata_file("DICOMDIR")
     # A File-set can be loaded from the path to its DICOMDIR dataset or the
     #   dataset itself
     fs = FileSet(path)  # or fs = FileSet(dcmread(path))
@@ -180,10 +180,7 @@ This example shows how to read and interact with a DICOM File-set.
         # Returns a list of FileInstance, where each one represents an available
         #   SOP Instance with a matching *Patient ID*
         result = fs.find(PatientID=patient_id)
-        print(
-            f"PatientName={result[0].PatientName}, "
-            f"PatientID={result[0].PatientID}"
-        )
+        print(f"PatientName={result[0].PatientName}, " f"PatientID={result[0].PatientID}")
 
         # Search available studies
         study_uids = fs.find_values("StudyInstanceUID", instances=result)
@@ -200,9 +197,9 @@ This example shows how to read and interact with a DICOM File-set.
                 result = fs.find(
                     PatientID=patient_id,
                     StudyInstanceUID=study_uid,
-                    SeriesInstanceUID=series_uid
+                    SeriesInstanceUID=series_uid,
                 )
-                plural = ['', 's'][len(result) > 1]
+                plural = ["", "s"][len(result) > 1]
 
                 print(
                     f"    Modality={result[0].Modality} - "
@@ -259,14 +256,14 @@ This example shows how to read and interact with a DICOM File-set.
     print(f"File-set copied to {root} and contains the following files:")
     # Note how the original File-set directory layout has been changed to
     #   the structure used by pydicom
-    for p in sorted(root.glob('**/*')):
+    for p in sorted(root.glob("**/*")):
         if p.is_file():
             print(f"  {p.relative_to(root)}")
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.218 seconds)
+   **Total running time of the script:** ( 0 minutes  0.223 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_fileset.py:

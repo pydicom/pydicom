@@ -29,7 +29,7 @@ python3 dicomtree.py file.dcm
 Or in file browser, right click on file.dcm, open with custom command:
 python3 dicomtree.py
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-92
+.. GENERATED FROM PYTHON SOURCE LINES 14-99
 
 .. code-block:: default
 
@@ -45,25 +45,31 @@ python3 dicomtree.py
     def RunTree(w, filename):
         top = tkinter_tix.Frame(w, relief=tkinter_tix.RAISED, bd=1)
         tree = tkinter_tix.Tree(top, options="hlist.columns 2")
-        tree.pack(expand=1, fill=tkinter_tix.BOTH, padx=10, pady=10,
-                  side=tkinter_tix.LEFT)
+        tree.pack(expand=1, fill=tkinter_tix.BOTH, padx=10, pady=10, side=tkinter_tix.LEFT)
         # print(tree.hlist.keys())   # use to see the available configure() options
-        tree.hlist.configure(bg='white', font='Courier 10', indent=30)
-        tree.hlist.configure(selectbackground='light yellow', gap=150)
+        tree.hlist.configure(bg="white", font="Courier 10", indent=30)
+        tree.hlist.configure(selectbackground="light yellow", gap=150)
 
         box = tkinter_tix.ButtonBox(w, orientation=tkinter_tix.HORIZONTAL)
         # box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
-        box.add('exit', text='Exit', underline=0, command=w.destroy, width=6)
+        box.add("exit", text="Exit", underline=0, command=w.destroy, width=6)
         box.pack(side=tkinter_tix.BOTTOM, fill=tkinter_tix.X)
         top.pack(side=tkinter_tix.TOP, fill=tkinter_tix.BOTH, expand=1)
         # https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
-        tree.bind_all('<MouseWheel>', lambda event:  # Wheel in Windows
-                      tree.hlist.yview_scroll(int(-1 * event.delta / 120.),
-                                              "units"))
-        tree.bind_all('<Button-4>', lambda event:  # Wheel up in Linux
-                      tree.hlist.yview_scroll(int(-1), "units"))
-        tree.bind_all('<Button-5>', lambda event:  # Wheel down in Linux
-                      tree.hlist.yview_scroll(int(+1), "units"))
+        tree.bind_all(
+            "<MouseWheel>",
+            lambda event: tree.hlist.yview_scroll(  # Wheel in Windows
+                int(-1 * event.delta / 120.0), "units"
+            ),
+        )
+        tree.bind_all(
+            "<Button-4>",
+            lambda event: tree.hlist.yview_scroll(int(-1), "units"),  # Wheel up in Linux
+        )
+        tree.bind_all(
+            "<Button-5>",
+            lambda event: tree.hlist.yview_scroll(int(+1), "units"),  # Wheel down in Linux
+        )
 
         show_file(filename, tree)
 
@@ -90,14 +96,15 @@ python3 dicomtree.py
                 for i, dataset in enumerate(data_element.value):
                     item_id = node_id + "." + str(i + 1)
                     sq_item_description = data_element.name.replace(
-                        " Sequence", "")  # XXX not i18n
+                        " Sequence", ""
+                    )  # XXX not i18n
                     item_text = f"{sq_item_description:s} {i + 1:d}"
                     tree.hlist.add(item_id, text=item_text)
                     tree.hlist.hide_entry(item_id)
                     recurse_tree(tree, dataset, item_id, hide=True)
 
 
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         import sys
         import pydicom
 

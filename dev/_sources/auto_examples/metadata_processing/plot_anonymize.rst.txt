@@ -27,12 +27,13 @@ This example is a starting point to anonymize DICOM data.
 It shows how to read data and replace tags: person names, patient id,
 optionally remove curves and private tags, and write the results in a new file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-24
+.. GENERATED FROM PYTHON SOURCE LINES 12-25
 
 .. code-block:: default
 
 
-    # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
+    # authors : Darcy Mason
+    #           Guillaume Lemaitre <g.lemaitre58@gmail.com>
     # license : MIT
 
 
@@ -50,21 +51,20 @@ optionally remove curves and private tags, and write the results in a new file.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-27
+.. GENERATED FROM PYTHON SOURCE LINES 26-28
 
 Anonymize a single file
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-36
+.. GENERATED FROM PYTHON SOURCE LINES 28-36
 
 .. code-block:: default
 
 
-    filename = get_testdata_file('MR_small.dcm')
+    filename = get_testdata_file("MR_small.dcm")
     dataset = pydicom.dcmread(filename)
 
-    data_elements = ['PatientID',
-                     'PatientBirthDate']
+    data_elements = ["PatientID", "PatientBirthDate"]
     for de in data_elements:
         print(dataset.data_element(de))
 
@@ -160,10 +160,10 @@ Data elements of type 3 (optional) can be easily deleted using ``del`` or
 .. code-block:: default
 
 
-    if 'OtherPatientIDs' in dataset:
-        delattr(dataset, 'OtherPatientIDs')
+    if "OtherPatientIDs" in dataset:
+        delattr(dataset, "OtherPatientIDs")
 
-    if 'OtherPatientIDsSequence' in dataset:
+    if "OtherPatientIDsSequence" in dataset:
         del dataset.OtherPatientIDsSequence
 
 
@@ -183,9 +183,9 @@ blank string.
 .. code-block:: default
 
 
-    tag = 'PatientBirthDate'
+    tag = "PatientBirthDate"
     if tag in dataset:
-        dataset.data_element(tag).value = '19000101'
+        dataset.data_element(tag).value = "19000101"
 
 
 
@@ -198,13 +198,12 @@ blank string.
 
 Finally, this is possible to store the image
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-93
+.. GENERATED FROM PYTHON SOURCE LINES 85-92
 
 .. code-block:: default
 
 
-    data_elements = ['PatientID',
-                     'PatientBirthDate']
+    data_elements = ["PatientID", "PatientBirthDate"]
     for de in data_elements:
         print(dataset.data_element(de))
 
