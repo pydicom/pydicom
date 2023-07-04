@@ -18,3 +18,4 @@ Pydicom Internals
 -----------------
 * repository folder structure refactored
 * renamed top level "source" folder to "util"
+* New CI tools - `dependabot`, and `pre-commit` using black and ruff
