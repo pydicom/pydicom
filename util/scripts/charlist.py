@@ -9,8 +9,8 @@ from pydicom.data import get_charset_files
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format='%(message)s')
-    logger = logging.getLogger('charlist')
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    logger = logging.getLogger("charlist")
 
     # Get list of all DICOM files
     names = get_charset_files("*.dcm")
@@ -28,9 +28,7 @@ if __name__ == "__main__":
                 requested_seq = ds.RequestedProcedureCodeSequence[0]
                 spec_charset = requested_seq.SpecificCharacterSet
                 patient_name = requested_seq.PatientName
-                files_info.append((fname,
-                                   spec_charset,
-                                   patient_name))
+                files_info.append((fname, spec_charset, patient_name))
             except Exception:
                 logger.warning("Trouble reading file %s", name)
 
