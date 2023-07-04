@@ -56,10 +56,8 @@ from pydicom.values import converters
 
 _PKG_DIRECTORY = Path(__file__).parent.parent.parent / "pydicom"
 PYDICOM_DICT_FILENAME = _PKG_DIRECTORY / "_dicom_dict.py"
-MAIN_DICT_NAME = 'DicomDictionary: Dict[int, Tuple[str, str, str, str, str]]'
-MASK_DICT_NAME = (
-    'RepeatersDictionary: Dict[str, Tuple[str, str, str, str, str]]'
-)
+MAIN_DICT_NAME = "DicomDictionary: Dict[int, Tuple[str, str, str, str, str]]"
+MASK_DICT_NAME = "RepeatersDictionary: Dict[str, Tuple[str, str, str, str, str]]"
 BR = "{http://docbook.org/ns/docbook}"
 
 
@@ -84,11 +82,7 @@ def write_dict(fp, dict_name, attributes, tag_is_string):
         entry_format = f"{{Tag}}: {tag_content}"
 
     fp.write(f"\n{dict_name} = {{\n    ")
-    fp.write(
-        ",  # noqa\n    ".join(
-            entry_format.format(**attr) for attr in attributes
-        )
-    )
+    fp.write(",  # noqa\n    ".join(entry_format.format(**attr) for attr in attributes))
     fp.write("  # noqa\n}\n")
 
 
@@ -217,17 +211,17 @@ def setup_argparse():
             "Generate a new _dicom_dict.py file from Parts 6 and 7 of the "
             "DICOM Standard"
         ),
-        usage="generate_dicom_dict.py [options]"
+        usage="generate_dicom_dict.py [options]",
     )
 
-    opts = parser.add_argument_group('Options')
+    opts = parser.add_argument_group("Options")
     opts.add_argument(
         "--local",
         help=(
             "The path to the directory containing the XML files (used instead "
             "of downloading them)"
         ),
-        type=str
+        type=str,
     )
 
     return parser.parse_args()
@@ -243,12 +237,12 @@ if __name__ == "__main__":
 
     if not USE_DOWNLOAD:
         local_dir = Path(args.local)
-        part_06 = (local_dir / 'part06.xml').resolve(strict=True)
-        part_07 = (local_dir / 'part07.xml').resolve(strict=True)
+        part_06 = (local_dir / "part06.xml").resolve(strict=True)
+        part_07 = (local_dir / "part07.xml").resolve(strict=True)
     else:
         url = "http://medical.nema.org/medical/dicom/current/source/docbook"
-        url_06 = f'{url}/part06/part06.xml'
-        url_07 = f'{url}/part07/part07.xml'
+        url_06 = f"{url}/part06/part06.xml"
+        url_07 = f"{url}/part07/part07.xml"
         print(f"Downloading '{url_06}'")
         part_06 = urllib2.urlopen(url_06)
         print(f"Downloading '{url_07}'")
@@ -260,9 +254,9 @@ if __name__ == "__main__":
     root = tree.getroot()
 
     # Check the version is up to date
-    dcm_version = root.find('{http://docbook.org/ns/docbook}subtitle')
+    dcm_version = root.find("{http://docbook.org/ns/docbook}subtitle")
     dcm_version = dcm_version.text.split()[2]
-    lib_version = getattr(_version, '__dicom_version__', None)
+    lib_version = getattr(_version, "__dicom_version__", None)
     if lib_version != dcm_version:
         print(
             "Warning: 'pydicom._version.__dicom_version__' needs to be "
@@ -272,9 +266,7 @@ if __name__ == "__main__":
     title = "Registry of DICOM"
     attrs += parse_docbook_table(root, f"{title} Data Elements")
     attrs += parse_docbook_table(root, f"{title} File Meta Elements")
-    attrs += parse_docbook_table(
-        root, f"{title} Directory Structuring Elements"
-    )
+    attrs += parse_docbook_table(root, f"{title} Directory Structuring Elements")
 
     # Get the Command Group elements (0000,eeee) - Part 7
     tree = ET.parse(part_07)
@@ -299,11 +291,11 @@ if __name__ == "__main__":
     mask_attributes = []
 
     for attr in attrs:
-        group, elem = attr['Tag'][1:-1].split(",")
+        group, elem = attr["Tag"][1:-1].split(",")
 
         # e.g. (FFFE,E000)
-        if attr['VR'] == 'See Note':
-            attr['VR'] = 'NONE'
+        if attr["VR"] == "See Note":
+            attr["VR"] = "NONE"
 
         # e.g. (0018,1153), (0018,8150) and (0018,8151)
         # SyntaxError without encoding statement
@@ -311,35 +303,35 @@ if __name__ == "__main__":
         attr["Name"] = attr["Name"].replace("µ", "u")
 
         # some new tags don't have the retired entry (2019)
-        if 'Retired' not in attr:
-            attr['Retired'] = ''
+        if "Retired" not in attr:
+            attr["Retired"] = ""
         # e.g. (0014,0023) and (0018,9445)
-        elif attr['Retired'] in ['RET', 'RET - See Note']:
-            attr['Retired'] = 'Retired'
+        elif attr["Retired"] in ["RET", "RET - See Note"]:
+            attr["Retired"] = "Retired"
         # since 2019 the year is added, e.g. RET(2007)
-        elif attr['Retired'].startswith('RET ('):
-            attr['Retired'] = 'Retired'
+        elif attr["Retired"].startswith("RET ("):
+            attr["Retired"] = "Retired"
         # e.g. (0008,0102), (0014,0025), (0040, A170)
-        elif attr['Retired'] in ['DICOS', 'DICONDE', 'See Note']:
-            attr['Retired'] = ''
+        elif attr["Retired"] in ["DICOS", "DICONDE", "See Note"]:
+            attr["Retired"] = ""
 
         # e.g. (0028,1200)
-        attr['VM'] = attr['VM'].split(' or ')[0]
+        attr["VM"] = attr["VM"].split(" or ")[0]
 
         # If blank then add dummy vals
         # e.g. (0018,9445) and (0028,0020)
-        if attr['VR'] == '' and attr['VM'] == '':
-            attr['VR'] = 'OB'
-            attr['VM'] = '1'
-            attr['Name'] = 'Retired-blank'
+        if attr["VR"] == "" and attr["VM"] == "":
+            attr["VR"] = "OB"
+            attr["VM"] = "1"
+            attr["Name"] = "Retired-blank"
 
         # handle retired 'repeating group' tags
         # e.g. (50xx,eeee) or (gggg,31xx)
-        if 'x' in group or 'x' in elem:
+        if "x" in group or "x" in elem:
             attr["Tag"] = group + elem
             mask_attributes.append(attr)
         else:
-            attr["Tag"] = f'0x{group}{elem}'
+            attr["Tag"] = f"0x{group}{elem}"
             main_attributes.append(attr)
 
     with open(PYDICOM_DICT_FILENAME, "w") as f:
@@ -348,7 +340,7 @@ if __name__ == "__main__":
             f'{os.path.basename(__file__)}"""\n'
         )
         f.write("from typing import Dict, Tuple\n\n")
-        f.write('# Each dict entry is Tag: (VR, VM, Name, Retired, Keyword)')
+        f.write("# Each dict entry is Tag: (VR, VM, Name, Retired, Keyword)")
         write_dict(f, MAIN_DICT_NAME, main_attributes, tag_is_string=False)
         write_dict(f, MASK_DICT_NAME, mask_attributes, tag_is_string=True)
 
@@ -357,11 +349,11 @@ if __name__ == "__main__":
 
     print("Checking that all VRs are supported...")
     for attr in itertools.chain(main_attributes, mask_attributes):
-        vr = attr['VR']
-        tag = attr['Tag']
+        vr = attr["VR"]
+        tag = attr["Tag"]
         try:
             # (fffe,e000), (fffe,e00d) and (fffe,e0dd) have no VR
-            assert vr in converters or vr == 'NONE'
+            assert vr in converters or vr == "NONE"
         except AssertionError:
             print(f"Warning: the VR '{vr}' for tag {tag} is not implemented")
 
