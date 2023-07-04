@@ -44,10 +44,11 @@ docs = [
         "sphinx-copybutton"
 ]
 dev = [
-    "mypy",
+    "black==23.3.0",
+    "mypy==1.3.0",
     "pytest",
     "pytest-cov",
-    "ruff",
+    "ruff==0.0.272",
 ]
 
 [project.urls]
@@ -65,6 +66,10 @@ pydicom = "pydicom.cli.main:main"
 [project.entry-points.pydicom_subcommands]
 codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
+
+
+[tool.black]
+extend-exclude = "/.venv|.*_dict.py$"
 
 
 [tool.ruff]
