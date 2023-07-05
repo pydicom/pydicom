@@ -424,7 +424,7 @@ UID_dictionary = {
     '1.2.840.10008.15.0.3.17': ('dicomPrimaryDeviceType', 'LDAP OID', '', '', 'dicomPrimaryDeviceType'),  # noqa
     '1.2.840.10008.15.0.3.18': ('dicomRelatedDeviceReference', 'LDAP OID', '', '', 'dicomRelatedDeviceReference'),  # noqa
     '1.2.840.10008.15.0.3.19': ('dicomPreferredCalledAETitle', 'LDAP OID', '', '', 'dicomPreferredCalledAETitle'),  # noqa
-    '1.2.840.10008.15.0.3.20': ('dicomTLSCyphersuite', 'LDAP OID', '', '', 'dicomTLSCyphersuite'),  # noqa
+    '1.2.840.10008.15.0.3.20': ('dicomTLSCiphersuite', 'LDAP OID', '', '', 'dicomTLSCiphersuite'),  # noqa
     '1.2.840.10008.15.0.3.21': ('dicomAuthorizedNodeCertificateReference', 'LDAP OID', '', '', 'dicomAuthorizedNodeCertificateReference'),  # noqa
     '1.2.840.10008.15.0.3.22': ('dicomThisNodeCertificateReference', 'LDAP OID', '', '', 'dicomThisNodeCertificateReference'),  # noqa
     '1.2.840.10008.15.0.3.23': ('dicomInstalled', 'LDAP OID', '', '', 'dicomInstalled'),  # noqa

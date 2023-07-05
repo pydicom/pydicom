@@ -460,10 +460,10 @@ def convert_PN(
 
     stripped_string = byte_string.rstrip(b"\x00 ")
     decoded_value = decode_bytes(stripped_string, encodings, TEXT_VR_DELIMS)
-    value_splitted = decoded_value.split("\\")
-    if len(value_splitted) == 1:
-        return get_valtype(value_splitted[0])
-    return MultiValue(get_valtype, value_splitted)
+    value_split = decoded_value.split("\\")
+    if len(value_split) == 1:
+        return get_valtype(value_split[0])
+    return MultiValue(get_valtype, value_split)
 
 
 def convert_string(

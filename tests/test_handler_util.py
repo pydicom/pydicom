@@ -1445,7 +1445,7 @@ class TestNumpy_PaletteColor:
         # original `arr` is unchanged
         assert np.array_equal(orig, arr)
 
-    def test_uint16_16_segmented_litle(self):
+    def test_uint16_16_segmented_little(self):
         """Test uint16 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_SEG_LE_16_1F)
         assert 16 == ds.BitsStored
