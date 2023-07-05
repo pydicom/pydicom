@@ -107,7 +107,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
 
     Note
     ----
-        This function is meant to be used in a call to an `argparse` libary's
+        This function is meant to be used in a call to an `argparse` library's
         `add_argument` call for subparsers, with name="filespec" and
         `type=filespec_parser`. When used that way, the resulting args.filespec
         will contain the return values of this function

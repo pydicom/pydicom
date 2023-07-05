@@ -592,7 +592,7 @@ class TestJPEGLS:
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
-    def test_arrary(self):
+    def test_array(self):
         """Test returned array values are OK."""
         ds = dcmread(JPEG_LS_LOSSLESS)
         arr = ds.pixel_array
