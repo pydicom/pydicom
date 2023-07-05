@@ -5,6 +5,8 @@ repos:
   rev: v1.15.10
   hooks:
     - id: typos
+      exclude: |
+        /_.*_dict.py
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
   rev: v0.0.272
