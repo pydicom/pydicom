@@ -1708,7 +1708,7 @@ class TestDatasetElements:
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         assert isinstance(self.ds.ConceptCodeSequence, Sequence)
 
-    def test_formatted_DS_assigment(self):
+    def test_formatted_DS_assignment(self):
         """Assigning an auto-formatted decimal string works as expected."""
         ds = pydicom.Dataset()
         ds.PatientWeight = DS(math.pi, auto_format=True)
