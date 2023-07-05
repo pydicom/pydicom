@@ -2226,7 +2226,7 @@ class Dataset:
 
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute
-            # XXX note if user mis-spells a dicom data_element - no error!!!
+            # XXX note if user misspells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
     def _set_file_meta(self, value: Optional["Dataset"]) -> None:
