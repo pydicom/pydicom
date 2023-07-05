@@ -6841,7 +6841,7 @@ concepts['SCT'] = \
                                                   'dog breed',
                                                   [7480])},
  'EpagneulPicardDogBreed': {'132477002': ('Epagneul Picard dog breed', [7480])},
- 'EpagneulPontAudemerDogBreed': {'132480001': ('Epagneul Pont-Audemer dog '
+ 'EpagneulPointAudemerDogBreed': {'132480001': ('Epagneul Point-Audemer dog '
                                                'breed',
                                                [7480])},
  'Ephedrine': {'65026000': ('Ephedrine', [65])},
@@ -8247,8 +8247,8 @@ concepts['SCT'] = \
  'GiantSchnauzerDogBreed': {'57947002': ('Giant schnauzer dog breed', [7480])},
  'GidranHorseBreed': {'133108005': ('Gidran horse breed', [7480])},
  'GiemsaStain': {'373646006': ('giemsa stain', [8112])},
- 'GirCattleBreed': {'32938007': ('Gir cattle breed (organism)', [])},
- 'GirCowBreed': {'32938007': ('Gir cow breed', [7480])},
+ 'GitCattleBreed': {'32938007': ('Git cattle breed (organism)', [])},
+ 'GitCowBreed': {'32938007': ('Git cow breed', [7480])},
  'GirgentanaGoatBreed': {'131696008': ('Girgentana goat breed', [7480])},
  'GirolandoCattleBreed': {'133804005': ('Girolando cattle breed (organism)',
                                         [])},
@@ -13832,7 +13832,7 @@ concepts['SCT'] = \
  'MildlyEnlargedCardiacChamber': {'373126002': ('Mildly enlarged cardiac '
                                                 'chamber',
                                                 [3122, 3705])},
- 'MiliaryAneurysm': {'43299000': ('miliary aneurysm', [3808])},
+ 'MilitaryAneurysm': {'43299000': ('military aneurysm', [3808])},
  'MilkOfCalciumCalcification': {'129753004': ('Milk of calcium calcification',
                                               [6011, 6010])},
  'MilkOfCalciumRadiographicCalcification': {'129753004': ('Milk of calcium '
@@ -15946,7 +15946,7 @@ concepts['SCT'] = \
                                                [])},
  'PedicleOfVertebra': {'78972004': ('Pedicle of vertebra', [6115])},
  'Pedunculated': {'25126001': ('Pedunculated', [6209])},
- 'PeeWeeCattleBreed': {'133400005': ('Pee Wee cattle breed', [7480])},
+ 'PeeWeCattleBreed': {'133400005': ('Pee We cattle breed', [7480])},
  'PekingeseDog': {'67684001': ('Pekingese dog', [7480])},
  'PelibüeySheepBreed': {'132802000': ('Pelibüey sheep breed', [7480])},
  'PeloponnesusCattleBreed': {'133401009': ('Peloponnesus cattle breed',
@@ -16703,7 +16703,7 @@ concepts['SCT'] = \
  'PolishSimmentalCattleBreed': {'133415006': ('Polish Simmental cattle breed',
                                               [7480])},
  'PollMerinoSheepBreed': {'132721003': ('Poll Merino sheep breed', [7480])},
- 'PolledGirCattleBreed': {'133688008': ('Polled Gir cattle breed', [7480])},
+ 'PolledGitCattleBreed': {'133688008': ('Polled Git cattle breed', [7480])},
  'PolledGuzeratCattleBreed': {'133746006': ('Polled Guzerat cattle breed',
                                             [7480])},
  'PolledHereford': {'9277006': ('Polled Hereford (organism)', [])},
@@ -20507,7 +20507,7 @@ concepts['SCT'] = \
  'SouthernUkrainianCattleBreed': {'133510004': ('Southern Ukrainian cattle '
                                                 'breed (organism)',
                                                 [])},
- 'SouthernUkranianCattleBreed': {'133510004': ('Southern Ukranian cattle breed',
+ 'SouthernUkrainianCattleBreed': {'133510004': ('Southern Ukrainian cattle breed',
                                                [7480])},
  'SouthwestSpanishMustangHorseBreed': {'133089001': ('Southwest Spanish '
                                                      'Mustang horse breed',
@@ -27401,8 +27401,8 @@ concepts['SCT'] = \
  'Vancomycin': {'372735009': ('Vancomycin (substance)', [])},
  'VancomycinAntibiotic': {'372735009': ('Vancomycin antibiotic', [621, 622])},
  'VaricoseAneurysm': {'57754000': ('varicose aneurysm', [3808])},
- 'VasDeferens': {'57671007': ('Vas deferens', [9514, 7160, 7192, 7151])},
- 'VasDeferensStructure': {'57671007': ('Vas deferens structure (body '
+ 'WasDeferens': {'57671007': ('Was deferens', [9514, 7160, 7192, 7151])},
+ 'WasDeferensStructure': {'57671007': ('Was deferens structure (body '
                                        'structure)',
                                        [])},
  'VascularCalcification': {'129759000': ('Vascular calcification',
@@ -28130,7 +28130,7 @@ concepts['SCT'] = \
  'Yttrium': {'63754004': ('Yttrium', [300])},
  'YucaPig': {'15443006': ('Yuca pig (organism)', [])},
  'YucaPigBreed': {'15443006': ('Yuca pig breed', [7480])},
- 'YucatanMinaturePigBreed': {'132226007': ('Yucatan Minature pig breed',
+ 'YucatanMiniaturePigBreed': {'132226007': ('Yucatan Miniature pig breed',
                                            [7480])},
  'YucatanMiniaturePigBreed': {'132226007': ('Yucatan Miniature pig breed '
                                             '(organism)',
@@ -28331,7 +28331,7 @@ concepts['SCT'] = \
  '_2SigmaUpperValueOfPopulation': {'371920000': ('2 Sigma Upper Value of '
                                                  'population',
                                                  [226, 221, 7465])},
- '_2ndDiagonalCoronaryArtery': {'91751009': ('2nd Diagonal Coronary Artery',
+ '_2andDiagonalCoronaryArtery': {'91751009': ('2nd Diagonal Coronary Artery',
                                              [3014,
                                               3604,
                                               6109,
@@ -28342,7 +28342,7 @@ concepts['SCT'] = \
                                               7192,
                                               7151,
                                               3827])},
- '_2ndLeftPosterolateralCoronaryArtery': {'91758003': ('2nd Left '
+ '_2andLeftPosterolateralCoronaryArtery': {'91758003': ('2nd Left '
                                                        'Posterolateral '
                                                        'Coronary Artery',
                                                        [3014,
@@ -28355,7 +28355,7 @@ concepts['SCT'] = \
                                                         7192,
                                                         7151,
                                                         3827])},
- '_2ndMarginalCoronaryArtery': {'91755000': ('2nd Marginal Coronary Artery',
+ '_2andMarginalCoronaryArtery': {'91755000': ('2nd Marginal Coronary Artery',
                                              [3014,
                                               3604,
                                               6109,
@@ -28366,7 +28366,7 @@ concepts['SCT'] = \
                                               7192,
                                               7151,
                                               3827])},
- '_2ndRightPosterolateralCoronaryArtery': {'91762009': ('2nd Right '
+ '_2andRightPosterolateralCoronaryArtery': {'91762009': ('2nd Right '
                                                         'posterolateral '
                                                         'Coronary Artery',
                                                         [3014,
@@ -28530,7 +28530,7 @@ concepts['DCM'] = \
  'ACDConstant': {'111768': ('ACD Constant', [4237])},
  'ACRAccreditationPhantomCT': {'113682': ('ACR Accreditation Phantom - CT',
                                           [4051, 4052])},
- 'ACRAccreditationPhantomECT': {'113686': ('ACR Accreditation Phantom - ECT',
+ 'ACRAccreditationPhantomETC': {'113686': ('ACR Accreditation Phantom - ETC',
                                            [4051, 4052])},
  'ACRAccreditationPhantomECTPET': {'113688': ('ACR Accreditation Phantom - '
                                               'ECT/PET',
@@ -32059,7 +32059,7 @@ concepts['DCM'] = \
                                                     [4271])},
  'MidlungWindow': {'112085': ('Midlung window',
                               [6109, 6102, 9514, 7192, 7151, 6110])},
- 'MiliaryPattern': {'112129': ('Miliary pattern', [6102, 6106])},
+ 'MilitaryPattern': {'112129': ('Military pattern', [6102, 6106])},
  'MinimizeMeterset': {'130018': ('Minimize Meterset', [9500, 9532])},
  'MinimumAbsoluteVolumeAtRadiationDose': {'130016': ('Minimum Absolute Volume '
                                                      'at Radiation Dose',
@@ -33957,7 +33957,7 @@ concepts['DCM'] = \
                                                         'Container',
                                                         [])},
  'ResourceInadequate': {'110527': ('Resource inadequate', [9300, 71])},
- 'ResourcePreEmpted': {'110526': ('Resource pre-empted', [9300, 9303])},
+ 'ResourcePreEmptied': {'110526': ('Resource pre-emptied', [9300, 9303])},
  'RespirationWaveform': {'109117': ('Respiration Waveform', [3005])},
  'RespiratoryWaveform': {'RESP': ('Respiratory Waveform', [33, 29, 30])},
  'ResponseEvaluation': {'112020': ('Response Evaluation', [])},
@@ -35879,7 +35879,7 @@ concepts['DCM'] = \
  '_2FAF18': {'126713': ('2FA F^18^', [4021])},
  '_2SigmaDeviationOfPopulation': {'121417': ('2 Sigma deviation of population',
                                              [226, 221, 7465])},
- '_2ndWeek': {'111393': ('2nd week', [6163])},
+ '_2andWeek': {'111393': ('2nd week', [6163])},
  '_30cmAboveTabletop': {'113863': ('30cm above Tabletop', [10025])},
  '_30cmInFrontOfImageInputSurface': {'113861': ('30cm in Front of Image Input '
                                                 'Surface',
@@ -36603,7 +36603,7 @@ concepts['LN'] = \
  'EFW1ByShinozuka1996': {'33141-3': ('EFW1 by Shinozuka 1996', [12012, 12014])},
  'EFW2ByShinozuka1996': {'33142-1': ('EFW2 by Shinozuka 1996', [12012, 12014])},
  'EFW3ByShinozuka1996': {'33143-9': ('EFW3 by Shinozuka 1996', [12012, 12014])},
- 'EFWByACAndBPDShepard1982': {'11739-0': ('EFW by AC and BPD, Shepard 1982',
+ 'EFWByACAndBPDShepherd1982': {'11739-0': ('EFW by AC and BPD, Shepherd 1982',
                                           [12012, 12014])},
  'EFWByACBPDFLHCHadlock1985': {'11732-5': ('EFW by AC, BPD, FL, HC, Hadlock '
                                            '1985',
@@ -39942,7 +39942,7 @@ concepts['BARI'] = \
                                                  7192,
                                                  7151,
                                                  3827])},
- '_2ndDiagonalCoronaryArteryLaterals': {'16A': ('2nd Diagonal Coronary Artery '
+ '_2andDiagonalCoronaryArteryLaterals': {'16A': ('2nd Diagonal Coronary Artery '
                                                 'Laterals',
                                                 [3014,
                                                  3604,
@@ -39954,7 +39954,7 @@ concepts['BARI'] = \
                                                  7192,
                                                  7151,
                                                  3827])},
- '_2ndMarginalCoronaryArteryLaterals': {'21A': ('2nd Marginal Coronary Artery '
+ '_2andMarginalCoronaryArteryLaterals': {'21A': ('2nd Marginal Coronary Artery '
                                                 'Laterals',
                                                 [3014,
                                                  3604,
@@ -40039,7 +40039,7 @@ concepts['NEU'] = \
                                         [7702, 7710])},
  'PosteriorThalamicRadiation': {'2083': ('posterior thalamic radiation',
                                          [7702, 7710])},
- 'StriaTerminalis': {'286': ('stria terminalis', [7704, 7710])},
+ 'StriaTerminals': {'286': ('stria terminals', [7704, 7710])},
  'SuperiorLongitudinalFasciculus': {'2080': ('superior longitudinal fasciculus',
                                              [7703, 7710])},
  'SuperiorOpticRadiationBaumLoop': {'3473': ("superior optic radiation (Baum's "

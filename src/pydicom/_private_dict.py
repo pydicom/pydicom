@@ -759,7 +759,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx70': ('US', '1', 'Performed number of images', ''),  # noqa
         '0019xx7f': ('OB', '1', 'Canon Internal Data 111', ''),  # noqa
     },
-    'DIDI TO PCR 1.1': {
+    'DID TO PCR 1.1': {
         '0019xx00': ('LT', '1', 'Post Mode String', ''),  # noqa
         '0019xx01': ('LT', '1', 'Post Data', ''),  # noqa
         '0019xx10': ('LT', '1', 'Image Header', ''),  # noqa
@@ -832,7 +832,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     'DLX_PATNT_01': {
         '0011xx01': ('LT', '1', 'patient DOB', ''),  # noqa
     },
-    'DLX_SERIE_01': {
+    'DLX_SERIES_01': {
         '0019xx01': ('DS', '1', 'Angle Value 1', ''),  # noqa
         '0019xx02': ('DS', '1', 'Angle Value 2', ''),  # noqa
         '0019xx03': ('DS', '1', 'Angle Value 3', ''),  # noqa
@@ -1293,7 +1293,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx90': ('LO', '1', 'CR Film Output Exposures', ''),  # noqa
     },
     'GE LUT Asymmetry Parameter': {
-        '0045xx67': ('DS', '1', 'LUT Assymetry', ''),  # noqa
+        '0045xx67': ('DS', '1', 'LUT Asymmetry', ''),  # noqa
     },
     'GEHC_CT_ADVAPP_001': {
         '0053xx20': ('IS', '1', 'ShuttleFlag', ''),  # noqa
@@ -2066,7 +2066,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0045xx62': ('IS', '1', 'User Window Center', ''),  # noqa
         '0045xx63': ('IS', '1', 'User Window Width', ''),  # noqa
         '0045xx65': ('IS', '1', 'Requested Detector Entrance Dose', ''),  # noqa
-        '0045xx67': ('DS', '3', 'VOI LUT Assymmetry parameter beta', ''),  # noqa
+        '0045xx67': ('DS', '3', 'VOI LUT Asymmetry parameter beta', ''),  # noqa
         '0045xx69': ('IS', '1', 'Collimator rotation', ''),  # noqa
         '0045xx72': ('DS', '1', 'Collimator Width', ''),  # noqa
         '0045xx73': ('DS', '1', 'Collimator Height', ''),  # noqa
@@ -2293,9 +2293,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0013xx26': ('LT', '1', 'Study Comments', ''),  # noqa
         '0015xx10': ('SL', '1', 'Frame Termination Condition', ''),  # noqa
         '0015xx11': ('SL', '1', 'Frame Termination Value', ''),  # noqa
-        '0015xx12': ('SL', '1', 'Num ECT Phases', ''),  # noqa
+        '0015xx12': ('SL', '1', 'Num ETC Phases', ''),  # noqa
         '0015xx13': ('SL', '1', 'Num WB Scans', ''),  # noqa
-        '0015xx14': ('SL', '1', 'ECT Phase Num', ''),  # noqa
+        '0015xx14': ('SL', '1', 'ETC Phase Num', ''),  # noqa
         '0015xx15': ('SL', '1', 'WB Scan Num', ''),  # noqa
         '0015xx16': ('SL', '1', 'Comb Head Number', ''),  # noqa
         '0015xx17': ('UL', '1', 'Preceding Beat', ''),  # noqa
@@ -2632,9 +2632,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx2d': ('SH', '1', 'Filter Mode (String slop field 1 in legacy GE MR', ''),  # noqa
         '0043xx2e': ('SH', '1', 'String slop field 2', ''),  # noqa
         '0043xx2f': ('SS', '1', 'Image Type (real, imaginary, phase, magnitude)', ''),  # noqa
-        '0043xx30': ('SS', '1', 'Vas collapse flag', ''),  # noqa
+        '0043xx30': ('SS', '1', 'Was collapse flag', ''),  # noqa
         '0043xx31': ('DS', '2', 'Recon Center Coordinates', ''),  # noqa
-        '0043xx32': ('SS', '1', 'Vas flags', ''),  # noqa
+        '0043xx32': ('SS', '1', 'Was flags', ''),  # noqa
         '0043xx33': ('FL', '1', 'Neg_scanspacing', ''),  # noqa
         '0043xx34': ('IS', '1', 'Offset Frequency', ''),  # noqa
         '0043xx35': ('UL', '1', 'User_usage_tag', ''),  # noqa
@@ -2974,7 +2974,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xxd0': ('FL', '1', 'PET vqc_z_axis_roll', ''),  # noqa
         '0009xxd1': ('LO', '1', 'PET ctac_conv_scale', ''),  # noqa
         '0009xxd2': ('UI', '1', 'PET image_set_id', ''),  # noqa
-        '0009xxd3': ('SL', '1', 'PET constrast_route', ''),  # noqa
+        '0009xxd3': ('SL', '1', 'PET contrast_route', ''),  # noqa
         '0009xxd4': ('LO', '1', 'PET ctac_conv_scale', ''),  # noqa
         '0009xxd5': ('FL', '1', 'PET loop_filter_parm', ''),  # noqa
         '0009xxd6': ('FL', '1', 'PET image_one_loc', ''),  # noqa
@@ -3178,7 +3178,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx82': ('FL', '1', 'Simpson End Systolic Volume ml/m2', ''),  # noqa
         '0009xx84': ('FL', '1', 'Simpson Stroke Volume ml/m2', ''),  # noqa
     },
-    'GEMS_RELA_01': {
+    'GEMS_REAL_01': {
         '002110xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
         '0021xx03': ('SS', '1', 'Series from which Prescribed', ''),  # noqa
         '0021xx05': ('SH', '1', 'Genesis Version - now', ''),  # noqa
@@ -7286,7 +7286,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx93': ('FL', '1', 'Filter Cutoff Frequency', ''),  # noqa
         '0055xx94': ('FL', '1', 'Filter Alpha Coefficient', ''),  # noqa
         '0055xx95': ('FL', '1', 'Filter Order', ''),  # noqa
-        '0055xx96': ('FL', '1', 'Attenuation Cooefficient', ''),  # noqa
+        '0055xx96': ('FL', '1', 'Attenuation Coefficient', ''),  # noqa
         '0055xx97': ('SS', '1', 'Percent Ray', ''),  # noqa
         '0055xx98': ('SS', '1', 'Astigmatic Collimator 1 Neuro 2 Cardiac', ''),  # noqa
         '0055xx99': ('SS', '1', 'XP0', ''),  # noqa
@@ -10191,7 +10191,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx51': ('UI', '1', 'VEPRO UID ??', ''),  # noqa
         '0055xx65': ('OB', '1', '??', ''),  # noqa
     },
-    'Varian Medical Systems VISION 3253': {
+    'Variant Medical Systems VISION 3253': {
         '3253xx00': ('UN', '1', 'XML stream.', ''),  # noqa
         '3253xx01': ('UN', '1', 'Data length of the XML stream', ''),  # noqa
         '3253xx02': ('UN', '1', 'Extended Interface Format tag', ''),  # noqa
