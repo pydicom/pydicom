@@ -1,4 +1,4 @@
-name: pr-type-lint-spell
+name: pr-typing
 
 on:
   pull_request:
@@ -30,11 +30,3 @@ jobs:
     - name: Run typing check with mypy
       run: |
         mypy
-
-  check-spelling:
-    name: Check for spelling errors
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: codespell-project/actions-codespell@master
