@@ -68,7 +68,7 @@ ct_name = get_testdata_file("CT_small.dcm")
 mr_name = get_testdata_file("MR_small.dcm")
 truncated_mr_name = get_testdata_file("MR_truncated.dcm")
 jpeg2000_name = get_testdata_file("JPEG2000.dcm")
-jpeg2000_embedded_sequence_delimeter_name = get_testdata_file(
+jpeg2000_embedded_sequence_delimiter_name = get_testdata_file(
     "JPEG2000-embedded-sequence-delimiter.dcm"
 )
 jpeg2000_lossless_name = get_testdata_file("MR_small_jp2klossless.dcm")
@@ -347,7 +347,7 @@ class TestReader:
         ]
         assert expected == ctspecific_tags
 
-    def test_specific_tags_with_other_unkonwn_length_tags(self):
+    def test_specific_tags_with_other_unknown_length_tags(self):
         rtstruct_specific = dcmread(
             rtstruct_name,
             force=True,
@@ -557,7 +557,7 @@ class TestReader:
         """Test ignoring embedded sequence delimiter in encoded pixel
         data fragment. Reproduces #1140.
         """
-        ds = dcmread(jpeg2000_embedded_sequence_delimeter_name)
+        ds = dcmread(jpeg2000_embedded_sequence_delimiter_name)
         assert "OB" == ds[0x7FE00010].VR
         assert 266 == len(ds[0x7FE00010].value)
 
