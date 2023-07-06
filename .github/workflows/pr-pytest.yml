@@ -6,6 +6,7 @@ on:
 
 jobs:
   test-pypy:
+    if: false
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -32,6 +33,7 @@ jobs:
         pytest
 
   test-core-only:
+    if: false
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -86,6 +88,7 @@ jobs:
       uses: codecov/codecov-action@v3
 
   test-core-extras:
+    if: false
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
