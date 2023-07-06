@@ -90,7 +90,7 @@ class TestEncoder:
         assert {} == enc._available
         assert {} == enc._unavailable
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is available")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_add_plugin_function_missing(self):
         """Test encoding function missing when adding a plugin."""
         enc = Encoder(RLELossless)
@@ -106,7 +106,7 @@ class TestEncoder:
         assert {} == enc._available
         assert {} == enc._unavailable
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_add_plugin_twice(self):
         """Test adding a plugin that already exists."""
         self.enc.add_plugin("foo", ("pydicom.encoders.native", "_encode_frame"))
@@ -119,7 +119,7 @@ class TestEncoder:
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_remove_plugin(self):
         """Test removing a plugin."""
         self.enc.add_plugin("foo", ("pydicom.encoders.native", "_encode_frame"))
@@ -224,7 +224,7 @@ class TestEncoder:
         with pytest.raises(AttributeError, match=msg):
             enc.kwargs_from_ds(ds)
 
-    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_missing_dependencies(self):
         """Test the required encoder being unavailable."""
         enc = RLELosslessEncoder
@@ -912,7 +912,7 @@ class TestEncoder_Preprocess:
 class TestEncoder_Process:
     """Tests for Encoder._process."""
 
-    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_no_plugins(self):
         """Test with no available plugins"""
         enc = Encoder(RLELossless)
@@ -1002,7 +1002,7 @@ class TestDatasetCompress:
         assert not ds.is_implicit_VR
         assert ds.is_little_endian
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
         """Test encode with an arr."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -1056,7 +1056,7 @@ class TestDatasetCompress:
         assert ds.ExtendedOffsetTable == b"\x00" * 8
         assert ds.ExtendedOffsetTableLengths == b"\x66\x53" + b"\x00" * 6
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_round_trip(self):
         """Test an encoding round-trip"""
         ds = get_testdata_file("MR_small_RLE.dcm", read=True)
@@ -1077,7 +1077,7 @@ class TestDatasetCompress:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.PlanarConfiguration == 1
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_override_kwargs(self):
         """Test we can override using kwargs."""
         ds = get_testdata_file("SC_rgb_small_odd.dcm", read=True)

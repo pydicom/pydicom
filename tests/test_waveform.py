@@ -26,7 +26,7 @@ except ImportError:
 ECG = get_testdata_file("waveform_ecg.dcm")
 
 
-@pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+@pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
 def test_waveform_array_raises():
     """Test waveform_array raises exception for all syntaxes."""
     ds = dcmread(ECG)
