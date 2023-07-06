@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for dataset.py"""
+import logging
 
 import pytest
 
@@ -35,17 +36,17 @@ class TestConvertTag:
         assert convert_tag(bytestring, True, 0) == Tag(0x2312, 0x0010)
         assert convert_tag(bytestring, True, 2) == Tag(0x0010, 0x0020)
 
-    @pytest.mark.skip(reason="empty bytestring not handled properly")
     def test_empty_bytestring(self):
         """Test convert_tag with empty bytestring"""
         bytestring = b""
-        assert convert_tag(bytestring, True) == ""
+        with pytest.raises(ValueError, match="byte string too short*"):
+            convert_tag(bytestring, True)
 
-    @pytest.mark.skip(reason="bad bytestring not handled properly")
     def test_bad_bytestring(self):
         """Test convert_tag with a bad bytestring"""
         bytestring = b"\x10\x00"
-        convert_tag(bytestring, True)
+        with pytest.raises(ValueError, match="byte string too short*"):
+            convert_tag(bytestring, True)
 
 
 class TestConvertAE:
@@ -176,14 +177,16 @@ class TestConvertAT:
         bytestring = b""
         assert convert_ATvalue(bytestring, True) == []
 
-    @pytest.mark.skip(reason="bad bytestring not handled properly")
-    def test_bad_length(self):
+    def test_bad_length(self, caplog):
         """Test convert_ATvalue with bad length bytestring"""
-        bytestring = b""
-        assert convert_ATvalue(bytestring, True) == ""
-
         bytestring = b"\x10\x00\x20\x00\x10\x00\x30\x00\x10"
-        convert_ATvalue(bytestring, True)
+        out = convert_ATvalue(bytestring, True)
+        assert Tag(0x0010, 0x0020) in out
+        assert Tag(0x0010, 0x0030) in out
+        assert len(caplog.records) == 1
+        assert caplog.records[0].levelno == logging.WARNING
+        assert (caplog.records[0].message ==
+                "Expected length to be multiple of 4 for VR 'AT', got length 9")
 
 
 class TestConvertDA:
