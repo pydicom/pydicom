@@ -1,0 +1,27 @@
+name: merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        # Do the ones not covered in PR workflow
+        os: [ubuntu, macos, PyPy]
+        python-version: ["3.10"]  # , "3.12" except PyPy
+        test-extras: [false]
+        upload-coverage: [false]
+        include:
+          - os: windows
+            python-version: "3.11"
+            test-extras: true
+            upload-coverage: true
+    uses: ./.github/workflows/tests_wf.yml
+    with: 
+      os: ${{ matrix.os }}
+      python-version:  ${{ matrix.python-version }}
+      test-extras: ${{ matrix.test-extras }}
+      upload-coverage: ${{ matrix.upload-coverage }}
