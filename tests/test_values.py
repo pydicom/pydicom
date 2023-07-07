@@ -185,8 +185,10 @@ class TestConvertAT:
         assert Tag(0x0010, 0x0030) in out
         assert len(caplog.records) == 1
         assert caplog.records[0].levelno == logging.WARNING
-        assert (caplog.records[0].message ==
-                "Expected length to be multiple of 4 for VR 'AT', got length 9")
+        assert (
+            caplog.records[0].message
+            == "Expected length to be multiple of 4 for VR 'AT', got length 9"
+        )
 
 
 class TestConvertDA:

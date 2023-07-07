@@ -69,7 +69,7 @@ def convert_tag(byte_string: bytes, is_little_endian: bool, offset: int = 0) -> 
     if len(byte_string) < 4:
         raise ValueError("byte string too short - must be at least 4 bytes long.")
     fmt = "<HH" if is_little_endian else ">HH"
-    value = cast(tuple[int, int], unpack(fmt, byte_string[offset: offset + 4]))
+    value = cast(tuple[int, int], unpack(fmt, byte_string[offset : offset + 4]))
     return TupleTag(value)
 
 
