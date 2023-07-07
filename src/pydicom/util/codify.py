@@ -187,7 +187,9 @@ def code_sequence(
         var_names = deque()
 
     def unique_name(name: str) -> str:
-        name_count = cast(deque, var_names).count(name) - 1
+        name_count = (
+            cast(deque, var_names).count(name) - 1
+        )  # type:ignore[redundant-cast]
         return name if name_count == 0 else name + f"_{name_count}"
 
     lines = []

@@ -33,23 +33,42 @@ version = "3.0.0.dev0"
 
 [project.optional-dependencies]
 docs = [
-        "numpy",
-        "numpydoc",
-        "matplotlib",
-        "pillow",
-        "sphinx",
-        "sphinx_rtd_theme",
-        "sphinx-gallery",
-        "sphinxcontrib-napoleon",
-        "sphinx-copybutton"
+    "numpy",
+    "numpydoc",
+    "matplotlib",
+    "pillow",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-gallery",
+    "sphinxcontrib-napoleon",
+    "sphinx-copybutton"
 ]
+
 dev = [
     "black==23.3.0",
     "mypy==1.4.1",
+    "pydicom-data",
     "pytest",
     "pytest-cov",
     "ruff==0.0.277",
+    "types-requests"
 ]
+
+basic = ["numpy"]
+
+pixeldata = [
+    "numpy",
+    "pillow", # leave out? Better alternatives below
+    "pyjpegls",
+    "pylibjpeg[openjpeg]",
+    "pylibjpeg[rle]",
+    "python-gdcm"
+]        
+
+# Consider libjpeg-turbo (BSD-like license) when 12-bit available
+# https://github.com/libjpeg-turbo/libjpeg-turbo/issues/199
+gpl-license = ["pylibjpeg[libjpeg]"]
+
 
 [project.urls]
 documentation = "https://pydicom.github.io/pydicom"
@@ -118,8 +137,8 @@ python_version = "3.10"
 files = "src/"
 exclude = ["src/pydicom/benchmarks/", "src/pydicom/pixel_data_handlers/pillow_handler.py"]
 show_error_codes = true
-warn_redundant_casts = true
-warn_unused_ignores = true
+warn_redundant_casts = false
+warn_unused_ignores = false
 warn_return_any = true
 warn_unreachable = false
 ignore_missing_imports = true
