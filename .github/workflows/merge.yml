@@ -19,6 +19,14 @@ jobs:
             python-version: "3.11"
             test-extras: true
             upload-coverage: true
+          - os: macos
+            python-version: "3.10"
+            test-extras: true
+        exclude:
+          # for combo with test-extras, already includes false tests, so remove from matrix
+          - os: macos
+            python-version: "3.10"
+            test-extras: false
     uses: ./.github/workflows/tests_wf.yml
     with: 
       os: ${{ matrix.os }}
