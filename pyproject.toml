@@ -51,6 +51,7 @@ dev = [
     "pytest",
     "pytest-cov",
     "ruff==0.0.277",
+    "types-requests"
 ]
 
 basic = ["numpy"]
