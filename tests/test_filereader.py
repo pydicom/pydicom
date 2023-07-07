@@ -1281,7 +1281,6 @@ class TestReadDataElement:
         new = DataElement(0xFFFE0002, "SV", 2**63 - 1)
         assert elem == new
 
-    @pytest.mark.skip("No public elements with VR of SV")
     def test_read_SV_explicit_little(self):
         """Check reading element with VR of SV encoded as explicit"""
         ds = dcmread(self.fp_ex, force=True)

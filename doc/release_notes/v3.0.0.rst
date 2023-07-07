@@ -5,7 +5,8 @@ Changes
 -------
 * Removed support for Python <= 3.9
 * compat module removed
-
+* values with VR AE with an incorrect value length are now handled
+  gracefully (extra bytes are ignored with a warning)
 
 Enhancements
 ------------
