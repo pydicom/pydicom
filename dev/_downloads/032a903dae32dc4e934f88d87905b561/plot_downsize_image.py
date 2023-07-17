@@ -30,9 +30,7 @@ data = ds.pixel_array
 print(f"The image has {data.shape[0]} x {data.shape[1]} voxels")
 data_downsampling = data[::8, ::8]
 print(
-    "The downsampled image has {} x {} voxels".format(
-        data_downsampling.shape[0], data_downsampling.shape[1]
-    )
+    f"The downsampled image has {data_downsampling.shape[0]} x {data_downsampling.shape[1]} voxels"
 )
 
 # copy the data back to the original data set
