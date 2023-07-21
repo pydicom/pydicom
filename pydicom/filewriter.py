@@ -96,7 +96,8 @@ def _correct_ambiguous_vr_element(
         while (
             'PixelRepresentation' not in ds
             and ds.parent_seq is not None
-            and ds.parent_seq().parent_dataset()   # type: ignore
+            and ds.parent_seq().parent_dataset is not None  # type: ignore[union-attr]
+            and ds.parent_seq().parent_dataset()  # type: ignore
         ):
             # Make weakrefs into strong refs (locally here) by calling () them
             ds = ds.parent_seq().parent_dataset()  # type: ignore
