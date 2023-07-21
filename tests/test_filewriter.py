@@ -167,6 +167,29 @@ class TestWriteFile:
         them identical (JPEG2K file)."""
         self.compare(jpeg_name)
 
+    def test_None_parent(self):
+        """Ensure can write nested sequence with no parent dataset"""
+        # from issues 1836, 1838, 1839
+
+        # (0040,9096)  Real World Value Mapping Sequence  1 item(s) ----
+        #    (0040,9211) Real World Value Last Value Mapped  US: 8699
+        byts = (
+            b"\0" * 128
+            + b"DICM"
+            + bytes.fromhex(
+                "4000 9690 FFFFFFFF"  # (0040,9096) Sequence undefined length
+                "  FEFF 00E0 FFFFFFFF"  # Sequence Item undefined length
+                "    4000 1192 02000000"  # (0040,9211) length 2
+                "    FB 21                  "  # value
+                "  FEFF 0DE0 00000000"  # Item Delimiter
+                "FEFF DDE0 00000000"  # Sequence Delimiter
+            )
+        )
+
+        ds = dcmread(BytesIO(byts))
+        # original bug raises 'NoneType' object is not callable on decode
+        ds.decode()
+
     def test_pathlib_path_filename(self):
         """Check that file can be written using pathlib.Path"""
         ds = dcmread(Path(ct_name))
