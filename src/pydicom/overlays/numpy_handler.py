@@ -215,7 +215,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     elem_values = {kk: vv.value for kk, vv in elem.items()}
 
     # Add in if not present
-    nr_frames: Optional["DataElement"] = ds.get((group, 0x0015), None)
+    nr_frames: DataElement | None = ds.get((group, 0x0015), None)
     if nr_frames is None:
         elem_values["NumberOfFramesInOverlay"] = 1
     else:

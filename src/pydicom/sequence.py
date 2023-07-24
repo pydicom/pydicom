@@ -52,7 +52,7 @@ class Sequence(MultiValue[Dataset]):
             raise TypeError("The Sequence constructor requires an iterable")
 
         # the parent dataset
-        self._parent_dataset: "weakref.ReferenceType[Dataset] | None" = None
+        self._parent_dataset: weakref.ReferenceType[Dataset] | None = None
 
         # validate_dataset is used as a pseudo type_constructor
         self._list: list[Dataset] = []

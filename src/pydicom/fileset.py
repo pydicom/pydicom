@@ -187,9 +187,9 @@ class RecordNode(Iterable["RecordNode"]):
         record : pydicom.dataset.Dataset, optional
             A *Directory Record Sequence's* directory record.
         """
-        self.children: list["RecordNode"] = []
+        self.children: list[RecordNode] = []
         self.instance: FileInstance | None = None
-        self._parent: Optional["RecordNode"] = None
+        self._parent: RecordNode | None = None
         self._record: Dataset
 
         if record:

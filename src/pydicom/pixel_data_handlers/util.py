@@ -265,7 +265,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         else:
             unc_data = cast(list[int], item.LUTData)
 
-        lut_data: "np.ndarray" = np.asarray(unc_data, dtype=dtype)
+        lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
@@ -441,7 +441,7 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     else:
         unc_data = cast(list[int], item.LUTData)
 
-    lut_data: "np.ndarray" = np.asarray(unc_data, dtype=dtype)
+    lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
     clipped_iv = np.zeros(arr.shape, dtype=dtype)
