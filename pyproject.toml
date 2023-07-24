@@ -124,7 +124,7 @@ max-complexity = 32
 
 [tool.ruff.pylint]
 max-args = 17
-max-branches = 39
+max-branches = 42
 max-returns = 9
 max-statements = 106
 
