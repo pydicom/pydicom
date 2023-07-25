@@ -20,7 +20,7 @@ except ImportError:
     HAVE_JPEGLS = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
-from pydicom.pixel_data_handlers.util import pixel_dtype
+from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -107,7 +107,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     pixel_bytes = bytearray()
 
-    nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
+    nr_frames = get_nr_frames(ds)
     if nr_frames > 1:
         for src in decode_data_sequence(ds.PixelData):
             frame = jpeg_ls.decode(numpy.frombuffer(src, dtype="u1"))

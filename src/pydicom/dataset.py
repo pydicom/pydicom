@@ -73,6 +73,7 @@ from pydicom.pixel_data_handlers.util import (
     convert_color_space,
     reshape_pixel_array,
     get_image_pixel_ids,
+    get_nr_frames,
 )
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType
 from pydicom.uid import (
@@ -1761,7 +1762,7 @@ class Dataset:
         encoded = [f for f in frame_iterator]
 
         # Encapsulate the encoded *Pixel Data*
-        nr_frames = getattr(self, "NumberOfFrames", 1) or 1
+        nr_frames = get_nr_frames(self)
         total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
         if encapsulate_ext or total > 2**32 - 1:
             (

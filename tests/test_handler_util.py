@@ -874,12 +874,12 @@ class TestNumpy_ReshapePixelArray:
             assert (4, 5, 3) == arr.shape
             assert np.array_equal(arr, self.ref_1_3)
 
-    def test_invalid_nr_frames_raises(self):
-        """Test an invalid Number of Frames value raises exception."""
+    def test_invalid_nr_frames_warns(self):
+        """Test an invalid Number of Frames value shows an warning."""
         self.ds.SamplesPerPixel = 1
         self.ds.NumberOfFrames = 0
         # Need to escape brackets
-        with pytest.raises(ValueError, match=r"value of 0 for \(0028,0008\)"):
+        with pytest.warns(UserWarning, match=r"value of 0 for \(0028,0008\)"):
             reshape_pixel_array(self.ds, RESHAPE_ARRAYS["1frame_1sample"])
 
     def test_invalid_samples_raises(self):
@@ -2597,6 +2597,18 @@ class TestGetNrFrames:
         ds.NumberOfFrames = None
         msg = (
             r"A value of None for \(0028,0008\) 'Number of Frames' is "
+            r"non-conformant. It's recommended that this value be "
+            r"changed to 1"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            assert 1 == get_nr_frames(ds)
+
+    def test_zero(self):
+        """Test warning when (0028,0008) 'Number of Frames' has a value of 0"""
+        ds = Dataset()
+        ds.NumberOfFrames = 0
+        msg = (
+            r"A value of 0 for \(0028,0008\) 'Number of Frames' is "
             r"non-conformant. It's recommended that this value be "
             r"changed to 1"
         )

@@ -49,7 +49,7 @@ except ImportError:
     HAVE_RLE = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
-from pydicom.pixel_data_handlers.util import pixel_dtype
+from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
 from pydicom.encoders.native import _encode_frame
 import pydicom.uid
 
@@ -155,7 +155,7 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = ">") -> "np.ndarray":
 
     nr_bits = cast(int, ds.BitsAllocated)
     nr_samples = cast(int, ds.SamplesPerPixel)
-    nr_frames = cast(int, getattr(ds, "NumberOfFrames", 1) or 1)
+    nr_frames = get_nr_frames(ds)
     rows = cast(int, ds.Rows)
     cols = cast(int, ds.Columns)
 
