@@ -425,12 +425,12 @@ class Dataset:
         self.is_undefined_length_sequence_item = False
 
         # the parent data set, if this dataset is a sequence item
-        self._parent_seq: "weakref.ReferenceType[Sequence] | None" = None
+        self._parent_seq: weakref.ReferenceType[Sequence] | None = None
 
         # known private creator blocks
         self._private_blocks: dict[tuple[int, str], PrivateBlock] = {}
 
-        self._pixel_array: Optional["numpy.ndarray"] = None
+        self._pixel_array: numpy.ndarray | None = None
         self._pixel_id: dict[str, int] = {}
 
         self.file_meta: FileMetaDataset
@@ -2721,7 +2721,7 @@ class FileDataset(Dataset):
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
-        self.file_meta: "FileMetaDataset" = (
+        self.file_meta: FileMetaDataset = (
             file_meta if file_meta is not None else FileMetaDataset()
         )
         self.is_implicit_VR: bool = is_implicit_VR

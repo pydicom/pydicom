@@ -231,7 +231,7 @@ class DataElement:
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
         self.private_creator: str | None = None
-        self.parent: Optional["Dataset"] = None
+        self.parent: Dataset | None = None
 
     def validate(self, value: Any) -> None:
         """Validate the current value against the DICOM standard.
