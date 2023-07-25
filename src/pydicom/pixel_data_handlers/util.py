@@ -1121,28 +1121,32 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
     return {}
 
 
-def get_nr_frames(ds: "Dataset") -> int:
-    """Return NumberOfFrames or 1 if NumberOfFrames is None.
+def get_nr_frames(ds: "Dataset", warn: bool = True) -> int:
+    """Return NumberOfFrames or 1 if NumberOfFrames is None or 0.
 
     Parameters
     ----------
     ds : dataset.Dataset
         The :class:`~pydicom.dataset.Dataset` containing the Image Pixel module
         corresponding to the data in `arr`.
+    warn : bool
+        If ``True`` (the default), a warning is issued if NumberOfFrames
+        has an invalid value.
 
     Returns
     -------
     int
-        An integer for the NumberOfFrames or 1 if NumberOfFrames is None
+        An integer for the NumberOfFrames or 1 if NumberOfFrames is None or 0
     """
     nr_frames: int | None = getattr(ds, "NumberOfFrames", 1)
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
-    if nr_frames is None:
-        warnings.warn(
-            "A value of None for (0028,0008) 'Number of Frames' is "
-            "non-conformant. It's recommended that this value be "
-            "changed to 1"
-        )
+    if not nr_frames:  # None or 0
+        if warn:
+            warnings.warn(
+                f"A value of {nr_frames} for (0028,0008) 'Number of Frames' is "
+                "non-conformant. It's recommended that this value be "
+                "changed to 1"
+            )
         nr_frames = 1
 
     return nr_frames
@@ -1402,12 +1406,6 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
 
     nr_frames = get_nr_frames(ds)
     nr_samples = cast(int, ds.SamplesPerPixel)
-
-    if nr_frames < 1:
-        raise ValueError(
-            f"Unable to reshape the pixel array as a value of {nr_frames} for "
-            "(0028,0008) 'Number of Frames' is invalid."
-        )
 
     if nr_samples < 1:
         raise ValueError(

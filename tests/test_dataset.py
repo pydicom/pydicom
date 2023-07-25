@@ -1540,6 +1540,15 @@ class TestDataset:
         assert get_image_pixel_ids(ds) == ds._pixel_id
         assert "Test Value" == ds._pixel_array
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+    def test_invalid_nr_frames_warns(self):
+        """Test an invalid Number of Frames value shows an warning."""
+        fpath = get_testdata_file("CT_small.dcm")
+        ds = dcmread(fpath)
+        ds.NumberOfFrames = 0
+        with pytest.warns(UserWarning, match=r"value of 0 for \(0028,0008\)"):
+            assert ds.pixel_array is not None
+
     def test_pixel_array_id_changed(self):
         """Test that we try to get new pixel data if the id has changed."""
         fpath = get_testdata_file("CT_small.dcm")

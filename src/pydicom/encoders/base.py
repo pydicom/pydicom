@@ -6,6 +6,7 @@ import sys
 from typing import Union, cast, TYPE_CHECKING, Any
 from collections.abc import Callable, Iterator, Iterable
 
+from pydicom.pixel_data_handlers.util import get_nr_frames
 from pydicom.uid import (
     UID,
     JPEGBaseline8Bit,
@@ -400,7 +401,7 @@ class Encoder:
         from pydicom.dataset import Dataset
 
         if isinstance(src, Dataset):
-            nr_frames = cast(str | None, src.get("NumberOfFrames", 1))
+            nr_frames = get_nr_frames(src, warn=False)
             for idx in range(int(nr_frames or 1)):
                 yield self._encode_dataset(
                     src, idx, encoding_plugin, decoding_plugin, **kwargs
@@ -474,7 +475,7 @@ class Encoder:
         photometric_interpretation = cast(str, ds.PhotometricInterpretation)
 
         # IS, may be missing, None or "1", "2", ...
-        nr_frames = cast(str | None, ds.get("NumberOfFrames", 1))
+        nr_frames = get_nr_frames(ds, warn=False)
 
         return {
             "rows": rows,

@@ -103,6 +103,7 @@ from pydicom.pixel_data_handlers.util import (
     get_expected_length,
     reshape_pixel_array,
     get_j2k_parameters,
+    get_nr_frames,
 )
 from pydicom.uid import (
     JPEGBaseline8Bit,
@@ -262,7 +263,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     decoder = _DECODERS[tsyntax]
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
-    nr_frames = getattr(ds, "NumberOfFrames", 1)
+    nr_frames = get_nr_frames(ds, warn=False)
     pixel_module = ds.group_dataset(0x0028)
     dtype = pixel_dtype(ds)
 
@@ -324,7 +325,7 @@ def get_pixeldata(ds: "Dataset") -> "np.ndarray":
         The contents of (7FE0,0010) *Pixel Data* as a 1D array.
     """
     expected_len = get_expected_length(ds, "pixels")
-    frame_len = expected_len // getattr(ds, "NumberOfFrames", 1)
+    frame_len = expected_len // get_nr_frames(ds)
     # Empty destination array for our decoded pixel data
     arr = np.empty(expected_len, pixel_dtype(ds))
 

@@ -7,6 +7,8 @@ Changes
 * compat module removed
 * values with VR AE with an incorrect value length are now handled
   gracefully (extra bytes are ignored with a warning)
+* a value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued
+  on reading the pixel data (:issue:`1844`)
 
 Enhancements
 ------------

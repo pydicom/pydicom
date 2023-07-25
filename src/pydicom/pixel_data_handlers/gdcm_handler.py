@@ -36,6 +36,7 @@ from pydicom.pixel_data_handlers.util import (
     get_expected_length,
     pixel_dtype,
     get_j2k_parameters,
+    get_nr_frames,
 )
 
 
@@ -112,7 +113,7 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     tsyntax = ds.file_meta.TransferSyntaxUID
     data_element = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
     if tsyntax.is_compressed:
-        if getattr(ds, "NumberOfFrames", 1) > 1:
+        if get_nr_frames(ds, warn=False) > 1:
             pixel_data_sequence = pydicom.encaps.decode_data_sequence(ds.PixelData)
         else:
             pixel_data_sequence = [pydicom.encaps.defragment_data(ds.PixelData)]
@@ -145,7 +146,7 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     gdcm.Image
     """
     image = gdcm.Image()
-    number_of_frames = getattr(ds, "NumberOfFrames", 1)
+    number_of_frames = get_nr_frames(ds, warn=False)
     image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
     image.SetDimensions((ds.Columns, ds.Rows, number_of_frames))
     image.SetDataElement(data_element)
@@ -283,7 +284,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     tsyntax = ds.file_meta.TransferSyntaxUID
     if config.APPLY_J2K_CORRECTIONS and tsyntax in [JPEG2000, JPEG2000Lossless]:
-        nr_frames = getattr(ds, "NumberOfFrames", 1)
+        nr_frames = get_nr_frames(ds)
         codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
 
         params = get_j2k_parameters(codestream)

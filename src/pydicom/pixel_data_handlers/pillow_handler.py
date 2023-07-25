@@ -31,7 +31,11 @@ except ImportError:
 
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_parameters
+from pydicom.pixel_data_handlers.util import (
+    pixel_dtype,
+    get_j2k_parameters,
+    get_nr_frames,
+)
 from pydicom.uid import (
     UID,
     JPEG2000,
@@ -195,7 +199,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     columns = cast(int, ds.Columns)
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
-    nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
+    nr_frames = get_nr_frames(ds)
 
     pixel_bytes = bytearray()
     if nr_frames > 1:
