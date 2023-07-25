@@ -110,6 +110,8 @@
 <li><p>compat module removed</p></li>
 <li><p>values with VR AE with an incorrect value length are now handled
 gracefully (extra bytes are ignored with a warning)</p></li>
+<li><p>a value of 0 for <code class="docutils literal notranslate"><span class="pre">NumberOfFrames</span></code> is now handled as 1 frame, with a user warning issued
+on reading the pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1844">#1844</a>)</p></li>
 </ul>
 </section>
 <section id="enhancements">
