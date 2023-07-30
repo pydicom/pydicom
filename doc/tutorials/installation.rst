@@ -166,16 +166,16 @@ Using pip::
 Install the development version
 ===============================
 
-To install a snapshot of the latest code (the ``master`` branch) from
+To install a snapshot of the latest code (the ``main`` branch) from
 :gh:`GitHub <pydicom>`::
 
   pip install git+https://github.com/pydicom/pydicom
 
-The ``master`` branch is under active development and while it is usually
+The ``main`` branch is under active development and while it is usually
 stable, it may have undocumented changes or bugs.
 
 If you want to keep up-to-date with the latest code, make sure you have
-`Git <https://git-scm.com/>`_ installed and then clone the ``master``
+`Git <https://git-scm.com/>`_ installed and then clone the ``main``
 branch (this will create a ``pydicom`` directory in your current directory)::
 
   git clone --depth=1 https://github.com/pydicom/pydicom.git
