@@ -218,9 +218,6 @@ def private(dicomdir):
     ds.DirectoryRecordSequence.append(bottom)
     bottom.seq_item_tell = offset
 
-    # Redo the record parsing to reflect changes
-    ds.parse_records()
-
     return ds
 
 
@@ -479,7 +476,6 @@ class TestGenerateFilename:
             next(generate_filename("A" * 8))
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestRecordNode:
     """Tests for RecordNode."""
 
@@ -761,7 +757,6 @@ class TestRecordNode:
             instance.node._file_id
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileInstance:
     """Tests for FileInstance."""
 
@@ -1052,7 +1047,6 @@ class TestFileInstance:
         assert ExplicitVRLittleEndian == instance.TransferSyntaxUID
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet:
     """Tests for FileSet."""
 
@@ -1873,7 +1867,6 @@ class TestFileSet:
         ) in str(fs)
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Load:
     """Tests for a loaded File-set."""
 
@@ -2096,8 +2089,7 @@ class TestFileSet_Load:
 
     def test_load_dicomdir_big_endian(self, dicomdir, tdir):
         """Test loading a big endian DICOMDIR"""
-        with pytest.warns(UserWarning):
-            ds = dcmread(BIGENDIAN_TEST_FILE)
+        ds = dcmread(BIGENDIAN_TEST_FILE)
         msg = (
             r"The DICOMDIR dataset uses an invalid transfer syntax "
             r"'Explicit VR Big Endian' and will be updated to use 'Explicit "
@@ -2117,8 +2109,7 @@ class TestFileSet_Load:
 
     def test_load_dicomdir_implicit(self, dicomdir, tdir):
         """Test loading an implicit VR DICOMDIR."""
-        with pytest.warns(UserWarning):
-            ds = dcmread(IMPLICIT_TEST_FILE)
+        ds = dcmread(IMPLICIT_TEST_FILE)
         msg = (
             r"The DICOMDIR dataset uses an invalid transfer syntax "
             r"'Implicit VR Little Endian' and will be updated to use "
@@ -2162,7 +2153,6 @@ class TestFileSet_Load:
         assert fs.UID == dicomdir.file_meta.MediaStorageSOPInstanceUID
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Modify:
     """Tests for a modified File-set."""
 
@@ -2316,12 +2306,11 @@ class TestFileSet_Modify:
         fs = FileSet(ds)
         with pytest.warns(UserWarning):
             fs.write(force_implicit=True, use_existing=True)
-        with pytest.warns(UserWarning):
-            ds = dcmread(Path(fs.path) / "DICOMDIR")
+
+        ds = dcmread(Path(fs.path) / "DICOMDIR")
         assert ImplicitVRLittleEndian == ds.file_meta.TransferSyntaxUID
 
-        with pytest.warns(UserWarning):
-            ref_ds = dcmread(IMPLICIT_TEST_FILE)
+        ref_ds = dcmread(IMPLICIT_TEST_FILE)
         assert Dataset(ref_ds) == ds
 
         ref = FileSet(dicomdir)
@@ -2485,7 +2474,6 @@ class TestFileSet_Modify:
         assert item.ReferencedFileID == ["98892003", "MR700", "4648"]
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Copy:
     """Tests for copying a File-set."""
 
@@ -2735,7 +2723,6 @@ REFERENCE_4LEVEL = [
 ]
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 @pytest.mark.parametrize("rtype, sop", REFERENCE_1LEVEL)
 def test_one_level_record(rtype, sop, dummy, tdir):
     """Test adding instances that require a single level hierarchy."""
@@ -2762,7 +2749,6 @@ def test_one_level_record(rtype, sop, dummy, tdir):
     fs.add(ds)
 
 
-@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 @pytest.mark.parametrize("rtype, sop, modality, kw", REFERENCE_4LEVEL)
 def test_four_level_record(rtype, sop, modality, kw, dummy, tdir):
     """Test adding instances that require the 4-level hierarchy."""

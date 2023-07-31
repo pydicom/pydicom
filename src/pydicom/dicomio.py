@@ -4,7 +4,7 @@ import warnings
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    from pydicom.filereader import read_file, read_dicomdir
+    from pydicom.filereader import read_file
     from pydicom.filewriter import write_file
 
 from pydicom.filereader import dcmread

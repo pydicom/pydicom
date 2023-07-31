@@ -1502,22 +1502,6 @@ class TestDataset:
         with dcmread(test_file) as ds:
             assert "CompressedSamples^CT1" == ds.PatientName
 
-    def test_invalid_dicomdir_handled_as_filedataset(self):
-        ds = Dataset()
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-        ds.file_meta.MediaStorageSOPClassUID = MediaStorageDirectoryStorage
-        ds.PatientName = "Doe^John"
-        fp = DicomBytesIO()
-        ds.save_as(fp)
-        msg = (
-            "The SOP Class 'Media Storage Directory Storage' does"
-            "not match the contents of the dataset*"
-        )
-        with pytest.warns(UserWarning, match=msg):
-            ds = dcmread(fp, force=True)
-        assert ds.PatientName == "Doe^John"
-
     def test_exit_exception(self):
         """Test Dataset.__exit__ when an exception is raised."""
 
