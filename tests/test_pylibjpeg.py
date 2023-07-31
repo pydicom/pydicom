@@ -756,6 +756,7 @@ class TestJPEG2K:
         with pytest.warns(UserWarning, match=msg):
             arr = ds.pixel_array
 
+        assert 1 == ds.PixelRepresentation
         assert "int16" == arr.dtype
         assert (512, 512) == arr.shape
         assert arr.flags.writeable

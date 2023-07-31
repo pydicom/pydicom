@@ -16,6 +16,9 @@ Enhancements
 
 Fixes
 -----
+* Fixed the GDCM and pylibjpeg handlers changing the *Pixel Representation* value to 0
+  when the J2K stream disagrees with the dataset and
+  :attr:`~pydicom.config.APPLY_J2K_CORRECTIONS` is `True` (:issue:`1689`)
 
 Pydicom Internals
 -----------------

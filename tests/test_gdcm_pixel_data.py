@@ -519,6 +519,7 @@ class TestsWithGDCM:
         assert 13 == params["precision"]
         assert not params["is_signed"]
         arr = ds.pixel_array
+        assert 1 == ds.PixelRepresentation
 
         assert "int16" == arr.dtype
         assert (512, 512) == arr.shape

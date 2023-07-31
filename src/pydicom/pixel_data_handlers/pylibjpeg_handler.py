@@ -47,6 +47,7 @@ values given in the table below.
 
 """
 
+from copy import deepcopy
 import logging
 from typing import TYPE_CHECKING, cast
 from collections.abc import Iterable
@@ -264,7 +265,8 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
     nr_frames = get_nr_frames(ds, warn=False)
-    pixel_module = ds.group_dataset(0x0028)
+    # Need a copy of the pixel module to avoid modifying the original
+    pixel_module = deepcopy(ds.group_dataset(0x0028))
     dtype = pixel_dtype(ds)
 
     bits_stored = cast(int, ds.BitsStored)

@@ -3,6 +3,7 @@
 pixel transfer syntaxes.
 """
 
+from copy import deepcopy
 import os
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
@@ -294,7 +295,8 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         if not j2k_sign and ds.PixelRepresentation == 1:
             # Convert unsigned J2K data to 2's complement
             shift = cast(int, ds.BitsAllocated) - j2k_precision
-            pixel_module = ds.group_dataset(0x0028)
+            # Need a copy of the pixel module to avoid modifying the original
+            pixel_module = deepcopy(ds.group_dataset(0x0028))
             pixel_module.PixelRepresentation = 0
             dtype = pixel_dtype(pixel_module)
             arr = (arr.astype(dtype) << shift).astype(numpy_dtype) >> shift
