@@ -122,6 +122,11 @@ on reading the pixel data (<a class="reference external" href="https://github.co
 </section>
 <section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed the GDCM and pylibjpeg handlers changing the <em>Pixel Representation</em> value to 0
+when the J2K stream disagrees with the dataset and
+<a class="reference internal" href="../reference/generated/pydicom.config.APPLY_J2K_CORRECTIONS.html#pydicom.config.APPLY_J2K_CORRECTIONS" title="pydicom.config.APPLY_J2K_CORRECTIONS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">APPLY_J2K_CORRECTIONS</span></code></a> is <cite>True</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1689">#1689</a>)</p></li>
+</ul>
 </section>
 <section id="pydicom-internals">
 <h2>Pydicom Internals<a class="headerlink" href="#pydicom-internals" title="Permalink to this heading">¶</a></h2>
