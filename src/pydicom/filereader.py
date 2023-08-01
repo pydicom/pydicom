@@ -23,7 +23,6 @@ from pydicom.dataelem import (
     empty_value_for_VR,
 )
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
-from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFileLike
 from pydicom.fileutil import (
@@ -763,7 +762,7 @@ def read_partial(
     defer_size: int | str | float | None = None,
     force: bool = False,
     specific_tags: list[BaseTag] | None = None,
-) -> FileDataset | DicomDir:
+) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 
     Parameters
@@ -786,7 +785,7 @@ def read_partial(
 
     Returns
     -------
-    dataset.FileDataset or dicomdir.DicomDir
+    dataset.FileDataset
         The read dataset.
 
     See Also
@@ -891,27 +890,7 @@ def read_partial(
     # (0002, 0002) Media Storage SOP Class UID
     elem = file_meta.get(0x00020002, None)
     sop_class = elem.value.name if (elem and elem.VM == 1) else ""
-    if sop_class == "Media Storage Directory Storage":
-        if "DirectoryRecordSequence" not in dataset:
-            warnings.warn(
-                "The SOP Class 'Media Storage Directory Storage' does"
-                "not match the contents of the dataset - handling it"
-                "as a regular dataset instead of a DICOMDIR."
-            )
-            ds_class: type[FileDataset] | type[DicomDir] = FileDataset
-        else:
-            warnings.warn(
-                "The 'DicomDir' class is deprecated and will be removed in"
-                " v3.0, after which 'dcmread()' will return a normal "
-                "'FileDataset' instance for 'Media Storage Directory' "
-                "SOP Instances.",
-                DeprecationWarning,
-            )
-            ds_class = DicomDir
-    else:
-        ds_class = FileDataset
-
-    ds = ds_class(
+    ds = FileDataset(
         fileobj,
         dataset,
         preamble,
@@ -930,7 +909,7 @@ def dcmread(
     stop_before_pixels: bool = False,
     force: bool = False,
     specific_tags: TagListType | None = None,
-) -> FileDataset | DicomDir:
+) -> FileDataset:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the :dcm:`DICOM File
@@ -939,12 +918,6 @@ def dcmread(
     there are missing required Type 1 *File Meta Information Group* elements
     or the entire *File Meta Information* is missing) then you will have to
     set `force` to ``True``.
-
-    .. deprecated:: 2.2
-
-        Returning a :class:`~pydicom.dicomdir.DicomDir` is deprecated and
-        will be removed in v3.0. Use :class:`~pydicom.fileset.FileSet` instead.
-
 
     Examples
     --------
@@ -993,11 +966,9 @@ def dcmread(
 
     Returns
     -------
-    FileDataset or DicomDir
+    FileDataset
         An instance of :class:`~pydicom.dataset.FileDataset` that represents
-        a parsed DICOM file, unless the dataset is a *Media Storage Directory*
-        instance in which case it will be a
-        :class:`~pydicom.dicomdir.DicomDir`.
+        a parsed DICOM file.
 
     Raises
     ------
@@ -1081,46 +1052,6 @@ def __getattr__(name: str) -> Any:
 
 if sys.version_info[:2] < (3, 7):
     read_file = dcmread
-
-
-def read_dicomdir(filename: PathType = "DICOMDIR") -> DicomDir:
-    """Read a DICOMDIR file and return a :class:`~pydicom.dicomdir.DicomDir`.
-
-    This is a wrapper around :func:`dcmread` which gives a default file name.
-
-    .. deprecated:: 2.1
-
-        ``read_dicomdir()`` is deprecated and will be removed in v3.0. Use
-        :func:`~pydicom.filereader.dcmread` instead.
-
-    Parameters
-    ----------
-    filename : str, optional
-        Full path and name to DICOMDIR file to open
-
-    Returns
-    -------
-    DicomDir
-
-    Raises
-    ------
-    InvalidDicomError
-        Raised if filename is not a DICOMDIR file.
-    """
-    warnings.warn(
-        "'read_dicomdir()' is deprecated and will be removed in v3.0, use "
-        "'dcmread()' instead",
-        DeprecationWarning,
-    )
-
-    str_or_obj = path_from_pathlike(filename)
-    ds = dcmread(str_or_obj)
-    if not isinstance(ds, DicomDir):
-        raise InvalidDicomError(
-            f"File '{filename!r}' is not a Media Storage Directory file"
-        )
-
-    return ds
 
 
 def data_element_offset_to_value(is_implicit_VR: bool, VR: str | None) -> int:
