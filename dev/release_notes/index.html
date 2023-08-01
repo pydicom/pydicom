@@ -294,6 +294,10 @@
 gracefully (extra bytes are ignored with a warning)</p></li>
 <li><p>a value of 0 for <code class="docutils literal notranslate"><span class="pre">NumberOfFrames</span></code> is now handled as 1 frame, with a user warning issued
 on reading the pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1844">#1844</a>)</p></li>
+<li><p>The <cite>dicomdir</cite> module and <cite>DicomDir</cite> class have been removed and reading a
+DICOMDIR dataset now returns a normal <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance.
+For handling DICOM File-sets and DICOMDIR datasets use the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class instead.</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -704,7 +708,7 @@ become <code class="docutils literal notranslate"><span class="pre">MultiFrame</
 <li><p><code class="docutils literal notranslate"><span class="pre">PILSupportedCompressedPixelTransferSyntaxes</span></code></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dicomdir.DicomDir.html#pydicom.dicomdir.DicomDir" title="pydicom.dicomdir.DicomDir"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomDir</span></code></a> and the <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module are
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomDir</span></code> and the <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module are
 deprecated and will be removed in v3.0. Use <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>
 instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1211">#1211</a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pydicom.overlay_data_handlers</span></code> is deprecated, use <code class="docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>

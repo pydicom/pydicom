@@ -27,7 +27,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.filereader.read_partial" href="pydicom.filereader.read_partial.html" />
-    <link rel="prev" title="pydicom.filereader.read_dicomdir" href="pydicom.filereader.read_dicomdir.html" /> 
+    <link rel="prev" title="pydicom.filereader.read_deferred_data_element" href="pydicom.filereader.read_deferred_data_element.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -75,7 +75,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../fileio.html">Dataset IO</a><ul class="current">
@@ -85,7 +84,6 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.dcmread.html">pydicom.filereader.dcmread</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_dataset.html">pydicom.filereader.read_dataset</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_deferred_data_element.html">pydicom.filereader.read_deferred_data_element</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_dicomdir.html">pydicom.filereader.read_dicomdir</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.filereader.read_file_meta_info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_partial.html">pydicom.filereader.read_partial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_preamble.html">pydicom.filereader.read_preamble</a></li>
@@ -147,7 +145,7 @@
 <h1>pydicom.filereader.read_file_meta_info<a class="headerlink" href="#pydicom-filereader-read-file-meta-info" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.filereader.read_file_meta_info">
-<span class="sig-prename descclassname"><span class="pre">pydicom.filereader.</span></span><span class="sig-name descname"><span class="pre">read_file_meta_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">PathLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><span class="pre">FileMetaDataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c96297798/pydicom/filereader.py#L681"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filereader.read_file_meta_info" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.filereader.</span></span><span class="sig-name descname"><span class="pre">read_file_meta_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">PathLike</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><span class="pre">FileMetaDataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a28875923/pydicom/filereader.py#L680"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filereader.read_file_meta_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and return the DICOM file meta information only.</p>
 <p>This function is meant to be used in user code, for quickly going through
 a series of files to find one which is referenced to a particular SOP,
@@ -160,7 +158,7 @@ without having to read the entire files.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pydicom.filereader.read_dicomdir.html" class="btn btn-neutral float-left" title="pydicom.filereader.read_dicomdir" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.filereader.read_deferred_data_element.html" class="btn btn-neutral float-left" title="pydicom.filereader.read_deferred_data_element" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pydicom.filereader.read_partial.html" class="btn btn-neutral float-right" title="pydicom.filereader.read_partial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

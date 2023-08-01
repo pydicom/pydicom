@@ -112,6 +112,10 @@
 gracefully (extra bytes are ignored with a warning)</p></li>
 <li><p>a value of 0 for <code class="docutils literal notranslate"><span class="pre">NumberOfFrames</span></code> is now handled as 1 frame, with a user warning issued
 on reading the pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1844">#1844</a>)</p></li>
+<li><p>The <cite>dicomdir</cite> module and <cite>DicomDir</cite> class have been removed and reading a
+DICOMDIR dataset now returns a normal <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance.
+For handling DICOM File-sets and DICOMDIR datasets use the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class instead.</p></li>
 </ul>
 </section>
 <section id="enhancements">

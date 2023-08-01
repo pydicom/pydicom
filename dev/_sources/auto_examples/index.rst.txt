@@ -247,23 +247,6 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read a DICOM :File-set&#x27;s DICOMDIR dataset.">
-
-.. only:: html
-
-  .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_directory_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Read a DICOMDIR dataset</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read and interact with a DICOM File-set.">
 
 .. only:: html

@@ -9,6 +9,10 @@ Changes
   gracefully (extra bytes are ignored with a warning)
 * a value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued
   on reading the pixel data (:issue:`1844`)
+* The `dicomdir` module and `DicomDir` class have been removed and reading a
+  DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
+  For handling DICOM File-sets and DICOMDIR datasets use the 
+  :class:`~pydicom.fileset.FileSet` class instead.
 
 Enhancements
 ------------
