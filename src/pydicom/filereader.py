@@ -1038,22 +1038,6 @@ def dcmread(
     return dataset
 
 
-def __getattr__(name: str) -> Any:
-    if name == "read_file":
-        warnings.warn(
-            "'read_file' is deprecated and will be removed in v3.0, use "
-            "'dcmread' instead",
-            DeprecationWarning,
-        )
-        return globals()["dcmread"]
-
-    raise AttributeError(f"module {__name__} has no attribute {name}")
-
-
-if sys.version_info[:2] < (3, 7):
-    read_file = dcmread
-
-
 def data_element_offset_to_value(is_implicit_VR: bool, VR: str | None) -> int:
     """Return number of bytes from start of data element to start of value"""
     if is_implicit_VR:

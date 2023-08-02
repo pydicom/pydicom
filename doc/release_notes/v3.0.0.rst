@@ -11,8 +11,11 @@ Changes
   on reading the pixel data (:issue:`1844`)
 * The `dicomdir` module and `DicomDir` class have been removed and reading a
   DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
-  For handling DICOM File-sets and DICOMDIR datasets use the 
+  For handling DICOM File-sets and DICOMDIR datasets use the
   :class:`~pydicom.fileset.FileSet` class instead.
+* The `read_file` and `write_file` functions have been removed, use
+  :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwriter`
+  instead.
 
 Enhancements
 ------------
