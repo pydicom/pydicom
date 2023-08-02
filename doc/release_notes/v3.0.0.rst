@@ -4,22 +4,23 @@ Version 3.0.0
 Changes
 -------
 * Removed support for Python <= 3.9
-* compat module removed
-* values with VR AE with an incorrect value length are now handled
+* `compat` module removed
+* Values with VR AE with an incorrect value length are now handled
   gracefully (extra bytes are ignored with a warning)
-* a value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued
+* A value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued
   on reading the pixel data (:issue:`1844`)
 * The `dicomdir` module and `DicomDir` class have been removed and reading a
   DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
   For handling DICOM File-sets and DICOMDIR datasets use the
   :class:`~pydicom.fileset.FileSet` class instead.
 * The `read_file` and `write_file` functions have been removed, use
-  :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwriter`
+  :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite`
   instead.
 
 Enhancements
 ------------
-* Added details of missing required tag information when adding Dataset to Fileset
+* Added details of missing required tag information when adding a dataset to a
+  File-set (:issue:`1752`)
 
 Fixes
 -----
@@ -29,6 +30,6 @@ Fixes
 
 Pydicom Internals
 -----------------
-* repository folder structure refactored
-* renamed top level "source" folder to "util"
+* Repository folder structure refactored
+* Renamed top level "source" folder to "util"
 * New CI tools - `dependabot`, and `pre-commit` using black and ruff
