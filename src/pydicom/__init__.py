@@ -27,7 +27,6 @@ Quick Start
    https://www.github.com/pydicom/pydicom
 
 """
-import warnings
 
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
@@ -46,4 +45,5 @@ __all__ = [
     "dcmwrite",
     "__version__",
     "__version_info__",
+    "__dicom_version__",
 ]
