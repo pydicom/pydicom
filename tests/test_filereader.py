@@ -1630,18 +1630,3 @@ class TestDataElementGenerator:
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
-
-
-def test_read_file_deprecated():
-    """Test deprecation warning for read_file()."""
-    if sys.version_info[:2] < (3, 7):
-        from pydicom.filereader import read_file
-    else:
-        msg = (
-            r"'read_file' is deprecated and will be removed in v3.0, use "
-            r"'dcmread' instead"
-        )
-        with pytest.warns(DeprecationWarning, match=msg):
-            from pydicom.filereader import read_file
-
-    assert read_file == dcmread

@@ -79,7 +79,7 @@ class TestDataset:
         fp = DicomBytesIO()
         dataset.is_little_endian = True
         dataset.is_implicit_VR = True
-        pydicom.write_file(fp, dataset)
+        pydicom.dcmwrite(fp, dataset)
 
         def _reset():
             fp.seek(0)

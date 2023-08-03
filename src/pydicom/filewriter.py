@@ -1152,22 +1152,6 @@ def dcmwrite(
             fp.close()
 
 
-def __getattr__(name: str) -> Any:
-    if name == "write_file":
-        warnings.warn(
-            "'write_file' is deprecated and will be removed in v3.0, use "
-            "'dcmwrite' instead",
-            DeprecationWarning,
-        )
-        return globals()["dcmwrite"]
-
-    raise AttributeError(f"module {__name__} has no attribute {name}")
-
-
-if sys.version_info[:2] < (3, 7):
-    write_file = dcmwrite
-
-
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #   (struct_format is python's struct module format)
