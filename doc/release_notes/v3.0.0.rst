@@ -16,7 +16,7 @@ Changes
 * The `read_file` and `write_file` functions have been removed, use
   :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite`
   instead.
-* The value for ``JPEGLossless`` has changed from
+* The value for :attr:`~pydicom.uid.JPEGLossless` has changed from
   1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
   :attr:`~pydicom.uid.JPEGLosslessSV1` instead for 1.2.840.10008.1.2.4.70
 * The following UID constants have been removed:
