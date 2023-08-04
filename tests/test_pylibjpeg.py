@@ -16,7 +16,7 @@ from pydicom.uid import (
     ImplicitVRLittleEndian,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
-    JPEGLosslessP14,
+    JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
@@ -65,7 +65,7 @@ TEST_RLE = TEST_HANDLER and HAVE_RLE  # Run RLE Lossless tests
 SUPPORTED_SYNTAXES = [
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
-    JPEGLosslessP14,
+    JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,

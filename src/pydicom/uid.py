@@ -7,43 +7,12 @@ import random
 import re
 import sys
 import uuid
-import warnings
 from typing import Any
 
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary
 from pydicom.config import disable_value_validation
 from pydicom.valuerep import STR_VR_REGEXES, validate_value
-
-_deprecations = {
-    "JPEGBaseline": "JPEGBaseline8Bit",
-    "JPEGExtended": "JPEGExtended12Bit",
-    "JPEGLossless": "JPEGLosslessSV1",
-    "JPEGLSLossy": "JPEGLSNearLossless",
-    "JPEG2000MultiComponentLossless": "JPEG2000MCLossless",
-    "JPEG2000MultiComponent": "JPEG2000MC",
-}
-
-
-def __getattr__(name: str) -> Any:
-    if name in _deprecations:
-        replacement = _deprecations[name]
-        if name == "JPEGLossless":
-            warnings.warn(
-                "In pydicom v3.0 the UID for 'JPEGLossless' will change "
-                "from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
-                f"match its UID keyword. Use '{replacement}' instead"
-            )
-        else:
-            warnings.warn(
-                f"The UID constant '{name}' is deprecated and will be removed "
-                f"in pydicom v3.0, use '{replacement}' instead",
-                DeprecationWarning,
-            )
-
-        return globals()[replacement]
-
-    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 class UID(str):
@@ -265,9 +234,9 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.50"""
     JPEGExtended12Bit = UID("1.2.840.10008.1.2.4.51")
     """1.2.840.10008.1.2.4.51"""
-    JPEGLosslessP14 = UID("1.2.840.10008.1.2.4.57")  # needs to be updated
+    JPEGLossless = UID("1.2.840.10008.1.2.4.57")
     """1.2.840.10008.1.2.4.57"""
-    JPEGLosslessSV1 = UID("1.2.840.10008.1.2.4.70")  # Old JPEGLossless
+    JPEGLosslessSV1 = UID("1.2.840.10008.1.2.4.70")
     """1.2.840.10008.1.2.4.70"""
     JPEGLSLossless = UID("1.2.840.10008.1.2.4.80")
     """1.2.840.10008.1.2.4.80"""
@@ -283,24 +252,44 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.93"""
     MPEG2MPML = UID("1.2.840.10008.1.2.4.100")
     """1.2.840.10008.1.2.4.100"""
+    MPEG2MPMLF = UID("1.2.840.10008.1.2.4.100.1")
+    """1.2.840.10008.1.2.4.100.1"""
     MPEG2MPHL = UID("1.2.840.10008.1.2.4.101")
     """1.2.840.10008.1.2.4.101"""
+    MPEG2MPHLF = UID("1.2.840.10008.1.2.4.101.1")
+    """1.2.840.10008.1.2.4.101.1"""
     MPEG4HP41 = UID("1.2.840.10008.1.2.4.102")
     """1.2.840.10008.1.2.4.102"""
+    MPEG4HP41F = UID("1.2.840.10008.1.2.4.102.1")
+    """1.2.840.10008.1.2.4.102.1"""
     MPEG4HP41BD = UID("1.2.840.10008.1.2.4.103")
     """1.2.840.10008.1.2.4.103"""
+    MPEG4HP41BDF = UID("1.2.840.10008.1.2.4.103.1")
+    """1.2.840.10008.1.2.4.103.1"""
     MPEG4HP422D = UID("1.2.840.10008.1.2.4.104")
     """1.2.840.10008.1.2.4.104"""
+    MPEG4HP422DF = UID("1.2.840.10008.1.2.4.104.1")
+    """1.2.840.10008.1.2.4.104.1"""
     MPEG4HP423D = UID("1.2.840.10008.1.2.4.105")
     """1.2.840.10008.1.2.4.105"""
+    MPEG4HP423DF = UID("1.2.840.10008.1.2.4.105.1")
+    """1.2.840.10008.1.2.4.105.1"""
     MPEG4HP42STEREO = UID("1.2.840.10008.1.2.4.106")
     """1.2.840.10008.1.2.4.106"""
+    MPEG4HP42STEREOF = UID("1.2.840.10008.1.2.4.106.1")
+    """1.2.840.10008.1.2.4.106.1"""
     HEVCMP51 = UID("1.2.840.10008.1.2.4.107")
     """1.2.840.10008.1.2.4.107"""
     HEVCM10P51 = UID("1.2.840.10008.1.2.4.108")
     """1.2.840.10008.1.2.4.108"""
     RLELossless = UID("1.2.840.10008.1.2.5")
     """1.2.840.10008.1.2.5"""
+    SMPTEST211020UncompressedProgressiveActiveVideo = UID("1.2.840.10008.1.2.7.1")
+    """1.2.840.10008.1.2.7.1"""
+    SMPTEST211020UncompressedInterlacedActiveVideo = UID("1.2.840.10008.1.2.7.2")
+    """1.2.840.10008.1.2.7.2"""
+    SMPTEST211030PCMDigitalAudio = UID("1.2.840.10008.1.2.7.3")
+    """1.2.840.10008.1.2.7.3"""
 
 AllTransferSyntaxes = [
     ImplicitVRLittleEndian,
@@ -309,7 +298,7 @@ AllTransferSyntaxes = [
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
-    JPEGLosslessP14,
+    JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
@@ -318,22 +307,32 @@ AllTransferSyntaxes = [
     JPEG2000MCLossless,
     JPEG2000MC,
     MPEG2MPML,
+    MPEG2MPMLF,
     MPEG2MPHL,
+    MPEG2MPHLF,
     MPEG4HP41,
+    MPEG4HP41F,
     MPEG4HP41BD,
+    MPEG4HP41BDF,
     MPEG4HP422D,
+    MPEG4HP422DF,
     MPEG4HP423D,
+    MPEG4HP423DF,
     MPEG4HP42STEREO,
+    MPEG4HP42STEREOF,
     HEVCMP51,
     HEVCM10P51,
     RLELossless,
+    SMPTEST211020UncompressedProgressiveActiveVideo,
+    SMPTEST211020UncompressedInterlacedActiveVideo,
+    SMPTEST211030PCMDigitalAudio,
 ]
 """All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
 
 JPEGTransferSyntaxes = [
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
-    JPEGLosslessP14,
+    JPEGLossless,
     JPEGLosslessSV1,
 ]
 """JPEG (ISO/IEC 10918-1) transfer syntaxes"""
@@ -346,12 +345,19 @@ JPEG2000TransferSyntaxes = [JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG
 
 MPEGTransferSyntaxes = [
     MPEG2MPML,
+    MPEG2MPMLF,
     MPEG2MPHL,
+    MPEG2MPHLF,
     MPEG4HP41,
+    MPEG4HP41F,
     MPEG4HP41BD,
+    MPEG4HP41BDF,
     MPEG4HP422D,
+    MPEG4HP422DF,
     MPEG4HP423D,
+    MPEG4HP423DF,
     MPEG4HP42STEREO,
+    MPEG4HP42STEREOF,
     HEVCMP51,
     HEVCM10P51,
 ]
@@ -367,31 +373,6 @@ UncompressedTransferSyntaxes = [
     ExplicitVRBigEndian,
 ]
 """Uncompressed (native) transfer syntaxes."""
-
-# Deprecated
-if sys.version_info[:2] < (3, 7):
-    JPEGBaseline = JPEGBaseline8Bit
-    JPEGExtended = JPEGExtended12Bit
-    JPEGLossless = JPEGLosslessSV1
-    JPEGLSLossy = JPEGLSNearLossless
-    JPEG2000MultiComponentLossless = JPEG2000MCLossless
-    JPEG2000MultiComponent = JPEG2000MC
-
-JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseline8Bit,
-    JPEGExtended12Bit,
-]
-JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
-JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
-PILSupportedCompressedPixelTransferSyntaxes = [
-    JPEGBaseline8Bit,
-    JPEGLosslessP14,
-    JPEGExtended12Bit,
-    JPEG2000Lossless,
-    JPEG2000,
-]
-RLECompressedLosslessSyntaxes = RLETransferSyntaxes
-UncompressedPixelTransferSyntaxes = UncompressedTransferSyntaxes
 
 
 def generate_uid(

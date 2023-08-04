@@ -11,7 +11,7 @@ from pydicom.uid import (
     UID,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
-    JPEGLosslessP14,
+    JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
@@ -803,7 +803,7 @@ ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
         ("MONOCHROME2", 1, (0,), (8,), (8,)),
         ("MONOCHROME2", 1, (0,), (16,), (12,)),
     ],
-    JPEGLosslessP14: [  # 1.2.840.10008.1.2.4.57: Table 8.2.1-2 in PS3.5
+    JPEGLossless: [  # 1.2.840.10008.1.2.4.57: Table 8.2.1-2 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
         ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
         ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),

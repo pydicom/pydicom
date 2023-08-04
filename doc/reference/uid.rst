@@ -17,7 +17,7 @@ Transfer Syntax UIDs
    ExplicitVRBigEndian
    JPEGBaseline8Bit
    JPEGExtended12Bit
-   JPEGLosslessP14
+   JPEGLossless
    JPEGLosslessSV1
    JPEGLSLossless
    JPEGLSNearLossless
@@ -26,15 +26,25 @@ Transfer Syntax UIDs
    JPEG2000MCLossless
    JPEG2000MC
    MPEG2MPML
+   MPEG2MPMLF
    MPEG2MPHL
+   MPEG2MPHLF
    MPEG4HP41
+   MPEG4HP41F
    MPEG4HP41BD
+   MPEG4HP41BDF
    MPEG4HP422D
+   MPEG4HP422DF
    MPEG4HP423D
+   MPEG4HP423DF
    MPEG4HP42STEREO
+   MPEG4HP42STEREOF
    HEVCMP51
    HEVCM10P51
    RLELossless
+   SMPTEST211020UncompressedProgressiveActiveVideo
+   SMPTEST211020UncompressedInterlacedActiveVideo
+   SMPTEST211030PCMDigitalAudio
 
 
 Transfer Syntax Lists
