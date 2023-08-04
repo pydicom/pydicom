@@ -105,7 +105,7 @@
 <h1>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Permalink to this heading">¶</a></h1>
 <section id="changes">
 <h2>Changes<a class="headerlink" href="#changes" title="Permalink to this heading">¶</a></h2>
-<ul class="simple">
+<ul>
 <li><p>Removed support for Python &lt;= 3.9</p></li>
 <li><p><cite>compat</cite> module removed</p></li>
 <li><p>Values with VR AE with an incorrect value length are now handled
@@ -119,13 +119,61 @@ For handling DICOM File-sets and DICOMDIR datasets use the
 <li><p>The <cite>read_file</cite> and <cite>write_file</cite> functions have been removed, use
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> and <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a>
 instead.</p></li>
+<li><p>The value for <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLossless.html#pydicom.uid.JPEGLossless" title="pydicom.uid.JPEGLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLossless</span></code></a> has changed from
+1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLosslessSV1.html#pydicom.uid.JPEGLosslessSV1" title="pydicom.uid.JPEGLosslessSV1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLosslessSV1</span></code></a> instead for 1.2.840.10008.1.2.4.70</p></li>
+<li><p>The following UID constants have been removed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGBaseline</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGBaseline8Bit.html#pydicom.uid.JPEGBaseline8Bit" title="pydicom.uid.JPEGBaseline8Bit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGBaseline8Bit</span></code></a> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGExtended</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGExtended12Bit.html#pydicom.uid.JPEGExtended12Bit" title="pydicom.uid.JPEGExtended12Bit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGExtended12Bit</span></code></a> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLSLossy</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLSNearLossless.html#pydicom.uid.JPEGLSNearLossless" title="pydicom.uid.JPEGLSNearLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSNearLossless</span></code></a> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000MultiComponentLossless</span></code> (use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000MCLossless.html#pydicom.uid.JPEG2000MCLossless" title="pydicom.uid.JPEG2000MCLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000MCLossless</span></code></a> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000MultiComponent</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000MC.html#pydicom.uid.JPEG2000MC" title="pydicom.uid.JPEG2000MC"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000MC</span></code></a> instead)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The following UID lists have been removed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLossyCompressedPixelTransferSyntaxes</span></code>: use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEGTransferSyntaxes.html#pydicom.uid.JPEGTransferSyntaxes" title="pydicom.uid.JPEGTransferSyntaxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGTransferSyntaxes</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLSSupportedCompressedPixelTransferSyntaxes</span></code>: use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLSTransferSyntaxes.html#pydicom.uid.JPEGLSTransferSyntaxes" title="pydicom.uid.JPEGLSTransferSyntaxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSTransferSyntaxes</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000CompressedPixelTransferSyntaxes</span></code>: use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000TransferSyntaxes.html#pydicom.uid.JPEG2000TransferSyntaxes" title="pydicom.uid.JPEG2000TransferSyntaxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000TransferSyntaxes</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RLECompressedLosslessSyntaxes</span></code>: use
+<a class="reference internal" href="../reference/generated/pydicom.uid.RLETransferSyntaxes.html#pydicom.uid.RLETransferSyntaxes" title="pydicom.uid.RLETransferSyntaxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLETransferSyntaxes</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UncompressedPixelTransferSyntaxes</span></code>: use
+<a class="reference internal" href="../reference/generated/pydicom.uid.UncompressedTransferSyntaxes.html#pydicom.uid.UncompressedTransferSyntaxes" title="pydicom.uid.UncompressedTransferSyntaxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UncompressedTransferSyntaxes</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PILSupportedCompressedPixelTransferSyntaxes</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </section>
 <section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this heading">¶</a></h2>
-<ul class="simple">
+<ul>
 <li><p>Added details of missing required tag information when adding a dataset to a
 File-set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1752">#1752</a>)</p></li>
+<li><p>The following UID constants have been added:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG2MPMLF.html#pydicom.uid.MPEG2MPMLF" title="pydicom.uid.MPEG2MPMLF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG2MPMLF</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG2MPHLF.html#pydicom.uid.MPEG2MPHLF" title="pydicom.uid.MPEG2MPHLF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG2MPHLF</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP41F.html#pydicom.uid.MPEG4HP41F" title="pydicom.uid.MPEG4HP41F"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP41F</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP41BDF.html#pydicom.uid.MPEG4HP41BDF" title="pydicom.uid.MPEG4HP41BDF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP41BDF</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP422DF.html#pydicom.uid.MPEG4HP422DF" title="pydicom.uid.MPEG4HP422DF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP422DF</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP423DF.html#pydicom.uid.MPEG4HP423DF" title="pydicom.uid.MPEG4HP423DF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP423DF</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP42STEREOF.html#pydicom.uid.MPEG4HP42STEREOF" title="pydicom.uid.MPEG4HP42STEREOF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP42STEREOF</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo.html#pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo" title="pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SMPTEST211020UncompressedProgressiveActiveVideo</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo.html#pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo" title="pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SMPTEST211020UncompressedInterlacedActiveVideo</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.SMPTEST211030PCMDigitalAudio.html#pydicom.uid.SMPTEST211030PCMDigitalAudio" title="pydicom.uid.SMPTEST211030PCMDigitalAudio"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SMPTEST211030PCMDigitalAudio</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </section>
 <section id="fixes">

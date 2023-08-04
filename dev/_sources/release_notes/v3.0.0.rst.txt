@@ -16,11 +16,47 @@ Changes
 * The `read_file` and `write_file` functions have been removed, use
   :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite`
   instead.
+* The value for :attr:`~pydicom.uid.JPEGLossless` has changed from
+  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
+  :attr:`~pydicom.uid.JPEGLosslessSV1` instead for 1.2.840.10008.1.2.4.70
+* The following UID constants have been removed:
+
+    * ``JPEGBaseline`` (use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead)
+    * ``JPEGExtended`` (use :attr:`~pydicom.uid.JPEGExtended12Bit` instead)
+    * ``JPEGLSLossy`` (use :attr:`~pydicom.uid.JPEGLSNearLossless` instead)
+    * ``JPEG2000MultiComponentLossless`` (use
+      :attr:`~pydicom.uid.JPEG2000MCLossless` instead)
+    * ``JPEG2000MultiComponent`` (use :attr:`~pydicom.uid.JPEG2000MC` instead)
+* The following UID lists have been removed:
+
+    * ``JPEGLossyCompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.JPEGTransferSyntaxes`
+    * ``JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
+    * ``JPEG2000CompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
+    * ``RLECompressedLosslessSyntaxes``: use
+      :attr:`~pydicom.uid.RLETransferSyntaxes`
+    * ``UncompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
+    * ``PILSupportedCompressedPixelTransferSyntaxes``
 
 Enhancements
 ------------
 * Added details of missing required tag information when adding a dataset to a
   File-set (:issue:`1752`)
+* The following UID constants have been added:
+
+    * :attr:`~pydicom.uid.MPEG2MPMLF`
+    * :attr:`~pydicom.uid.MPEG2MPHLF`
+    * :attr:`~pydicom.uid.MPEG4HP41F`
+    * :attr:`~pydicom.uid.MPEG4HP41BDF`
+    * :attr:`~pydicom.uid.MPEG4HP422DF`
+    * :attr:`~pydicom.uid.MPEG4HP423DF`
+    * :attr:`~pydicom.uid.MPEG4HP42STEREOF`
+    * :attr:`~pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo`
+    * :attr:`~pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo`
+    * :attr:`~pydicom.uid.SMPTEST211030PCMDigitalAudio`
 
 Fixes
 -----
