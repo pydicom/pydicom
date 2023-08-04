@@ -51,7 +51,7 @@ DEPENDENCIES = {
 SUPPORTED_TRANSFER_SYNTAXES = [
     pydicom.uid.JPEGBaseline8Bit,
     pydicom.uid.JPEGExtended12Bit,
-    pydicom.uid.JPEGLosslessP14,
+    pydicom.uid.JPEGLossless,
     pydicom.uid.JPEGLosslessSV1,
     pydicom.uid.JPEGLSLossless,
     pydicom.uid.JPEGLSNearLossless,
