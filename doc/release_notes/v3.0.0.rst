@@ -47,7 +47,6 @@ Enhancements
   File-set (:issue:`1752`)
 * The following UID constants have been added:
 
-    * :attr:`~pydicom.uid.JPEGBaseline8Bit`
     * :attr:`~pydicom.uid.MPEG2MPMLF`
     * :attr:`~pydicom.uid.MPEG2MPHLF`
     * :attr:`~pydicom.uid.MPEG4HP41F`
