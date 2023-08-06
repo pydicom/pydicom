@@ -2133,20 +2133,3 @@ class PersonName:
         )
 
         return cls(encoded_value, encodings=encodings)
-
-
-# Alias old class names for backwards compat in user code
-def __getattr__(name: str) -> Any:
-    if name == "PersonNameUnicode":
-        warnings.warn(
-            "'PersonNameUnicode' is deprecated and will be removed in "
-            "pydicom v3.0, use 'PersonName' instead",
-            DeprecationWarning,
-        )
-        return globals()["PersonName"]
-
-    raise AttributeError(f"module {__name__} has no attribute {name}")
-
-
-if sys.version_info[:2] < (3, 7):
-    PersonNameUnicode = PersonName

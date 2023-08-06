@@ -22,6 +22,5 @@ or TM and utilities.
    ISfloat
    MultiString
    PersonName
-   PersonNameUnicode
    TM
    VR

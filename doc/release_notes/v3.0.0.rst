@@ -40,6 +40,8 @@ Changes
     * ``UncompressedPixelTransferSyntaxes``: use
       :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
     * ``PILSupportedCompressedPixelTransferSyntaxes``
+* The `PersonNameUnicode` class has been removed, use
+  :class:`~pydicom.valuerep.PersonName` instead
 
 Enhancements
 ------------

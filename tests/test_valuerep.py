@@ -1523,22 +1523,6 @@ class TestDateTime:
         assert tm is None
 
 
-def test_person_name_unicode_warns():
-    """Test deprecation warning for PersonNameUnicode."""
-    if sys.version_info[:2] < (3, 7):
-        from pydicom.valuerep import PersonNameUnicode
-
-    else:
-        msg = (
-            r"'PersonNameUnicode' is deprecated and will be removed in "
-            r"pydicom v3.0, use 'PersonName' instead"
-        )
-        with pytest.warns(DeprecationWarning, match=msg):
-            from pydicom.valuerep import PersonNameUnicode
-
-    assert PersonNameUnicode == PersonName
-
-
 VALUE_REFERENCE = [
     # (VR, Python setter type, (VM 0 values), (VM >= 1 values), keyword)
     ("AE", str, (None, ""), ("foo", "bar"), "Receiver"),
