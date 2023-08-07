@@ -121,7 +121,7 @@ to download the full example code</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a>
 
 <span class="kn">import</span> <span class="nn">tkinter</span>
 
@@ -133,23 +133,23 @@ to download the full example code</p>
 
 
 <span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
         <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span>
         <span class="sa">b</span><span class="s2">&quot;Yamada^Tarou=</span><span class="se">\033</span><span class="s2">$B;3ED</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$BB@O:&quot;</span>
         <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">(B=</span><span class="se">\033</span><span class="s2">$B$d$^$@</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$B$?$m$&amp;</span><span class="se">\033</span><span class="s2">(B&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;iso2022_jp&quot;</span><span class="p">],</span>
     <span class="p">),</span>
     <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xcd\xf5\x5e\xd0\xa1\xb6\xab</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;GB18030&quot;</span><span class="p">]</span>
     <span class="p">),</span>
     <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xe7\x8e\x8b\x5e\xe5\xb0\x8f\xe6\x9d\xb1</span><span class="s2">=&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">],</span>
     <span class="p">),</span>
     <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Hong^Gildong=</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\373\363</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\321\316\324\327</span><span class="s2">=&quot;</span>
         <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\310\253</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\261\346\265\277</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;euc_kr&quot;</span><span class="p">],</span>
