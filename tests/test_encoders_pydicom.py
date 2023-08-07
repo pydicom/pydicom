@@ -23,7 +23,6 @@ from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_frame,
     _rle_decode_segment,
 )
-from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
 from pydicom.uid import RLELossless
 
@@ -367,81 +366,3 @@ class TestEncodeSegment:
         redecoded = _rle_decode_segment(encoded)
         assert ds.Rows * ds.Columns == len(redecoded)
         assert decoded == redecoded
-
-
-# Tests for deprecated rle_encode_frame() function
-@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-class TestRLEEncodeFrame:
-    """Tests for rle_encode_frame()."""
-
-    def test_16_segments_raises(self):
-        """Test that trying to encode 16-segments raises exception."""
-        arr = np.asarray([[[1, 2, 3, 4]]], dtype="uint32")
-        assert (1, 1, 4) == arr.shape
-        assert 4 == arr.dtype.itemsize
-
-        msg = (
-            r"Unable to encode as the DICOM standard only allows "
-            r"a maximum of 15 segments in RLE encoded data"
-        )
-        with pytest.raises(ValueError, match=msg):
-            rle_encode_frame(arr)
-
-    def test_encoding_multiple_frames_raises(self):
-        """Test encoding multiple framed pixel data raises exception."""
-        # Note: only works with multi-sample data
-        ds = dcmread(EXPL_8_3_2F)
-        assert ds.NumberOfFrames > 1
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-
-        msg = (
-            r"Unable to encode multiple frames at once, please encode one "
-            r"frame at a time"
-        )
-        with pytest.raises(ValueError, match=msg):
-            rle_encode_frame(ds.pixel_array)
-
-    def test_functional(self):
-        """Test function works OK."""
-        ds = dcmread(EXPL_16_3_1F)
-        ref = ds.pixel_array
-        assert ds.BitsAllocated == 16
-        assert ds.SamplesPerPixel == 3
-        assert ds.PixelRepresentation == 0
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(
-            encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
-        )
-        ds.PlanarConfiguration = 1
-        arr = np.frombuffer(decoded, "<u2")
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_big_endian_arr(self):
-        """Test using a big endian array works."""
-        ds = dcmread(EXPL_16_3_1F)
-        ref = ds.pixel_array
-        assert ds.BitsAllocated == 16
-        assert ds.SamplesPerPixel == 3
-        assert ds.PixelRepresentation == 0
-
-        arr = ref.newbyteorder(">")
-        assert id(arr) != id(ref)
-        assert arr.dtype == ">u2"
-        encoded = rle_encode_frame(arr)
-        decoded = _rle_decode_frame(
-            encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
-        )
-        ds.PlanarConfiguration = 1
-        arr = np.frombuffer(decoded, "<u2")
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_old_import_path(self):
-        """Test the old import path is OK."""
-        from pydicom.pixel_data_handlers import rle_handler
-
-        assert hasattr(rle_handler, "rle_encode_frame")

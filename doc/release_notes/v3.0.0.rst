@@ -42,6 +42,11 @@ Changes
     * ``PILSupportedCompressedPixelTransferSyntaxes``
 * The `PersonNameUnicode` class has been removed, use
   :class:`~pydicom.valuerep.PersonName` instead
+* The `DataElement.description` attribute has been removed, use
+  :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead
+* The `pixel_data_handlers.rle_handler.rle_encode_frame` function has been
+  removed, use :meth:`~pydicom.dataset.Dataset.compress` or
+  :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
 
 Enhancements
 ------------

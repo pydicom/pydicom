@@ -1219,14 +1219,3 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
-
-
-def test_elem_description_deprecated():
-    """Test deprecation warning for DataElement.description()"""
-    elem = DataElement("PatientName", "PN", "Citizen^Jan")
-    msg = (
-        r"'DataElement.description\(\)' is deprecated and will be removed in "
-        r"v3.0, use 'DataElement.name' instead"
-    )
-    with pytest.warns(DeprecationWarning, match=msg):
-        assert elem.description() == "Patient's Name"
