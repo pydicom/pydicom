@@ -49,6 +49,11 @@ Changes
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
 * Removed the `_storage_sopclass_uids` module, import UIDs from the `uid` module
   instead
+* The theoretical maximum number of instances supported by
+  :class:`~pydicom.fileset.FileSet` has been reduced to 308915776
+* The `alphanumeric` keyword argument for :func:`~pydicom.fileset.generate_filename`
+  has been change dto `use_alpha` and the characters used for filenames changed
+  to use [A-Z] accordingly to ensure support for 32-bit systems (:issue:`1743`) .
 
 Enhancements
 ------------

@@ -399,7 +399,7 @@ class TestGenerateFilename:
 
     def test_numeric(self):
         """Test generating numeric suffixes."""
-        gen = generate_filename(start=0, alphanumeric=False)
+        gen = generate_filename(start=0, use_alpha=False)
         assert "00000000" == next(gen)
         assert "00000001" == next(gen)
         assert "00000002" == next(gen)
@@ -416,58 +416,44 @@ class TestGenerateFilename:
         """Test prefix for numeric filenames."""
         for ii in range(1, 8):
             prefix = "A" * ii
-            gen = generate_filename(prefix="A" * ii, start=0, alphanumeric=False)
+            gen = generate_filename(prefix="A" * ii, start=0, use_alpha=False)
             assert prefix + "0" * (8 - ii) == next(gen)
 
     def test_numeric_start(self):
         """Test start point with numeric suffixes."""
-        gen = generate_filename(start=10, alphanumeric=False)
+        gen = generate_filename(start=10, use_alpha=False)
         assert "00000010" == next(gen)
         assert "00000011" == next(gen)
         assert "00000012" == next(gen)
 
-    def test_alphanumeric(self):
-        """Test generating alphanumeric suffixes."""
-        gen = generate_filename(start=0, alphanumeric=True)
-        assert "00000000" == next(gen)
-        assert "00000001" == next(gen)
-        assert "00000002" == next(gen)
-        assert "00000003" == next(gen)
-        assert "00000004" == next(gen)
-        assert "00000005" == next(gen)
-        assert "00000006" == next(gen)
-        assert "00000007" == next(gen)
-        assert "00000008" == next(gen)
-        assert "00000009" == next(gen)
-        assert "0000000A" == next(gen)
-        for ii in range(24):
+    def test_alpha(self):
+        """Test generating alpha suffixes."""
+        gen = generate_filename(start=0, use_alpha=True)
+        assert "AAAAAAAA" == next(gen)
+        assert "AAAAAAAB" == next(gen)
+        assert "AAAAAAAC" == next(gen)
+        assert "AAAAAAAD" == next(gen)
+        for ii in range(21):
             next(gen)
-        assert "0000000Z" == next(gen)
-        assert "00000010" == next(gen)
+        assert "AAAAAAAZ" == next(gen)
+        assert "AAAAAABA" == next(gen)
 
-    def test_alphanumeric_prefix(self):
+    def test_alpha_prefix(self):
         """Test length of the suffixes."""
         for ii in range(1, 8):
-            prefix = "A" * ii
-            gen = generate_filename(prefix="A" * ii, start=0, alphanumeric=True)
-            assert prefix + "0" * (8 - ii) == next(gen)
-            assert prefix + "0" * (7 - ii) + "1" == next(gen)
-            assert prefix + "0" * (7 - ii) + "2" == next(gen)
-            assert prefix + "0" * (7 - ii) + "3" == next(gen)
-            assert prefix + "0" * (7 - ii) + "4" == next(gen)
-            assert prefix + "0" * (7 - ii) + "5" == next(gen)
-            assert prefix + "0" * (7 - ii) + "6" == next(gen)
-            assert prefix + "0" * (7 - ii) + "7" == next(gen)
-            assert prefix + "0" * (7 - ii) + "8" == next(gen)
-            assert prefix + "0" * (7 - ii) + "9" == next(gen)
-            assert prefix + "0" * (7 - ii) + "A" == next(gen)
+            prefix = "2" * ii
+            gen = generate_filename(prefix="2" * ii, start=0, use_alpha=True)
+            assert prefix + "A" * (8 - ii) == next(gen)
+            assert prefix + "A" * (7 - ii) + "B" == next(gen)
+            assert prefix + "A" * (7 - ii) + "C" == next(gen)
+            assert prefix + "A" * (7 - ii) + "D" == next(gen)
 
-    def test_alphanumeric_start(self):
-        """Test start point with alphanumeric suffixes."""
-        gen = generate_filename(start=10, alphanumeric=True)
-        assert "0000000A" == next(gen)
-        assert "0000000B" == next(gen)
-        assert "0000000C" == next(gen)
+    def test_alpha_start(self):
+        """Test start point with alpha suffixes."""
+        gen = generate_filename(start=10, use_alpha=True)
+        assert "AAAAAAAK" == next(gen)
+        assert "AAAAAAAL" == next(gen)
+        assert "AAAAAAAM" == next(gen)
 
     def test_long_prefix_raises(self):
         """Test too long a prefix."""
@@ -2241,18 +2227,18 @@ class TestFileSet_Modify:
         assert 10**6 + 1 == len(fs)
         ds, paths = write_fs(fs)
         instance = fs._instances[-1]
-        # Was written with alphanumeric File IDs
-        assert "IM00001D" in instance.path
+        # Was written with alpha File IDs
+        assert "IMAAAABX" in instance.path
 
         def my_len(self):
-            return 36**6 + 1
+            return 26**6 + 1
 
         FileSet.__len__ = my_len
         fs = FileSet(ds)
-        assert 36**6 + 1 == len(fs)
+        assert 26**6 + 1 == len(fs)
         msg = (
             r"pydicom doesn't support writing File-sets with more than "
-            r"2176782336 managed instances"
+            r"308915776 managed instances"
         )
         with pytest.raises(NotImplementedError, match=msg):
             fs.write()
@@ -2574,17 +2560,17 @@ class TestFileSet_Copy:
         fs, ds, paths = copy_fs(fs, tdir.name)
         instance = fs._instances[-1]
         # Was written with alphanumeric File IDs
-        assert "IM00001D" in instance.path
+        assert "IMAAAABX" in instance.path
 
         def my_len(self):
-            return 36**6 + 1
+            return 26**6 + 1
 
         FileSet.__len__ = my_len
         fs = FileSet(tiny)
-        assert 36**6 + 1 == len(fs)
+        assert 26**6 + 1 == len(fs)
         msg = (
             r"pydicom doesn't support writing File-sets with more than "
-            r"2176782336 managed instances"
+            r"308915776 managed instances"
         )
         with pytest.raises(NotImplementedError, match=msg):
             fs.copy(tdir.name)
