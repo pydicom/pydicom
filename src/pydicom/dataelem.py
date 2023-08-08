@@ -664,22 +664,6 @@ class DataElement:
 
         return ""
 
-    def description(self) -> str:
-        """Return the DICOM dictionary name for the element as :class:`str`.
-
-        .. deprecated:: 2.3
-
-            ``DataElement.description()`` will be removed in v3.0, use
-            :attr:`~pydicom.dataelem.DataElement.name` instead
-        """
-        warnings.warn(
-            "'DataElement.description()' is deprecated and will be removed "
-            "in v3.0, use 'DataElement.name' instead",
-            DeprecationWarning,
-        )
-
-        return self.name
-
     @property
     def is_private(self) -> bool:
         """Return ``True`` if the element's tag is private.

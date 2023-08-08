@@ -7,8 +7,13 @@ import uuid
 
 import pytest
 
-from pydicom._storage_sopclass_uids import CTImageStorage
-from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSNearLossless
+from pydicom.uid import (
+    UID,
+    generate_uid,
+    PYDICOM_ROOT_UID,
+    JPEGLSNearLossless,
+    CTImageStorage,
+)
 import pydicom.uid
 
 
