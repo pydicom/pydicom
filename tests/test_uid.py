@@ -8,7 +8,11 @@ import uuid
 import pytest
 
 from pydicom.uid import (
-    UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSNearLossless, CTImageStorage
+    UID,
+    generate_uid,
+    PYDICOM_ROOT_UID,
+    JPEGLSNearLossless,
+    CTImageStorage,
 )
 import pydicom.uid
 
