@@ -14,14 +14,14 @@ jobs:
         os: [windows]
         python-version: ["3.10"]  # , "3.12" soon
         test-extras: [false]
-        upload-coverage: [false]
+        upload-coverage: [true]
         include:
           - os: ubuntu
             python-version: "3.11"
             test-extras: true
             upload-coverage: true
     uses: ./.github/workflows/tests_wf.yml
-    with: 
+    with:
       os: ${{ matrix.os }}
       python-version:  ${{ matrix.python-version }}
       test-extras: ${{ matrix.test-extras }}
@@ -37,7 +37,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
