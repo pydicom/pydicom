@@ -72,8 +72,6 @@ _LOWER_OFFSET = "OffsetOfReferencedLowerLevelDirectoryEntity"
 _LAST_OFFSET = "OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity"
 
 
-
-
 def generate_filename(
     prefix: str = "", start: int = 0, use_alpha: bool = False
 ) -> Iterator[str]:
