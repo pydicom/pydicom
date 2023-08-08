@@ -26,11 +26,10 @@ jobs:
     runs-on: ${{ inputs.os }}-latest
     steps:
     - name: Set env variables
-      if: inputs.upload-coverage
-        if: ${{ inputs.os } == "ubuntu"
-        run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
-        if: ${{ inputs.os } == "windows"
-        run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "%GITHUB_ENV%" 
+      if: inputs.upload-coverage && ${{ inputs.os } == "ubuntu"
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
+      if: inputs.upload-coverage && ${{ inputs.os } == "windows"
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "%GITHUB_ENV%"
     - name: Check-out code
       uses: actions/checkout@v3
       with:
