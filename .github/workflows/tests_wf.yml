@@ -4,10 +4,10 @@ on:
   workflow_call:
     inputs:
       os:
-        required: true 
+        required: true
         type: string
       python-version:
-        required: true 
+        required: true
         type: string
       test-extras:
         required: false
@@ -17,7 +17,7 @@ on:
         required: false
         type: boolean
         default: false
-  
+
 env:
   PYTEST_ARGS: ""
 
@@ -25,9 +25,12 @@ jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
     steps:
-    - name: Set env variables
-      if: inputs.upload-coverage
-      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV" 
+    - name: Set env variables for ubuntu
+      if: inputs.upload-coverage && startsWith(inputs.os, 'ubuntu')
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
+    - name: Set env variables for windows
+      if: inputs.upload-coverage && startsWith(inputs.os, 'windows')
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$env:GITHUB_ENV"
     - name: Check-out code
       uses: actions/checkout@v3
       with:
@@ -50,7 +53,7 @@ jobs:
     - name: Test with Numpy
       run: |
         python -m pip install .[basic]
-        python -m pytest ${{ env.PYTEST_ARGS }} 
+        python -m pytest ${{ env.PYTEST_ARGS }}
 
     - name: Test with all optional dependencies
       if: inputs.test-extras
