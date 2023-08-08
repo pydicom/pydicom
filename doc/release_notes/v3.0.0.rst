@@ -47,6 +47,8 @@ Changes
 * The `pixel_data_handlers.rle_handler.rle_encode_frame` function has been
   removed, use :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
+* Removed the `_storage_sopclass_uids` module, import UIDs from the `uid` module
+  instead
 
 Enhancements
 ------------
