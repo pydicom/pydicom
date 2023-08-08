@@ -25,9 +25,10 @@ jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
     steps:
-    - name: Set env variables
+    - name: Set env variables - Ubuntu
       if: inputs.upload-coverage && ${{ inputs.os }} == "ubuntu"
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
+    - name: Set env variables - Windows
       if: inputs.upload-coverage && ${{ inputs.os }} == "windows"
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "%GITHUB_ENV%"
     - name: Check-out code
