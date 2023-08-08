@@ -335,6 +335,13 @@ instead.</p></li>
 </li>
 <li><p>The <cite>PersonNameUnicode</cite> class has been removed, use
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> instead</p></li>
+<li><p>The <cite>DataElement.description</cite> attribute has been removed, use
+<a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.name" title="pydicom.dataelem.DataElement.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.name</span></code></a> instead</p></li>
+<li><p>The <cite>pixel_data_handlers.rle_handler.rle_encode_frame</cite> function has been
+removed, use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
+<a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
+<li><p>Removed the <cite>_storage_sopclass_uids</cite> module, import UIDs from the <cite>uid</cite> module
+instead</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -439,7 +446,7 @@ in pytest 7.2</p></li>
 <section id="id5">
 <h3>Changes<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.description" title="pydicom.dataelem.DataElement.description"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataElement.description</span></code></a> is
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataElement.description</span></code> is
 deprecated and will be removed in v3.0, use
 <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.name" title="pydicom.dataelem.DataElement.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.name</span></code></a> instead</p></li>
 <li><p>Updated the private dictionary</p></li>
@@ -518,7 +525,7 @@ strings instead of the formatted date and time representations
 metadata is now ignored. This makes it possible to compare a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> object with a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> object.</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.rle_handler.html#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="pydicom.pixel_data_handlers.rle_handler.rle_encode_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">rle_encode_frame()</span></code></a> is
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">rle_encode_frame()</span></code> is
 deprecated and will be removed in v3.0, use
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
 <a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>

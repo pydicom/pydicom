@@ -15,7 +15,6 @@
    
       ~DataElement.__init__
       ~DataElement.clear
-      ~DataElement.description
       ~DataElement.from_json
       ~DataElement.to_json
       ~DataElement.to_json_dict
