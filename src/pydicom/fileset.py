@@ -2089,7 +2089,7 @@ class FileSet:
         if len(self) > 26**6:
             raise NotImplementedError(
                 "pydicom doesn't support writing File-sets with more than "
-                "308915776 managed instances on 32-bit systems"
+                "308915776 managed instances"
             )
 
         # Remove the removals - must be first because the File IDs will be
