@@ -2241,7 +2241,7 @@ class TestFileSet_Modify:
         assert 10**6 + 1 == len(fs)
         ds, paths = write_fs(fs)
         instance = fs._instances[-1]
-        # Was written with alpha File IDs
+        # Was written with alphanumeric File IDs
         assert "IM00001E" in instance.path
 
         def my_len(self):

@@ -80,7 +80,7 @@ def generate_filename(
     Maximum number of File IDs is:
 
     * Numeric: (10 ** (8 - `prefix`)) - `start`
-    * Alpha: (26 ** (8 - `prefix`)) - `start`
+    * Alpha: (35 ** (8 - `prefix`)) - `start`
 
     .. versionchanged:: 3.0
 
