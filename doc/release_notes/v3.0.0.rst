@@ -50,11 +50,10 @@ Changes
 * Removed the `_storage_sopclass_uids` module, import UIDs from the `uid` module
   instead
 * The theoretical maximum number of instances supported by
-  :class:`~pydicom.fileset.FileSet` has been reduced to 308915776 to ensure support
+  :class:`~pydicom.fileset.FileSet` has been reduced to 1838265625 to ensure support
   for 32-bit systems (:issue:`1743`)
-* The `alphanumeric` keyword argument for :func:`~pydicom.fileset.generate_filename`
-  has been changed to `use_alpha` and the characters used for filenames changed
-  to use [A-Z] accordingly
+* The characters used by :func:`~pydicom.fileset.generate_filename` when
+  `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
 
 Enhancements
 ------------

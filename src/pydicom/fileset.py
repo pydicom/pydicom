@@ -73,7 +73,7 @@ _LAST_OFFSET = "OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity"
 
 
 def generate_filename(
-    prefix: str = "", start: int = 0, use_alpha: bool = False
+    prefix: str = "", start: int = 0, alphanumeric: bool = False
 ) -> Iterator[str]:
     """Yield File IDs for a File-set.
 
@@ -84,8 +84,8 @@ def generate_filename(
 
     .. versionchanged:: 3.0
 
-       `alphanumeric` has been changed to `use_alpha` and the characters
-       used when `use_alpha` is ``True`` has been reduced to [A-Z]
+       The characters used when `alphanumeric` is ``True`` has been reduced to
+       [0-9][A-I,K-Z]
 
     Parameters
     ----------
@@ -94,9 +94,9 @@ def generate_filename(
     start : int, optional
         The starting index to use for the suffixes, (default ``0``).
         i.e. if you want to start at ``'00010'`` then `start` should be ``10``.
-    use_alpha : bool, optional
+    alphanumeric : bool, optional
         If ``False`` (default) then only generate suffixes using the characters
-        [0-9], otherwise use [A-Z].
+        [0-9], otherwise use [0-9][A-I,K-Z].
 
     Yields
     ------
@@ -108,8 +108,10 @@ def generate_filename(
     if len(prefix) > 7:
         raise ValueError("The 'prefix' must be less than 8 characters long")
 
-    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if use_alpha else "0123456789"
-    padding = "A" if use_alpha else "0"
+    chars = "0123456789ABCDEFGHIKLMNOPQRSTUVWXYZ"
+    if not alphanumeric:
+        chars = chars[:10]
+
     idx = start
     b = len(chars)
     length = 8 - len(prefix)
@@ -120,7 +122,7 @@ def generate_filename(
             suffix += chars[n % b]
             n //= b
 
-        yield f"{prefix}{suffix[::-1]:{padding}>{length}}"
+        yield f"{prefix}{suffix[::-1]:>0{length}}"
         idx += 1
 
 
@@ -248,11 +250,10 @@ class RecordNode(Iterable["RecordNode"]):
         if self.record_type == "PRIVATE":
             prefix = f"{prefix}{self.depth}"
 
-        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        if not self.file_set._use_alpha:
-            chars = "0123456789"
+        chars = "0123456789ABCDEFGHIKLMNOPQRSTUVWXYZ"
+        if not self.file_set._use_alphanumeric:
+            chars = chars[:10]
 
-        padding = "A" if self.file_set._use_alpha else "0"
         suffix = ""
         n = self.index
         b = len(chars)
@@ -260,7 +261,7 @@ class RecordNode(Iterable["RecordNode"]):
             suffix += chars[n % b]
             n //= b
 
-        idx = f"{suffix[::-1]:{padding}>{8 - len(prefix)}}"
+        idx = f"{suffix[::-1]:>0{8 - len(prefix)}}"
 
         return f"{prefix}{idx}"
 
@@ -977,8 +978,8 @@ class FileSet:
         self._ds = Dataset()
         # The File-set's managed SOP Instances as list of FileInstance
         self._instances: list[FileInstance] = []
-        # Use alpha or numeric File IDs
-        self._use_alpha = False
+        # Use alphanumeric or numeric File IDs
+        self._use_alphanumeric = False
 
         # The File-set ID
         self._id: str | None = None
@@ -1244,12 +1245,12 @@ class FileSet:
             raise ValueError("Cannot copy the File-set as the 'path' is unchanged")
 
         if len(self) > 10**6:
-            self._use_alpha = True
+            self._use_alphanumeric = True
 
-        if len(self) > 26**6:
+        if len(self) > 35**6:
             raise NotImplementedError(
                 "pydicom doesn't support writing File-sets with more than "
-                "308915776 managed instances"
+                "1838265625 managed instances"
             )
 
         # Removals are detached from the tree
@@ -2084,12 +2085,12 @@ class FileSet:
 
         # Worst case scenario if all instances in one directory
         if len(self) > 10**6:
-            self._use_alpha = True
+            self._use_alphanumeric = True
 
-        if len(self) > 26**6:
+        if len(self) > 35**6:
             raise NotImplementedError(
                 "pydicom doesn't support writing File-sets with more than "
-                "308915776 managed instances"
+                "1838265625 managed instances"
             )
 
         # Remove the removals - must be first because the File IDs will be
