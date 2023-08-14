@@ -462,12 +462,12 @@ class TestNumeric:
 
         ds_json = ds.to_json_dict()
 
-        assert type(ds_json["0009100B"]["Value"][0]) == int
-        assert type(ds_json["0009100C"]["Value"][0]) == int
-        assert type(ds_json["0009100D"]["Value"][0]) == int
-        assert type(ds_json["0009100E"]["Value"][0]) == int
-        assert type(ds_json["0009100F"]["Value"][0]) == float
-        assert type(ds_json["00091010"]["Value"][0]) == float
-        assert type(ds_json["00091014"]["Value"][0]) == int
-        assert type(ds_json["00091015"]["Value"][0]) == float
-        assert type(ds_json["00091102"]["Value"][0]) == int
+        assert isinstance(ds_json["0009100B"]["Value"][0], int)
+        assert isinstance(ds_json["0009100C"]["Value"][0], int)
+        assert isinstance(ds_json["0009100D"]["Value"][0], int)
+        assert isinstance(ds_json["0009100E"]["Value"][0], int)
+        assert isinstance(ds_json["0009100F"]["Value"][0], float)
+        assert isinstance(ds_json["00091010"]["Value"][0], float)
+        assert isinstance(ds_json["00091014"]["Value"][0], int)
+        assert isinstance(ds_json["00091015"]["Value"][0], float)
+        assert isinstance(ds_json["00091102"]["Value"][0], int)
