@@ -1113,7 +1113,7 @@ class TestNumpy_GetPixelData:
             delattr(ds, attr)
             msg = (
                 r"Unable to convert the pixel data as the following required "
-                r"elements are missing from the dataset: {}".format(attr)
+                rf"elements are missing from the dataset: {attr}"
             )
             with pytest.raises(AttributeError, match=msg):
                 get_pixeldata(ds)

@@ -218,7 +218,7 @@ class TestNoNumpy_NoRLEHandler:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
-                r"'{}'".format(uid)
+                rf"'{uid}'"
             )
             with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
@@ -264,7 +264,7 @@ class TestNoNumpy_RLEHandler:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
-                r"'{}'".format(uid)
+                rf"'{uid}'"
             )
             with pytest.raises(RuntimeError, match=exc_msg):
                 ds.pixel_array
@@ -323,7 +323,7 @@ class TestNumpy_NoRLEHandler:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
-                r"'{}'".format(uid)
+                rf"'{uid}'"
             )
             with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
@@ -355,7 +355,7 @@ class TestNumpy_RLEHandler:
             ds.file_meta.TransferSyntaxUID = uid
             msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
-                r"'{}'".format(uid)
+                rf"'{uid}'"
             )
             with pytest.raises(NotImplementedError, match=msg):
                 ds.pixel_array

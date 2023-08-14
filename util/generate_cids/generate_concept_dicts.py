@@ -311,7 +311,7 @@ if __name__ == "__main__":
                 except KeyError:
                     raise NotImplementedError(
                         "The DICOM scheme designator for the following FHIR system "
-                        "has not been specified: {}".format(system)
+                        f"has not been specified: {system}"
                     )
                 if scheme_designator not in concepts:
                     concepts[scheme_designator] = dict()
