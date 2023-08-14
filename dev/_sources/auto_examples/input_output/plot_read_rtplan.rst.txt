@@ -68,8 +68,8 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
             cp0 = beam.ControlPointSequence[0]
             SSD = float(cp0.SourceToSurfaceDistance / 10)
             lines.append(
-                "{b.BeamName:^13s} {b.BeamNumber:8d} "
-                "{gantry:8.1f} {ssd:8.1f}".format(b=beam, gantry=cp0.GantryAngle, ssd=SSD)
+                f"{beam.BeamName:^13s} {beam.BeamNumber:8d} "
+                f"{cp0.GantryAngle:8.1f} {SSD:8.1f}"
             )
         return "\n".join(lines)
 
