@@ -499,7 +499,7 @@ def read_item(fp: DicomFileLike) -> bytes | None:
     if length == 0xFFFFFFFF:
         raise ValueError(
             "Encapsulated data fragment had Undefined Length"
-            " at data position 0x{:x}".format(fp.tell() - 4)
+            f" at data position 0x{fp.tell() - 4:x}"
         )
 
     item_data = fp.read(length)
