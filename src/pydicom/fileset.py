@@ -80,11 +80,11 @@ def generate_filename(
     Maximum number of File IDs is:
 
     * Numeric: (10 ** (8 - `prefix`)) - `start`
-    * Alpha: (35 ** (8 - `prefix`)) - `start`
+    * Alphanumeric: (35 ** (8 - `prefix`)) - `start`
 
     .. versionchanged:: 3.0
 
-       The characters used when `alphanumeric` is ``True`` has been reduced to
+       The characters used when `alphanumeric` is ``True`` have been reduced to
        [0-9][A-I,K-Z]
 
     Parameters
