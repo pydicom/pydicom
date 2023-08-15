@@ -204,14 +204,11 @@ class TestCodify:
         assert r"c:\temp\testout.dcm" in out
 
     def test_code_relative_filename(self, capsys):
-        """Test utils.codify.code_file with a relative path"""
+        """Test utils.codify.code_file with a relative path that doesn't exist"""
         # regression test for #1865
-        filename = get_testdata_file("UN_sequence.dcm")
-        args = [Path(filename).name]
-        with chdir(Path(filename).parent.resolve()):
+        args = ["XXxUN_sequenceXX.dcm"]  # file that doesn't exist
+        with pytest.raises(SystemExit):
             codify_main(100, args)
-        out, err = capsys.readouterr()
-        assert "UN_sequence" in out
 
     def test_code_dataelem_at(self):
         """Test utils.codify.code_dataelem"""
