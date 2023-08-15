@@ -160,6 +160,11 @@ removed, use <a class="reference internal" href="../reference/generated/pydicom.
 <a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
 <li><p>Removed the <cite>_storage_sopclass_uids</cite> module, import UIDs from the <cite>uid</cite> module
 instead</p></li>
+<li><p>The theoretical maximum number of instances supported by
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> has been reduced to 1838265625 to ensure support
+for 32-bit systems (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1743">#1743</a>)</p></li>
+<li><p>The characters used by <a class="reference internal" href="../reference/generated/pydicom.fileset.generate_filename.html#pydicom.fileset.generate_filename" title="pydicom.fileset.generate_filename"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_filename()</span></code></a> when
+<cite>alphanumeric</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> has been reduced to [0-9][A-I,K-Z]</p></li>
 </ul>
 </section>
 <section id="enhancements">
