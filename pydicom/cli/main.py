@@ -137,7 +137,8 @@ def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
     if not pydicom_filename:
         try:
             char_filenames = get_charset_files(filename)
-            pydicom_filename = char_filenames[0]
+            if char_filenames:
+                pydicom_filename = char_filenames[0]
         except NotImplementedError:  # will get this if absolute path passed
             pass
 

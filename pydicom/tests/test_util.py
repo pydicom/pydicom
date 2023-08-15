@@ -171,6 +171,13 @@ class TestCodify:
         out, err = capsys.readouterr()
         assert r"c:\temp\testout.dcm" in out
 
+    def test_code_relative_filename(self, capsys):
+        """Test utils.codify.code_file with a relative path that doesn't exist"""
+        # regression test for #1865
+        args = ["XXxUN_sequenceXX.dcm"]  # file that doesn't exist
+        with pytest.raises(SystemExit):
+            codify_main(100, args)
+
     def test_code_dataelem_at(self):
         """Test utils.codify.code_dataelem"""
         elem = DataElement(0x00000901, 'AT', (0x1234, 0x5678))
