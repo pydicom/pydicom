@@ -1,6 +1,7 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
+from collections.abc import Iterator, Iterable, Callable
 import copy
 import os
 from pathlib import Path
@@ -8,7 +9,6 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import Optional, Union, Any, cast
-from collections.abc import Iterator, Iterable, Callable
 import warnings
 
 from pydicom.charset import default_encoding
@@ -80,7 +80,12 @@ def generate_filename(
     Maximum number of File IDs is:
 
     * Numeric: (10 ** (8 - `prefix`)) - `start`
-    * Alphanumeric: (36 ** (8 - `prefix`)) - `start`
+    * Alphanumeric: (35 ** (8 - `prefix`)) - `start`
+
+    .. versionchanged:: 3.0
+
+       The characters used when `alphanumeric` is ``True`` have been reduced to
+       [0-9][A-I,K-Z]
 
     Parameters
     ----------
@@ -91,7 +96,7 @@ def generate_filename(
         i.e. if you want to start at ``'00010'`` then `start` should be ``10``.
     alphanumeric : bool, optional
         If ``False`` (default) then only generate suffixes using the characters
-        [0-9], otherwise use [0-9][A-Z].
+        [0-9], otherwise use [0-9][A-I,K-Z].
 
     Yields
     ------
@@ -103,7 +108,7 @@ def generate_filename(
     if len(prefix) > 7:
         raise ValueError("The 'prefix' must be less than 8 characters long")
 
-    chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    chars = "0123456789ABCDEFGHIKLMNOPQRSTUVWXYZ"
     if not alphanumeric:
         chars = chars[:10]
 
@@ -245,7 +250,7 @@ class RecordNode(Iterable["RecordNode"]):
         if self.record_type == "PRIVATE":
             prefix = f"{prefix}{self.depth}"
 
-        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        chars = "0123456789ABCDEFGHIKLMNOPQRSTUVWXYZ"
         if not self.file_set._use_alphanumeric:
             chars = chars[:10]
 
@@ -1241,10 +1246,11 @@ class FileSet:
 
         if len(self) > 10**6:
             self._use_alphanumeric = True
-        if len(self) > 36**6:
+
+        if len(self) > 35**6:
             raise NotImplementedError(
                 "pydicom doesn't support writing File-sets with more than "
-                "2176782336 managed instances"
+                "1838265625 managed instances"
             )
 
         # Removals are detached from the tree
@@ -2080,10 +2086,11 @@ class FileSet:
         # Worst case scenario if all instances in one directory
         if len(self) > 10**6:
             self._use_alphanumeric = True
-        if len(self) > 36**6:
+
+        if len(self) > 35**6:
             raise NotImplementedError(
                 "pydicom doesn't support writing File-sets with more than "
-                "2176782336 managed instances"
+                "1838265625 managed instances"
             )
 
         # Remove the removals - must be first because the File IDs will be

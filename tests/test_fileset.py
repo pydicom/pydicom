@@ -440,7 +440,7 @@ class TestGenerateFilename:
         assert "00000008" == next(gen)
         assert "00000009" == next(gen)
         assert "0000000A" == next(gen)
-        for ii in range(24):
+        for ii in range(23):
             next(gen)
         assert "0000000Z" == next(gen)
         assert "00000010" == next(gen)
@@ -2242,17 +2242,17 @@ class TestFileSet_Modify:
         ds, paths = write_fs(fs)
         instance = fs._instances[-1]
         # Was written with alphanumeric File IDs
-        assert "IM00001D" in instance.path
+        assert "IM00001E" in instance.path
 
         def my_len(self):
-            return 36**6 + 1
+            return 35**6 + 1
 
         FileSet.__len__ = my_len
         fs = FileSet(ds)
-        assert 36**6 + 1 == len(fs)
+        assert 35**6 + 1 == len(fs)
         msg = (
             r"pydicom doesn't support writing File-sets with more than "
-            r"2176782336 managed instances"
+            r"1838265625 managed instances"
         )
         with pytest.raises(NotImplementedError, match=msg):
             fs.write()
@@ -2574,17 +2574,17 @@ class TestFileSet_Copy:
         fs, ds, paths = copy_fs(fs, tdir.name)
         instance = fs._instances[-1]
         # Was written with alphanumeric File IDs
-        assert "IM00001D" in instance.path
+        assert "IM00001E" in instance.path
 
         def my_len(self):
-            return 36**6 + 1
+            return 35**6 + 1
 
         FileSet.__len__ = my_len
         fs = FileSet(tiny)
-        assert 36**6 + 1 == len(fs)
+        assert 35**6 + 1 == len(fs)
         msg = (
             r"pydicom doesn't support writing File-sets with more than "
-            r"2176782336 managed instances"
+            r"1838265625 managed instances"
         )
         with pytest.raises(NotImplementedError, match=msg):
             fs.copy(tdir.name)
