@@ -2,6 +2,7 @@
 """Test suite for util functions"""
 import copy
 from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
@@ -40,6 +41,19 @@ except ImportError:
 test_dir = os.path.dirname(__file__)
 raw_hex_module = os.path.join(test_dir, "_write_stds.py")
 raw_hex_code = open(raw_hex_module, "rb").read()
+
+
+# For Python >=3.11, this can be imported from contextlib
+@contextmanager
+def chdir(new_dir):
+    import os
+
+    old_dir = os.getcwd()
+    try:
+        os.chdir(new_dir)
+        yield
+    finally:
+        os.chdir(old_dir)
 
 
 class TestCodify:
@@ -188,6 +202,13 @@ class TestCodify:
         codify_main(100, args)
         out, err = capsys.readouterr()
         assert r"c:\temp\testout.dcm" in out
+
+    def test_code_relative_filename(self, capsys):
+        """Test utils.codify.code_file with a relative path that doesn't exist"""
+        # regression test for #1865
+        args = ["XXxUN_sequenceXX.dcm"]  # file that doesn't exist
+        with pytest.raises(SystemExit):
+            codify_main(100, args)
 
     def test_code_dataelem_at(self):
         """Test utils.codify.code_dataelem"""
