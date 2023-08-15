@@ -158,7 +158,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         ds = dcmread(filename, force=True)
     except FileNotFoundError:
         extra = (
-            (f", \nbut 'pydicom::{pydicom_filename}' test data file is available")
+            (f", \nbut 'pydicom::{filename}' test data file is available")
             if pydicom_filename
             else ""
         )
