@@ -47,6 +47,7 @@ raw_hex_code = open(raw_hex_module, "rb").read()
 @contextmanager
 def chdir(new_dir):
     import os
+
     old_dir = os.getcwd()
     try:
         os.chdir(new_dir)
