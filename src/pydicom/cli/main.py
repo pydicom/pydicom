@@ -18,6 +18,8 @@ from pydicom import dcmread
 from pydicom.data.data_manager import get_charset_files, get_testdata_file
 from pydicom.dataset import Dataset
 
+from pathlib import Path
+
 
 subparsers: argparse._SubParsersAction | None = None
 
@@ -124,6 +126,9 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
     """
     prefix, filename, element = filespec_parts(filespec)
 
+    # filename = Path(filename)
+    # if filename.is
+        
     # Get the pydicom test filename even without prefix, in case user forgot it
     try:
         pydicom_filename = cast(str, get_testdata_file(filename))
@@ -153,7 +158,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         ds = dcmread(filename, force=True)
     except FileNotFoundError:
         extra = (
-            (f", \nbut 'pydicom::{filename}' test data file is available")
+            (f", \nbut 'pydicom::{pydicom_filename}' test data file is available")
             if pydicom_filename
             else ""
         )
