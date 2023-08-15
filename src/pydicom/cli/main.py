@@ -128,7 +128,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
 
     # filename = Path(filename)
     # if filename.is
-        
+
     # Get the pydicom test filename even without prefix, in case user forgot it
     try:
         pydicom_filename = cast(str, get_testdata_file(filename))
