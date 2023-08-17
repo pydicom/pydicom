@@ -26,20 +26,10 @@ Download the documentation
 
      git clone https://github.com/YourUsername/pydicom.git
 
-4. (Optional) We recommend that you install your development copy of *pydicom*
-   in a virtual environment. See the :doc:`virtual environments<virtualenvs>`
-   tutorial for more information.
-
-   Create a new virtualenv ``pyd-doc``, using a Python 3.X version such
-   as 3.10, then activate it::
-
-   python3.10 -m venv pyd-doc
-   source pyd-doc/bin/activate
-
-5. Install the cloned copy of *pydicom* and the dependencies requires for
+4. Install the cloned copy of *pydicom* and the dependencies requires for
    building the documentation (using ``-e`` for an editable install)::
 
-   pip install -e pydicom[docs]
+     pip install -e pydicom[docs]
 
 
 Build and preview the documentation

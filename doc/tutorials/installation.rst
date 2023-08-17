@@ -7,9 +7,7 @@ How to install pydicom
    We recommend installing into a
    `virtual environment <https://docs.python.org/3/tutorial/venv.html>`_,
    which is an isolated Python environment that allows you to install
-   packages without admin privileges. See the
-   :doc:`virtual environments tutorial<virtualenvs>` on how to create and
-   manage virtual environments.
+   packages without admin privileges.
 
 
 .. _tut_install:
@@ -24,7 +22,7 @@ Python is supported, check :ref:`this table<faq_install_version>`.
 Install using pip
 -----------------
 
-*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`_, the
+*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`__, the
 official third-party Python software repository. The simplest way to install
 from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
 
@@ -45,7 +43,7 @@ Install using conda
 -------------------
 
 *pydicom* is also available for `conda <https://docs.conda.io/>`_ at
-`conda-forge <https://anaconda.org/conda-forge/pydicom>`_::
+`conda-forge <https://anaconda.org/conda-forge/pydicom>`__::
 
   conda install -c conda-forge pydicom
 
@@ -135,13 +133,13 @@ Installing GDCM
 `GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
-The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`_ are built by the
+The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`__ are built by the
 `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
 versions of Python on Windows, MacOS and Linux, and can be installed using pip::
 
   pip install python-gdcm
 
-The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`_
+The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`__
 tend to be older versions and not as well supported. They're available on conda using::
 
   conda install gdcm -c conda-forge
