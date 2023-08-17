@@ -64,7 +64,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/compressing.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
@@ -149,17 +148,11 @@ using:</p>
 </pre></div>
 </div>
 </li>
-<li><p>(Optional) We recommend that you install your development copy of <em>pydicom</em>
-in a virtual environment. See the <a class="reference internal" href="virtualenvs.html"><span class="doc">virtual environments</span></a>
-tutorial for more information.</p>
-<p>Create a new virtualenv <code class="docutils literal notranslate"><span class="pre">pyd-doc</span></code>, using a Python 3.X version such
-as 3.10, then activate it:</p>
-<p>python3.10 -m venv pyd-doc
-source pyd-doc/bin/activate</p>
-</li>
 <li><p>Install the cloned copy of <em>pydicom</em> and the dependencies requires for
 building the documentation (using <code class="docutils literal notranslate"><span class="pre">-e</span></code> for an editable install):</p>
-<p>pip install -e pydicom[docs]</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="n">pydicom</span><span class="p">[</span><span class="n">docs</span><span class="p">]</span>
+</pre></div>
+</div>
 </li>
 </ol>
 </section>

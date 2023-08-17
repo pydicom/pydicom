@@ -28,18 +28,7 @@ Download the current source code
 
      $ git clone https://github.com/YourUsername/pydicom.git
 
-4. (Optional) We recommend that you install your development copy of *pydicom*
-   in a virtual environment as this allows you to test different combinations
-   of Python and installed packages. See the
-   :doc:`virtual environments<virtualenvs>` tutorial for more information.
-
-   Create a new virtualenv ``pydX.Y``, where ``X.Y`` is an installed Python
-   version such as 3.7 and ``/path/to/pythonX.Y`` is the path to the
-   corresponding Python executable::
-
-   $ mkvirtualenv -p /path/to/pythonX.Y pydX.Y
-
-5. Install the cloned copy of *pydicom* (``-e`` for editable mode)::
+4. Install the cloned copy of *pydicom* (``-e`` for editable mode)::
 
    $ pip install -e pydicom/
 
