@@ -18,11 +18,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -121,7 +121,7 @@
            <div itemprop="articleBody">
              
   <section id="waveforms">
-<h1>Waveforms<a class="headerlink" href="#waveforms" title="Permalink to this heading">¶</a></h1>
+<h1>Waveforms<a class="headerlink" href="#waveforms" title="Link to this heading">¶</a></h1>
 <p>This tutorial is about understanding waveforms in DICOM datasets and covers:</p>
 <ul class="simple">
 <li><p>An introduction to DICOM waveforms</p></li>
@@ -145,7 +145,7 @@ conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> <
 <li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Waveform IODs</a></p></li>
 </ul>
 <section id="waveforms-in-dicom">
-<h2>Waveforms in DICOM<a class="headerlink" href="#waveforms-in-dicom" title="Permalink to this heading">¶</a></h2>
+<h2>Waveforms in DICOM<a class="headerlink" href="#waveforms-in-dicom" title="Link to this heading">¶</a></h2>
 <p>There are a number of DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Information Object Definitions</a> (IODs) that contain
 waveforms, such as <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>,
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.9.html">Respiratory Waveform</a> and
@@ -206,7 +206,7 @@ defining information for each channel is available in the (5400,0200)
 </div>
 </section>
 <section id="decoding-waveform-data">
-<h2>Decoding <em>Waveform Data</em><a class="headerlink" href="#decoding-waveform-data" title="Permalink to this heading">¶</a></h2>
+<h2>Decoding <em>Waveform Data</em><a class="headerlink" href="#decoding-waveform-data" title="Link to this heading">¶</a></h2>
 <p>The combined sample data for each multiplex is stored in the corresponding
 (5400,1010) <em>Waveform Data</em> element:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">WaveformBitsAllocated</span>
@@ -271,7 +271,7 @@ within the <em>Waveform Sequence</em>:</p>
 </div>
 </section>
 <section id="encoding-waveform-data">
-<h2>Encoding <em>Waveform Data</em><a class="headerlink" href="#encoding-waveform-data" title="Permalink to this heading">¶</a></h2>
+<h2>Encoding <em>Waveform Data</em><a class="headerlink" href="#encoding-waveform-data" title="Link to this heading">¶</a></h2>
 <p>Having seen how to decode and view a waveform then next step is creating our
 own multiplex group. The new group will contain two channels
 representing cosine and sine curves. We’ve chosen to represent our waveforms

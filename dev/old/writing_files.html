@@ -18,11 +18,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -123,10 +123,10 @@
            <div itemprop="articleBody">
              
   <section id="writing-dicom-files">
-<span id="id1"></span><h1>Writing DICOM Files<a class="headerlink" href="#writing-dicom-files" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>Writing DICOM Files<a class="headerlink" href="#writing-dicom-files" title="Link to this heading">¶</a></h1>
 <p class="rubric">How to write DICOM files using pydicom.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>Probably the most common use of pydicom is to read an existing DICOM file,
 alter some items, and write it back out again. The first example in
 <a class="reference internal" href="getting_started.html"><span class="doc">Introduction to pydicom</span></a> shows how to do this.</p>
@@ -141,7 +141,7 @@ own UIDs, implementation name, and so on.</p>
 </div>
 </section>
 <section id="using-codify">
-<span id="writing-files-using-codify"></span><h2>Using Codify<a class="headerlink" href="#using-codify" title="Permalink to this heading">¶</a></h2>
+<span id="writing-files-using-codify"></span><h2>Using Codify<a class="headerlink" href="#using-codify" title="Link to this heading">¶</a></h2>
 <p>pydicom has a command-line utility called <code class="docutils literal notranslate"><span class="pre">codify</span></code> that
 takes an existing DICOM file, and produces Python code. The Python code
 uses pydicom to produce a copy of the original file again, when the code is
@@ -187,7 +187,7 @@ can look at the codify.py source and the <code class="docutils literal notransla
 starting point for that.</p>
 </section>
 <section id="writing-a-file-from-scratch">
-<h2>Writing a file from Scratch<a class="headerlink" href="#writing-a-file-from-scratch" title="Permalink to this heading">¶</a></h2>
+<h2>Writing a file from Scratch<a class="headerlink" href="#writing-a-file-from-scratch" title="Link to this heading">¶</a></h2>
 <p>The codify tool, described in the previous section, is a good starting point
 for pydicom code, but if you can’t (or don’t want to) use that tool, then you
 can certainly write code from scratch to make a complete DICOM file using

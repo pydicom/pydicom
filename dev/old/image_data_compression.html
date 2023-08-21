@@ -18,11 +18,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -126,10 +126,10 @@
            <div itemprop="articleBody">
              
   <section id="compressing-pixel-data">
-<span id="guide-compression"></span><h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this heading">¶</a></h1>
+<span id="guide-compression"></span><h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Link to this heading">¶</a></h1>
 <p class="rubric">How to compress Pixel Data</p>
 <section id="compressing-using-third-party-packages">
-<h2>Compressing using third-party packages<a class="headerlink" href="#compressing-using-third-party-packages" title="Permalink to this heading">¶</a></h2>
+<h2>Compressing using third-party packages<a class="headerlink" href="#compressing-using-third-party-packages" title="Link to this heading">¶</a></h2>
 <p>Because <em>pydicom</em> currently offers limited support for compressing <em>Pixel Data</em>
 you’ll have to rely on third-party packages to perform the actual compression.
 <em>pydicom</em> can then be used to take that compressed data and add it to the
@@ -184,9 +184,9 @@ for more information.</p>
 </div>
 </section>
 <section id="compressing-using-pydicom">
-<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this heading">¶</a></h2>
+<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Link to this heading">¶</a></h2>
 <section id="supported-transfer-syntaxes">
-<span id="guide-compression-supported"></span><h3>Supported Transfer Syntaxes<a class="headerlink" href="#supported-transfer-syntaxes" title="Permalink to this heading">¶</a></h3>
+<span id="guide-compression-supported"></span><h3>Supported Transfer Syntaxes<a class="headerlink" href="#supported-transfer-syntaxes" title="Link to this heading">¶</a></h3>
 <p><em>Pixel Data</em> can be compressed natively using <em>pydicom</em> for the following
 transfer syntaxes:</p>
 <table class="docutils align-default">
@@ -220,7 +220,7 @@ transfer syntaxes:</p>
 </div>
 </section>
 <section id="compressing-with-dataset-compress">
-<h3>Compressing with <code class="docutils literal notranslate"><span class="pre">Dataset.compress()</span></code><a class="headerlink" href="#compressing-with-dataset-compress" title="Permalink to this heading">¶</a></h3>
+<h3>Compressing with <code class="docutils literal notranslate"><span class="pre">Dataset.compress()</span></code><a class="headerlink" href="#compressing-with-dataset-compress" title="Link to this heading">¶</a></h3>
 <p>The <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> method can
 be used to compress an uncompressed dataset in-place:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>

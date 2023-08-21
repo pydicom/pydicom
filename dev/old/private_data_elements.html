@@ -18,11 +18,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -124,10 +124,10 @@
            <div itemprop="articleBody">
              
   <section id="private-data-elements">
-<span id="id1"></span><h1>Private Data Elements<a class="headerlink" href="#private-data-elements" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>Private Data Elements<a class="headerlink" href="#private-data-elements" title="Link to this heading">¶</a></h1>
 <p class="rubric">Accessing or creating private data elements</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>The DICOM standard allows DICOM file creators to use <cite>private data elements</cite>
 to store information that is not defined by the DICOM standard itself.</p>
 <p>Private data elements are stored in Datasets just like other data elements.
@@ -142,7 +142,7 @@ functions to make creating private blocks and data elements easier.</p>
 elements using pydicom.</p>
 </section>
 <section id="displaying-private-data-elements-in-pydicom">
-<h2>Displaying Private Data Elements in pydicom<a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Permalink to this heading">¶</a></h2>
+<h2>Displaying Private Data Elements in pydicom<a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Link to this heading">¶</a></h2>
 <p>Here is an example of some private tags displayed for pydicom’s test file
 ‘CT_small.dcm’:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
@@ -199,7 +199,7 @@ through it:</p>
 private data elements, as shown in the next section.</p>
 </section>
 <section id="setting-private-data-elements-with-pydicom">
-<h2>Setting Private Data Elements with pydicom<a class="headerlink" href="#setting-private-data-elements-with-pydicom" title="Permalink to this heading">¶</a></h2>
+<h2>Setting Private Data Elements with pydicom<a class="headerlink" href="#setting-private-data-elements-with-pydicom" title="Link to this heading">¶</a></h2>
 <p>The DICOM standard requires a private creator data element to identify and
 reserve a section of private tags. That name should be unique, and usually
 has the company name as the first part to accomplish that.  Pydicom (since
@@ -226,7 +226,7 @@ with block object:</p>
 </div>
 </section>
 <section id="removing-all-private-data-elements">
-<h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Permalink to this heading">¶</a></h2>
+<h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Link to this heading">¶</a></h2>
 <p>One part of anonymizing a DICOM file is to ensure that private data elements
 have been removed, as there is no guarantee as to what kind of information
 might be contained in them.  Pydicom provides a convenient function

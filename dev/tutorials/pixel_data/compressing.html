@@ -18,11 +18,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-        <script src="../../_static/clipboard.min.js"></script>
-        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -121,7 +121,7 @@
            <div itemprop="articleBody">
              
   <section id="compressing-pixel-data">
-<h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this heading">¶</a></h1>
+<h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Link to this heading">¶</a></h1>
 <p>This tutorial is about compressing a dataset’s <em>Pixel Data</em> and covers</p>
 <ul class="simple">
 <li><p>An introduction to compression</p></li>
@@ -145,7 +145,7 @@ pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg
 </pre></div>
 </div>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>DICOM conformant applications are usually required to support the
 <em>Little Endian Implicit VR</em> transfer syntax, which is an uncompressed (native)
 transfer syntax. This means that datasets using <em>Little Endian Implicit VR</em> have
@@ -180,7 +180,7 @@ then it’s recommended (but not required) that an <a class="reference external"
 in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/PS3.5.html">Part 5 of the DICOM Standard</a>.</p>
 </section>
 <section id="encapsulating-data-compressed-by-third-party-packages">
-<h2>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Permalink to this heading">¶</a></h2>
+<h2>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Link to this heading">¶</a></h2>
 <p>Once you’ve used a third-party package to compress the <em>Pixel Data</em>,
 <em>pydicom</em> can be used to encapsulate and add it to the
 dataset, with either the <a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a> or
@@ -217,7 +217,7 @@ dataset, with either the <a class="reference internal" href="../../reference/gen
 </div>
 </section>
 <section id="compressing-using-pydicom">
-<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this heading">¶</a></h2>
+<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Link to this heading">¶</a></h2>
 <p>Currently, only the <em>RLE Lossless</em> transfer syntax is supported for
 compressing <em>Pixel Data</em> natively using <em>pydicom</em>. The easiest method is to
 pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>:</p>

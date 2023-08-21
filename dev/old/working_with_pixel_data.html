@@ -18,11 +18,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -126,10 +126,10 @@
            <div itemprop="articleBody">
              
   <section id="working-with-pixel-data">
-<span id="id1"></span><h1>Working with Pixel Data<a class="headerlink" href="#working-with-pixel-data" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>Working with Pixel Data<a class="headerlink" href="#working-with-pixel-data" title="Link to this heading">¶</a></h1>
 <p class="rubric">How to work with pixel data in pydicom.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>Many DICOM SOP classes contain bulk pixel data, which is usually used to
 represent one or more image frames (although <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.18.3.html">other types of data</a> are possible). In these SOP classes the pixel
 data is (almost) always contained in the (7FE0,0010) <em>Pixel Data</em> element.
@@ -172,7 +172,7 @@ an easy way to get it in a convenient form:
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a>.</p>
 </section>
 <section id="dataset-pixel-array">
-<h2><code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code><a class="headerlink" href="#dataset-pixel-array" title="Permalink to this heading">¶</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code><a class="headerlink" href="#dataset-pixel-array" title="Link to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a>
@@ -223,7 +223,7 @@ an example.</p>
 data to graphics libraries for viewing. See <a class="reference internal" href="viewing_images.html"><span class="doc">Viewing Images</span></a> for details.</p>
 </section>
 <section id="color-space">
-<span id="colorspace"></span><h2>Color space<a class="headerlink" href="#color-space" title="Permalink to this heading">¶</a></h2>
+<span id="colorspace"></span><h2>Color space<a class="headerlink" href="#color-space" title="Link to this heading">¶</a></h2>
 <p>When using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
 with <em>Pixel Data</em> that has an (0028,0002) <em>Samples per Pixel</em> value
 of <code class="docutils literal notranslate"><span class="pre">3</span></code> then the returned pixel data will be in the color space as given by
@@ -242,7 +242,7 @@ information about color spaces.</p>
 </div>
 </section>
 <section id="palette-color">
-<h2>Palette Color<a class="headerlink" href="#palette-color" title="Permalink to this heading">¶</a></h2>
+<h2>Palette Color<a class="headerlink" href="#palette-color" title="Link to this heading">¶</a></h2>
 <p>Some DICOM datasets store their output image pixel values in a lookup table
 (LUT), where the values in <em>Pixel Data</em> are the index to a corresponding
 LUT entry. When a dataset’s (0028,0004) <em>Photometric Interpretation</em> value is
@@ -277,7 +277,7 @@ of the pixel data is 8-bit.</p>
 </div>
 </section>
 <section id="modality-lut-or-rescale-operation">
-<h2>Modality LUT or Rescale Operation<a class="headerlink" href="#modality-lut-or-rescale-operation" title="Permalink to this heading">¶</a></h2>
+<h2>Modality LUT or Rescale Operation<a class="headerlink" href="#modality-lut-or-rescale-operation" title="Link to this heading">¶</a></h2>
 <p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Modality LUT</a> module
 converts raw pixel data values to a specific (possibly unitless) physical
 quantity, such as Hounsfield units for CT. The
@@ -296,7 +296,7 @@ first.</p>
 </div>
 </section>
 <section id="voi-lut-or-windowing-operation">
-<h2>VOI LUT or Windowing Operation<a class="headerlink" href="#voi-lut-or-windowing-operation" title="Permalink to this heading">¶</a></h2>
+<h2>VOI LUT or Windowing Operation<a class="headerlink" href="#voi-lut-or-windowing-operation" title="Link to this heading">¶</a></h2>
 <p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT</a> module applies a
 VOI or windowing operation to input values. The
 <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> function
