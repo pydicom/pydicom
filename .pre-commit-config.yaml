@@ -2,17 +2,17 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 - repo: https://github.com/crate-ci/typos
-  rev: v1.16.10
+  rev: v1.16.11
   hooks:
     - id: typos
       exclude: _.*_dict.py
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.0.287
+  rev: v0.0.288
   hooks:
   - id: ruff
     args: [src, --fix, --exit-non-zero-on-fix]
 - repo: https://github.com/psf/black
-  rev: 23.7.0
+  rev: 23.9.1
   hooks:
   - id: black
