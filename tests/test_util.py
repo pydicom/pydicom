@@ -310,9 +310,7 @@ class TestDump:
         pretty_print(ds)
 
         s = capsys.readouterr().out
-        assert (
-            "(0008,0005) Specific Character Set              CS: 'ISO_IR 100'"
-        ) in s
+        assert ("(0008,0005) Specific Character Set              CS: 'ISO_IR 100'") in s
         assert ("(0010,1002) Other Patient IDs Sequence -- 2 item(s)") in s
         assert ("  (0010,0022) Type of Patient ID                  CS: 'TEXT'") in s
         assert (
