@@ -7,7 +7,7 @@ from pydicom.tag import Tag, BaseTag, TagType
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from pydicom._dicom_dict import DicomDictionary
 
-# those with tags like "(50xx, 0005)"
+# those with tags like "(50xx,0005)"
 from pydicom._dicom_dict import RepeatersDictionary
 from pydicom._private_dict import private_dictionaries
 

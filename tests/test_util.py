@@ -72,7 +72,7 @@ class TestCodify:
         output_str = [
             "(0x0000, 0x0000)",
             "(0x0010, 0x0010)",
-            "(0x7fe0, 0x0010)",
+            "(0x7FE0, 0x0010)",
             "(0x1111, 0x0001)",
         ]
         for tag, out_str in zip(input_tag, output_str):
@@ -137,7 +137,7 @@ class TestCodify:
         ]
         out_str = [
             "ds.add_new((0x0011, 0x1010), 'PN', 'CITIZEN')",
-            "ds.add_new((0x0081, 0x010c), 'UI', '1.1.2.3.4.5')",
+            "ds.add_new((0x0081, 0x010C), 'UI', '1.1.2.3.4.5')",
             "ds.add_new((0x1111, 0x0301), 'US', 1200)",
         ]
         for elem, out in zip(input_elem, out_str):
@@ -175,10 +175,10 @@ class TestCodify:
     def test_codify_recurring_keyword(self):
         """Test utils.codify.code_dataset with same keyword nested"""
         # Create fake Dataset with repeated DICOM keyword nested
-        # (0040, a730)  Content Sequence  1 item(s) ----
-        #    (0040, a040) Value Type                          CS: 'CODE'
-        #    (0040, a730)  Content Sequence  1 item(s) ----
-        #       (0040, a040) Value Type                          CS: 'CODE'
+        # (0040,A730)  Content Sequence  1 item(s) ----
+        #    (0040,A040) Value Type                          CS: 'CODE'
+        #    (0040,A730)  Content Sequence  1 item(s) ----
+        #       (0040,A040) Value Type                          CS: 'CODE'
 
         ds = Dataset()
         ds.ContentSequence = seq1 = Sequence()
@@ -311,12 +311,12 @@ class TestDump:
 
         s = capsys.readouterr().out
         assert (
-            "(0008, 0005) Specific Character Set              CS: 'ISO_IR 100'"
+            "(0008,0005) Specific Character Set              CS: 'ISO_IR 100'"
         ) in s
-        assert ("(0010, 1002) Other Patient IDs Sequence -- 2 item(s)") in s
-        assert ("  (0010, 0022) Type of Patient ID                  CS: 'TEXT'") in s
+        assert ("(0010,1002) Other Patient IDs Sequence -- 2 item(s)") in s
+        assert ("  (0010,0022) Type of Patient ID                  CS: 'TEXT'") in s
         assert (
-            "(fffc, fffc) Data Set Trailing Padding           OB: Array of "
+            "(FFFC,FFFC) Data Set Trailing Padding           OB: Array of "
             "126 elements"
         ) in s
 
@@ -454,7 +454,7 @@ class TestDataElementCallbackTests:
     @pytest.mark.filterwarnings("ignore:Unknown DICOM tag")
     def test_process_unknown_vr(self):
         bad_vr_bytes = self.ds_bytes
-        # tag (0900, 0010), length 4, value "1,2"
+        # tag (0900,0010), length 4, value "1,2"
         bad_vr_bytes += b"\x00\x09\x10\x00" b"\x04\x00\x00\x00" b"\x31\x2c\x32\x20"
         fixer.fix_separator(b",", for_VRs=["DS", "IS"], process_unknown_VRs=True)
         ds = filereader.read_dataset(

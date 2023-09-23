@@ -169,7 +169,7 @@ def data_element_generator(
                         debug_msg += " " + bytes2hex(bytes_read)
 
         if debugging:
-            debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
+            debug_msg = f"{debug_msg:<47s}  ({group:04X},{elem:04X})"
             if not is_implicit_VR:
                 debug_msg += f" {vr} "
             if length != 0xFFFFFFFF:
@@ -887,7 +887,7 @@ def read_partial(
     # Add the command set elements to the dataset (if any)
     dataset.update(command_set)
 
-    # (0002, 0002) Media Storage SOP Class UID
+    # (0002,0002) Media Storage SOP Class UID
     elem = file_meta.get(0x00020002, None)
     sop_class = elem.value.name if (elem and elem.VM == 1) else ""
     ds = FileDataset(

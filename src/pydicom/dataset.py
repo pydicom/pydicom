@@ -294,13 +294,13 @@ class Dataset:
 
     >>> elem = ds['PatientName']
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
+    (0010,0010) Patient's Name                      PN: 'CITIZEN^John'
     >>> elem = ds[0x00100010]
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
+    (0010,0010) Patient's Name                      PN: 'CITIZEN^John'
     >>> elem = ds.data_element('PatientName')
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
+    (0010,0010) Patient's Name                      PN: 'CITIZEN^John'
 
     Accessing a private :class:`~pydicom.dataelem.DataElement`
     item:
@@ -308,7 +308,7 @@ class Dataset:
     >>> block = ds.private_block(0x0041, 'My Creator')
     >>> elem = block[0x01]
     >>> elem
-    (0041, 1001) Private tag data                    LO: '12345'
+    (0041,1001) Private tag data                    LO: '12345'
     >>> elem.value
     '12345'
 
@@ -345,13 +345,13 @@ class Dataset:
 
     >>> for elem in ds:
     ...    print(elem)
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
+    (0010,0010) Patient's Name                      PN: 'CITIZEN^John'
 
     Iterating through the entire :class:`Dataset` (including Sequences):
 
     >>> for elem in ds.iterall():
     ...     print(elem)
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
+    (0010,0010) Patient's Name                      PN: 'CITIZEN^John'
 
     Recursively iterate through a :class:`Dataset` (including Sequences):
 
@@ -369,7 +369,7 @@ class Dataset:
     >>> jsonmodel = ds.to_json()
     >>> ds2 = Dataset()
     >>> ds2.from_json(jsonmodel)
-    (0010, 0010) Patient's Name                      PN: 'Some^Name'
+    (0010,0010) Patient's Name                      PN: 'Some^Name'
 
     Attributes
     ----------
@@ -702,7 +702,7 @@ class Dataset:
         >>> ds.PatientName = 'CITIZEN^Jan'
         >>> del ds[0x00000000]
         >>> ds
-        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
+        (0010,0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
         Slicing using :class:`~pydicom.dataelem.DataElement` tag
 
@@ -712,7 +712,7 @@ class Dataset:
         >>> ds.PatientName = 'CITIZEN^Jan'
         >>> del ds[:0x00100000]
         >>> ds
-        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
+        (0010,0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
         Parameters
         ----------
@@ -963,8 +963,8 @@ class Dataset:
         the  dataset
 
         >>> ds[0x00100000:0x00110000]
-        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
-        (0010, 0020) Patient ID                          LO: '12345'
+        (0010,0010) Patient's Name                      PN: 'CITIZEN^Jan'
+        (0010,0020) Patient ID                          LO: '12345'
 
         All group ``0x0002`` elements in the dataset
 
@@ -1403,7 +1403,7 @@ class Dataset:
         >>> ds = Dataset()
         >>> elem = ds.setdefault((0x0010, 0x0010), "Test")
         >>> elem
-        (0010, 0010) Patient's Name                      PN: 'Test'
+        (0010,0010) Patient's Name                      PN: 'Test'
         >>> elem.value
         'Test'
         >>> elem = ds.setdefault('PatientSex',

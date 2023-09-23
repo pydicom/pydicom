@@ -268,7 +268,7 @@ if __name__ == "__main__":
     attrs += parse_docbook_table(root, f"{title} File Meta Elements")
     attrs += parse_docbook_table(root, f"{title} Directory Structuring Elements")
 
-    # Get the Command Group elements (0000,eeee) - Part 7
+    # Get the Command Group elements (0000,EEEE\) - Part 7
     tree = ET.parse(part_07)
     root = tree.getroot()
     command_attrs = parse_docbook_table(root, "Command Fields")
@@ -311,7 +311,7 @@ if __name__ == "__main__":
         # since 2019 the year is added, e.g. RET(2007)
         elif attr["Retired"].startswith("RET ("):
             attr["Retired"] = "Retired"
-        # e.g. (0008,0102), (0014,0025), (0040, A170)
+        # e.g. (0008,0102), (0014,0025), (0040,A170)
         elif attr["Retired"] in ["DICOS", "DICONDE", "See Note"]:
             attr["Retired"] = ""
 
@@ -352,7 +352,7 @@ if __name__ == "__main__":
         vr = attr["VR"]
         tag = attr["Tag"]
         try:
-            # (fffe,e000), (fffe,e00d) and (fffe,e0dd) have no VR
+            # (FFFE,E000), (FFFE,E00D) and (FFFE,E0DD) have no VR
             assert vr in converters or vr == "NONE"
         except AssertionError:
             print(f"Warning: the VR '{vr}' for tag {tag} is not implemented")

@@ -31,7 +31,7 @@ class TestRawReaderExplVRTests:
 
     def testExplVRLittleEndianShortLength(self):
         """Raw read: Explicit VR Little Endian short length..."""
-        # (0008,212a) IS 2-byte-length, value '1 '
+        # (0008,212A) IS 2-byte-length, value '1 '
         infile = BytesIO(hex2bytes("08 00 2a 21 49 53 02 00 31 20"))
         # XXX Assumes that a RawDataElement doesn't convert the value based
         # upon the VR value, thus it will remain a byte string since that is
@@ -44,7 +44,7 @@ class TestRawReaderExplVRTests:
 
     def testExplVRLittleEndianUndefLength(self):
         """Raw read: Expl VR Little Endian with undefined length..."""
-        # (7fe0,0010), OB, 2-byte reserved, 4-byte-length (UNDEFINED)
+        # (7FE0,0010), OB, 2-byte reserved, 4-byte-length (UNDEFINED)
         hexstr1 = "e0 7f 10 00 4f 42 00 00 ff ff ff ff"
         hexstr2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
         hexstr3 = " fe ff dd e0 00 00 00 00"  # Sequence Delimiter
@@ -89,7 +89,7 @@ class TestRawReaderImplVR:
 
     def testImplVRLittleEndian(self):
         """Raw read: Implicit VR Little Endian..."""
-        # (0008,212a) {IS} 4-byte-length, value '1 '
+        # (0008,212A) {IS} 4-byte-length, value '1 '
         infile = BytesIO(hex2bytes("08 00 2a 21 02 00 00 00 31 20"))
 
         expected = ((8, 0x212A), None, 2, b"1 ", 0x8, True, True, True)
@@ -101,7 +101,7 @@ class TestRawReaderImplVR:
 
     def testImplVRLittleEndianUndefLength(self):
         """Raw read: Impl VR Little Endian with undefined length..."""
-        # (7fe0,0010), OB, 2-byte reserved, 4-byte-length (UNDEFINED)
+        # (7FE0,0010), OB, 2-byte reserved, 4-byte-length (UNDEFINED)
         hexstr1 = "e0 7f 10 00 ff ff ff ff"
         hexstr2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
         hexstr3 = " fe ff dd e0 00 00 00 00"  # Sequence Delimiter
@@ -141,10 +141,10 @@ class TestRawReaderImplVR:
         undefined length..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "18 00 00 00"  # Item (dataset) Length
             "41 42 43 44"
             "45 46 47 48"
@@ -178,10 +178,10 @@ class TestRawReaderImplVR:
         undefined length broken into two defined-length fragments..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "18 00 00 00"  # Item (dataset) Length
             "41 42 43 44"
             "45 46 47 48"
@@ -189,7 +189,7 @@ class TestRawReaderImplVR:
             "4d 4e 4f 50"
             "51 52 53 54"
             "55 56 57 58"
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "14 00 00 00"  # Item (dataset) Length
             "41 42 43 44"
             "45 46 47 48"
@@ -226,10 +226,10 @@ class TestRawReaderImplVR:
         length..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "ff ff ff ff"  # Item (dataset) Length - undefined
             "41 42 43 44"
             "45 46 47 48"
@@ -264,10 +264,10 @@ class TestRawReaderImplVR:
         length..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "50 00 00 00"  # Item (dataset) Length - too long
             "41 42 43 44"
             "45 46 47 48"
@@ -302,10 +302,10 @@ class TestRawReaderImplVR:
         is specified..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
         )
 
         infile = BytesIO(hex2bytes(hexstr))
@@ -320,10 +320,10 @@ class TestRawReaderImplVR:
         undefined length that's longer than defer_size..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "14 00 00 00"  # Item (dataset) Length
             "41 42 43 44"
             "45 46 47 48"
@@ -356,10 +356,10 @@ class TestRawReaderImplVR:
         undefined length and a bad (non-zero) sequence delimiter length..."""
 
         hexstr = (
-            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "e0 7f 10 00"  # (7FE0,0010) Pixel Data
             "4f 42 00 00"  # VR OB, 2 bytes reserved
             "ff ff ff ff"  # -1 undefined length
-            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "fe ff 00 e0"  # (FFFE,E000) Item Tag
             "10 00 00 00"  # Item (dataset) Length
             "41 42 43 44"
             "45 46 47 48"
@@ -393,12 +393,12 @@ class TestRawSequence:
         """Read sequence with a single empty item..."""
         # This is fix for issue 27
         hexstr = (
-            "08 00 32 10"  # (0008, 1032) SQ "Procedure Code Sequence"
+            "08 00 32 10"  # (0008,1032) SQ "Procedure Code Sequence"
             " 08 00 00 00"  # length 8
-            " fe ff 00 e0"  # (fffe, e000) Item Tag
+            " fe ff 00 e0"  # (FFFE,E000) Item Tag
             " 00 00 00 00"  # length = 0
         ) + (  # --------------- end of Sequence
-            " 08 00 3e 10"  # (0008, 103e) LO "Series Description"  nopep8
+            " 08 00 3e 10"  # (0008,103E) LO "Series Description"  nopep8
             " 0c 00 00 00"  # length     nopep8
             " 52 20 41 44 44 20 56 49 45 57 53 20"  # value     nopep8
         )
@@ -423,23 +423,23 @@ class TestRawSequence:
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
         hexstr = (
-            "0a 30 B0 00"  # (300a, 00b0) Beam Sequence
+            "0a 30 B0 00"  # (300A,00B0) Beam Sequence
             " 40 00 00 00"  # length
-            " fe ff 00 e0"  # (fffe, e000) Item Tag
+            " fe ff 00 e0"  # (FFFE,E000) Item Tag
             " 18 00 00 00"  # Item (dataset) Length
-            " 0a 30 c0 00"  # (300A, 00C0) Beam Number
+            " 0a 30 c0 00"  # (300A,00C0) Beam Number
             " 02 00 00 00"  # length
             " 31 20"  # value '1 '
-            " 0a 30 c2 00"  # (300A, 00C2) Beam Name
+            " 0a 30 c2 00"  # (300A,00C2) Beam Name
             " 06 00 00 00"  # length
             " 42 65 61 6d 20 31"  # value 'Beam 1'
             # -------------
-            " fe ff 00 e0"  # (fffe, e000) Item Tag
+            " fe ff 00 e0"  # (FFFE,E000) Item Tag
             " 18 00 00 00"  # Item (dataset) Length
-            " 0a 30 c0 00"  # (300A, 00C0) Beam Number
+            " 0a 30 c0 00"  # (300A,00C0) Beam Number
             " 02 00 00 00"  # length
             " 32 20"  # value '2 '
-            " 0a 30 c2 00"  # (300A, 00C2) Beam Name
+            " 0a 30 c2 00"  # (300A,00C2) Beam Name
             " 06 00 00 00"  # length
             " 42 65 61 6d 20 32"  # value 'Beam 2'
         )
@@ -461,23 +461,23 @@ class TestRawSequence:
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
         hexstr = (
-            "30 0a 00 B0"  # (300a, 00b0) Beam Sequence
+            "30 0a 00 B0"  # (300A,00B0) Beam Sequence
             " 00 00 00 40"  # length
-            " ff fe e0 00"  # (fffe, e000) Item Tag
+            " ff fe e0 00"  # (FFFE,E000) Item Tag
             " 00 00 00 18"  # Item (dataset) Length
-            " 30 0a 00 c0"  # (300A, 00C0) Beam Number
+            " 30 0a 00 c0"  # (300A,00C0) Beam Number
             " 00 00 00 02"  # length
             " 31 20"  # value '1 '
-            " 30 0a 00 c2"  # (300A, 00C2) Beam Name
+            " 30 0a 00 c2"  # (300A,00C2) Beam Name
             " 00 00 00 06"  # length
             " 42 65 61 6d 20 31"  # value 'Beam 1'
             # -------------
-            " ff fe e0 00"  # (fffe, e000) Item Tag
+            " ff fe e0 00"  # (FFFE,E000) Item Tag
             " 00 00 00 18"  # Item (dataset) Length
-            " 30 0a 00 c0"  # (300A, 00C0) Beam Number
+            " 30 0a 00 c0"  # (300A,00C0) Beam Number
             " 00 00 00 02"  # length
             " 32 20"  # value '2 '
-            " 30 0a 00 c2"  # (300A, 00C2) Beam Name
+            " 30 0a 00 c2"  # (300A,00C2) Beam Name
             " 00 00 00 06"  # length
             " 42 65 61 6d 20 32"  # value 'Beam 2'
         )
@@ -499,28 +499,28 @@ class TestRawSequence:
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-2 p42
         hexstr = (
-            "30 0a 00 B0"  # (300a, 00b0) Beam Sequence
+            "30 0a 00 B0"  # (300A,00B0) Beam Sequence
             " 53 51"  # SQ
             " 00 00"  # reserved
             " ff ff ff ff"  # undefined length
-            " ff fe e0 00"  # (fffe, e000) Item Tag
+            " ff fe e0 00"  # (FFFE,E000) Item Tag
             " 00 00 00 18"  # Item (dataset) Length
-            " 30 0a 00 c0"  # (300A, 00C0) Beam Number
+            " 30 0a 00 c0"  # (300A,00C0) Beam Number
             " 49 53"  # IS
             " 00 02"  # length
             " 31 20"  # value '1 '
-            " 30 0a 00 c2"  # (300A, 00C2) Beam Name
+            " 30 0a 00 c2"  # (300A,00C2) Beam Name
             " 4c 4F"  # LO
             " 00 06"  # length
             " 42 65 61 6d 20 31"  # value 'Beam 1'
             # -------------
-            " ff fe e0 00"  # (fffe, e000) Item Tag
+            " ff fe e0 00"  # (FFFE,E000) Item Tag
             " 00 00 00 18"  # Item (dataset) Length
-            " 30 0a 00 c0"  # (300A, 00C0) Beam Number
+            " 30 0a 00 c0"  # (300A,00C0) Beam Number
             " 49 53"  # IS
             " 00 02"  # length
             " 32 20"  # value '2 '
-            " 30 0a 00 c2"  # (300A, 00C2) Beam Name
+            " 30 0a 00 c2"  # (300A,00C2) Beam Name
             " 4C 4F"  # LO
             " 00 06"  # length
             " 42 65 61 6d 20 32"  # value 'Beam 2'
@@ -545,13 +545,13 @@ class TestRawSequence:
         """Raw read: Tolerate missing VR in Sequence item"""
         # issue 1305
         hexstr = (
-            "30 0a 00 B0"  # (300a, 00b0) Beam Sequence
+            "30 0a 00 B0"  # (300A,00B0) Beam Sequence
             " 53 51"  # SQ
             " 00 00"  # reserved
             " FF FF FF FF"  # undefined length
-            " ff fe e0 00"  # (fffe, e000) Item Tag
+            " ff fe e0 00"  # (FFFE,E000) Item Tag
             " 00 00 00 12"  # Item (dataset) Length - 18 bytes
-            " 00 10 00 20 00 00 00 0a"  # (0010, 0020) IMPL VR with length 0a
+            " 00 10 00 20 00 00 00 0a"  # (0010,0020) IMPL VR with length 0a
             " 34 34 34 34 34 34 34 34 34 34"
             " ff fe E0 dd"  # SQ delimiter
             " 00 00 00 00"  # zero length

@@ -5,6 +5,7 @@ Changes
 -------
 * Removed support for Python <= 3.9
 * `compat` module removed
+* All tag formats changed to upper case, no space e.g. "(7FE0,0010)" rather than "(7fe0, 0010)"
 * Values with VR AE with an incorrect value length are now handled
   gracefully (extra bytes are ignored with a warning)
 * A value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued

@@ -309,10 +309,10 @@ class TestDataElement:
     def test_str_no_vr(self):
         """Test DataElement.__str__ output with no VR"""
         elem = DataElement(0x00100010, "PN", "ANON")
-        assert "(0010, 0010) Patient's Name" in str(elem)
+        assert "(0010,0010) Patient's Name" in str(elem)
         assert "PN: 'ANON'" in str(elem)
         elem.showVR = False
-        assert "(0010, 0010) Patient's Name" in str(elem)
+        assert "(0010,0010) Patient's Name" in str(elem)
         assert "PN" not in str(elem)
 
     def test_repr_seq(self):
@@ -572,7 +572,7 @@ class TestRawDataElement:
         """RawDataElement: conversion of unknown tag warns..."""
         raw = RawDataElement(Tag(0x88880088), None, 4, b"unknown", 0, True, True)
 
-        with pytest.warns(UserWarning, match=r"\(8888, 0088\)"):
+        with pytest.warns(UserWarning, match=r"\(8888,0088\)"):
             element = DataElement_from_raw(raw)
             assert element.VR == "UN"
 
@@ -583,7 +583,7 @@ class TestRawDataElement:
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
         raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
 
-        with pytest.raises(KeyError, match=r"\(8888, 0002\)"):
+        with pytest.raises(KeyError, match=r"\(8888,0002\)"):
             DataElement_from_raw(raw)
 
     def test_valid_tag(self, no_datetime_conversion):
@@ -637,7 +637,7 @@ class TestRawDataElement:
             r"Expected total bytes to be an even multiple of bytes per value. "
             r"Instead received b'1' with length 1 and struct format 'd' which "
             r"corresponds to bytes per value of 8. This occurred while trying "
-            r"to parse \(0019, 0000\) according to VR 'FD'. "
+            r"to parse \(0019,0000\) according to VR 'FD'. "
             r"Setting VR to 'UN'."
         )
         with pytest.warns(UserWarning, match=msg):

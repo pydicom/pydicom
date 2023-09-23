@@ -242,7 +242,7 @@ class TestWriteFile:
             ds.save_as(self.file_out)
 
     def test_write_ffff_ffff(self):
-        """Test writing element (FFFF, FFFF) to file #92"""
+        """Test writing element (FFFF,FFFF) to file #92"""
         fp = DicomBytesIO()
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
@@ -551,7 +551,7 @@ class TestWriteDataElement:
         )
         elem = DataElement(0x0070150D, "OD", bytestring)
         encoded_elem = self.encode_element(elem)
-        # Tag pair (0070, 150d): 70 00 0d 15
+        # Tag pair (0070,150D): 70 00 0d 15
         # Length (16): 10 00 00 00
         #             | Tag          |   Length      |    Value ->
         ref_bytes = b"\x70\x00\x0d\x15\x10\x00\x00\x00" + bytestring
@@ -575,7 +575,7 @@ class TestWriteDataElement:
         )
         elem = DataElement(0x0070150D, "OD", bytestring)
         encoded_elem = self.encode_element(elem, False, True)
-        # Tag pair (0070, 150d): 70 00 0d 15
+        # Tag pair (0070,150D): 70 00 0d 15
         # VR (OD): \x4f\x44
         # Reserved: \x00\x00
         # Length (16): \x10\x00\x00\x00
@@ -596,7 +596,7 @@ class TestWriteDataElement:
         bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
         elem = DataElement(0x00660129, "OL", bytestring)
         encoded_elem = self.encode_element(elem)
-        # Tag pair (0066, 0129): 66 00 29 01
+        # Tag pair (0066,0129): 66 00 29 01
         # Length (12): 0c 00 00 00
         #             | Tag          |   Length      |    Value ->
         ref_bytes = b"\x66\x00\x29\x01\x0c\x00\x00\x00" + bytestring
@@ -618,7 +618,7 @@ class TestWriteDataElement:
         bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
         elem = DataElement(0x00660129, "OL", bytestring)
         encoded_elem = self.encode_element(elem, False, True)
-        # Tag pair (0066, 0129): 66 00 29 01
+        # Tag pair (0066,0129): 66 00 29 01
         # VR (OL): \x4f\x4c
         # Reserved: \x00\x00
         # Length (12): 0c 00 00 00
@@ -638,7 +638,7 @@ class TestWriteDataElement:
         # VM 1, even data
         elem = DataElement(0x00189908, "UC", "Test")
         encoded_elem = self.encode_element(elem)
-        # Tag pair (0018, 9908): 08 00 20 01
+        # Tag pair (0018,9908): 08 00 20 01
         # Length (4): 04 00 00 00
         # Value: \x54\x65\x73\x74
         ref_bytes = b"\x18\x00\x08\x99\x04\x00\x00\x00\x54\x65\x73\x74"
@@ -677,7 +677,7 @@ class TestWriteDataElement:
         # VM 1, even data
         elem = DataElement(0x00189908, "UC", "Test")
         encoded_elem = self.encode_element(elem, False, True)
-        # Tag pair (0018, 9908): 08 00 20 01
+        # Tag pair (0018,9908): 08 00 20 01
         # VR (UC): \x55\x43
         # Reserved: \x00\x00
         # Length (4): \x04\x00\x00\x00
@@ -725,7 +725,7 @@ class TestWriteDataElement:
         # Even length URL
         elem = DataElement(0x00080120, "UR", "http://github.com/darcymason/pydicom")
         encoded_elem = self.encode_element(elem)
-        # Tag pair (0008, 2001): 08 00 20 01
+        # Tag pair (0008,2001): 08 00 20 01
         # Length (36): 24 00 00 00
         # Value: 68 to 6d
         ref_bytes = (
@@ -740,7 +740,7 @@ class TestWriteDataElement:
         # Odd length URL has trailing \x20 (SPACE) padding
         elem.value = "../test/test.py"
         encoded_elem = self.encode_element(elem)
-        # Tag pair (0008, 2001): 08 00 20 01
+        # Tag pair (0008,2001): 08 00 20 01
         # Length (16): 10 00 00 00
         # Value: 2e to 20
         ref_bytes = (
@@ -764,7 +764,7 @@ class TestWriteDataElement:
         # Even length URL
         elem = DataElement(0x00080120, "UR", "ftp://bits")
         encoded_elem = self.encode_element(elem, False, True)
-        # Tag pair (0008, 2001): 08 00 20 01
+        # Tag pair (0008,2001): 08 00 20 01
         # VR (UR): \x55\x52
         # Reserved: \x00\x00
         # Length (4): \x0a\x00\x00\x00
@@ -843,7 +843,7 @@ class TestCorrectAmbiguousVR:
         with pytest.raises(
             AttributeError,
             match=r"Failed to resolve ambiguous VR for tag "
-            r"\(0028, 0104\):.* 'PixelRepresentation'",
+            r"\(0028,0104\):.* 'PixelRepresentation'",
         ):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
@@ -876,7 +876,7 @@ class TestCorrectAmbiguousVR:
         with pytest.raises(
             AttributeError,
             match=r"Failed to resolve ambiguous VR for tag "
-            r"\(0028, 3002\):.* 'PixelRepresentation'",
+            r"\(0028,3002\):.* 'PixelRepresentation'",
         ):
             correct_ambiguous_vr(deepcopy(ref_ds), False)
 
@@ -910,7 +910,7 @@ class TestCorrectAmbiguousVR:
         with pytest.raises(
             AttributeError,
             match=r"Failed to resolve ambiguous VR for tag "
-            r"\(7fe0, 0010\):.* 'BitsAllocated'",
+            r"\(7FE0,0010\):.* 'BitsAllocated'",
         ):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
@@ -949,7 +949,7 @@ class TestCorrectAmbiguousVR:
         with pytest.raises(
             AttributeError,
             match=r"Failed to resolve ambiguous VR for tag "
-            r"\(5400, 1010\):.* 'WaveformBitsAllocated'",
+            r"\(5400,1010\):.* 'WaveformBitsAllocated'",
         ):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
@@ -982,7 +982,7 @@ class TestCorrectAmbiguousVR:
         with pytest.raises(
             AttributeError,
             match=r"Failed to resolve ambiguous VR for tag "
-            r"\(0028, 3006\):.* 'LUTDescriptor'",
+            r"\(0028,3006\):.* 'LUTDescriptor'",
         ):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
@@ -1159,7 +1159,7 @@ class TestCorrectAmbiguousVRElement:
         with pytest.raises(
             AttributeError,
             match=r"Failed to resolve ambiguous VR for tag "
-            r"\(0028, 0120\):.* 'PixelRepresentation'",
+            r"\(0028,0120\):.* 'PixelRepresentation'",
         ):
             correct_ambiguous_vr_element(ds[0x00280120], ds, True)
 
@@ -2421,7 +2421,7 @@ class TestWriteNumbers:
         fp.is_little_endian = True
         elem = DataElement(0x00100010, "US", b"\x00")
         fmt = "H"
-        with pytest.raises(OSError, match=r"for data_element:\n\(0010, 0010\)"):
+        with pytest.raises(OSError, match=r"for data_element:\n\(0010,0010\)"):
             write_numbers(fp, elem, fmt)
 
     def test_write_big_endian(self):
@@ -2802,7 +2802,7 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.is_implicit_VR = False
 
         msg = (
-            r"The value for the data element \(3004, 0058\) exceeds the "
+            r"The value for the data element \(3004,0058\) exceeds the "
             r"size of 64 kByte and cannot be written in an explicit "
             r"transfer syntax. The data element VR is changed from "
             r"'DS' to 'UN' to allow saving the data."

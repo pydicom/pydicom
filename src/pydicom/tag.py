@@ -197,8 +197,8 @@ class BaseTag(int):
     __hash__ = int.__hash__
 
     def __str__(self) -> str:
-        """Return the tag value as a hex string '(gggg, eeee)'."""
-        return f"({self.group:04x}, {self.element:04x})"
+        """Return the tag value as a hex string '(gggg,eeee)'."""
+        return f"({self.group:04X},{self.element:04X})"
 
     __repr__ = __str__
 
