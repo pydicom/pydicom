@@ -268,7 +268,7 @@ if __name__ == "__main__":
     attrs += parse_docbook_table(root, f"{title} File Meta Elements")
     attrs += parse_docbook_table(root, f"{title} Directory Structuring Elements")
 
-    # Get the Command Group elements (0000,EEEE\) - Part 7
+    # Get the Command Group elements (0000,eeee) - Part 7
     tree = ET.parse(part_07)
     root = tree.getroot()
     command_attrs = parse_docbook_table(root, "Command Fields")
