@@ -39,7 +39,8 @@ def parse_private_docbook(doc_root):
     entries = defaultdict(dict)
     for entry in root:
         owner = entry.attrib["owner"]
-        tag = entry.attrib["group"] + entry.attrib["element"]
+        tag = entry.attrib["group"].upper() + entry.attrib["element"].upper()
+        tag = tag.replace("XX", "xx")
         vr = entry.attrib["vr"]
         vm = entry.attrib["vm"]
         name = entry.attrib["name"].replace("\\", "\\\\")  # escape backslashes
