@@ -76,8 +76,8 @@ Anonymize a single file
 
  .. code-block:: none
 
-    (0010, 0020) Patient ID                          LO: '4MR1'
-    (0010, 0030) Patient's Birth Date                DA: ''
+    (0010,0020) Patient ID                          LO: '4MR1'
+    (0010,0030) Patient's Birth Date                DA: ''
 
 
 
@@ -217,8 +217,8 @@ Finally, this is possible to store the image
 
  .. code-block:: none
 
-    (0010, 0020) Patient ID                          LO: 'id'
-    (0010, 0030) Patient's Birth Date                DA: '19000101'
+    (0010,0020) Patient ID                          LO: 'id'
+    (0010,0030) Patient's Birth Date                DA: '19000101'
 
 
 
@@ -226,7 +226,7 @@ Finally, this is possible to store the image
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.008 seconds)
+   **Total running time of the script:** (0 minutes 0.009 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_anonymize.py:

@@ -33,9 +33,9 @@ This examples illustrates how to work with sequences.
 
  .. code-block:: none
 
-    Number of blocks: [(300a, 00f8) Block Type                          CS: 'APERTURE'
-    (300a, 00fe) Block Name                          LO: 'Block1'(300a, 00f8) Block Type                          CS: 'APERTURE'
-    (300a, 00fe) Block Name                          LO: 'Block2']
+    Number of blocks: [(300A,00F8) Block Type                          CS: 'APERTURE'
+    (300A,00FE) Block Name                          LO: 'Block1'(300A,00F8) Block Type                          CS: 'APERTURE'
+    (300A,00FE) Block Name                          LO: 'Block2']
 
 
 
@@ -81,7 +81,7 @@ This examples illustrates how to work with sequences.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.002 seconds)
+   **Total running time of the script:** (0 minutes 0.001 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_sequences.py:
