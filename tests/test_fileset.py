@@ -794,7 +794,7 @@ class TestFileInstance:
         assert "20010101" == instance[(0x0008, 0x0020)].value
         assert "20010101" == instance["0x00080020"].value
 
-        with pytest.raises(KeyError, match=r"(0000, 0000)"):
+        with pytest.raises(KeyError, match=r"(0000,0000)"):
             instance[0x00000000]
 
     def test_getitem_special(self, tiny):
@@ -1417,7 +1417,7 @@ class TestFileSet:
         fs = FileSet()
         msg = (
             r"Unable to use the default 'PATIENT' record creator: "
-            r"The instance's \(0010, 0020\) 'Patient ID' element cannot be empty. "
+            r"The instance's \(0010,0020\) 'Patient ID' element cannot be empty. "
             r"See DICOM PS3.3 Section F.5. Either update the instance, "
             r"define your own record creation function "
             r"or use 'FileSet.add_custom\(\)' instead"
@@ -2358,7 +2358,7 @@ class TestFileSet_Modify:
         del ds.InstanceNumber
         msg = (
             r"Unable to use the default 'RT DOSE' record creator: "
-            r"The instance's \(0020, 0013\) 'Instance Number' element is missing. "
+            r"The instance's \(0020,0013\) 'Instance Number' element is missing. "
             r"See DICOM PS3.3 Section F.5. Either update the instance, "
             r"define your own record creation function "
             r"or use 'FileSet.add_custom\(\)' instead"
@@ -2373,7 +2373,7 @@ class TestFileSet_Modify:
         ds.InstanceNumber = None
         msg = (
             r"Unable to use the default 'RT DOSE' record creator: "
-            r"The instance's \(0020, 0013\) 'Instance Number' element cannot be empty. "
+            r"The instance's \(0020,0013\) 'Instance Number' element cannot be empty. "
             r"See DICOM PS3.3 Section F.5. Either update the instance, "
             r"define your own record creation function "
             r"or use 'FileSet.add_custom\(\)' instead"
@@ -2450,7 +2450,7 @@ class TestFileSet_Modify:
         fs = FileSet()
         msg = (
             r"Unable to use the default 'HANGING PROTOCOL' record creator: "
-            r"The instance's \(0072, 0008\) 'Hanging Protocol Creator' element "
+            r"The instance's \(0072,0008\) 'Hanging Protocol Creator' element "
             r"is missing. See DICOM PS3.3 Section F.5. Either update the "
             r"instance, define your own record creation function or use "
             r"'FileSet.add_custom\(\)' instead"

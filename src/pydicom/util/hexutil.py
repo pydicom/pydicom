@@ -17,9 +17,9 @@ def hex2bytes(hexstring: str | bytes) -> bytes:
 
     ::
         hex_string = (
-            "08 00 32 10 "  # (0008, 1032) SQ "Procedure Code Sequence"
+            "08 00 32 10 "  # (0008,1032) SQ "Procedure Code Sequence"
             "08 00 00 00 "  # length 8
-            "fe ff 00 e0 "  # (fffe, e000) Item Tag
+            "fe ff 00 e0 "  # (FFFE,E000) Item Tag
         )
         byte_string = hex2bytes(hex_string)
 

@@ -47,7 +47,7 @@ def camel_to_underscore(name: str) -> str:
 
 def tag_repr(tag: BaseTag) -> str:
     """String of tag value as (0xgggg, 0xeeee)"""
-    return f"(0x{tag.group:04x}, 0x{tag.element:04x})"
+    return f"(0x{tag.group:04X}, 0x{tag.element:04X})"
 
 
 def default_name_filter(name: str) -> str:

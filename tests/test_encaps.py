@@ -32,7 +32,7 @@ class TestGetFrameOffsets:
 
     def test_bad_tag(self):
         """Test raises exception if no item tag."""
-        # (fffe,e100)
+        # (FFFE,E100)
         bytestream = (
             b"\xFE\xFF\x00\xE1" b"\x08\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
         )
@@ -40,7 +40,7 @@ class TestGetFrameOffsets:
         fp.is_little_endian = True
         with pytest.raises(
             ValueError,
-            match=r"Unexpected tag '\(fffe, e100\)' when "
+            match=r"Unexpected tag '\(FFFE,E100\)' when "
             r"parsing the Basic Table Offset item",
         ):
             get_frame_offsets(fp)
@@ -140,7 +140,7 @@ class TestGetNrFragments:
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         msg = (
-            r"Unexpected tag '\(0010, 0010\)' at offset 12 when parsing the "
+            r"Unexpected tag '\(0010,0010\)' at offset 12 when parsing the "
             r"encapsulated pixel data fragment items"
         )
         with pytest.raises(ValueError, match=msg):
@@ -257,7 +257,7 @@ class TestGeneratePixelDataFragment:
         assert next(fragments) == b"\x01\x00\x00\x00"
         with pytest.raises(
             ValueError,
-            match=r"Unexpected tag '\(0010, 0010\)' at offset "
+            match=r"Unexpected tag '\(0010,0010\)' at offset "
             r"12 when parsing the encapsulated pixel "
             r"data fragment items",
         ):

@@ -221,10 +221,10 @@ class TestBaseTag:
 
     def test_str(self):
         """Test str(BaseTag) produces correct value."""
-        assert "(0000, 0000)" == str(BaseTag(0x00000000))
-        assert "(0001, 0002)" == str(BaseTag(0x00010002))
-        assert "(1000, 2000)" == str(BaseTag(0x10002000))
-        assert "(ffff, fffe)" == str(BaseTag(0xFFFFFFFE))
+        assert "(0000,0000)" == str(BaseTag(0x00000000))
+        assert "(0001,0002)" == str(BaseTag(0x00010002))
+        assert "(1000,2000)" == str(BaseTag(0x10002000))
+        assert "(FFFF,FFFE)" == str(BaseTag(0xFFFFFFFE))
 
     def test_json_key(self):
         """Test BaseTag.json_key() produces correct value."""

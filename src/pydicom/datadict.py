@@ -7,7 +7,7 @@ from pydicom.tag import Tag, BaseTag, TagType
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from pydicom._dicom_dict import DicomDictionary
 
-# those with tags like "(50xx, 0005)"
+# those with tags like "(50xx,0005)"
 from pydicom._dicom_dict import RepeatersDictionary
 from pydicom._private_dict import private_dictionaries
 
@@ -232,7 +232,7 @@ def add_private_dict_entries(
         )
 
     new_entries = {
-        f"{tag >> 16:04x}xx{tag & 0xff:02x}": value
+        f"{tag >> 16:04X}xx{tag & 0xff:02X}": value
         for tag, value in new_entries_dict.items()
     }
     private_dictionaries.setdefault(private_creator, {}).update(new_entries)
@@ -558,8 +558,8 @@ def get_private_entry(tag: TagType, private_creator: str) -> tuple[str, str, str
     # Some elements in _private_dict are explicit;
     # most have "xx" for high-byte of element
     #  so here put in the "xx" in the block position for key to look up
-    group_str = f"{tag.group:04x}"
-    elem_str = f"{tag.elem:04x}"
+    group_str = f"{tag.group:04X}"
+    elem_str = f"{tag.elem:04X}"
     keys = [
         f"{group_str}{elem_str}",
         f"{group_str}xx{elem_str[-2:]}",

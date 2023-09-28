@@ -76,9 +76,9 @@ class TestSequence:
         ds.BeamSequence[0].PatientID = "12345"
 
         out = str(ds.BeamSequence)
-        assert "[(0010, 0010) Patient's Name" in out
+        assert "[(0010,0010) Patient's Name" in out
         assert "PN: 'TEST'" in out
-        assert "(0010, 0020) Patient ID" in out
+        assert "(0010,0020) Patient ID" in out
         assert "LO: '12345']" in out
 
     def test_adding_datasets(self):

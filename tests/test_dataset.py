@@ -144,7 +144,7 @@ class TestDataset:
         ds.PatientID = "123456"  # Valid value
         ds.SmallestImagePixelValue = BadRepr()  # Invalid value
 
-        msg = r"With tag \(0028, 0106\) got exception: bad repr"
+        msg = r"With tag \(0028,0106\) got exception: bad repr"
         with pytest.raises(ValueError, match=msg):
             str(ds)
 
@@ -160,7 +160,7 @@ class TestDataset:
         def func(dataset=ds):
             return dataset.walk(callback)
 
-        msg = r"With tag \(0028, 0106\) got exception: bad repr"
+        msg = r"With tag \(0028,0106\) got exception: bad repr"
         with pytest.raises(ValueError, match=msg):
             func()
 
@@ -296,14 +296,14 @@ class TestDataset:
         assert 2 == len(self.ds)
 
     def test_setdefault_unknown_tag(self, dont_raise_on_writing_invalid_value):
-        with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
+        with pytest.warns(UserWarning, match=r"\(8888,0002\)"):
             elem = self.ds.setdefault(0x88880002, "foo")
         assert "foo" == elem.value
         assert "UN" == elem.VR
         assert 2 == len(self.ds)
 
     def test_setdefault_unknown_tag_strict(self, raise_on_writing_invalid_value):
-        with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
+        with pytest.raises(KeyError, match=r"\(8888,0004\)"):
             elem = self.ds.setdefault(0x88880004, "foo")
 
     def test_setdefault_tuple(self):
@@ -316,14 +316,14 @@ class TestDataset:
         assert 2 == len(self.ds)
 
     def test_setdefault_unknown_tuple(self, dont_raise_on_writing_invalid_value):
-        with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
+        with pytest.warns(UserWarning, match=r"\(8888,0002\)"):
             elem = self.ds.setdefault((0x8888, 0x0002), "foo")
         assert "foo" == elem.value
         assert "UN" == elem.VR
         assert 2 == len(self.ds)
 
     def test_setdefault_unknown_tuple_strict(self, raise_on_writing_invalid_value):
-        with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
+        with pytest.raises(KeyError, match=r"\(8888,0004\)"):
             elem = self.ds.setdefault((0x8888, 0x0004), "foo")
 
     def test_setdefault_use_value(self, dont_raise_on_writing_invalid_value):
@@ -1241,14 +1241,14 @@ class TestDataset:
         ds.add_new(0x00250011, "LO", "Valid Creator")
         ds.add_new(0x00251007, "UN", "foobar")
         ds.add_new(0x00251107, "UN", "foobaz")
-        msg = r"\(0025, 0010\) '\[13975, 13802]' " r"is not a valid private creator"
+        msg = r"\(0025,0010\) '\[13975, 13802]' " r"is not a valid private creator"
         with pytest.warns(UserWarning, match=msg):
             assert (
-                str(ds[0x00251007]) == "(0025, 1007) Private tag data"
+                str(ds[0x00251007]) == "(0025,1007) Private tag data"
                 "                    UN: 'foobar'"
             )
         assert (
-            str(ds[0x00251107]) == "(0025, 1107) Private tag data"
+            str(ds[0x00251107]) == "(0025,1107) Private tag data"
             "                    UN: 'foobaz'"
         )
 
@@ -1578,9 +1578,9 @@ class TestDataset:
             sequence_element_format=seq_format,
             indent_format=indent_format,
         )
-        assert "(0010, 0010)" == next(line_generator)
-        assert "Beam Sequence (300a, 00b0)" == next(line_generator)
-        assert "(0010, 0020)" == next(line_generator)
+        assert "(0010,0010)" == next(line_generator)
+        assert "Beam Sequence (300A,00B0)" == next(line_generator)
+        assert "(0010,0020)" == next(line_generator)
         with pytest.raises(StopIteration):
             next(line_generator)
 
@@ -2131,12 +2131,12 @@ class TestFileMeta:
         shown = str(ds)
 
         assert shown.startswith("Dataset.file_meta ---")
-        assert shown.splitlines()[1].startswith("(0002, 0010) Transfer Syntax UID")
+        assert shown.splitlines()[1].startswith("(0002,0010) Transfer Syntax UID")
 
         # Turn off file_meta display
         pydicom.config.show_file_meta = False
         shown = str(ds)
-        assert shown.startswith("(0010, 0010) Patient's Name")
+        assert shown.startswith("(0010,0010) Patient's Name")
 
         pydicom.config.show_file_meta = orig_show
 

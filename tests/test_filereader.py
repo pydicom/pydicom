@@ -164,7 +164,7 @@ class TestReader:
         value = ct.file_meta[0x2, 0x12].value
         assert value == ct.file_meta.ImplementationClassUID
 
-        # (0020, 0032) Image Position (Patient)
+        # (0020,0032) Image Position (Patient)
         # [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
@@ -247,7 +247,7 @@ class TestReader:
     def test_MR(self):
         """Returns correct values for sample data elements in test MR file."""
         mr = dcmread(mr_name)
-        # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
+        # (0010,0010) Patient's Name           'CompressedSamples^MR1'
         mr.decode()
         assert "CompressedSamples^MR1" == mr.PatientName
         assert mr[0x10, 0x10].value == mr.PatientName
@@ -1052,7 +1052,7 @@ class TestUnknownVR:
             False,
             True,
         )
-        msg = r"Unknown Value Representation '{}' in tag \(0008, 0006\)"
+        msg = r"Unknown Value Representation '{}' in tag \(0008,0006\)"
         msg = msg.format(str_output)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
@@ -1604,7 +1604,7 @@ class TestDataElementGenerator:
 
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
-        # (0010, 0010) PatientName PN 6 ABCDEF
+        # (0010,0010) PatientName PN 6 ABCDEF
         bytestream = b"\x10\x00\x10\x00" b"PN" b"\x06\x00" b"ABCDEF"
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
@@ -1614,7 +1614,7 @@ class TestDataElementGenerator:
 
     def test_little_endian_implicit(self):
         """Test reading little endian implicit VR data"""
-        # (0010, 0010) PatientName PN 6 ABCDEF
+        # (0010,0010) PatientName PN 6 ABCDEF
         bytestream = b"\x10\x00\x10\x00" b"\x06\x00\x00\x00" b"ABCDEF"
         fp = BytesIO(bytestream)
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
@@ -1623,7 +1623,7 @@ class TestDataElementGenerator:
 
     def test_big_endian_explicit(self):
         """Test reading big endian explicit VR data"""
-        # (0010, 0010) PatientName PN 6 ABCDEF
+        # (0010,0010) PatientName PN 6 ABCDEF
         bytestream = b"\x00\x10\x00\x10" b"PN" b"\x00\x06" b"ABCDEF"
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,

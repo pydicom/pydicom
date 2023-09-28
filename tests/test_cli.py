@@ -196,12 +196,12 @@ class TestCLIcall:
         # Top-level-only option, also different file for more variety
         main("show -t pydicom::nested_priv_SQ.dcm".split())
         out, err = capsys.readouterr()
-        assert "(0001, 0001)  Private Creator" in out
+        assert "(0001,0001)  Private Creator" in out
         assert "UN: b'Nested SQ'" not in out
         assert err == ""
 
         # Exclude private option
         main("show -x pydicom::nested_priv_SQ.dcm".split())
         out, err = capsys.readouterr()
-        assert "(0001, 0001)  Private Creator" not in out
+        assert "(0001,0001)  Private Creator" not in out
         assert err == ""

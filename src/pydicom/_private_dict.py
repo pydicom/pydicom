@@ -41,9 +41,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3711xx03': ('US', '1', 'Revision Number', ''),  # noqa
         '3711xx04': ('UL', '1', 'Unix Timestamp', ''),  # noqa
         '3711xx05': ('IS', '1', 'Bag ID', ''),  # noqa
-        '3711xx0c': ('UI', '1', 'Original Study UID', ''),  # noqa
-        '3711xx0d': ('US', '1', 'Overlay Grayscale Value', ''),  # noqa
-        '3711xx0e': ('CS', '1', 'Anonymization Status', ''),  # noqa
+        '3711xx0C': ('UI', '1', 'Original Study UID', ''),  # noqa
+        '3711xx0D': ('US', '1', 'Overlay Grayscale Value', ''),  # noqa
+        '3711xx0E': ('CS', '1', 'Anonymization Status', ''),  # noqa
     },
     'ACUSON': {
         '0009xx00': ('IS', '1', 'Unknown', ''),  # noqa
@@ -56,12 +56,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx07': ('UN', '1', 'Unknown', ''),  # noqa
         '0009xx08': ('LT', '1', 'Unknown', ''),  # noqa
         '0009xx09': ('LT', '1', 'Unknown', ''),  # noqa
-        '0009xx0a': ('IS', '1', 'Unknown', ''),  # noqa
-        '0009xx0b': ('IS', '1', 'Unknown', ''),  # noqa
-        '0009xx0c': ('IS', '1', 'Unknown', ''),  # noqa
-        '0009xx0d': ('IS', '1', 'Unknown', ''),  # noqa
-        '0009xx0e': ('IS', '1', 'Unknown', ''),  # noqa
-        '0009xx0f': ('UN', '1', 'Unknown', ''),  # noqa
+        '0009xx0A': ('IS', '1', 'Unknown', ''),  # noqa
+        '0009xx0B': ('IS', '1', 'Unknown', ''),  # noqa
+        '0009xx0C': ('IS', '1', 'Unknown', ''),  # noqa
+        '0009xx0D': ('IS', '1', 'Unknown', ''),  # noqa
+        '0009xx0E': ('IS', '1', 'Unknown', ''),  # noqa
+        '0009xx0F': ('UN', '1', 'Unknown', ''),  # noqa
         '0009xx10': ('IS', '1', 'Unknown', ''),  # noqa
         '0009xx11': ('UN', '1', 'Unknown', ''),  # noqa
         '0009xx12': ('IS', '1', 'Unknown', ''),  # noqa
@@ -70,113 +70,113 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx15': ('UN', '1', 'Unknown', ''),  # noqa
     },
     'ACUSON: 1.2.840.11386.1.0': {
-        '7fdfxx00': ('IS', '1', 'Lossy Compression Ratio', ''),  # noqa
-        '7fdfxx01': ('US', '1', 'Image Format', ''),  # noqa
-        '7fdfxx02': ('US', '1', 'Acuson Region Type', ''),  # noqa
-        '7fdfxx0b': ('UL', '1', 'Acuson Image Apex X', ''),  # noqa
-        '7fdfxx0c': ('UL', '1', 'Acuson Image Apex Y', ''),  # noqa
-        '7fdfxx0d': ('IS', '1', 'B-Color-On Flag', ''),  # noqa
+        '7FDFxx00': ('IS', '1', 'Lossy Compression Ratio', ''),  # noqa
+        '7FDFxx01': ('US', '1', 'Image Format', ''),  # noqa
+        '7FDFxx02': ('US', '1', 'Acuson Region Type', ''),  # noqa
+        '7FDFxx0B': ('UL', '1', 'Acuson Image Apex X', ''),  # noqa
+        '7FDFxx0C': ('UL', '1', 'Acuson Image Apex Y', ''),  # noqa
+        '7FDFxx0D': ('IS', '1', 'B-Color-On Flag', ''),  # noqa
     },
     'ACUSON:1.2.840.113680.1.0:0921': {
         '0009xx20': ('UN', '1', 'View Name', ''),  # noqa
-        '0009xx2a': ('UN', '1', 'View List', ''),  # noqa
+        '0009xx2A': ('UN', '1', 'View List', ''),  # noqa
     },
     'ACUSON:1.2.840.113680.1.0:7f10': {
-        '7fdfxx00': ('UN', '1', 'Lossy Compression Ratio', ''),  # noqa
-        '7fdfxx01': ('UN', '1', 'Image Format', ''),  # noqa
-        '7fdfxx02': ('UN', '1', 'Acuson Region Type', ''),  # noqa
-        '7fdfxx0b': ('UN', '1', 'Acuson Image Apex X', ''),  # noqa
-        '7fdfxx0c': ('UN', '1', 'Acuson Image Apex Y', ''),  # noqa
-        '7fdfxx0d': ('UN', '1', 'B-Color-On Flag', ''),  # noqa
-        '7fdfxx0e': ('UN', '1', 'Acuson Mechanical Apex X', ''),  # noqa
-        '7fdfxx0f': ('UN', '1', 'Acuson Mechanical Apex Y', ''),  # noqa
-        '7fdfxx10': ('UN', '1', 'Acquisition Type:', ''),  # noqa
-        '7fdfxx18': ('UN', '1', 'Transformation Matrix Sequence', ''),  # noqa
-        '7fdfxx20': ('UN', '1', 'Left angle', ''),  # noqa
-        '7fdfxx22': ('UN', '1', 'Right angle', ''),  # noqa
-        '7fdfxx24': ('UN', '1', 'Color Map Family', ''),  # noqa
-        '7fdfxx25': ('UN', '1', 'Full Colormap.', ''),  # noqa
-        '7fdfxx26': ('UN', '1', 'Color Invert', ''),  # noqa
-        '7fdfxx27': ('UN', '1', 'Color Baseline', ''),  # noqa
-        '7fdfxx28': ('UN', '1', 'CD Color Mix Points X1', ''),  # noqa
-        '7fdfxx29': ('UN', '1', 'CD Color Mix Points Y1', ''),  # noqa
-        '7fdfxx2a': ('UN', '1', 'CD Color Mix Points X2', ''),  # noqa
-        '7fdfxx2b': ('UN', '1', 'CD Color Mix Points Y2', ''),  # noqa
-        '7fdfxx2c': ('UN', '1', 'Color Accent', ''),  # noqa
-        '7fdfxx30': ('UN', '1', 'Persistence SQ', ''),  # noqa
-        '7fdfxx31': ('UN', '1', 'Persistence Mode', ''),  # noqa
-        '7fdfxx32': ('UN', '1', 'Persistence Coefficient Mode', ''),  # noqa
-        '7fdfxx33': ('UN', '1', 'Alpha coefficient', ''),  # noqa
-        '7fdfxx34': ('UN', '1', 'Gamma coefficient', ''),  # noqa
-        '7fdfxx35': ('UN', '1', 'Persistence Time Flag', ''),  # noqa
-        '7fdfxx36': ('UN', '1', 'Persistence adaptive flag', ''),  # noqa
-        '7fdfxx37': ('UN', '1', 'Persistence Frame Rate', ''),  # noqa
-        '7fdfxx38': ('UN', '1', 'Persistence ID', ''),  # noqa
-        '7fdfxx40': ('UN', '1', 'Observation Date Time SQ', ''),  # noqa
-        '7fdfxx50': ('UN', '1', 'Capture Type Name', ''),  # noqa
-        '7fdfxx52': ('UN', '1', 'Capture Type Number', ''),  # noqa
-        '7fdfxx54': ('UN', '1', 'Number of Capture Types', ''),  # noqa
-        '7fdfxx60': ('UN', '1', 'CD Steering Angle', ''),  # noqa
-        '7fdfxx61': ('UN', '1', 'CD PRI', ''),  # noqa
-        '7fdfxx62': ('UN', '1', 'CD Dynamic Range', ''),  # noqa
-        '7fdfxx63': ('UN', '1', 'CD Velocity Scale Min', ''),  # noqa
-        '7fdfxx64': ('UN', '1', 'CD Velocity Scale Max', ''),  # noqa
-        '7fdfxx65': ('UN', '1', 'CD Color Mode', ''),  # noqa
-        '7fdfxx66': ('UN', '1', 'CD Frequency', ''),  # noqa
-        '7fdfxx67': ('UN', '1', 'CD Balance', ''),  # noqa
-        '7fdfxx68': ('UN', '1', 'CD Delta', ''),  # noqa
-        '7fdfxx69': ('UN', '1', 'CD Pan Box Min X0', ''),  # noqa
-        '7fdfxx6a': ('UN', '1', 'CD Pan Box Min Y0', ''),  # noqa
-        '7fdfxx6b': ('UN', '1', 'CD Pan Box Min X1', ''),  # noqa
-        '7fdfxx6c': ('UN', '1', 'CD Pan Box Min Y1', ''),  # noqa
-        '7fdfxx6d': ('UN', '1', 'CPS Map Type', ''),  # noqa
-        '7fdfxx6e': ('UN', '1', 'CPS Map Data', ''),  # noqa
-        '7fdfxx6f': ('UN', '1', 'CPS Balance Setting', ''),  # noqa
-        '7fdfxx70': ('UN', '1', '3DCard Step Angle', ''),  # noqa
-        '7fdfxx71': ('UN', '1', '3DCard Xdcr Angle', ''),  # noqa
-        '7fdfxx72': ('UN', '1', 'B-mode Frequency', ''),  # noqa
-        '7fdfxx73': ('UN', '1', 'B-mode Dynamic Range', ''),  # noqa
-        '7fdfxx74': ('UN', '1', 'B-mode Frame Rate', ''),  # noqa
-        '7fdfxx75': ('UN', '1', 'B-mode Space Time', ''),  # noqa
-        '7fdfxx76': ('UN', '1', 'B-mode Persistence', ''),  # noqa
-        '7fdfxx77': ('UN', '1', 'B-mode Display Depth Start', ''),  # noqa
-        '7fdfxx78': ('UN', '1', 'B-mode Display Depth End', ''),  # noqa
-        '7fdfxx79': ('UN', '1', 'B-mode Res Mode', ''),  # noqa
-        '7fdfxx7a': ('UN', '1', 'B-mode Preset Application', ''),  # noqa
-        '7fdfxx7b': ('UN', '1', 'Image Spec Name', ''),  # noqa
-        '7fdfxx7c': ('UN', '1', 'B Preset Image Look', ''),  # noqa
-        '7fdfxx7d': ('UN', '1', 'B-mode Post Processing', ''),  # noqa
-        '7fdfxx7e': ('UN', '1', 'B Edge', ''),  # noqa
-        '7fdfxx7f': ('UN', '1', 'B Delta', ''),  # noqa
-        '7fdfxx80': ('UN', '1', 'B-mode 1D Post Processing Curve', ''),  # noqa
-        '7fdfxx81': ('UN', '1', 'B-mode Delta (ECRI) Map Diagonal', ''),  # noqa
-        '7fdfxx82': ('UN', '1', 'Bytes Per Timestamp', ''),  # noqa
-        '7fdfxx83': ('UN', '1', 'Microseconds in unit timestamp', ''),  # noqa
-        '7fdfxx84': ('UN', '1', 'Start Stopwatch Timestamp', ''),  # noqa
-        '7fdfxx85': ('UN', '1', 'Acoustic Frame Timestamp', ''),  # noqa
-        '7fdfxx86': ('UN', '1', 'R-Wave Timestamp', ''),  # noqa
-        '7fdfxx87': ('UN', '1', 'Last Destruction Timestamp', ''),  # noqa
-        '7fdfxx88': ('UN', '1', 'Pixels Per Second', ''),  # noqa
-        '7fdfxx89': ('UN', '1', 'ECG Reference Timestamp', ''),  # noqa
-        '7fdfxx8a': ('UN', '1', 'ECG Sampling Interval (milliseconds)', ''),  # noqa
-        '7fdfxx8b': ('UN', '1', 'ECG Sample Count', ''),  # noqa
-        '7fdfxx8c': ('UN', '1', 'ECG Sample Size', ''),  # noqa
-        '7fdfxx8d': ('UN', '1', 'ECG Data Value', ''),  # noqa
-        '7fdfxx8e': ('UN', '1', 'Contrast/Active Image Indicator', ''),  # noqa
-        '7fdfxx8f': ('UN', '1', 'Live Dual Mode Indicator', ''),  # noqa
-        '7fdfxx90': ('UN', '1', '3DCard Clipset ID', ''),  # noqa
-        '7fdfxx91': ('UN', '1', '3DCard HRWave Min', ''),  # noqa
-        '7fdfxx92': ('UN', '1', '3DCard HRWave Max', ''),  # noqa
-        '7fdfxx93': ('UN', '1', 'Perspective Capture Type', ''),  # noqa
-        '7fdfxxf1': ('UN', '1', 'Trigger Mask.', ''),  # noqa
-        '7fdfxxf2': ('UN', '1', 'Study Directory', ''),  # noqa
-        '7fdfxxf3': ('UN', '1', 'Last Modify Date', ''),  # noqa
-        '7fdfxxf4': ('UN', '1', 'Last Modify Time', ''),  # noqa
-        '7fdfxxf5': ('UN', '1', 'Teaching Study', ''),  # noqa
-        '7fdfxxf6': ('UN', '1', 'Series Base UID', ''),  # noqa
+        '7FDFxx00': ('UN', '1', 'Lossy Compression Ratio', ''),  # noqa
+        '7FDFxx01': ('UN', '1', 'Image Format', ''),  # noqa
+        '7FDFxx02': ('UN', '1', 'Acuson Region Type', ''),  # noqa
+        '7FDFxx0B': ('UN', '1', 'Acuson Image Apex X', ''),  # noqa
+        '7FDFxx0C': ('UN', '1', 'Acuson Image Apex Y', ''),  # noqa
+        '7FDFxx0D': ('UN', '1', 'B-Color-On Flag', ''),  # noqa
+        '7FDFxx0E': ('UN', '1', 'Acuson Mechanical Apex X', ''),  # noqa
+        '7FDFxx0F': ('UN', '1', 'Acuson Mechanical Apex Y', ''),  # noqa
+        '7FDFxx10': ('UN', '1', 'Acquisition Type:', ''),  # noqa
+        '7FDFxx18': ('UN', '1', 'Transformation Matrix Sequence', ''),  # noqa
+        '7FDFxx20': ('UN', '1', 'Left angle', ''),  # noqa
+        '7FDFxx22': ('UN', '1', 'Right angle', ''),  # noqa
+        '7FDFxx24': ('UN', '1', 'Color Map Family', ''),  # noqa
+        '7FDFxx25': ('UN', '1', 'Full Colormap.', ''),  # noqa
+        '7FDFxx26': ('UN', '1', 'Color Invert', ''),  # noqa
+        '7FDFxx27': ('UN', '1', 'Color Baseline', ''),  # noqa
+        '7FDFxx28': ('UN', '1', 'CD Color Mix Points X1', ''),  # noqa
+        '7FDFxx29': ('UN', '1', 'CD Color Mix Points Y1', ''),  # noqa
+        '7FDFxx2A': ('UN', '1', 'CD Color Mix Points X2', ''),  # noqa
+        '7FDFxx2B': ('UN', '1', 'CD Color Mix Points Y2', ''),  # noqa
+        '7FDFxx2C': ('UN', '1', 'Color Accent', ''),  # noqa
+        '7FDFxx30': ('UN', '1', 'Persistence SQ', ''),  # noqa
+        '7FDFxx31': ('UN', '1', 'Persistence Mode', ''),  # noqa
+        '7FDFxx32': ('UN', '1', 'Persistence Coefficient Mode', ''),  # noqa
+        '7FDFxx33': ('UN', '1', 'Alpha coefficient', ''),  # noqa
+        '7FDFxx34': ('UN', '1', 'Gamma coefficient', ''),  # noqa
+        '7FDFxx35': ('UN', '1', 'Persistence Time Flag', ''),  # noqa
+        '7FDFxx36': ('UN', '1', 'Persistence adaptive flag', ''),  # noqa
+        '7FDFxx37': ('UN', '1', 'Persistence Frame Rate', ''),  # noqa
+        '7FDFxx38': ('UN', '1', 'Persistence ID', ''),  # noqa
+        '7FDFxx40': ('UN', '1', 'Observation Date Time SQ', ''),  # noqa
+        '7FDFxx50': ('UN', '1', 'Capture Type Name', ''),  # noqa
+        '7FDFxx52': ('UN', '1', 'Capture Type Number', ''),  # noqa
+        '7FDFxx54': ('UN', '1', 'Number of Capture Types', ''),  # noqa
+        '7FDFxx60': ('UN', '1', 'CD Steering Angle', ''),  # noqa
+        '7FDFxx61': ('UN', '1', 'CD PRI', ''),  # noqa
+        '7FDFxx62': ('UN', '1', 'CD Dynamic Range', ''),  # noqa
+        '7FDFxx63': ('UN', '1', 'CD Velocity Scale Min', ''),  # noqa
+        '7FDFxx64': ('UN', '1', 'CD Velocity Scale Max', ''),  # noqa
+        '7FDFxx65': ('UN', '1', 'CD Color Mode', ''),  # noqa
+        '7FDFxx66': ('UN', '1', 'CD Frequency', ''),  # noqa
+        '7FDFxx67': ('UN', '1', 'CD Balance', ''),  # noqa
+        '7FDFxx68': ('UN', '1', 'CD Delta', ''),  # noqa
+        '7FDFxx69': ('UN', '1', 'CD Pan Box Min X0', ''),  # noqa
+        '7FDFxx6A': ('UN', '1', 'CD Pan Box Min Y0', ''),  # noqa
+        '7FDFxx6B': ('UN', '1', 'CD Pan Box Min X1', ''),  # noqa
+        '7FDFxx6C': ('UN', '1', 'CD Pan Box Min Y1', ''),  # noqa
+        '7FDFxx6D': ('UN', '1', 'CPS Map Type', ''),  # noqa
+        '7FDFxx6E': ('UN', '1', 'CPS Map Data', ''),  # noqa
+        '7FDFxx6F': ('UN', '1', 'CPS Balance Setting', ''),  # noqa
+        '7FDFxx70': ('UN', '1', '3DCard Step Angle', ''),  # noqa
+        '7FDFxx71': ('UN', '1', '3DCard Xdcr Angle', ''),  # noqa
+        '7FDFxx72': ('UN', '1', 'B-mode Frequency', ''),  # noqa
+        '7FDFxx73': ('UN', '1', 'B-mode Dynamic Range', ''),  # noqa
+        '7FDFxx74': ('UN', '1', 'B-mode Frame Rate', ''),  # noqa
+        '7FDFxx75': ('UN', '1', 'B-mode Space Time', ''),  # noqa
+        '7FDFxx76': ('UN', '1', 'B-mode Persistence', ''),  # noqa
+        '7FDFxx77': ('UN', '1', 'B-mode Display Depth Start', ''),  # noqa
+        '7FDFxx78': ('UN', '1', 'B-mode Display Depth End', ''),  # noqa
+        '7FDFxx79': ('UN', '1', 'B-mode Res Mode', ''),  # noqa
+        '7FDFxx7A': ('UN', '1', 'B-mode Preset Application', ''),  # noqa
+        '7FDFxx7B': ('UN', '1', 'Image Spec Name', ''),  # noqa
+        '7FDFxx7C': ('UN', '1', 'B Preset Image Look', ''),  # noqa
+        '7FDFxx7D': ('UN', '1', 'B-mode Post Processing', ''),  # noqa
+        '7FDFxx7E': ('UN', '1', 'B Edge', ''),  # noqa
+        '7FDFxx7F': ('UN', '1', 'B Delta', ''),  # noqa
+        '7FDFxx80': ('UN', '1', 'B-mode 1D Post Processing Curve', ''),  # noqa
+        '7FDFxx81': ('UN', '1', 'B-mode Delta (ECRI) Map Diagonal', ''),  # noqa
+        '7FDFxx82': ('UN', '1', 'Bytes Per Timestamp', ''),  # noqa
+        '7FDFxx83': ('UN', '1', 'Microseconds in unit timestamp', ''),  # noqa
+        '7FDFxx84': ('UN', '1', 'Start Stopwatch Timestamp', ''),  # noqa
+        '7FDFxx85': ('UN', '1', 'Acoustic Frame Timestamp', ''),  # noqa
+        '7FDFxx86': ('UN', '1', 'R-Wave Timestamp', ''),  # noqa
+        '7FDFxx87': ('UN', '1', 'Last Destruction Timestamp', ''),  # noqa
+        '7FDFxx88': ('UN', '1', 'Pixels Per Second', ''),  # noqa
+        '7FDFxx89': ('UN', '1', 'ECG Reference Timestamp', ''),  # noqa
+        '7FDFxx8A': ('UN', '1', 'ECG Sampling Interval (milliseconds)', ''),  # noqa
+        '7FDFxx8B': ('UN', '1', 'ECG Sample Count', ''),  # noqa
+        '7FDFxx8C': ('UN', '1', 'ECG Sample Size', ''),  # noqa
+        '7FDFxx8D': ('UN', '1', 'ECG Data Value', ''),  # noqa
+        '7FDFxx8E': ('UN', '1', 'Contrast/Active Image Indicator', ''),  # noqa
+        '7FDFxx8F': ('UN', '1', 'Live Dual Mode Indicator', ''),  # noqa
+        '7FDFxx90': ('UN', '1', '3DCard Clipset ID', ''),  # noqa
+        '7FDFxx91': ('UN', '1', '3DCard HRWave Min', ''),  # noqa
+        '7FDFxx92': ('UN', '1', '3DCard HRWave Max', ''),  # noqa
+        '7FDFxx93': ('UN', '1', 'Perspective Capture Type', ''),  # noqa
+        '7FDFxxF1': ('UN', '1', 'Trigger Mask.', ''),  # noqa
+        '7FDFxxF2': ('UN', '1', 'Study Directory', ''),  # noqa
+        '7FDFxxF3': ('UN', '1', 'Last Modify Date', ''),  # noqa
+        '7FDFxxF4': ('UN', '1', 'Last Modify Time', ''),  # noqa
+        '7FDFxxF5': ('UN', '1', 'Teaching Study', ''),  # noqa
+        '7FDFxxF6': ('UN', '1', 'Series Base UID', ''),  # noqa
     },
     'ACUSON:1.2.840.113680.1.0:7ffe': {
-        '7fdfxx00': ('UN', '1', 'Data Padding', ''),  # noqa
+        '7FDFxx00': ('UN', '1', 'Data Padding', ''),  # noqa
     },
     'ADAC_IMG': {
         '0019xx02': ('IS', '1', 'Ver200 ADAC Pegasys File Size', ''),  # noqa
@@ -210,8 +210,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx14': ('ST', '3', 'Window/Level List (Note 3)', ''),  # noqa
         '0019xx15': ('LO', '1', 'Dose Monitoring List', ''),  # noqa
         '0019xx16': ('LO', '3', 'Other Info (Note 5)', ''),  # noqa
-        '0019xx1a': ('LO', '1', 'Clipped Exposure Deviation', ''),  # noqa
-        '0019xx1b': ('LO', '1', 'Logarithmic PLT Full Scale', ''),  # noqa
+        '0019xx1A': ('LO', '1', 'Clipped Exposure Deviation', ''),  # noqa
+        '0019xx1B': ('LO', '1', 'Logarithmic PLT Full Scale', ''),  # noqa
         '0019xx60': ('US', '1', 'Total number of series', ''),  # noqa
         '0019xx61': ('SH', '1', 'Session Number', ''),  # noqa
         '0019xx62': ('SH', '1', 'ID Station name', ''),  # noqa
@@ -229,9 +229,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     'AGFA-AG_HPState': {
         '0071xx18': ('SQ', '1', 'Unknown', ''),  # noqa
         '0071xx19': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0071xx1a': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0071xx1c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0071xx1e': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0071xx1A': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0071xx1C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0071xx1E': ('SQ', '1', 'Unknown', ''),  # noqa
         '0071xx20': ('FL', '1-n', 'Unknown', ''),  # noqa
         '0071xx21': ('FD', '1-n', 'Unknown', ''),  # noqa
         '0071xx22': ('FD', '1-n', 'Unknown', ''),  # noqa
@@ -265,21 +265,21 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx00': ('SH', '1', 'Unknown', ''),  # noqa
         '0009xx04': ('US', '1-n', 'Unknown', ''),  # noqa
         '0009xx06': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0009xx0a': ('SH', '1', 'Unknown', ''),  # noqa
+        '0009xx0A': ('SH', '1', 'Unknown', ''),  # noqa
         '0009xx20': ('CS', '1', 'Unknown', ''),  # noqa
         '0009xx22': ('CS', '1', 'Unknown', ''),  # noqa
         '0009xx24': ('CS', '1', 'Unknown', ''),  # noqa
         '0009xx26': ('IS', '1', 'Unknown', ''),  # noqa
         '0009xx28': ('IS', '1', 'Unknown', ''),  # noqa
-        '0009xx2a': ('DS', '1', 'Unknown', ''),  # noqa
+        '0009xx2A': ('DS', '1', 'Unknown', ''),  # noqa
         '0009xx30': ('FD', '1', 'Unknown', ''),  # noqa
         '0009xx32': ('DS', '1', 'Unknown', ''),  # noqa
         '0009xx34': ('CS', '1', 'Unknown', ''),  # noqa
         '0019xx08': ('FD', '1', 'Unknown', ''),  # noqa
-        '0019xx0c': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx0e': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xx0C': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx0E': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx18': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019xx1a': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019xx1A': ('SL', '1', 'Unknown', ''),  # noqa
         '0019xx40': ('SS', '1', 'Unknown', ''),  # noqa
         '0019xx46': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx50': ('SL', '1', 'Unknown', ''),  # noqa
@@ -294,8 +294,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3101xx20': ('SQ', '1', 'AMI Annotation Sequence (RET)', ''),  # noqa
     },
     'AMI ImageContextExt_01': {
-        '3107xxa0': ('CS', '1', 'AMI Window Function (RET)', ''),  # noqa
-        '3107xxb0': ('DS', '1', 'AMI Window Slope (RET)', ''),  # noqa
+        '3107xxA0': ('CS', '1', 'AMI Window Function (RET)', ''),  # noqa
+        '3107xxB0': ('DS', '1', 'AMI Window Slope (RET)', ''),  # noqa
     },
     'AMI ImageContext_01': {
         '3109xx10': ('CS', '1', 'AMI Window Invert (RET)', ''),  # noqa
@@ -330,11 +330,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3103xx70': ('SH', '1', 'AMI Annotation Label (RET)', ''),  # noqa
         '3103xx80': ('PN', '1', 'AMI Annotation Creator (RET)', ''),  # noqa
         '3103xx90': ('PN', '1', 'AMI Annotation Modifiers (RET)', ''),  # noqa
-        '3103xxa0': ('DA', '1', 'AMI Annotation Creation Date (RET)', ''),  # noqa
-        '3103xxb0': ('TM', '1', 'AMI Annotation Creation Time (RET)', ''),  # noqa
-        '3103xxc0': ('DA', '1', 'AMI Annotation Modification Dates (RET)', ''),  # noqa
-        '3103xxd0': ('TM', '1', 'AMI Annotation Modification Times (RET)', ''),  # noqa
-        '3103xxe0': ('US', '1', 'AMI Annotation Frame Number (RET)', ''),  # noqa
+        '3103xxA0': ('DA', '1', 'AMI Annotation Creation Date (RET)', ''),  # noqa
+        '3103xxB0': ('TM', '1', 'AMI Annotation Creation Time (RET)', ''),  # noqa
+        '3103xxC0': ('DA', '1', 'AMI Annotation Modification Dates (RET)', ''),  # noqa
+        '3103xxD0': ('TM', '1', 'AMI Annotation Modification Times (RET)', ''),  # noqa
+        '3103xxE0': ('US', '1', 'AMI Annotation Frame Number (RET)', ''),  # noqa
     },
     'AMI Sequence Annotations_02': {
         '3103xx10': ('CS', '1', 'AMI Annotation Sequence (RET)', ''),  # noqa
@@ -345,11 +345,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3103xx70': ('SH', '1', 'AMI Annotation Label (RET)', ''),  # noqa
         '3103xx80': ('PN', '1', 'AMI Annotation Creator (RET)', ''),  # noqa
         '3103xx90': ('PN', '1', 'AMI Annotation Modifiers (RET)', ''),  # noqa
-        '3103xxa0': ('DA', '1', 'AMI Annotation Creation Date (RET)', ''),  # noqa
-        '3103xxb0': ('TM', '1', 'AMI Annotation Creation Time (RET)', ''),  # noqa
-        '3103xxc0': ('DA', '1', 'AMI Annotation Modification Dates (RET)', ''),  # noqa
-        '3103xxd0': ('TM', '1', 'AMI Annotation Modification Times (RET)', ''),  # noqa
-        '3103xxe0': ('US', '1', 'AMI Annotation Frame Number (RET)', ''),  # noqa
+        '3103xxA0': ('DA', '1', 'AMI Annotation Creation Date (RET)', ''),  # noqa
+        '3103xxB0': ('TM', '1', 'AMI Annotation Creation Time (RET)', ''),  # noqa
+        '3103xxC0': ('DA', '1', 'AMI Annotation Modification Dates (RET)', ''),  # noqa
+        '3103xxD0': ('TM', '1', 'AMI Annotation Modification Times (RET)', ''),  # noqa
+        '3103xxE0': ('US', '1', 'AMI Annotation Frame Number (RET)', ''),  # noqa
     },
     'AMI StudyExtensions_01': {
         '3111xx01': ('UL', '1', 'AMI Last Released Annot Label (RET)', ''),  # noqa
@@ -393,7 +393,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     },
     'Acuson X500': {
         '0009xx20': ('UN', '1', '(a)View Name', ''),  # noqa
-        '0009xx2a': ('UN', '1', 'View List', ''),  # noqa
+        '0009xx2A': ('UN', '1', 'View List', ''),  # noqa
         '0011xx10': ('UN', '1', 'Siemens Medical', ''),  # noqa
         '0011xx11': ('UN', '1', 'DIMAQ Software', ''),  # noqa
         '0011xx20': ('UN', '1', 'Private Data', ''),  # noqa
@@ -411,18 +411,18 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     },
     'Agfa ADC NX': {
         '0019xx09': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0019xxf5': ('CS', '1', 'Cassette Orientation', ''),  # noqa
-        '0019xxf6': ('DS', '1', 'Plate Sensitivity', ''),  # noqa
-        '0019xxf7': ('DS', '1', 'Plate Erasability', ''),  # noqa
-        '0019xxf8': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxfe': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxF5': ('CS', '1', 'Cassette Orientation', ''),  # noqa
+        '0019xxF6': ('DS', '1', 'Plate Sensitivity', ''),  # noqa
+        '0019xxF7': ('DS', '1', 'Plate Erasability', ''),  # noqa
+        '0019xxF8': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxFE': ('CS', '1', 'Unknown', ''),  # noqa
     },
     'AgilityRuntime': {
         '0029xx11': ('CS', '1', 'Unknown', ''),  # noqa
         '0029xx12': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx13': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx14': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx1f': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx1F': ('US', '1', 'Unknown', ''),  # noqa
     },
     'Applicare/Centricity Radiology Web/Version 1.0': {
         '4109xx01': ('SH', '1', 'Mammography Laterality', ''),  # noqa
@@ -458,11 +458,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3113xx17': ('LO', '1', 'LibraryId', ''),  # noqa
         '3113xx18': ('LO', '1', 'Pathnames', ''),  # noqa
         '3113xx19': ('LO', '1', 'DriverPath', ''),  # noqa
-        '3113xx1a': ('LO', '1', 'Source', ''),  # noqa
-        '3113xx1b': ('LO', '1', 'Destination', ''),  # noqa
-        '3113xx1c': ('SL', '1', 'MediumId', ''),  # noqa
-        '3113xx1d': ('LO', '1', 'ArchiveId', ''),  # noqa
-        '3113xx1e': ('LO', '1', 'Origin', ''),  # noqa
+        '3113xx1A': ('LO', '1', 'Source', ''),  # noqa
+        '3113xx1B': ('LO', '1', 'Destination', ''),  # noqa
+        '3113xx1C': ('SL', '1', 'MediumId', ''),  # noqa
+        '3113xx1D': ('LO', '1', 'ArchiveId', ''),  # noqa
+        '3113xx1E': ('LO', '1', 'Origin', ''),  # noqa
         '3113xx21': ('SL', '1', 'Version', ''),  # noqa
         '3113xx22': ('SL', '1', 'OBSOLETE', ''),  # noqa
         '3113xx23': ('ST', '1', 'InstanceFileLocation', ''),  # noqa
@@ -474,10 +474,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3113xx37': ('CS', '1', 'ImageMediumState', ''),  # noqa
         '3113xx38': ('LO', '1', 'SeriesMediumLocation', ''),  # noqa
         '3113xx39': ('LO', '1', 'SeriesMediumLabel', ''),  # noqa
-        '3113xx3a': ('CS', '1', 'SeriesMediumState', ''),  # noqa
-        '3113xx3b': ('LO', '1', 'StudyMediumLocation', ''),  # noqa
-        '3113xx3c': ('LO', '1', 'StudyMediumLabel', ''),  # noqa
-        '3113xx3d': ('CS', '1', 'StudyMediumState', ''),  # noqa
+        '3113xx3A': ('CS', '1', 'SeriesMediumState', ''),  # noqa
+        '3113xx3B': ('LO', '1', 'StudyMediumLocation', ''),  # noqa
+        '3113xx3C': ('LO', '1', 'StudyMediumLabel', ''),  # noqa
+        '3113xx3D': ('CS', '1', 'StudyMediumState', ''),  # noqa
         '3113xx52': ('CS', '1', 'StudyState', ''),  # noqa
         '3113xx53': ('CS', '1', 'SeriesState', ''),  # noqa
         '3113xx55': ('CS', '1', 'ImageStateText', ''),  # noqa
@@ -496,11 +496,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3109xx07': ('UL', '1', '<internal', ''),  # noqa
         '3109xx08': ('LO', '1', 'Receive Origin', ''),  # noqa
         '3109xx09': ('LO', '1', 'Folder', ''),  # noqa
-        '3109xx0a': ('DA', '1', 'Receive Date', ''),  # noqa
-        '3109xx0b': ('TM', '1', 'Receive Time', ''),  # noqa
-        '3109xx0c': ('CS', '1', 'Prior', ''),  # noqa
-        '3109xx0d': ('CS', '1', 'STAT Study', ''),  # noqa
-        '3109xx0e': ('CS', '1', '<internal', ''),  # noqa
+        '3109xx0A': ('DA', '1', 'Receive Date', ''),  # noqa
+        '3109xx0B': ('TM', '1', 'Receive Time', ''),  # noqa
+        '3109xx0C': ('CS', '1', 'Prior', ''),  # noqa
+        '3109xx0D': ('CS', '1', 'STAT Study', ''),  # noqa
+        '3109xx0E': ('CS', '1', '<internal', ''),  # noqa
         '3109xx10': ('CS', '1', '<internal', ''),  # noqa
         '3109xx11': ('LO', '1', '<internal', ''),  # noqa
         '3109xx12': ('LO', '1', '<internal', ''),  # noqa
@@ -517,9 +517,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3109xx27': ('SQ', '1', '<internal', ''),  # noqa
         '3109xx28': ('LO', '1', '<internal', ''),  # noqa
         '3109xx29': ('LO', '1', '<internal', ''),  # noqa
-        '3109xx2a': ('LO', '1', 'Send Flag', ''),  # noqa
-        '3109xx2b': ('LO', '1', 'Print Flag', ''),  # noqa
-        '3109xx2c': ('LO', '1', 'Archive Flag', ''),  # noqa
+        '3109xx2A': ('LO', '1', 'Send Flag', ''),  # noqa
+        '3109xx2B': ('LO', '1', 'Print Flag', ''),  # noqa
+        '3109xx2C': ('LO', '1', 'Archive Flag', ''),  # noqa
         '3109xx30': ('LO', '1', '<internal', ''),  # noqa
         '3109xx31': ('CS', '1', '<internal', ''),  # noqa
         '3109xx32': ('CS', '1', '<internal', ''),  # noqa
@@ -534,8 +534,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3109xx41': ('CS', '1', '<internal', ''),  # noqa
         '3109xx42': ('CS', '1', '<internal', ''),  # noqa
         '3109xx43': ('CS', '1', 'Archive Status', ''),  # noqa
-        '3109xxee': ('UI', '1', '<internal', ''),  # noqa
-        '3109xxef': ('CS', '1', '<internal', ''),  # noqa
+        '3109xxEE': ('UI', '1', '<internal', ''),  # noqa
+        '3109xxEF': ('CS', '1', '<internal', ''),  # noqa
     },
     'Applicare/RadWorks/Version 6.0': {
         '4103xx01': ('AT', '1', 'Internal: non-existent tags', ''),  # noqa
@@ -549,12 +549,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '4105xx07': ('SH', '1', 'Annotation Label', ''),  # noqa
         '4105xx08': ('PN', '1', 'Annotation Creator', ''),  # noqa
         '4105xx09': ('DA', '1', 'Annotation Creation Date', ''),  # noqa
-        '4105xx0a': ('TM', '1', 'Annotation Creation Time', ''),  # noqa
-        '4105xx0b': ('SQ', '1', 'Annotation Modification Sequence', ''),  # noqa
-        '4105xx0c': ('PN', '1', 'Annotation Modifier', ''),  # noqa
-        '4105xx0d': ('DA', '1', 'Annotation Modification Date', ''),  # noqa
-        '4105xx0e': ('TM', '1', 'Annotation Modification Time', ''),  # noqa
-        '4105xx0f': ('LO', '1', 'Palette Color LUT Name', ''),  # noqa
+        '4105xx0A': ('TM', '1', 'Annotation Creation Time', ''),  # noqa
+        '4105xx0B': ('SQ', '1', 'Annotation Modification Sequence', ''),  # noqa
+        '4105xx0C': ('PN', '1', 'Annotation Modifier', ''),  # noqa
+        '4105xx0D': ('DA', '1', 'Annotation Modification Date', ''),  # noqa
+        '4105xx0E': ('TM', '1', 'Annotation Modification Time', ''),  # noqa
+        '4105xx0F': ('LO', '1', 'Palette Color LUT Name', ''),  # noqa
         '4105xx10': ('US', '1', 'Annotation Number', ''),  # noqa
         '4107xx01': ('SQ', '1', 'Requested Palette Color LUT', ''),  # noqa
     },
@@ -578,9 +578,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3113xx27': ('LO', '1', '<internal', ''),  # noqa
         '3113xx30': ('UI', '1', '<internal', ''),  # noqa
         '3113xx31': ('UI', '1', '<internal', ''),  # noqa
-        '3113xxe0': ('CS', '1', '<internal', ''),  # noqa
-        '3113xxe1': ('CS', '1', '<internal', ''),  # noqa
-        '3113xxe2': ('CS', '1', '<internal', ''),  # noqa
+        '3113xxE0': ('CS', '1', '<internal', ''),  # noqa
+        '3113xxE1': ('CS', '1', '<internal', ''),  # noqa
+        '3113xxE2': ('CS', '1', '<internal', ''),  # noqa
     },
     'BRIT Systems, Inc.': {
         '0021xx00': ('SQ', '1', 'Person Information Sequence', ''),  # noqa
@@ -593,10 +593,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx07': ('SH', '1', 'Person Pager Phone', ''),  # noqa
         '0021xx08': ('SH', '1', 'Person Fax Phone', ''),  # noqa
         '0021xx09': ('LO', '1', 'Person EMail', ''),  # noqa
-        '0021xx0a': ('ST', '1', 'Person Address', ''),  # noqa
-        '0021xx0b': ('LO', '1', 'Person Password', ''),  # noqa
-        '0021xx0c': ('SH', '1', 'Person Emergency Phone', ''),  # noqa
-        '0021xx0d': ('LO', '1', 'Physician ID', ''),  # noqa
+        '0021xx0A': ('ST', '1', 'Person Address', ''),  # noqa
+        '0021xx0B': ('LO', '1', 'Person Password', ''),  # noqa
+        '0021xx0C': ('SH', '1', 'Person Emergency Phone', ''),  # noqa
+        '0021xx0D': ('LO', '1', 'Physician ID', ''),  # noqa
         '0021xx11': ('LO', '1', 'Original Patient ID', ''),  # noqa
         '0021xx12': ('UI', '1', 'Original Study Instance UID', ''),  # noqa
         '0021xx13': ('UI', '1', 'Original Series Instance UID', ''),  # noqa
@@ -606,7 +606,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx17': ('LO', '1', 'Patient DFS', ''),  # noqa
         '0021xx18': ('LO', '1', 'Patient Class', ''),  # noqa
         '0021xx19': ('LO', '1', 'Patient Type', ''),  # noqa
-        '0021xx1f': ('LT', '1', 'Generic String', ''),  # noqa
+        '0021xx1F': ('LT', '1', 'Generic String', ''),  # noqa
         '0021xx20': ('LO', '1', 'QC Study Assigned By', ''),  # noqa
         '0021xx21': ('LO', '1', 'QC Study Split By', ''),  # noqa
         '0021xx22': ('LO', '1', 'QC Study Moved By', ''),  # noqa
@@ -626,14 +626,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx91': ('LO', '1', 'Software Title', ''),  # noqa
         '0021xx92': ('SH', '1', 'Software Version', ''),  # noqa
         '0021xx93': ('LO', '1', 'Serial Number', ''),  # noqa
-        '0021xxa0': ('SQ', '1', 'Object Action Sequence', ''),  # noqa
-        '0021xxa1': ('ST', '1', 'Object Action', ''),  # noqa
-        '0021xxa2': ('DA', '1', 'Object Action Date', ''),  # noqa
-        '0021xxa3': ('TM', '1', 'Object Action Time', ''),  # noqa
-        '0021xxa5': ('AE', '1', 'Local AE Title', ''),  # noqa
-        '0021xxa6': ('SH', '1', 'Local IP Address', ''),  # noqa
-        '0021xxa7': ('AE', '1', 'Remote AE Title', ''),  # noqa
-        '0021xxa8': ('SH', '1', 'Remote IP Address', ''),  # noqa
+        '0021xxA0': ('SQ', '1', 'Object Action Sequence', ''),  # noqa
+        '0021xxA1': ('ST', '1', 'Object Action', ''),  # noqa
+        '0021xxA2': ('DA', '1', 'Object Action Date', ''),  # noqa
+        '0021xxA3': ('TM', '1', 'Object Action Time', ''),  # noqa
+        '0021xxA5': ('AE', '1', 'Local AE Title', ''),  # noqa
+        '0021xxA6': ('SH', '1', 'Local IP Address', ''),  # noqa
+        '0021xxA7': ('AE', '1', 'Remote AE Title', ''),  # noqa
+        '0021xxA8': ('SH', '1', 'Remote IP Address', ''),  # noqa
     },
     'BioPri': {
         '0009xx00': ('LO', '1', 'Unknown', ''),  # noqa
@@ -682,6 +682,534 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx30': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx40': ('UN', '1', 'Unknown', ''),  # noqa
     },
+    'CANON_MEC_MR3': {
+        '00290001': ('SQ', '1', 'Other Private Data', ''),  # noqa
+        '00290089': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290090': ('OB', '1', 'Reversed EVRLE DataSet', ''),  # noqa
+        '700D0000': ('DS', '1', 'Scale Factor', ''),  # noqa
+        '700D0005': ('DS', '4', 'FOV', ''),  # noqa
+        '700D000C': ('CS', '1', 'Receiver Gain Correction Check Flag', ''),  # noqa
+        '700D0020': ('SH', '1', 'Identification Flag of 3D GDC', ''),  # noqa
+    },
+    'CANON_MEC_MR3^10': {
+        '00090002': ('SH', '1', 'Unknown', ''),  # noqa
+        '00110003': ('US', '1', 'Unknown', ''),  # noqa
+        '00110004': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00110005': ('US', '1', 'Unknown', ''),  # noqa
+        '00110006': ('US', '1', 'Unknown', ''),  # noqa
+        '00110007': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '00110008': ('SH', '1', 'Unknown', ''),  # noqa
+        '0011000C': ('SS', '1', 'Unknown', ''),  # noqa
+        '0011000E': ('US', '2', 'Unknown', ''),  # noqa
+        '00190001': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190003': ('US', '1', 'Unknown', ''),  # noqa
+        '00190004': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190005': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190006': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190007': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190008': ('US', '1', 'Unknown', ''),  # noqa
+        '00190009': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('US', '3', 'Unknown', ''),  # noqa
+        '0019000D': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000E': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000F': ('SL', '6', 'Unknown', ''),  # noqa
+        '00190010': ('US', '2', 'Unknown', ''),  # noqa
+        '00190011': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190012': ('US', '1', 'Unknown', ''),  # noqa
+        '00190013': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190014': ('US', '1', 'Unknown', ''),  # noqa
+        '00190015': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190016': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190017': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190018': ('US', '1', 'Unknown', ''),  # noqa
+        '00190019': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001E': ('US', '1', 'Unknown', ''),  # noqa
+        '00190027': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190028': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190029': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002B': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019002F': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190030': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190031': ('OF', '1-n', 'Unknown', ''),  # noqa
+        '00190032': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190033': ('SL', '3', 'Unknown', ''),  # noqa
+        '00190034': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190035': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190036': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190038': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190039': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003B': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019003C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190042': ('US', '1', 'Unknown', ''),  # noqa
+        '00190043': ('US', '1', 'Unknown', ''),  # noqa
+        '00190044': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190045': ('SS', '1', 'Unknown', ''),  # noqa
+        '00190046': ('US', '1', 'Unknown', ''),  # noqa
+        '00190047': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190048': ('US', '1', 'Unknown', ''),  # noqa
+        '00190049': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004C': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004F': ('US', '1', 'Unknown', ''),  # noqa
+        '00190050': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190051': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190052': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190054': ('US', '1', 'Unknown', ''),  # noqa
+        '00190055': ('US', '1', 'Unknown', ''),  # noqa
+        '00190056': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190057': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190058': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190059': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005A': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005D': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005F': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190060': ('US', '1', 'Unknown', ''),  # noqa
+        '00190061': ('US', '1', 'Unknown', ''),  # noqa
+        '00190062': ('US', '1', 'Unknown', ''),  # noqa
+        '00190063': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190065': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019006B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006E': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190070': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190071': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190073': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190075': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190076': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190078': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019007B': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019007C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007D': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190085': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190086': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190087': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190088': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190089': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '0019008C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019008D': ('TM', '1', 'Unknown', ''),  # noqa
+        '0019008E': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190092': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190093': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190096': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009B': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009C': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('SL', '4', 'Unknown', ''),  # noqa
+        '001900A1': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900A4': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900A5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AB': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900AD': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B7': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900BA': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BC': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900BD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C6': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900C9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CA': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900CB': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CC': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900D1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D2': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900D3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900D9': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900DA': ('US', '1', 'Unknown', ''),  # noqa
+        '001900DB': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900DC': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900EA': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900EB': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900EC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900EF': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F4': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900F5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F6': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900F8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900F9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FF': ('SL', '3', 'Unknown', ''),  # noqa
+        '00210002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00210003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00210004': ('US', '1', 'Unknown', ''),  # noqa
+        '00210008': ('DS', '3', 'Unknown', ''),  # noqa
+        '00210009': ('DS', '3', 'Unknown', ''),  # noqa
+        '0021000A': ('DS', '3', 'Unknown', ''),  # noqa
+        '0021000B': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000C': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000D': ('FL', '1', 'Unknown', ''),  # noqa
+        '0021000F': ('US', '1', 'Unknown', ''),  # noqa
+        '00210012': ('DS', '3', 'Unknown', ''),  # noqa
+        '00210014': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210015': ('FL', '1', 'Unknown', ''),  # noqa
+        '00210016': ('FL', '2', 'Unknown', ''),  # noqa
+        '00210018': ('US', '1', 'Unknown', ''),  # noqa
+        '0021001D': ('IS', '1', 'Unknown', ''),  # noqa
+        '0021001F': ('US', '1', 'Unknown', ''),  # noqa
+        '00210022': ('US', '1', 'Unknown', ''),  # noqa
+        '00210023': ('SS', '1', 'Unknown', ''),  # noqa
+        '00290001': ('SL', '1', 'Unknown', ''),  # noqa
+        '00290005': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00290006': ('FL', '1', 'Unknown', ''),  # noqa
+        '00290007': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029001C': ('FL', '2', 'Unknown', ''),  # noqa
+        '00290021': ('SL', '3', 'Unknown', ''),  # noqa
+        '0029004E': ('SL', '1', 'Unknown', ''),  # noqa
+        '00290050': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290051': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290052': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290054': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290067': ('FD', '4', 'Unknown', ''),  # noqa
+        '00290068': ('SS', '1', 'Unknown', ''),  # noqa
+        '0029006E': ('OB', '1', 'Unknown', ''),  # noqa
+        '700D0010': ('DS', '1', '2nd Flip Angle [degree]', ''),  # noqa
+        '700D0011': ('US', '2', 'Acquisition Inner Matrix', ''),  # noqa
+        '700D0012': ('US', '1', 'MP2RAGE Flag', ''),  # noqa
+        '700D0013': ('FL', '1', 'Inversion efficiency of inversion recovery pulse', ''),  # noqa
+        '700D0014': ('SL', '1', 'Number of dummy shot', ''),  # noqa
+        '700D0015': ('FL', '1', 'FFE total repetition time[s]', ''),  # noqa
+        '700D0016': ('LO', '3', 'PAS Name', ''),  # noqa
+        '700D0017': ('LT', '1', 'Intended Processing', ''),  # noqa
+        '700D0018': ('SS', '1', 'Scanned Orientation IDs', ''),  # noqa
+        '700D0019': ('OB', '1', 'PAS Reproduct Information', ''),  # noqa
+        '700D001A': ('DS', '1', 'ASTAR Inversion Time', ''),  # noqa
+        '700D001B': ('DS', '1', 'Saturation Recovery Time', ''),  # noqa
+        'E2010002': ('US', '1', 'Unknown', ''),  # noqa
+        'E3010000': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4010000': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010001': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010002': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010003': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010004': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010005': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4010007': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010008': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010012': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010013': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4010020': ('SQ', '1', 'Unknown', ''),  # noqa
+        'E4010021': ('SQ', '1', 'Unknown', ''),  # noqa
+        'E4010022': ('LO', '1', 'Unknown', ''),  # noqa
+        'E4010023': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4010024': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030000': ('SQ', '1', 'Unknown', ''),  # noqa
+        'EE010000': ('US', '1', 'Unknown', ''),  # noqa
+        'EE010001': ('OB', '1', 'Unknown', ''),  # noqa
+        'EE010002': ('US', '1', 'Unknown', ''),  # noqa
+    },
+    'CANON_MEC_MR3^11': {
+        '00190001': ('OB', '1', 'Unknown', ''),  # noqa
+        '00190002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190004': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190008': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190009': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019000A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190019': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019001A': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190024': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190025': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190026': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190028': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190029': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002C': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002D': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002E': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190030': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190031': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190032': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190034': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190035': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190036': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190037': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190038': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190039': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019003A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019003D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003E': ('FL', '9', 'Unknown', ''),  # noqa
+        '0019003F': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190040': ('US', '1', 'Unknown', ''),  # noqa
+        '00190041': ('US', '1', 'Unknown', ''),  # noqa
+        '00190042': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190043': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190044': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190046': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190048': ('LT', '1', 'Unknown', ''),  # noqa
+        '00190049': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019004C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004E': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190055': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190057': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190058': ('US', '1', 'Unknown', ''),  # noqa
+        '00190059': ('US', '1', 'Unknown', ''),  # noqa
+        '0019005D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019005F': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190060': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190061': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190062': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190063': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190065': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190066': ('SL', '6', 'Unknown', ''),  # noqa
+        '00190068': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190069': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006B': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019006D': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006E': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006F': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190071': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190072': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190073': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190077': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190078': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190079': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007A': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019007C': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019007D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190080': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190083': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190087': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190092': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190093': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190094': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019009A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019009D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009F': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A5': ('US', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('US', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900B1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B3': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900B6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B7': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B9': ('US', '1', 'Unknown', ''),  # noqa
+        '001900BB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BC': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C1': ('US', '1', 'Unknown', ''),  # noqa
+        '001900C2': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900C4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900E1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900E3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900E4': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900E5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900F2': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900F3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900F6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F7': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FF': ('SL', '1', 'Unknown', ''),  # noqa
+    },
+    'CANON_MEC_MR3^12': {
+        '00190000': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190001': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190004': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190005': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190006': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190007': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190008': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190009': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019000D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019000E': ('US', '1', 'Unknown', ''),  # noqa
+        '00190010': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190011': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190012': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190013': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190014': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190018': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190028': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('DS', '3', 'Unknown', ''),  # noqa
+        '0019002B': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190032': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190034': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190052': ('FL', '2', 'Unknown', ''),  # noqa
+        '00190076': ('OB', '1', 'Unknown', ''),  # noqa
+        '00190079': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190080': ('FD', '1', 'Unknown', ''),  # noqa
+        '00190086': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190087': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190088': ('US', '1', 'Unknown', ''),  # noqa
+        '00190089': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008B': ('US', '1', 'Unknown', ''),  # noqa
+        '00190093': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190094': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190095': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190097': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190098': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190099': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019009A': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009B': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019009C': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009D': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009E': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009F': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A4': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('FL', '2-2n', 'Unknown', ''),  # noqa
+        '001900A7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AA': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AB': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AC': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AD': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AE': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AF': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900B3': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900C2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900C4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900CE': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CF': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900D1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900D2': ('US', '3', 'Unknown', ''),  # noqa
+        '001900D3': ('SS', '1', 'Unknown', ''),  # noqa
+        '001900D4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900D5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900D6': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900D7': ('US', '2', 'Unknown', ''),  # noqa
+        '001900DE': ('US', '1', 'Unknown', ''),  # noqa
+        '001900DF': ('US', '1', 'Unknown', ''),  # noqa
+        '001900E0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900E2': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900E3': ('TM', '1', 'Unknown', ''),  # noqa
+        '001900E4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900EB': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EF': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('LT', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+    },
+    'CANON_MEC_MR3^13': {
+        '00190002': ('US', '1', 'Unknown', ''),  # noqa
+        '00190003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190004': ('US', '1', 'Unknown', ''),  # noqa
+        '00190005': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190008': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190009': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('FD', '3', 'Unknown', ''),  # noqa
+        '0019000B': ('FD', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('FD', '1', 'Unknown', ''),  # noqa
+        '0019000F': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190014': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190019': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001F': ('US', '1', 'Unknown', ''),  # noqa
+        '00190022': ('SL', '1', 'Unknown', ''),  # noqa
+        'E4030000': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4030001': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030002': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030003': ('OB', '1', 'Unknown', ''),  # noqa
+    },
     'CARDIO-D.R. 1.0': {
         '0009xx00': ('UL', '1', 'File Location', ''),  # noqa
         '0009xx01': ('UL', '1', 'File Size', ''),  # noqa
@@ -707,9 +1235,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx05': ('OB', '1', 'Private Data', ''),  # noqa
         '0009xx06': ('OB', '1', 'Private Data', ''),  # noqa
         '0009xx08': ('OB', '1', 'ACOM flags', ''),  # noqa
-        '0009xx0a': ('UN', '1', 'Private Data', ''),  # noqa
-        '0009xx0b': ('UN', '1', 'Private Data', ''),  # noqa
-        '0009xx0c': ('UN', '1', 'Private Data', ''),  # noqa
+        '0009xx0A': ('UN', '1', 'Private Data', ''),  # noqa
+        '0009xx0B': ('UN', '1', 'Private Data', ''),  # noqa
+        '0009xx0C': ('UN', '1', 'Private Data', ''),  # noqa
         '0029xx80': ('SQ', '1', 'Private Data', ''),  # noqa
         '0031xx01': ('UN', '1', 'Private Data stream', ''),  # noqa
     },
@@ -749,15 +1277,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx17': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx18': ('UN', '1', 'Unknown', ''),  # noqa
         '0019xx19': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xx1a': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xx1b': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx1c': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx1e': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx1f': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xx1A': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xx1B': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019xx1C': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx1E': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx1F': ('UN', '1', 'Unknown', ''),  # noqa
         '0019xx21': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx60': ('US', '1', 'Performed number of series', ''),  # noqa
         '0019xx70': ('US', '1', 'Performed number of images', ''),  # noqa
-        '0019xx7f': ('OB', '1', 'Canon Internal Data 111', ''),  # noqa
+        '0019xx7F': ('OB', '1', 'Canon Internal Data 111', ''),  # noqa
     },
     'DIDI TO PCR 1.1': {
         '0019xx00': ('LT', '1', 'Post Mode String', ''),  # noqa
@@ -775,38 +1303,38 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx81': ('SH', '1', 'Filter Type', ''),  # noqa
         '0019xx82': ('LT', '1', 'Stitching', ''),  # noqa
         '0019xx89': ('IS', '1', 'Exposure Index', ''),  # noqa
-        '0019xx8a': ('IS', '1', 'Collimator X', ''),  # noqa
-        '0019xx8b': ('IS', '1', 'Collimator Y', ''),  # noqa
-        '0019xx8c': ('LO', '1', 'Print Marker', ''),  # noqa
-        '0019xx8d': ('LO', '1', 'RGDV Name', ''),  # noqa
-        '0019xx8e': ('LO', '1', 'Acqd Sensitivity', ''),  # noqa
-        '0019xx8f': ('LO', '1', 'Processing Category', ''),  # noqa
+        '0019xx8A': ('IS', '1', 'Collimator X', ''),  # noqa
+        '0019xx8B': ('IS', '1', 'Collimator Y', ''),  # noqa
+        '0019xx8C': ('LO', '1', 'Print Marker', ''),  # noqa
+        '0019xx8D': ('LO', '1', 'RGDV Name', ''),  # noqa
+        '0019xx8E': ('LO', '1', 'Acqd Sensitivity', ''),  # noqa
+        '0019xx8F': ('LO', '1', 'Processing Category', ''),  # noqa
         '0019xx90': ('LO', '1', 'Unprocessed Flag', ''),  # noqa
         '0019xx91': ('DS', '2', 'Key Values', ''),  # noqa
         '0019xx92': ('LO', '1', 'Destination Postprocessing Function', ''),  # noqa
-        '0019xxa0': ('LO', '1', 'Version', ''),  # noqa
-        '0019xxa1': ('LO', '1', 'Ranging Mode', ''),  # noqa
-        '0019xxa2': ('DS', '1', 'Abdomen Brightness', ''),  # noqa
-        '0019xxa3': ('DS', '1', 'Fixed Brightness', ''),  # noqa
-        '0019xxa4': ('DS', '1', 'Detail Contrast', ''),  # noqa
-        '0019xxa5': ('DA', '1', 'Contrast Balance', ''),  # noqa
-        '0019xxa6': ('DS', '1', 'Structure Boost', ''),  # noqa
-        '0019xxa7': ('DS', '1', 'Structure Preference', ''),  # noqa
-        '0019xxa8': ('DS', '1', 'Noise Robustness', ''),  # noqa
-        '0019xxa9': ('DS', '1', 'Noise Dose Limit', ''),  # noqa
-        '0019xxaa': ('DS', '1', 'Noise Dose Step', ''),  # noqa
-        '0019xxab': ('DS', '1', 'Noise Frequency Limit', ''),  # noqa
-        '0019xxac': ('DS', '1', 'Weak Contrast Limit', ''),  # noqa
-        '0019xxad': ('DS', '1', 'Strong Contrast Limit', ''),  # noqa
-        '0019xxae': ('DS', '1', 'Structure Boost Offset', ''),  # noqa
-        '0019xxaf': ('LO', '1', 'Smooth Gain', ''),  # noqa
-        '0019xxb0': ('LO', '1', 'Measure Field 1', ''),  # noqa
-        '0019xxb1': ('LO', '1', 'Measure Field 2', ''),  # noqa
-        '0019xxb2': ('IS', '1', 'Key Percentile 1', ''),  # noqa
-        '0019xxb3': ('IS', '1', 'Key Percentile 2', ''),  # noqa
-        '0019xxb4': ('IS', '1', 'Density LUT', ''),  # noqa
-        '0019xxb5': ('DS', '1', 'Brightness', ''),  # noqa
-        '0019xxb6': ('DS', '1', 'Gamma', ''),  # noqa
+        '0019xxA0': ('LO', '1', 'Version', ''),  # noqa
+        '0019xxA1': ('LO', '1', 'Ranging Mode', ''),  # noqa
+        '0019xxA2': ('DS', '1', 'Abdomen Brightness', ''),  # noqa
+        '0019xxA3': ('DS', '1', 'Fixed Brightness', ''),  # noqa
+        '0019xxA4': ('DS', '1', 'Detail Contrast', ''),  # noqa
+        '0019xxA5': ('DA', '1', 'Contrast Balance', ''),  # noqa
+        '0019xxA6': ('DS', '1', 'Structure Boost', ''),  # noqa
+        '0019xxA7': ('DS', '1', 'Structure Preference', ''),  # noqa
+        '0019xxA8': ('DS', '1', 'Noise Robustness', ''),  # noqa
+        '0019xxA9': ('DS', '1', 'Noise Dose Limit', ''),  # noqa
+        '0019xxAA': ('DS', '1', 'Noise Dose Step', ''),  # noqa
+        '0019xxAB': ('DS', '1', 'Noise Frequency Limit', ''),  # noqa
+        '0019xxAC': ('DS', '1', 'Weak Contrast Limit', ''),  # noqa
+        '0019xxAD': ('DS', '1', 'Strong Contrast Limit', ''),  # noqa
+        '0019xxAE': ('DS', '1', 'Structure Boost Offset', ''),  # noqa
+        '0019xxAF': ('LO', '1', 'Smooth Gain', ''),  # noqa
+        '0019xxB0': ('LO', '1', 'Measure Field 1', ''),  # noqa
+        '0019xxB1': ('LO', '1', 'Measure Field 2', ''),  # noqa
+        '0019xxB2': ('IS', '1', 'Key Percentile 1', ''),  # noqa
+        '0019xxB3': ('IS', '1', 'Key Percentile 2', ''),  # noqa
+        '0019xxB4': ('IS', '1', 'Density LUT', ''),  # noqa
+        '0019xxB5': ('DS', '1', 'Brightness', ''),  # noqa
+        '0019xxB6': ('DS', '1', 'Gamma', ''),  # noqa
         '0089xx10': ('SQ', '1', 'Stamp Image Sequence', ''),  # noqa
     },
     'DIGISCAN IMAGE': {
@@ -842,7 +1370,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('ST', '1', 'Adx Procedure Name', ''),  # noqa
         '0019xx08': ('ST', '1', 'Adx Exam Name', ''),  # noqa
         '0019xx09': ('SH', '1', 'Adx Patient Size', ''),  # noqa
-        '0019xx0a': ('IS', '1', 'Adx Record View', ''),  # noqa
+        '0019xx0A': ('IS', '1', 'Adx Record View', ''),  # noqa
         '0019xx10': ('DS', '1', 'Adx Injector Delay', ''),  # noqa
         '0019xx11': ('CS', '1', 'Adx Auto Inject', ''),  # noqa
         '0019xx14': ('IS', '1', 'Adx Acq Mode', ''),  # noqa
@@ -851,12 +1379,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx17': ('IS', '1', 'User Spatial Filter Strength', ''),  # noqa
         '0019xx18': ('IS', '1', 'User Zoom Factor', ''),  # noqa
         '0019xx19': ('IS', '1', 'X Zoom', ''),  # noqa
-        '0019xx1a': ('IS', '1', 'Y Zoom', ''),  # noqa
-        '0019xx1b': ('DS', '1', 'Adx Focus', ''),  # noqa
-        '0019xx1c': ('CS', '1', 'Adx Dose', ''),  # noqa
-        '0019xx1d': ('IS', '1', 'Side Mark', ''),  # noqa
-        '0019xx1e': ('IS', '1', 'Percent Landscape', ''),  # noqa
-        '0019xx1f': ('DS', '1', 'Adx Exposure Duration', ''),  # noqa
+        '0019xx1A': ('IS', '1', 'Y Zoom', ''),  # noqa
+        '0019xx1B': ('DS', '1', 'Adx Focus', ''),  # noqa
+        '0019xx1C': ('CS', '1', 'Adx Dose', ''),  # noqa
+        '0019xx1D': ('IS', '1', 'Side Mark', ''),  # noqa
+        '0019xx1E': ('IS', '1', 'Percent Landscape', ''),  # noqa
+        '0019xx1F': ('DS', '1', 'Adx Exposure Duration', ''),  # noqa
         '0019xx20': ('SH', '1', 'Ip Address', ''),  # noqa
         '0019xx21': ('DS', '1', 'Table Vertical Position', ''),  # noqa
         '0019xx22': ('DS', '1', 'Table Longitudinal Position', ''),  # noqa
@@ -868,147 +1396,155 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx28': ('DS', '1', 'Image chain FWHM psf mm max', ''),  # noqa
     },
     'DL_INTERNAL_USE': {
-        '0015xx8f': ('IS', '1', 'Unknown', ''),  # noqa
+        '0015xx8F': ('IS', '1', 'Unknown', ''),  # noqa
     },
     'DR Systems, Inc.': {
         '4453xx01': ('LO', '1', 'DR Exam ID', ''),  # noqa
         '4453xx02': ('LO', '1', 'DR Image Type', ''),  # noqa
         '4453xx04': ('LO', '1', 'DR File Type', ''),  # noqa
         '4453xx05': ('LO', '1', 'DR File Suffix', ''),  # noqa
-        '4453xx0a': ('UN', '1', 'DR Annotation Type', ''),  # noqa
-        '4453xx0c': ('SQ', '1', 'DR Original Instance UID Sequence', ''),  # noqa
+        '4453xx0A': ('UN', '1', 'DR Annotation Type', ''),  # noqa
+        '4453xx0C': ('SQ', '1', 'DR Original Instance UID Sequence', ''),  # noqa
     },
     'DicomUtils 20100512': {
         '00090001': ('SQ', '1', 'DICOMUTILS_PROCESSING_METHODS', ''),  # noqa
     },
     'ELGEMS_XPERT': {
-        '7fa1xx00': ('OB', '1', 'XPert Composite Report Item buffer', ''),  # noqa
-        '7fa1xx10': ('OB', '1', 'Xpert Composite Report Item Identificator', ''),  # noqa
+        '7FA1xx00': ('OB', '1', 'XPert Composite Report Item buffer', ''),  # noqa
+        '7FA1xx10': ('OB', '1', 'Xpert Composite Report Item Identificator', ''),  # noqa
     },
     'ELSCINT1': {
         '0003xx01': ('OW', '1', 'Offset List Structure', ''),  # noqa
-        '00e1xx01': ('US', '1', 'Data Dictionary Version', ''),  # noqa
-        '00e1xx05': ('IS', '1', 'Unknown', ''),  # noqa
-        '00e1xx06': ('IS', '1', 'Unknown', ''),  # noqa
-        '00e1xx07': ('IS', '1', 'Unknown', ''),  # noqa
-        '00e1xx14': ('CS', '1', 'Unknown', ''),  # noqa
-        '00e1xx18': ('OB', '1', 'Unknown', ''),  # noqa
-        '00e1xx21': ('DS', '1', 'Unknown', ''),  # noqa
-        '00e1xx22': ('DS', '2', 'Presentation Relative Center', ''),  # noqa
-        '00e1xx23': ('DS', '2', 'Presentation Relative Part', ''),  # noqa
-        '00e1xx24': ('CS', '1', 'Presentation Horizontal Invert', ''),  # noqa
-        '00e1xx25': ('CS', '1', 'Unknown', ''),  # noqa
-        '00e1xx2a': ('DS', '1', 'Unknown', ''),  # noqa
-        '00e1xx30': ('UI', '1', 'Unknown', ''),  # noqa
-        '00e1xx31': ('CS', '1', 'Unknown', ''),  # noqa
-        '00e1xx32': ('US', '2', 'Unknown', ''),  # noqa
-        '00e1xx37': ('DS', '1', 'Unknown', ''),  # noqa
-        '00e1xx39': ('SQ', '1', 'Unknown', ''),  # noqa
-        '00e1xx3f': ('CS', '1', 'Unknown', ''),  # noqa
-        '00e1xx40': ('SH', '1', 'Image Label', ''),  # noqa
-        '00e1xx41': ('DS', '1', 'Unknown', ''),  # noqa
-        '00e1xx42': ('LO', '1', 'Unknown', ''),  # noqa
-        '00e1xx43': ('IS', '1', 'Unknown', ''),  # noqa
-        '00e1xx50': ('DS', '1', 'Acquisition Duration', ''),  # noqa
-        '00e1xx51': ('SH', '1', 'Unknown', ''),  # noqa
-        '00e1xx60': ('CS', '1', 'Unknown', ''),  # noqa
-        '00e1xx61': ('LO', '1', 'Protocol File Name', ''),  # noqa
-        '00e1xx62': ('CS', '1', 'Unknown', ''),  # noqa
-        '00e1xx63': ('SH', '1', 'Patient Language', ''),  # noqa
-        '00e1xx65': ('LO', '1', 'Patient Data Modification Date', ''),  # noqa
-        '00e1xx6a': ('IS', '1', 'Unknown', ''),  # noqa
-        '00e1xx6b': ('IS', '1', 'Unknown', ''),  # noqa
-        '00e1xxa0': ('LO', '1', 'Unknown', ''),  # noqa
-        '00e1xxc2': ('UI', '1', 'Unknown', ''),  # noqa
-        '00e3xx00': ('OB', '1', 'Unknown', ''),  # noqa
-        '00e3xx18': ('OB', '1', 'Unknown', ''),  # noqa
-        '00e3xx1f': ('OB', '1', 'Unknown', ''),  # noqa
-        '01e1xx18': ('OB', '1', 'Unknown', ''),  # noqa
-        '01e1xx21': ('ST', '1', 'Unknown', ''),  # noqa
-        '01e1xx34': ('IS', '1', 'Unknown', ''),  # noqa
-        '01f1xx01': ('CS', '1', 'Acquisition Type', ''),  # noqa
-        '01f1xx02': ('CS', '1', 'Unknown', ''),  # noqa
-        '01f1xx03': ('CS', '1', 'Concurrent Slices Generation', ''),  # noqa
-        '01f1xx04': ('CS', '1', 'Angular Sampling Density', ''),  # noqa
-        '01f1xx05': ('DS', '1', 'Reconstruction Arc', ''),  # noqa
-        '01f1xx06': ('DS', '1', 'Unknown', ''),  # noqa
-        '01f1xx07': ('DS', '1', 'Table Velocity', ''),  # noqa
-        '01f1xx08': ('DS', '1', 'Acquisition Length', ''),  # noqa
-        '01f1xx0a': ('US', '1', 'Edge Enhancement Weight', ''),  # noqa
-        '01f1xx0b': ('CS', '2', 'Unknown', ''),  # noqa
-        '01f1xx0c': ('DS', '2', 'Scanner Relative Center', ''),  # noqa
-        '01f1xx0d': ('DS', '1', 'Rotation Angle', ''),  # noqa
-        '01f1xx0e': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f1xx26': ('DS', '1', 'Pitch', ''),  # noqa
-        '01f1xx27': ('DS', '1', 'Rotation Time', ''),  # noqa
-        '01f1xx28': ('DS', '1', 'Unknown', ''),  # noqa
-        '01f1xx30': ('US', '1', 'Unknown', ''),  # noqa
-        '01f1xx32': ('CS', '1', 'Image View Convention', ''),  # noqa
-        '01f1xx33': ('DS', '1', 'Unknown', ''),  # noqa
-        '01f1xx36': ('CS', '1', 'Unknown', ''),  # noqa
-        '01f1xx37': ('DS', '1', 'Unknown', ''),  # noqa
-        '01f1xx38': ('LO', '1', 'Unknown', ''),  # noqa
-        '01f1xx39': ('LO', '1', 'Unknown', ''),  # noqa
-        '01f1xx40': ('CS', '1', 'Unknown', ''),  # noqa
-        '01f1xx42': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f1xx43': ('LO', '1', 'Unknown', ''),  # noqa
-        '01f1xx44': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f1xx45': ('IS', '1', 'Unknown', ''),  # noqa
-        '01f1xx46': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f1xx47': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f1xx49': ('DS', '1', 'Unknown', ''),  # noqa
-        '01f1xx4a': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f1xx4b': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f1xx4c': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f1xx4d': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f1xx4e': ('LO', '1', 'Unknown', ''),  # noqa
-        '01f1xx53': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f3xx01': ('SQ', '1', 'Unknown', ''),  # noqa
-        '01f3xx02': ('SS', '1', 'Unknown', ''),  # noqa
-        '01f3xx03': ('FL', '2', 'Unknown', ''),  # noqa
-        '01f3xx04': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f3xx11': ('SQ', '1', 'PS Sequence', ''),  # noqa
-        '01f3xx12': ('SS', '1', 'Unknown', ''),  # noqa
-        '01f3xx13': ('FL', '2', 'Unknown', ''),  # noqa
-        '01f3xx14': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f3xx15': ('US', '1', 'Unknown', ''),  # noqa
-        '01f3xx16': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f3xx17': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f3xx18': ('SH', '1', 'Unknown', ''),  # noqa
-        '01f3xx19': ('FL', '1', 'Unknown', ''),  # noqa
-        '01f3xx23': ('US', '1', 'Unknown', ''),  # noqa
-        '01f3xx24': ('IS', '2', 'Unknown', ''),  # noqa
-        '01f7xx10': ('OB', '1', 'Unknown', ''),  # noqa
-        '01f7xx11': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx13': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx14': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx15': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx16': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx17': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx18': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx19': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx1a': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx1b': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx1c': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx1e': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx1f': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx22': ('UI', '1', 'Unknown', ''),  # noqa
-        '01f7xx23': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx25': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx26': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx27': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx28': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx29': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx2b': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx2c': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx2d': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx2e': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx30': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx31': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx70': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx73': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx74': ('OW', '1', 'Unknown', ''),  # noqa
-        '01f7xx75': ('OW', '1', 'Unknown', ''),  # noqa
+        '00E10046': ('OB', '1', 'Unknown', ''),  # noqa
+        '00E100E1': ('UN', '1', 'Unknown', ''),  # noqa
+        '00E100EC': ('UN', '1', 'Unknown', ''),  # noqa
+        '00E1xx01': ('US', '1', 'Data Dictionary Version', ''),  # noqa
+        '00E1xx05': ('IS', '1', 'Unknown', ''),  # noqa
+        '00E1xx06': ('IS', '1', 'Unknown', ''),  # noqa
+        '00E1xx07': ('IS', '1', 'Unknown', ''),  # noqa
+        '00E1xx14': ('CS', '1', 'Unknown', ''),  # noqa
+        '00E1xx18': ('OB', '1', 'Unknown', ''),  # noqa
+        '00E1xx21': ('DS', '1', 'Unknown', ''),  # noqa
+        '00E1xx22': ('DS', '2', 'Presentation Relative Center', ''),  # noqa
+        '00E1xx23': ('DS', '2', 'Presentation Relative Part', ''),  # noqa
+        '00E1xx24': ('CS', '1', 'Presentation Horizontal Invert', ''),  # noqa
+        '00E1xx25': ('CS', '1', 'Unknown', ''),  # noqa
+        '00E1xx2A': ('DS', '1', 'Unknown', ''),  # noqa
+        '00E1xx30': ('UI', '1', 'Unknown', ''),  # noqa
+        '00E1xx31': ('CS', '1', 'Unknown', ''),  # noqa
+        '00E1xx32': ('US', '2', 'Unknown', ''),  # noqa
+        '00E1xx37': ('DS', '1', 'Unknown', ''),  # noqa
+        '00E1xx39': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00E1xx3F': ('CS', '1', 'Unknown', ''),  # noqa
+        '00E1xx40': ('SH', '1', 'Image Label', ''),  # noqa
+        '00E1xx41': ('DS', '1', 'Unknown', ''),  # noqa
+        '00E1xx42': ('LO', '1', 'Unknown', ''),  # noqa
+        '00E1xx43': ('IS', '1', 'Unknown', ''),  # noqa
+        '00E1xx50': ('DS', '1', 'Acquisition Duration', ''),  # noqa
+        '00E1xx51': ('SH', '1', 'Unknown', ''),  # noqa
+        '00E1xx60': ('CS', '1', 'Unknown', ''),  # noqa
+        '00E1xx61': ('LO', '1', 'Protocol File Name', ''),  # noqa
+        '00E1xx62': ('CS', '1', 'Unknown', ''),  # noqa
+        '00E1xx63': ('SH', '1', 'Patient Language', ''),  # noqa
+        '00E1xx65': ('LO', '1', 'Patient Data Modification Date', ''),  # noqa
+        '00E1xx6A': ('IS', '1', 'Unknown', ''),  # noqa
+        '00E1xx6B': ('IS', '1', 'Unknown', ''),  # noqa
+        '00E1xxA0': ('LO', '1', 'Unknown', ''),  # noqa
+        '00E1xxC2': ('UI', '1', 'Unknown', ''),  # noqa
+        '00E3xx00': ('OB', '1', 'Unknown', ''),  # noqa
+        '00E3xx18': ('OB', '1', 'Unknown', ''),  # noqa
+        '00E3xx1F': ('OB', '1', 'Unknown', ''),  # noqa
+        '01E10040': ('UN', '1', 'Unknown', ''),  # noqa
+        '01E1xx18': ('OB', '1', 'Unknown', ''),  # noqa
+        '01E1xx21': ('ST', '1', 'Unknown', ''),  # noqa
+        '01E1xx34': ('IS', '1', 'Unknown', ''),  # noqa
+        '01F1000F': ('UN', '1', 'Unknown', ''),  # noqa
+        '01F1xx01': ('CS', '1', 'Acquisition Type', ''),  # noqa
+        '01F1xx02': ('CS', '1', 'Unknown', ''),  # noqa
+        '01F1xx03': ('CS', '1', 'Concurrent Slices Generation', ''),  # noqa
+        '01F1xx04': ('CS', '1', 'Angular Sampling Density', ''),  # noqa
+        '01F1xx05': ('DS', '1', 'Reconstruction Arc', ''),  # noqa
+        '01F1xx06': ('DS', '1', 'Unknown', ''),  # noqa
+        '01F1xx07': ('DS', '1', 'Table Velocity', ''),  # noqa
+        '01F1xx08': ('DS', '1', 'Acquisition Length', ''),  # noqa
+        '01F1xx0A': ('US', '1', 'Edge Enhancement Weight', ''),  # noqa
+        '01F1xx0B': ('CS', '2', 'Unknown', ''),  # noqa
+        '01F1xx0C': ('DS', '2', 'Scanner Relative Center', ''),  # noqa
+        '01F1xx0D': ('DS', '1', 'Rotation Angle', ''),  # noqa
+        '01F1xx0E': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F1xx26': ('DS', '1', 'Pitch', ''),  # noqa
+        '01F1xx27': ('DS', '1', 'Rotation Time', ''),  # noqa
+        '01F1xx28': ('DS', '1', 'Unknown', ''),  # noqa
+        '01F1xx30': ('US', '1', 'Unknown', ''),  # noqa
+        '01F1xx32': ('CS', '1', 'Image View Convention', ''),  # noqa
+        '01F1xx33': ('DS', '1', 'Unknown', ''),  # noqa
+        '01F1xx36': ('CS', '1', 'Unknown', ''),  # noqa
+        '01F1xx37': ('DS', '1', 'Unknown', ''),  # noqa
+        '01F1xx38': ('LO', '1', 'Unknown', ''),  # noqa
+        '01F1xx39': ('LO', '1', 'Unknown', ''),  # noqa
+        '01F1xx40': ('CS', '1', 'Unknown', ''),  # noqa
+        '01F1xx42': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F1xx43': ('LO', '1', 'Unknown', ''),  # noqa
+        '01F1xx44': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F1xx45': ('IS', '1', 'Unknown', ''),  # noqa
+        '01F1xx46': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F1xx47': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F1xx49': ('DS', '1', 'Unknown', ''),  # noqa
+        '01F1xx4A': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F1xx4B': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F1xx4C': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F1xx4D': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F1xx4E': ('LO', '1', 'Unknown', ''),  # noqa
+        '01F1xx53': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F3xx01': ('SQ', '1', 'Unknown', ''),  # noqa
+        '01F3xx02': ('SS', '1', 'Unknown', ''),  # noqa
+        '01F3xx03': ('FL', '2', 'Unknown', ''),  # noqa
+        '01F3xx04': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F3xx11': ('SQ', '1', 'PS Sequence', ''),  # noqa
+        '01F3xx12': ('SS', '1', 'Unknown', ''),  # noqa
+        '01F3xx13': ('FL', '2', 'Unknown', ''),  # noqa
+        '01F3xx14': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F3xx15': ('US', '1', 'Unknown', ''),  # noqa
+        '01F3xx16': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F3xx17': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F3xx18': ('SH', '1', 'Unknown', ''),  # noqa
+        '01F3xx19': ('FL', '1', 'Unknown', ''),  # noqa
+        '01F3xx23': ('US', '1', 'Unknown', ''),  # noqa
+        '01F3xx24': ('IS', '2', 'Unknown', ''),  # noqa
+        '01F70097': ('UN', '1', 'Unknown', ''),  # noqa
+        '01F70099': ('UN', '1', 'Unknown', ''),  # noqa
+        '01F7009B': ('IS', '1', 'iDose Level', ''),  # noqa
+        '01F7xx10': ('OB', '1', 'Unknown', ''),  # noqa
+        '01F7xx11': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx13': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx14': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx15': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx16': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx17': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx18': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx19': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx1A': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx1B': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx1C': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx1E': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx1F': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx22': ('UI', '1', 'Unknown', ''),  # noqa
+        '01F7xx23': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx25': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx26': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx27': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx28': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx29': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx2B': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx2C': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx2D': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx2E': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx30': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx31': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx70': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx73': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx74': ('OW', '1', 'Unknown', ''),  # noqa
+        '01F7xx75': ('OW', '1', 'Unknown', ''),  # noqa
         '0601xx00': ('SH', '1', 'Implementation Version', ''),  # noqa
         '0601xx20': ('DS', '1', 'Relative Table Position', ''),  # noqa
         '0601xx21': ('DS', '1', 'Relative Table Height', ''),  # noqa
@@ -1018,50 +1554,51 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0601xx70': ('DS', '1', 'Batch Number', ''),  # noqa
         '0601xx71': ('DS', '1', 'Batch Size', ''),  # noqa
         '0601xx72': ('DS', '1', 'Batch Slice Number', ''),  # noqa
-        '07a1xx01': ('UL', '1', 'number of series in study', ''),  # noqa
-        '07a1xx02': ('UL', '1', 'number of images in series', ''),  # noqa
-        '07a1xx03': ('UL', '1', 'last update time', ''),  # noqa
-        '07a1xx04': ('UL', '1', 'last update date', ''),  # noqa
-        '07a1xx07': ('US', '3', 'Unknown', ''),  # noqa
-        '07a1xx08': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '07a1xx09': ('OW', '1', 'Unknown', ''),  # noqa
-        '07a1xx0a': ('OB', '1', 'Tamar Compressed Pixel Data', ''),  # noqa
-        '07a1xx0c': ('US', '1', 'Unknown', ''),  # noqa
-        '07a1xx10': ('LO', '1', 'Tamar Software Version', ''),  # noqa
-        '07a1xx11': ('CS', '1', 'Tamar Compression Type', ''),  # noqa
-        '07a1xx12': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '07a1xx13': ('UL', '1', 'Unknown', ''),  # noqa
-        '07a1xx14': ('LO', '1', 'protection flag', ''),  # noqa
-        '07a1xx16': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '07a1xx18': ('SQ', '1', 'Unknown', ''),  # noqa
-        '07a1xx19': ('FL', '1', 'Unknown', ''),  # noqa
-        '07a1xx1c': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '07a1xx2a': ('CS', '1', 'Tamar Study Status', ''),  # noqa
-        '07a1xx2b': ('CS', '1', 'Unknown', ''),  # noqa
-        '07a1xx36': ('AE', '1', 'Tamar Source Ae', ''),  # noqa
-        '07a1xx40': ('CS', '1', 'Tamar Study Body Part', ''),  # noqa
-        '07a1xx43': ('IS', '1', 'Unknown', ''),  # noqa
-        '07a1xx50': ('US', '1', 'Tamar Site Id', ''),  # noqa
-        '07a1xx56': ('US', '1', 'Unknown', ''),  # noqa
-        '07a1xx75': ('LO', '2', 'Unknown', ''),  # noqa
-        '07a1xx85': ('UL', '1', 'Tamar Translate Flags', ''),  # noqa
-        '07a1xx9f': ('CS', '1', 'Unknown', ''),  # noqa
-        '07a3xx01': ('LO', '1', 'Tamar Exe Software Version', ''),  # noqa
-        '07a3xx03': ('CS', '1', 'Tamar Study Has Sticky Note', ''),  # noqa
-        '07a3xx05': ('CS', '1', 'Unknown', ''),  # noqa
-        '07a3xx06': ('CS', '1', 'Unknown', ''),  # noqa
-        '07a3xx10': ('LO', '1', 'Tamar Original Curve Desc', ''),  # noqa
-        '07a3xx34': ('SH', '1', 'Tamar Study Age', ''),  # noqa
-        '07a3xx43': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '07a3xx55': ('SH', '1', 'Unknown', ''),  # noqa
-        '07a3xx61': ('LT', '1', 'Unknown', ''),  # noqa
-        '07a3xx62': ('SQ', '1', 'Unknown', ''),  # noqa
-        '07a3xx63': ('SQ', '1', 'Unknown', ''),  # noqa
-        '07a3xx64': ('IS', '1-n', 'Unknown', ''),  # noqa
-        '07a3xx66': ('IS', '1', 'Unknown', ''),  # noqa
-        '07a3xx99': ('CS', '1', 'Unknown', ''),  # noqa
-        '07a3xx9c': ('CS', '1', 'Unknown', ''),  # noqa
-        '07a3xx9f': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A1xx01': ('UL', '1', 'number of series in study', ''),  # noqa
+        '07A1xx02': ('UL', '1', 'number of images in series', ''),  # noqa
+        '07A1xx03': ('UL', '1', 'last update time', ''),  # noqa
+        '07A1xx04': ('UL', '1', 'last update date', ''),  # noqa
+        '07A1xx07': ('US', '3', 'Unknown', ''),  # noqa
+        '07A1xx08': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '07A1xx09': ('OW', '1', 'Unknown', ''),  # noqa
+        '07A1xx0A': ('OB', '1', 'Tamar Compressed Pixel Data', ''),  # noqa
+        '07A1xx0C': ('US', '1', 'Unknown', ''),  # noqa
+        '07A1xx10': ('LO', '1', 'Tamar Software Version', ''),  # noqa
+        '07A1xx11': ('CS', '1', 'Tamar Compression Type', ''),  # noqa
+        '07A1xx12': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '07A1xx13': ('UL', '1', 'Unknown', ''),  # noqa
+        '07A1xx14': ('LO', '1', 'protection flag', ''),  # noqa
+        '07A1xx16': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '07A1xx18': ('SQ', '1', 'Unknown', ''),  # noqa
+        '07A1xx19': ('FL', '1', 'Unknown', ''),  # noqa
+        '07A1xx1C': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '07A1xx2A': ('CS', '1', 'Tamar Study Status', ''),  # noqa
+        '07A1xx2B': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A1xx36': ('AE', '1', 'Tamar Source Ae', ''),  # noqa
+        '07A1xx40': ('CS', '1', 'Tamar Study Body Part', ''),  # noqa
+        '07A1xx43': ('IS', '1', 'Unknown', ''),  # noqa
+        '07A1xx50': ('US', '1', 'Tamar Site Id', ''),  # noqa
+        '07A1xx56': ('US', '1', 'Unknown', ''),  # noqa
+        '07A1xx5A': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A1xx75': ('LO', '2', 'Unknown', ''),  # noqa
+        '07A1xx85': ('UL', '1', 'Tamar Translate Flags', ''),  # noqa
+        '07A1xx9F': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A3xx01': ('LO', '1', 'Tamar Exe Software Version', ''),  # noqa
+        '07A3xx03': ('CS', '1', 'Tamar Study Has Sticky Note', ''),  # noqa
+        '07A3xx05': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A3xx06': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A3xx10': ('LO', '1', 'Tamar Original Curve Desc', ''),  # noqa
+        '07A3xx34': ('SH', '1', 'Tamar Study Age', ''),  # noqa
+        '07A3xx43': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '07A3xx55': ('SH', '1', 'Unknown', ''),  # noqa
+        '07A3xx61': ('LT', '1', 'Unknown', ''),  # noqa
+        '07A3xx62': ('SQ', '1', 'Unknown', ''),  # noqa
+        '07A3xx63': ('SQ', '1', 'Unknown', ''),  # noqa
+        '07A3xx64': ('IS', '1-n', 'Unknown', ''),  # noqa
+        '07A3xx66': ('IS', '1', 'Unknown', ''),  # noqa
+        '07A3xx99': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A3xx9C': ('CS', '1', 'Unknown', ''),  # noqa
+        '07A3xx9F': ('CS', '1', 'Unknown', ''),  # noqa
         '5001xx70': ('SQ', '1', 'Unknown', ''),  # noqa
         '5001xx71': ('SH', '1', 'Unknown', ''),  # noqa
         '5001xx80': ('SQ', '1', 'Unknown', ''),  # noqa
@@ -1070,8 +1607,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx83': ('FL', '1-n', 'Unknown', ''),  # noqa
         '5001xx84': ('SQ', '1', 'Unknown', ''),  # noqa
         '6001xx10': ('CS', '1', 'Text Overlay Flag', ''),  # noqa
-        '7fdfxxf0': ('OB', '1', 'Unknown', ''),  # noqa
-        '7fdfxxff': ('SH', '1', 'Unknown', ''),  # noqa
+        '7FDFxxF0': ('OB', '1', 'Unknown', ''),  # noqa
+        '7FDFxxFF': ('SH', '1', 'Unknown', ''),  # noqa
     },
     'EMAGEON JPEG2K INFO': {
         '0009xx00': ('SQ', '1', 'Unknown', ''),  # noqa
@@ -1103,57 +1640,57 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0031xx33': ('UL', '1', 'Private data', ''),  # noqa
         '0031xx34': ('UL', '1', 'Private data', ''),  # noqa
         '0031xx35': ('UL', '1', 'Private data', ''),  # noqa
-        '200dxx01': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx02': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx03': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx04': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx05': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx06': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx07': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx08': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx09': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx0a': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx0b': ('OB', '1', 'Private data', ''),  # noqa
-        '200dxx0c': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx0d': ('UL', '1', 'Private data', ''),  # noqa
-        '200dxx0e': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx0f': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx10': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx11': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx12': ('OB', '1', 'Private data', ''),  # noqa
-        '200dxx13': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx14': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx15': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx1a': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx1b': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx20': ('SQ', '1', 'Private data', ''),  # noqa
-        '200dxx27': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx28': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx30': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx31': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx32': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx33': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx34': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx35': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx36': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx37': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx38': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx39': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx3a': ('LO', '1', 'Private data', ''),  # noqa
-        '200dxx50': ('CS', '1', 'Private data', ''),  # noqa
-        '200dxx51': ('CS', '1', 'Private data', ''),  # noqa
-        '200dxx52': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx53': ('CS', '1', 'Private data', ''),  # noqa
-        '200dxx54': ('CS', '1', 'Private data', ''),  # noqa
-        '200dxx55': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx56': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx57': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx58': ('IS', '1', 'Private data', ''),  # noqa
-        '200dxx59': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx5a': ('FD', '1', 'Private data', ''),  # noqa
-        '200dxx5d': ('CS', '1', 'Private data', ''),  # noqa
-        '200dxx5e': ('CS', '1', 'Private data', ''),  # noqa
-        '200dxxff': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx02': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx03': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx04': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx05': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx06': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx07': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx08': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx09': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx0A': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx0B': ('OB', '1', 'Private data', ''),  # noqa
+        '200Dxx0C': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx0D': ('UL', '1', 'Private data', ''),  # noqa
+        '200Dxx0E': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx0F': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx10': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx11': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx12': ('OB', '1', 'Private data', ''),  # noqa
+        '200Dxx13': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx14': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx15': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx1A': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx1B': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx20': ('SQ', '1', 'Private data', ''),  # noqa
+        '200Dxx27': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx28': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx30': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx31': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx32': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx33': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx34': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx35': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx36': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx37': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx38': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx39': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx3A': ('LO', '1', 'Private data', ''),  # noqa
+        '200Dxx50': ('CS', '1', 'Private data', ''),  # noqa
+        '200Dxx51': ('CS', '1', 'Private data', ''),  # noqa
+        '200Dxx52': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx53': ('CS', '1', 'Private data', ''),  # noqa
+        '200Dxx54': ('CS', '1', 'Private data', ''),  # noqa
+        '200Dxx55': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx56': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx57': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx58': ('IS', '1', 'Private data', ''),  # noqa
+        '200Dxx59': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx5A': ('FD', '1', 'Private data', ''),  # noqa
+        '200Dxx5D': ('CS', '1', 'Private data', ''),  # noqa
+        '200Dxx5E': ('CS', '1', 'Private data', ''),  # noqa
+        '200DxxFF': ('IS', '1', 'Private data', ''),  # noqa
         '7777xx01': ('DA', '1', 'Private data', ''),  # noqa
         '7777xx02': ('CS', '1', 'Private data', ''),  # noqa
         '7777xx03': ('LO', '1', 'Private data', ''),  # noqa
@@ -1166,13 +1703,13 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx06': ('OW', '1', 'Route Image UID', ''),  # noqa
         '0009xx08': ('UL', '1', 'Image Display Information Version No.', ''),  # noqa
         '0009xx09': ('UL', '1', 'Patient Information Version No.', ''),  # noqa
-        '0009xx0c': ('OW', '1', 'Film UID', ''),  # noqa
+        '0009xx0C': ('OW', '1', 'Film UID', ''),  # noqa
         '0009xx10': ('CS', '1', 'Exposure Unit Type Code', ''),  # noqa
         '0009xx80': ('LO', '1', 'Kanji Hospital Name', ''),  # noqa
         '0009xx90': ('ST', '1', 'Distribution Code', ''),  # noqa
         '0009xx92': ('SH', '1', 'Kanji Department Name', ''),  # noqa
-        '0009xxf0': ('CS', '1', 'Blackening Process Flag', ''),  # noqa
-        '0009xxf1': ('ST', '1', 'Processing Information Flag', ''),  # noqa
+        '0009xxF0': ('CS', '1', 'Blackening Process Flag', ''),  # noqa
+        '0009xxF1': ('ST', '1', 'Processing Information Flag', ''),  # noqa
         '0019xx15': ('LO', '1', 'Kanji Body Part for Exposure', ''),  # noqa
         '0019xx30': ('LO', '1', 'Menu Character String', ''),  # noqa
         '0019xx32': ('LO', '1', 'Kanji Menu Name', ''),  # noqa
@@ -1185,9 +1722,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx81': ('IS', '1', 'Reading Sensitivity Center', ''),  # noqa
         '0019xx90': ('SH', '1', 'Film Annotation Character String 1', ''),  # noqa
         '0019xx91': ('SH', '1', 'Film Annotation Character String 2', ''),  # noqa
-        '0019xxa0': ('SQ', '1', 'Exposure Status Sequence', ''),  # noqa
-        '0019xxa1': ('CS', '1', 'Exposure Status', ''),  # noqa
-        '0019xxa2': ('CS', '1', 'Exposure Kind', ''),  # noqa
+        '0019xxA0': ('SQ', '1', 'Exposure Status Sequence', ''),  # noqa
+        '0019xxA1': ('CS', '1', 'Exposure Status', ''),  # noqa
+        '0019xxA2': ('CS', '1', 'Exposure Kind', ''),  # noqa
         '0021xx10': ('CS', '1', 'FCR Image ID', ''),  # noqa
         '0021xx30': ('CS', '1', 'Set No.', ''),  # noqa
         '0021xx40': ('IS', '1', 'Image No. in the Set', ''),  # noqa
@@ -1195,66 +1732,68 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx70': ('IS', '1', 'Film Number within the Series', ''),  # noqa
         '0021xx80': ('OB', '1', 'Equipment Type-Specific Information', ''),  # noqa
         '0021xx90': ('CS', '1', 'LUT Number', ''),  # noqa
-        '0023xx10': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0023xx20': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0023xx30': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0023xx10': ('SQ', '1', 'Left-image Processing Parameter Sequence', ''),  # noqa
+        '0023xx20': ('SQ', '1', 'Right-image Processing Parameter Sequence', ''),  # noqa
+        '0023xx30': ('SQ', '1', 'Single-image Processing Parameter Sequence', ''),  # noqa
         '0025xx10': ('US', '1', 'Relative Light Emission Amount Sk', ''),  # noqa
         '0025xx11': ('US', '1', 'Term of Correction for Each IP Type St', ''),  # noqa
         '0025xx12': ('US', '1', 'Reading Gain Gp', ''),  # noqa
-        '0025xx13': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx15': ('CS', '1', 'Unknown', ''),  # noqa
-        '0025xx20': ('US', '2', 'Unknown', ''),  # noqa
-        '0025xx21': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx30': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx31': ('SS', '1', 'Unknown', ''),  # noqa
-        '0025xx32': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx33': ('SS', '1', 'Unknown', ''),  # noqa
-        '0025xx34': ('SS', '1', 'Unknown', ''),  # noqa
-        '0025xx40': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx41': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx42': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx43': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx50': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx51': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx52': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx53': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx60': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx61': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx62': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx63': ('CS', '1', 'Unknown', ''),  # noqa
-        '0025xx70': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx71': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx72': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx73': ('US', '6', 'Unknown', ''),  # noqa
-        '0025xx74': ('US', '6', 'Unknown', ''),  # noqa
-        '0025xx80': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx81': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx82': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx83': ('US', '6', 'Unknown', ''),  # noqa
-        '0025xx84': ('US', '6', 'Unknown', ''),  # noqa
-        '0025xx90': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx91': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx92': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx93': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx94': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx95': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xx96': ('CS', '1', 'Unknown', ''),  # noqa
-        '0025xxa0': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xxa1': ('SS', '1', 'Unknown', ''),  # noqa
-        '0025xxa2': ('US', '1', 'Unknown', ''),  # noqa
-        '0025xxa3': ('SS', '1', 'Unknown', ''),  # noqa
-        '0027xx10': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx20': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx30': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx40': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx50': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx60': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx70': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xx80': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0027xxa0': ('IS', '1', 'Unknown', ''),  # noqa
-        '0027xxa1': ('CS', '2', 'Unknown', ''),  # noqa
-        '0027xxa2': ('CS', '2', 'Unknown', ''),  # noqa
-        '0027xxa3': ('SS', '1-n', 'Unknown', ''),  # noqa
+        '0025xx13': ('US', '1', 'Latitude', ''),  # noqa
+        '0025xx15': ('CS', '1', 'Image Processing Selection Flag', ''),  # noqa
+        '0025xx16': ('US', '1', 'Min', ''),  # noqa
+        '0025xx17': ('US', '1', 'Max', ''),  # noqa
+        '0025xx20': ('US', '2', 'Sensitivity Shift (S-SHFT)', ''),  # noqa
+        '0025xx21': ('US', '1', 'Contrast Shift (C-SHIFT)', ''),  # noqa
+        '0025xx30': ('US', '1', 'GT', ''),  # noqa
+        '0025xx31': ('SS', '1', 'GA', ''),  # noqa
+        '0025xx32': ('US', '1', 'GC', ''),  # noqa
+        '0025xx33': ('SS', '1', 'GS', ''),  # noqa
+        '0025xx34': ('SS', '1', 'tan θ', ''),  # noqa
+        '0025xx40': ('US', '1', 'RT', ''),  # noqa
+        '0025xx41': ('US', '1', 'RN', ''),  # noqa
+        '0025xx42': ('US', '1', 'RE', ''),  # noqa
+        '0025xx43': ('US', '1', 'N', ''),  # noqa
+        '0025xx50': ('US', '1', 'DRT', ''),  # noqa
+        '0025xx51': ('US', '1', 'DRN', ''),  # noqa
+        '0025xx52': ('US', '1', 'DRE', ''),  # noqa
+        '0025xx53': ('US', '1', 'DN', ''),  # noqa
+        '0025xx60': ('US', '1', 'ORN', ''),  # noqa
+        '0025xx61': ('US', '1', 'ORE', ''),  # noqa
+        '0025xx62': ('US', '1', 'ON', ''),  # noqa
+        '0025xx63': ('CS', '1', 'ORD', ''),  # noqa
+        '0025xx70': ('US', '1', 'MDT', ''),  # noqa
+        '0025xx71': ('US', '1', 'MDB', ''),  # noqa
+        '0025xx72': ('US', '1', 'MDE', ''),  # noqa
+        '0025xx73': ('US', '1-n', 'MFP-DRC Suppression Characteristics Parameters', ''),  # noqa
+        '0025xx74': ('US', '1-n', 'MFP-DRC Frequency Characteristics Parameters', ''),  # noqa
+        '0025xx80': ('US', '1', 'MRT', ''),  # noqa
+        '0025xx81': ('US', '1', 'MRB', ''),  # noqa
+        '0025xx82': ('US', '1', 'MRE', ''),  # noqa
+        '0025xx83': ('US', '1-n', 'MFP-USM Suppression Characteristics Parameters', ''),  # noqa
+        '0025xx84': ('US', '1-n', 'MFP-USM Frequency Characteristics Parameters', ''),  # noqa
+        '0025xx90': ('US', '1', 'PTE (α edge)', ''),  # noqa
+        '0025xx91': ('US', '1', 'PTR (α calc)', ''),  # noqa
+        '0025xx92': ('US', '1', 'PRN', ''),  # noqa
+        '0025xx93': ('US', '1', 'PRE', ''),  # noqa
+        '0025xx94': ('US', '1', 'PEM Sstd', ''),  # noqa
+        '0025xx95': ('US', '1', 'PEM Lstd', ''),  # noqa
+        '0025xx96': ('CS', '1', 'PEM Unsharp Mask Value N', ''),  # noqa
+        '0025xxA0': ('US', '1', 'MFP GT', ''),  # noqa
+        '0025xxA1': ('SS', '1', 'MFP GA', ''),  # noqa
+        '0025xxA2': ('US', '1', 'MFP GC', ''),  # noqa
+        '0025xxA3': ('SS', '1', 'MFP GS', ''),  # noqa
+        '0027xx10': ('SQ', '1', 'γ Raw Data Table Sequence', ''),  # noqa
+        '0027xx20': ('SQ', '1', 'β Raw Data Table Sequence', ''),  # noqa
+        '0027xx30': ('SQ', '1', 'DRC Raw Data Table Sequence', ''),  # noqa
+        '0027xx40': ('SQ', '1', 'MFP-DRC Raw Data Table Sequence', ''),  # noqa
+        '0027xx50': ('SQ', '1', 'MFP-USM Raw Data Table Sequence', ''),  # noqa
+        '0027xx60': ('SQ', '1', 'PEM α Edge Raw Data Table Sequence', ''),  # noqa
+        '0027xx70': ('SQ', '1', 'PEM α Calc Raw Data Table Sequence', ''),  # noqa
+        '0027xx80': ('SQ', '1', 'MFP γ Raw Data Table Sequence', ''),  # noqa
+        '0027xxA0': ('IS', '1', 'No. of Data', ''),  # noqa
+        '0027xxA1': ('CS', '2', 'Data Input Type', ''),  # noqa
+        '0027xxA2': ('CS', '2', 'Data Output Type', ''),  # noqa
+        '0027xxA3': ('US_SS', '1-n', 'Raw Data', ''),  # noqa
         '0029xx20': ('CS', '1', 'Image Scanning Direction', ''),  # noqa
         '0029xx25': ('CS', '1', 'Image Rotation/Reversal Information', ''),  # noqa
         '0029xx30': ('CS', '1', 'Extended Reading Size Value', ''),  # noqa
@@ -1269,20 +1808,20 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2011xx10': ('CS', '1', 'Image Display Format', ''),  # noqa
         '2011xx11': ('CS', '1', 'Image Position Specifying Flag', ''),  # noqa
         '2011xx20': ('OW', '1', 'Interpolation A-VRS System Format', ''),  # noqa
-        '50f1xx06': ('CS', '1', 'Energy Subtraction Param.', ''),  # noqa
-        '50f1xx07': ('CS', '1', 'Subtraction Registration Result', ''),  # noqa
-        '50f1xx08': ('CS', '1', 'Energy Subtraction Param. 2', ''),  # noqa
-        '50f1xx09': ('SL', '1', 'Afin Conversion Coefficient', ''),  # noqa
-        '50f1xx0a': ('SH', '1', 'FNC Parameters', ''),  # noqa
-        '50f1xx10': ('CS', '1', 'Film Output Format', ''),  # noqa
-        '50f1xx20': ('CS', '1', 'Image Processing Modification Flag', ''),  # noqa
+        '50F1xx06': ('CS', '1', 'Energy Subtraction Param.', ''),  # noqa
+        '50F1xx07': ('CS', '1', 'Subtraction Registration Result', ''),  # noqa
+        '50F1xx08': ('CS', '1', 'Energy Subtraction Param. 2', ''),  # noqa
+        '50F1xx09': ('SL', '1', 'Afin Conversion Coefficient', ''),  # noqa
+        '50F1xx0A': ('SH', '1', 'FNC Parameters', ''),  # noqa
+        '50F1xx10': ('CS', '1', 'Film Output Format', ''),  # noqa
+        '50F1xx20': ('CS', '1', 'Image Processing Modification Flag', ''),  # noqa
     },
     'FFP DATA': {
         '0009xx01': ('UN', '1', 'CR Header Information', ''),  # noqa
     },
     'GDCM CONFORMANCE TESTS': {
-        '4d4dxx01': ('SQ', '1', 'Array Container Sequence', ''),  # noqa
-        '4d4dxx02': ('OB', '1', '0-Filled Array', ''),  # noqa
+        '4D4Dxx01': ('SQ', '1', 'Array Container Sequence', ''),  # noqa
+        '4D4Dxx02': ('OB', '1', '0-Filled Array', ''),  # noqa
     },
     'GE ??? From Adantage Review CS': {
         '0019xx30': ('LO', '1', 'CR EDR Mode', ''),  # noqa
@@ -1293,7 +1832,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx90': ('LO', '1', 'CR Film Output Exposures', ''),  # noqa
     },
     'GE LUT Asymmetry Parameter': {
-        '0045xx67': ('DS', '1', 'LUT Assymetry', ''),  # noqa
+        '0045xx67': ('DS', '1', 'LUT Asymmetry', ''),  # noqa
     },
     'GEHC_CT_ADVAPP_001': {
         '0053xx20': ('IS', '1', 'ShuttleFlag', ''),  # noqa
@@ -1312,18 +1851,18 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx10': ('UL', '1', 'Shift Count', ''),  # noqa
         '0029xx12': ('UL', '1', 'Offset', ''),  # noqa
         '0029xx14': ('UL', '1', 'Actual Frame Number', ''),  # noqa
-        '004bxx13': ('IS', '1', 'Unknown', ''),  # noqa
-        '004bxx15': ('LT', '1', 'Unknown', ''),  # noqa
+        '004Bxx13': ('IS', '1', 'Unknown', ''),  # noqa
+        '004Bxx15': ('LT', '1', 'Unknown', ''),  # noqa
         '0905xx30': ('LO', '1', 'Assigning Authority For Patient ID', ''),  # noqa
         '0907xx10': ('UI', '1', 'Original Study Instance UID', ''),  # noqa
         '0907xx20': ('UI', '1', 'Original Series Instance UID', ''),  # noqa
         '0907xx30': ('UI', '1', 'Original SOP Instance UID', ''),  # noqa
-        '7fd1xx10': ('UL', '1', 'GE IIS Compression ID', ''),  # noqa
-        '7fd1xx20': ('UL', '1', 'GE IIS Multiframe Offsets', ''),  # noqa
-        '7fd1xx30': ('UL', '1', 'Unknown', ''),  # noqa
-        '7fd1xx40': ('UL', '1-n', 'Unknown', ''),  # noqa
-        '7fd1xx50': ('UL', '1-n', 'Unknown', ''),  # noqa
-        '7fd1xx60': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '7FD1xx10': ('UL', '1', 'GE IIS Compression ID', ''),  # noqa
+        '7FD1xx20': ('UL', '1', 'GE IIS Multiframe Offsets', ''),  # noqa
+        '7FD1xx30': ('UL', '1', 'Unknown', ''),  # noqa
+        '7FD1xx40': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '7FD1xx50': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '7FD1xx60': ('UL', '1-n', 'Unknown', ''),  # noqa
     },
     'GEIIS PACS': {
         '0903xx10': ('US', '1', 'Reject Image Flag', ''),  # noqa
@@ -1343,45 +1882,45 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx95': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'GEMS_3DSTATE_001': {
-        '0047xxd6': ('ST', '1', 'General Description', ''),  # noqa
-        '0047xxd7': ('CS', '1', 'TDRT', ''),  # noqa
-        '0047xxd8': ('US', '1', 'NVRP', ''),  # noqa
-        '0047xxd9': ('US', '1', 'CVRPN', ''),  # noqa
-        '0047xxda': ('SQ', '1', 'Volume Rendering Presets Sequence', ''),  # noqa
-        '0047xxdb': ('LO', '1', 'Preset Name', ''),  # noqa
-        '0047xxdc': ('SS', '1-n', 'Opacity Curve X', ''),  # noqa
-        '0047xxdd': ('FL', '1-n', 'Opacity Curve Y', ''),  # noqa
-        '0047xxde': ('US', '1', 'NOCP', ''),  # noqa
-        '0047xxdf': ('SS', '1-n', 'Color Curve X', ''),  # noqa
-        '0047xxe1': ('US', '1', 'NCCP', ''),  # noqa
-        '0047xxe2': ('CS', '1', 'GSA', ''),  # noqa
-        '0047xxe3': ('CS', '1', 'VRSF', ''),  # noqa
-        '0047xxe4': ('FL', '1', 'AF', ''),  # noqa
-        '0047xxe5': ('FL', '1', 'DF', ''),  # noqa
-        '0047xxe6': ('FL', '1', 'SCF', ''),  # noqa
-        '0047xxe7': ('FL', '1', 'SPF', ''),  # noqa
-        '0047xxe8': ('FL', '24', 'Orthogonal Clipping Planes', ''),  # noqa
-        '0047xxe9': ('FL', '3', 'CP', ''),  # noqa
-        '0047xxea': ('DS', '3', 'CFP', ''),  # noqa
-        '0047xxeb': ('DS', '3', 'CVU', ''),  # noqa
-        '0047xxec': ('FL', '1', 'RFOV', ''),  # noqa
-        '0047xxed': ('CS', '1', 'PPRP', ''),  # noqa
-        '0047xxee': ('DS', '1', '3DWW', ''),  # noqa
-        '0047xxef': ('DS', '1', '3DWL', ''),  # noqa
-        '0047xxf0': ('CS', '1', 'BBV', ''),  # noqa
-        '0047xxf1': ('CS', '1', 'ERF', ''),  # noqa
-        '0047xxf2': ('US', '1', 'TDRMS', ''),  # noqa
-        '0047xxf3': ('FL', '1', 'TDSSS', ''),  # noqa
+        '0047xxD6': ('ST', '1', 'General Description', ''),  # noqa
+        '0047xxD7': ('CS', '1', 'TDRT', ''),  # noqa
+        '0047xxD8': ('US', '1', 'NVRP', ''),  # noqa
+        '0047xxD9': ('US', '1', 'CVRPN', ''),  # noqa
+        '0047xxDA': ('SQ', '1', 'Volume Rendering Presets Sequence', ''),  # noqa
+        '0047xxDB': ('LO', '1', 'Preset Name', ''),  # noqa
+        '0047xxDC': ('SS', '1-n', 'Opacity Curve X', ''),  # noqa
+        '0047xxDD': ('FL', '1-n', 'Opacity Curve Y', ''),  # noqa
+        '0047xxDE': ('US', '1', 'NOCP', ''),  # noqa
+        '0047xxDF': ('SS', '1-n', 'Color Curve X', ''),  # noqa
+        '0047xxE1': ('US', '1', 'NCCP', ''),  # noqa
+        '0047xxE2': ('CS', '1', 'GSA', ''),  # noqa
+        '0047xxE3': ('CS', '1', 'VRSF', ''),  # noqa
+        '0047xxE4': ('FL', '1', 'AF', ''),  # noqa
+        '0047xxE5': ('FL', '1', 'DF', ''),  # noqa
+        '0047xxE6': ('FL', '1', 'SCF', ''),  # noqa
+        '0047xxE7': ('FL', '1', 'SPF', ''),  # noqa
+        '0047xxE8': ('FL', '24', 'Orthogonal Clipping Planes', ''),  # noqa
+        '0047xxE9': ('FL', '3', 'CP', ''),  # noqa
+        '0047xxEA': ('DS', '3', 'CFP', ''),  # noqa
+        '0047xxEB': ('DS', '3', 'CVU', ''),  # noqa
+        '0047xxEC': ('FL', '1', 'RFOV', ''),  # noqa
+        '0047xxED': ('CS', '1', 'PPRP', ''),  # noqa
+        '0047xxEE': ('DS', '1', '3DWW', ''),  # noqa
+        '0047xxEF': ('DS', '1', '3DWL', ''),  # noqa
+        '0047xxF0': ('CS', '1', 'BBV', ''),  # noqa
+        '0047xxF1': ('CS', '1', 'ERF', ''),  # noqa
+        '0047xxF2': ('US', '1', 'TDRMS', ''),  # noqa
+        '0047xxF3': ('FL', '1', 'TDSSS', ''),  # noqa
     },
     'GEMS_ACQU_01': {
         '0009xx24': ('DS', '1', 'Unknown', ''),  # noqa
         '0009xx25': ('US', '1', 'Unknown', ''),  # noqa
-        '0009xx3e': ('US', '1', 'Unknown', ''),  # noqa
-        '0009xx3f': ('US', '1', 'Unknown', ''),  # noqa
+        '0009xx3E': ('US', '1', 'Unknown', ''),  # noqa
+        '0009xx3F': ('US', '1', 'Unknown', ''),  # noqa
         '0009xx42': ('US', '1', 'Unknown', ''),  # noqa
         '0009xx43': ('US', '1', 'Unknown', ''),  # noqa
-        '0009xxf8': ('US', '1', 'Unknown', ''),  # noqa
-        '0009xxfb': ('IS', '1', 'Unknown', ''),  # noqa
+        '0009xxF8': ('US', '1', 'Unknown', ''),  # noqa
+        '0009xxFB': ('IS', '1', 'Unknown', ''),  # noqa
         '001910xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
         '0019xx01': ('LT', '1', 'Unknown', ''),  # noqa
         '0019xx02': ('SL', '1', 'Detector Channel', ''),  # noqa
@@ -1389,8 +1928,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx04': ('DS', '1', 'Cell spacing', ''),  # noqa
         '0019xx05': ('LT', '1', 'Unknown', ''),  # noqa
         '0019xx06': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xx0e': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx0f': ('DS', '1', 'Horiz. Frame of ref.', ''),  # noqa
+        '0019xx0E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx0F': ('DS', '1', 'Horiz. Frame of ref.', ''),  # noqa
         '0019xx11': ('SS', '1', 'Series contrast', ''),  # noqa
         '0019xx12': ('SS', '1', 'Last pseq', ''),  # noqa
         '0019xx13': ('SS', '1', 'Start number for baseline', ''),  # noqa
@@ -1400,9 +1939,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx17': ('SS', '1', 'Series plane', ''),  # noqa
         '0019xx18': ('LO', '1', 'First scan ras', ''),  # noqa
         '0019xx19': ('DS', '1', 'First scan location', ''),  # noqa
-        '0019xx1a': ('LO', '1', 'Last scan ras', ''),  # noqa
-        '0019xx1b': ('DS', '1', 'Last scan loc', ''),  # noqa
-        '0019xx1e': ('DS', '1', 'Display field of view', ''),  # noqa
+        '0019xx1A': ('LO', '1', 'Last scan ras', ''),  # noqa
+        '0019xx1B': ('DS', '1', 'Last scan loc', ''),  # noqa
+        '0019xx1E': ('DS', '1', 'Display field of view', ''),  # noqa
         '0019xx20': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx22': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx23': ('DS', '1', 'Table Speed [mm/rotation]', ''),  # noqa
@@ -1410,18 +1949,18 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx25': ('SS', '1', 'Mid scan flag', ''),  # noqa
         '0019xx26': ('SL', '1', 'Tube Azimuth [degree]', ''),  # noqa
         '0019xx27': ('DS', '1', 'Rotation Speed [msec]', ''),  # noqa
-        '0019xx2a': ('DS', '1', 'x-ray On position', ''),  # noqa
-        '0019xx2b': ('DS', '1', 'x-ray Off position', ''),  # noqa
-        '0019xx2c': ('SL', '1', 'Number of triggers', ''),  # noqa
-        '0019xx2d': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx2e': ('DS', '1', 'Angle of first view', ''),  # noqa
-        '0019xx2f': ('DS', '1', 'Trigger frequency', ''),  # noqa
+        '0019xx2A': ('DS', '1', 'x-ray On position', ''),  # noqa
+        '0019xx2B': ('DS', '1', 'x-ray Off position', ''),  # noqa
+        '0019xx2C': ('SL', '1', 'Number of triggers', ''),  # noqa
+        '0019xx2D': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx2E': ('DS', '1', 'Angle of first view', ''),  # noqa
+        '0019xx2F': ('DS', '1', 'Trigger frequency', ''),  # noqa
         '0019xx39': ('SS', '1', 'SFOV Type', ''),  # noqa
-        '0019xx3a': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx3b': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019xx3c': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xx3e': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xx3f': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xx3A': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx3B': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xx3C': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xx3E': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xx3F': ('UN', '1', 'Unknown', ''),  # noqa
         '0019xx40': ('SS', '1', 'Stat recon flag', ''),  # noqa
         '0019xx41': ('SS', '1', 'Compute type', ''),  # noqa
         '0019xx42': ('SS', '1', 'Segment Number', ''),  # noqa
@@ -1430,21 +1969,21 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx47': ('SS', '1', 'View compression factor', ''),  # noqa
         '0019xx48': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx49': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx4a': ('SS', '1', 'Total no. of ref channels', ''),  # noqa
-        '0019xx4b': ('SL', '1', 'Data size for scan data', ''),  # noqa
+        '0019xx4A': ('SS', '1', 'Total no. of ref channels', ''),  # noqa
+        '0019xx4B': ('SL', '1', 'Data size for scan data', ''),  # noqa
         '0019xx52': ('SS', '1', 'Recon post proc. Flag', ''),  # noqa
         '0019xx54': ('UN', '1', 'Unknown', ''),  # noqa
         '0019xx57': ('SS', '1', 'CT water number', ''),  # noqa
         '0019xx58': ('SS', '1', 'CT bone number', ''),  # noqa
-        '0019xx5a': ('FL', '1', 'Acquisition Duration', ''),  # noqa
-        '0019xx5d': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx5e': ('SL', '1', 'Number of channels (1...512)', ''),  # noqa
-        '0019xx5f': ('SL', '1', 'Increment between channels', ''),  # noqa
+        '0019xx5A': ('FL', '1', 'Acquisition Duration', ''),  # noqa
+        '0019xx5D': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx5E': ('SL', '1', 'Number of channels (1...512)', ''),  # noqa
+        '0019xx5F': ('SL', '1', 'Increment between channels', ''),  # noqa
         '0019xx60': ('SL', '1', 'Starting view', ''),  # noqa
         '0019xx61': ('SL', '1', 'Number of views', ''),  # noqa
         '0019xx62': ('SL', '1', 'Increment between views', ''),  # noqa
-        '0019xx6a': ('SS', '1', 'Dependent on #views processed', ''),  # noqa
-        '0019xx6b': ('SS', '1', 'Field of view in detector cells', ''),  # noqa
+        '0019xx6A': ('SS', '1', 'Dependent on #views processed', ''),  # noqa
+        '0019xx6B': ('SS', '1', 'Field of view in detector cells', ''),  # noqa
         '0019xx70': ('SS', '1', 'Value of back projection button', ''),  # noqa
         '0019xx71': ('SS', '1', 'Set if fatq estimates were used', ''),  # noqa
         '0019xx72': ('DS', '1', 'Z chan avg over views', ''),  # noqa
@@ -1452,9 +1991,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx74': ('DS', '1', 'Max left chan over views', ''),  # noqa
         '0019xx75': ('DS', '1', 'Avg of right ref chans over views', ''),  # noqa
         '0019xx76': ('DS', '1', 'Max right chan over views', ''),  # noqa
-        '0019xx7d': ('DS', '1', 'Second echo', ''),  # noqa
-        '0019xx7e': ('SS', '1', 'Number of echoes', ''),  # noqa
-        '0019xx7f': ('DS', '1', 'Table delta', ''),  # noqa
+        '0019xx7D': ('DS', '1', 'Second echo', ''),  # noqa
+        '0019xx7E': ('SS', '1', 'Number of echoes', ''),  # noqa
+        '0019xx7F': ('DS', '1', 'Table delta', ''),  # noqa
         '0019xx81': ('SS', '1', 'Contiguous', ''),  # noqa
         '0019xx82': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx83': ('DS', '1', 'Unknown', ''),  # noqa
@@ -1463,10 +2002,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx86': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx87': ('DS', '1', 'Cardiac repetition time', ''),  # noqa
         '0019xx88': ('SS', '1', 'Images per cardiac cycle', ''),  # noqa
-        '0019xx8a': ('SS', '1', 'Actual receive gain analog', ''),  # noqa
-        '0019xx8b': ('SS', '1', 'Actual receive gain digital', ''),  # noqa
-        '0019xx8d': ('DS', '1', 'Delay after trigger', ''),  # noqa
-        '0019xx8f': ('SS', '1', 'Swappf', ''),  # noqa
+        '0019xx8A': ('SS', '1', 'Actual receive gain analog', ''),  # noqa
+        '0019xx8B': ('SS', '1', 'Actual receive gain digital', ''),  # noqa
+        '0019xx8D': ('DS', '1', 'Delay after trigger', ''),  # noqa
+        '0019xx8F': ('SS', '1', 'Swappf', ''),  # noqa
         '0019xx90': ('SS', '1', 'Pause Interval', ''),  # noqa
         '0019xx91': ('DS', '1', 'Pause Time', ''),  # noqa
         '0019xx92': ('SL', '1', 'Slice offset on freq axis', ''),  # noqa
@@ -1477,89 +2016,89 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx97': ('SL', '1', 'Bitmap defining CVs', ''),  # noqa
         '0019xx98': ('SS', '1', 'Center freq. Method', ''),  # noqa
         '0019xx99': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx9b': ('SS', '1', 'Pulse Sequence Mode', ''),  # noqa
-        '0019xx9c': ('LO', '1', 'Pulse Sequence Name', ''),  # noqa
-        '0019xx9d': ('DT', '1', 'Pulse Sequence Date', ''),  # noqa
-        '0019xx9e': ('LO', '1', 'Internal Pulse Sequence Name', ''),  # noqa
-        '0019xx9f': ('SS', '1', 'Transmitting Coil Type', ''),  # noqa
-        '0019xxa0': ('SS', '1', 'Surface Coil Type', ''),  # noqa
-        '0019xxa1': ('SS', '1', 'Extremity Coil flag', ''),  # noqa
-        '0019xxa2': ('SL', '1', 'Raw data run number', ''),  # noqa
-        '0019xxa3': ('UL', '1', 'Calibrated Field strength', ''),  # noqa
-        '0019xxa4': ('SS', '1', 'SAT fat/water/bone', ''),  # noqa
-        '0019xxa5': ('DS', '1', 'Receive bandwidth', ''),  # noqa
-        '0019xxa7': ('DS', '1', 'User data 0', ''),  # noqa
-        '0019xxa8': ('DS', '1', 'User data 1', ''),  # noqa
-        '0019xxa9': ('DS', '1', 'User data 2', ''),  # noqa
-        '0019xxaa': ('DS', '1', 'User data 3', ''),  # noqa
-        '0019xxab': ('DS', '1', 'User data 4', ''),  # noqa
-        '0019xxac': ('DS', '1', 'User data 5', ''),  # noqa
-        '0019xxad': ('DS', '1', 'User data 6', ''),  # noqa
-        '0019xxae': ('DS', '1', 'User data 7', ''),  # noqa
-        '0019xxaf': ('DS', '1', 'User data 8', ''),  # noqa
-        '0019xxb0': ('DS', '1', 'User data 9', ''),  # noqa
-        '0019xxb1': ('DS', '1', 'User data 10', ''),  # noqa
-        '0019xxb2': ('DS', '1', 'User data 11', ''),  # noqa
-        '0019xxb3': ('DS', '1', 'User data 12', ''),  # noqa
-        '0019xxb4': ('DS', '1', 'User data 13', ''),  # noqa
-        '0019xxb5': ('DS', '1', 'User data 14', ''),  # noqa
-        '0019xxb6': ('DS', '1', 'User data 15', ''),  # noqa
-        '0019xxb7': ('DS', '1', 'User data 16', ''),  # noqa
-        '0019xxb8': ('DS', '1', 'User data 17', ''),  # noqa
-        '0019xxb9': ('DS', '1', 'User data 18', ''),  # noqa
-        '0019xxba': ('DS', '1', 'User data 19', ''),  # noqa
-        '0019xxbb': ('DS', '1', 'User data 20', ''),  # noqa
-        '0019xxbc': ('DS', '1', 'User data 21', ''),  # noqa
-        '0019xxbd': ('DS', '1', 'User data 22', ''),  # noqa
-        '0019xxbe': ('DS', '1', 'Projection angle', ''),  # noqa
-        '0019xxc0': ('SS', '1', 'Saturation planes', ''),  # noqa
-        '0019xxc1': ('SS', '1', 'Surface coil intensity', ''),  # noqa
-        '0019xxc2': ('SS', '1', 'SAT location R', ''),  # noqa
-        '0019xxc3': ('SS', '1', 'SAT location L', ''),  # noqa
-        '0019xxc4': ('SS', '1', 'SAT location A', ''),  # noqa
-        '0019xxc5': ('SS', '1', 'SAT location P', ''),  # noqa
-        '0019xxc6': ('SS', '1', 'SAT location H', ''),  # noqa
-        '0019xxc7': ('SS', '1', 'SAT location F', ''),  # noqa
-        '0019xxc8': ('SS', '1', 'SAT thickness R/L', ''),  # noqa
-        '0019xxc9': ('SS', '1', 'SAT thickness A/P', ''),  # noqa
-        '0019xxca': ('SS', '1', 'SAT thickness H/F', ''),  # noqa
-        '0019xxcb': ('SS', '1', 'Phase Contrast flow axis', ''),  # noqa
-        '0019xxcc': ('SS', '1', 'Velocity encoding', ''),  # noqa
-        '0019xxcd': ('SS', '1', 'Thickness disclaimer', ''),  # noqa
-        '0019xxce': ('SS', '1', 'Prescan type', ''),  # noqa
-        '0019xxcf': ('SS', '1', 'Prescan status', ''),  # noqa
-        '0019xxd0': ('SH', '1', 'Raw data type', ''),  # noqa
-        '0019xxd2': ('SS', '1', 'Projection Algorithm', ''),  # noqa
-        '0019xxd3': ('SH', '1', 'Projection Algorithm Name', ''),  # noqa
-        '0019xxd4': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxd5': ('SS', '1', 'Fractional echo', ''),  # noqa
-        '0019xxd6': ('SS', '1', 'Prep pulse', ''),  # noqa
-        '0019xxd7': ('SS', '1', 'Cardiac phase number', ''),  # noqa
-        '0019xxd8': ('SS', '1', 'Variable echoflag', ''),  # noqa
-        '0019xxd9': ('DS', '1', 'Concatenated SAT {# DTI Diffusion Dir., release 9.0 & below}', ''),  # noqa
-        '0019xxda': ('SS', '1', 'Reference channel used', ''),  # noqa
-        '0019xxdb': ('DS', '1', 'Back projector coefficient', ''),  # noqa
-        '0019xxdc': ('SS', '1', 'Primary speed correction used', ''),  # noqa
-        '0019xxdd': ('SS', '1', 'Overrange correction used', ''),  # noqa
-        '0019xxde': ('DS', '1', 'Dynamic Z alpha value', ''),  # noqa
-        '0019xxdf': ('DS', '1', 'User data 23 {# DTI Diffusion Dir., release 9.0 & below}', ''),  # noqa
-        '0019xxe0': ('DS', '1', 'User data 24 {# DTI Diffusion Dir., release 10.0 & above}', ''),  # noqa
-        '0019xxe1': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxe2': ('DS', '1', 'Velocity Encode Scale', ''),  # noqa
-        '0019xxe3': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019xxe4': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019xxe5': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxe6': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxe8': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxe9': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxeb': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxec': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxf0': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xxf1': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019xxf2': ('SS', '1', 'Fast phases', ''),  # noqa
-        '0019xxf3': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019xxf4': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019xxf9': ('DS', '1', 'Transmit gain', ''),  # noqa
+        '0019xx9B': ('SS', '1', 'Pulse Sequence Mode', ''),  # noqa
+        '0019xx9C': ('LO', '1', 'Pulse Sequence Name', ''),  # noqa
+        '0019xx9D': ('DT', '1', 'Pulse Sequence Date', ''),  # noqa
+        '0019xx9E': ('LO', '1', 'Internal Pulse Sequence Name', ''),  # noqa
+        '0019xx9F': ('SS', '1', 'Transmitting Coil Type', ''),  # noqa
+        '0019xxA0': ('SS', '1', 'Surface Coil Type', ''),  # noqa
+        '0019xxA1': ('SS', '1', 'Extremity Coil flag', ''),  # noqa
+        '0019xxA2': ('SL', '1', 'Raw data run number', ''),  # noqa
+        '0019xxA3': ('UL', '1', 'Calibrated Field strength', ''),  # noqa
+        '0019xxA4': ('SS', '1', 'SAT fat/water/bone', ''),  # noqa
+        '0019xxA5': ('DS', '1', 'Receive bandwidth', ''),  # noqa
+        '0019xxA7': ('DS', '1', 'User data 0', ''),  # noqa
+        '0019xxA8': ('DS', '1', 'User data 1', ''),  # noqa
+        '0019xxA9': ('DS', '1', 'User data 2', ''),  # noqa
+        '0019xxAA': ('DS', '1', 'User data 3', ''),  # noqa
+        '0019xxAB': ('DS', '1', 'User data 4', ''),  # noqa
+        '0019xxAC': ('DS', '1', 'User data 5', ''),  # noqa
+        '0019xxAD': ('DS', '1', 'User data 6', ''),  # noqa
+        '0019xxAE': ('DS', '1', 'User data 7', ''),  # noqa
+        '0019xxAF': ('DS', '1', 'User data 8', ''),  # noqa
+        '0019xxB0': ('DS', '1', 'User data 9', ''),  # noqa
+        '0019xxB1': ('DS', '1', 'User data 10', ''),  # noqa
+        '0019xxB2': ('DS', '1', 'User data 11', ''),  # noqa
+        '0019xxB3': ('DS', '1', 'User data 12', ''),  # noqa
+        '0019xxB4': ('DS', '1', 'User data 13', ''),  # noqa
+        '0019xxB5': ('DS', '1', 'User data 14', ''),  # noqa
+        '0019xxB6': ('DS', '1', 'User data 15', ''),  # noqa
+        '0019xxB7': ('DS', '1', 'User data 16', ''),  # noqa
+        '0019xxB8': ('DS', '1', 'User data 17', ''),  # noqa
+        '0019xxB9': ('DS', '1', 'User data 18', ''),  # noqa
+        '0019xxBA': ('DS', '1', 'User data 19', ''),  # noqa
+        '0019xxBB': ('DS', '1', 'User data 20', ''),  # noqa
+        '0019xxBC': ('DS', '1', 'User data 21', ''),  # noqa
+        '0019xxBD': ('DS', '1', 'User data 22', ''),  # noqa
+        '0019xxBE': ('DS', '1', 'Projection angle', ''),  # noqa
+        '0019xxC0': ('SS', '1', 'Saturation planes', ''),  # noqa
+        '0019xxC1': ('SS', '1', 'Surface coil intensity', ''),  # noqa
+        '0019xxC2': ('SS', '1', 'SAT location R', ''),  # noqa
+        '0019xxC3': ('SS', '1', 'SAT location L', ''),  # noqa
+        '0019xxC4': ('SS', '1', 'SAT location A', ''),  # noqa
+        '0019xxC5': ('SS', '1', 'SAT location P', ''),  # noqa
+        '0019xxC6': ('SS', '1', 'SAT location H', ''),  # noqa
+        '0019xxC7': ('SS', '1', 'SAT location F', ''),  # noqa
+        '0019xxC8': ('SS', '1', 'SAT thickness R/L', ''),  # noqa
+        '0019xxC9': ('SS', '1', 'SAT thickness A/P', ''),  # noqa
+        '0019xxCA': ('SS', '1', 'SAT thickness H/F', ''),  # noqa
+        '0019xxCB': ('SS', '1', 'Phase Contrast flow axis', ''),  # noqa
+        '0019xxCC': ('SS', '1', 'Velocity encoding', ''),  # noqa
+        '0019xxCD': ('SS', '1', 'Thickness disclaimer', ''),  # noqa
+        '0019xxCE': ('SS', '1', 'Prescan type', ''),  # noqa
+        '0019xxCF': ('SS', '1', 'Prescan status', ''),  # noqa
+        '0019xxD0': ('SH', '1', 'Raw data type', ''),  # noqa
+        '0019xxD2': ('SS', '1', 'Projection Algorithm', ''),  # noqa
+        '0019xxD3': ('SH', '1', 'Projection Algorithm Name', ''),  # noqa
+        '0019xxD4': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxD5': ('SS', '1', 'Fractional echo', ''),  # noqa
+        '0019xxD6': ('SS', '1', 'Prep pulse', ''),  # noqa
+        '0019xxD7': ('SS', '1', 'Cardiac phase number', ''),  # noqa
+        '0019xxD8': ('SS', '1', 'Variable echoflag', ''),  # noqa
+        '0019xxD9': ('DS', '1', 'Concatenated SAT {# DTI Diffusion Dir., release 9.0 & below}', ''),  # noqa
+        '0019xxDA': ('SS', '1', 'Reference channel used', ''),  # noqa
+        '0019xxDB': ('DS', '1', 'Back projector coefficient', ''),  # noqa
+        '0019xxDC': ('SS', '1', 'Primary speed correction used', ''),  # noqa
+        '0019xxDD': ('SS', '1', 'Overrange correction used', ''),  # noqa
+        '0019xxDE': ('DS', '1', 'Dynamic Z alpha value', ''),  # noqa
+        '0019xxDF': ('DS', '1', 'User data 23 {# DTI Diffusion Dir., release 9.0 & below}', ''),  # noqa
+        '0019xxE0': ('DS', '1', 'User data 24 {# DTI Diffusion Dir., release 10.0 & above}', ''),  # noqa
+        '0019xxE1': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxE2': ('DS', '1', 'Velocity Encode Scale', ''),  # noqa
+        '0019xxE3': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xxE4': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xxE5': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxE6': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxE8': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxE9': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxEB': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxEC': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxF0': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xxF1': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xxF2': ('SS', '1', 'Fast phases', ''),  # noqa
+        '0019xxF3': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xxF4': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xxF9': ('DS', '1', 'Transmit gain', ''),  # noqa
     },
     'GEMS_ACRQA_1.0 BLOCK1': {
         '0023xx00': ('LO', '1', 'CR Exposure Menu Code', ''),  # noqa
@@ -1632,8 +2171,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0023xx70': ('LO', '1', 'CR Machine Type', ''),  # noqa
         '0023xx80': ('LO', '1', 'CR Technician Code', ''),  # noqa
         '0023xx90': ('LO', '1', 'CR Energy Subtraction Parameters', ''),  # noqa
-        '0023xxf0': ('LO', '1', 'CR Distribution Code', ''),  # noqa
-        '0023xxff': ('US', '1', 'CR Shutters Applied', ''),  # noqa
+        '0023xxF0': ('LO', '1', 'CR Distribution Code', ''),  # noqa
+        '0023xxFF': ('US', '1', 'CR Shutters Applied', ''),  # noqa
     },
     'GEMS_ADWSoft_3D1': {
         '0047xx01': ('SQ', '1', 'Reconstruction Parameters Sequence', ''),  # noqa
@@ -1659,8 +2198,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0047xx81': ('IS', '1', 'Acquisition DLX 2D Series Count', ''),  # noqa
         '0047xx85': ('SQ', '1', 'Acquisition DLX 2D Series Sequence', ''),  # noqa
         '0047xx89': ('DS', '1-n', 'Contrast Agent Volume List', ''),  # noqa
-        '0047xx8a': ('US', '1', 'Number Of Injections', ''),  # noqa
-        '0047xx8b': ('US', '1', 'Frame Count', ''),  # noqa
+        '0047xx8A': ('US', '1', 'Number Of Injections', ''),  # noqa
+        '0047xx8B': ('US', '1', 'Frame Count', ''),  # noqa
         '0047xx91': ('LO', '1', 'XA 3D Reconstruction Algorithm Name', ''),  # noqa
         '0047xx92': ('CS', '1', 'XA 3D Reconstruction Algorithm Version', ''),  # noqa
         '0047xx93': ('DA', '1', 'DLX Calibration Date', ''),  # noqa
@@ -1669,40 +2208,40 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0047xx96': ('IS', '1-n', 'Used Frames', ''),  # noqa
         '0047xx98': ('US', '1', 'Transform Count', ''),  # noqa
         '0047xx99': ('SQ', '1', 'Transform Sequence', ''),  # noqa
-        '0047xx9a': ('DS', '9', 'Transform Rotation Matrix', ''),  # noqa
-        '0047xx9b': ('DS', '3', 'Transform Translation Vector', ''),  # noqa
-        '0047xx9c': ('LO', '1', 'Transform Label', ''),  # noqa
-        '0047xxb0': ('SQ', '1', 'Wireframe List', ''),  # noqa
-        '0047xxb1': ('US', '1', 'Wireframe Count', ''),  # noqa
-        '0047xxb2': ('US', '1', 'Location System', ''),  # noqa
-        '0047xxb5': ('LO', '1', 'Wireframe Name', ''),  # noqa
-        '0047xxb6': ('LO', '1', 'Wireframe Group Name', ''),  # noqa
-        '0047xxb7': ('LO', '1', 'Wireframe Color', ''),  # noqa
-        '0047xxb8': ('SL', '1', 'Wireframe Attributes', ''),  # noqa
-        '0047xxb9': ('SL', '1', 'Wireframe Point Count', ''),  # noqa
-        '0047xxba': ('SL', '1', 'Wireframe Timestamp', ''),  # noqa
-        '0047xxbb': ('SQ', '1', 'Wireframe Point List', ''),  # noqa
-        '0047xxbc': ('DS', '3', 'Wireframe Points Coordinates', ''),  # noqa
-        '0047xxc0': ('DS', '3', 'Volume Upper Left High Corner RAS', ''),  # noqa
-        '0047xxc1': ('DS', '9', 'Volume Slice To RAS Rotation Matrix', ''),  # noqa
-        '0047xxc2': ('DS', '1', 'Volume Upper Left High Corner TLOC', ''),  # noqa
-        '0047xxd1': ('OB', '1', 'Volume Segment List', ''),  # noqa
-        '0047xxd2': ('OB', '1', 'Volume Gradient List', ''),  # noqa
-        '0047xxd3': ('OB', '1', 'Volume Density List', ''),  # noqa
-        '0047xxd4': ('OB', '1', 'Volume Z Position List', ''),  # noqa
-        '0047xxd5': ('OB', '1', 'Volume Original Index List', ''),  # noqa
-        '0047xxf4': ('LO', '1-n', 'Volume Name(s)', ''),  # noqa
-        '0047xxf5': ('DS', '1-n', 'Min original density', ''),  # noqa
-        '0047xxf6': ('DS', '1-n', 'Max original density', ''),  # noqa
-        '0047xxf7': ('DS', '1-n', 'Min Converted Density', ''),  # noqa
-        '0047xxf8': ('DS', '1-n', 'Max Converted Density', ''),  # noqa
-        '0047xxf9': ('LO', '1', 'Protocol Film Name', ''),  # noqa
-        '0047xxfa': ('US', '1', 'Protocol Resolution', ''),  # noqa
-        '0047xxfb': ('US', '1', 'Phase Number (percent)', ''),  # noqa
-        '0047xxfc': ('OB', '1', 'Volume midscan times list', ''),  # noqa
-        '0047xxfd': ('OB', '1', 'Volume Registered Phases List', ''),  # noqa
-        '0047xxfe': ('LO', '1', 'Protocol Name', ''),  # noqa
-        '0047xxff': ('LO', '1', 'Protocol Title', ''),  # noqa
+        '0047xx9A': ('DS', '9', 'Transform Rotation Matrix', ''),  # noqa
+        '0047xx9B': ('DS', '3', 'Transform Translation Vector', ''),  # noqa
+        '0047xx9C': ('LO', '1', 'Transform Label', ''),  # noqa
+        '0047xxB0': ('SQ', '1', 'Wireframe List', ''),  # noqa
+        '0047xxB1': ('US', '1', 'Wireframe Count', ''),  # noqa
+        '0047xxB2': ('US', '1', 'Location System', ''),  # noqa
+        '0047xxB5': ('LO', '1', 'Wireframe Name', ''),  # noqa
+        '0047xxB6': ('LO', '1', 'Wireframe Group Name', ''),  # noqa
+        '0047xxB7': ('LO', '1', 'Wireframe Color', ''),  # noqa
+        '0047xxB8': ('SL', '1', 'Wireframe Attributes', ''),  # noqa
+        '0047xxB9': ('SL', '1', 'Wireframe Point Count', ''),  # noqa
+        '0047xxBA': ('SL', '1', 'Wireframe Timestamp', ''),  # noqa
+        '0047xxBB': ('SQ', '1', 'Wireframe Point List', ''),  # noqa
+        '0047xxBC': ('DS', '3', 'Wireframe Points Coordinates', ''),  # noqa
+        '0047xxC0': ('DS', '3', 'Volume Upper Left High Corner RAS', ''),  # noqa
+        '0047xxC1': ('DS', '9', 'Volume Slice To RAS Rotation Matrix', ''),  # noqa
+        '0047xxC2': ('DS', '1', 'Volume Upper Left High Corner TLOC', ''),  # noqa
+        '0047xxD1': ('OB', '1', 'Volume Segment List', ''),  # noqa
+        '0047xxD2': ('OB', '1', 'Volume Gradient List', ''),  # noqa
+        '0047xxD3': ('OB', '1', 'Volume Density List', ''),  # noqa
+        '0047xxD4': ('OB', '1', 'Volume Z Position List', ''),  # noqa
+        '0047xxD5': ('OB', '1', 'Volume Original Index List', ''),  # noqa
+        '0047xxF4': ('LO', '1-n', 'Volume Name(s)', ''),  # noqa
+        '0047xxF5': ('DS', '1-n', 'Min original density', ''),  # noqa
+        '0047xxF6': ('DS', '1-n', 'Max original density', ''),  # noqa
+        '0047xxF7': ('DS', '1-n', 'Min Converted Density', ''),  # noqa
+        '0047xxF8': ('DS', '1-n', 'Max Converted Density', ''),  # noqa
+        '0047xxF9': ('LO', '1', 'Protocol Film Name', ''),  # noqa
+        '0047xxFA': ('US', '1', 'Protocol Resolution', ''),  # noqa
+        '0047xxFB': ('US', '1', 'Phase Number (percent)', ''),  # noqa
+        '0047xxFC': ('OB', '1', 'Volume midscan times list', ''),  # noqa
+        '0047xxFD': ('OB', '1', 'Volume Registered Phases List', ''),  # noqa
+        '0047xxFE': ('LO', '1', 'Protocol Name', ''),  # noqa
+        '0047xxFF': ('LO', '1', 'Protocol Title', ''),  # noqa
     },
     'GEMS_ADWSoft_3D2': {
         '0057xx01': ('OB', '1', 'Cardiac Reconstruction Algorithm List', ''),  # noqa
@@ -1715,14 +2254,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx85': ('DA', '1', 'Private Entity Date', ''),  # noqa
         '0039xx90': ('TM', '1', 'Private Entity Time', ''),  # noqa
         '0039xx95': ('LO', '1', 'Private Entity Launch Command', ''),  # noqa
-        '0039xxaa': ('CS', '1', 'Private Entity Type', ''),  # noqa
+        '0039xxAA': ('CS', '1', 'Private Entity Type', ''),  # noqa
     },
     'GEMS_ADWSoft_DPO1': {
         '0039xx80': ('IS', '1', 'Private Entity Number', ''),  # noqa
         '0039xx85': ('DA', '1', 'Private Entity Date', ''),  # noqa
         '0039xx90': ('TM', '1', 'Private Entity Time', ''),  # noqa
         '0039xx95': ('LO', '1', 'Private Entity Launch Command', ''),  # noqa
-        '0039xxaa': ('CS', '1', 'Private Entity Type', ''),  # noqa
+        '0039xxAA': ('CS', '1', 'Private Entity Type', ''),  # noqa
     },
     'GEMS_AWSOFT_CD1': {
         '0039xx65': ('UI', '1', 'Reference to Study UID', ''),  # noqa
@@ -1732,8 +2271,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx85': ('DA', '1', 'DPO Date', ''),  # noqa
         '0039xx90': ('TM', '1', 'DPO Time', ''),  # noqa
         '0039xx95': ('LO', '1', 'DPO Invocation String', ''),  # noqa
-        '0039xxaa': ('CS', '1', 'DPO type', ''),  # noqa
-        '0039xxff': ('OB', '1', 'DPO data', ''),  # noqa
+        '0039xxAA': ('CS', '1', 'DPO type', ''),  # noqa
+        '0039xxFF': ('OB', '1', 'DPO data', ''),  # noqa
     },
     'GEMS_AWSoft_SB1': {
         '0039xx50': ('UI', '1', 'Reference to Study UID', ''),  # noqa
@@ -1754,14 +2293,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0049xx07': ('US', '1', 'NumHeartRateSamplesPriorToConfirm', ''),  # noqa
         '0049xx08': ('CS', '1', 'AutoHeartRateDetectPredict', ''),  # noqa
         '0049xx09': ('CS', '1', 'SystemOptimizedHeartRate', ''),  # noqa
-        '0049xx0a': ('ST', '1', 'EkgMonitorType', ''),  # noqa
-        '0049xx0b': ('CS', '1', 'NumReconSectors', ''),  # noqa
-        '0049xx0c': ('FL', '256', 'RpeakTimeStamps', ''),  # noqa
+        '0049xx0A': ('ST', '1', 'EkgMonitorType', ''),  # noqa
+        '0049xx0B': ('CS', '1', 'NumReconSectors', ''),  # noqa
+        '0049xx0C': ('FL', '256', 'RpeakTimeStamps', ''),  # noqa
     },
     'GEMS_CT_HINO_01': {
-        '004bxx01': ('DS', '1-n', 'Beam Thickess', ''),  # noqa
-        '004bxx02': ('DS', '1-n', 'R Time', ''),  # noqa
-        '004bxx03': ('IS', '1', 'HBC Number', ''),  # noqa
+        '004Bxx01': ('DS', '1-n', 'Beam Thickess', ''),  # noqa
+        '004Bxx02': ('DS', '1-n', 'R Time', ''),  # noqa
+        '004Bxx03': ('IS', '1', 'HBC Number', ''),  # noqa
     },
     'GEMS_CT_VES_01': {
         '0051xx01': ('SQ', '1', 'CTVESSequence', ''),  # noqa
@@ -1791,15 +2330,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx07': ('DS', '1', 'Positioner Secondary Angle', ''),  # noqa
         '0025xx08': ('IS', '1', 'Beam Orientation', ''),  # noqa
         '0025xx09': ('DS', '1', 'Larm Angle', ''),  # noqa
-        '0025xx0a': ('SQ', '1', 'Frame Sequence', ''),  # noqa
-        '0025xx0b': ('DS', '1', 'Target Cnr', ''),  # noqa
+        '0025xx0A': ('SQ', '1', 'Frame Sequence', ''),  # noqa
+        '0025xx0B': ('DS', '1', 'Target Cnr', ''),  # noqa
         '0025xx10': ('DS', '1', 'Pivot Angle', ''),  # noqa
-        '0025xx1a': ('DS', '1', 'Arc Angle', ''),  # noqa
-        '0025xx1b': ('DS', '1', 'Table Vertical Position', ''),  # noqa
-        '0025xx1c': ('DS', '1', 'Table Longitudinal Position', ''),  # noqa
-        '0025xx1d': ('DS', '1', 'Table Lateral Position', ''),  # noqa
-        '0025xx1e': ('IS', '1', 'Beam Cover Area', ''),  # noqa
-        '0025xx1f': ('DS', '1', 'Kvp Actual', ''),  # noqa
+        '0025xx1A': ('DS', '1', 'Arc Angle', ''),  # noqa
+        '0025xx1B': ('DS', '1', 'Table Vertical Position', ''),  # noqa
+        '0025xx1C': ('DS', '1', 'Table Longitudinal Position', ''),  # noqa
+        '0025xx1D': ('DS', '1', 'Table Lateral Position', ''),  # noqa
+        '0025xx1E': ('IS', '1', 'Beam Cover Area', ''),  # noqa
+        '0025xx1F': ('DS', '1', 'Kvp Actual', ''),  # noqa
         '0025xx20': ('DS', '1', 'Mas Actual', ''),  # noqa
         '0025xx21': ('DS', '1', 'Pw Actual', ''),  # noqa
         '0025xx22': ('DS', '1', 'Kvp Commanded', ''),  # noqa
@@ -1810,12 +2349,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx27': ('DS', '1', 'Target Entrance Dose', ''),  # noqa
         '0025xx28': ('DS', '1', 'Cnr Commanded', ''),  # noqa
         '0025xx29': ('DS', '1', 'Contrast Commanded', ''),  # noqa
-        '0025xx2a': ('DS', '1', 'Ept Actual', ''),  # noqa
-        '0025xx2b': ('IS', '1', 'Spectral Filter Znb', ''),  # noqa
-        '0025xx2c': ('DS', '1', 'Spectral Filter Weight', ''),  # noqa
-        '0025xx2d': ('DS', '1', 'Spectral Filter Density', ''),  # noqa
-        '0025xx2e': ('IS', '1', 'Spectral Filter Thickness', ''),  # noqa
-        '0025xx2f': ('IS', '1', 'Spectral Filter Status', ''),  # noqa
+        '0025xx2A': ('DS', '1', 'Ept Actual', ''),  # noqa
+        '0025xx2B': ('IS', '1', 'Spectral Filter Znb', ''),  # noqa
+        '0025xx2C': ('DS', '1', 'Spectral Filter Weight', ''),  # noqa
+        '0025xx2D': ('DS', '1', 'Spectral Filter Density', ''),  # noqa
+        '0025xx2E': ('IS', '1', 'Spectral Filter Thickness', ''),  # noqa
+        '0025xx2F': ('IS', '1', 'Spectral Filter Status', ''),  # noqa
         '0025xx30': ('IS', '1', 'Fov Dimension', ''),  # noqa
         '0025xx33': ('IS', '1', 'Fov Origin', ''),  # noqa
         '0025xx34': ('IS', '1', 'Collimator Left Vertical Edge', ''),  # noqa
@@ -1824,15 +2363,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx37': ('IS', '1', 'Collimator Low Horizontal Edge', ''),  # noqa
         '0025xx38': ('IS', '1', 'Vertices Polygonal Collimator', ''),  # noqa
         '0025xx39': ('IS', '1', 'Contour Filter Distance', ''),  # noqa
-        '0025xx3a': ('UL', '1', 'Contour Filter Angle', ''),  # noqa
-        '0025xx3b': ('CS', '1', 'Table Rotation Status', ''),  # noqa
-        '0025xx3c': ('CS', '1', 'Internal Label Frame', ''),  # noqa
+        '0025xx3A': ('UL', '1', 'Contour Filter Angle', ''),  # noqa
+        '0025xx3B': ('CS', '1', 'Table Rotation Status', ''),  # noqa
+        '0025xx3C': ('CS', '1', 'Internal Label Frame', ''),  # noqa
     },
     'GEMS_DL_IMG_01': {
-        '0019xx0b': ('DS', '1', 'Fov Dimension Double', ''),  # noqa
-        '0019xx0c': ('FL', '2-2n', 'LV Diastolic contour', ''),  # noqa
-        '0019xx0d': ('FL', '2-2n', 'LV Systolic contour', ''),  # noqa
-        '0019xx2b': ('FL', '1', 'Distance to table top', ''),  # noqa
+        '0019xx0B': ('DS', '1', 'Fov Dimension Double', ''),  # noqa
+        '0019xx0C': ('FL', '2-2n', 'LV Diastolic contour', ''),  # noqa
+        '0019xx0D': ('FL', '2-2n', 'LV Systolic contour', ''),  # noqa
+        '0019xx2B': ('FL', '1', 'Distance to table top', ''),  # noqa
         '0019xx30': ('LO', '1', 'Image File Name', ''),  # noqa
         '0019xx31': ('IS', '1', 'Default Spatial Filter Family', ''),  # noqa
         '0019xx32': ('IS', '1', 'Default Spatial Filter Strength', ''),  # noqa
@@ -1843,11 +2382,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx37': ('CS', '1', 'Sensor Roi Shape', ''),  # noqa
         '0019xx38': ('DS', '1', 'Sensor Roi x Position', ''),  # noqa
         '0019xx39': ('DS', '1', 'Sensor Roi y Position', ''),  # noqa
-        '0019xx3a': ('DS', '1', 'Sensor Roi x Size', ''),  # noqa
-        '0019xx3b': ('DS', '1', 'Sensor Roi y Size', ''),  # noqa
-        '0019xx3d': ('DS', '1', 'Noise Sensitivity', ''),  # noqa
-        '0019xx3e': ('DS', '1', 'Sharp Sensitivity', ''),  # noqa
-        '0019xx3f': ('DS', '1', 'Contrast Sensitivity', ''),  # noqa
+        '0019xx3A': ('DS', '1', 'Sensor Roi x Size', ''),  # noqa
+        '0019xx3B': ('DS', '1', 'Sensor Roi y Size', ''),  # noqa
+        '0019xx3D': ('DS', '1', 'Noise Sensitivity', ''),  # noqa
+        '0019xx3E': ('DS', '1', 'Sharp Sensitivity', ''),  # noqa
+        '0019xx3F': ('DS', '1', 'Contrast Sensitivity', ''),  # noqa
         '0019xx40': ('DS', '1', 'Lag Sensitivity', ''),  # noqa
         '0019xx41': ('CS', '1', 'Tube', ''),  # noqa
         '0019xx42': ('US', '1', 'Detector Size Rows', ''),  # noqa
@@ -1858,11 +2397,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx47': ('CS', '1', 'Object Back Motion', ''),  # noqa
         '0019xx48': ('UL', '1', 'Exposure Trajectory Family', ''),  # noqa
         '0019xx49': ('DS', '1', 'Window Time Duration', ''),  # noqa
-        '0019xx4a': ('CS', '1', 'Positioner Angle Display Mode', ''),  # noqa
-        '0019xx4b': ('IS', '1', 'Detector Origin', ''),  # noqa
-        '0019xx4c': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx4e': ('DS', '1', 'Default Brightness Contrast', ''),  # noqa
-        '0019xx4f': ('DS', '1', 'User Brightness Contrast', ''),  # noqa
+        '0019xx4A': ('CS', '1', 'Positioner Angle Display Mode', ''),  # noqa
+        '0019xx4B': ('IS', '1', 'Detector Origin', ''),  # noqa
+        '0019xx4C': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx4E': ('DS', '1', 'Default Brightness Contrast', ''),  # noqa
+        '0019xx4F': ('DS', '1', 'User Brightness Contrast', ''),  # noqa
         '0019xx50': ('IS', '1', 'Source Series Number', ''),  # noqa
         '0019xx51': ('IS', '1', 'Source Image Number', ''),  # noqa
         '0019xx52': ('IS', '1', 'Source Frame Number', ''),  # noqa
@@ -1879,12 +2418,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx87': ('US', '1', 'Calibration Accuracy', ''),  # noqa
         '0019xx88': ('CS', '1', 'Calibration Extended', ''),  # noqa
         '0019xx89': ('US', '1', 'Calibration Image Original', ''),  # noqa
-        '0019xx8a': ('US', '1', 'Calibration Frame Original', ''),  # noqa
-        '0019xx8b': ('US', '1', 'Calibration Number Of Points Uif', ''),  # noqa
-        '0019xx8c': ('US', '1', 'Calibration Points Row', ''),  # noqa
-        '0019xx8d': ('US', '1', 'Calibration Points Column', ''),  # noqa
-        '0019xx8e': ('FL', '1', 'Calibration Magnification Ratio', ''),  # noqa
-        '0019xx8f': ('LO', '1', 'Calibration Sw Version', ''),  # noqa
+        '0019xx8A': ('US', '1', 'Calibration Frame Original', ''),  # noqa
+        '0019xx8B': ('US', '1', 'Calibration Number Of Points Uif', ''),  # noqa
+        '0019xx8C': ('US', '1', 'Calibration Points Row', ''),  # noqa
+        '0019xx8D': ('US', '1', 'Calibration Points Column', ''),  # noqa
+        '0019xx8E': ('FL', '1', 'Calibration Magnification Ratio', ''),  # noqa
+        '0019xx8F': ('LO', '1', 'Calibration Sw Version', ''),  # noqa
         '0019xx90': ('LO', '1', 'Extend Calibration Sw Version', ''),  # noqa
         '0019xx91': ('IS', '1', 'Calibration Return Code', ''),  # noqa
         '0019xx92': ('DS', '1', 'Detector Rotation Angle', ''),  # noqa
@@ -1895,64 +2434,64 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx97': ('DS', '1', 'Angle 1 Increment', ''),  # noqa
         '0019xx98': ('DS', '1', 'Angle 2 Increment', ''),  # noqa
         '0019xx99': ('DS', '1', 'Angle 3 Increment', ''),  # noqa
-        '0019xx9a': ('DS', '1', 'Sensor Feedback', ''),  # noqa
-        '0019xx9b': ('CS', '1', 'Grid', ''),  # noqa
-        '0019xx9c': ('FL', '1', 'Default Mask Pixel Shift', ''),  # noqa
-        '0019xx9d': ('CS', '1', 'Applicable Review Mode', ''),  # noqa
-        '0019xx9e': ('DS', '1', 'Log Lut Control Points', ''),  # noqa
-        '0019xx9f': ('DS', '1', 'Exp Lut Control Points', ''),  # noqa
-        '0019xxa0': ('DS', '1', 'ABD Value', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'Sub Window Center', ''),  # noqa
-        '0019xxa2': ('DS', '1', 'Sub Window Width', ''),  # noqa
-        '0019xxa3': ('DS', '1', 'Image Rotation', ''),  # noqa
-        '0019xxa4': ('CS', '1', 'Auto Injection Enabled', ''),  # noqa
-        '0019xxa5': ('CS', '1', 'Injection Phase', ''),  # noqa
-        '0019xxa6': ('DS', '1', 'Injection Delay', ''),  # noqa
-        '0019xxa7': ('IS', '1', 'Reference Injection Frame Number', ''),  # noqa
-        '0019xxa8': ('DS', '1', 'Injection Duration', ''),  # noqa
-        '0019xxa9': ('DS', '1', 'EPT', ''),  # noqa
-        '0019xxaa': ('CS', '1', 'Can Downscan 512', ''),  # noqa
-        '0019xxab': ('IS', '1', 'Current Spatial Filter Strength', ''),  # noqa
-        '0019xxac': ('DS', '1', 'Brightness Sensitivity', ''),  # noqa
-        '0019xxad': ('DS', '1', 'Exp Lut NOSUB Control Points', ''),  # noqa
-        '0019xxae': ('LO', '1-n', 'SUB operator LUTs names', ''),  # noqa
-        '0019xxaf': ('DS', '1-n', 'kVp actual vector', ''),  # noqa
-        '0019xxb0': ('DS', '1-n', 'mAs actual vector', ''),  # noqa
-        '0019xxb1': ('LO', '1', 'Acquisition Mode Description', ''),  # noqa
-        '0019xxb2': ('LO', '1', 'Acquisition Mode Display Label', ''),  # noqa
-        '0019xxb3': ('LO', '1', 'Acquisition Protocol User Name', ''),  # noqa
-        '0019xxb8': ('FL', '1', 'Recommended display frame rate float', ''),  # noqa
-        '0019xxb9': ('FL', '1-n', 'ABD Vector', ''),  # noqa
-        '0019xxba': ('CS', '1', 'Acquisition region', ''),  # noqa
-        '0019xxbb': ('CS', '1', 'Acquisition SUB mode', ''),  # noqa
-        '0019xxbc': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019xxbd': ('CS', '1-n', 'Table rotation status vector', ''),  # noqa
-        '0019xxbe': ('FL', '1-n', 'Source to image distance per frame vector', ''),  # noqa
-        '0019xxc2': ('DS', '1-n', 'pw actual vector', ''),  # noqa
-        '0019xxc4': ('IS', '1', 'Spectral filter thickness', ''),  # noqa
-        '0019xxc5': ('FL', '1', 'Preselected pivot rotation speed', ''),  # noqa
-        '0019xxc7': ('CS', '1', 'Patient position per image', ''),  # noqa
-        '0019xxc8': ('CS', '1', '3D structure of interest', ''),  # noqa
-        '0019xxc9': ('CS', '1', '3D calibration out of date flag', ''),  # noqa
-        '0019xxca': ('IS', '1', '3Dspin expected number of frames', ''),  # noqa
-        '0019xxd4': ('FL', '1', 'Detection gain value', ''),  # noqa
-        '0019xxd5': ('FL', '1', 'mR mAs calibration value', ''),  # noqa
-        '0019xxdc': ('LO', '1', 'DRM LUT file name', ''),  # noqa
-        '0019xxdd': ('DS', '1-n', 'DRM Strength', ''),  # noqa
-        '0019xxde': ('CS', '1', 'Acquisition Plane', ''),  # noqa
-        '0019xxdf': ('FL', '1-n', 'LP off longitudinal position Z', ''),  # noqa
-        '0019xxe0': ('FL', '1', 'DAP of current record', ''),  # noqa
-        '0019xxe1': ('FL', '1', 'Pivot Lateral Angle', ''),  # noqa
-        '0019xxe2': ('FL', '1', 'Carm Lateral Angle', ''),  # noqa
-        '0019xxe3': ('FL', '1-n', 'Pivot Lateral Angle increment', ''),  # noqa
-        '0019xxe4': ('FL', '1-n', 'Carm Lateral Angle increment', ''),  # noqa
-        '0019xxe7': ('FL', '1', 'LP off long pos Z first frame', ''),  # noqa
-        '0019xxe8': ('FL', '1-n', 'LP off long pos Z increment', ''),  # noqa
-        '0019xxe9': ('FL', '1-n', 'Source to detector distance per frame vector', ''),  # noqa
-        '0019xxea': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019xxeb': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019xxec': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019xxed': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019xx9A': ('DS', '1', 'Sensor Feedback', ''),  # noqa
+        '0019xx9B': ('CS', '1', 'Grid', ''),  # noqa
+        '0019xx9C': ('FL', '1', 'Default Mask Pixel Shift', ''),  # noqa
+        '0019xx9D': ('CS', '1', 'Applicable Review Mode', ''),  # noqa
+        '0019xx9E': ('DS', '1', 'Log Lut Control Points', ''),  # noqa
+        '0019xx9F': ('DS', '1', 'Exp Lut Control Points', ''),  # noqa
+        '0019xxA0': ('DS', '1', 'ABD Value', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'Sub Window Center', ''),  # noqa
+        '0019xxA2': ('DS', '1', 'Sub Window Width', ''),  # noqa
+        '0019xxA3': ('DS', '1', 'Image Rotation', ''),  # noqa
+        '0019xxA4': ('CS', '1', 'Auto Injection Enabled', ''),  # noqa
+        '0019xxA5': ('CS', '1', 'Injection Phase', ''),  # noqa
+        '0019xxA6': ('DS', '1', 'Injection Delay', ''),  # noqa
+        '0019xxA7': ('IS', '1', 'Reference Injection Frame Number', ''),  # noqa
+        '0019xxA8': ('DS', '1', 'Injection Duration', ''),  # noqa
+        '0019xxA9': ('DS', '1', 'EPT', ''),  # noqa
+        '0019xxAA': ('CS', '1', 'Can Downscan 512', ''),  # noqa
+        '0019xxAB': ('IS', '1', 'Current Spatial Filter Strength', ''),  # noqa
+        '0019xxAC': ('DS', '1', 'Brightness Sensitivity', ''),  # noqa
+        '0019xxAD': ('DS', '1', 'Exp Lut NOSUB Control Points', ''),  # noqa
+        '0019xxAE': ('LO', '1-n', 'SUB operator LUTs names', ''),  # noqa
+        '0019xxAF': ('DS', '1-n', 'kVp actual vector', ''),  # noqa
+        '0019xxB0': ('DS', '1-n', 'mAs actual vector', ''),  # noqa
+        '0019xxB1': ('LO', '1', 'Acquisition Mode Description', ''),  # noqa
+        '0019xxB2': ('LO', '1', 'Acquisition Mode Display Label', ''),  # noqa
+        '0019xxB3': ('LO', '1', 'Acquisition Protocol User Name', ''),  # noqa
+        '0019xxB8': ('FL', '1', 'Recommended display frame rate float', ''),  # noqa
+        '0019xxB9': ('FL', '1-n', 'ABD Vector', ''),  # noqa
+        '0019xxBA': ('CS', '1', 'Acquisition region', ''),  # noqa
+        '0019xxBB': ('CS', '1', 'Acquisition SUB mode', ''),  # noqa
+        '0019xxBC': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019xxBD': ('CS', '1-n', 'Table rotation status vector', ''),  # noqa
+        '0019xxBE': ('FL', '1-n', 'Source to image distance per frame vector', ''),  # noqa
+        '0019xxC2': ('DS', '1-n', 'pw actual vector', ''),  # noqa
+        '0019xxC4': ('IS', '1', 'Spectral filter thickness', ''),  # noqa
+        '0019xxC5': ('FL', '1', 'Preselected pivot rotation speed', ''),  # noqa
+        '0019xxC7': ('CS', '1', 'Patient position per image', ''),  # noqa
+        '0019xxC8': ('CS', '1', '3D structure of interest', ''),  # noqa
+        '0019xxC9': ('CS', '1', '3D calibration out of date flag', ''),  # noqa
+        '0019xxCA': ('IS', '1', '3Dspin expected number of frames', ''),  # noqa
+        '0019xxD4': ('FL', '1', 'Detection gain value', ''),  # noqa
+        '0019xxD5': ('FL', '1', 'mR mAs calibration value', ''),  # noqa
+        '0019xxDC': ('LO', '1', 'DRM LUT file name', ''),  # noqa
+        '0019xxDD': ('DS', '1-n', 'DRM Strength', ''),  # noqa
+        '0019xxDE': ('CS', '1', 'Acquisition Plane', ''),  # noqa
+        '0019xxDF': ('FL', '1-n', 'LP off longitudinal position Z', ''),  # noqa
+        '0019xxE0': ('FL', '1', 'DAP of current record', ''),  # noqa
+        '0019xxE1': ('FL', '1', 'Pivot Lateral Angle', ''),  # noqa
+        '0019xxE2': ('FL', '1', 'Carm Lateral Angle', ''),  # noqa
+        '0019xxE3': ('FL', '1-n', 'Pivot Lateral Angle increment', ''),  # noqa
+        '0019xxE4': ('FL', '1-n', 'Carm Lateral Angle increment', ''),  # noqa
+        '0019xxE7': ('FL', '1', 'LP off long pos Z first frame', ''),  # noqa
+        '0019xxE8': ('FL', '1-n', 'LP off long pos Z increment', ''),  # noqa
+        '0019xxE9': ('FL', '1-n', 'Source to detector distance per frame vector', ''),  # noqa
+        '0019xxEA': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019xxEB': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019xxEC': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019xxED': ('FL', '1', 'Unknown', ''),  # noqa
     },
     'GEMS_DL_PATNT_01': {
         '0011xx80': ('UI', '1', 'Patient Instance Uid', ''),  # noqa
@@ -1962,12 +2501,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     },
     'GEMS_DL_SERIES': {
         '0015xx87': ('IS', '1', 'Number of images', ''),  # noqa
-        '0019xx0b': ('DS', '1-2', 'fov dimension double', ''),  # noqa
+        '0019xx0B': ('DS', '1-2', 'fov dimension double', ''),  # noqa
         '0019xx31': ('IS', '1', 'default spatial filter family', ''),  # noqa
         '0019xx32': ('IS', '1', 'default spatial filter strength', ''),  # noqa
-        '0019xx4b': ('IS', '2', 'Detector origin', ''),  # noqa
-        '0019xx4e': ('DS', '2', 'def_bright_contr', ''),  # noqa
-        '0019xx4f': ('DS', '2', 'user_bright_contr', ''),  # noqa
+        '0019xx4B': ('IS', '2', 'Detector origin', ''),  # noqa
+        '0019xx4E': ('DS', '2', 'def_bright_contr', ''),  # noqa
+        '0019xx4F': ('DS', '2', 'user_bright_contr', ''),  # noqa
         '0019xx81': ('US', '1', 'Calibration frame', ''),  # noqa
         '0019xx82': ('CS', '1', 'Calibration object', ''),  # noqa
         '0019xx83': ('DS', '1', 'Calibration object size mm', ''),  # noqa
@@ -1977,12 +2516,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx87': ('US', '1', 'Calibration accuracy', ''),  # noqa
         '0019xx88': ('CS', '1', 'Calibration extended', ''),  # noqa
         '0019xx89': ('US', '1', 'Calibration image original', ''),  # noqa
-        '0019xx8a': ('US', '1', 'Calibration frame original', ''),  # noqa
-        '0019xx8b': ('US', '1', 'Calibration nb points uif', ''),  # noqa
-        '0019xx8c': ('US', '1-n', 'Calibration points row', ''),  # noqa
-        '0019xx8d': ('US', '1-n', 'Calibration points column', ''),  # noqa
-        '0019xx8e': ('FL', '1', 'Calibration mag ratio', ''),  # noqa
-        '0019xx8f': ('LO', '1', 'Calibration sw version', ''),  # noqa
+        '0019xx8A': ('US', '1', 'Calibration frame original', ''),  # noqa
+        '0019xx8B': ('US', '1', 'Calibration nb points uif', ''),  # noqa
+        '0019xx8C': ('US', '1-n', 'Calibration points row', ''),  # noqa
+        '0019xx8D': ('US', '1-n', 'Calibration points column', ''),  # noqa
+        '0019xx8E': ('FL', '1', 'Calibration mag ratio', ''),  # noqa
+        '0019xx8F': ('LO', '1', 'Calibration sw version', ''),  # noqa
         '0019xx90': ('LO', '1', 'Extend calib sw version', ''),  # noqa
         '0019xx91': ('IS', '1', 'Calibration return code', ''),  # noqa
         '0019xx92': ('DS', '1', 'detector_rot_angle', ''),  # noqa
@@ -1991,40 +2530,40 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx97': ('DS', '1-n', 'Angle 1 increment', ''),  # noqa
         '0019xx98': ('DS', '1-n', 'Angle 2 increment', ''),  # noqa
         '0019xx99': ('DS', '1-n', 'Angle 3 increment', ''),  # noqa
-        '0019xx9a': ('DS', '1-n', 'sensor feedback', ''),  # noqa
-        '0019xx9d': ('CS', '1', 'applicable review mode', ''),  # noqa
-        '0019xx9e': ('DS', '1-n', 'log LUT control points', ''),  # noqa
-        '0019xx9f': ('DS', '1-n', 'exp LUT SUB control points', ''),  # noqa
-        '0019xxa0': ('DS', '1', 'ABD value', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'Sub window center', ''),  # noqa
-        '0019xxa2': ('DS', '1', 'Sub window width', ''),  # noqa
-        '0019xxa4': ('CS', '1', 'Auto injection enabled', ''),  # noqa
-        '0019xxa5': ('CS', '1', 'injection phase', ''),  # noqa
-        '0019xxa6': ('DS', '1', 'injection delay', ''),  # noqa
-        '0019xxa7': ('IS', '1', 'reference injection frame number', ''),  # noqa
-        '0019xxa9': ('DS', '1-n', 'EPT', ''),  # noqa
-        '0019xxaa': ('CS', '1', 'can downscan 512', ''),  # noqa
-        '0019xxab': ('IS', '1', 'current spatial filter strength', ''),  # noqa
-        '0019xxad': ('DS', '1-n', 'exp LUT NOSUB control points', ''),  # noqa
-        '0019xxae': ('LO', '1-n', 'SUB operator LUTs names', ''),  # noqa
-        '0019xxc4': ('IS', '1', 'Default spatial filter family', ''),  # noqa
-        '0019xxc5': ('FL', '1', 'Preselected pivot rotation speed', ''),  # noqa
-        '0019xxc7': ('CS', '1', 'Patient position per image', ''),  # noqa
-        '0019xxc8': ('CS', '1', '3D structure of interest', ''),  # noqa
-        '0019xxc9': ('CS', '1', '3D calibration out of date flag', ''),  # noqa
-        '0019xxca': ('IS', '1', '3Dspin expected number of frames', ''),  # noqa
-        '0019xxd4': ('FL', '1', 'Detection gain value', ''),  # noqa
-        '0019xxd5': ('FL', '1', 'mR mAs calibration value', ''),  # noqa
-        '0019xxdc': ('LO', '1', 'DRM LUT file name', ''),  # noqa
-        '0019xxdd': ('DS', '1-n', 'DRM Strength', ''),  # noqa
+        '0019xx9A': ('DS', '1-n', 'sensor feedback', ''),  # noqa
+        '0019xx9D': ('CS', '1', 'applicable review mode', ''),  # noqa
+        '0019xx9E': ('DS', '1-n', 'log LUT control points', ''),  # noqa
+        '0019xx9F': ('DS', '1-n', 'exp LUT SUB control points', ''),  # noqa
+        '0019xxA0': ('DS', '1', 'ABD value', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'Sub window center', ''),  # noqa
+        '0019xxA2': ('DS', '1', 'Sub window width', ''),  # noqa
+        '0019xxA4': ('CS', '1', 'Auto injection enabled', ''),  # noqa
+        '0019xxA5': ('CS', '1', 'injection phase', ''),  # noqa
+        '0019xxA6': ('DS', '1', 'injection delay', ''),  # noqa
+        '0019xxA7': ('IS', '1', 'reference injection frame number', ''),  # noqa
+        '0019xxA9': ('DS', '1-n', 'EPT', ''),  # noqa
+        '0019xxAA': ('CS', '1', 'can downscan 512', ''),  # noqa
+        '0019xxAB': ('IS', '1', 'current spatial filter strength', ''),  # noqa
+        '0019xxAD': ('DS', '1-n', 'exp LUT NOSUB control points', ''),  # noqa
+        '0019xxAE': ('LO', '1-n', 'SUB operator LUTs names', ''),  # noqa
+        '0019xxC4': ('IS', '1', 'Default spatial filter family', ''),  # noqa
+        '0019xxC5': ('FL', '1', 'Preselected pivot rotation speed', ''),  # noqa
+        '0019xxC7': ('CS', '1', 'Patient position per image', ''),  # noqa
+        '0019xxC8': ('CS', '1', '3D structure of interest', ''),  # noqa
+        '0019xxC9': ('CS', '1', '3D calibration out of date flag', ''),  # noqa
+        '0019xxCA': ('IS', '1', '3Dspin expected number of frames', ''),  # noqa
+        '0019xxD4': ('FL', '1', 'Detection gain value', ''),  # noqa
+        '0019xxD5': ('FL', '1', 'mR mAs calibration value', ''),  # noqa
+        '0019xxDC': ('LO', '1', 'DRM LUT file name', ''),  # noqa
+        '0019xxDD': ('DS', '1-n', 'DRM Strength', ''),  # noqa
     },
     'GEMS_DL_SERIES_01': {
         '0015xx85': ('LO', '1', 'Series File Name', ''),  # noqa
         '0015xx87': ('IS', '1', 'Number Of Images', ''),  # noqa
-        '0015xx8c': ('CS', '1', 'Sent Flag', ''),  # noqa
-        '0015xx8d': ('US', '1', 'Item Locked', ''),  # noqa
-        '0019xx4c': ('CS', '1', 'internal label', ''),  # noqa
-        '0019xx4d': ('CS', '1', 'browser hide', ''),  # noqa
+        '0015xx8C': ('CS', '1', 'Sent Flag', ''),  # noqa
+        '0015xx8D': ('US', '1', 'Item Locked', ''),  # noqa
+        '0019xx4C': ('CS', '1', 'internal label', ''),  # noqa
+        '0019xx4D': ('CS', '1', 'browser hide', ''),  # noqa
     },
     'GEMS_DL_STUDY_01': {
         '0015xx80': ('DS', '1', 'Study Dose', ''),  # noqa
@@ -2036,10 +2575,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0015xx86': ('IS', '1', 'Last Xa Number', ''),  # noqa
         '0015xx88': ('PN', '1', 'Default Operator Name', ''),  # noqa
         '0015xx89': ('PN', '1', 'Default Performing Physician Name', ''),  # noqa
-        '0015xx8a': ('CS', '1', 'Default Patient Orientation', ''),  # noqa
-        '0015xx8b': ('IS', '1', 'Last Sc Number', ''),  # noqa
-        '0015xx8e': ('UI', '1', 'Common Series Instance Uid', ''),  # noqa
-        '0015xx8f': ('IS', '1', 'Study Number', ''),  # noqa
+        '0015xx8A': ('CS', '1', 'Default Patient Orientation', ''),  # noqa
+        '0015xx8B': ('IS', '1', 'Last Sc Number', ''),  # noqa
+        '0015xx8E': ('UI', '1', 'Common Series Instance Uid', ''),  # noqa
+        '0015xx8F': ('IS', '1', 'Study Number', ''),  # noqa
         '0015xx92': ('FL', '1', 'Study dose Frontal', ''),  # noqa
         '0015xx93': ('FL', '1', 'Study total dap Frontal', ''),  # noqa
         '0015xx94': ('FL', '1', 'Study fluoro dap frontal', ''),  # noqa
@@ -2048,10 +2587,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0015xx97': ('IS', '1', 'Study record time frontal', ''),  # noqa
         '0015xx98': ('FL', '1', 'Study dose lateral', ''),  # noqa
         '0015xx99': ('FL', '1', 'Study total dap lateral', ''),  # noqa
-        '0015xx9a': ('FL', '1', 'Study fluoro dap lateral', ''),  # noqa
-        '0015xx9b': ('IS', '1', 'Study fluoro time lateral', ''),  # noqa
-        '0015xx9c': ('FL', '1', 'Study record dap leteral', ''),  # noqa
-        '0015xx9d': ('IS', '1', 'Study record time lateral', ''),  # noqa
+        '0015xx9A': ('FL', '1', 'Study fluoro dap lateral', ''),  # noqa
+        '0015xx9B': ('IS', '1', 'Study fluoro time lateral', ''),  # noqa
+        '0015xx9C': ('FL', '1', 'Study record dap leteral', ''),  # noqa
+        '0015xx9D': ('IS', '1', 'Study record time lateral', ''),  # noqa
     },
     'GEMS_DRS_1': {
         '0037xx10': ('LO', '1', 'Referring Department', ''),  # noqa
@@ -2066,7 +2605,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0045xx62': ('IS', '1', 'User Window Center', ''),  # noqa
         '0045xx63': ('IS', '1', 'User Window Width', ''),  # noqa
         '0045xx65': ('IS', '1', 'Requested Detector Entrance Dose', ''),  # noqa
-        '0045xx67': ('DS', '3', 'VOI LUT Assymmetry parameter beta', ''),  # noqa
+        '0045xx67': ('DS', '3', 'VOI LUT Asymmetry parameter beta', ''),  # noqa
         '0045xx69': ('IS', '1', 'Collimator rotation', ''),  # noqa
         '0045xx72': ('DS', '1', 'Collimator Width', ''),  # noqa
         '0045xx73': ('DS', '1', 'Collimator Height', ''),  # noqa
@@ -2081,15 +2620,16 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0051xx07': ('LO', '1', 'Functional Image Version', ''),  # noqa
         '0051xx08': ('SL', '1', 'Store Color Ramp', ''),  # noqa
         '0051xx09': ('SL', '1', 'Store Width of Functional Image', ''),  # noqa
-        '0051xx0a': ('SL', '1', 'Store level of Functional Image', ''),  # noqa
-        '0051xx0b': ('FL', '1', 'Store B-Value with Functional Image', ''),  # noqa
-        '0051xx0c': ('LO', '1', 'Analysis Package', ''),  # noqa
+        '0051xx0A': ('SL', '1', 'Store level of Functional Image', ''),  # noqa
+        '0051xx0B': ('FL', '1', 'Store B-Value with Functional Image', ''),  # noqa
+        '0051xx0C': ('LO', '1', 'Analysis Package', ''),  # noqa
+        '0051xx0E': ('UN', '1', 'Unknown', ''),  # noqa
     },
     'GEMS_GDXE_ATHENAV2_INTERNAL_USE': {
-        '7fdfxx10': ('LT', '1', 'PPS Stream', ''),  # noqa
-        '7fdfxx11': ('LT', '1', 'Pixel Data References (temporary)', ''),  # noqa
-        '7fdfxx20': ('SS', '1', 'Auto Push Tag', ''),  # noqa
-        '7fdfxx25': ('CS', '1', 'PPS Status', ''),  # noqa
+        '7FDFxx10': ('LT', '1', 'PPS Stream', ''),  # noqa
+        '7FDFxx11': ('LT', '1', 'Pixel Data References (temporary)', ''),  # noqa
+        '7FDFxx20': ('SS', '1', 'Auto Push Tag', ''),  # noqa
+        '7FDFxx25': ('CS', '1', 'PPS Status', ''),  # noqa
     },
     'GEMS_GDXE_FALCON_04': {
         '0011xx03': ('UI', '1', 'Processed Series UID', ''),  # noqa
@@ -2134,7 +2674,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx10': ('LO', '1', 'Study Name', ''),  # noqa
         '0009xx11': ('SL', '1', 'Study Flags', ''),  # noqa
         '0009xx12': ('SL', '1', 'Study Type', ''),  # noqa
-        '0009xx1e': ('UI', '1', 'Dataset UID', ''),  # noqa
+        '0009xx1E': ('UI', '1', 'Dataset UID', ''),  # noqa
         '0009xx20': ('LO', '1', 'Series Object Name', ''),  # noqa
         '0009xx21': ('SL', '1', 'Series Flags', ''),  # noqa
         '0009xx22': ('SH', '1', 'User Orientation', ''),  # noqa
@@ -2145,12 +2685,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx27': ('SL', '1', 'Number Detectors', ''),  # noqa
         '0009xx28': ('SL', '1', 'Number RR Windows', ''),  # noqa
         '0009xx29': ('SL', '1', 'Number MG Time Slots', ''),  # noqa
-        '0009xx2a': ('SL', '1', 'Number View Sets', ''),  # noqa
-        '0009xx2b': ('LO', '1', 'Trigger History UID', ''),  # noqa
-        '0009xx2c': ('LO', '1', 'Series Comments', ''),  # noqa
-        '0009xx2d': ('SL', '1', 'Track Beat Average', ''),  # noqa
-        '0009xx2e': ('FD', '1', 'Distance Prescribed', ''),  # noqa
-        '0009xx2f': ('SL', '1', 'Table Direction', ''),  # noqa
+        '0009xx2A': ('SL', '1', 'Number View Sets', ''),  # noqa
+        '0009xx2B': ('LO', '1', 'Trigger History UID', ''),  # noqa
+        '0009xx2C': ('LO', '1', 'Series Comments', ''),  # noqa
+        '0009xx2D': ('SL', '1', 'Track Beat Average', ''),  # noqa
+        '0009xx2E': ('FD', '1', 'Distance Prescribed', ''),  # noqa
+        '0009xx2F': ('SL', '1', 'Table Direction', ''),  # noqa
         '0009xx30': ('LO', '1', 'Unknown', ''),  # noqa
         '0009xx33': ('FD', '1', 'Rotational Continuous Speed', ''),  # noqa
         '0009xx34': ('SL', '1', 'Gantry Motion Type (retired)', ''),  # noqa
@@ -2158,17 +2698,17 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx37': ('SL', '1', 'Starting Heart Rate', ''),  # noqa
         '0009xx38': ('SL', '1', 'RR Window Width', ''),  # noqa
         '0009xx39': ('SL', '1', 'RR Window Offset', ''),  # noqa
-        '0009xx3a': ('SL', '1', 'Percent Cycle Imaged', ''),  # noqa
+        '0009xx3A': ('SL', '1', 'Percent Cycle Imaged', ''),  # noqa
         '0009xx40': ('PN', '1', 'Patient Object Name', ''),  # noqa
         '0009xx41': ('SL', '1', 'Patient Flags', ''),  # noqa
         '0009xx42': ('DA', '1', 'Patient Creation Date', ''),  # noqa
         '0009xx43': ('TM', '1', 'Patient Creation Time', ''),  # noqa
         '0009xx44': ('SL', '1', 'Num Views Acquired (retired)', ''),  # noqa
         '0009xx45': ('LT', '1', 'Unknown', ''),  # noqa
-        '0011xx0a': ('SL', '1', 'Series Type', ''),  # noqa
-        '0011xx0b': ('SL', '1', 'Effective Series Duration', ''),  # noqa
-        '0011xx0c': ('SL', '1', 'Num Beats', ''),  # noqa
-        '0011xx0d': ('LO', '1', 'Radio Nuclide Name', ''),  # noqa
+        '0011xx0A': ('SL', '1', 'Series Type', ''),  # noqa
+        '0011xx0B': ('SL', '1', 'Effective Series Duration', ''),  # noqa
+        '0011xx0C': ('SL', '1', 'Num Beats', ''),  # noqa
+        '0011xx0D': ('LO', '1', 'Radio Nuclide Name', ''),  # noqa
         '0011xx10': ('LO', '1', 'Dataset Object Name', ''),  # noqa
         '0011xx11': ('IS', '1', 'Dataset Modified', ''),  # noqa
         '0011xx12': ('LO', '1-n', 'Dataset Name', ''),  # noqa
@@ -2179,12 +2719,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx17': ('SL', '1', 'RR Interval Window Number', ''),  # noqa
         '0011xx18': ('SL', '1', 'MG Bin Number', ''),  # noqa
         '0011xx19': ('FD', '1', 'Radius Of Rotation', ''),  # noqa
-        '0011xx1a': ('SL', '1', 'Detector Count Zone', ''),  # noqa
-        '0011xx1b': ('SL', '1', 'Num Energy Windows', ''),  # noqa
-        '0011xx1c': ('SL', '4', 'Energy Offset', ''),  # noqa
-        '0011xx1d': ('SL', '1', 'Energy Range', ''),  # noqa
-        '0011xx1e': ('SL', '4', 'Energy Width (retired)', ''),  # noqa
-        '0011xx1f': ('SL', '1', 'Image Orientation', ''),  # noqa
+        '0011xx1A': ('SL', '1', 'Detector Count Zone', ''),  # noqa
+        '0011xx1B': ('SL', '1', 'Num Energy Windows', ''),  # noqa
+        '0011xx1C': ('SL', '4', 'Energy Offset', ''),  # noqa
+        '0011xx1D': ('SL', '1', 'Energy Range', ''),  # noqa
+        '0011xx1E': ('SL', '4', 'Energy Width (retired)', ''),  # noqa
+        '0011xx1F': ('SL', '1', 'Image Orientation', ''),  # noqa
         '0011xx21': ('DS', '1', 'Acq Zoom (retired)', ''),  # noqa
         '0011xx22': ('DS', '1', 'Acq Pan (retired)', ''),  # noqa
         '0011xx23': ('SL', '1', 'Use FOV Mask', ''),  # noqa
@@ -2194,11 +2734,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx27': ('SL', '2', 'ROI Top Left', ''),  # noqa
         '0011xx28': ('SL', '2', 'ROI Bottom Right', ''),  # noqa
         '0011xx29': ('SL', '1', 'Uniformity Mean', ''),  # noqa
-        '0011xx2a': ('FD', '1', 'Phase Duration (retired)', ''),  # noqa
-        '0011xx2c': ('FD', '1', 'View X Adjustment', ''),  # noqa
-        '0011xx2d': ('FD', '1', 'View Y Adjustment', ''),  # noqa
-        '0011xx2e': ('SL', '1', 'Pixel Overflow Flag', ''),  # noqa
-        '0011xx2f': ('SL', '1', 'Overflow Level', ''),  # noqa
+        '0011xx2A': ('FD', '1', 'Phase Duration (retired)', ''),  # noqa
+        '0011xx2C': ('FD', '1', 'View X Adjustment', ''),  # noqa
+        '0011xx2D': ('FD', '1', 'View Y Adjustment', ''),  # noqa
+        '0011xx2E': ('SL', '1', 'Pixel Overflow Flag', ''),  # noqa
+        '0011xx2F': ('SL', '1', 'Overflow Level', ''),  # noqa
         '0011xx30': ('LO', '1', 'Picture Object Name', ''),  # noqa
         '0011xx31': ('LO', '1', 'Acquisition Parent UID', ''),  # noqa
         '0011xx32': ('LO', '1', 'Processing Parent UID', ''),  # noqa
@@ -2209,12 +2749,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx37': ('LT', '1', 'Acquisition Specific Correction Name', ''),  # noqa
         '0011xx38': ('SL', '1', 'Byte Order', ''),  # noqa
         '0011xx39': ('SL', '1', 'Compression Type', ''),  # noqa
-        '0011xx3a': ('SL', '1', 'Picture Format', ''),  # noqa
-        '0011xx3b': ('FD', '1', 'Pixel Scale', ''),  # noqa
-        '0011xx3c': ('FD', '1', 'Pixel Offset', ''),  # noqa
-        '0011xx3d': ('SL', '4', 'Energy Peak (retired)', ''),  # noqa
-        '0011xx3e': ('SL', '1', 'FOV Shape', ''),  # noqa
-        '0011xx3f': ('SL', '1', 'Dataset Flags', ''),  # noqa
+        '0011xx3A': ('SL', '1', 'Picture Format', ''),  # noqa
+        '0011xx3B': ('FD', '1', 'Pixel Scale', ''),  # noqa
+        '0011xx3C': ('FD', '1', 'Pixel Offset', ''),  # noqa
+        '0011xx3D': ('SL', '4', 'Energy Peak (retired)', ''),  # noqa
+        '0011xx3E': ('SL', '1', 'FOV Shape', ''),  # noqa
+        '0011xx3F': ('SL', '1', 'Dataset Flags', ''),  # noqa
         '0011xx40': ('LO', '1', 'Viewing Object Name', ''),  # noqa
         '0011xx41': ('SL', '1', 'Orientation Angle', ''),  # noqa
         '0011xx42': ('FD', '1', 'Rotation Angle', ''),  # noqa
@@ -2235,12 +2775,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx67': ('SL', '1', 'Reference Frame Number', ''),  # noqa
         '0011xx68': ('SL', '1', 'Cursor Length', ''),  # noqa
         '0011xx69': ('SL', '1', 'Number of Cursors', ''),  # noqa
-        '0011xx6a': ('SL', '1', 'Cursor Coordinates', ''),  # noqa
-        '0011xx6b': ('SL', '1', 'Recon Options Flag', ''),  # noqa
-        '0011xx6c': ('FD', '1', 'Motion Threshold', ''),  # noqa
-        '0011xx6d': ('UI', '1', 'Motion Curve UID', ''),  # noqa
-        '0011xx6e': ('SL', '1', 'Recon Type', ''),  # noqa
-        '0011xx6f': ('SL', '1', 'Pre Filter Type', ''),  # noqa
+        '0011xx6A': ('SL', '1', 'Cursor Coordinates', ''),  # noqa
+        '0011xx6B': ('SL', '1', 'Recon Options Flag', ''),  # noqa
+        '0011xx6C': ('FD', '1', 'Motion Threshold', ''),  # noqa
+        '0011xx6D': ('UI', '1', 'Motion Curve UID', ''),  # noqa
+        '0011xx6E': ('SL', '1', 'Recon Type', ''),  # noqa
+        '0011xx6F': ('SL', '1', 'Pre Filter Type', ''),  # noqa
         '0011xx71': ('SL', '1', 'Back Proj Filter Type', ''),  # noqa
         '0011xx72': ('SL', '1', 'Recon Arc', ''),  # noqa
         '0011xx73': ('FD', '1', 'Recon Pan AP Offset', ''),  # noqa
@@ -2250,12 +2790,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx77': ('SL', '1', 'Attenuation Type', ''),  # noqa
         '0011xx78': ('SL', '1', 'Dual Energy Processing', ''),  # noqa
         '0011xx79': ('SH', '1', 'Pre Filter Param', ''),  # noqa
-        '0011xx7a': ('SH', '1', 'Pre Filter Param 2', ''),  # noqa
-        '0011xx7b': ('SH', '1', 'Back Proj Filter Param', ''),  # noqa
-        '0011xx7c': ('SH', '1', 'Back Proj Filter Param 2', ''),  # noqa
-        '0011xx7d': ('SH', '1', 'Attenuation Coef', ''),  # noqa
-        '0011xx7e': ('SL', '1', 'Ref Slice Width', ''),  # noqa
-        '0011xx7f': ('FD', '1', 'Ref Trans Pixel Volume', ''),  # noqa
+        '0011xx7A': ('SH', '1', 'Pre Filter Param 2', ''),  # noqa
+        '0011xx7B': ('SH', '1', 'Back Proj Filter Param', ''),  # noqa
+        '0011xx7C': ('SH', '1', 'Back Proj Filter Param 2', ''),  # noqa
+        '0011xx7D': ('SH', '1', 'Attenuation Coef', ''),  # noqa
+        '0011xx7E': ('SL', '1', 'Ref Slice Width', ''),  # noqa
+        '0011xx7F': ('FD', '1', 'Ref Trans Pixel Volume', ''),  # noqa
         '0011xx81': ('SH', '1', 'Attenuation Threshold', ''),  # noqa
         '0011xx82': ('FD', '1', 'Interpolation Distance', ''),  # noqa
         '0011xx83': ('FD', '1', 'Interpolation Center X', ''),  # noqa
@@ -2265,10 +2805,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx87': ('SL', '1', 'Slice Width Pixels', ''),  # noqa
         '0011xx88': ('SL', '1', 'Rfmtr Trans Ref', ''),  # noqa
         '0011xx89': ('FD', '1', 'Rfmtr Trans Ref mm', ''),  # noqa
-        '0011xx8a': ('SL', '1', 'Two Line Trans Ref', ''),  # noqa
-        '0011xx8b': ('SL', '1', 'Three-D Zero', ''),  # noqa
-        '0011xx8c': ('SL', '1', 'Three-D Zero Length', ''),  # noqa
-        '0011xx8d': ('SL', '1', 'Three-D Zero In', ''),  # noqa
+        '0011xx8A': ('SL', '1', 'Two Line Trans Ref', ''),  # noqa
+        '0011xx8B': ('SL', '1', 'Three-D Zero', ''),  # noqa
+        '0011xx8C': ('SL', '1', 'Three-D Zero Length', ''),  # noqa
+        '0011xx8D': ('SL', '1', 'Three-D Zero In', ''),  # noqa
         '0013xx10': ('FD', '2', 'Digital FOV', ''),  # noqa
         '0013xx11': ('SL', '1', 'Source Translator', ''),  # noqa
         '0013xx12': ('UL', '1', 'RAL Flags', ''),  # noqa
@@ -2279,11 +2819,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0013xx17': ('SL', '1', 'AutoTrack Width', ''),  # noqa
         '0013xx18': ('FD', '1', 'Transmission Scan Time', ''),  # noqa
         '0013xx19': ('FD', '1', 'Transmission Mask Width', ''),  # noqa
-        '0013xx1a': ('FD', '1', 'Copper Attenuator Thickness', ''),  # noqa
-        '0013xx1b': ('FD', '1', 'Det Ang Separation', ''),  # noqa
-        '0013xx1c': ('SL', '1', 'Axial Acceptance Angle', ''),  # noqa
-        '0013xx1d': ('SL', '1', 'Theta Acceptance Value', ''),  # noqa
-        '0013xx1e': ('FD', '1-n', 'Tomo View Offset', ''),  # noqa
+        '0013xx1A': ('FD', '1', 'Copper Attenuator Thickness', ''),  # noqa
+        '0013xx1B': ('FD', '1', 'Det Ang Separation', ''),  # noqa
+        '0013xx1C': ('SL', '1', 'Axial Acceptance Angle', ''),  # noqa
+        '0013xx1D': ('SL', '1', 'Theta Acceptance Value', ''),  # noqa
+        '0013xx1E': ('FD', '1-n', 'Tomo View Offset', ''),  # noqa
         '0013xx20': ('FD', '1', 'Accepted Beats Time', ''),  # noqa
         '0013xx21': ('FD', '2', 'Threshold', ''),  # noqa
         '0013xx22': ('FD', '2', 'Linear Depth', ''),  # noqa
@@ -2299,7 +2839,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0015xx15': ('SL', '1', 'WB Scan Num', ''),  # noqa
         '0015xx16': ('SL', '1', 'Comb Head Number', ''),  # noqa
         '0015xx17': ('UL', '1', 'Preceding Beat', ''),  # noqa
-        '0019xx5f': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019xx5F': ('SQ', '1', 'Unknown', ''),  # noqa
         '0033xx07': ('SQ', '1-n', 'Orig SOP Instance UID', ''),  # noqa
         '0033xx08': ('CS', '1', 'Xeleris Data Object Type', ''),  # noqa
         '0033xx10': ('SL', '1', 'Modified', ''),  # noqa
@@ -2308,12 +2848,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0033xx17': ('SH', '1', 'Date', ''),  # noqa
         '0033xx18': ('SH', '1', 'Time', ''),  # noqa
         '0033xx19': ('UL', '1', 'ProtocoldataFlags', ''),  # noqa
-        '0033xx1a': ('UL', '1', 'ProtocolName', ''),  # noqa
-        '0033xx1b': ('LO', '1', 'RelevantDataUID', ''),  # noqa
-        '0033xx1c': ('LO', '1', 'BulkData', ''),  # noqa
-        '0033xx1d': ('SL', '1-n', 'IntData', ''),  # noqa
-        '0033xx1e': ('FD', '1-n', 'DoubleData', ''),  # noqa
-        '0033xx1f': ('OB', '1', 'StringData', ''),  # noqa
+        '0033xx1A': ('UL', '1', 'ProtocolName', ''),  # noqa
+        '0033xx1B': ('LO', '1', 'RelevantDataUID', ''),  # noqa
+        '0033xx1C': ('LO', '1', 'BulkData', ''),  # noqa
+        '0033xx1D': ('SL', '1-n', 'IntData', ''),  # noqa
+        '0033xx1E': ('FD', '1-n', 'DoubleData', ''),  # noqa
+        '0033xx1F': ('OB', '1', 'StringData', ''),  # noqa
         '0033xx20': ('LT', '1-n', 'BulkDataFormat', ''),  # noqa
         '0033xx21': ('LT', '1-n', 'IntDataFormat', ''),  # noqa
         '0033xx22': ('LT', '1-n', 'DoubleDataFormat', ''),  # noqa
@@ -2342,12 +2882,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx07': ('SL', '1', 'CurveType', ''),  # noqa
         '5001xx08': ('SL', '1', 'GraphType', ''),  # noqa
         '5001xx09': ('LO', '1', 'Legend', ''),  # noqa
-        '5001xx0a': ('LO', '1', 'XUnits', ''),  # noqa
-        '5001xx0b': ('LO', '1', 'YUnits', ''),  # noqa
-        '5001xx0c': ('SL', '1', 'Edit', ''),  # noqa
-        '5001xx0d': ('SL', '1', 'Suspend', ''),  # noqa
-        '5001xx0e': ('SL', '1', 'StyleLine', ''),  # noqa
-        '5001xx0f': ('SL', '1', 'StyleFill', ''),  # noqa
+        '5001xx0A': ('LO', '1', 'XUnits', ''),  # noqa
+        '5001xx0B': ('LO', '1', 'YUnits', ''),  # noqa
+        '5001xx0C': ('SL', '1', 'Edit', ''),  # noqa
+        '5001xx0D': ('SL', '1', 'Suspend', ''),  # noqa
+        '5001xx0E': ('SL', '1', 'StyleLine', ''),  # noqa
+        '5001xx0F': ('SL', '1', 'StyleFill', ''),  # noqa
         '5001xx10': ('LO', '1', 'StyleColour', ''),  # noqa
         '5001xx11': ('SL', '1', 'StyleWidth', ''),  # noqa
         '5001xx12': ('SL', '1', 'StylePoint', ''),  # noqa
@@ -2358,12 +2898,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx17': ('FD', '1-n', 'SegStart', ''),  # noqa
         '5001xx18': ('FD', '1-n', 'SegEnd', ''),  # noqa
         '5001xx19': ('SL', '1-n', 'SegStyleLine', ''),  # noqa
-        '5001xx1a': ('SL', '1-n', 'SegStyleFill', ''),  # noqa
-        '5001xx1b': ('LO', '1', 'SegStyleColour', ''),  # noqa
-        '5001xx1c': ('SL', '1-n', 'SegStyleWidth', ''),  # noqa
-        '5001xx1d': ('SL', '1-n', 'SegStylePoint', ''),  # noqa
-        '5001xx1e': ('SL', '1', 'SegStylePColour', ''),  # noqa
-        '5001xx1f': ('SL', '1', 'SegStylePSize', ''),  # noqa
+        '5001xx1A': ('SL', '1-n', 'SegStyleFill', ''),  # noqa
+        '5001xx1B': ('LO', '1', 'SegStyleColour', ''),  # noqa
+        '5001xx1C': ('SL', '1-n', 'SegStyleWidth', ''),  # noqa
+        '5001xx1D': ('SL', '1-n', 'SegStylePoint', ''),  # noqa
+        '5001xx1E': ('SL', '1', 'SegStylePColour', ''),  # noqa
+        '5001xx1F': ('SL', '1', 'SegStylePSize', ''),  # noqa
         '5001xx20': ('LO', '1', 'SegName', ''),  # noqa
         '5001xx21': ('SL', '1-n', 'SegAllowDirInt', ''),  # noqa
         '5001xx22': ('SL', '1', 'TextAnnots', ''),  # noqa
@@ -2381,10 +2921,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx37': ('FD', '1', 'ROIArea', ''),  # noqa
         '5001xx38': ('SL', '1', 'Modified', ''),  # noqa
         '5001xx39': ('LO', '1', 'Name', ''),  # noqa
-        '5001xx3a': ('LO', '1', 'Software version', ''),  # noqa
-        '5001xx3b': ('SH', '1', 'StartDate', ''),  # noqa
-        '5001xx3c': ('SH', '1', 'CompletionDate', ''),  # noqa
-        '5001xx3d': ('LO', '1', 'DetectorName', ''),  # noqa
+        '5001xx3A': ('LO', '1', 'Software version', ''),  # noqa
+        '5001xx3B': ('SH', '1', 'StartDate', ''),  # noqa
+        '5001xx3C': ('SH', '1', 'CompletionDate', ''),  # noqa
+        '5001xx3D': ('LO', '1', 'DetectorName', ''),  # noqa
         '5001xx41': ('SL', '1', 'Modified', ''),  # noqa
         '5001xx42': ('LO', '1', 'Name', ''),  # noqa
         '5001xx43': ('SL', '1', 'Name', ''),  # noqa
@@ -2394,12 +2934,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx47': ('LO', '1', 'NormalColor', ''),  # noqa
         '5001xx48': ('LT', '1', 'NameFont', ''),  # noqa
         '5001xx49': ('SL', '1', 'FillPattern', ''),  # noqa
-        '5001xx4a': ('SL', '1', 'LineStyle', ''),  # noqa
-        '5001xx4b': ('SL', '1', 'LineDashLength', ''),  # noqa
-        '5001xx4c': ('SL', '1', 'LineThickness', ''),  # noqa
-        '5001xx4d': ('SL', '1', 'Interactivity', ''),  # noqa
-        '5001xx4e': ('SL', '1', 'NamePos', ''),  # noqa
-        '5001xx4f': ('SL', '1', 'NameDisplay', ''),  # noqa
+        '5001xx4A': ('SL', '1', 'LineStyle', ''),  # noqa
+        '5001xx4B': ('SL', '1', 'LineDashLength', ''),  # noqa
+        '5001xx4C': ('SL', '1', 'LineThickness', ''),  # noqa
+        '5001xx4D': ('SL', '1', 'Interactivity', ''),  # noqa
+        '5001xx4E': ('SL', '1', 'NamePos', ''),  # noqa
+        '5001xx4F': ('SL', '1', 'NameDisplay', ''),  # noqa
         '5001xx50': ('LO', '1', 'Label', ''),  # noqa
         '5001xx51': ('SL', '1-n', 'BpSeg', ''),  # noqa
         '5001xx52': ('US', '1-n', 'BpSegPairs', ''),  # noqa
@@ -2408,12 +2948,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx55': ('SL', '1-n', 'Shape', ''),  # noqa
         '5001xx56': ('FD', '1-n', 'ShapeTilt', ''),  # noqa
         '5001xx59': ('SL', '1-n', 'ShapePtsSpace', ''),  # noqa
-        '5001xx5a': ('SL', '1-n', 'ShapeCtrlPtsCounts', ''),  # noqa
-        '5001xx5b': ('FD', '1-n', 'ShapeCtrlPts', ''),  # noqa
-        '5001xx5c': ('SL', '1', 'ShapeCPSpace', ''),  # noqa
-        '5001xx5d': ('SL', '1', 'ROIFlags', ''),  # noqa
-        '5001xx5e': ('SL', '1', 'FrameNumber', ''),  # noqa
-        '5001xx5f': ('SL', '1', 'Id', ''),  # noqa
+        '5001xx5A': ('SL', '1-n', 'ShapeCtrlPtsCounts', ''),  # noqa
+        '5001xx5B': ('FD', '1-n', 'ShapeCtrlPts', ''),  # noqa
+        '5001xx5C': ('SL', '1', 'ShapeCPSpace', ''),  # noqa
+        '5001xx5D': ('SL', '1', 'ROIFlags', ''),  # noqa
+        '5001xx5E': ('SL', '1', 'FrameNumber', ''),  # noqa
+        '5001xx5F': ('SL', '1', 'Id', ''),  # noqa
         '5001xx60': ('LO', '1-n', 'DatasetROIMapping', ''),  # noqa
     },
     'GEMS_GNHD_01': {
@@ -2430,12 +2970,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0045xx07': ('FL', '1', 'Z smoothing Factor', ''),  # noqa
         '0045xx08': ('SS', '1', 'View Weighting Mode', ''),  # noqa
         '0045xx09': ('SS', '1', 'Sigma Row number', ''),  # noqa
-        '0045xx0a': ('FL', '1', 'Minimum DAS value', ''),  # noqa
-        '0045xx0b': ('FL', '1', 'Maximum Offset Value', ''),  # noqa
-        '0045xx0c': ('SS', '1', 'Number of Views shifted', ''),  # noqa
-        '0045xx0d': ('SS', '1', 'Z tracking Flag', ''),  # noqa
-        '0045xx0e': ('FL', '1', 'Mean Z error', ''),  # noqa
-        '0045xx0f': ('FL', '1', 'Z tracking Error', ''),  # noqa
+        '0045xx0A': ('FL', '1', 'Minimum DAS value', ''),  # noqa
+        '0045xx0B': ('FL', '1', 'Maximum Offset Value', ''),  # noqa
+        '0045xx0C': ('SS', '1', 'Number of Views shifted', ''),  # noqa
+        '0045xx0D': ('SS', '1', 'Z tracking Flag', ''),  # noqa
+        '0045xx0E': ('FL', '1', 'Mean Z error', ''),  # noqa
+        '0045xx0F': ('FL', '1', 'Z tracking Error', ''),  # noqa
         '0045xx10': ('SS', '1', 'Start View 2A', ''),  # noqa
         '0045xx11': ('SS', '1', 'Number of Views 2A', ''),  # noqa
         '0045xx12': ('SS', '1', 'Start View 1A', ''),  # noqa
@@ -2446,30 +2986,39 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0045xx17': ('SS', '1', 'Start View 1B', ''),  # noqa
         '0045xx18': ('SS', '1', 'Number of Views 1B', ''),  # noqa
         '0045xx19': ('SS', '1', 'Air Calibration Date', ''),  # noqa
-        '0045xx1a': ('SS', '1', 'Air Calibration Time', ''),  # noqa
-        '0045xx1b': ('SS', '1', 'Phantom Calibration Date', ''),  # noqa
-        '0045xx1c': ('SS', '1', 'Phantom Calibration Time', ''),  # noqa
-        '0045xx1d': ('SS', '1', 'Z Slope Calibration Date', ''),  # noqa
-        '0045xx1e': ('SS', '1', 'Z Slope Calibration Time', ''),  # noqa
-        '0045xx1f': ('SS', '1', 'Cross Talk Calibration Date', ''),  # noqa
+        '0045xx1A': ('SS', '1', 'Air Calibration Time', ''),  # noqa
+        '0045xx1B': ('SS', '1', 'Phantom Calibration Date', ''),  # noqa
+        '0045xx1C': ('SS', '1', 'Phantom Calibration Time', ''),  # noqa
+        '0045xx1D': ('SS', '1', 'Z Slope Calibration Date', ''),  # noqa
+        '0045xx1E': ('SS', '1', 'Z Slope Calibration Time', ''),  # noqa
+        '0045xx1F': ('SS', '1', 'Cross Talk Calibration Date', ''),  # noqa
         '0045xx20': ('SS', '1', 'Cross Talk Calibration Time', ''),  # noqa
         '0045xx21': ('SS', '1', 'Iterbone Flag', ''),  # noqa
-        '0045xx22': ('SS', '1', 'Perisstaltic Flag', ''),  # noqa
+        '0045xx22': ('SS', '1', 'Peristaltic Flag', ''),  # noqa
         '0045xx30': ('CS', '1', 'CardiacReconAlgorithm', ''),  # noqa
         '0045xx31': ('CS', '1', 'AvgHeartRateForImage', ''),  # noqa
-        '0045xx32': ('FL', '1', 'TemporalResolution', ''),  # noqa
+        '0045xx32': ('FL', '1', 'Temporal Resolution', ''),  # noqa
         '0045xx33': ('CS', '1', 'PctRpeakDelay', ''),  # noqa
         '0045xx34': ('CS', '1', 'ActualPctRpeakDelay', ''),  # noqa
         '0045xx36': ('CS', '1', 'EkgFullMaStartPhase', ''),  # noqa
         '0045xx37': ('CS', '1', 'EkgFullMaEndPhase', ''),  # noqa
         '0045xx38': ('CS', '1', 'EkgModulationMaxMa', ''),  # noqa
         '0045xx39': ('CS', '1', 'EkgModulationMinMa', ''),  # noqa
-        '0045xx3b': ('LO', '1', 'NoiseReductionImageFilterDesc', ''),  # noqa
+        '0045xx3B': ('LO', '1', 'Noise Reduction Image Filter Description', ''),  # noqa
+        '0045xx3F': ('IS', '1', 'RPeakTimeDelay', ''),  # noqa
+        '0045xx44': ('IS', '1', 'ActualRPeakTimeDelay', ''),  # noqa
+        '0045xx45': ('ST', '1', 'CardiacScanOptions', ''),  # noqa
+        '0045xx50': ('FD', '1', 'Temporal Center View Angle', ''),  # noqa
+        '0045xx51': ('FD', '1', 'Recon Center View Angle', ''),  # noqa
+        '0045xx52': ('CS', '1', 'WideCone Masking', ''),  # noqa
+        '0045xx53': ('FD', '1', 'WideCone Corner Blending Radius', ''),  # noqa
+        '0045xx54': ('FD', '1', 'WideCone Corner Blending Radius Offset', ''),  # noqa
+        '0045xx55': ('CS', '1', 'Internal Recon Algorithm', ''),  # noqa
     },
     'GEMS_HINO_CT_01': {
-        '004bxx01': ('DS', '1-n', 'Beam Thickness', ''),  # noqa
-        '004bxx02': ('DS', '1-n', 'R Time', ''),  # noqa
-        '004bxx03': ('IS', '1', 'HBC number', ''),  # noqa
+        '004Bxx01': ('DS', '1-n', 'Beam Thickness', ''),  # noqa
+        '004Bxx02': ('DS', '1-n', 'R Time', ''),  # noqa
+        '004Bxx03': ('IS', '1', 'HBC number', ''),  # noqa
     },
     'GEMS_IDEN_01': {
         '000910xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
@@ -2477,27 +3026,27 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx02': ('SH', '1', 'Suite id', ''),  # noqa
         '0009xx04': ('SH', '1', 'Product id', ''),  # noqa
         '0009xx17': ('LT', '1', 'Series Description', ''),  # noqa
-        '0009xx1a': ('US', '1', 'Unknown', ''),  # noqa
+        '0009xx1A': ('US', '1', 'Unknown', ''),  # noqa
         '0009xx20': ('US', '1', 'Unknown', ''),  # noqa
         '0009xx27': ('SL', '1', 'Image actual date', ''),  # noqa
-        '0009xx2f': ('SH', '1', 'Unknown', ''),  # noqa
+        '0009xx2F': ('SH', '1', 'Unknown', ''),  # noqa
         '0009xx30': ('SH', '1', 'Service id', ''),  # noqa
         '0009xx31': ('SH', '1', 'Mobile location number', ''),  # noqa
-        '0009xxe2': ('LT', '1-n', 'Image Type (ORIGINAL\\PROSPECTIVE ...)', ''),  # noqa
-        '0009xxe3': ('UI', '1', 'Equipment UID', ''),  # noqa
-        '0009xxe6': ('SH', '1', 'Genesis Version - now', ''),  # noqa
-        '0009xxe7': ('UL', '1', 'Exam Record checksum', ''),  # noqa
-        '0009xxe8': ('SH', '1', 'Series Suite Id', ''),  # noqa
-        '0009xxe9': ('SL', '1', 'Actual series data time stamp', ''),  # noqa
+        '0009xxE2': ('LT', '1-n', 'Image Type (ORIGINAL\\PROSPECTIVE ...)', ''),  # noqa
+        '0009xxE3': ('UI', '1', 'Equipment UID', ''),  # noqa
+        '0009xxE6': ('SH', '1', 'Genesis Version - now', ''),  # noqa
+        '0009xxE7': ('UL', '1', 'Exam Record checksum', ''),  # noqa
+        '0009xxE8': ('SH', '1', 'Series Suite Id', ''),  # noqa
+        '0009xxE9': ('SL', '1', 'Actual series data time stamp', ''),  # noqa
     },
     'GEMS_IMAG_01': {
         '002710xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
         '0027xx06': ('SL', '1', 'Image archive flag', ''),  # noqa
         '0027xx10': ('SS', '1', 'Scout Type', ''),  # noqa
-        '0027xx1c': ('SL', '1', 'Vma mamp', ''),  # noqa
-        '0027xx1d': ('SS', '1', 'Vma phase', ''),  # noqa
-        '0027xx1e': ('SL', '1', 'Vma mod', ''),  # noqa
-        '0027xx1f': ('SL', '1', 'Vma clip', ''),  # noqa
+        '0027xx1C': ('SL', '1', 'Vma mamp', ''),  # noqa
+        '0027xx1D': ('SS', '1', 'Vma phase', ''),  # noqa
+        '0027xx1E': ('SL', '1', 'Vma mod', ''),  # noqa
+        '0027xx1F': ('SL', '1', 'Vma clip', ''),  # noqa
         '0027xx20': ('SS', '1', 'Smart scan ON/OFF flag', ''),  # noqa
         '0027xx30': ('SH', '1', 'Foreign Image Revision', ''),  # noqa
         '0027xx31': ('SS', '1', 'Imaging Mode', ''),  # noqa
@@ -2515,10 +3064,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0027xx47': ('FL', '1', 'Normal S coord', ''),  # noqa
         '0027xx48': ('FL', '1', 'R Coord of Top Right Corner', ''),  # noqa
         '0027xx49': ('FL', '1', 'A Coord of Top Right Corner', ''),  # noqa
-        '0027xx4a': ('FL', '1', 'S Coord of Top Right Corner', ''),  # noqa
-        '0027xx4b': ('FL', '1', 'R Coord of Bottom Right Corner', ''),  # noqa
-        '0027xx4c': ('FL', '1', 'A Coord of Bottom Right Corner', ''),  # noqa
-        '0027xx4d': ('FL', '1', 'S Coord of Bottom Right Corner', ''),  # noqa
+        '0027xx4A': ('FL', '1', 'S Coord of Top Right Corner', ''),  # noqa
+        '0027xx4B': ('FL', '1', 'R Coord of Bottom Right Corner', ''),  # noqa
+        '0027xx4C': ('FL', '1', 'A Coord of Bottom Right Corner', ''),  # noqa
+        '0027xx4D': ('FL', '1', 'S Coord of Bottom Right Corner', ''),  # noqa
         '0027xx50': ('FL', '1', 'Scan Start Location', ''),  # noqa
         '0027xx51': ('FL', '1', 'Scan End Location', ''),  # noqa
         '0027xx52': ('SH', '1', 'RAS letter for side of image', ''),  # noqa
@@ -2532,7 +3081,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx16': ('SL', '1', 'Lower range of Pixels1', ''),  # noqa
         '0029xx17': ('SL', '1', 'Lower range of Pixels2', ''),  # noqa
         '0029xx18': ('SL', '1', 'Upper range of Pixels2', ''),  # noqa
-        '0029xx1a': ('SL', '1', 'Len of tot hdr in bytes No longer supported', ''),  # noqa
+        '0029xx1A': ('SL', '1', 'Len of tot hdr in bytes No longer supported', ''),  # noqa
         '0029xx26': ('SS', '1', 'Version of the hdr struct', ''),  # noqa
         '0029xx34': ('SL', '1', 'Advantage comp. Overflow', ''),  # noqa
         '0029xx35': ('SL', '1', 'Advantage comp. Underflow', ''),  # noqa
@@ -2545,12 +3094,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx07': ('SL', '1', 'Lower range of Pixels1', ''),  # noqa
         '0029xx08': ('SH', '1', 'Lower range of Pixels1', ''),  # noqa
         '0029xx09': ('SH', '1', 'Lower range of Pixels1', ''),  # noqa
-        '0029xx0a': ('SS', '1', 'Lower range of Pixels1', ''),  # noqa
+        '0029xx0A': ('SS', '1', 'Lower range of Pixels1', ''),  # noqa
         '0029xx15': ('SL', '1', 'Lower range of Pixels1', ''),  # noqa
         '0029xx16': ('SL', '1', 'Upper range of Pixels1', ''),  # noqa
         '0029xx17': ('SL', '1', 'Lower range of Pixels2', ''),  # noqa
         '0029xx18': ('SL', '1', 'Upper range of Pixels2', ''),  # noqa
-        '0029xx1a': ('SL', '1', 'Len of tot hdr in bytes', ''),  # noqa
+        '0029xx1A': ('SL', '1', 'Len of tot hdr in bytes', ''),  # noqa
         '0029xx26': ('SS', '1', 'Version of the hdr struct', ''),  # noqa
         '0029xx34': ('SL', '1', 'Advantage comp. Overflow', ''),  # noqa
         '0029xx35': ('SL', '1', 'Advantage comp. Underflow', ''),  # noqa
@@ -2583,8 +3132,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7001xx07': ('OB', '1', 'rdb_hdr_tool', ''),  # noqa
         '7001xx08': ('OB', '1', 'rdb_raw_data', ''),  # noqa
         '7001xx09': ('OB', '1', 'SSP save', ''),  # noqa
-        '7001xx0a': ('OB', '1', 'UDA save', ''),  # noqa
-        '7001xx0b': ('OB', '1', 'rdb_chemsat_data', ''),  # noqa
+        '7001xx0A': ('OB', '1', 'UDA save', ''),  # noqa
+        '7001xx0B': ('OB', '1', 'rdb_chemsat_data', ''),  # noqa
     },
     'GEMS_PARM_01': {
         '004310xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
@@ -2597,12 +3146,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx07': ('SS', '1', 'Views per segment', ''),  # noqa
         '0043xx08': ('SS', '1', 'Respiratory rate, bpm', ''),  # noqa
         '0043xx09': ('SS', '1', 'Respiratory trigger point', ''),  # noqa
-        '0043xx0a': ('SS', '1', 'Type of receiver used', ''),  # noqa
-        '0043xx0b': ('DS', '1', 'DB/dt Peak rate of change of gradient field', ''),  # noqa
-        '0043xx0c': ('DS', '1', 'dB/dt Limits in units of percent', ''),  # noqa
-        '0043xx0d': ('DS', '1', 'PSD estimated limit', ''),  # noqa
-        '0043xx0e': ('DS', '1', 'PSD estimated limit in tesla per second', ''),  # noqa
-        '0043xx0f': ('DS', '1', 'Saravghead', ''),  # noqa
+        '0043xx0A': ('SS', '1', 'Type of receiver used', ''),  # noqa
+        '0043xx0B': ('DS', '1', 'DB/dt Peak rate of change of gradient field', ''),  # noqa
+        '0043xx0C': ('DS', '1', 'dB/dt Limits in units of percent', ''),  # noqa
+        '0043xx0D': ('DS', '1', 'PSD estimated limit', ''),  # noqa
+        '0043xx0E': ('DS', '1', 'PSD estimated limit in tesla per second', ''),  # noqa
+        '0043xx0F': ('DS', '1', 'Saravghead', ''),  # noqa
         '0043xx10': ('US', '1', 'Window value', ''),  # noqa
         '0043xx11': ('US', '1', 'Total input views', ''),  # noqa
         '0043xx12': ('SS', '3', 'X-ray chain', ''),  # noqa
@@ -2613,12 +3162,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx17': ('DS', '1', 'IBH image scale factors', ''),  # noqa
         '0043xx18': ('DS', '3', 'BBH coefficients', ''),  # noqa
         '0043xx19': ('SS', '1', 'Number of BBH chains to blend', ''),  # noqa
-        '0043xx1a': ('SL', '1', 'Starting channel number', ''),  # noqa
-        '0043xx1b': ('SS', '1', 'Ppscan parameters', ''),  # noqa
-        '0043xx1c': ('SS', '1', 'GE image integrity', ''),  # noqa
-        '0043xx1d': ('SS', '1', 'Level value', ''),  # noqa
-        '0043xx1e': ('DS', '1', 'Delta Start Time [msec]', ''),  # noqa
-        '0043xx1f': ('SL', '1', 'Max overranges in a view', ''),  # noqa
+        '0043xx1A': ('SL', '1', 'Starting channel number', ''),  # noqa
+        '0043xx1B': ('SS', '1', 'Ppscan parameters', ''),  # noqa
+        '0043xx1C': ('SS', '1', 'GE image integrity', ''),  # noqa
+        '0043xx1D': ('SS', '1', 'Level value', ''),  # noqa
+        '0043xx1E': ('DS', '1', 'Delta Start Time [msec]', ''),  # noqa
+        '0043xx1F': ('SL', '1', 'Max overranges in a view', ''),  # noqa
         '0043xx20': ('DS', '1', 'Avg overranges all views', ''),  # noqa
         '0043xx21': ('SS', '1', 'Corrected after glow terms', ''),  # noqa
         '0043xx25': ('SS', '6', 'Reference channels', ''),  # noqa
@@ -2626,12 +3175,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx27': ('SH', '1', 'Scan Pitch Ratio', ''),  # noqa
         '0043xx28': ('OB', '1', 'Unique image iden', ''),  # noqa
         '0043xx29': ('OB', '1', 'Histogram tables', ''),  # noqa
-        '0043xx2a': ('OB', '1', 'User defined data', ''),  # noqa
-        '0043xx2b': ('SS', '4', 'Private Scan Options', ''),  # noqa
-        '0043xx2c': ('SS', '1', 'Effective echo spacing', ''),  # noqa
-        '0043xx2d': ('SH', '1', 'Filter Mode (String slop field 1 in legacy GE MR', ''),  # noqa
-        '0043xx2e': ('SH', '1', 'String slop field 2', ''),  # noqa
-        '0043xx2f': ('SS', '1', 'Image Type (real, imaginary, phase, magnitude)', ''),  # noqa
+        '0043xx2A': ('OB', '1', 'User defined data', ''),  # noqa
+        '0043xx2B': ('SS', '4', 'Private Scan Options', ''),  # noqa
+        '0043xx2C': ('SS', '1', 'Effective echo spacing', ''),  # noqa
+        '0043xx2D': ('SH', '1', 'Filter Mode (String slop field 1 in legacy GE MR', ''),  # noqa
+        '0043xx2E': ('SH', '1', 'String slop field 2', ''),  # noqa
+        '0043xx2F': ('SS', '1', 'Image Type (real, imaginary, phase, magnitude)', ''),  # noqa
         '0043xx30': ('SS', '1', 'Vas collapse flag', ''),  # noqa
         '0043xx31': ('DS', '2', 'Recon Center Coordinates', ''),  # noqa
         '0043xx32': ('SS', '1', 'Vas flags', ''),  # noqa
@@ -2652,11 +3201,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx47': ('SL', '4', 'DAS cal frequency', ''),  # noqa
         '0043xx48': ('SL', '4', 'DAS reg xm', ''),  # noqa
         '0043xx49': ('SL', '4', 'DAS auto zero', ''),  # noqa
-        '0043xx4a': ('SS', '4', 'Starting channel of view', ''),  # noqa
-        '0043xx4b': ('SL', '4', 'DAS xm pattern', ''),  # noqa
-        '0043xx4c': ('SS', '4', 'TGGC trigger mode', ''),  # noqa
-        '0043xx4d': ('FL', '4', 'Start scan to X-ray on delay', ''),  # noqa
-        '0043xx4e': ('FL', '4', 'Duration of X-ray on', ''),  # noqa
+        '0043xx4A': ('SS', '4', 'Starting channel of view', ''),  # noqa
+        '0043xx4B': ('SL', '4', 'DAS xm pattern', ''),  # noqa
+        '0043xx4C': ('SS', '4', 'TGGC trigger mode', ''),  # noqa
+        '0043xx4D': ('FL', '4', 'Start scan to X-ray on delay', ''),  # noqa
+        '0043xx4E': ('FL', '4', 'Duration of X-ray on', ''),  # noqa
         '0043xx60': ('IS', '8', 'Slop_int_10...slop_int_17', ''),  # noqa
         '0043xx61': ('UI', '1', 'Scanner Study Entity UID', ''),  # noqa
         '0043xx62': ('SH', '1', 'Scanner Study ID', ''),  # noqa
@@ -2667,12 +3216,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx67': ('US', '1', 'IBO Correction Indicator', ''),  # noqa
         '0043xx68': ('US', '1', 'XT Correction Indicator', ''),  # noqa
         '0043xx69': ('US', '1', 'Q-cal Correction Indicator', ''),  # noqa
-        '0043xx6a': ('US', '1', 'AV Correction Indicator', ''),  # noqa
-        '0043xx6b': ('US', '1', 'L-MDK Correction Indicator', ''),  # noqa
-        '0043xx6c': ('IS', '1', 'Detector Row', ''),  # noqa
-        '0043xx6d': ('IS', '1', 'Area Size', ''),  # noqa
-        '0043xx6e': ('SH', '1', 'Auto mA Mode', ''),  # noqa
-        '0043xx6f': ('DS', '3-4', 'Scanner Table Entry (single gradient coil systems only)/Scanner Table Entry + Gradient Coil Selected', ''),  # noqa
+        '0043xx6A': ('US', '1', 'AV Correction Indicator', ''),  # noqa
+        '0043xx6B': ('US', '1', 'L-MDK Correction Indicator', ''),  # noqa
+        '0043xx6C': ('IS', '1', 'Detector Row', ''),  # noqa
+        '0043xx6D': ('IS', '1', 'Area Size', ''),  # noqa
+        '0043xx6E': ('SH', '1', 'Auto mA Mode', ''),  # noqa
+        '0043xx6F': ('DS', '3-4', 'Scanner Table Entry (single gradient coil systems only)/Scanner Table Entry + Gradient Coil Selected', ''),  # noqa
         '0043xx70': ('LO', '1', 'Paradigm Name', ''),  # noqa
         '0043xx71': ('ST', '1', 'Paradigm Description', ''),  # noqa
         '0043xx72': ('UI', '1', 'Paradigm UID', ''),  # noqa
@@ -2683,12 +3232,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx77': ('SH', '1', 'Application Name', ''),  # noqa
         '0043xx78': ('SH', '1', 'Application Version', ''),  # noqa
         '0043xx79': ('US', '1', 'Slices Per Volume', ''),  # noqa
-        '0043xx7a': ('US', '1', 'Expected Time Points', ''),  # noqa
-        '0043xx7b': ('FL', '1-n', 'Regressor Values', ''),  # noqa
-        '0043xx7c': ('FL', '1', 'Delay after slice group', ''),  # noqa
-        '0043xx7d': ('US', '1', 'Recon mode flag word', ''),  # noqa
-        '0043xx7e': ('LO', '1-n', 'PACC specific information', ''),  # noqa
-        '0043xx7f': ('DS', '1-n', 'Reserved', ''),  # noqa
+        '0043xx7A': ('US', '1', 'Expected Time Points', ''),  # noqa
+        '0043xx7B': ('FL', '1-n', 'Regressor Values', ''),  # noqa
+        '0043xx7C': ('FL', '1', 'Delay after slice group', ''),  # noqa
+        '0043xx7D': ('US', '1', 'Recon mode flag word', ''),  # noqa
+        '0043xx7E': ('LO', '1-n', 'PACC specific information', ''),  # noqa
+        '0043xx7F': ('DS', '1-n', 'Reserved', ''),  # noqa
         '0043xx80': ('LO', '1-n', 'Coil ID Data', ''),  # noqa
         '0043xx81': ('LO', '1', 'GE Coil Name', ''),  # noqa
         '0043xx82': ('LO', '1-n', 'System Configuration Information', ''),  # noqa
@@ -2699,12 +3248,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx87': ('UT', '1', 'Reserved', ''),  # noqa
         '0043xx88': ('UI', '1', 'PURE Acquisition Calibration Series UID', ''),  # noqa
         '0043xx89': ('LO', '3', 'Governing Body, dB/dt, and SAR definition', ''),  # noqa
-        '0043xx8a': ('CS', '1', 'Private In-Plane Phase Encoding Direction', ''),  # noqa
-        '0043xx8b': ('OB', '1', 'FMRI Binary Data Block', ''),  # noqa
-        '0043xx8c': ('DS', '6', 'Voxel Location', ''),  # noqa
-        '0043xx8d': ('DS', '7-7n', 'SAT Band Locations', ''),  # noqa
-        '0043xx8e': ('DS', '3', 'Spectro Prescan Values', ''),  # noqa
-        '0043xx8f': ('DS', '3', 'Spectro Parameters', ''),  # noqa
+        '0043xx8A': ('CS', '1', 'Private In-Plane Phase Encoding Direction', ''),  # noqa
+        '0043xx8B': ('OB', '1', 'FMRI Binary Data Block', ''),  # noqa
+        '0043xx8C': ('DS', '6', 'Voxel Location', ''),  # noqa
+        '0043xx8D': ('DS', '7-7n', 'SAT Band Locations', ''),  # noqa
+        '0043xx8E': ('DS', '3', 'Spectro Prescan Values', ''),  # noqa
+        '0043xx8F': ('DS', '3', 'Spectro Parameters', ''),  # noqa
         '0043xx90': ('LO', '1-n', 'SAR Definition', ''),  # noqa
         '0043xx91': ('DS', '1-n', 'SAR value', ''),  # noqa
         '0043xx92': ('LO', '1', 'Image Error Text', ''),  # noqa
@@ -2715,20 +3264,20 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0043xx97': ('LO', '8', 'Image Filtering Parameters', ''),  # noqa
         '0043xx98': ('UI', '1', 'ASSET Acquisition Calibration Series UID', ''),  # noqa
         '0043xx99': ('LO', '1-n', 'Extended Options', ''),  # noqa
-        '0043xx9a': ('IS', '1', 'Rx Stack Identification', ''),  # noqa
-        '0043xx9b': ('DS', '1', 'NPW factor', ''),  # noqa
-        '0043xx9c': ('OB', '1', 'Research Tag 1', ''),  # noqa
-        '0043xx9d': ('OB', '1', 'Research Tag 2', ''),  # noqa
-        '0043xx9e': ('OB', '1', 'Research Tag 3', ''),  # noqa
-        '0043xx9f': ('OB', '1', 'Research Tag 4', ''),  # noqa
-        '0043xxa0': ('SQ', '1', 'Spectroscopy Pixel Sequence', ''),  # noqa
-        '0043xxa1': ('SQ', '1', 'Spectroscopy Default Display Sequence', ''),  # noqa
-        '0043xxa2': ('DS', '1-n', 'MEG Data', ''),  # noqa
-        '0043xxa3': ('CS', '1', 'ASL Contrast technique', ''),  # noqa
-        '0043xxa4': ('LO', '1', 'Detailed text for ASL labeling technique', ''),  # noqa
-        '0043xxa5': ('IS', '1', 'Duration of the label or control pulse', ''),  # noqa
-        '0051xx0a': ('SL', '1', 'Store level of Functional Image', ''),  # noqa
-        '0051xx0b': ('FL', '1', 'Store B-Value with Functional Image', ''),  # noqa
+        '0043xx9A': ('IS', '1', 'Rx Stack Identification', ''),  # noqa
+        '0043xx9B': ('DS', '1', 'NPW factor', ''),  # noqa
+        '0043xx9C': ('OB', '1', 'Research Tag 1', ''),  # noqa
+        '0043xx9D': ('OB', '1', 'Research Tag 2', ''),  # noqa
+        '0043xx9E': ('OB', '1', 'Research Tag 3', ''),  # noqa
+        '0043xx9F': ('OB', '1', 'Research Tag 4', ''),  # noqa
+        '0043xxA0': ('SQ', '1', 'Spectroscopy Pixel Sequence', ''),  # noqa
+        '0043xxA1': ('SQ', '1', 'Spectroscopy Default Display Sequence', ''),  # noqa
+        '0043xxA2': ('DS', '1-n', 'MEG Data', ''),  # noqa
+        '0043xxA3': ('CS', '1', 'ASL Contrast technique', ''),  # noqa
+        '0043xxA4': ('LO', '1', 'Detailed text for ASL labeling technique', ''),  # noqa
+        '0043xxA5': ('IS', '1', 'Duration of the label or control pulse', ''),  # noqa
+        '0051xx0A': ('SL', '1', 'Store level of Functional Image', ''),  # noqa
+        '0051xx0B': ('FL', '1', 'Store B-Value with Functional Image', ''),  # noqa
         '2001xx10': ('UI', '1', 'DICOM Implementation UID', ''),  # noqa
         '2001xx11': ('SH', '1', 'DICOM Implementation Version', ''),  # noqa
         '2001xx12': ('UI', '1', 'Within-DICOM-Implementation SOP Instance UID', ''),  # noqa
@@ -2747,19 +3296,19 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx80': ('OB', '1', 'Contrast', ''),  # noqa
         '2001xx81': ('FL', '1-n', 'Regressor Values', ''),  # noqa
         '2001xx86': ('US', '1', 'Number of Degrees of Freedom', ''),  # noqa
-        '2001xx8a': ('FL', '1', 'Z Threshold', ''),  # noqa
-        '2001xx8b': ('FL', '1', 'p Threshold', ''),  # noqa
+        '2001xx8A': ('FL', '1', 'Z Threshold', ''),  # noqa
+        '2001xx8B': ('FL', '1', 'p Threshold', ''),  # noqa
         '2001xx90': ('OB', '1', 'Processing parameters', ''),  # noqa
         '2001xx91': ('OB', '1', 'Motion Plot', ''),  # noqa
         '2001xx92': ('OB', '1', 'ROIs', ''),  # noqa
         '2001xx93': ('OB', '1', 'Tracts', ''),  # noqa
         '2001xx94': ('OB', '1', 'Report', ''),  # noqa
         '2001xx95': ('OB', '1', 'Response Data', ''),  # noqa
-        '2001xxa0': ('FL', '1-n', 'Motion Parameters', ''),  # noqa
-        '2001xxa1': ('FL', '1-n', 'Registration Parameters', ''),  # noqa
-        '2001xxa2': ('FL', '1-n', 'Subject Data', ''),  # noqa
-        '2001xxb0': ('OB', '1', 'DTI Parameters', ''),  # noqa
-        '2001xxc0': ('OB', '1', 'Paradigm Info', ''),  # noqa
+        '2001xxA0': ('FL', '1-n', 'Motion Parameters', ''),  # noqa
+        '2001xxA1': ('FL', '1-n', 'Registration Parameters', ''),  # noqa
+        '2001xxA2': ('FL', '1-n', 'Subject Data', ''),  # noqa
+        '2001xxB0': ('OB', '1', 'DTI Parameters', ''),  # noqa
+        '2001xxC0': ('OB', '1', 'Paradigm Info', ''),  # noqa
     },
     'GEMS_PATI_01': {
         '001110xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
@@ -2775,12 +3324,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx07': ('UI', '1', 'PET exam_id', ''),  # noqa
         '0009xx08': ('SH', '1', 'PET compatible_version', ''),  # noqa
         '0009xx09': ('SH', '1', 'PET software_version', ''),  # noqa
-        '0009xx0a': ('UI', '1', 'PET scan_id', ''),  # noqa
-        '0009xx0b': ('SH', '1', 'PET compatible_version', ''),  # noqa
-        '0009xx0c': ('SH', '1', 'PET software_version', ''),  # noqa
-        '0009xx0d': ('DT', '1', 'PET scan_datetime', ''),  # noqa
-        '0009xx0e': ('DT', '1', 'PET scan_ready', ''),  # noqa
-        '0009xx0f': ('ST', '1', 'PET scan_description', ''),  # noqa
+        '0009xx0A': ('UI', '1', 'PET scan_id', ''),  # noqa
+        '0009xx0B': ('SH', '1', 'PET compatible_version', ''),  # noqa
+        '0009xx0C': ('SH', '1', 'PET software_version', ''),  # noqa
+        '0009xx0D': ('DT', '1', 'PET scan_datetime', ''),  # noqa
+        '0009xx0E': ('DT', '1', 'PET scan_ready', ''),  # noqa
+        '0009xx0F': ('ST', '1', 'PET scan_description', ''),  # noqa
         '0009xx10': ('LO', '1', 'PET hospital_name', ''),  # noqa
         '0009xx11': ('LO', '1', 'PET scanner_desc', ''),  # noqa
         '0009xx12': ('LO', '1', 'PET manufacturer', ''),  # noqa
@@ -2791,12 +3340,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx17': ('SL', '1', 'PET scan_perspective', ''),  # noqa
         '0009xx18': ('SL', '1', 'PET scan_type', ''),  # noqa
         '0009xx19': ('SL', '1', 'PET scan_mode', ''),  # noqa
-        '0009xx1a': ('SL', '1', 'PET start_condition', ''),  # noqa
-        '0009xx1b': ('SL', '1', 'PET start_cond_data', ''),  # noqa
-        '0009xx1c': ('SL', '1', 'PET sel_stop_cond', ''),  # noqa
-        '0009xx1d': ('SL', '1', 'PET sel_stop_cond_data', ''),  # noqa
-        '0009xx1e': ('SL', '1', 'PET collect_deadtime', ''),  # noqa
-        '0009xx1f': ('SL', '1', 'PET collect_singles', ''),  # noqa
+        '0009xx1A': ('SL', '1', 'PET start_condition', ''),  # noqa
+        '0009xx1B': ('SL', '1', 'PET start_cond_data', ''),  # noqa
+        '0009xx1C': ('SL', '1', 'PET sel_stop_cond', ''),  # noqa
+        '0009xx1D': ('SL', '1', 'PET sel_stop_cond_data', ''),  # noqa
+        '0009xx1E': ('SL', '1', 'PET collect_deadtime', ''),  # noqa
+        '0009xx1F': ('SL', '1', 'PET collect_singles', ''),  # noqa
         '0009xx20': ('SL', '1', 'PET collect_countrate', ''),  # noqa
         '0009xx21': ('SL', '1', 'PET countrate_period', ''),  # noqa
         '0009xx22': ('SL', '1', 'PET delayed_events', ''),  # noqa
@@ -2807,12 +3356,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx27': ('SL', '1', 'PET theta_compression', ''),  # noqa
         '0009xx28': ('SL', '1', 'PET axial_compression', ''),  # noqa
         '0009xx29': ('FL', '1', 'PET gantry_tilt_angle', ''),  # noqa
-        '0009xx2a': ('SL', '1', 'PET collimation', ''),  # noqa
-        '0009xx2b': ('SL', '1', 'PET scan_fov', ''),  # noqa
-        '0009xx2c': ('SL', '1', 'PET axial_fov', ''),  # noqa
-        '0009xx2d': ('SL', '1', 'PET event_separation', ''),  # noqa
-        '0009xx2e': ('SL', '1', 'PET mask_width', ''),  # noqa
-        '0009xx2f': ('SL', '1', 'PET binning_mode', ''),  # noqa
+        '0009xx2A': ('SL', '1', 'PET collimation', ''),  # noqa
+        '0009xx2B': ('SL', '1', 'PET scan_fov', ''),  # noqa
+        '0009xx2C': ('SL', '1', 'PET axial_fov', ''),  # noqa
+        '0009xx2D': ('SL', '1', 'PET event_separation', ''),  # noqa
+        '0009xx2E': ('SL', '1', 'PET mask_width', ''),  # noqa
+        '0009xx2F': ('SL', '1', 'PET binning_mode', ''),  # noqa
         '0009xx30': ('SL', '1', 'PET trig_rej_method', ''),  # noqa
         '0009xx31': ('SL', '1', 'PET number_for_reject', ''),  # noqa
         '0009xx32': ('SL', '1', 'PET lower_reject_limit', ''),  # noqa
@@ -2823,12 +3372,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx37': ('LO', '1', 'PET batch_description', ''),  # noqa
         '0009xx38': ('FL', '1', 'PET tracer_activity', ''),  # noqa
         '0009xx39': ('DT', '1', 'PET meas_datetime', ''),  # noqa
-        '0009xx3a': ('FL', '1', 'PET pre_inj_volume', ''),  # noqa
-        '0009xx3b': ('DT', '1', 'PET admin_datetime', ''),  # noqa
-        '0009xx3c': ('FL', '1', 'PET post_inj_activity', ''),  # noqa
-        '0009xx3d': ('DT', '1', 'PET post_inj_datetime', ''),  # noqa
-        '0009xx3e': ('SH', '1', 'PET radionuclide_name', ''),  # noqa
-        '0009xx3f': ('FL', '1', 'PET half_life', ''),  # noqa
+        '0009xx3A': ('FL', '1', 'PET pre_inj_volume', ''),  # noqa
+        '0009xx3B': ('DT', '1', 'PET admin_datetime', ''),  # noqa
+        '0009xx3C': ('FL', '1', 'PET post_inj_activity', ''),  # noqa
+        '0009xx3D': ('DT', '1', 'PET post_inj_datetime', ''),  # noqa
+        '0009xx3E': ('SH', '1', 'PET radionuclide_name', ''),  # noqa
+        '0009xx3F': ('FL', '1', 'PET half_life', ''),  # noqa
         '0009xx40': ('FL', '1', 'PET positron_fraction', ''),  # noqa
         '0009xx41': ('SL', '1', 'PET source1_holder', ''),  # noqa
         '0009xx42': ('FL', '1', 'PET source1_activity', ''),  # noqa
@@ -2839,12 +3388,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx47': ('FL', '1', 'PET source2_activity', ''),  # noqa
         '0009xx48': ('DT', '1', 'PET source2_meas_dt', ''),  # noqa
         '0009xx49': ('SH', '1', 'PET source2_radnuclide', ''),  # noqa
-        '0009xx4a': ('FL', '1', 'PET source2_half_life', ''),  # noqa
-        '0009xx4b': ('SL', '1', 'PET source_speed', ''),  # noqa
-        '0009xx4c': ('FL', '1', 'PET source_location', ''),  # noqa
-        '0009xx4d': ('SL', '1', 'PET emission_present', ''),  # noqa
-        '0009xx4e': ('SL', '1', 'PET lower_axial_acc', ''),  # noqa
-        '0009xx4f': ('SL', '1', 'PET upper_axial_acc', ''),  # noqa
+        '0009xx4A': ('FL', '1', 'PET source2_half_life', ''),  # noqa
+        '0009xx4B': ('SL', '1', 'PET source_speed', ''),  # noqa
+        '0009xx4C': ('FL', '1', 'PET source_location', ''),  # noqa
+        '0009xx4D': ('SL', '1', 'PET emission_present', ''),  # noqa
+        '0009xx4E': ('SL', '1', 'PET lower_axial_acc', ''),  # noqa
+        '0009xx4F': ('SL', '1', 'PET upper_axial_acc', ''),  # noqa
         '0009xx50': ('SL', '1', 'PET lower_coinc_limit', ''),  # noqa
         '0009xx51': ('SL', '1', 'PET upper_coinc_limit', ''),  # noqa
         '0009xx52': ('SL', '1', 'PET coinc_delay_offset', ''),  # noqa
@@ -2855,12 +3404,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx57': ('UI', '1', 'PET normal_2d_cal_id', ''),  # noqa
         '0009xx58': ('UI', '1', 'PET blank_cal_id', ''),  # noqa
         '0009xx59': ('UI', '1', 'PET wc_cal_id', ''),  # noqa
-        '0009xx5a': ('SL', '1', 'PET derived', ''),  # noqa
-        '0009xx5b': ('LO', '1', 'PET contrast_agent', ''),  # noqa
-        '0009xx5c': ('UI', '1', 'PET frame_id', ''),  # noqa
-        '0009xx5d': ('UI', '1', 'PET scan_id', ''),  # noqa
-        '0009xx5e': ('UI', '1', 'PET exam_id', ''),  # noqa
-        '0009xx5f': ('LO', '1', 'PET patient_id', ''),  # noqa
+        '0009xx5A': ('SL', '1', 'PET derived', ''),  # noqa
+        '0009xx5B': ('LO', '1', 'PET contrast_agent', ''),  # noqa
+        '0009xx5C': ('UI', '1', 'PET frame_id', ''),  # noqa
+        '0009xx5D': ('UI', '1', 'PET scan_id', ''),  # noqa
+        '0009xx5E': ('UI', '1', 'PET exam_id', ''),  # noqa
+        '0009xx5F': ('LO', '1', 'PET patient_id', ''),  # noqa
         '0009xx60': ('SH', '1', 'PET compatible_version', ''),  # noqa
         '0009xx61': ('SH', '1', 'PET software_version', ''),  # noqa
         '0009xx62': ('ST', '1', 'PET where_is_frame', ''),  # noqa
@@ -2871,12 +3420,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx67': ('FL', '1', 'PET table_z_position', ''),  # noqa
         '0009xx68': ('DT', '1', 'PET landmark_datetime', ''),  # noqa
         '0009xx69': ('SL', '1', 'PET slice_count', ''),  # noqa
-        '0009xx6a': ('FL', '1', 'PET start_location', ''),  # noqa
-        '0009xx6b': ('SL', '1', 'PET acq_delay', ''),  # noqa
-        '0009xx6c': ('DT', '1', 'PET acq_start', ''),  # noqa
-        '0009xx6d': ('SL', '1', 'PET acq_duration', ''),  # noqa
-        '0009xx6e': ('SL', '1', 'PET acq_bin_dur', ''),  # noqa
-        '0009xx6f': ('SL', '1', 'PET acq_bin_start', ''),  # noqa
+        '0009xx6A': ('FL', '1', 'PET start_location', ''),  # noqa
+        '0009xx6B': ('SL', '1', 'PET acq_delay', ''),  # noqa
+        '0009xx6C': ('DT', '1', 'PET acq_start', ''),  # noqa
+        '0009xx6D': ('SL', '1', 'PET acq_duration', ''),  # noqa
+        '0009xx6E': ('SL', '1', 'PET acq_bin_dur', ''),  # noqa
+        '0009xx6F': ('SL', '1', 'PET acq_bin_start', ''),  # noqa
         '0009xx70': ('SL', '1', 'PET actual_stop_cond', ''),  # noqa
         '0009xx71': ('FD', '1', 'PET total_prompts', ''),  # noqa
         '0009xx72': ('FD', '1', 'PET total_delays', ''),  # noqa
@@ -2887,12 +3436,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx77': ('SL', '1', 'PET uncompressed_size', ''),  # noqa
         '0009xx78': ('SL', '1', 'PET accum_bin_dur', ''),  # noqa
         '0009xx79': ('SH', '1', 'PET compatible_version', ''),  # noqa
-        '0009xx7a': ('SH', '1', 'PET software_version', ''),  # noqa
-        '0009xx7b': ('DT', '1', 'PET is_datetime', ''),  # noqa
-        '0009xx7c': ('SL', '1', 'PET is_source', ''),  # noqa
-        '0009xx7d': ('SL', '1', 'PET is_contents', ''),  # noqa
-        '0009xx7e': ('SL', '1', 'PET is_type', ''),  # noqa
-        '0009xx7f': ('DS', '3', 'PET is_reference', ''),  # noqa
+        '0009xx7A': ('SH', '1', 'PET software_version', ''),  # noqa
+        '0009xx7B': ('DT', '1', 'PET is_datetime', ''),  # noqa
+        '0009xx7C': ('SL', '1', 'PET is_source', ''),  # noqa
+        '0009xx7D': ('SL', '1', 'PET is_contents', ''),  # noqa
+        '0009xx7E': ('SL', '1', 'PET is_type', ''),  # noqa
+        '0009xx7F': ('DS', '3', 'PET is_reference', ''),  # noqa
         '0009xx80': ('SL', '1', 'PET multi_patient', ''),  # noqa
         '0009xx81': ('SL', '1', 'PET number_of_normals', ''),  # noqa
         '0009xx82': ('UI', '1', 'PET color_map_id', ''),  # noqa
@@ -2903,12 +3452,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx87': ('SL', '1', 'PET pan_x', ''),  # noqa
         '0009xx88': ('SL', '1', 'PET pan_y', ''),  # noqa
         '0009xx89': ('FL', '1', 'PET window_level_min', ''),  # noqa
-        '0009xx8a': ('FL', '1', 'PET window_level_max', ''),  # noqa
-        '0009xx8b': ('SL', '1', 'PET recon_method', ''),  # noqa
-        '0009xx8c': ('SL', '1', 'PET attenuation', ''),  # noqa
-        '0009xx8d': ('FL', '1', 'PET atten_coefficient', ''),  # noqa
-        '0009xx8e': ('SL', '1', 'PET bp_filter', ''),  # noqa
-        '0009xx8f': ('FL', '1', 'PET bp_filter_cutoff', ''),  # noqa
+        '0009xx8A': ('FL', '1', 'PET window_level_max', ''),  # noqa
+        '0009xx8B': ('SL', '1', 'PET recon_method', ''),  # noqa
+        '0009xx8C': ('SL', '1', 'PET attenuation', ''),  # noqa
+        '0009xx8D': ('FL', '1', 'PET atten_coefficient', ''),  # noqa
+        '0009xx8E': ('SL', '1', 'PET bp_filter', ''),  # noqa
+        '0009xx8F': ('FL', '1', 'PET bp_filter_cutoff', ''),  # noqa
         '0009xx90': ('SL', '1', 'PET bp_filter_order', ''),  # noqa
         '0009xx91': ('FL', '1', 'PET bp_center_l', ''),  # noqa
         '0009xx92': ('FL', '1', 'PET bp_center_p', ''),  # noqa
@@ -2919,88 +3468,88 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx97': ('UI', '1', 'PET trans_scan_id', ''),  # noqa
         '0009xx98': ('UI', '1', 'PET norm_cal_id', ''),  # noqa
         '0009xx99': ('UI', '1', 'PET blnk_cal_id', ''),  # noqa
-        '0009xx9a': ('FL', '1', 'PET cac_edge_threshold', ''),  # noqa
-        '0009xx9b': ('FL', '1', 'PET cac_skull_offset', ''),  # noqa
-        '0009xx9c': ('UI', '1', 'PET emiss_sub_id', ''),  # noqa
-        '0009xx9d': ('SL', '1', 'PET radial_filter_3d', ''),  # noqa
-        '0009xx9e': ('FL', '1', 'PET radial_cutoff_3d', ''),  # noqa
-        '0009xx9f': ('SL', '1', 'PET axial_filter_3d', ''),  # noqa
-        '0009xxa0': ('FL', '1', 'PET axial_cutoff_3d', ''),  # noqa
-        '0009xxa1': ('FL', '1', 'PET axial_start', ''),  # noqa
-        '0009xxa2': ('FL', '1', 'PET axial_spacing', ''),  # noqa
-        '0009xxa3': ('SL', '1', 'PET axial_angles_used', ''),  # noqa
-        '0009xxa4': ('SH', '1', 'PET compatible_version', ''),  # noqa
-        '0009xxa5': ('SH', '1', 'PET software_version', ''),  # noqa
-        '0009xxa6': ('SL', '1', 'PET slice_number', ''),  # noqa
-        '0009xxa7': ('FL', '1', 'PET total_counts', ''),  # noqa
-        '0009xxa8': ('OB', '1', 'PET other_atts', ''),  # noqa
-        '0009xxa9': ('SL', '1', 'PET other_atts_size', ''),  # noqa
-        '0009xxaa': ('SL', '1', 'PET archived', ''),  # noqa
-        '0009xxab': ('FL', '1', 'PET bp_center_x', ''),  # noqa
-        '0009xxac': ('FL', '1', 'PET bp_center_y', ''),  # noqa
-        '0009xxad': ('UI', '1', 'PET trans_frame_id', ''),  # noqa
-        '0009xxae': ('UI', '1', 'PET tpluse_frame_id', ''),  # noqa
-        '0009xxb1': ('FL', '1', 'PET profile_spacing', ''),  # noqa
-        '0009xxb2': ('SL', '1', 'PET ir_num_iterations', ''),  # noqa
-        '0009xxb3': ('SL', '1', 'PET ir_num_subsets', ''),  # noqa
-        '0009xxb4': ('FL', '1', 'PET ir_recon_fov', ''),  # noqa
-        '0009xxb5': ('SL', '1', 'PET ir_corr_model', ''),  # noqa
-        '0009xxb6': ('SL', '1', 'PET ir_loop_filter', ''),  # noqa
-        '0009xxb7': ('FL', '1', 'PET ir_pre_filt_parm', ''),  # noqa
-        '0009xxb8': ('SL', '1', 'PET ir_loop_filt_parm', ''),  # noqa
-        '0009xxb9': ('FL', '1', 'PET response_filt_parm', ''),  # noqa
-        '0009xxba': ('SL', '1', 'PET post_filter', ''),  # noqa
-        '0009xxbb': ('FL', '1', 'PET post_filt_parm', ''),  # noqa
-        '0009xxbc': ('SL', '1', 'PET ir_regularize', ''),  # noqa
-        '0009xxbd': ('FL', '1', 'PET regularize_parm', ''),  # noqa
-        '0009xxbe': ('SL', '1', 'PET ac_bp_filter', ''),  # noqa
-        '0009xxbf': ('FL', '1', 'PET ac_bp_filt_cut_off', ''),  # noqa
-        '0009xxc0': ('SL', '1', 'PET ac_bp_filt_order', ''),  # noqa
-        '0009xxc1': ('SL', '1', 'PET ac_img_smooth', ''),  # noqa
-        '0009xxc2': ('FL', '1', 'PET ac_img_smooth_parm', ''),  # noqa
-        '0009xxc3': ('SL', '1', 'PET scatter_method', ''),  # noqa
-        '0009xxc4': ('SL', '1', 'PET scatter_num_iter', ''),  # noqa
-        '0009xxc5': ('FL', '1', 'PET scatter_parm', ''),  # noqa
-        '0009xxc6': ('FL', '1', 'PET seg_qc_parm', ''),  # noqa
-        '0009xxc7': ('SL', '1', 'PET overlap', ''),  # noqa
-        '0009xxc8': ('UI', '1', 'PET ovlp_frm_id', ''),  # noqa
-        '0009xxc9': ('UI', '1', 'PET ovlp_trans_frm_id', ''),  # noqa
-        '0009xxca': ('UI', '1', 'PET ovlp_tpulse_frm_id', ''),  # noqa
-        '0009xxcb': ('FL', '1', 'PET vqc_x_axis_trans', ''),  # noqa
-        '0009xxcc': ('FL', '1', 'PET vqc_x_axis_tilt', ''),  # noqa
-        '0009xxcd': ('FL', '1', 'PET vqc_y_axis_trans', ''),  # noqa
-        '0009xxce': ('FL', '1', 'PET vqc_y_axis_swivel', ''),  # noqa
-        '0009xxcf': ('FL', '1', 'PET vqc_z_axis_trans', ''),  # noqa
-        '0009xxd0': ('FL', '1', 'PET vqc_z_axis_roll', ''),  # noqa
-        '0009xxd1': ('LO', '1', 'PET ctac_conv_scale', ''),  # noqa
-        '0009xxd2': ('UI', '1', 'PET image_set_id', ''),  # noqa
-        '0009xxd3': ('SL', '1', 'PET constrast_route', ''),  # noqa
-        '0009xxd4': ('LO', '1', 'PET ctac_conv_scale', ''),  # noqa
-        '0009xxd5': ('FL', '1', 'PET loop_filter_parm', ''),  # noqa
-        '0009xxd6': ('FL', '1', 'PET image_one_loc', ''),  # noqa
-        '0009xxd7': ('FL', '1', 'PET image_index_loc', ''),  # noqa
-        '0009xxd8': ('SL', '1', 'PET frame_number', ''),  # noqa
-        '0009xxd9': ('SL', '1', 'PET list_file_exists', ''),  # noqa
-        '0009xxda': ('ST', '1', 'PET where_is_list_frame', ''),  # noqa
-        '0009xxdb': ('SL', '1', 'PET ir_z_filter_flag', ''),  # noqa
-        '0009xxdc': ('FL', '1', 'PET ir_z_filter_ratio', ''),  # noqa
-        '0009xxdd': ('US', '1', 'PET num_of_rr_interval', ''),  # noqa
-        '0009xxde': ('US', '1', 'PET num_of_time_slots', ''),  # noqa
-        '0009xxdf': ('US', '1', 'PET num_of_slices', ''),  # noqa
-        '0009xxe0': ('US', '1', 'PET num_of_time_slices', ''),  # noqa
-        '0009xxe1': ('SL', '1', 'PET unlisted_scan', ''),  # noqa
-        '0009xxe2': ('SL', '1', 'PET rest_stress', ''),  # noqa
-        '0009xxe3': ('FL', '1', 'PET phase percentage', ''),  # noqa
-        '0009xxe4': ('ST', '1', 'Recon Protocol', ''),  # noqa
-        '0009xxe5': ('FL', '1', 'PET left shift', ''),  # noqa
-        '0009xxe6': ('FL', '1', 'PET posterior shift', ''),  # noqa
-        '0009xxe7': ('FL', '1', 'PET superior shift', ''),  # noqa
-        '0009xxe8': ('SL', '1', 'PET acq_bin_num', ''),  # noqa
-        '0009xxe9': ('FL', '1', 'PET acq_bin_dur_percent', ''),  # noqa
-        '0009xxea': ('SL', '1', '3D Filter flag', ''),  # noqa
-        '0009xxeb': ('FL', '1', '3D Filter cutoff', ''),  # noqa
-        '0009xxec': ('SL', '1', '3D Filter order', ''),  # noqa
-        '0009xxf0': ('UI', '1', 'Reformat group', ''),  # noqa
+        '0009xx9A': ('FL', '1', 'PET cac_edge_threshold', ''),  # noqa
+        '0009xx9B': ('FL', '1', 'PET cac_skull_offset', ''),  # noqa
+        '0009xx9C': ('UI', '1', 'PET emiss_sub_id', ''),  # noqa
+        '0009xx9D': ('SL', '1', 'PET radial_filter_3d', ''),  # noqa
+        '0009xx9E': ('FL', '1', 'PET radial_cutoff_3d', ''),  # noqa
+        '0009xx9F': ('SL', '1', 'PET axial_filter_3d', ''),  # noqa
+        '0009xxA0': ('FL', '1', 'PET axial_cutoff_3d', ''),  # noqa
+        '0009xxA1': ('FL', '1', 'PET axial_start', ''),  # noqa
+        '0009xxA2': ('FL', '1', 'PET axial_spacing', ''),  # noqa
+        '0009xxA3': ('SL', '1', 'PET axial_angles_used', ''),  # noqa
+        '0009xxA4': ('SH', '1', 'PET compatible_version', ''),  # noqa
+        '0009xxA5': ('SH', '1', 'PET software_version', ''),  # noqa
+        '0009xxA6': ('SL', '1', 'PET slice_number', ''),  # noqa
+        '0009xxA7': ('FL', '1', 'PET total_counts', ''),  # noqa
+        '0009xxA8': ('OB', '1', 'PET other_atts', ''),  # noqa
+        '0009xxA9': ('SL', '1', 'PET other_atts_size', ''),  # noqa
+        '0009xxAA': ('SL', '1', 'PET archived', ''),  # noqa
+        '0009xxAB': ('FL', '1', 'PET bp_center_x', ''),  # noqa
+        '0009xxAC': ('FL', '1', 'PET bp_center_y', ''),  # noqa
+        '0009xxAD': ('UI', '1', 'PET trans_frame_id', ''),  # noqa
+        '0009xxAE': ('UI', '1', 'PET tpluse_frame_id', ''),  # noqa
+        '0009xxB1': ('FL', '1', 'PET profile_spacing', ''),  # noqa
+        '0009xxB2': ('SL', '1', 'PET ir_num_iterations', ''),  # noqa
+        '0009xxB3': ('SL', '1', 'PET ir_num_subsets', ''),  # noqa
+        '0009xxB4': ('FL', '1', 'PET ir_recon_fov', ''),  # noqa
+        '0009xxB5': ('SL', '1', 'PET ir_corr_model', ''),  # noqa
+        '0009xxB6': ('SL', '1', 'PET ir_loop_filter', ''),  # noqa
+        '0009xxB7': ('FL', '1', 'PET ir_pre_filt_parm', ''),  # noqa
+        '0009xxB8': ('SL', '1', 'PET ir_loop_filt_parm', ''),  # noqa
+        '0009xxB9': ('FL', '1', 'PET response_filt_parm', ''),  # noqa
+        '0009xxBA': ('SL', '1', 'PET post_filter', ''),  # noqa
+        '0009xxBB': ('FL', '1', 'PET post_filt_parm', ''),  # noqa
+        '0009xxBC': ('SL', '1', 'PET ir_regularize', ''),  # noqa
+        '0009xxBD': ('FL', '1', 'PET regularize_parm', ''),  # noqa
+        '0009xxBE': ('SL', '1', 'PET ac_bp_filter', ''),  # noqa
+        '0009xxBF': ('FL', '1', 'PET ac_bp_filt_cut_off', ''),  # noqa
+        '0009xxC0': ('SL', '1', 'PET ac_bp_filt_order', ''),  # noqa
+        '0009xxC1': ('SL', '1', 'PET ac_img_smooth', ''),  # noqa
+        '0009xxC2': ('FL', '1', 'PET ac_img_smooth_parm', ''),  # noqa
+        '0009xxC3': ('SL', '1', 'PET scatter_method', ''),  # noqa
+        '0009xxC4': ('SL', '1', 'PET scatter_num_iter', ''),  # noqa
+        '0009xxC5': ('FL', '1', 'PET scatter_parm', ''),  # noqa
+        '0009xxC6': ('FL', '1', 'PET seg_qc_parm', ''),  # noqa
+        '0009xxC7': ('SL', '1', 'PET overlap', ''),  # noqa
+        '0009xxC8': ('UI', '1', 'PET ovlp_frm_id', ''),  # noqa
+        '0009xxC9': ('UI', '1', 'PET ovlp_trans_frm_id', ''),  # noqa
+        '0009xxCA': ('UI', '1', 'PET ovlp_tpulse_frm_id', ''),  # noqa
+        '0009xxCB': ('FL', '1', 'PET vqc_x_axis_trans', ''),  # noqa
+        '0009xxCC': ('FL', '1', 'PET vqc_x_axis_tilt', ''),  # noqa
+        '0009xxCD': ('FL', '1', 'PET vqc_y_axis_trans', ''),  # noqa
+        '0009xxCE': ('FL', '1', 'PET vqc_y_axis_swivel', ''),  # noqa
+        '0009xxCF': ('FL', '1', 'PET vqc_z_axis_trans', ''),  # noqa
+        '0009xxD0': ('FL', '1', 'PET vqc_z_axis_roll', ''),  # noqa
+        '0009xxD1': ('LO', '1', 'PET ctac_conv_scale', ''),  # noqa
+        '0009xxD2': ('UI', '1', 'PET image_set_id', ''),  # noqa
+        '0009xxD3': ('SL', '1', 'PET constrast_route', ''),  # noqa
+        '0009xxD4': ('LO', '1', 'PET ctac_conv_scale', ''),  # noqa
+        '0009xxD5': ('FL', '1', 'PET loop_filter_parm', ''),  # noqa
+        '0009xxD6': ('FL', '1', 'PET image_one_loc', ''),  # noqa
+        '0009xxD7': ('FL', '1', 'PET image_index_loc', ''),  # noqa
+        '0009xxD8': ('SL', '1', 'PET frame_number', ''),  # noqa
+        '0009xxD9': ('SL', '1', 'PET list_file_exists', ''),  # noqa
+        '0009xxDA': ('ST', '1', 'PET where_is_list_frame', ''),  # noqa
+        '0009xxDB': ('SL', '1', 'PET ir_z_filter_flag', ''),  # noqa
+        '0009xxDC': ('FL', '1', 'PET ir_z_filter_ratio', ''),  # noqa
+        '0009xxDD': ('US', '1', 'PET num_of_rr_interval', ''),  # noqa
+        '0009xxDE': ('US', '1', 'PET num_of_time_slots', ''),  # noqa
+        '0009xxDF': ('US', '1', 'PET num_of_slices', ''),  # noqa
+        '0009xxE0': ('US', '1', 'PET num_of_time_slices', ''),  # noqa
+        '0009xxE1': ('SL', '1', 'PET unlisted_scan', ''),  # noqa
+        '0009xxE2': ('SL', '1', 'PET rest_stress', ''),  # noqa
+        '0009xxE3': ('FL', '1', 'PET phase percentage', ''),  # noqa
+        '0009xxE4': ('ST', '1', 'Recon Protocol', ''),  # noqa
+        '0009xxE5': ('FL', '1', 'PET left shift', ''),  # noqa
+        '0009xxE6': ('FL', '1', 'PET posterior shift', ''),  # noqa
+        '0009xxE7': ('FL', '1', 'PET superior shift', ''),  # noqa
+        '0009xxE8': ('SL', '1', 'PET acq_bin_num', ''),  # noqa
+        '0009xxE9': ('FL', '1', 'PET acq_bin_dur_percent', ''),  # noqa
+        '0009xxEA': ('SL', '1', '3D Filter flag', ''),  # noqa
+        '0009xxEB': ('FL', '1', '3D Filter cutoff', ''),  # noqa
+        '0009xxEC': ('SL', '1', '3D Filter order', ''),  # noqa
+        '0009xxF0': ('UI', '1', 'Reformat group', ''),  # noqa
         '0011xx01': ('SQ', '1', 'GE Advance ROI Sequence', ''),  # noqa
         '0011xx02': ('UI', '1', 'GE Advance ROI.roi_id', ''),  # noqa
         '0011xx03': ('UI', '1', 'GE Advance ROI.image_id', ''),  # noqa
@@ -3010,12 +3559,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx07': ('DT', '1', 'GE Advance ROI.roi_datetime', ''),  # noqa
         '0011xx08': ('SL', '1', 'GE Advance ROI.roi_type', ''),  # noqa
         '0011xx09': ('FL', '1', 'GE Advance ROI.center_x', ''),  # noqa
-        '0011xx0a': ('FL', '1', 'GE Advance ROI.center_y', ''),  # noqa
-        '0011xx0b': ('FL', '1', 'GE Advance ROI.width', ''),  # noqa
-        '0011xx0c': ('FL', '1', 'GE Advance ROI.height', ''),  # noqa
-        '0011xx0d': ('FL', '1', 'GE Advance ROI.angle', ''),  # noqa
-        '0011xx0e': ('SL', '1', 'GE Advance ROI.number_of_points', ''),  # noqa
-        '0011xx0f': ('OB', '1', 'GE Advance ROI.roi_data', ''),  # noqa
+        '0011xx0A': ('FL', '1', 'GE Advance ROI.center_y', ''),  # noqa
+        '0011xx0B': ('FL', '1', 'GE Advance ROI.width', ''),  # noqa
+        '0011xx0C': ('FL', '1', 'GE Advance ROI.height', ''),  # noqa
+        '0011xx0D': ('FL', '1', 'GE Advance ROI.angle', ''),  # noqa
+        '0011xx0E': ('SL', '1', 'GE Advance ROI.number_of_points', ''),  # noqa
+        '0011xx0F': ('OB', '1', 'GE Advance ROI.roi_data', ''),  # noqa
         '0011xx10': ('SL', '1', 'GE Advance ROI.roi_size', ''),  # noqa
         '0011xx11': ('LO', '1', 'GE Advance ROI.color', ''),  # noqa
         '0011xx12': ('SL', '1', 'GE Advance ROI.line_type', ''),  # noqa
@@ -3033,12 +3582,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0013xx07': ('LO', '1', 'GE Advance Annotation.font_name', ''),  # noqa
         '0013xx08': ('SH', '1', 'GE Advance Annotation.font_size', ''),  # noqa
         '0013xx09': ('LO', '1', 'GE Advance Annotation.foreground_color', ''),  # noqa
-        '0013xx0a': ('LO', '1', 'GE Advance Annotation.background_color', ''),  # noqa
-        '0013xx0b': ('SL', '1', 'GE Advance Annotation.coordinate_system', ''),  # noqa
-        '0013xx0c': ('FL', '1', 'GE Advance Annotation.start_x', ''),  # noqa
-        '0013xx0d': ('FL', '1', 'GE Advance Annotation.start_y', ''),  # noqa
-        '0013xx0e': ('FL', '1', 'GE Advance Annotation.end_x', ''),  # noqa
-        '0013xx0f': ('FL', '1', 'GE Advance Annotation.end_y', ''),  # noqa
+        '0013xx0A': ('LO', '1', 'GE Advance Annotation.background_color', ''),  # noqa
+        '0013xx0B': ('SL', '1', 'GE Advance Annotation.coordinate_system', ''),  # noqa
+        '0013xx0C': ('FL', '1', 'GE Advance Annotation.start_x', ''),  # noqa
+        '0013xx0D': ('FL', '1', 'GE Advance Annotation.start_y', ''),  # noqa
+        '0013xx0E': ('FL', '1', 'GE Advance Annotation.end_x', ''),  # noqa
+        '0013xx0F': ('FL', '1', 'GE Advance Annotation.end_y', ''),  # noqa
         '0013xx10': ('SL', '1', 'GE Advance Annotation.start_symbol', ''),  # noqa
         '0013xx11': ('SL', '1', 'GE Advance Annotation.end_symbol', ''),  # noqa
         '0013xx12': ('OB', '1', 'GE Advance Annotation.annotation_data', ''),  # noqa
@@ -3053,10 +3602,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx07': ('ST', '1', 'PET where_is_corr', ''),  # noqa
         '0017xx08': ('SL', '1', 'PET corr_file_size', ''),  # noqa
         '0017xx09': ('LO', '1', 'PET scan_id', ''),  # noqa
-        '0017xx0a': ('DT', '1', 'PET scan_datetime', ''),  # noqa
-        '0017xx0b': ('LO', '1', 'PET norm_2d_cal_id', ''),  # noqa
-        '0017xx0c': ('SH', '1', 'PET hosp_identifier', ''),  # noqa
-        '0017xx0d': ('SL', '1', 'PET archived', ''),  # noqa
+        '0017xx0A': ('DT', '1', 'PET scan_datetime', ''),  # noqa
+        '0017xx0B': ('LO', '1', 'PET norm_2d_cal_id', ''),  # noqa
+        '0017xx0C': ('SH', '1', 'PET hosp_identifier', ''),  # noqa
+        '0017xx0D': ('SL', '1', 'PET archived', ''),  # noqa
         '0019xx01': ('UI', '1', 'PET wc_cal_id', ''),  # noqa
         '0019xx02': ('SH', '1', 'PET compatible_version', ''),  # noqa
         '0019xx03': ('SH', '1', 'PET software_version', ''),  # noqa
@@ -3066,12 +3615,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('LO', '1', 'PET cal_hardware', ''),  # noqa
         '0019xx08': ('OB', '1', 'PET coefficients', ''),  # noqa
         '0019xx09': ('FL', '1', 'PET activity_factor_hr', ''),  # noqa
-        '0019xx0a': ('FL', '1', 'PET activity_factor_hs', ''),  # noqa
-        '0019xx0b': ('FL', '1', 'PET activity_factor_3d', ''),  # noqa
-        '0019xx0c': ('LO', '1', 'PET scan_id', ''),  # noqa
-        '0019xx0d': ('DT', '1', 'PET scan_datetime', ''),  # noqa
-        '0019xx0e': ('SH', '1', 'PET hosp_identifier', ''),  # noqa
-        '0019xx0f': ('FL', '1', 'PET meas_activity', ''),  # noqa
+        '0019xx0A': ('FL', '1', 'PET activity_factor_hs', ''),  # noqa
+        '0019xx0B': ('FL', '1', 'PET activity_factor_3d', ''),  # noqa
+        '0019xx0C': ('LO', '1', 'PET scan_id', ''),  # noqa
+        '0019xx0D': ('DT', '1', 'PET scan_datetime', ''),  # noqa
+        '0019xx0E': ('SH', '1', 'PET hosp_identifier', ''),  # noqa
+        '0019xx0F': ('FL', '1', 'PET meas_activity', ''),  # noqa
         '0019xx10': ('DT', '1', 'PET meas_datetime', ''),  # noqa
         '0019xx11': ('SL', '1', 'PET axial_filter_3d', ''),  # noqa
         '0019xx12': ('FL', '1', 'PET axial_cutoff_3d', ''),  # noqa
@@ -3101,12 +3650,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5003xx07': ('ST', '1', 'GE Advance Graph.graph_description', ''),  # noqa
         '5003xx08': ('LO', '1', 'GE Advance Graph.title_font_name', ''),  # noqa
         '5003xx09': ('SH', '1', 'GE Advance Graph.title_font_size', ''),  # noqa
-        '5003xx0a': ('LO', '1', 'GE Advance Graph.footer', ''),  # noqa
-        '5003xx0b': ('SH', '1', 'GE Advance Graph.footer_font_size', ''),  # noqa
-        '5003xx0c': ('LO', '1', 'GE Advance Graph.foreground_color', ''),  # noqa
-        '5003xx0d': ('LO', '1', 'GE Advance Graph.background_color', ''),  # noqa
-        '5003xx0e': ('SL', '1', 'GE Advance Graph.graph_border', ''),  # noqa
-        '5003xx0f': ('SL', '1', 'GE Advance Graph.graph_width', ''),  # noqa
+        '5003xx0A': ('LO', '1', 'GE Advance Graph.footer', ''),  # noqa
+        '5003xx0B': ('SH', '1', 'GE Advance Graph.footer_font_size', ''),  # noqa
+        '5003xx0C': ('LO', '1', 'GE Advance Graph.foreground_color', ''),  # noqa
+        '5003xx0D': ('LO', '1', 'GE Advance Graph.background_color', ''),  # noqa
+        '5003xx0E': ('SL', '1', 'GE Advance Graph.graph_border', ''),  # noqa
+        '5003xx0F': ('SL', '1', 'GE Advance Graph.graph_width', ''),  # noqa
         '5003xx10': ('SL', '1', 'GE Advance Graph.graph_height', ''),  # noqa
         '5003xx11': ('SL', '1', 'GE Advance Graph.grid', ''),  # noqa
         '5003xx12': ('LO', '1', 'GE Advance Graph.label_font_name', ''),  # noqa
@@ -3117,12 +3666,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5003xx17': ('FL', '1', 'GE Advance Graph.x_major_tics', ''),  # noqa
         '5003xx18': ('FL', '1', 'GE Advance Graph.x_axis_min', ''),  # noqa
         '5003xx19': ('FL', '1', 'GE Advance Graph.x_axis_max', ''),  # noqa
-        '5003xx1a': ('LO', '1', 'GE Advance Graph.y_axis_label', ''),  # noqa
-        '5003xx1b': ('SL', '1', 'GE Advance Graph.y_axis_units', ''),  # noqa
-        '5003xx1c': ('FL', '1', 'GE Advance Graph.y_major_tics', ''),  # noqa
-        '5003xx1d': ('FL', '1', 'GE Advance Graph.y_axis_min', ''),  # noqa
-        '5003xx1e': ('FL', '1', 'GE Advance Graph.y_axis_max', ''),  # noqa
-        '5003xx1f': ('LO', '1', 'GE Advance Graph.legend_font_name', ''),  # noqa
+        '5003xx1A': ('LO', '1', 'GE Advance Graph.y_axis_label', ''),  # noqa
+        '5003xx1B': ('SL', '1', 'GE Advance Graph.y_axis_units', ''),  # noqa
+        '5003xx1C': ('FL', '1', 'GE Advance Graph.y_major_tics', ''),  # noqa
+        '5003xx1D': ('FL', '1', 'GE Advance Graph.y_axis_min', ''),  # noqa
+        '5003xx1E': ('FL', '1', 'GE Advance Graph.y_axis_max', ''),  # noqa
+        '5003xx1F': ('LO', '1', 'GE Advance Graph.legend_font_name', ''),  # noqa
         '5003xx20': ('SH', '1', 'GE Advance Graph.legend_font_size', ''),  # noqa
         '5003xx21': ('SL', '1', 'GE Advance Graph.legend_location_x', ''),  # noqa
         '5003xx22': ('SL', '1', 'GE Advance Graph.legend_location_y', ''),  # noqa
@@ -3139,10 +3688,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5005xx07': ('LO', '1', 'GE Advance CurvePresentation.curve_label', ''),  # noqa
         '5005xx08': ('LO', '1', 'GE Advance CurvePresentation.color', ''),  # noqa
         '5005xx09': ('SL', '1', 'GE Advance CurvePresentation.line_type', ''),  # noqa
-        '5005xx0a': ('SL', '1', 'GE Advance CurvePresentation.line_width', ''),  # noqa
-        '5005xx0b': ('SL', '1', 'GE Advance CurvePresentation.point_symbol', ''),  # noqa
-        '5005xx0c': ('SL', '1', 'GE Advance CurvePresentation.point_symbol_dim', ''),  # noqa
-        '5005xx0d': ('LO', '1', 'GE Advance CurvePresentation.point_color', ''),  # noqa
+        '5005xx0A': ('SL', '1', 'GE Advance CurvePresentation.line_width', ''),  # noqa
+        '5005xx0B': ('SL', '1', 'GE Advance CurvePresentation.point_symbol', ''),  # noqa
+        '5005xx0C': ('SL', '1', 'GE Advance CurvePresentation.point_symbol_dim', ''),  # noqa
+        '5005xx0D': ('LO', '1', 'GE Advance CurvePresentation.point_color', ''),  # noqa
     },
     'GEMS_QVA_PHOTO_01': {
         '0009xx60': ('FL', '1', 'Dodge End Diastolic Volume ml', ''),  # noqa
@@ -3155,12 +3704,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx67': ('IS', '1', 'Simpson Ejection Fraction', ''),  # noqa
         '0009xx68': ('FL', '1', 'CFX Single Hypokinesia in Region', ''),  # noqa
         '0009xx69': ('FL', '1', 'CFX Single Hyperkinesia in Opposite Region', ''),  # noqa
-        '0009xx6a': ('IS', '1', 'CFX Single Total LV contour Percent', ''),  # noqa
-        '0009xx6b': ('FL', '1', 'CFX Multiple Hypokinesia in Region', ''),  # noqa
-        '0009xx6c': ('FL', '1', 'CFX Multiple Hyperkinesia in Opposite Region', ''),  # noqa
-        '0009xx6d': ('IS', '1', 'CFX Multiple Total LV contour Percent', ''),  # noqa
-        '0009xx6e': ('FL', '1', 'RCA Single Hypokinesia in Region', ''),  # noqa
-        '0009xx6f': ('FL', '1', 'RCA Single Hyperkinesia in Opposite Region', ''),  # noqa
+        '0009xx6A': ('IS', '1', 'CFX Single Total LV contour Percent', ''),  # noqa
+        '0009xx6B': ('FL', '1', 'CFX Multiple Hypokinesia in Region', ''),  # noqa
+        '0009xx6C': ('FL', '1', 'CFX Multiple Hyperkinesia in Opposite Region', ''),  # noqa
+        '0009xx6D': ('IS', '1', 'CFX Multiple Total LV contour Percent', ''),  # noqa
+        '0009xx6E': ('FL', '1', 'RCA Single Hypokinesia in Region', ''),  # noqa
+        '0009xx6F': ('FL', '1', 'RCA Single Hyperkinesia in Opposite Region', ''),  # noqa
         '0009xx70': ('IS', '1', 'RCA Single Total LV contour Percent', ''),  # noqa
         '0009xx71': ('FL', '1', 'RCA Multiple Hypokinesia in Region', ''),  # noqa
         '0009xx72': ('FL', '1', 'RCA Multiple Hyperkinesia in Opposite Region', ''),  # noqa
@@ -3171,9 +3720,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx77': ('FL', '1', 'LAD Multiple Hypokinesia in Region', ''),  # noqa
         '0009xx78': ('FL', '1', 'LAD Multiple Hyperkinesia in Opposite Region', ''),  # noqa
         '0009xx79': ('IS', '1', 'LAD Multiple Total LV contour Percent', ''),  # noqa
-        '0009xx7a': ('FL', '1', 'Dodge End Diastolic Volume ml/m2', ''),  # noqa
-        '0009xx7c': ('FL', '1', 'Dodge End Systolic Volume ml/m2', ''),  # noqa
-        '0009xx7e': ('FL', '1', 'Dodge Stroke Volume ml/m2', ''),  # noqa
+        '0009xx7A': ('FL', '1', 'Dodge End Diastolic Volume ml/m2', ''),  # noqa
+        '0009xx7C': ('FL', '1', 'Dodge End Systolic Volume ml/m2', ''),  # noqa
+        '0009xx7E': ('FL', '1', 'Dodge Stroke Volume ml/m2', ''),  # noqa
         '0009xx80': ('FL', '1', 'Simpson End Diastolic Volume ml/m2', ''),  # noqa
         '0009xx82': ('FL', '1', 'Simpson End Systolic Volume ml/m2', ''),  # noqa
         '0009xx84': ('FL', '1', 'Simpson Stroke Volume ml/m2', ''),  # noqa
@@ -3191,9 +3740,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx35': ('SS', '1', 'Series from which prescribed', ''),  # noqa
         '0021xx36': ('SS', '1', 'Image from which prescribed', ''),  # noqa
         '0021xx37': ('SS', '1', 'Screen Format', ''),  # noqa
-        '0021xx4a': ('LO', '1', 'Anatomical reference for scout', ''),  # noqa
-        '0021xx4e': ('US', '1', 'Unknown', ''),  # noqa
-        '0021xx4f': ('SS', '1', 'Locations in acquisition', ''),  # noqa
+        '0021xx4A': ('LO', '1', 'Anatomical reference for scout', ''),  # noqa
+        '0021xx4E': ('US', '1', 'Unknown', ''),  # noqa
+        '0021xx4F': ('SS', '1', 'Locations in acquisition', ''),  # noqa
         '0021xx50': ('SS', '1', 'Graphically prescribed', ''),  # noqa
         '0021xx51': ('DS', '1', 'Rotation from source x rot', ''),  # noqa
         '0021xx52': ('DS', '1', 'Rotation from source y rot', ''),  # noqa
@@ -3204,12 +3753,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx57': ('SL', '1', 'Locs per 3D slab', ''),  # noqa
         '0021xx58': ('SL', '1', 'Overlaps', ''),  # noqa
         '0021xx59': ('SL', '1', 'Image Filtering 0.5/0.2T', ''),  # noqa
-        '0021xx5a': ('SL', '1', 'Diffusion direction', ''),  # noqa
-        '0021xx5b': ('DS', '1', 'Tagging Flip Angle', ''),  # noqa
-        '0021xx5c': ('DS', '1', 'Tagging Orientation', ''),  # noqa
-        '0021xx5d': ('DS', '1', 'Tag Spacing', ''),  # noqa
-        '0021xx5e': ('DS', '1', 'RTIA_timer', ''),  # noqa
-        '0021xx5f': ('DS', '1', 'Fps', ''),  # noqa
+        '0021xx5A': ('SL', '1', 'Diffusion direction', ''),  # noqa
+        '0021xx5B': ('DS', '1', 'Tagging Flip Angle', ''),  # noqa
+        '0021xx5C': ('DS', '1', 'Tagging Orientation', ''),  # noqa
+        '0021xx5D': ('DS', '1', 'Tag Spacing', ''),  # noqa
+        '0021xx5E': ('DS', '1', 'RTIA_timer', ''),  # noqa
+        '0021xx5F': ('DS', '1', 'Fps', ''),  # noqa
         '0021xx70': ('LT', '1', 'Unknown', ''),  # noqa
         '0021xx71': ('LT', '1', 'Unknown', ''),  # noqa
         '0021xx81': ('DS', '1', 'Auto window/level alpha', ''),  # noqa
@@ -3227,9 +3776,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0249xx14': ('PN', '1', 'Operator Name', ''),  # noqa
         '0249xx16': ('LO', '1', 'Plan Comment', ''),  # noqa
         '0249xx18': ('SQ', '1', 'Plan Image Sequence', ''),  # noqa
-        '0249xx1a': ('LO', '1', 'Exam/Series/Image Identifier', ''),  # noqa
-        '0249xx1b': ('IS', '1', 'Additional Image Identifier', ''),  # noqa
-        '0249xx1c': ('CS', '1', 'Build Resolution', ''),  # noqa
+        '0249xx1A': ('LO', '1', 'Exam/Series/Image Identifier', ''),  # noqa
+        '0249xx1B': ('IS', '1', 'Additional Image Identifier', ''),  # noqa
+        '0249xx1C': ('CS', '1', 'Build Resolution', ''),  # noqa
         '0249xx20': ('SQ', '1', 'Structure Sequence', ''),  # noqa
         '0249xx22': ('SH', '1', 'Structure Name', ''),  # noqa
         '0249xx24': ('CS', '1', 'Structure Type', ''),  # noqa
@@ -3238,7 +3787,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0249xx32': ('SQ', '1', 'Slab Image Sequence', ''),  # noqa
         '0249xx36': ('DS', '1', 'Z Plus Thickness', ''),  # noqa
         '0249xx38': ('DS', '1', 'Z Minus Thickness', ''),  # noqa
-        '0249xx3a': ('DS', '3-n', 'Slab Shape', ''),  # noqa
+        '0249xx3A': ('DS', '3-n', 'Slab Shape', ''),  # noqa
         '0249xx40': ('SQ', '1', 'Marker Sequence', ''),  # noqa
         '0249xx42': ('SH', '1', 'Marker Name', ''),  # noqa
         '0249xx44': ('CS', '1', 'Marker Color', ''),  # noqa
@@ -3260,38 +3809,38 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0249xx84': ('DS', '2-n', 'Cutout Shape', ''),  # noqa
         '0249xx90': ('SH', '1', 'Collimator Name', ''),  # noqa
         '0249xx92': ('CS', '1', 'Collimator Type', ''),  # noqa
-        '0249xxa0': ('SQ', '1', 'Dynamic Segment Sequence', ''),  # noqa
-        '0249xxa2': ('DS', '1', 'Table Angle', ''),  # noqa
-        '0249xxa4': ('DS', '1', 'Gantry Angle', ''),  # noqa
-        '0249xxa6': ('DS', '1', 'Collimator Angle', ''),  # noqa
-        '0249xxa8': ('DS', '3', 'Isocenter Position', ''),  # noqa
-        '0249xxa9': ('DS', '1', 'Source-Surface Distance', ''),  # noqa
-        '0249xxaa': ('DS', '1', 'X Symmetric Opening', ''),  # noqa
-        '0249xxac': ('DS', '1', 'Y Symmetric Opening', ''),  # noqa
-        '0249xxae': ('DS', '1', 'X Positive Jaw Position', ''),  # noqa
-        '0249xxb0': ('DS', '1', 'X Negative Jaw Position', ''),  # noqa
-        '0249xxb2': ('DS', '1', 'Y Positive Jaw Position', ''),  # noqa
-        '0249xxb4': ('DS', '1', 'Y Negative Jaw Position', ''),  # noqa
-        '0249xxb6': ('DS', '2-n', 'Leaf Positions', ''),  # noqa
-        '0249xxd0': ('CS', '1', 'Treatment Position', ''),  # noqa
+        '0249xxA0': ('SQ', '1', 'Dynamic Segment Sequence', ''),  # noqa
+        '0249xxA2': ('DS', '1', 'Table Angle', ''),  # noqa
+        '0249xxA4': ('DS', '1', 'Gantry Angle', ''),  # noqa
+        '0249xxA6': ('DS', '1', 'Collimator Angle', ''),  # noqa
+        '0249xxA8': ('DS', '3', 'Isocenter Position', ''),  # noqa
+        '0249xxA9': ('DS', '1', 'Source-Surface Distance', ''),  # noqa
+        '0249xxAA': ('DS', '1', 'X Symmetric Opening', ''),  # noqa
+        '0249xxAC': ('DS', '1', 'Y Symmetric Opening', ''),  # noqa
+        '0249xxAE': ('DS', '1', 'X Positive Jaw Position', ''),  # noqa
+        '0249xxB0': ('DS', '1', 'X Negative Jaw Position', ''),  # noqa
+        '0249xxB2': ('DS', '1', 'Y Positive Jaw Position', ''),  # noqa
+        '0249xxB4': ('DS', '1', 'Y Negative Jaw Position', ''),  # noqa
+        '0249xxB6': ('DS', '2-n', 'Leaf Positions', ''),  # noqa
+        '0249xxD0': ('CS', '1', 'Treatment Position', ''),  # noqa
     },
     'GEMS_SENO_02': {
         '0045xx04': ('CS', '1', 'AES', ''),  # noqa
         '0045xx06': ('DS', '1', 'Stereo angle', ''),  # noqa
         '0045xx09': ('DS', '1', 'Real Magnification Factor', ''),  # noqa
-        '0045xx0b': ('CS', '1', 'Senograph Type', ''),  # noqa
-        '0045xx0c': ('DS', '1', 'Integration Time', ''),  # noqa
-        '0045xx0d': ('DS', '1', 'ROI Origin X and Y', ''),  # noqa
+        '0045xx0B': ('CS', '1', 'Senograph Type', ''),  # noqa
+        '0045xx0C': ('DS', '1', 'Integration Time', ''),  # noqa
+        '0045xx0D': ('DS', '1', 'ROI Origin X and Y', ''),  # noqa
         '0045xx11': ('DS', '2', 'Receptor Size cm X and Y', ''),  # noqa
         '0045xx12': ('IS', '2', 'Receptor Size Pixels X and Y', ''),  # noqa
         '0045xx13': ('ST', '1', 'Screen', ''),  # noqa
         '0045xx14': ('DS', '1', 'Pixel Pitch Microns', ''),  # noqa
         '0045xx15': ('IS', '1', 'Pixel Depth Bits', ''),  # noqa
         '0045xx16': ('IS', '2', 'Binning Factor X and Y', ''),  # noqa
-        '0045xx1b': ('LO', '1', 'Clinical View', ''),  # noqa
-        '0045xx1d': ('DS', '1', 'Mean Of Raw Gray Levels', ''),  # noqa
-        '0045xx1e': ('DS', '1', 'Mean Of Offset Gray Levels', ''),  # noqa
-        '0045xx1f': ('DS', '1', 'Mean Of Corrected Gray Levels', ''),  # noqa
+        '0045xx1B': ('LO', '1', 'Clinical View', ''),  # noqa
+        '0045xx1D': ('DS', '1', 'Mean Of Raw Gray Levels', ''),  # noqa
+        '0045xx1E': ('DS', '1', 'Mean Of Offset Gray Levels', ''),  # noqa
+        '0045xx1F': ('DS', '1', 'Mean Of Corrected Gray Levels', ''),  # noqa
         '0045xx20': ('DS', '1', 'Estimated Anat mean', ''),  # noqa
         '0045xx21': ('DS', '1', 'Mean Of Log Region Gray Levels', ''),  # noqa
         '0045xx22': ('DS', '1', 'Standard Deviation Of Raw Gray Levels', ''),  # noqa
@@ -3302,15 +3851,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0045xx27': ('IS', '1', 'Set Number', ''),  # noqa
         '0045xx28': ('CS', '1', 'WindowingType (LINEAR or GAMMA)', ''),  # noqa
         '0045xx29': ('DS', '2', 'Windowing parameters', ''),  # noqa
-        '0045xx2a': ('IS', '1', '2DLocX', ''),  # noqa
-        '0045xx2b': ('IS', '1', '2DLocY', ''),  # noqa
+        '0045xx2A': ('IS', '1', '2DLocX', ''),  # noqa
+        '0045xx2B': ('IS', '1', '2DLocY', ''),  # noqa
         '0045xx39': ('US', '1', 'Vignette Rows', ''),  # noqa
-        '0045xx3a': ('US', '1', 'Vignette Columns', ''),  # noqa
-        '0045xx3b': ('US', '1', 'Vignette Bits Allocated', ''),  # noqa
-        '0045xx3c': ('US', '1', 'Vignette Bits Stored', ''),  # noqa
-        '0045xx3d': ('US', '1', 'Vignette High Bit', ''),  # noqa
-        '0045xx3e': ('US', '1', 'Vignette Pixel Representation', ''),  # noqa
-        '0045xx3f': ('OB', '1', 'Vignette Pixel Data', ''),  # noqa
+        '0045xx3A': ('US', '1', 'Vignette Columns', ''),  # noqa
+        '0045xx3B': ('US', '1', 'Vignette Bits Allocated', ''),  # noqa
+        '0045xx3C': ('US', '1', 'Vignette Bits Stored', ''),  # noqa
+        '0045xx3D': ('US', '1', 'Vignette High Bit', ''),  # noqa
+        '0045xx3E': ('US', '1', 'Vignette Pixel Representation', ''),  # noqa
+        '0045xx3F': ('OB', '1', 'Vignette Pixel Data', ''),  # noqa
         '0045xx49': ('DS', '1', 'Radiological Thickness', ''),  # noqa
         '0045xx50': ('UI', '1', 'SC Instance UID', ''),  # noqa
         '0045xx51': ('UI', '1', 'SC series UID', ''),  # noqa
@@ -3342,8 +3891,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx17': ('SL', '1', 'Series Complete Flag', ''),  # noqa
         '0025xx18': ('SL', '1', 'Number of images archived', ''),  # noqa
         '0025xx19': ('SL', '1', 'Last image number used', ''),  # noqa
-        '0025xx1a': ('SH', '1', 'Primary Receiver Suite and Host', ''),  # noqa
-        '0025xx1b': ('OB', '1', 'Protocol Data Block (compressed)', ''),  # noqa
+        '0025xx1A': ('SH', '1', 'Primary Receiver Suite and Host', ''),  # noqa
+        '0025xx1B': ('OB', '1', 'Protocol Data Block (compressed)', ''),  # noqa
     },
     'GEMS_STDY_01': {
         '002310xx': ('LO', '1', 'Private Element Creator', ''),  # noqa
@@ -3353,50 +3902,50 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0023xx50': ('SS', '1', 'Summary image', ''),  # noqa
         '0023xx70': ('FD', '1', 'Start time(secs) in first axial', ''),  # noqa
         '0023xx74': ('SL', '1', 'No. of updates to header', ''),  # noqa
-        '0023xx7d': ('SS', '1', 'Indicates study has complete info (DICOM/genesis)', ''),  # noqa
+        '0023xx7D': ('SS', '1', 'Indicates study has complete info (DICOM/genesis)', ''),  # noqa
     },
     'GEMS_Ultrasound_ImageGroup_001': {
         '6003xx10': ('SQ', '1', 'Unknown', ''),  # noqa
         '6003xx11': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'GEMS_Ultrasound_MovieGroup_001': {
-        '7fe1xx01': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '7fe1xx03': ('UL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx08': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx10': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx12': ('LO', '1', 'Unknown', ''),  # noqa
-        '7fe1xx18': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx20': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx24': ('SH', '1', 'Unknown', ''),  # noqa
-        '7fe1xx26': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx36': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx37': ('UL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx43': ('OB', '1', 'Unknown', ''),  # noqa
-        '7fe1xx48': ('FD', '1-2', 'Unknown', ''),  # noqa
-        '7fe1xx49': ('UL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx51': ('FL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx52': ('FD', '1', 'Unknown', ''),  # noqa
-        '7fe1xx53': ('UL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx54': ('SL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx55': ('OB', '1', 'Unknown', ''),  # noqa
-        '7fe1xx57': ('LT', '1', 'Unknown', ''),  # noqa
-        '7fe1xx60': ('OB', '1', 'Unknown', ''),  # noqa
-        '7fe1xx61': ('OW', '1', 'Unknown', ''),  # noqa
-        '7fe1xx70': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx71': ('UL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx72': ('LO', '1', 'Unknown', ''),  # noqa
-        '7fe1xx73': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx74': ('LO', '1', 'Unknown', ''),  # noqa
-        '7fe1xx75': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx77': ('FD', '1-n', 'Unknown', ''),  # noqa
-        '7fe1xx79': ('SL', '1', 'Unknown', ''),  # noqa
-        '7fe1xx83': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx84': ('LO', '1', 'Unknown', ''),  # noqa
-        '7fe1xx85': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7fe1xx86': ('SL', '4', 'Unknown', ''),  # noqa
-        '7fe1xx87': ('FD', '4', 'Unknown', ''),  # noqa
-        '7fe1xx88': ('FD', '1', 'Unknown', ''),  # noqa
+        '7FE1xx01': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx02': ('LO', '1', 'Unknown', ''),  # noqa
+        '7FE1xx03': ('UL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx08': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx10': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx12': ('LO', '1', 'Unknown', ''),  # noqa
+        '7FE1xx18': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx20': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx24': ('SH', '1', 'Unknown', ''),  # noqa
+        '7FE1xx26': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx36': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx37': ('UL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx43': ('OB', '1', 'Unknown', ''),  # noqa
+        '7FE1xx48': ('FD', '1-2', 'Unknown', ''),  # noqa
+        '7FE1xx49': ('UL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx51': ('FL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx52': ('FD', '1', 'Unknown', ''),  # noqa
+        '7FE1xx53': ('UL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx54': ('SL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx55': ('OB', '1', 'Unknown', ''),  # noqa
+        '7FE1xx57': ('LT', '1', 'Unknown', ''),  # noqa
+        '7FE1xx60': ('OB', '1', 'Unknown', ''),  # noqa
+        '7FE1xx61': ('OW', '1', 'Unknown', ''),  # noqa
+        '7FE1xx70': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx71': ('UL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx72': ('LO', '1', 'Unknown', ''),  # noqa
+        '7FE1xx73': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx74': ('LO', '1', 'Unknown', ''),  # noqa
+        '7FE1xx75': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx77': ('FD', '1-n', 'Unknown', ''),  # noqa
+        '7FE1xx79': ('SL', '1', 'Unknown', ''),  # noqa
+        '7FE1xx83': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx84': ('LO', '1', 'Unknown', ''),  # noqa
+        '7FE1xx85': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7FE1xx86': ('SL', '4', 'Unknown', ''),  # noqa
+        '7FE1xx87': ('FD', '4', 'Unknown', ''),  # noqa
+        '7FE1xx88': ('FD', '1', 'Unknown', ''),  # noqa
     },
     'GEMS_VXTLSTATE_001': {
         '0057xx05': ('SQ', '1', 'Volumes_info', ''),  # noqa
@@ -3464,12 +4013,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0033xx17': ('SH', '1', 'Date', ''),  # noqa
         '0033xx18': ('SH', '1', 'Time', ''),  # noqa
         '0033xx19': ('UL', '1', 'ProtocoldataFlags', ''),  # noqa
-        '0033xx1a': ('LO', '1', 'ProtocolName', ''),  # noqa
-        '0033xx1b': ('LO', '1', 'StudyId', ''),  # noqa
-        '0033xx1c': ('OB', '1', 'BulkData', ''),  # noqa
-        '0033xx1d': ('SL', '1-n', 'IntData', ''),  # noqa
-        '0033xx1e': ('FD', '1-n', 'DoubleData', ''),  # noqa
-        '0033xx1f': ('OB', '1', 'StringData', ''),  # noqa
+        '0033xx1A': ('LO', '1', 'ProtocolName', ''),  # noqa
+        '0033xx1B': ('LO', '1', 'StudyId', ''),  # noqa
+        '0033xx1C': ('OB', '1', 'BulkData', ''),  # noqa
+        '0033xx1D': ('SL', '1-n', 'IntData', ''),  # noqa
+        '0033xx1E': ('FD', '1-n', 'DoubleData', ''),  # noqa
+        '0033xx1F': ('OB', '1', 'StringData', ''),  # noqa
         '0033xx20': ('OB', '1', 'BulkDataFormat', ''),  # noqa
         '0033xx21': ('OB', '1', 'IntDataFormat', ''),  # noqa
         '0033xx22': ('OB', '1', 'DoubleDataFormat', ''),  # noqa
@@ -3477,10 +4026,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0033xx24': ('LT', '1', 'Description', ''),  # noqa
         '0033xx28': ('LO', '1', 'RTName', ''),  # noqa
         '0033xx29': ('LT', '1', 'RTSpecification', ''),  # noqa
-        '0033xx2a': ('UL', '1', 'ReviewTemplatesFlags', ''),  # noqa
-        '0033xx2b': ('LT', '1', 'DataValidationSpec', ''),  # noqa
-        '0033xx2c': ('LT', '1', 'Description', ''),  # noqa
-        '0033xx2d': ('LT', '1', 'IconDescription', ''),  # noqa
+        '0033xx2A': ('UL', '1', 'ReviewTemplatesFlags', ''),  # noqa
+        '0033xx2B': ('LT', '1', 'DataValidationSpec', ''),  # noqa
+        '0033xx2C': ('LT', '1', 'Description', ''),  # noqa
+        '0033xx2D': ('LT', '1', 'IconDescription', ''),  # noqa
         '0033xx50': ('SQ', '1', 'ProtocoldataSQ', ''),  # noqa
         '0033xx51': ('UI', '1', 'PDOSOPClassUID', ''),  # noqa
         '0033xx52': ('UI', '1', 'PDOSOPInstanceUID', ''),  # noqa
@@ -3510,12 +4059,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0057xx47': ('LO', '1', 'Normal Colour', ''),  # noqa
         '0057xx48': ('LT', '1', 'NameFont', ''),  # noqa
         '0057xx49': ('SL', '1', 'FillPattern', ''),  # noqa
-        '0057xx4a': ('SL', '1', 'LineStyle', ''),  # noqa
-        '0057xx4b': ('SL', '1', 'LineDashLength', ''),  # noqa
-        '0057xx4c': ('SL', '1', 'LineThickness', ''),  # noqa
-        '0057xx4d': ('SL', '1', 'Interactivity', ''),  # noqa
-        '0057xx4e': ('SL', '1', 'NamePos', ''),  # noqa
-        '0057xx4f': ('SL', '1', 'NameDisplay', ''),  # noqa
+        '0057xx4A': ('SL', '1', 'LineStyle', ''),  # noqa
+        '0057xx4B': ('SL', '1', 'LineDashLength', ''),  # noqa
+        '0057xx4C': ('SL', '1', 'LineThickness', ''),  # noqa
+        '0057xx4D': ('SL', '1', 'Interactivity', ''),  # noqa
+        '0057xx4E': ('SL', '1', 'NamePos', ''),  # noqa
+        '0057xx4F': ('SL', '1', 'NameDisplay', ''),  # noqa
         '0057xx50': ('LO', '1', 'Label', ''),  # noqa
         '0057xx51': ('SL', '1-n', 'BpSeg', ''),  # noqa
         '0057xx52': ('US', '1-n', 'BpSegpairs', ''),  # noqa
@@ -3524,11 +4073,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0057xx55': ('SL', '1-n', 'Shape', ''),  # noqa
         '0057xx56': ('FD', '1-n', 'ShapeTilt', ''),  # noqa
         '0057xx59': ('SL', '1-n', 'ShapePtsSpace', ''),  # noqa
-        '0057xx5a': ('SL', '1-n', 'ShapeCtrlPtsCount', ''),  # noqa
-        '0057xx5b': ('FD', '1-n', 'Shap CtrlPts', ''),  # noqa
-        '0057xx5c': ('SL', '1', 'ShapeCPSpace', ''),  # noqa
-        '0057xx5d': ('UL', '1-n', 'ROIFlags', ''),  # noqa
-        '0057xx5e': ('UL', '1', 'FrameNumber', ''),  # noqa
+        '0057xx5A': ('SL', '1-n', 'ShapeCtrlPtsCount', ''),  # noqa
+        '0057xx5B': ('FD', '1-n', 'Shap CtrlPts', ''),  # noqa
+        '0057xx5C': ('SL', '1', 'ShapeCPSpace', ''),  # noqa
+        '0057xx5D': ('UL', '1-n', 'ROIFlags', ''),  # noqa
+        '0057xx5E': ('UL', '1', 'FrameNumber', ''),  # noqa
         '0057xx60': ('LO', '1-n', 'DatasetROIMapping', ''),  # noqa
     },
     'GEMS_XR3DCAL_01': {
@@ -3541,12 +4090,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx07': ('TM', '1', '3Dcal calibration processing time', ''),  # noqa
         '0021xx08': ('FL', '1', '3Dcal L arm angle', ''),  # noqa
         '0021xx09': ('FL', '1-n', '3Dcal Pivot angle vector', ''),  # noqa
-        '0021xx0a': ('FL', '1', '3Dcal C arm angle', ''),  # noqa
-        '0021xx0b': ('SQ', '1', '3Dcal matrix sequence', ''),  # noqa
-        '0021xx0c': ('LO', '1-n', '3Dcal matrix elements', ''),  # noqa
-        '0021xx0d': ('LO', '1', '3Dcal algorithm version', ''),  # noqa
-        '0021xx0e': ('FL', '1', '3Dcal 3D frame unit size', ''),  # noqa
-        '0021xx0f': ('LO', '1', '3Dcal calibration mode', ''),  # noqa
+        '0021xx0A': ('FL', '1', '3Dcal C arm angle', ''),  # noqa
+        '0021xx0B': ('SQ', '1', '3Dcal matrix sequence', ''),  # noqa
+        '0021xx0C': ('LO', '1-n', '3Dcal matrix elements', ''),  # noqa
+        '0021xx0D': ('LO', '1', '3Dcal algorithm version', ''),  # noqa
+        '0021xx0E': ('FL', '1', '3Dcal 3D frame unit size', ''),  # noqa
+        '0021xx0F': ('LO', '1', '3Dcal calibration mode', ''),  # noqa
         '0021xx10': ('FL', '1', '3Dcal image frame origin row', ''),  # noqa
         '0021xx11': ('FL', '1', '3Dcal image frame origin column', ''),  # noqa
         '0021xx12': ('IS', '1', '3Dcal positioner pivot rotation speed', ''),  # noqa
@@ -3561,19 +4110,19 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     },
     'GE_GENESIS_REV3.0': {
         '0019xx39': ('SS', '1', 'Axial Type', ''),  # noqa
-        '0019xx8f': ('SS', '1', 'Swap Phase / Frequency Axis', ''),  # noqa
-        '0019xx9c': ('SS', '1', 'Pulse Sequence Name', ''),  # noqa
-        '0019xx9f': ('SS', '1', 'Coil Type', ''),  # noqa
-        '0019xxa4': ('SS', '1', 'SAT fat/water/none', ''),  # noqa
-        '0019xxc0': ('SS', '1', 'Bitmap of SAT Selections', ''),  # noqa
-        '0019xxc1': ('SS', '1', 'Surfacel Coil Iintensity Correction Flag', ''),  # noqa
-        '0019xxcb': ('SS', '1', 'Phase Contrast Flow Axis', ''),  # noqa
-        '0019xxcc': ('SS', '1', 'Phase Contrast Velocity Encoding', ''),  # noqa
-        '0019xxd5': ('SS', '1', 'Fractional Echo', ''),  # noqa
-        '0019xxd8': ('SS', '1', 'Variable Echo Flag', ''),  # noqa
-        '0019xxd9': ('DS', '1', 'Concatenated Sat', ''),  # noqa
-        '0019xxf2': ('SS', '1', 'Number of Phases', ''),  # noqa
-        '0043xx1e': ('DS', '1', 'Delta Start Time', ''),  # noqa
+        '0019xx8F': ('SS', '1', 'Swap Phase / Frequency Axis', ''),  # noqa
+        '0019xx9C': ('SS', '1', 'Pulse Sequence Name', ''),  # noqa
+        '0019xx9F': ('SS', '1', 'Coil Type', ''),  # noqa
+        '0019xxA4': ('SS', '1', 'SAT fat/water/none', ''),  # noqa
+        '0019xxC0': ('SS', '1', 'Bitmap of SAT Selections', ''),  # noqa
+        '0019xxC1': ('SS', '1', 'Surfacel Coil Iintensity Correction Flag', ''),  # noqa
+        '0019xxCB': ('SS', '1', 'Phase Contrast Flow Axis', ''),  # noqa
+        '0019xxCC': ('SS', '1', 'Phase Contrast Velocity Encoding', ''),  # noqa
+        '0019xxD5': ('SS', '1', 'Fractional Echo', ''),  # noqa
+        '0019xxD8': ('SS', '1', 'Variable Echo Flag', ''),  # noqa
+        '0019xxD9': ('DS', '1', 'Concatenated Sat', ''),  # noqa
+        '0019xxF2': ('SS', '1', 'Number of Phases', ''),  # noqa
+        '0043xx1E': ('DS', '1', 'Delta Start Time', ''),  # noqa
         '0043xx27': ('SH', '1', 'Pitch Ratio', ''),  # noqa
     },
     'GE_GROUP': {
@@ -3619,15 +4168,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx70': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx85': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx90': ('DS', '1', 'Unknown', ''),  # noqa
-        '7e01xx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '7e01xx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '7e01xx10': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7e01xx11': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7e01xx12': ('OB', '1', 'Unknown', ''),  # noqa
-        '7f01xx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '7f01xx02': ('SH', '1', 'Unknown', ''),  # noqa
-        '7f01xx10': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7f01xx12': ('OB', '1', 'Unknown', ''),  # noqa
+        '7E01xx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '7E01xx02': ('LO', '1', 'Unknown', ''),  # noqa
+        '7E01xx10': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7E01xx11': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7E01xx12': ('OB', '1', 'Unknown', ''),  # noqa
+        '7F01xx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '7F01xx02': ('SH', '1', 'Unknown', ''),  # noqa
+        '7F01xx10': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7F01xx12': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'Hologic': {
         '0011xx00': ('LO', '1', 'Hx Questionnaire', ''),  # noqa
@@ -3645,9 +4194,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx02': ('PN', '1', 'Owner', ''),  # noqa
     },
     'IMPAC': {
-        '300bxx02': ('FL', '1', 'Unknown', ''),  # noqa
-        '300bxx04': ('FL', '1', 'Unknown', ''),  # noqa
-        '300bxx0e': ('FL', '1', 'Unknown', ''),  # noqa
+        '300Bxx02': ('FL', '1', 'Unknown', ''),  # noqa
+        '300Bxx04': ('FL', '1', 'Unknown', ''),  # noqa
+        '300Bxx0E': ('FL', '1', 'Unknown', ''),  # noqa
     },
     'IMS s.r.l. Biopsy Private Code': {
         '1269xx01': ('IS', '1', 'Biopsy Image', ''),  # noqa
@@ -3707,11 +4256,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0041xx50': ('SQ', '1', 'Exposure Information Sequence', ''),  # noqa
     },
     'INTELERAD MEDICAL SYSTEMS': {
-        '3f01xx01': ('LO', '1', 'Institution Code', ''),  # noqa
-        '3f01xx02': ('LO', '1', 'Routed Transfer AE', ''),  # noqa
-        '3f01xx03': ('LO', '1', 'Source AE', ''),  # noqa
-        '3f01xx04': ('LO', '1', 'Deferred Validation', ''),  # noqa
-        '3f01xx05': ('LO', '1', 'Series Owner', ''),  # noqa
+        '3F01xx01': ('LO', '1', 'Institution Code', ''),  # noqa
+        '3F01xx02': ('LO', '1', 'Routed Transfer AE', ''),  # noqa
+        '3F01xx03': ('LO', '1', 'Source AE', ''),  # noqa
+        '3F01xx04': ('LO', '1', 'Deferred Validation', ''),  # noqa
+        '3F01xx05': ('LO', '1', 'Series Owner', ''),  # noqa
     },
     'ISG Image': {
         '0065xx11': ('UL', '1', 'Unknown', ''),  # noqa
@@ -3741,15 +4290,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '4321xx64': ('LO', '1', 'Custom Tag', ''),  # noqa
     },
     'KINETDX': {
-        '0021xxa5': ('US', '1', 'Unknown', ''),  # noqa
-        '0021xxa8': ('LO', '1', 'Unknown', ''),  # noqa
-        '0021xxaa': ('OB', '1', 'Unknown', ''),  # noqa
+        '0021xxA5': ('US', '1', 'Unknown', ''),  # noqa
+        '0021xxA8': ('LO', '1', 'Unknown', ''),  # noqa
+        '0021xxAA': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'KINETDX_GRAPHICS': {
-        '0021xxa4': ('LT', '1', 'Unknown', ''),  # noqa
+        '0021xxA4': ('LT', '1', 'Unknown', ''),  # noqa
     },
     'KRETZ_US': {
-        '7fe1xx01': ('OB', '1', 'Unknown', ''),  # noqa
+        '7FE1xx01': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'Kodak Image Information': {
         '0029xx15': ('LO', '1', 'Unknown', ''),  # noqa
@@ -3757,7 +4306,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx17': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx18': ('UT', '1', 'Unknown', ''),  # noqa
         '0029xx19': ('IS', '1', 'Unknown', ''),  # noqa
-        '0029xx1a': ('IS', '1', 'Unknown', ''),  # noqa
+        '0029xx1A': ('IS', '1', 'Unknown', ''),  # noqa
     },
     'LODOX_STATSCAN': {
         '0019xx01': ('IS', '1-n', 'Unknown', ''),  # noqa
@@ -3804,9 +4353,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3005xx04': ('DS', '1', 'Unknown', ''),  # noqa
         '3005xx06': ('DS', '1', 'Unknown', ''),  # noqa
         '3005xx08': ('DS', '1', 'Unknown', ''),  # noqa
-        '3005xx0a': ('CS', '1', 'Unknown', ''),  # noqa
-        '3005xx0c': ('CS', '1', 'Unknown', ''),  # noqa
-        '3005xx0e': ('CS', '1', 'Unknown', ''),  # noqa
+        '3005xx0A': ('CS', '1', 'Unknown', ''),  # noqa
+        '3005xx0C': ('CS', '1', 'Unknown', ''),  # noqa
+        '3005xx0E': ('CS', '1', 'Unknown', ''),  # noqa
         '3005xx10': ('DS', '1', 'Unknown', ''),  # noqa
         '3005xx12': ('DS', '1', 'Unknown', ''),  # noqa
     },
@@ -3826,8 +4375,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx51': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx52': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx60': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xxf1': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xxf2': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xxF1': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xxF2': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx01': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx10': ('DS', '1', 'Window Center', ''),  # noqa
         '0029xx11': ('DS', '1', 'Window Width', ''),  # noqa
@@ -3847,7 +4396,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0033xx04': ('LO', '1', 'Unknown', ''),  # noqa
         '0033xx06': ('LO', '1', 'Unknown', ''),  # noqa
         '0033xx08': ('LO', '1', 'Unknown', ''),  # noqa
-        '0033xx0a': ('LO', '1', 'Unknown', ''),  # noqa
+        '0033xx0A': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'MITRA OBJECT DOCUMENT 1.0': {
         '0029xx00': ('OB', '1', 'Unknown', ''),  # noqa
@@ -3857,9 +4406,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0033xx04': ('CS', '1', 'Study Description', ''),  # noqa
         '0033xx06': ('PN', '1', "Referring Physician's Name", ''),  # noqa
         '0033xx08': ('PN', '1', "Requesting Physician's Name", ''),  # noqa
-        '0033xx0a': ('PN', '1', "Performing Physician's Name", ''),  # noqa
-        '0033xx0c': ('LO', '1', 'Reason for Study', ''),  # noqa
-        '0033xx0e': ('LT', '1', 'Study Comments', ''),  # noqa
+        '0033xx0A': ('PN', '1', "Performing Physician's Name", ''),  # noqa
+        '0033xx0C': ('LO', '1', 'Reason for Study', ''),  # noqa
+        '0033xx0E': ('LT', '1', 'Study Comments', ''),  # noqa
         '0033xx13': ('PN', '1', "Patient's Name Single Byte", ''),  # noqa
         '0033xx14': ('PN', '1', "Patient's Name Ideographic", ''),  # noqa
         '0033xx15': ('PN', '1', "Patient's Name Phonetic", ''),  # noqa
@@ -3867,11 +4416,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0033xx17': ('PN', '1', "Referring Physician's Name Ideographic", ''),  # noqa
         '0033xx18': ('PN', '1', "Referring Physician's Name Phonetic", ''),  # noqa
         '0033xx19': ('PN', '1', "Requesting Physician's Name Single Byte", ''),  # noqa
-        '0033xx1a': ('PN', '1', "Requesting Physician's Name Ideographic", ''),  # noqa
-        '0033xx1b': ('PN', '1', "Requesting Physician's Name Phonetic", ''),  # noqa
-        '0033xx1c': ('PN', '1', "Performing Physician's Name Single Byte", ''),  # noqa
-        '0033xx1d': ('PN', '1', "Performing Physician's Name Ideographic", ''),  # noqa
-        '0033xx1e': ('PN', '1', "Performing Physician's Name Phonetic", ''),  # noqa
+        '0033xx1A': ('PN', '1', "Requesting Physician's Name Ideographic", ''),  # noqa
+        '0033xx1B': ('PN', '1', "Requesting Physician's Name Phonetic", ''),  # noqa
+        '0033xx1C': ('PN', '1', "Performing Physician's Name Single Byte", ''),  # noqa
+        '0033xx1D': ('PN', '1', "Performing Physician's Name Ideographic", ''),  # noqa
+        '0033xx1E': ('PN', '1', "Performing Physician's Name Phonetic", ''),  # noqa
     },
     'MITRA PRESENTATION 1.0': {
         '0029xx00': ('CS', '1', 'Mitra Rotation', ''),  # noqa
@@ -3886,59 +4435,391 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx13': ('CS', '1', 'Breast Box y1', ''),  # noqa
     },
     'MMCPrivate': {
-        '0009xx48': ('LO', '1', 'Unknown', ''),  # noqa
-        '0009xx4e': ('LO', '1', 'Unknown', ''),  # noqa
-        '0011xx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx03': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019xx04': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx05': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx08': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx09': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx0a': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx0b': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx0c': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xx0f': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx10': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx01': ('IS', '1', 'Unknown', ''),  # noqa
-        '0029xx02': ('IS', '1', 'Unknown', ''),  # noqa
-        '0029xx05': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx06': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx08': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx09': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx0a': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx0b': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx0c': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx0d': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx0e': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx0f': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx10': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx11': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx12': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx13': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx14': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx15': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx16': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx17': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx18': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx1c': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx20': ('IS', '1', 'Unknown', ''),  # noqa
-        '0029xx21': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx22': ('ST', '1', 'Unknown', ''),  # noqa
-        '0029xx23': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx24': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx25': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx26': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx27': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx28': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx29': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx2a': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx2b': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx2c': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx2d': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx2e': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xx2f': ('OB', '1', 'Unknown', ''),  # noqa
+        '0009xx00': ('LO', '1', 'Private Creator', ''),  # noqa
+        '0009xx01': ('LO', '1', 'Technologist', ''),  # noqa
+        '0009xx02': ('LO', '1', 'ScheduledStudyDateTime', ''),  # noqa
+        '0009xx03': ('OB', '1', 'StudyAppData', ''),  # noqa
+        '0009xx04': ('UI', '1', 'ProtocolObjectID', ''),  # noqa
+        '0009xx05': ('LO', '1', 'Name', ''),  # noqa
+        '0009xx06': ('IS', '1', 'Frequency', ''),  # noqa
+        '0009xx07': ('SH', '1', 'UpdateFlag', ''),  # noqa
+        '0009xx08': ('SH', '1', 'Directory', ''),  # noqa
+        '0009xx09': ('LO', '1', 'Comments', ''),  # noqa
+        '0009xx0A': ('LO', '1', 'Region', ''),  # noqa
+        '0009xx0B': ('SH', '1', 'Laterality', ''),  # noqa
+        '0009xx0C': ('TM', '1', 'TotalScanTime', ''),  # noqa
+        '0009xx0D': ('LO', '1', 'ContrastMedium', ''),  # noqa
+        '0009xx0E': ('LO', '1', 'CreateDateTime', ''),  # noqa
+        '0009xx0F': ('LO', '1', 'Creator', ''),  # noqa
+        '0009xx10': ('LO', '1', 'SiteName', ''),  # noqa
+        '0009xx11': ('LO', '1', 'ReferringPhysician', ''),  # noqa
+        '0009xx12': ('LO', '1', 'Radiologist', ''),  # noqa
+        '0009xx13': ('LO', '1', 'Technologist', ''),  # noqa
+        '0009xx14': ('UI', '1', 'ProtocolUid', ''),  # noqa
+        '0009xx15': ('SH', '1', 'IsInLibrary', ''),  # noqa
+        '0009xx16': ('LO', '1', 'Gating', ''),  # noqa
+        '0009xx17': ('ST', '1', 'Note', ''),  # noqa
+        '0009xx18': ('IS', '1', 'NumberOfTasks', ''),  # noqa
+        '0009xx19': ('SH', '1', 'IsFlagRaised', ''),  # noqa
+        '0009xx1A': ('SH', '1', 'IsArchived', ''),  # noqa
+        '0009xx1B': ('SH', '1', 'IsDefault', ''),  # noqa
+        '0009xx1C': ('OB', '1', 'ProtocolAppData', ''),  # noqa
+        '0009xx1D': ('SH', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0009xx1E': ('SH', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0009xx1F': ('SQ', '1', 'TaskInfo', ''),  # noqa
+        '0009xx20': ('UI', '1', 'TaskInfoObjectID', ''),  # noqa
+        '0009xx21': ('LO', '1', 'Name', ''),  # noqa
+        '0009xx22': ('SH', '1', 'TaskStatus', ''),  # noqa
+        '0009xx23': ('SH', '1', 'TaskPriority', ''),  # noqa
+        '0009xx24': ('SH', '1', 'Leaf', ''),  # noqa
+        '0009xx25': ('LO', '1', 'TaskID', ''),  # noqa
+        '0009xx26': ('IS', '1', 'Frequency', ''),  # noqa
+        '0009xx27': ('SH', '1', 'UpdateFlag', ''),  # noqa
+        '0009xx28': ('SH', '1', 'Directory', ''),  # noqa
+        '0009xx29': ('LO', '1', 'Comments', ''),  # noqa
+        '0009xx2A': ('SH', '1', 'Category', ''),  # noqa
+        '0009xx2B': ('LO', '1', 'Region', ''),  # noqa
+        '0009xx2C': ('SH', '1', 'Laterality', ''),  # noqa
+        '0009xx2D': ('TM', '1', 'ScanTime', ''),  # noqa
+        '0009xx2E': ('LO', '1', 'ContrastMedium', ''),  # noqa
+        '0009xx2F': ('LO', '1', 'CreateDateTime', ''),  # noqa
+        '0009xx30': ('LO', '1', 'Creator', ''),  # noqa
+        '0009xx31': ('LO', '1', 'SiteName', ''),  # noqa
+        '0009xx32': ('LO', '1', 'ReferringPhysician', ''),  # noqa
+        '0009xx33': ('LO', '1', 'Radiologist', ''),  # noqa
+        '0009xx34': ('LO', '1', 'Technologist', ''),  # noqa
+        '0009xx35': ('UI', '1', 'TaskUid', ''),  # noqa
+        '0009xx36': ('UI', '1', 'TaskInfoUid', ''),  # noqa
+        '0009xx37': ('SH', '1', 'IsInLibrary', ''),  # noqa
+        '0009xx38': ('IS', '1', 'TaskOrder', ''),  # noqa
+        '0009xx39': ('LO', '1', 'Gating', ''),  # noqa
+        '0009xx3A': ('SH', '1', 'Plane', ''),  # noqa
+        '0009xx3B': ('LO', '1', 'SequenceType', ''),  # noqa
+        '0009xx3C': ('SH', '1', 'IsExecutive', ''),  # noqa
+        '0009xx3D': ('ST', '1', 'Note', ''),  # noqa
+        '0009xx3E': ('SH', '1', 'AutoStart', ''),  # noqa
+        '0009xx3F': ('SH', '1', 'AutoSave', ''),  # noqa
+        '0009xx40': ('SH', '1', 'AutoArchive', ''),  # noqa
+        '0009xx41': ('IS', '1', 'QueueGroupID', ''),  # noqa
+        '0009xx42': ('SH', '1', 'IsFlagRaised', ''),  # noqa
+        '0009xx43': ('SH', '1', 'IsArchived', ''),  # noqa
+        '0009xx44': ('SH', '1', 'IsDefault', ''),  # noqa
+        '0009xx45': ('OB', '1', 'TaskInfoAppData', ''),  # noqa
+        '0009xx46': ('SH', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0009xx47': ('SH', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0009xx48': ('LO', '1', 'ProtocolName', ''),  # noqa
+        '0009xx4E': ('LO', '1', 'Cms_BodyPartExamined', ''),  # noqa
+        '0009xx4F': ('LO', '1', 'IsProtected', ''),  # noqa
+        '0009xx50': ('OB', '1', '?StudyReservationInfo', ''),  # noqa
+        '0009xx51': ('LO', '1', 'Cmi_contrastBolusAgent', ''),  # noqa
+        '0009xx52': ('LO', '1', 'Cms_institutionName', ''),  # noqa
+        '0009xx53': ('LO', '1', 'Cms_institutionalDepartmentName', ''),  # noqa
+        '0009xx54': ('LO', '1', 'Cms_seriesDescription', ''),  # noqa
+        '0009xx55': ('LO', '1', 'Cms_operatorsName', ''),  # noqa
+        '0009xx56': ('LO', '1', 'Cms_PerformingPhysiciansName', ''),  # noqa
+        '0009xx57': ('ST', '1', 'Cms_institutionAddress', ''),  # noqa
+        '0009xx58': ('LO', '1', 'Cmi_imageComments', ''),  # noqa
+        '0009xx59': ('LO', '1', 'Cmi_instanceCreationDateTime', ''),  # noqa
+        '0009xx5A': ('LO', '1', 'MppsStepStatus', ''),  # noqa
+        '0009xx5B': ('IS', '1', 'FilmedCount', ''),  # noqa
+        '0009xx5C': ('LO', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0009xx5D': ('LO', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0009xx5E': ('LO', '1', 'IsDeleted', ''),  # noqa
+        '0009xx5F': ('UI', '1', 'ProtocolObjectID', ''),  # noqa
+        '0009xx60': ('OB', '1', 'TaskInfoAppData', ''),  # noqa
+        '0009xx72': ('UI', '1', 'ProtocolTaskInfoObjectID', ''),  # noqa
+        '0009xx73': ('IS', '1', 'ProtocolTaskOrder', ''),  # noqa
+        '0009xx74': ('UI', '1', 'ProtocolTaskUid', ''),  # noqa
+        '0009xx75': ('OB', '1', 'ProtocolTaskAppData', ''),  # noqa
+        '0009xx76': ('SH', '1', 'ProtocolTaskIsAllowCascadeSave', ''),  # noqa
+        '0009xx77': ('SH', '1', 'ProtocolTaskIsAllowCascadeProtect', ''),  # noqa
+        '0011xx00': ('LO', '1', 'Private Creator', ''),  # noqa
+        '0011xx01': ('LO', '1', 'IsRapidRegistration', ''),  # noqa
+        '0011xx02': ('LO', '1', 'IsProtected', ''),  # noqa
+        '0011xx03': ('IS', '1', 'FilmedCount', ''),  # noqa
+        '0011xx04': ('OB', '1', 'ApplicationData', ''),  # noqa
+        '0011xx05': ('LO', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0011xx06': ('LO', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0011xx07': ('LO', '1', 'IsDeleted', ''),  # noqa
+        '0019xx00': ('LO', '1', 'Private Creator', ''),  # noqa
+        '0019xx01': ('LO', '1', 'ProcType', ''),  # noqa
+        '0019xx02': ('LO', '1', 'Plane', ''),  # noqa
+        '0019xx03': ('SH', '1', 'IsSnapShotSeries', ''),  # noqa
+        '0019xx04': ('DS', '1', 'MaxFsColor', ''),  # noqa
+        '0019xx05': ('LO', '1', 'SeriesCategoryType', ''),  # noqa
+        '0019xx07': ('LO', '1', 'ImageContrastBolusAgent', ''),  # noqa
+        '0019xx08': ('DS', '1', 'ImageSliceThickness', ''),  # noqa
+        '0019xx09': ('DS', '1', 'ImageReconstructionDiameter', ''),  # noqa
+        '0019xx0A': ('LO', '1', 'ImageEchoTime', ''),  # noqa
+        '0019xx0B': ('DS', '1', 'ImageRepetitionTime', ''),  # noqa
+        '0019xx0C': ('LO', '1', 'SequenceType', ''),  # noqa
+        '0019xx0D': ('LO', '1', 'TaskUid', ''),  # noqa
+        '0019xx0E': ('OB', '1', 'SeriesAppData', ''),  # noqa
+        '0019xx0F': ('IS', '1', 'MultiSliceNumber', ''),  # noqa
+        '0019xx10': ('LO', '1', 'ImageScanTime', ''),  # noqa
+        '0019xx11': ('LO', '1', 'IsProtected', ''),  # noqa
+        '0019xx12': ('IS', '1', 'ImageIncrement', ''),  # noqa
+        '0019xx13': ('LO', '1', 'MppsStepStatus', ''),  # noqa
+        '0019xx14': ('IS', '1', 'StorageCommittedCount', ''),  # noqa
+        '0019xx15': ('IS', '1', 'ArchivedCount', ''),  # noqa
+        '0019xx16': ('IS', '1', 'TransferredCount', ''),  # noqa
+        '0019xx17': ('LO', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0019xx18': ('LO', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0019xx19': ('LO', '1', 'IsDeleted', ''),  # noqa
+        '0019xx1A': ('UI', '1', 'CharacterizedImageInstanceUid', ''),  # noqa
+        '0019xx1B': ('IS', '1', 'CharacterizedImageCount', ''),  # noqa
+        '0019xx1C': ('LO', '1', 'InternalWindowWidth', ''),  # noqa
+        '0019xx1D': ('LO', '1', 'InternalWindowLevel', ''),  # noqa
+        '0019xx1E': ('LO', '1', '?FlipAngle?', ''),  # noqa
+        '0019xx1F': ('LO', '1', '?InversionTime?', ''),  # noqa
+        '0019xx20': ('UI', '1', 'MultiFrameSopInstanceUid', ''),  # noqa
+        '0019xx21': ('OB', '1', '?ScanInterface.GroupParamArchive', ''),  # noqa
+        '0029xx00': ('LO', '1', 'Private Creator', ''),  # noqa
+        '0029xx01': ('IS', '1', 'SliceNumber', ''),  # noqa
+        '0029xx02': ('IS', '1', 'PhaseNumber', ''),  # noqa
+        '0029xx03': ('LO', '1', 'ProcType', ''),  # noqa
+        '0029xx04': ('LO', '1', 'StopwatchTime', ''),  # noqa
+        '0029xx05': ('LO', '1', 'Plane', ''),  # noqa
+        '0029xx06': ('LO', '1', 'ScanTime', ''),  # noqa
+        '0029xx08': ('LO', '1', 'DualSliceFlag', ''),  # noqa
+        '0029xx09': ('LO', '1', 'SspRatio', ''),  # noqa
+        '0029xx0A': ('LO', '1', 'GatingSignalSource', ''),  # noqa
+        '0029xx0B': ('LO', '1', 'Rephase', ''),  # noqa
+        '0029xx0C': ('LO', '1', 'HalfEcho', ''),  # noqa
+        '0029xx0D': ('LO', '1', 'RectFOVRatio', ''),  # noqa
+        '0029xx0E': ('LO', '1', 'HalfScan', ''),  # noqa
+        '0029xx0F': ('LO', '1', 'NumShots', ''),  # noqa
+        '0029xx10': ('LO', '1', 'ContrastAgent', ''),  # noqa
+        '0029xx11': ('LO', '1', 'EchoAllocation', ''),  # noqa
+        '0029xx12': ('LO', '1', 'NumEchoShift', ''),  # noqa
+        '0029xx13': ('LO', '1', 'FatSat', ''),  # noqa
+        '0029xx14': ('LO', '1', 'MTC', ''),  # noqa
+        '0029xx15': ('LO', '1', 'NumPreSat', ''),  # noqa
+        '0029xx16': ('LO', '1', 'TargetVelocity', ''),  # noqa
+        '0029xx17': ('LO', '1', 'VENCAxis', ''),  # noqa
+        '0029xx18': ('LO', '1', 'NumVENCDirection', ''),  # noqa
+        '0029xx1C': ('LO', '1', 'IsScalableWindowLevel', ''),  # noqa
+        '0029xx1D': ('LO', '1', 'ThreeDSettingLineAngle', ''),  # noqa
+        '0029xx1E': ('LO', '1', 'MPGTotalAxis', ''),  # noqa
+        '0029xx1F': ('LO', '1', 'MPGAxisNumber', ''),  # noqa
+        '0029xx20': ('IS', '1', 'MultiEchoNumber', ''),  # noqa
+        '0029xx21': ('DS', '1', 'NaviAverageGateWidth', ''),  # noqa
+        '0029xx22': ('ST', '1', 'ShimCompensateValue', ''),  # noqa
+        '0029xx23': ('LO', '1', 'GCOffset', ''),  # noqa
+        '0029xx24': ('DS', '1', 'NaviMaxGateWidth', ''),  # noqa
+        '0029xx25': ('DS', '1', 'NaviMinGateWidth', ''),  # noqa
+        '0029xx26': ('DS', '1', 'NaviMaxGatePosition', ''),  # noqa
+        '0029xx27': ('DS', '1', 'NaviMinGatePosition', ''),  # noqa
+        '0029xx28': ('DS', '1', 'TimeDuration', ''),  # noqa
+        '0029xx29': ('DS', '1', 'TablePosition', ''),  # noqa
+        '0029xx2A': ('DS', '1', 'NaviInitialGateWidth', ''),  # noqa
+        '0029xx2B': ('DS', '1', 'NaviFinalGateWidth', ''),  # noqa
+        '0029xx2C': ('DS', '1', 'NaviInitialGatePosition', ''),  # noqa
+        '0029xx2D': ('DS', '1', 'NaviFinalGatePosition', ''),  # noqa
+        '0029xx2E': ('DS', '1', 'NaviAverageGatePosition', ''),  # noqa
+        '0029xx2F': ('OB', '1', 'ImageAppData', ''),  # noqa
+        '0029xx30': ('FD', '1', 'DiffusionBValue', ''),  # noqa
+        '0029xx31': ('SQ', '1', 'SharedFunctionalGroupsSequence', ''),  # noqa
+        '0029xx32': ('SQ', '1', 'PerFrameFunctionalGroupsSequence', ''),  # noqa
+        '0029xx33': ('DS', '1', 'LossyImageCompressionRatio', ''),  # noqa
+        '0029xx34': ('UI', '1', 'InstanceCreatorUID', ''),  # noqa
+        '0029xx35': ('UI', '1', 'RelatedGeneralSOPClassUID', ''),  # noqa
+        '0029xx36': ('UI', '1', 'OriginalSpecializedSOPClassUID', ''),  # noqa
+        '0029xx37': ('SH', '1', 'TimezoneOffsetFromUTC', ''),  # noqa
+        '0029xx38': ('CS', '1', 'SOPInstanceStatus', ''),  # noqa
+        '0029xx39': ('DT', '1', 'SOPAuthorizationDateandTime', ''),  # noqa
+        '0029xx3A': ('LT', '1', 'SOPAuthorizationComment', ''),  # noqa
+        '0029xx3B': ('LO', '1', 'AuthorizationEquipmentCertificationNumber', ''),  # noqa
+        '0029xx3C': ('UL', '1', 'ConcatenationFrameOffsetNumber', ''),  # noqa
+        '0029xx3D': ('US', '1', 'RepresentativeFrameNumber', ''),  # noqa
+        '0029xx3E': ('UI', '1', 'ConcatenationUID', ''),  # noqa
+        '0029xx3F': ('US', '1', 'InConcatenationNumber', ''),  # noqa
+        '0029xx40': ('CS', '1', 'CardiacSynchronizationTechnique', ''),  # noqa
+        '0029xx41': ('CS', '1', 'CardiacSignalSource', ''),  # noqa
+        '0029xx42': ('FD', '1', 'CardiacRRIntervalSpecified', ''),  # noqa
+        '0029xx43': ('CS', '1', 'CardiacBeatRejectionTechnique', ''),  # noqa
+        '0029xx44': ('IS', '1', 'LowRRValue', ''),  # noqa
+        '0029xx45': ('IS', '1', 'HighRRValue', ''),  # noqa
+        '0029xx46': ('IS', '1', 'IntervalsAcquired', ''),  # noqa
+        '0029xx47': ('IS', '1', 'IntervalsRejected', ''),  # noqa
+        '0029xx48': ('CS', '1', 'RespiratoryMotionCompensationTechnique', ''),  # noqa
+        '0029xx49': ('CS', '1', 'RespiratorySignalSource', ''),  # noqa
+        '0029xx4A': ('CS', '1', 'BulkMotionCompensationTechnique', ''),  # noqa
+        '0029xx4B': ('CS', '1', 'BulkMotionSignalSource', ''),  # noqa
+        '0029xx4C': ('CS', '1', 'PixelPresentation', ''),  # noqa
+        '0029xx4D': ('CS', '1', 'VolumetricProperties', ''),  # noqa
+        '0029xx4E': ('CS', '1', 'VolumeBasedCalculationTechnique', ''),  # noqa
+        '0029xx4F': ('ST', '1', 'AcquisitionContextDescription', ''),  # noqa
+        '0029xx50': ('SQ', '1', 'ModalityLUTSequence', ''),  # noqa
+        '0029xx51': ('LO', '1', 'LUTDescriptor', ''),  # noqa
+        '0029xx52': ('LO', '1', 'LUTExplanation', ''),  # noqa
+        '0029xx53': ('LO', '1', 'LUTData', ''),  # noqa
+        '0029xx54': ('CS', '1', 'PresentationLUTShape', ''),  # noqa
+        '0029xx55': ('SQ', '1', 'FrameAnatomySequence', ''),  # noqa
+        '0029xx56': ('CS', '1', 'FrameLaterality', ''),  # noqa
+        '0029xx57': ('SQ', '1', 'AnatomicRegionSequence', ''),  # noqa
+        '0029xx58': ('SH', '1', 'AnatomicRegionCodeValue', ''),  # noqa
+        '0029xx59': ('SH', '1', 'AnatomicRegionCodingSchemeDesignator', ''),  # noqa
+        '0029xx5A': ('SH', '1', 'AnatomicRegionCodingSchemeVersion', ''),  # noqa
+        '0029xx5B': ('LO', '1', 'AnatomicRegionCodeMeaning', ''),  # noqa
+        '0029xx5C': ('SQ', '1', 'PixelValueTransformationSequence', ''),  # noqa
+        '0029xx5D': ('LO', '1', 'RescaleType', ''),  # noqa
+        '0029xx5E': ('SQ', '1', 'CardiacTriggerSequence', ''),  # noqa
+        '0029xx5F': ('FD', '1', 'TriggerDelayTime', ''),  # noqa
+        '0029xx60': ('SQ', '1', 'FrameVOILUTSequence', ''),  # noqa
+        '0029xx61': ('LO', '1', 'WindowCenterAndWidthExplanation', ''),  # noqa
+        '0029xx62': ('CS', '1', 'AcquisitionContrast', ''),  # noqa
+        '0029xx63': ('SQ', '1', 'MRModifierSequence', ''),  # noqa
+        '0029xx64': ('CS', '1', 'ParallelAcquisitionTechnic', ''),  # noqa
+        '0029xx65': ('FD', '1', 'ParallelReductionFactorSecIn', ''),  # noqa
+        '0029xx66': ('CS', '1', 'InversionRecovery', ''),  # noqa
+        '0029xx67': ('CS', '1', 'FlowCompensation', ''),  # noqa
+        '0029xx68': ('CS', '1', 'FlowCompensationDirection', ''),  # noqa
+        '0029xx69': ('CS', '1', 'SpatialPreSaturation', ''),  # noqa
+        '0029xx6A': ('CS', '1', 'PartialFourier', ''),  # noqa
+        '0029xx6B': ('CS', '1', 'PartialFourierDirection', ''),  # noqa
+        '0029xx6C': ('CS', '1', 'ResonantNucleus', ''),  # noqa
+        '0029xx6D': ('CS', '1', 'KSpaceFiltering', ''),  # noqa
+        '0029xx6E': ('CS', '1', 'ApplicableSafetyStandardAgency', ''),  # noqa
+        '0029xx6F': ('LO', '1', 'ApplicableSafetyStandardDescription', ''),  # noqa
+        '0029xx70': ('SQ', '1', 'MRReceiveCoilSequence', ''),  # noqa
+        '0029xx71': ('LO', '1', 'ReceiveCoilManufacturerName', ''),  # noqa
+        '0029xx72': ('CS', '1', 'ReceiveCoilType', ''),  # noqa
+        '0029xx73': ('CS', '1', 'QuadratureReceiveCoil', ''),  # noqa
+        '0029xx74': ('LO', '1', 'MultiCoilConfiguration', ''),  # noqa
+        '0029xx75': ('CS', '1', 'ComplexImageComponent', ''),  # noqa
+        '0029xx76': ('SH', '1', 'PulseSequenceName', ''),  # noqa
+        '0029xx77': ('CS', '1', 'EchoPulseSequence', ''),  # noqa
+        '0029xx78': ('CS', '1', 'MultipleSpinEcho', ''),  # noqa
+        '0029xx79': ('CS', '1', 'MultiPlanarExcitation', ''),  # noqa
+        '0029xx7A': ('CS', '1', 'PhaseContrast', ''),  # noqa
+        '0029xx7B': ('CS', '1', 'TimeOfFlightContrast', ''),  # noqa
+        '0029xx7C': ('CS', '1', 'SteadyStatePulseSequence', ''),  # noqa
+        '0029xx7D': ('CS', '1', 'EchoPlanarPulseSequence', ''),  # noqa
+        '0029xx7E': ('CS', '1', 'SpectrallySelectedSuppression', ''),  # noqa
+        '0029xx7F': ('CS', '1', 'OversamplingPhase', ''),  # noqa
+        '0029xx80': ('CS', '1', 'SegmentedKSpaceTraversal', ''),  # noqa
+        '0029xx81': ('CS', '1', 'CoverageOfKSpace', ''),  # noqa
+        '0029xx82': ('SQ', '1', 'MRTimingAndRelatedParametersSequence', ''),  # noqa
+        '0029xx83': ('US', '1', 'RFEchoTrainLength', ''),  # noqa
+        '0029xx84': ('US', '1', 'GradientEchoTrainLength', ''),  # noqa
+        '0029xx85': ('CS', '1', 'GradientOutputType', ''),  # noqa
+        '0029xx86': ('FD', '1', 'GradientOutput', ''),  # noqa
+        '0029xx87': ('SQ', '1', 'MRFOVGeometrySequence', ''),  # noqa
+        '0029xx88': ('US', '1', 'MRAcquisitionFrequencyEncodingSteps', ''),  # noqa
+        '0029xx89': ('US', '1', 'MRAcquisitionPhaseEncodingStepsInPlane', ''),  # noqa
+        '0029xx8A': ('US', '1', 'MRAcquisitionPhaseEncodingStepsOutOfPlane', ''),  # noqa
+        '0029xx8B': ('SQ', '1', 'MRTransmitCoilSequence', ''),  # noqa
+        '0029xx8C': ('SH', '1', 'TransmitCoilName', ''),  # noqa
+        '0029xx8D': ('LO', '1', 'TransmitCoilManufacturerName', ''),  # noqa
+        '0029xx8E': ('CS', '1', 'TransmitCoilType', ''),  # noqa
+        '0029xx8F': ('SQ', '1', 'MREchoSequence', ''),  # noqa
+        '0029xx90': ('FD', '1', 'EffectiveEchoTime', ''),  # noqa
+        '0029xx91': ('SQ', '1', 'MRMetaboliteMapSequence', ''),  # noqa
+        '0029xx92': ('ST', '1', 'MetaboliteMapDescription', ''),  # noqa
+        '0029xx93': ('SQ', '1', 'MetaboliteMapCodeSequence', ''),  # noqa
+        '0029xx94': ('SH', '1', 'MetaboliteMapCodeValue', ''),  # noqa
+        '0029xx95': ('SH', '1', 'MetaboliteMapCodingSchemeDesignator', ''),  # noqa
+        '0029xx96': ('SH', '1', 'MetaboliteMapCodingSchemeVersion', ''),  # noqa
+        '0029xx97': ('LO', '1', 'MetaboliteMapCodeMeaning', ''),  # noqa
+        '0029xx98': ('SQ', '1', 'MRImagingModifierSequence', ''),  # noqa
+        '0029xx99': ('CS', '1', 'MagnetizationTransfer', ''),  # noqa
+        '0029xx9A': ('CS', '1', 'BloodSignalNulling', ''),  # noqa
+        '0029xx9B': ('CS', '1', 'Tagging', ''),  # noqa
+        '0029xx9C': ('FD', '1', 'TagSpacingFirstDimension', ''),  # noqa
+        '0029xx9D': ('FD', '1', 'TagSpacingSecondDimension', ''),  # noqa
+        '0029xx9E': ('FD', '1', 'TagAngleFirstAxis', ''),  # noqa
+        '0029xx9F': ('SS', '1', 'TagAngleSecondAxis', ''),  # noqa
+        '0029xxA0': ('FD', '1', 'TagThickness', ''),  # noqa
+        '0029xxA1': ('FD', '1', 'TaggingDelay', ''),  # noqa
+        '0029xxA2': ('FD', '1', 'TransmitterFrequency', ''),  # noqa
+        '0029xxA3': ('DS', '1', 'PixelBandwidth', ''),  # noqa
+        '0029xxA4': ('SQ', '1', 'MRVelocityEncodingSequence', ''),  # noqa
+        '0029xxA5': ('FD', '1', 'VelocityEncodingDirection', ''),  # noqa
+        '0029xxA6': ('FD', '1', 'VelocityEncodingMinimumValue', ''),  # noqa
+        '0029xxA7': ('FD', '1', 'VelocityEncodingMaximumValue', ''),  # noqa
+        '0029xxA8': ('SQ', '1', 'MRImageFrameTypeSequence', ''),  # noqa
+        '0029xxA9': ('CS', '1', 'FrameType', ''),  # noqa
+        '0029xxAA': ('CS', '1', 'PixelPresentation', ''),  # noqa
+        '0029xxAB': ('CS', '1', 'VolumetricProperties', ''),  # noqa
+        '0029xxAC': ('CS', '1', 'VolumeBasedCalculationTechnique', ''),  # noqa
+        '0029xxAD': ('IS', '1', 'FilmedCount', ''),  # noqa
+        '0029xxAE': ('LO', '1', 'IsTransferred', ''),  # noqa
+        '0029xxAF': ('LO', '1', 'IsArchived', ''),  # noqa
+        '0029xxB0': ('LO', '1', 'MppsStepStatus', ''),  # noqa
+        '0029xxB1': ('LO', '1', 'CommitmentStatus', ''),  # noqa
+        '0029xxB2': ('LO', '1', 'IsStorageCommitted', ''),  # noqa
+        '0029xxB3': ('LO', '1', 'IsDicom', ''),  # noqa
+        '0029xxB4': ('LO', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0029xxB5': ('LO', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0029xxB6': ('LO', '1', 'IsDeleted', ''),  # noqa
+        '0029xxB7': ('OB', '1', 'ApplicationData', ''),  # noqa
+        '0029xxB8': ('LO', '1', 'IsAllowCascadeSave', ''),  # noqa
+        '0029xxB9': ('LO', '1', 'IsAllowCascadeProtect', ''),  # noqa
+        '0029xxBA': ('LO', '1', 'IsDeleted', ''),  # noqa
+        '0029xxBB': ('IS', '1', 'VOI1', ''),  # noqa
+        '0029xxBC': ('IS', '1', 'VOI2', ''),  # noqa
+        '0029xxBD': ('UI', '1', 'BackgroundImageInstanceUID', ''),  # noqa
+        '0029xxBE': ('LO', '1', 'IsStoredToPortableMedia', ''),  # noqa
+        '0029xxBF': ('DS', '1', 'Voi1', ''),  # noqa
+        '0029xxC0': ('FD', '1', 'SelectiveIRColumn', ''),  # noqa
+        '0029xxC1': ('DS', '1', 'Voi2', ''),  # noqa
+        '0029xxC2': ('DS', '1', 'MixingTime', ''),  # noqa
+        '0029xxC3': ('DS', '1', 'SelectiveIRPosition', ''),  # noqa
+        '0029xxC4': ('DS', '1', 'SelectiveIRRow', ''),  # noqa
+        '0029xxC5': ('DS', '1', 'SelectiveIRColumn', ''),  # noqa
+        '0029xxC6': ('DS', '1', 'SelectiveIROrientation', ''),  # noqa
+        '0029xxC7': ('LO', '1', 'SelectiveIRThickness', ''),  # noqa
+        '0029xxC8': ('SH', '1', 'RephaseOrderSlice', ''),  # noqa
+        '0029xxC9': ('SH', '1', 'RephaseOrderPhase', ''),  # noqa
+        '0029xxCA': ('SH', '1', 'RephaseOrderFreq', ''),  # noqa
+        '0029xxCB': ('ST', '1', 'MetaboliteMapDescription', ''),  # noqa
+        '0029xxCC': ('SQ', '1', 'volumeLocalizationSeq', ''),  # noqa
+        '0029xxCD': ('FD', '1', 'SlabThickness', ''),  # noqa
+        '0029xxCE': ('FD', '1', 'SlabOrientation', ''),  # noqa
+        '0029xxCF': ('FD', '1', 'MidSlabPosition', ''),  # noqa
+        '0029xxD0': ('LO', '1', 'AcqModeSliceDir', ''),  # noqa
+        '0029xxD1': ('LO', '1', 'IRThicknessRatio', ''),  # noqa
+        '0029xxD2': ('LO', '1', 'BBIRThicknessRatio', ''),  # noqa
+        '0029xxD3': ('LO', '1', 'DeltaAngle', ''),  # noqa
+        '0029xxD4': ('IS', '1', 'MultiFrameFrameNumber', ''),  # noqa
+        '0029xxD5': ('UI', '1', 'EnhancedSopInstanceUid', ''),  # noqa
+        '0029xxD6': ('LO', '1', 'PolarityOfPhaseEncoding', ''),  # noqa
+        '0029xxD7': ('OB', '1', 'PresentationStates', ''),  # noqa
+        '0029xxD9': ('DS', '3', 'Magnetic Field Direction', ''),  # noqa
+        '0041xx01': ('OB', '1', 'RawDataAppData', ''),  # noqa
+        '0041xx02': ('SQ', '1', 'RawDataIndex', ''),  # noqa
+        '0041xx03': ('LO', '1', 'ChannelNumber', ''),  # noqa
+        '0041xx04': ('LO', '1', 'AxisDirection', ''),  # noqa
+        '0041xx05': ('LO', '1', 'SlabNumbe', ''),  # noqa
+        '0041xx06': ('LO', '1', 'CardiacPhaseNumbe', ''),  # noqa
+        '0041xx07': ('LO', '1', 'EchoNumber', ''),  # noqa
+        '0041xx08': ('LO', '1', 'SliceEncodeNumber', ''),  # noqa
+        '0041xx09': ('LO', '1', 'NsaNumber', ''),  # noqa
+        '0041xx0A': ('OB', '1', 'RawData', ''),  # noqa
+        '0041xx0B': ('SS', '1', 'RawDataMRInfo', ''),  # noqa
+        '0041xx0C': ('IS', '1', 'NumberOfVoxels', ''),  # noqa
+        '0041xx0D': ('DS', '1', 'MixingTime', ''),  # noqa
+        '0041xx0E': ('DS', '1', 'ADDiff', ''),  # noqa
+        '0041xx0F': ('LO', '1', 'ScanTime', ''),  # noqa
+        '0041xx10': ('LO', '1', 'NumPreSat', ''),  # noqa
+        '0041xx11': ('LO', '1', 'IsStoredToPortableMedia', ''),  # noqa
+        '0041xx12': ('DS', '1', 'Voi1', ''),  # noqa
+        '0041xx13': ('DS', '1', 'Voi2', ''),  # noqa
+        '0041xx14': ('DS', '1', 'VoxelSize', ''),  # noqa
+        '0041xx15': ('IS', '1', 'FreqPoint', ''),  # noqa
+        '0041xx16': ('SH', '1', 'LowOrderShim', ''),  # noqa
+        '0041xx17': ('SH', '1', 'EccLevel', ''),  # noqa
+        '0041xx18': ('FL', '1', 'FwhmHz', ''),  # noqa
+        '0041xx19': ('FL', '1', 'FwhmPpm', ''),  # noqa
+        '0041xx1A': ('FL', '1', 'WaterSupRate', ''),  # noqa
+        '0071xx01': ('FL', '1', 'ForegroundTransparency', ''),  # noqa
+        '0071xx02': ('LO', '1', 'IsDisplayBackgroundImage', ''),  # noqa
+        '0071xx03': ('FL', '1', 'ForegroundHorizontalShift', ''),  # noqa
+        '0071xx04': ('FL', '1', 'ForegroundVerticalShift', ''),  # noqa
+        '0071xx05': ('FL', '1', 'ForegroundRotationAngle', ''),  # noqa
+        '0071xx06': ('FL', '1', 'ForegroundMagnification', ''),  # noqa
+        '0071xx07': ('OB', '1', 'ApplicationData', ''),  # noqa
     },
     'Mayo/IBM Archive Project': {
         '0021xx01': ('UN', '1', 'Unknown', ''),  # noqa
@@ -3952,12 +4833,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx17': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx18': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx19': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xx1a': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xx1b': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xx1c': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xx1d': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xx1e': ('UN', '1', 'Unknown', ''),  # noqa
-        '0021xx1f': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xx1A': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xx1B': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xx1C': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xx1D': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xx1E': ('UN', '1', 'Unknown', ''),  # noqa
+        '0021xx1F': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx20': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx40': ('UN', '1', 'Unknown', ''),  # noqa
         '0021xx41': ('UN', '1', 'Unknown', ''),  # noqa
@@ -4056,14 +4937,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0041xx50': ('LT', '1', 'Folder Status', ''),  # noqa
         '0041xx60': ('UL', '1', 'Number of Images', ''),  # noqa
         '0041xx62': ('UL', '1', 'Number of Other', ''),  # noqa
-        '0041xxa0': ('LT', '1-n', 'External Folder Element DSID', ''),  # noqa
-        '0041xxa1': ('US', '1-n', 'External Folder Element Data Set Type', ''),  # noqa
-        '0041xxa2': ('LT', '1-n', 'External Folder Element File Location', ''),  # noqa
-        '0041xxa3': ('UL', '1-n', 'External Folder Element Length', ''),  # noqa
-        '0041xxb0': ('LT', '1-n', 'Internal Folder Element DSID', ''),  # noqa
-        '0041xxb1': ('US', '1-n', 'Internal Folder Element Data Set Type', ''),  # noqa
-        '0041xxb2': ('UL', '1-n', 'Internal Offset To Data Set', ''),  # noqa
-        '0041xxb3': ('UL', '1-n', 'Internal Offset To Image', ''),  # noqa
+        '0041xxA0': ('LT', '1-n', 'External Folder Element DSID', ''),  # noqa
+        '0041xxA1': ('US', '1-n', 'External Folder Element Data Set Type', ''),  # noqa
+        '0041xxA2': ('LT', '1-n', 'External Folder Element File Location', ''),  # noqa
+        '0041xxA3': ('UL', '1-n', 'External Folder Element Length', ''),  # noqa
+        '0041xxB0': ('LT', '1-n', 'Internal Folder Element DSID', ''),  # noqa
+        '0041xxB1': ('US', '1-n', 'Internal Folder Element Data Set Type', ''),  # noqa
+        '0041xxB2': ('UL', '1-n', 'Internal Offset To Data Set', ''),  # noqa
+        '0041xxB3': ('UL', '1-n', 'Internal Offset To Image', ''),  # noqa
     },
     'PAPYRUS 3.0': {
         '0041xx00': ('LT', '1', 'Comments', ''),  # noqa
@@ -4094,14 +4975,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '60xxxx78': ('US', '1', 'Shadow Size', ''),  # noqa
         '60xxxx80': ('LO', '1', 'Fill Pattern', ''),  # noqa
         '60xxxx82': ('US', '1', 'Overlay Pen Size', ''),  # noqa
-        '60xxxxa0': ('LO', '1', 'Label', ''),  # noqa
-        '60xxxxa2': ('LT', '1', 'Post It Text', ''),  # noqa
-        '60xxxxa4': ('US', '2', 'Anchor Point', ''),  # noqa
-        '60xxxxb0': ('LO', '1', 'ROI Type', ''),  # noqa
-        '60xxxxb2': ('LT', '1', 'Attached Annotation', ''),  # noqa
-        '60xxxxba': ('US', '1-n', 'Contour Points', ''),  # noqa
-        '60xxxxbc': ('US', '1-n', 'Mask Data', ''),  # noqa
-        '60xxxxc0': ('SQ', '1', 'UIN Overlay Sequence', ''),  # noqa
+        '60xxxxA0': ('LO', '1', 'Label', ''),  # noqa
+        '60xxxxA2': ('LT', '1', 'Post It Text', ''),  # noqa
+        '60xxxxA4': ('US', '2', 'Anchor Point', ''),  # noqa
+        '60xxxxB0': ('LO', '1', 'ROI Type', ''),  # noqa
+        '60xxxxB2': ('LT', '1', 'Attached Annotation', ''),  # noqa
+        '60xxxxBA': ('US', '1-n', 'Contour Points', ''),  # noqa
+        '60xxxxBC': ('US', '1-n', 'Mask Data', ''),  # noqa
+        '60xxxxC0': ('SQ', '1', 'UIN Overlay Sequence', ''),  # noqa
     },
     'PHILIPS MR': {
         '0009xx10': ('LO', '1', 'SPI Release', ''),  # noqa
@@ -4167,29 +5048,29 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     },
     'PHILIPS MR/LAST': {
         '0019xx09': ('DS', '1', 'Main Magnetic Field', ''),  # noqa
-        '0019xx0e': ('IS', '1', 'Flow Compensation', ''),  # noqa
-        '0019xxb1': ('IS', '1', 'Minimum RR Interval', ''),  # noqa
-        '0019xxb2': ('IS', '1', 'Maximum RR Interval', ''),  # noqa
-        '0019xxb3': ('IS', '1', 'Number of Rejections', ''),  # noqa
-        '0019xxb4': ('IS', '1-n', 'Number of RR Intervals', ''),  # noqa
-        '0019xxb5': ('IS', '1', 'Arrhythmia Rejection', ''),  # noqa
-        '0019xxb7': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxc0': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '0019xxc6': ('IS', '1', 'Cycled Multiple Slice', ''),  # noqa
-        '0019xxce': ('IS', '1', 'REST', ''),  # noqa
-        '0019xxd5': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxd6': ('IS', '1', 'Fourier Interpolation', ''),  # noqa
-        '0019xxd9': ('IS', '1-n', 'Unknown', ''),  # noqa
-        '0019xxe0': ('IS', '1', 'Prepulse', ''),  # noqa
-        '0019xxe1': ('DS', '1', 'Prepulse Delay', ''),  # noqa
-        '0019xxe2': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxe3': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxe4': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxe5': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxf0': ('LT', '1', 'WS Protocol String 1', ''),  # noqa
-        '0019xxf1': ('LT', '1', 'WS Protocol String 2', ''),  # noqa
-        '0019xxf2': ('LT', '1', 'WS Protocol String 3', ''),  # noqa
-        '0019xxf3': ('LT', '1', 'WS Protocol String 4', ''),  # noqa
+        '0019xx0E': ('IS', '1', 'Flow Compensation', ''),  # noqa
+        '0019xxB1': ('IS', '1', 'Minimum RR Interval', ''),  # noqa
+        '0019xxB2': ('IS', '1', 'Maximum RR Interval', ''),  # noqa
+        '0019xxB3': ('IS', '1', 'Number of Rejections', ''),  # noqa
+        '0019xxB4': ('IS', '1-n', 'Number of RR Intervals', ''),  # noqa
+        '0019xxB5': ('IS', '1', 'Arrhythmia Rejection', ''),  # noqa
+        '0019xxB7': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxC0': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0019xxC6': ('IS', '1', 'Cycled Multiple Slice', ''),  # noqa
+        '0019xxCE': ('IS', '1', 'REST', ''),  # noqa
+        '0019xxD5': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxD6': ('IS', '1', 'Fourier Interpolation', ''),  # noqa
+        '0019xxD9': ('IS', '1-n', 'Unknown', ''),  # noqa
+        '0019xxE0': ('IS', '1', 'Prepulse', ''),  # noqa
+        '0019xxE1': ('DS', '1', 'Prepulse Delay', ''),  # noqa
+        '0019xxE2': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxE3': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxE4': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxE5': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxF0': ('LT', '1', 'WS Protocol String 1', ''),  # noqa
+        '0019xxF1': ('LT', '1', 'WS Protocol String 2', ''),  # noqa
+        '0019xxF2': ('LT', '1', 'WS Protocol String 3', ''),  # noqa
+        '0019xxF3': ('LT', '1', 'WS Protocol String 4', ''),  # noqa
         '0021xx00': ('IS', '1', 'Unknown', ''),  # noqa
         '0021xx10': ('IS', '1', 'Unknown', ''),  # noqa
         '0021xx20': ('IS', '1', 'Unknown', ''),  # noqa
@@ -4231,23 +5112,23 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('DS', '1', 'LR Angulation', ''),  # noqa
         '0019xx08': ('IS', '1', 'Patient Orientation 1', ''),  # noqa
         '0019xx09': ('IS', '1', 'Patient Orientation', ''),  # noqa
-        '0019xx0a': ('IS', '1', 'Slice Orientation', ''),  # noqa
-        '0019xx0b': ('DS', '1', 'LR Offcenter', ''),  # noqa
-        '0019xx0c': ('DS', '1', 'CC Offcenter', ''),  # noqa
-        '0019xx0d': ('DS', '1', 'AP Offcenter', ''),  # noqa
-        '0019xx0e': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx0f': ('IS', '1', 'Number of Slices', ''),  # noqa
+        '0019xx0A': ('IS', '1', 'Slice Orientation', ''),  # noqa
+        '0019xx0B': ('DS', '1', 'LR Offcenter', ''),  # noqa
+        '0019xx0C': ('DS', '1', 'CC Offcenter', ''),  # noqa
+        '0019xx0D': ('DS', '1', 'AP Offcenter', ''),  # noqa
+        '0019xx0E': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xx0F': ('IS', '1', 'Number of Slices', ''),  # noqa
         '0019xx10': ('DS', '1', 'Slice Factor', ''),  # noqa
         '0019xx11': ('DS', '1-n', 'Echo Times', ''),  # noqa
         '0019xx14': ('CS', '1', 'Unknown', ''),  # noqa
         '0019xx15': ('IS', '1', 'Dynamic Study', ''),  # noqa
         '0019xx18': ('DS', '1', 'Heartbeat Interval', ''),  # noqa
         '0019xx19': ('DS', '1', 'Repetition Time FFE', ''),  # noqa
-        '0019xx1a': ('DS', '1', 'FFE Flip Angle', ''),  # noqa
-        '0019xx1b': ('IS', '1', 'Number of Scans', ''),  # noqa
-        '0019xx1c': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx1d': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx1e': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xx1A': ('DS', '1', 'FFE Flip Angle', ''),  # noqa
+        '0019xx1B': ('IS', '1', 'Number of Scans', ''),  # noqa
+        '0019xx1C': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx1D': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx1E': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx21': ('DS', '1-n', 'Unknown', ''),  # noqa
         '0019xx22': ('DS', '1', 'Dynamic Scan Time Begin', ''),  # noqa
         '0019xx23': ('DS', '1-n', 'Unknown', ''),  # noqa
@@ -4280,73 +5161,73 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx66': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx67': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx69': ('IS', '1', 'Number of Phases', ''),  # noqa
-        '0019xx6a': ('IS', '1', 'Cardiac Frequency', ''),  # noqa
-        '0019xx6b': ('DS', '1', 'Inversion Delay', ''),  # noqa
-        '0019xx6c': ('DS', '1', 'Gate Delay', ''),  # noqa
-        '0019xx6d': ('DS', '1', 'Gate Width', ''),  # noqa
-        '0019xx6e': ('DS', '1', 'Trigger Delay Time', ''),  # noqa
+        '0019xx6A': ('IS', '1', 'Cardiac Frequency', ''),  # noqa
+        '0019xx6B': ('DS', '1', 'Inversion Delay', ''),  # noqa
+        '0019xx6C': ('DS', '1', 'Gate Delay', ''),  # noqa
+        '0019xx6D': ('DS', '1', 'Gate Width', ''),  # noqa
+        '0019xx6E': ('DS', '1', 'Trigger Delay Time', ''),  # noqa
         '0019xx70': ('DS', '1-n', 'Unknown', ''),  # noqa
         '0019xx80': ('IS', '1', 'Number of Chemical Shifts', ''),  # noqa
         '0019xx81': ('DS', '1', 'Chemical Shift', ''),  # noqa
         '0019xx84': ('IS', '1', 'Number of Rows', ''),  # noqa
         '0019xx85': ('IS', '1', 'Number of Samples', ''),  # noqa
-        '0019xx8a': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx8b': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx8c': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx8d': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx8e': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xx8f': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx8A': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx8B': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx8C': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx8D': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx8E': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xx8F': ('CS', '1', 'Unknown', ''),  # noqa
         '0019xx94': ('LO', '1', 'Magnetization Transfer Contrast', ''),  # noqa
         '0019xx95': ('LO', '1', 'Spectral Presaturation With Inversion Recovery', ''),  # noqa
         '0019xx96': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx97': ('LO', '1', 'Unknown', ''),  # noqa
         '0019xx99': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xxa0': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa3': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa4': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxb4': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxb5': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxb6': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxc0': ('DS', '1', 'Trigger Delay Times', ''),  # noqa
-        '0019xxc8': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxc9': ('IS', '1', 'Foldover Direction Transverse', ''),  # noqa
-        '0019xxca': ('IS', '1', 'Foldover Direction Sagittal', ''),  # noqa
-        '0019xxcb': ('IS', '1', 'Foldover Direction Coronal', ''),  # noqa
-        '0019xxcc': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxcd': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxce': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxcf': ('IS', '1', 'Number of Echoes', ''),  # noqa
-        '0019xxd0': ('IS', '1', 'Scan Resolution', ''),  # noqa
-        '0019xxd1': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxd2': ('LO', '2', 'Water Fat Shift', ''),  # noqa
-        '0019xxd3': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxd4': ('IS', '1', 'Artifact Reduction', ''),  # noqa
-        '0019xxd5': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxd6': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxd7': ('DS', '1', 'Scan Percentage', ''),  # noqa
-        '0019xxd8': ('IS', '1', 'Halfscan', ''),  # noqa
-        '0019xxd9': ('IS', '1', 'EPI Factor', ''),  # noqa
-        '0019xxda': ('IS', '1', 'Turbo Factor', ''),  # noqa
-        '0019xxdb': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxe0': ('IS', '1', 'Percentage of Scan Completed', ''),  # noqa
-        '0019xxe1': ('DS', '1', 'Prepulse Delay', ''),  # noqa
-        '0019xxe3': ('DS', '1', 'Phase Contrast Velocity', ''),  # noqa
-        '0019xxf0': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxf6': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxf7': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxf8': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxf9': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxfa': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxfb': ('CS', '1', 'Unknown', ''),  # noqa
-        '0019xxfc': ('IS', '1', 'Resonance Frequency', ''),  # noqa
+        '0019xxA0': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA3': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA4': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxB4': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxB5': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxB6': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxC0': ('DS', '1', 'Trigger Delay Times', ''),  # noqa
+        '0019xxC8': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxC9': ('IS', '1', 'Foldover Direction Transverse', ''),  # noqa
+        '0019xxCA': ('IS', '1', 'Foldover Direction Sagittal', ''),  # noqa
+        '0019xxCB': ('IS', '1', 'Foldover Direction Coronal', ''),  # noqa
+        '0019xxCC': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxCD': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxCE': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxCF': ('IS', '1', 'Number of Echoes', ''),  # noqa
+        '0019xxD0': ('IS', '1', 'Scan Resolution', ''),  # noqa
+        '0019xxD1': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxD2': ('LO', '2', 'Water Fat Shift', ''),  # noqa
+        '0019xxD3': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxD4': ('IS', '1', 'Artifact Reduction', ''),  # noqa
+        '0019xxD5': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxD6': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxD7': ('DS', '1', 'Scan Percentage', ''),  # noqa
+        '0019xxD8': ('IS', '1', 'Halfscan', ''),  # noqa
+        '0019xxD9': ('IS', '1', 'EPI Factor', ''),  # noqa
+        '0019xxDA': ('IS', '1', 'Turbo Factor', ''),  # noqa
+        '0019xxDB': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxE0': ('IS', '1', 'Percentage of Scan Completed', ''),  # noqa
+        '0019xxE1': ('DS', '1', 'Prepulse Delay', ''),  # noqa
+        '0019xxE3': ('DS', '1', 'Phase Contrast Velocity', ''),  # noqa
+        '0019xxF0': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxF6': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxF7': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxF8': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxF9': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxFA': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxFB': ('CS', '1', 'Unknown', ''),  # noqa
+        '0019xxFC': ('IS', '1', 'Resonance Frequency', ''),  # noqa
         '0021xx00': ('IS', '1', 'Scan Date', ''),  # noqa
         '0021xx06': ('LO', '1', 'Unknown', ''),  # noqa
         '0021xx07': ('DT', '1', 'Unknown', ''),  # noqa
         '0021xx08': ('LO', '1', 'Unknown', ''),  # noqa
         '0021xx09': ('CS', '1', 'Unknown', ''),  # noqa
-        '0021xx0a': ('CS', '1', 'Unknown', ''),  # noqa
-        '0021xx0f': ('LO', '1', 'Unknown', ''),  # noqa
+        '0021xx0A': ('CS', '1', 'Unknown', ''),  # noqa
+        '0021xx0F': ('LO', '1', 'Unknown', ''),  # noqa
         '0021xx10': ('IS', '1', 'Image Type', ''),  # noqa
         '0021xx13': ('CS', '1', 'Unknown', ''),  # noqa
         '0021xx14': ('LO', '1', 'Unknown', ''),  # noqa
@@ -4372,9 +5253,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx51': ('DS', '1', 'Unknown', ''),  # noqa
         '0029xx52': ('DS', '1', 'Unknown', ''),  # noqa
         '0029xx53': ('DS', '1', 'Unknown', ''),  # noqa
-        '0029xxc3': ('IS', '1', 'Scan Resolution', ''),  # noqa
-        '0029xxc4': ('IS', '1', 'Field of View', ''),  # noqa
-        '0029xxd5': ('LT', '1', 'Slice Thickness', ''),  # noqa
+        '0029xxC3': ('IS', '1', 'Scan Resolution', ''),  # noqa
+        '0029xxC4': ('IS', '1', 'Field of View', ''),  # noqa
+        '0029xxD5': ('LT', '1', 'Slice Thickness', ''),  # noqa
     },
     'PHILIPS MR/PART 12': {
         '0009xx10': ('US', '1', 'Unknown', ''),  # noqa
@@ -4402,11 +5283,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5503xx12': ('SL', '1', 'Slice Thickness', ''),  # noqa
         '5503xx24': ('UT', '1', 'Plane', ''),  # noqa
         '5503xx30': ('SS', '1', 'Number of Slices', ''),  # noqa
-        '5503xxa5': ('UT', '1', 'Prepulse', ''),  # noqa
-        '5503xxae': ('SS', '1', 'Contrast Agent Flag', ''),  # noqa
-        '5503xxbb': ('SL', '1', 'Coil ID', ''),  # noqa
-        '5503xxc2': ('UT', '1', 'Anatomy', ''),  # noqa
-        '5503xxc3': ('UT', '1', 'Indication', ''),  # noqa
+        '5503xxA5': ('UT', '1', 'Prepulse', ''),  # noqa
+        '5503xxAE': ('SS', '1', 'Contrast Agent Flag', ''),  # noqa
+        '5503xxBB': ('SL', '1', 'Coil ID', ''),  # noqa
+        '5503xxC2': ('UT', '1', 'Anatomy', ''),  # noqa
+        '5503xxC3': ('UT', '1', 'Indication', ''),  # noqa
     },
     'PHILIPS UNKNOWN': {
         '2001xx01': ('UN', '1', 'MRSeriesNrOfEchoes', ''),  # noqa
@@ -4433,9 +5314,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx05': ('FD', '1-n', 'Frame Rescale Slope Vector', ''),  # noqa
     },
     'PMOD_GENPET': {
-        '7fe1xx01': ('UT', '1', 'Slices Names', ''),  # noqa
-        '7fe1xx02': ('UT', '1', 'Gene Codes', ''),  # noqa
-        '7fe1xx03': ('UT', '1', 'Gene Labels', ''),  # noqa
+        '7FE1xx01': ('UT', '1', 'Slices Names', ''),  # noqa
+        '7FE1xx02': ('UT', '1', 'Gene Codes', ''),  # noqa
+        '7FE1xx03': ('UT', '1', 'Gene Labels', ''),  # noqa
     },
     'PMS-THORA-5.1': {
         '0089xx20': ('SQ', '1', 'Stamp Image Sequence', ''),  # noqa
@@ -4468,12 +5349,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190007': ('FL', '3', 'Unknown', ''),  # noqa
         '00190008': ('US', '1', 'Unknown', ''),  # noqa
         '00190009': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019000a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019000b': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('US', '3', 'Unknown', ''),  # noqa
-        '0019000d': ('SL', '6', 'Unknown', ''),  # noqa
-        '0019000e': ('SL', '6', 'Unknown', ''),  # noqa
-        '0019000f': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('US', '3', 'Unknown', ''),  # noqa
+        '0019000D': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000E': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000F': ('SL', '6', 'Unknown', ''),  # noqa
         '00190010': ('US', '2', 'Unknown', ''),  # noqa
         '00190011': ('SL', '2', 'Unknown', ''),  # noqa
         '00190012': ('US', '1', 'Unknown', ''),  # noqa
@@ -4484,20 +5365,28 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190017': ('SL', '1', 'Unknown', ''),  # noqa
         '00190018': ('US', '1', 'Unknown', ''),  # noqa
         '00190019': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019001b': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190020': ('FL', '2', 'Unknown', ''),  # noqa
+        '00190021': ('US', '1', 'Unknown', ''),  # noqa
+        '00190022': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190023': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190024': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190025': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190026': ('SL', '1', 'Unknown', ''),  # noqa
         '00190027': ('SL', '1', 'Unknown', ''),  # noqa
         '00190028': ('SL', '1', 'Unknown', ''),  # noqa
         '00190029': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019002a': ('DS', '3', 'Unknown', ''),  # noqa
-        '0019002b': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019002c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019002d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019002e': ('US', '1', 'Unknown', ''),  # noqa
-        '0019002f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002B': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019002F': ('FL', '1', 'Unknown', ''),  # noqa
         '00190030': ('UL', '1', 'Unknown', ''),  # noqa
         '00190031': ('OF', '1-n', 'Unknown', ''),  # noqa
         '00190032': ('FL', '1', 'Unknown', ''),  # noqa
@@ -4506,12 +5395,13 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190035': ('SL', '1', 'Unknown', ''),  # noqa
         '00190036': ('SQ', '1', 'Unknown', ''),  # noqa
         '00190038': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003b': ('SL', '2', 'Unknown', ''),  # noqa
-        '0019003c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003f': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190039': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003B': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019003C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190042': ('US', '1', 'Unknown', ''),  # noqa
         '00190043': ('US', '1', 'Unknown', ''),  # noqa
         '00190044': ('SL', '1', 'Unknown', ''),  # noqa
@@ -4520,23 +5410,24 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190047': ('FL', '1', 'Unknown', ''),  # noqa
         '00190048': ('US', '1', 'Unknown', ''),  # noqa
         '00190049': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004b': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004c': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019004e': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004f': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004C': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004F': ('US', '1', 'Unknown', ''),  # noqa
         '00190050': ('SL', '2', 'Unknown', ''),  # noqa
         '00190051': ('SL', '2', 'Unknown', ''),  # noqa
         '00190052': ('LO', '1', 'Unknown', ''),  # noqa
         '00190054': ('US', '1', 'Unknown', ''),  # noqa
         '00190055': ('US', '1', 'Unknown', ''),  # noqa
+        '00190056': ('FL', '3', 'Unknown', ''),  # noqa
         '00190057': ('FL', '3', 'Unknown', ''),  # noqa
         '00190058': ('FL', '3', 'Unknown', ''),  # noqa
         '00190059': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005a': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '0019005d': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '0019005e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019005A': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005D': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005F': ('FL', '1', 'Unknown', ''),  # noqa
         '00190060': ('US', '1', 'Unknown', ''),  # noqa
         '00190061': ('US', '1', 'Unknown', ''),  # noqa
         '00190062': ('US', '1', 'Unknown', ''),  # noqa
@@ -4544,175 +5435,182 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190064': ('FL', '1', 'Unknown', ''),  # noqa
         '00190065': ('SL', '2', 'Unknown', ''),  # noqa
         '00190069': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019006a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019006b': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019006d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019006e': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019006f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019006B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006E': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190070': ('LO', '1', 'Unknown', ''),  # noqa
-        '00190071': ('LO', '1', 'Unknown', ''),  # noqa
-        '00190073': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190071': ('LO', '1', '?Sequence Options?', ''),  # noqa
+        '00190073': ('LO', '1', '?Sequence Options?', ''),  # noqa
         '00190075': ('LO', '1', 'Unknown', ''),  # noqa
         '00190076': ('LO', '1', 'Unknown', ''),  # noqa
         '00190078': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019007b': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019007c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019007d': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019007e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007B': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019007C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007D': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190085': ('FL', '1', 'Unknown', ''),  # noqa
         '00190086': ('SL', '1', 'Unknown', ''),  # noqa
         '00190087': ('FL', '1', 'Unknown', ''),  # noqa
-        '00190088': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019008a': ('SL', '1-n', 'Unknown', ''),  # noqa
-        '0019008c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0019008d': ('TM', '1', 'Unknown', ''),  # noqa
-        '0019008e': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190088': ('LO', '1', '?RxGain?', ''),  # noqa
+        '0019008A': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '0019008C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019008D': ('TM', '1', 'Unknown', ''),  # noqa
+        '0019008E': ('SL', '1', 'Unknown', ''),  # noqa
         '00190092': ('SL', '1', 'Unknown', ''),  # noqa
         '00190093': ('FL', '3', 'Unknown', ''),  # noqa
         '00190096': ('US', '1', 'Unknown', ''),  # noqa
-        '0019009b': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019009c': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a0': ('SL', '4', 'Unknown', ''),  # noqa
-        '001900a1': ('DS', '1', 'Unknown', ''),  # noqa
-        '001900a2': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a3': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900a4': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900a5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a8': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ab': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ac': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ae': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900af': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b7': ('FL', '2', 'Unknown', ''),  # noqa
-        '001900ba': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900bb': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900bc': ('FL', '2', 'Unknown', ''),  # noqa
-        '001900bd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900be': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c6': ('FL', '2', 'Unknown', ''),  # noqa
-        '001900c9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ca': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900cb': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900cc': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900cd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ce': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d0': ('US', '1', 'Unknown', ''),  # noqa
-        '001900d1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d2': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900d3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d8': ('US', '1', 'Unknown', ''),  # noqa
-        '001900d9': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900da': ('US', '1', 'Unknown', ''),  # noqa
-        '001900db': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900dc': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900e6': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900e9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ea': ('UI', '1', 'Unknown', ''),  # noqa
-        '001900eb': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ec': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ee': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900ef': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900f0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f1': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900f2': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900f3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f4': ('FD', '1', 'Unknown', ''),  # noqa
-        '001900f5': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f6': ('UI', '1', 'Unknown', ''),  # noqa
-        '001900f8': ('US', '1', 'Unknown', ''),  # noqa
-        '001900f9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fa': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fb': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900fc': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fd': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ff': ('SL', '3', 'Unknown', ''),  # noqa
-        '00210002': ('SL', '1', 'Unknown', ''),  # noqa
-        '00210003': ('SL', '1', 'Unknown', ''),  # noqa
-        '00210004': ('US', '1', 'Unknown', ''),  # noqa
-        '00210008': ('DS', '3', 'Unknown', ''),  # noqa
-        '00210009': ('DS', '3', 'Unknown', ''),  # noqa
-        '0021000a': ('DS', '3', 'Unknown', ''),  # noqa
-        '0021000b': ('US', '1', 'Unknown', ''),  # noqa
-        '0021000c': ('US', '1', 'Unknown', ''),  # noqa
-        '0021000d': ('FL', '1', 'Unknown', ''),  # noqa
-        '0021000f': ('US', '1', 'Unknown', ''),  # noqa
-        '00210012': ('DS', '3', 'Unknown', ''),  # noqa
+        '0019009B': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009C': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('SL', '4', 'Unknown', ''),  # noqa
+        '001900A1': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900A4': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900A5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('FL', '1', '?Repetition Time (/100)', ''),  # noqa
+        '001900A9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AB': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900AD': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B7': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900BA': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BC': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900BD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BE': ('SL', '1', 'Acquisition Duration', ''),  # noqa
+        '001900C1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C6': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900C9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CA': ('LO', '1', 'Sequence Name', ''),  # noqa
+        '001900CB': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CC': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CF': ('SL', '1', '?acquired series (vs postproc)?', ''),  # noqa
+        '001900D0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900D1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D2': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900D3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D8': ('US', '1-n', 'Unknown', ''),  # noqa
+        '001900D9': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900DA': ('US', '1', 'Unknown', ''),  # noqa
+        '001900DB': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900DC': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900EA': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900EB': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900EC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900EF': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F4': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900F5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F6': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900F8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900F9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FF': ('SL', '3', 'Unknown', ''),  # noqa
+        '00210002': ('SL', '1', '?num?', ''),  # noqa
+        '00210003': ('SL', '1', '?num?', ''),  # noqa
+        '00210004': ('US', '1', '?num?', ''),  # noqa
+        '00210008': ('DS', '3', '?vect1?', ''),  # noqa
+        '00210009': ('DS', '3', '?vect2?', ''),  # noqa
+        '0021000A': ('DS', '3', '?vect3?', ''),  # noqa
+        '0021000B': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000C': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000D': ('FL', '1', 'Unknown', ''),  # noqa
+        '0021000F': ('US', '1', 'Unknown', ''),  # noqa
+        '00210012': ('DS', '3', '?vect4?', ''),  # noqa
         '00210014': ('SQ', '1', 'Unknown', ''),  # noqa
         '00210015': ('FL', '1', 'Unknown', ''),  # noqa
         '00210016': ('FL', '2', 'Unknown', ''),  # noqa
         '00210018': ('US', '1', 'Unknown', ''),  # noqa
-        '0021001a': ('US', '1', 'Unknown', ''),  # noqa
-        '0021001d': ('IS', '1', 'Unknown', ''),  # noqa
-        '0021001f': ('US', '1', 'Unknown', ''),  # noqa
+        '0021001A': ('US', '1', 'Unknown', ''),  # noqa
+        '0021001D': ('IS', '1', 'Unknown', ''),  # noqa
+        '0021001F': ('US', '1', 'Unknown', ''),  # noqa
         '00290001': ('SL', '1', 'Unknown', ''),  # noqa
         '00290005': ('SQ', '1', 'Unknown', ''),  # noqa
         '00290006': ('FL', '1', 'Unknown', ''),  # noqa
         '00290007': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029001c': ('FL', '2', 'Unknown', ''),  # noqa
+        '0029001C': ('FL', '2', 'Unknown', ''),  # noqa
         '00290021': ('SL', '3', 'Unknown', ''),  # noqa
-        '0029004e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029004E': ('SL', '1', 'Unknown', ''),  # noqa
         '00290050': ('LO', '1', 'Unknown', ''),  # noqa
         '00290051': ('LO', '1', 'Unknown', ''),  # noqa
         '00290052': ('LO', '1', 'Unknown', ''),  # noqa
         '00290054': ('LO', '1', 'Unknown', ''),  # noqa
         '00290067': ('FD', '4', 'Unknown', ''),  # noqa
         '00290068': ('SS', '1', 'Unknown', ''),  # noqa
-        'e2010002': ('US', '1', 'Unknown', ''),  # noqa
-        'e3010000': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4010000': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010001': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010002': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010003': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010004': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010005': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4010008': ('FL', '1', 'Unknown', ''),  # noqa
-        'e4010012': ('FL', '1', 'Unknown', ''),  # noqa
-        'e4010013': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4010020': ('SQ', '1', 'Unknown', ''),  # noqa
-        'e4010021': ('SQ', '1', 'Unknown', ''),  # noqa
-        'e4010022': ('LO', '1', 'Unknown', ''),  # noqa
-        'e4010023': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4010024': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4030000': ('SQ', '1', 'Unknown', ''),  # noqa
-        'ee010000': ('US', '1', 'Unknown', ''),  # noqa
-        'ee010001': ('OB', '1', 'Unknown', ''),  # noqa
-        'ee010002': ('US', '1', 'Unknown', ''),  # noqa
+        '0029006E': ('OB', '1', 'Unknown', ''),  # noqa
+        'E2010002': ('US', '1', 'Unknown', ''),  # noqa
+        'E3010000': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4010000': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010001': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010002': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010003': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010004': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010005': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4010007': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010008': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010012': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010013': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4010020': ('SQ', '1', 'Unknown', ''),  # noqa
+        'E4010021': ('SQ', '1', 'Unknown', ''),  # noqa
+        'E4010022': ('LO', '1', 'Unknown', ''),  # noqa
+        'E4010023': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4010024': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030000': ('SQ', '1', 'Unknown', ''),  # noqa
+        'EE010000': ('US', '1', 'Unknown', ''),  # noqa
+        'EE010001': ('OB', '1', 'Unknown', ''),  # noqa
+        'EE010002': ('US', '1', 'Unknown', ''),  # noqa
     },
     'PMTF INFORMATION DATA^11': {
+        '00190001': ('OB', '1', '?character set?', ''),  # noqa
         '00190002': ('SL', '1', 'Unknown', ''),  # noqa
         '00190003': ('SL', '1', 'Unknown', ''),  # noqa
         '00190004': ('SL', '1', 'Unknown', ''),  # noqa
         '00190007': ('OB', '1', 'Unknown', ''),  # noqa
         '00190008': ('SH', '1', 'Unknown', ''),  # noqa
         '00190009': ('SL', '2', 'Unknown', ''),  # noqa
-        '0019000a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000b': ('OB', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('OB', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('SL', '1', 'Unknown', ''),  # noqa
         '00190019': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019001A': ('FL', '1', 'Unknown', ''),  # noqa
         '00190024': ('SL', '1', 'Unknown', ''),  # noqa
         '00190025': ('SL', '1', 'Unknown', ''),  # noqa
         '00190026': ('SL', '1', 'Unknown', ''),  # noqa
         '00190028': ('SL', '1', 'Unknown', ''),  # noqa
         '00190029': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019002a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019002b': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019002c': ('SL', '3', 'Unknown', ''),  # noqa
-        '0019002d': ('SL', '3', 'Unknown', ''),  # noqa
-        '0019002e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002C': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002D': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002E': ('SL', '1', 'Unknown', ''),  # noqa
         '00190030': ('SL', '1', 'Unknown', ''),  # noqa
         '00190031': ('SL', '1', 'Unknown', ''),  # noqa
         '00190032': ('SL', '1', 'Unknown', ''),  # noqa
@@ -4722,95 +5620,116 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190037': ('SL', '1', 'Unknown', ''),  # noqa
         '00190038': ('SL', '1', 'Unknown', ''),  # noqa
         '00190039': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019003a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019003c': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019003e': ('FL', '9', 'Unknown', ''),  # noqa
-        '0019003f': ('UI', '1', 'Unknown', ''),  # noqa
+        '0019003A': ('FL', '1', 'Repetition Time (/100)', ''),  # noqa
+        '0019003C': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019003D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003E': ('FL', '9', 'Unknown', ''),  # noqa
+        '0019003F': ('UI', '1', 'Unknown', ''),  # noqa
         '00190040': ('US', '1', 'Unknown', ''),  # noqa
         '00190041': ('US', '1', 'Unknown', ''),  # noqa
         '00190042': ('SL', '1', 'Unknown', ''),  # noqa
         '00190043': ('SL', '1', 'Unknown', ''),  # noqa
         '00190044': ('SL', '1', 'Unknown', ''),  # noqa
         '00190046': ('FL', '1', 'Unknown', ''),  # noqa
-        '00190048': ('LT', '1', 'Unknown', ''),  # noqa
-        '00190049': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019004c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019004d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019004e': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190048': ('LT', '1', '?QD Whole Body?', ''),  # noqa
+        '00190049': ('LT', '1', '?Atlas Head?', ''),  # noqa
+        '0019004C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004D': ('SL', '1', '?postproc series?', ''),  # noqa
+        '0019004E': ('SL', '1', 'Unknown', ''),  # noqa
         '00190055': ('LO', '1', 'Unknown', ''),  # noqa
         '00190057': ('FL', '1', 'Unknown', ''),  # noqa
         '00190058': ('US', '1', 'Unknown', ''),  # noqa
         '00190059': ('US', '1', 'Unknown', ''),  # noqa
-        '0019005c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005F': ('FL', '1', 'Unknown', ''),  # noqa
         '00190060': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190061': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190062': ('FL', '1', 'Unknown', ''),  # noqa
         '00190063': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190065': ('SL', '1', 'Unknown', ''),  # noqa
         '00190067': ('FL', '1', 'Unknown', ''),  # noqa
         '00190068': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019006c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019006d': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019006e': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019006f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006D': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006E': ('SH', '1', 'Sequence Name', ''),  # noqa
+        '0019006F': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190070': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190071': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190072': ('FL', '1', 'Unknown', ''),  # noqa
         '00190078': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007a': ('SL', '2', 'Unknown', ''),  # noqa
-        '0019007c': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019007d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007A': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019007C': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019007D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190080': ('FL', '1', 'Unknown', ''),  # noqa
         '00190084': ('SL', '1', 'Unknown', ''),  # noqa
         '00190087': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019008a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019008f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190090': ('SL', '1', 'Unknown', ''),  # noqa
         '00190091': ('SL', '1', 'Unknown', ''),  # noqa
         '00190092': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190093': ('SL', '1', 'Unknown', ''),  # noqa
         '00190094': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019009a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019009b': ('US', '1', 'Unknown', ''),  # noqa
-        '0019009c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019009d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019009e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019009f': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a5': ('US', '1', 'Unknown', ''),  # noqa
-        '001900a6': ('US', '1', 'Unknown', ''),  # noqa
-        '001900a8': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ad': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ae': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b2': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b3': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b4': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900b6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b7': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b9': ('US', '1', 'Unknown', ''),  # noqa
-        '001900c0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c1': ('US', '1', 'Unknown', ''),  # noqa
-        '001900c3': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900c4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e0': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900e1': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900e3': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900e4': ('DS', '1', 'Unknown', ''),  # noqa
-        '001900e5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900e6': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900f0': ('SL', '1-n', 'Unknown', ''),  # noqa
-        '001900f1': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900f2': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900f3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900f6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f7': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f8': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fa': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fb': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fc': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ff': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019009D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009F': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A5': ('US', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('US', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AB': ('US', '1', 'Unknown', ''),  # noqa
+        '001900AD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900B1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B3': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900B6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B7': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B9': ('US', '1', 'Unknown', ''),  # noqa
+        '001900BB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BC': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BE': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '001900BF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C1': ('US', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900C4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900E0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900E3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900E4': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900E5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '001900F1': ('SL', '3', 'Diffusion b-value x Toshiba Orientation', ''),  # noqa
+        '001900F2': ('FL', '3', 'Specific Absorption Rate Values', ''),  # noqa
+        '001900F3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900F6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F7': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FF': ('SL', '1', 'Unknown', ''),  # noqa
     },
     'PMTF INFORMATION DATA^12': {
         '00190000': ('SL', '1', 'Unknown', ''),  # noqa
@@ -4818,16 +5737,16 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190002': ('SL', '1', 'Unknown', ''),  # noqa
         '00190003': ('SL', '1', 'Unknown', ''),  # noqa
         '00190004': ('SL', '1', 'Unknown', ''),  # noqa
-        '00190005': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190005': ('SH', '1', '?Sequence Variant?', ''),  # noqa
         '00190006': ('FL', '1', 'Unknown', ''),  # noqa
-        '00190007': ('UL', '2', 'Unknown', ''),  # noqa
-        '00190008': ('UL', '2', 'Unknown', ''),  # noqa
+        '00190007': ('UL', '1-2', 'Unknown', ''),  # noqa
+        '00190008': ('UL', '1-2', 'Unknown', ''),  # noqa
         '00190009': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000b': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0019000d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0019000e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019000D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019000E': ('US', '1', 'Unknown', ''),  # noqa
         '00190010': ('SL', '1', 'Unknown', ''),  # noqa
         '00190011': ('SL', '1', 'Unknown', ''),  # noqa
         '00190012': ('SL', '1', 'Unknown', ''),  # noqa
@@ -4835,80 +5754,91 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190014': ('FL', '1', 'Unknown', ''),  # noqa
         '00190018': ('UL', '1', 'Unknown', ''),  # noqa
         '00190028': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019002a': ('TM', '1', 'Unknown', ''),  # noqa
-        '0019002b': ('SQ', '1', 'Unknown', ''),  # noqa
-        '00190032': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('DS', '3', 'Unknown', ''),  # noqa
+        '0019002B': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190032': ('SH', '1', 'Sequence Name', ''),  # noqa
         '00190034': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190052': ('FL', '2', 'Unknown', ''),  # noqa
         '00190076': ('OB', '1', 'Unknown', ''),  # noqa
         '00190079': ('SQ', '1', 'Unknown', ''),  # noqa
-        '00190080': ('FD', '1', 'Unknown', ''),  # noqa
+        '00190080': ('FD', '1', 'Acquisition Duration', ''),  # noqa
         '00190085': ('US', '1', 'Unknown', ''),  # noqa
         '00190086': ('LO', '1', 'Unknown', ''),  # noqa
         '00190087': ('SQ', '1', 'Unknown', ''),  # noqa
-        '00190088': ('US', '1', 'Unknown', ''),  # noqa
+        '00190088': ('US', '1', 'Series Number Global', ''),  # noqa
         '00190089': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019008a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019008b': ('US', '1', 'Unknown', ''),  # noqa
-        '0019008f': ('OB', '1', 'Unknown', ''),  # noqa
-        '00190093': ('SL', '1', 'Unknown', ''),  # noqa
-        '00190094': ('UI', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('US', '1', 'Series Number Global', ''),  # noqa
+        '0019008B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008F': ('OB', '1', 'Unknown', ''),  # noqa
+        '00190093': ('SL', '1', '?num?', ''),  # noqa
+        '00190094': ('UI', '1', 'Referenced SOP Instance UID', ''),  # noqa
         '00190095': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190096': ('LO', '1', '?PASTA?', ''),  # noqa
         '00190098': ('FL', '3', 'Unknown', ''),  # noqa
-        '00190099': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019009a': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019009c': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019009d': ('US', '1', 'Unknown', ''),  # noqa
-        '0019009e': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019009f': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a0': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a1': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a2': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a3': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a4': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a6': ('FL', '8', 'Unknown', ''),  # noqa
-        '001900a7': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a8': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900aa': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ab': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ac': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ad': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ae': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900af': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900b3': ('FD', '1', 'Unknown', ''),  # noqa
-        '001900b4': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900c2': ('US', '1', 'Unknown', ''),  # noqa
-        '001900c3': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900c4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c5': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c7': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900cc': ('SS', '1', 'Unknown', ''),  # noqa
-        '001900cd': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900cf': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900d1': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900d2': ('US', '3', 'Unknown', ''),  # noqa
-        '001900d3': ('SS', '1', 'Unknown', ''),  # noqa
-        '001900d4': ('US', '2', 'Unknown', ''),  # noqa
-        '001900d5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900d6': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900d7': ('US', '2', 'Unknown', ''),  # noqa
-        '001900d8': ('FL', '5', 'Unknown', ''),  # noqa
-        '001900de': ('US', '1', 'Unknown', ''),  # noqa
-        '001900df': ('US', '1', 'Unknown', ''),  # noqa
-        '001900e0': ('US', '1', 'Unknown', ''),  # noqa
-        '001900e1': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900e2': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900e3': ('TM', '1', 'Unknown', ''),  # noqa
-        '001900e4': ('US', '2', 'Unknown', ''),  # noqa
-        '001900eb': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ec': ('US', '1', 'Unknown', ''),  # noqa
+        '00190099': ('LO', '1', 'Sequence Name', ''),  # noqa
+        '0019009A': ('DS', '1', 'Series Number Local', ''),  # noqa
+        '0019009B': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009C': ('DS', '1', '?num?', ''),  # noqa
+        '0019009D': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009E': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009F': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A4': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('FL', '2-2n', 'Unknown', ''),  # noqa
+        '001900A7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A9': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AA': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AB': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AC': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AD': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AE': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AF': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900B3': ('FD', '1', 'Acquisition Duration', ''),  # noqa
+        '001900B4': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900C2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900C4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900CC': ('SS', '1-n', 'Unknown', ''),  # noqa
+        '001900CD': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900CE': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CF': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900D1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900D2': ('US', '3', 'Unknown', ''),  # noqa
+        '001900D3': ('SS', '1', 'Unknown', ''),  # noqa
+        '001900D4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900D5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900D6': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900D7': ('US', '2', '?vect2?', ''),  # noqa
+        '001900D8': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '001900DE': ('US', '1', '?num?', ''),  # noqa
+        '001900DF': ('US', '1', 'Unknown', ''),  # noqa
+        '001900E0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('FL', '3', '?vect3?', ''),  # noqa
+        '001900E2': ('FL', '3', '?vect3?', ''),  # noqa
+        '001900E3': ('TM', '1', '?time?', ''),  # noqa
+        '001900E4': ('US', '2', '?vect2?', ''),  # noqa
+        '001900EB': ('US', '1', '?num?', ''),  # noqa
+        '001900EC': ('US', '1', '?num?', ''),  # noqa
+        '001900EF': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
     },
     'PMTF INFORMATION DATA^13': {
-        'e4030000': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4030001': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4030002': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4030003': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030000': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4030001': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030002': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030003': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'POLYTRON-SMS 2.5': {
         '0009xx02': ('UN', '1', 'Private Data 1', ''),  # noqa
@@ -4928,10 +5858,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx70': ('PN', '1-n', "Original Operators' Name", ''),  # noqa
     },
     'Philips EV Imaging DD 017': {
-        '2007xxc1': ('UI', '1', '? SOP Instance UID ?', ''),  # noqa
-        '2007xxc2': ('DA', '1', 'Unknown', ''),  # noqa
-        '2007xxc3': ('TM', '1', 'Unknown', ''),  # noqa
-        '2007xxc4': ('UL', '1', 'Unknown', ''),  # noqa
+        '2007xxC1': ('UI', '1', '? SOP Instance UID ?', ''),  # noqa
+        '2007xxC2': ('DA', '1', 'Unknown', ''),  # noqa
+        '2007xxC3': ('TM', '1', 'Unknown', ''),  # noqa
+        '2007xxC4': ('UL', '1', 'Unknown', ''),  # noqa
     },
     'Philips EV Imaging DD 019': {
         '2007xx00': ('LO', '1', 'Unknown', ''),  # noqa
@@ -4963,11 +5893,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx07': ('CS', '1', 'Image Type ED ES', ''),  # noqa
         '2001xx08': ('IS', '1', 'Phase Number', ''),  # noqa
         '2001xx09': ('FL', '1', 'Unknown', ''),  # noqa
-        '2001xx0a': ('IS', '1', 'Slice Number MR', ''),  # noqa
-        '2001xx0b': ('CS', '1', 'Slice Orientation', ''),  # noqa
-        '2001xx0c': ('CS', '1', 'Unknown', ''),  # noqa
-        '2001xx0e': ('CS', '1', 'Unknown', ''),  # noqa
-        '2001xx0f': ('SS', '1', 'Unknown', ''),  # noqa
+        '2001xx0A': ('IS', '1', 'Slice Number MR', ''),  # noqa
+        '2001xx0B': ('CS', '1', 'Slice Orientation', ''),  # noqa
+        '2001xx0C': ('CS', '1', 'Unknown', ''),  # noqa
+        '2001xx0E': ('CS', '1', 'Unknown', ''),  # noqa
+        '2001xx0F': ('SS', '1', 'Unknown', ''),  # noqa
         '2001xx10': ('CS', '1', 'Cardiac Sync', ''),  # noqa
         '2001xx11': ('FL', '1', 'Diffusion Echo Time', ''),  # noqa
         '2001xx12': ('CS', '1', 'Dynamic Series', ''),  # noqa
@@ -4978,12 +5908,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx17': ('SL', '1', 'Number of Phases MR', ''),  # noqa
         '2001xx18': ('SL', '1', 'Number of Slices MR', ''),  # noqa
         '2001xx19': ('CS', '1', 'Partial Matrix Scanned', ''),  # noqa
-        '2001xx1a': ('FL', '1-n', 'PC Velocity', ''),  # noqa
-        '2001xx1b': ('FL', '1', 'Prepulse Delay', ''),  # noqa
-        '2001xx1c': ('CS', '1', 'Prepulse Type', ''),  # noqa
-        '2001xx1d': ('IS', '1', 'Reconstruction Number MR', ''),  # noqa
-        '2001xx1e': ('CS', '1', 'Unknown', ''),  # noqa
-        '2001xx1f': ('CS', '1', 'Respiration Sync', ''),  # noqa
+        '2001xx1A': ('FL', '1-n', 'PC Velocity', ''),  # noqa
+        '2001xx1B': ('FL', '1', 'Prepulse Delay', ''),  # noqa
+        '2001xx1C': ('CS', '1', 'Prepulse Type', ''),  # noqa
+        '2001xx1D': ('IS', '1', 'Reconstruction Number MR', ''),  # noqa
+        '2001xx1E': ('CS', '1', 'Unknown', ''),  # noqa
+        '2001xx1F': ('CS', '1', 'Respiration Sync', ''),  # noqa
         '2001xx20': ('LO', '1', 'Scanning Technique Description MR', ''),  # noqa
         '2001xx21': ('CS', '1', 'SPIR', ''),  # noqa
         '2001xx22': ('FL', '1', 'Water Fat Shift', ''),  # noqa
@@ -4993,11 +5923,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx26': ('CS', '1', 'Presentation State Subtraction Active', ''),  # noqa
         '2001xx28': ('FL', '1', 'Edge Enhancement Gain Factor Sub', ''),  # noqa
         '2001xx29': ('FL', '1', 'Edge Enhancement Gain Factor Non Sub', ''),  # noqa
-        '2001xx2a': ('CS', '1', 'Edge Enhancement Taste Adapt Sub', ''),  # noqa
-        '2001xx2b': ('CS', '1', 'Edge Enhancement Taste Non Sub', ''),  # noqa
-        '2001xx2c': ('FL', '1', 'Harmonization Factor', ''),  # noqa
-        '2001xx2d': ('SS', '1', 'Number of Stack Slices', ''),  # noqa
-        '2001xx2f': ('FL', '1', 'Harmonization Gain', ''),  # noqa
+        '2001xx2A': ('CS', '1', 'Edge Enhancement Taste Adapt Sub', ''),  # noqa
+        '2001xx2B': ('CS', '1', 'Edge Enhancement Taste Non Sub', ''),  # noqa
+        '2001xx2C': ('FL', '1', 'Harmonization Factor', ''),  # noqa
+        '2001xx2D': ('SS', '1', 'Number of Stack Slices', ''),  # noqa
+        '2001xx2F': ('FL', '1', 'Harmonization Gain', ''),  # noqa
         '2001xx30': ('UL', '1', 'Log Subtraction Gain Step', ''),  # noqa
         '2001xx31': ('US', '1', 'Mixing NR of Mask Image Numbers', ''),  # noqa
         '2001xx32': ('FL', '1-n', 'Stack Radial Angle', ''),  # noqa
@@ -5007,27 +5937,27 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx36': ('CS', '1-n', 'Stack Type', ''),  # noqa
         '2001xx37': ('CS', '1', 'Mixing Operation Type', ''),  # noqa
         '2001xx39': ('FL', '1', 'Unknown', ''),  # noqa
-        '2001xx3a': ('CS', '1', 'Pixel Shift', ''),  # noqa
-        '2001xx3d': ('UL', '1', 'Unknown', ''),  # noqa
-        '2001xx3f': ('CS', '1', 'Interpolation Method', ''),  # noqa
+        '2001xx3A': ('CS', '1', 'Pixel Shift', ''),  # noqa
+        '2001xx3D': ('UL', '1', 'Unknown', ''),  # noqa
+        '2001xx3F': ('CS', '1', 'Interpolation Method', ''),  # noqa
         '2001xx42': ('CS', '1', 'Subtraction Land Marking Active', ''),  # noqa
         '2001xx46': ('CS', '1', 'Graphic Line Style', ''),  # noqa
         '2001xx47': ('FL', '1', 'Graphic Line Width', ''),  # noqa
         '2001xx48': ('SS', '1', 'Graphic Annotation ID', ''),  # noqa
-        '2001xx4b': ('CS', '1', 'Poly Line Interpolation Method', ''),  # noqa
-        '2001xx4c': ('CS', '1', 'Poly Line Begin Point Style', ''),  # noqa
-        '2001xx4d': ('CS', '1', 'Poly Line End Point Style', ''),  # noqa
-        '2001xx4e': ('CS', '1', 'Window Smoothing Taste', ''),  # noqa
-        '2001xx4f': ('FD', '1', 'Harmonization Offset', ''),  # noqa
+        '2001xx4B': ('CS', '1', 'Poly Line Interpolation Method', ''),  # noqa
+        '2001xx4C': ('CS', '1', 'Poly Line Begin Point Style', ''),  # noqa
+        '2001xx4D': ('CS', '1', 'Poly Line End Point Style', ''),  # noqa
+        '2001xx4E': ('CS', '1', 'Window Smoothing Taste', ''),  # noqa
+        '2001xx4F': ('FD', '1', 'Harmonization Offset', ''),  # noqa
         '2001xx50': ('LO', '1', 'Unknown', ''),  # noqa
         '2001xx52': ('UI', '1', 'Unknown', ''),  # noqa
         '2001xx53': ('CS', '1', 'Window Invert', ''),  # noqa
         '2001xx55': ('CS', '1', 'Graphic Line Color', ''),  # noqa
         '2001xx56': ('CS', '1', 'Graphic Type (Private)', ''),  # noqa
-        '2001xx5a': ('ST', '1', 'Graphic Annotation Model', ''),  # noqa
-        '2001xx5d': ('ST', '1', 'Measurement Text Units', ''),  # noqa
-        '2001xx5e': ('ST', '1', 'Measurement Text Type', ''),  # noqa
-        '2001xx5f': ('SQ', '1', 'Stack Sequence', ''),  # noqa
+        '2001xx5A': ('ST', '1', 'Graphic Annotation Model', ''),  # noqa
+        '2001xx5D': ('ST', '1', 'Measurement Text Units', ''),  # noqa
+        '2001xx5E': ('ST', '1', 'Measurement Text Type', ''),  # noqa
+        '2001xx5F': ('SQ', '1', 'Stack Sequence', ''),  # noqa
         '2001xx60': ('SL', '1', 'Number of Stacks', ''),  # noqa
         '2001xx61': ('CS', '1', 'Unknown', ''),  # noqa
         '2001xx62': ('CS', '1', 'Unknown', ''),  # noqa
@@ -5037,11 +5967,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx67': ('CS', '1', 'Unknown', ''),  # noqa
         '2001xx68': ('SQ', '1', 'Unknown', ''),  # noqa
         '2001xx69': ('SQ', '1', 'Display Shutter Sequence', ''),  # noqa
-        '2001xx6a': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2001xx6b': ('SQ', '1', 'Has Edge Enhancement Sequence', ''),  # noqa
-        '2001xx6d': ('LO', '1', 'Text Font', ''),  # noqa
-        '2001xx6e': ('SH', '1', 'Series Type', ''),  # noqa
-        '2001xx6f': ('SQ', '1', 'Mixing Sequence', ''),  # noqa
+        '2001xx6A': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2001xx6B': ('SQ', '1', 'Has Edge Enhancement Sequence', ''),  # noqa
+        '2001xx6D': ('LO', '1', 'Text Font', ''),  # noqa
+        '2001xx6E': ('SH', '1', 'Series Type', ''),  # noqa
+        '2001xx6F': ('SQ', '1', 'Mixing Sequence', ''),  # noqa
         '2001xx71': ('CS', '1', 'Unknown', ''),  # noqa
         '2001xx73': ('SQ', '1', 'Referenced Mask Image Sequence', ''),  # noqa
         '2001xx74': ('DS', '1-n', 'Window Center Sub', ''),  # noqa
@@ -5049,10 +5979,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx76': ('UL', '1', 'Unknown', ''),  # noqa
         '2001xx77': ('CS', '1', 'GL TrafoType', ''),  # noqa
         '2001xx79': ('SQ', '1', 'Harmonisation Sequence', ''),  # noqa
-        '2001xx7a': ('FL', '1', 'Unknown', ''),  # noqa
-        '2001xx7b': ('IS', '1', 'Acquisition Number', ''),  # noqa
-        '2001xx7e': ('US', '1', 'Edge Enhancement Gain Taste', ''),  # noqa
-        '2001xx7f': ('US', '1', 'Edge Enhancement Gain Taste Sub', ''),  # noqa
+        '2001xx7A': ('FL', '1', 'Unknown', ''),  # noqa
+        '2001xx7B': ('IS', '1', 'Acquisition Number', ''),  # noqa
+        '2001xx7E': ('US', '1', 'Edge Enhancement Gain Taste', ''),  # noqa
+        '2001xx7F': ('US', '1', 'Edge Enhancement Gain Taste Sub', ''),  # noqa
         '2001xx80': ('LO', '1', 'Text Anchor Point Alignment', ''),  # noqa
         '2001xx81': ('IS', '1', 'Number of Dynamic Scans', ''),  # noqa
         '2001xx82': ('IS', '1', 'Echo Train Length', ''),  # noqa
@@ -5063,34 +5993,34 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx87': ('SH', '1', 'Imaged Nucleus', ''),  # noqa
         '2001xx88': ('DS', '1', 'Number of Averages', ''),  # noqa
         '2001xx89': ('DS', '1', 'Phase FOV Percent', ''),  # noqa
-        '2001xx8a': ('DS', '1', 'Sampling Percent', ''),  # noqa
-        '2001xx8b': ('SH', '1', 'Unknown', ''),  # noqa
+        '2001xx8A': ('DS', '1', 'Sampling Percent', ''),  # noqa
+        '2001xx8B': ('SH', '1', 'Unknown', ''),  # noqa
         '2001xx93': ('LO', '1', 'Text Style', ''),  # noqa
         '2001xx94': ('LO', '1', 'Processing Order Specialization', ''),  # noqa
         '2001xx97': ('SH', '1', 'Nucleus', ''),  # noqa
-        '2001xx9a': ('SQ', '1', 'Graphic Number Sequence', ''),  # noqa
-        '2001xx9b': ('UL', '1', 'Graphic Number', ''),  # noqa
-        '2001xx9c': ('LO', '1', 'Unknown', ''),  # noqa
-        '2001xx9d': ('LO', '1', 'PIIM Subtraction Type', ''),  # noqa
-        '2001xx9f': ('US', '2', 'Pixel Processing Kernel Size', ''),  # noqa
-        '2001xxa1': ('CS', '1', 'Is Raw Image', ''),  # noqa
-        '2001xxa2': ('US', '1', 'LOG Subtraction Curve Taste', ''),  # noqa
-        '2001xxa3': ('UL', '1', 'Text Color Foreground', ''),  # noqa
-        '2001xxa4': ('UL', '1', 'Text Color Background', ''),  # noqa
-        '2001xxa5': ('UL', '1', 'Text Color Shadow', ''),  # noqa
-        '2001xxc1': ('LO', '1', 'Nested Object Type Name', ''),  # noqa
-        '2001xxcc': ('ST', '1', 'Unknown', ''),  # noqa
-        '2001xxda': ('CS', '1', 'Unknown', ''),  # noqa
-        '2001xxf1': ('FL', '1-n', 'Prospective Motion Correction', ''),  # noqa
-        '2001xxf2': ('FL', '1', 'Retrospective Motion Correction', ''),  # noqa
+        '2001xx9A': ('SQ', '1', 'Graphic Number Sequence', ''),  # noqa
+        '2001xx9B': ('UL', '1', 'Graphic Number', ''),  # noqa
+        '2001xx9C': ('LO', '1', 'Unknown', ''),  # noqa
+        '2001xx9D': ('LO', '1', 'PIIM Subtraction Type', ''),  # noqa
+        '2001xx9F': ('US', '2', 'Pixel Processing Kernel Size', ''),  # noqa
+        '2001xxA1': ('CS', '1', 'Is Raw Image', ''),  # noqa
+        '2001xxA2': ('US', '1', 'LOG Subtraction Curve Taste', ''),  # noqa
+        '2001xxA3': ('UL', '1', 'Text Color Foreground', ''),  # noqa
+        '2001xxA4': ('UL', '1', 'Text Color Background', ''),  # noqa
+        '2001xxA5': ('UL', '1', 'Text Color Shadow', ''),  # noqa
+        '2001xxC1': ('LO', '1', 'Nested Object Type Name', ''),  # noqa
+        '2001xxCC': ('ST', '1', 'Unknown', ''),  # noqa
+        '2001xxDA': ('CS', '1', 'Unknown', ''),  # noqa
+        '2001xxF1': ('FL', '1-n', 'Prospective Motion Correction', ''),  # noqa
+        '2001xxF2': ('FL', '1', 'Retrospective Motion Correction', ''),  # noqa
         '2005xx14': ('CS', '1', 'Diffusion', ''),  # noqa
         '2005xx20': ('SL', '1', 'Number of Chemical Shifts', ''),  # noqa
         '2005xx30': ('FL', '1', 'Repetition Time', ''),  # noqa
         '2005xx33': ('FL', '1', 'Scan Duration', ''),  # noqa
         '2005xx35': ('CS', '1', 'Data Type', ''),  # noqa
-        '2005xx8b': ('SH', '1', 'Transmitting Coil', ''),  # noqa
-        '2005xx9f': ('CS', '1', 'Spectral Selective Excitation Pulse', ''),  # noqa
-        '2005xxa1': ('CS', '1', 'Syncra Scan Type', ''),  # noqa
+        '2005xx8B': ('SH', '1', 'Transmitting Coil', ''),  # noqa
+        '2005xx9F': ('CS', '1', 'Spectral Selective Excitation Pulse', ''),  # noqa
+        '2005xxA1': ('CS', '1', 'Syncra Scan Type', ''),  # noqa
     },
     'Philips Imaging DD 002': {
         '2001xx01': ('US', '1', 'Unknown', ''),  # noqa
@@ -5102,12 +6032,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx17': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx18': ('CS', '1', 'Unknown', ''),  # noqa
         '2001xx19': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx1a': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx1b': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx1c': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx1d': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx1e': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx1f': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx1A': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx1B': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx1C': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx1D': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx1E': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx1F': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx20': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx21': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx22': ('FD', '1', 'Unknown', ''),  # noqa
@@ -5118,12 +6048,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx27': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx28': ('US', '1', 'Unknown', ''),  # noqa
         '2001xx29': ('US', '1', 'Unknown', ''),  # noqa
-        '2001xx2a': ('US', '1', 'Unknown', ''),  # noqa
-        '2001xx2b': ('SS', '1', 'Unknown', ''),  # noqa
-        '2001xx2c': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx2d': ('FD', '1', 'Unknown', ''),  # noqa
-        '2001xx2e': ('SS', '1', 'Unknown', ''),  # noqa
-        '2001xx2f': ('SS', '1', 'Unknown', ''),  # noqa
+        '2001xx2A': ('US', '1', 'Unknown', ''),  # noqa
+        '2001xx2B': ('SS', '1', 'Unknown', ''),  # noqa
+        '2001xx2C': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx2D': ('FD', '1', 'Unknown', ''),  # noqa
+        '2001xx2E': ('SS', '1', 'Unknown', ''),  # noqa
+        '2001xx2F': ('SS', '1', 'Unknown', ''),  # noqa
         '2001xx30': ('SS', '1', 'Unknown', ''),  # noqa
         '2001xx31': ('SS', '1', 'Unknown', ''),  # noqa
         '2001xx32': ('SS', '1', 'Unknown', ''),  # noqa
@@ -5133,12 +6063,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2001xx36': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx37': ('FD', '1', 'Unknown', ''),  # noqa
         '2001xx39': ('CS', '1', 'Unknown', ''),  # noqa
-        '2001xx3a': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2001xx3b': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2001xx3c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2001xx3d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2001xx3e': ('SS', '1', 'Unknown', ''),  # noqa
-        '2001xx3f': ('SS', '1', 'Unknown', ''),  # noqa
+        '2001xx3A': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2001xx3B': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2001xx3C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2001xx3D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2001xx3E': ('SS', '1', 'Unknown', ''),  # noqa
+        '2001xx3F': ('SS', '1', 'Unknown', ''),  # noqa
         '2001xx40': ('SS', '1', 'Unknown', ''),  # noqa
     },
     'Philips Imaging DD 065': {
@@ -5156,8 +6086,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '4001xx16': ('ST', '1', 'Unknown', ''),  # noqa
         '4001xx17': ('ST', '1', 'Unknown', ''),  # noqa
         '4001xx18': ('ST', '1', 'Unknown', ''),  # noqa
-        '4001xx1c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '4001xx1d': ('LT', '1', 'Unknown', ''),  # noqa
+        '4001xx1C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '4001xx1D': ('LT', '1', 'Unknown', ''),  # noqa
     },
     'Philips Imaging DD 073': {
         '4007xx48': ('FL', '1', 'Unknown', ''),  # noqa
@@ -5174,12 +6104,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx05': ('CS', '1', 'Synergy Reconstruction Type', ''),  # noqa
         '2005xx08': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx09': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx0a': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx0b': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx0c': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx0d': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx0e': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx0f': ('DS', '1', 'Window Center', ''),  # noqa
+        '2005xx0A': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx0B': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx0C': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx0D': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx0E': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx0F': ('DS', '1', 'Window Center', ''),  # noqa
         '2005xx10': ('DS', '1', 'Window Width', ''),  # noqa
         '2005xx11': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx12': ('CS', '1', 'Unknown', ''),  # noqa
@@ -5190,12 +6120,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx17': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx18': ('LO', '1', 'Unknown', ''),  # noqa
         '2005xx19': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx1a': ('SS', '1', 'Unknown', ''),  # noqa
-        '2005xx1b': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx1c': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx1d': ('SS', '1', 'Unknown', ''),  # noqa
-        '2005xx1e': ('SH', '1', 'Unknown', ''),  # noqa
-        '2005xx1f': ('SH', '1', 'Unknown', ''),  # noqa
+        '2005xx1A': ('SS', '1', 'Unknown', ''),  # noqa
+        '2005xx1B': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx1C': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx1D': ('SS', '1', 'Unknown', ''),  # noqa
+        '2005xx1E': ('SH', '1', 'Unknown', ''),  # noqa
+        '2005xx1F': ('SH', '1', 'Unknown', ''),  # noqa
         '2005xx20': ('SL', '1', 'Number of Chemical Shift', ''),  # noqa
         '2005xx21': ('SS', '1', 'Unknown', ''),  # noqa
         '2005xx22': ('IS', '1', 'Unknown', ''),  # noqa
@@ -5205,12 +6135,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx27': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx28': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx29': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2a': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx2b': ('SS', '1', 'Unknown', ''),  # noqa
-        '2005xx2c': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2d': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx2e': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2f': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2A': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx2B': ('SS', '1', 'Unknown', ''),  # noqa
+        '2005xx2C': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2D': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx2E': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2F': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx30': ('FL', '1', 'Repetition Time', ''),  # noqa
         '2005xx31': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx32': ('CS', '1', 'Unknown', ''),  # noqa
@@ -5221,19 +6151,19 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx37': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx38': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx39': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx3a': ('SH', '1', 'Unknown', ''),  # noqa
-        '2005xx3b': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx3c': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx3d': ('SS', '1', 'Unknown', ''),  # noqa
-        '2005xx3e': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '2005xx3A': ('SH', '1', 'Unknown', ''),  # noqa
+        '2005xx3B': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx3C': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx3D': ('SS', '1', 'Unknown', ''),  # noqa
+        '2005xx3E': ('SL', '1-n', 'Unknown', ''),  # noqa
         '2005xx48': ('IS', '1', 'Unknown', ''),  # noqa
         '2005xx49': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx4a': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx4b': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx4c': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx4d': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx4e': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx4f': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx4A': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx4B': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx4C': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx4D': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx4E': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx4F': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx50': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx51': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx52': ('CS', '1', 'Unknown', ''),  # noqa
@@ -5244,12 +6174,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx57': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx58': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx59': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx5a': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx5b': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx5c': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx5d': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx5e': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx5f': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx5A': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx5B': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx5C': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx5D': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx5E': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx5F': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx60': ('IS', '1', 'Unknown', ''),  # noqa
         '2005xx61': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx63': ('SS', '1', 'Unknown', ''),  # noqa
@@ -5259,12 +6189,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx67': ('IS', '1', 'Unknown', ''),  # noqa
         '2005xx68': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx69': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx6a': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx6b': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx6c': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx6d': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx6e': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx6f': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx6A': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx6B': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx6C': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx6D': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx6E': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx6F': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx70': ('LO', '1', 'Unknown', ''),  # noqa
         '2005xx71': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx72': ('FL', '1', 'Unknown', ''),  # noqa
@@ -5274,31 +6204,31 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx76': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx78': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx79': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx7a': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx7b': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx7e': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx7A': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx7B': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx7E': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx80': ('SQ', '1', 'Unknown', ''),  # noqa
         '2005xx81': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx83': ('SQ', '1', 'Unknown', ''),  # noqa
         '2005xx84': ('SQ', '1', 'Unknown', ''),  # noqa
         '2005xx85': ('SQ', '1', 'Unknown', ''),  # noqa
         '2005xx86': ('SS', '1', 'Unknown', ''),  # noqa
-        '2005xx9e': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2005xx9f': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xxa0': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xxa1': ('CS', '1', 'Syncra Scan Type', ''),  # noqa
-        '2005xxa2': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xxa3': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xxa4': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xxa5': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xxa6': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xxa7': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xxa8': ('DS', '1', 'Unknown', ''),  # noqa
-        '2005xxa9': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xxb0': ('FL', '1', 'Diffusion Direction RL', ''),  # noqa
-        '2005xxb1': ('FL', '1', 'Diffusion Direction AP', ''),  # noqa
-        '2005xxb2': ('FL', '1', 'Diffusion Direction FH', ''),  # noqa
-        '2005xxc0': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx9E': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2005xx9F': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xxA0': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xxA1': ('CS', '1', 'Syncra Scan Type', ''),  # noqa
+        '2005xxA2': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xxA3': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xxA4': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xxA5': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xxA6': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xxA7': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xxA8': ('DS', '1', 'Unknown', ''),  # noqa
+        '2005xxA9': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xxB0': ('FL', '1', 'Diffusion Direction RL', ''),  # noqa
+        '2005xxB1': ('FL', '1', 'Diffusion Direction AP', ''),  # noqa
+        '2005xxB2': ('FL', '1', 'Diffusion Direction FH', ''),  # noqa
+        '2005xxC0': ('CS', '1', 'Unknown', ''),  # noqa
     },
     'Philips MR Imaging DD 002': {
         '2005xx32': ('SQ', '1', 'Unknown', ''),  # noqa
@@ -5415,10 +6345,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx06': ('SS', '1', 'Unknown', ''),  # noqa
         '2005xx07': ('SS', '1', 'Unknown', ''),  # noqa
         '2005xx09': ('DS', '1', 'Unknown', ''),  # noqa
-        '2005xx0a': ('DS', '1', 'Unknown', ''),  # noqa
-        '2005xx0b': ('LO', '1', 'Unknown', ''),  # noqa
-        '2005xx0e': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2005xx0f': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2005xx0A': ('DS', '1', 'Unknown', ''),  # noqa
+        '2005xx0B': ('LO', '1', 'Unknown', ''),  # noqa
+        '2005xx0E': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2005xx0F': ('SQ', '1', 'Unknown', ''),  # noqa
         '2005xx10': ('IS', '1', 'Unknown', ''),  # noqa
         '2005xx11': ('UI', '1', 'Unknown', ''),  # noqa
         '2005xx12': ('IS', '1', 'Unknown', ''),  # noqa
@@ -5428,12 +6358,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx16': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx18': ('CS', '3', 'Unknown', ''),  # noqa
         '2005xx19': ('CS', '3', 'Unknown', ''),  # noqa
-        '2005xx1a': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx1b': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx1c': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx1d': ('IS', '1', 'Unknown', ''),  # noqa
-        '2005xx1e': ('UL', '1', 'Unknown', ''),  # noqa
-        '2005xx1f': ('UL', '1', 'Unknown', ''),  # noqa
+        '2005xx1A': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx1B': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx1C': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx1D': ('IS', '1', 'Unknown', ''),  # noqa
+        '2005xx1E': ('UL', '1', 'Unknown', ''),  # noqa
+        '2005xx1F': ('UL', '1', 'Unknown', ''),  # noqa
         '2005xx20': ('UL', '1', 'Unknown', ''),  # noqa
         '2005xx21': ('UL', '1', 'Unknown', ''),  # noqa
         '2005xx22': ('UL', '1', 'Unknown', ''),  # noqa
@@ -5443,12 +6373,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx26': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx27': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx28': ('SL', '1', 'Unknown', ''),  # noqa
-        '2005xx2a': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2b': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2c': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2d': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx2e': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx2f': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx2A': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2B': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2C': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2D': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx2E': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx2F': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx30': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx31': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx32': ('CS', '1', 'Unknown', ''),  # noqa
@@ -5457,12 +6387,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx37': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx38': ('LT', '1', 'Unknown', ''),  # noqa
         '2005xx39': ('LT', '1', 'Unknown', ''),  # noqa
-        '2005xx3a': ('LT', '1', 'Unknown', ''),  # noqa
-        '2005xx3b': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx3c': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx3d': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx3e': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx3f': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx3A': ('LT', '1', 'Unknown', ''),  # noqa
+        '2005xx3B': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx3C': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx3D': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx3E': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx3F': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx40': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx41': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx42': ('FL', '1', 'Unknown', ''),  # noqa
@@ -5473,13 +6403,55 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2005xx47': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx48': ('FL', '1', 'Unknown', ''),  # noqa
         '2005xx49': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx4a': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx4b': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx4c': ('FL', '1', 'Unknown', ''),  # noqa
-        '2005xx4d': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx4e': ('CS', '1', 'Unknown', ''),  # noqa
-        '2005xx4f': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx4A': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx4B': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx4C': ('FL', '1', 'Unknown', ''),  # noqa
+        '2005xx4D': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx4E': ('CS', '1', 'Unknown', ''),  # noqa
+        '2005xx4F': ('CS', '1', 'Unknown', ''),  # noqa
         '2005xx50': ('SS', '1', 'Unknown', ''),  # noqa
+    },
+    'Philips MR Imaging DD 006': {
+        '20050053': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050054': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050055': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050056': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050057': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050058': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050059': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050060': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050061': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050062': ('LT', '1', 'Unknown', ''),  # noqa
+        '20050063': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050064': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050065': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050066': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050067': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050068': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050071': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050072': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050073': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050074': ('DS', '1', 'Unknown', ''),  # noqa
+        '20050075': ('DS', '1', 'Unknown', ''),  # noqa
+        '20050076': ('LT', '1', 'Unknown', ''),  # noqa
+        '20050078': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050079': ('CS', '3', 'Unknown', ''),  # noqa
+        '20050081': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050082': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050083': ('LT', '1', 'Unknown', ''),  # noqa
+        '20050085': ('DS', '1', 'Unknown', ''),  # noqa
+        '20050086': ('LT', '1', 'Unknown', ''),  # noqa
+        '20050087': ('DS', '1', 'Unknown', ''),  # noqa
+        '20050095': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050096': ('IS', '1', 'Unknown', ''),  # noqa
+        '20050097': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050099': ('SL', '1', 'Unknown', ''),  # noqa
+    },
+    'Philips MR Imaging DD 007': {
+        '20050000': ('CS', '1', 'Unknown', ''),  # noqa
+        '20050001': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050002': ('FL', '1', 'Unknown', ''),  # noqa
+        '20050003': ('FL', '1', 'Unknown', ''),  # noqa
     },
     'Philips NM Private Group': {
         '7043xx00': ('SH', '1', 'Unknown', ''),  # noqa
@@ -5501,7 +6473,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7053xx07': ('SQ', '1', 'Acquisition File Sequence', ''),  # noqa
         '7053xx08': ('SQ', '1', 'Unknown', ''),  # noqa
         '7053xx09': ('DS', '1', 'Activity Concentration Scale Factor', ''),  # noqa
-        '7053xx0f': ('UL', '1', 'Segment Size', ''),  # noqa
+        '7053xx0B': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx0C': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx0D': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx0E': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx0F': ('UL', '1', 'Segment Size', ''),  # noqa
         '7053xx10': ('US', '1', 'Segment Number', ''),  # noqa
         '7053xx11': ('US', '1', 'Number of Segments', ''),  # noqa
         '7053xx12': ('SQ', '1', 'File Data Sequence', ''),  # noqa
@@ -5511,304 +6487,354 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7053xx16': ('SS', '1', 'Unknown', ''),  # noqa
         '7053xx17': ('SS', '1', 'Unknown', ''),  # noqa
         '7053xx18': ('SS', '1', 'Unknown', ''),  # noqa
-        '7053xxc2': ('UI', '1', 'Unknown', ''),  # noqa
+        '7053xx50': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx51': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx52': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx53': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx54': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx55': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx56': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx57': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx58': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx59': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx5A': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx5B': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx5C': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx5D': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx5E': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx5F': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx60': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx61': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx62': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx63': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx64': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx65': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx66': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx67': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx68': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx69': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx6A': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx6B': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx6C': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx6D': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx6E': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx6F': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx70': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx71': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx72': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx73': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx74': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx75': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx76': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx77': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xx78': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxC2': ('UI', '1', 'Unknown', ''),  # noqa
+        '7053xxD0': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD1': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD2': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD3': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD5': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD6': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD7': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD8': ('UN', '1', 'Unknown', ''),  # noqa
+        '7053xxD9': ('UN', '1', 'Unknown', ''),  # noqa
     },
     'Philips RAD Imaging DD 001': {
-        '200bxx00': ('PN', '1', 'Unknown', ''),  # noqa
-        '200bxx01': ('US', '1', 'Unknown', ''),  # noqa
-        '200bxx02': ('US', '1', 'Unknown', ''),  # noqa
-        '200bxx05': ('IS', '1', 'Unknown', ''),  # noqa
-        '200bxx11': ('LO', '1', 'Unknown', ''),  # noqa
-        '200bxx27': ('DT', '1', 'Unknown', ''),  # noqa
-        '200bxx28': ('DS', '1', 'Unknown', ''),  # noqa
-        '200bxx29': ('DS', '1', 'Unknown', ''),  # noqa
-        '200bxx2a': ('UL', '1', 'Unknown', ''),  # noqa
-        '200bxx2b': ('DA', '1', 'Unknown', ''),  # noqa
-        '200bxx2c': ('TM', '1', 'Unknown', ''),  # noqa
-        '200bxx2d': ('LO', '1', 'Unknown', ''),  # noqa
-        '200bxx3b': ('LO', '1', 'Unknown', ''),  # noqa
-        '200bxx40': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx41': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx42': ('UI', '1', 'Unknown', ''),  # noqa
-        '200bxx43': ('UI', '1', 'Unknown', ''),  # noqa
-        '200bxx47': ('DA', '1', 'Unknown', ''),  # noqa
-        '200bxx48': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx4c': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx4d': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx4f': ('DT', '1', 'Unknown', ''),  # noqa
-        '200bxx52': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Bxx00': ('PN', '1', 'Unknown', ''),  # noqa
+        '200Bxx01': ('US', '1', 'Unknown', ''),  # noqa
+        '200Bxx02': ('US', '1', 'Unknown', ''),  # noqa
+        '200Bxx05': ('IS', '1', 'Unknown', ''),  # noqa
+        '200Bxx11': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Bxx27': ('DT', '1', 'Unknown', ''),  # noqa
+        '200Bxx28': ('DS', '1', 'Unknown', ''),  # noqa
+        '200Bxx29': ('DS', '1', 'Unknown', ''),  # noqa
+        '200Bxx2A': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Bxx2B': ('DA', '1', 'Unknown', ''),  # noqa
+        '200Bxx2C': ('TM', '1', 'Unknown', ''),  # noqa
+        '200Bxx2D': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Bxx3B': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Bxx40': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx41': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx42': ('UI', '1', 'Unknown', ''),  # noqa
+        '200Bxx43': ('UI', '1', 'Unknown', ''),  # noqa
+        '200Bxx47': ('DA', '1', 'Unknown', ''),  # noqa
+        '200Bxx48': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx4C': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx4D': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx4F': ('DT', '1', 'Unknown', ''),  # noqa
+        '200Bxx52': ('CS', '1', 'Unknown', ''),  # noqa
     },
     'Philips RAD Imaging DD 097': {
-        '200bxx00': ('ST', '1', 'Unknown', ''),  # noqa
-        '200bxx01': ('CS', '1', 'Unknown', ''),  # noqa
-        '200bxx02': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx50': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx51': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx52': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx53': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx54': ('ST', '1', 'Unknown', ''),  # noqa
-        '200bxx60': ('LT', '1', 'Unknown', ''),  # noqa
-        '200bxx63': ('LT', '1', 'Unknown', ''),  # noqa
-        '200bxx65': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx6e': ('US', '1', 'Unknown', ''),  # noqa
-        '200bxx72': ('FD', '1', 'Unknown', ''),  # noqa
-        '200bxx73': ('SS', '1', 'Unknown', ''),  # noqa
-        '200bxx74': ('IS', '1', 'Unknown', ''),  # noqa
-        '200bxx75': ('CS', '1', 'Unknown', ''),  # noqa
-        '200bxx76': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx78': ('IS', '1-n', 'Unknown', ''),  # noqa
-        '200bxx79': ('IS', '1', 'Unknown', ''),  # noqa
-        '200bxx7a': ('IS', '1', 'Unknown', ''),  # noqa
-        '200bxx7b': ('US', '1', 'Unknown', ''),  # noqa
-        '200bxx7c': ('US', '1', 'Unknown', ''),  # noqa
-        '200bxx7d': ('IS', '1-n', 'Unknown', ''),  # noqa
-        '200bxx7e': ('UI', '1', 'Unknown', ''),  # noqa
-        '200bxx81': ('LO', '1', 'Unknown', ''),  # noqa
-        '200bxx82': ('LO', '1', 'Unknown', ''),  # noqa
-        '200bxx85': ('IS', '1', 'Unknown', ''),  # noqa
-        '200bxx86': ('CS', '1', 'Unknown', ''),  # noqa
-        '200bxx88': ('CS', '1', 'Unknown', ''),  # noqa
-        '200bxx89': ('LT', '1', 'Unknown', ''),  # noqa
-        '200bxx90': ('DS', '1', 'Unknown', ''),  # noqa
-        '200bxx96': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx99': ('SH', '1', 'Unknown', ''),  # noqa
-        '200bxx9a': ('FD', '1', 'Unknown', ''),  # noqa
-        '200bxx9b': ('FD', '1', 'Unknown', ''),  # noqa
-        '200bxxa0': ('LT', '1', 'Unknown', ''),  # noqa
+        '200Bxx00': ('ST', '1', 'Unknown', ''),  # noqa
+        '200Bxx01': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Bxx02': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx50': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx51': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx52': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx53': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx54': ('ST', '1', 'Unknown', ''),  # noqa
+        '200Bxx60': ('LT', '1', 'Unknown', ''),  # noqa
+        '200Bxx63': ('LT', '1', 'Unknown', ''),  # noqa
+        '200Bxx65': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx6E': ('US', '1', 'Unknown', ''),  # noqa
+        '200Bxx72': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Bxx73': ('SS', '1', 'Unknown', ''),  # noqa
+        '200Bxx74': ('IS', '1', 'Unknown', ''),  # noqa
+        '200Bxx75': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Bxx76': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx78': ('IS', '1-n', 'Unknown', ''),  # noqa
+        '200Bxx79': ('IS', '1', 'Unknown', ''),  # noqa
+        '200Bxx7A': ('IS', '1', 'Unknown', ''),  # noqa
+        '200Bxx7B': ('US', '1', 'Unknown', ''),  # noqa
+        '200Bxx7C': ('US', '1', 'Unknown', ''),  # noqa
+        '200Bxx7D': ('IS', '1-n', 'Unknown', ''),  # noqa
+        '200Bxx7E': ('UI', '1', 'Unknown', ''),  # noqa
+        '200Bxx81': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Bxx82': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Bxx85': ('IS', '1', 'Unknown', ''),  # noqa
+        '200Bxx86': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Bxx88': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Bxx89': ('LT', '1', 'Unknown', ''),  # noqa
+        '200Bxx90': ('DS', '1', 'Unknown', ''),  # noqa
+        '200Bxx96': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx99': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Bxx9A': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Bxx9B': ('FD', '1', 'Unknown', ''),  # noqa
+        '200BxxA0': ('LT', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging 60': {
         '0031xx30': ('UL', '1', 'Private data', ''),  # noqa
         '0031xx31': ('UL', '1', 'Private data', ''),  # noqa
     },
     'Philips US Imaging DD 017': {
-        '200dxx05': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 023': {
-        '200dxx37': ('DA', '1', 'Unknown', ''),  # noqa
-        '200dxx38': ('TM', '1', 'Unknown', ''),  # noqa
+        '200Dxx37': ('DA', '1', 'Unknown', ''),  # noqa
+        '200Dxx38': ('TM', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 033': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx03': ('LO', '6', 'Unknown', ''),  # noqa
-        '200dxx04': ('LO', '6', 'Unknown', ''),  # noqa
-        '200dxx05': ('LO', '1-n', 'Unknown', ''),  # noqa
-        '200dxx06': ('LO', '6', 'Unknown', ''),  # noqa
-        '200dxx07': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx08': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx09': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0a': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0b': ('OB', '1', 'Raw Data US', ''),  # noqa
-        '200dxx14': ('IS', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx02': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx03': ('LO', '6', 'Unknown', ''),  # noqa
+        '200Dxx04': ('LO', '6', 'Unknown', ''),  # noqa
+        '200Dxx05': ('LO', '1-n', 'Unknown', ''),  # noqa
+        '200Dxx06': ('LO', '6', 'Unknown', ''),  # noqa
+        '200Dxx07': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx08': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx09': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0A': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0B': ('OB', '1', 'Raw Data US', ''),  # noqa
+        '200Dxx14': ('IS', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 034': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx03': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx04': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx05': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx06': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx07': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx08': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx09': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0a': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0b': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0c': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0d': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0e': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0f': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx10': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx21': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx22': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx23': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx24': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx02': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx03': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx04': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx06': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx07': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx08': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx09': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0A': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0B': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0C': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0D': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0E': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0F': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx10': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx21': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx22': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx23': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx24': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 035': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx03': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx04': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx05': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx07': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx08': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx09': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0a': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0b': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0c': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0d': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx02': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx03': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx04': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx07': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx08': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx09': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0A': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0B': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0C': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0D': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 036': {
-        '200dxx01': ('LO', '3', 'Cols/Rows/Frames', ''),  # noqa
-        '200dxx02': ('LO', '3', 'Cols/Rows/Frames', ''),  # noqa
-        '200dxx03': ('LO', '3', 'Voxel Spacing', ''),  # noqa
-        '200dxx04': ('LO', '3', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '3', 'Cols/Rows/Frames', ''),  # noqa
+        '200Dxx02': ('LO', '3', 'Cols/Rows/Frames', ''),  # noqa
+        '200Dxx03': ('LO', '3', 'Voxel Spacing', ''),  # noqa
+        '200Dxx04': ('LO', '3', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 038': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 039': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx04': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx05': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx06': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx07': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx08': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx09': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0a': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0b': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0c': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx0d': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx04': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx06': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx07': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx08': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx09': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0A': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0B': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0C': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx0D': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 040': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx02': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx03': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx04': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx05': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx06': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx07': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx20': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx02': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx03': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx04': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx06': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx07': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx20': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 041': {
-        '200dxx1e': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx1E': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 042': {
-        '200dxx50': ('LO', '3', 'Unknown', ''),  # noqa
-        '200dxx51': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx52': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx53': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx54': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx55': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx56': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx57': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx58': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx59': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx5a': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx5b': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx5c': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx5d': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx5e': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx5f': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx60': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx70': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx71': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx72': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx73': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx74': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx75': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx76': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx77': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx50': ('LO', '3', 'Unknown', ''),  # noqa
+        '200Dxx51': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx52': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx53': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx54': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx55': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx56': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx57': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx58': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx59': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx5A': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx5B': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx5C': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx5D': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx5E': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx5F': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx60': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx70': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx71': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx72': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx73': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx74': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx75': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx76': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx77': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 043': {
-        '200dxx05': ('SH', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('SH', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 109': {
-        '200dxx00': ('US', '1', 'Unknown', ''),  # noqa
-        '200dxx01': ('SQ', '1', 'Unknown', ''),  # noqa
-        '200dxx02': ('ST', '1', 'Unknown', ''),  # noqa
-        '200dxx03': ('CS', '1', 'Unknown', ''),  # noqa
-        '200dxx04': ('SL', '4', 'Unknown', ''),  # noqa
-        '200dxx05': ('UL', '3', 'Unknown', ''),  # noqa
-        '200dxx06': ('UL', '3', 'Unknown', ''),  # noqa
-        '200dxx07': ('CS', '1', 'Unknown', ''),  # noqa
-        '200dxx08': ('CS', '1', 'Unknown', ''),  # noqa
-        '200dxx09': ('OB', '1', 'Unknown', ''),  # noqa
-        '200dxx0a': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx0b': ('OB', '1', 'Unknown', ''),  # noqa
-        '200dxx0c': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx0d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '200dxx0e': ('CS', '1', 'Unknown', ''),  # noqa
-        '200dxx0f': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx10': ('SL', '1', 'Unknown', ''),  # noqa
-        '200dxx11': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx12': ('SL', '1', 'Unknown', ''),  # noqa
+        '200Dxx00': ('US', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('SQ', '1', 'Unknown', ''),  # noqa
+        '200Dxx02': ('ST', '1', 'Unknown', ''),  # noqa
+        '200Dxx03': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Dxx04': ('SL', '4', 'Unknown', ''),  # noqa
+        '200Dxx05': ('UL', '3', 'Unknown', ''),  # noqa
+        '200Dxx06': ('UL', '3', 'Unknown', ''),  # noqa
+        '200Dxx07': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Dxx08': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Dxx09': ('OB', '1', 'Unknown', ''),  # noqa
+        '200Dxx0A': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx0B': ('OB', '1', 'Unknown', ''),  # noqa
+        '200Dxx0C': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx0D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '200Dxx0E': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Dxx0F': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx10': ('SL', '1', 'Unknown', ''),  # noqa
+        '200Dxx11': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx12': ('SL', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Imaging DD 113': {
-        '200dxx01': ('LO', '1', 'Unknown', ''),  # noqa
-        '200dxx02': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx03': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx04': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx05': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx06': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx07': ('CS', '1', 'Unknown', ''),  # noqa
-        '200dxx09': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx0b': ('CS', '1', 'Unknown', ''),  # noqa
-        '200dxx0c': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx0d': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx0e': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx0f': ('DS', '1', 'Unknown', ''),  # noqa
-        '200dxx10': ('DS', '1', 'Unknown', ''),  # noqa
-        '200dxx11': ('SL', '1', 'Unknown', ''),  # noqa
-        '200dxx12': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx13': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '200dxx14': ('US', '1', 'Unknown', ''),  # noqa
-        '200dxx15': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx17': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx18': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx19': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx1a': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx1b': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx1c': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx1d': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx1e': ('UL', '1', 'Unknown', ''),  # noqa
-        '200dxx1f': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx20': ('FD', '1', 'Unknown', ''),  # noqa
-        '200dxx21': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx01': ('LO', '1', 'Unknown', ''),  # noqa
+        '200Dxx02': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx03': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx04': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx05': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx06': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx07': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Dxx09': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx0B': ('CS', '1', 'Unknown', ''),  # noqa
+        '200Dxx0C': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx0D': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx0E': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx0F': ('DS', '1', 'Unknown', ''),  # noqa
+        '200Dxx10': ('DS', '1', 'Unknown', ''),  # noqa
+        '200Dxx11': ('SL', '1', 'Unknown', ''),  # noqa
+        '200Dxx12': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx13': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '200Dxx14': ('US', '1', 'Unknown', ''),  # noqa
+        '200Dxx15': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx17': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx18': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx19': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx1A': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx1B': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx1C': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx1D': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx1E': ('UL', '1', 'Unknown', ''),  # noqa
+        '200Dxx1F': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx20': ('FD', '1', 'Unknown', ''),  # noqa
+        '200Dxx21': ('FD', '1', 'Unknown', ''),  # noqa
     },
     'Philips US Private 3D': {
-        '200dxx02': ('IS', '1', 'Threedpr Echo Vision Setting', ''),  # noqa
-        '200dxx03': ('IS', '1', 'Threedpr Color Vision Setting', ''),  # noqa
-        '200dxx04': ('IS', '1', 'Threedpr Transparency', ''),  # noqa
-        '200dxx06': ('FD', '1', 'Threedpr Vision Vol Brightness', ''),  # noqa
-        '200dxx08': ('IS', '1', 'Threedpr Low Threshold', ''),  # noqa
-        '200dxx09': ('IS', '1', 'Threedpr Image Layout', ''),  # noqa
-        '200dxx0a': ('IS', '1', 'Threedpr Xres Filtering Enabled', ''),  # noqa
-        '200dxx0b': ('IS', '1', 'Threedpr Echo Twod Chroma Map Enabled', ''),  # noqa
-        '200dxx0c': ('IS', '1', 'Threedpr Box Outlined Enabled', ''),  # noqa
-        '200dxx0d': ('IS', '1', 'Threedpr Smoothing Enabled', ''),  # noqa
-        '200dxx0e': ('IS', '1', 'Threedpr Reference Graphic Enabled', ''),  # noqa
-        '200dxx0f': ('IS', '1', 'Threedpr Map Inverted', ''),  # noqa
-        '200dxx10': ('IS', '1', 'Threedpr Color Stream Display Enabled', ''),  # noqa
-        '200dxx11': ('IS', '1', 'Threedpr Echo Stream Display Enabled', ''),  # noqa
-        '200dxx12': ('LO', '1', 'Vdb Param Color 3d Estimate Scale(2)', ''),  # noqa
-        '200dxx13': ('LO', '1', 'Vdb Param Color 3d Estimate Apex Position (1)', ''),  # noqa
-        '200dxx14': ('LO', '1', 'Vdb Param Color 3d Estimate Color Offset', ''),  # noqa
-        '200dxx15': ('LO', '1', 'Vdb Param Echo 3d Estimate Dimension(2)', ''),  # noqa
-        '200dxx16': ('SQ', '1', 'Private Native Threed Data Sequence(1)', ''),  # noqa
-        '200dxx17': ('IS', '1', 'Threedpr Basic Vol Brightness', ''),  # noqa
-        '200dxx18': ('LO', '1', 'Vdb Param Echo 3d Estimate Apex Position (2)', ''),  # noqa
-        '200dxx1a': ('IS', '1', 'Threedpr Echo Smoothing', ''),  # noqa
-        '200dxx1b': ('IS', '1', 'Threedpr Color Smoothing', ''),  # noqa
-        '200dxx1e': ('IS', '1', 'Threedpr Num Completed Trim Planes', ''),  # noqa
-        '200dxx1f': ('IS', '1', 'Threedpr Depth', ''),  # noqa
-        '200dxx20': ('SQ', '1', 'Private Native Data Stream Array', ''),  # noqa
-        '200dxx21': ('IS', '1', 'Threedpr Wall Filter', ''),  # noqa
-        '200dxx23': ('FD', '1', 'Threedpr Baseline', ''),  # noqa
-        '200dxx24': ('FD', '1', 'Threedpr Gain', ''),  # noqa
-        '200dxx25': ('FD', '1', 'Threedpr Compress', ''),  # noqa
-        '200dxx26': ('FD', '1', 'Threedpr Light Brightness', ''),  # noqa
-        '200dxx27': ('FD', '1', 'Threedpr Elevation Scale Factor', ''),  # noqa
-        '200dxx28': ('FD', '1', 'Threedpr Zoom Factor', ''),  # noqa
-        '200dxx29': ('FD', '1', 'Threedpr Color Write Priority', ''),  # noqa
-        '200dxx2a': ('FD', '1', 'Threedpr Rotation Angle X', ''),  # noqa
-        '200dxx2b': ('FD', '1', 'Threedpr Rotation Angle Y', ''),  # noqa
-        '200dxx2c': ('FD', '1', 'Threedpr Data Voi Center', ''),  # noqa
-        '200dxx2d': ('FD', '1', 'Threedpr View Translation', ''),  # noqa
-        '200dxx2e': ('FD', '1', 'Threedpr Data Voi Min Point', ''),  # noqa
-        '200dxx2f': ('FD', '1', 'Threedpr Data Voi Max Point', ''),  # noqa
-        '200dxx30': ('FD', '1', 'Threedpr Box Crop Min Point', ''),  # noqa
-        '200dxx31': ('FD', '1', 'Threedpr Box Crop Max Point', ''),  # noqa
-        '200dxx32': ('FD', '1', 'Threedpr Mpr Rotation Matrix', ''),  # noqa
-        '200dxx33': ('FD', '1', 'Threedpr Vol Rotation Matrix', ''),  # noqa
-        '200dxx34': ('FD', '1', 'Threedpr Trim Plane Equation', ''),  # noqa
-        '200dxx35': ('IS', '1', 'Threedpr Subpage Data Version', ''),  # noqa
-        '200dxx36': ('IS', '1', 'Threedpr Is Arbitrary Crop', ''),  # noqa
-        '200dxx37': ('IS', '1', 'Threedpr Arbitrary Crop Dist From Center', ''),  # noqa
-        '200dxx38': ('FD', '1', 'Threedpr Arbitrary Crop Rotation Matrix', ''),  # noqa
-        '200dxx39': ('FD', '1', 'Threedpr Color Gain', ''),  # noqa
-        '200dxx40': ('IS', '1', 'Threedpr Color Wall Filter Index', ''),  # noqa
-        '200dxx41': ('IS', '1', 'Threedpr Cursor Enabled', ''),  # noqa
-        '200dxx42': ('IS', '1', 'Threedpr Bondbox Graphic Enabled', ''),  # noqa
+        '200Dxx02': ('IS', '1', 'Threedpr Echo Vision Setting', ''),  # noqa
+        '200Dxx03': ('IS', '1', 'Threedpr Color Vision Setting', ''),  # noqa
+        '200Dxx04': ('IS', '1', 'Threedpr Transparency', ''),  # noqa
+        '200Dxx06': ('FD', '1', 'Threedpr Vision Vol Brightness', ''),  # noqa
+        '200Dxx08': ('IS', '1', 'Threedpr Low Threshold', ''),  # noqa
+        '200Dxx09': ('IS', '1', 'Threedpr Image Layout', ''),  # noqa
+        '200Dxx0A': ('IS', '1', 'Threedpr Xres Filtering Enabled', ''),  # noqa
+        '200Dxx0B': ('IS', '1', 'Threedpr Echo Twod Chroma Map Enabled', ''),  # noqa
+        '200Dxx0C': ('IS', '1', 'Threedpr Box Outlined Enabled', ''),  # noqa
+        '200Dxx0D': ('IS', '1', 'Threedpr Smoothing Enabled', ''),  # noqa
+        '200Dxx0E': ('IS', '1', 'Threedpr Reference Graphic Enabled', ''),  # noqa
+        '200Dxx0F': ('IS', '1', 'Threedpr Map Inverted', ''),  # noqa
+        '200Dxx10': ('IS', '1', 'Threedpr Color Stream Display Enabled', ''),  # noqa
+        '200Dxx11': ('IS', '1', 'Threedpr Echo Stream Display Enabled', ''),  # noqa
+        '200Dxx12': ('LO', '1', 'Vdb Param Color 3d Estimate Scale(2)', ''),  # noqa
+        '200Dxx13': ('LO', '1', 'Vdb Param Color 3d Estimate Apex Position (1)', ''),  # noqa
+        '200Dxx14': ('LO', '1', 'Vdb Param Color 3d Estimate Color Offset', ''),  # noqa
+        '200Dxx15': ('LO', '1', 'Vdb Param Echo 3d Estimate Dimension(2)', ''),  # noqa
+        '200Dxx16': ('SQ', '1', 'Private Native Threed Data Sequence(1)', ''),  # noqa
+        '200Dxx17': ('IS', '1', 'Threedpr Basic Vol Brightness', ''),  # noqa
+        '200Dxx18': ('LO', '1', 'Vdb Param Echo 3d Estimate Apex Position (2)', ''),  # noqa
+        '200Dxx1A': ('IS', '1', 'Threedpr Echo Smoothing', ''),  # noqa
+        '200Dxx1B': ('IS', '1', 'Threedpr Color Smoothing', ''),  # noqa
+        '200Dxx1E': ('IS', '1', 'Threedpr Num Completed Trim Planes', ''),  # noqa
+        '200Dxx1F': ('IS', '1', 'Threedpr Depth', ''),  # noqa
+        '200Dxx20': ('SQ', '1', 'Private Native Data Stream Array', ''),  # noqa
+        '200Dxx21': ('IS', '1', 'Threedpr Wall Filter', ''),  # noqa
+        '200Dxx23': ('FD', '1', 'Threedpr Baseline', ''),  # noqa
+        '200Dxx24': ('FD', '1', 'Threedpr Gain', ''),  # noqa
+        '200Dxx25': ('FD', '1', 'Threedpr Compress', ''),  # noqa
+        '200Dxx26': ('FD', '1', 'Threedpr Light Brightness', ''),  # noqa
+        '200Dxx27': ('FD', '1', 'Threedpr Elevation Scale Factor', ''),  # noqa
+        '200Dxx28': ('FD', '1', 'Threedpr Zoom Factor', ''),  # noqa
+        '200Dxx29': ('FD', '1', 'Threedpr Color Write Priority', ''),  # noqa
+        '200Dxx2A': ('FD', '1', 'Threedpr Rotation Angle X', ''),  # noqa
+        '200Dxx2B': ('FD', '1', 'Threedpr Rotation Angle Y', ''),  # noqa
+        '200Dxx2C': ('FD', '1', 'Threedpr Data Voi Center', ''),  # noqa
+        '200Dxx2D': ('FD', '1', 'Threedpr View Translation', ''),  # noqa
+        '200Dxx2E': ('FD', '1', 'Threedpr Data Voi Min Point', ''),  # noqa
+        '200Dxx2F': ('FD', '1', 'Threedpr Data Voi Max Point', ''),  # noqa
+        '200Dxx30': ('FD', '1', 'Threedpr Box Crop Min Point', ''),  # noqa
+        '200Dxx31': ('FD', '1', 'Threedpr Box Crop Max Point', ''),  # noqa
+        '200Dxx32': ('FD', '1', 'Threedpr Mpr Rotation Matrix', ''),  # noqa
+        '200Dxx33': ('FD', '1', 'Threedpr Vol Rotation Matrix', ''),  # noqa
+        '200Dxx34': ('FD', '1', 'Threedpr Trim Plane Equation', ''),  # noqa
+        '200Dxx35': ('IS', '1', 'Threedpr Subpage Data Version', ''),  # noqa
+        '200Dxx36': ('IS', '1', 'Threedpr Is Arbitrary Crop', ''),  # noqa
+        '200Dxx37': ('IS', '1', 'Threedpr Arbitrary Crop Dist From Center', ''),  # noqa
+        '200Dxx38': ('FD', '1', 'Threedpr Arbitrary Crop Rotation Matrix', ''),  # noqa
+        '200Dxx39': ('FD', '1', 'Threedpr Color Gain', ''),  # noqa
+        '200Dxx40': ('IS', '1', 'Threedpr Color Wall Filter Index', ''),  # noqa
+        '200Dxx41': ('IS', '1', 'Threedpr Cursor Enabled', ''),  # noqa
+        '200Dxx42': ('IS', '1', 'Threedpr Bondbox Graphic Enabled', ''),  # noqa
     },
     'Philips X-ray Imaging DD 001': {
         '2003xx00': ('CS', '1', 'Unknown', ''),  # noqa
@@ -5835,12 +6861,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '2003xx27': ('SH', '1', 'Unknown', ''),  # noqa
         '2003xx28': ('SH', '1', 'Unknown', ''),  # noqa
         '2003xx29': ('FD', '1', 'Unknown', ''),  # noqa
-        '2003xx2a': ('LO', '1', 'Unknown', ''),  # noqa
-        '2003xx2b': ('FD', '1', 'Unknown', ''),  # noqa
-        '2003xx2c': ('SH', '1', 'Unknown', ''),  # noqa
-        '2003xx2d': ('SL', '1-n', 'Unknown', ''),  # noqa
-        '2003xx2e': ('SQ', '1', 'Unknown', ''),  # noqa
-        '2003xx2f': ('CS', '1', 'IsResolvePatientMixApplied', ''),  # noqa
+        '2003xx2A': ('LO', '1', 'Unknown', ''),  # noqa
+        '2003xx2B': ('FD', '1', 'Unknown', ''),  # noqa
+        '2003xx2C': ('SH', '1', 'Unknown', ''),  # noqa
+        '2003xx2D': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '2003xx2E': ('SQ', '1', 'Unknown', ''),  # noqa
+        '2003xx2F': ('CS', '1', 'IsResolvePatientMixApplied', ''),  # noqa
         '2003xx30': ('CS', '1', 'Unknown', ''),  # noqa
         '2003xx31': ('CS', '1', 'Unknown', ''),  # noqa
         '2003xx32': ('UI', '1', 'Unknown', ''),  # noqa
@@ -5943,10 +6969,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx17': ('UL', '1', 'High Limit Vector', ''),  # noqa
         '0009xx18': ('UL', '1', 'Begin Index Vector', ''),  # noqa
         '0009xx19': ('UL', '1', 'End Index Vector', ''),  # noqa
-        '0009xx1a': ('UL', '1', 'Raw Time Vector', ''),  # noqa
-        '0009xx1b': ('LO', '1', 'Image Type String', ''),  # noqa
-        '0009xx1d': ('US', '1', 'Unknown', ''),  # noqa
-        '0009xx1e': ('ST', '1', 'Unknown', ''),  # noqa
+        '0009xx1A': ('UL', '1', 'Raw Time Vector', ''),  # noqa
+        '0009xx1B': ('LO', '1', 'Image Type String', ''),  # noqa
+        '0009xx1D': ('US', '1', 'Unknown', ''),  # noqa
+        '0009xx1E': ('ST', '1', 'Unknown', ''),  # noqa
         '0009xx22': ('FL', '1', 'Unknown', ''),  # noqa
         '0009xx23': ('US', '1', 'Unknown', ''),  # noqa
         '0009xx39': ('UI', '1', 'Unknown', ''),  # noqa
@@ -5955,7 +6981,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx42': ('LO', '1', 'Unknown', ''),  # noqa
         '0009xx44': ('SH', '1', 'Unknown', ''),  # noqa
         '0037xx10': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0037xx1b': ('LO', '1', 'Unknown', ''),  # noqa
+        '0037xx1B': ('LO', '1', 'Unknown', ''),  # noqa
         '0037xx30': ('LO', '1', 'Unknown', ''),  # noqa
         '0037xx40': ('LO', '1', 'Unknown', ''),  # noqa
         '0037xx50': ('LO', '1', 'Unknown', ''),  # noqa
@@ -5988,7 +7014,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     },
     'RadWorksTBR': {
         '3111xx02': ('CS', '1', 'AMI Compression Type (RET)', ''),  # noqa
-        '3111xxff': ('SQ', '1', '<internal', ''),  # noqa
+        '3111xxFF': ('SQ', '1', '<internal', ''),  # noqa
     },
     'SCHICK TECHNOLOGIES - Change Item Creator ID': {
         '0021xx01': ('UI', '1', 'Change List Item UID', ''),  # noqa
@@ -6031,7 +7057,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx07': ('US', '1', 'Caption Height', ''),  # noqa
         '0009xx08': ('US', '1', 'Source', ''),  # noqa
         '0009xx09': ('US', '1', 'Default Width', ''),  # noqa
-        '0009xx0a': ('US', '1', 'Default Height', ''),  # noqa
+        '0009xx0A': ('US', '1', 'Default Height', ''),  # noqa
     },
     'SECTRA_Ident_01': {
         '0009xx01': ('LO', '1', 'Request number', ''),  # noqa
@@ -6051,7 +7077,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '6001xx01': ('LO', '1', 'Sectra Overlay', ''),  # noqa
     },
     'SEGAMI MIML': {
-        '0031xx98': ('OW', '1', 'Unknown', ''),  # noqa
+        '0031xx98': ('OW', '1', '?Binary XML with PHI?', ''),  # noqa
     },
     'SEGAMI__MEMO': {
         '0035xx97': ('SH', '1', 'Unknown', ''),  # noqa
@@ -6084,9 +7110,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx37': ('LO', '1', 'Convolution Kernel Comment 8', ''),  # noqa
         '0019xx38': ('LO', '1', 'Convolution Kernel Comment 9', ''),  # noqa
         '0019xx39': ('LO', '1', 'Convolution Kernel Comment 10', ''),  # noqa
-        '0019xx3a': ('LO', '1', 'Reading Code RZ1 Comment 1', ''),  # noqa
-        '0019xx3b': ('LO', '1', 'Reading Code RZ1 Comment 2', ''),  # noqa
-        '0019xx3c': ('LO', '1', 'Reading Code RZ2 Comment 1', ''),  # noqa
+        '0019xx3A': ('LO', '1', 'Reading Code RZ1 Comment 1', ''),  # noqa
+        '0019xx3B': ('LO', '1', 'Reading Code RZ1 Comment 2', ''),  # noqa
+        '0019xx3C': ('LO', '1', 'Reading Code RZ2 Comment 1', ''),  # noqa
     },
     'SIEMENS CM VA0  CMS': {
         '0009xx00': ('IS', '1', 'Number of Measurements', ''),  # noqa
@@ -6094,7 +7120,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx12': ('UL', '1', 'Evaluation Mask Image', ''),  # noqa
         '0009xx26': ('DA', '1', 'Table Zero Date', ''),  # noqa
         '0009xx27': ('TM', '1', 'Table Zero Time', ''),  # noqa
-        '0011xx0a': ('LO', '1', 'Unknown', ''),  # noqa
+        '0011xx0A': ('LO', '1', 'Unknown', ''),  # noqa
         '0011xx10': ('DA', '1', 'Registration Date', ''),  # noqa
         '0011xx11': ('TM', '1', 'Registration Time', ''),  # noqa
         '0011xx22': ('LO', '1', 'Unknown', ''),  # noqa
@@ -6139,8 +7165,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx61': ('DS', '1-n', 'Image Normal', ''),  # noqa
         '0021xx63': ('DS', '1', 'Image Distance', ''),  # noqa
         '0021xx65': ('US', '1', 'Image Positioning History Mask', ''),  # noqa
-        '0021xx6a': ('DS', '1-n', 'Image Row', ''),  # noqa
-        '0021xx6b': ('DS', '1-n', 'Image Column', ''),  # noqa
+        '0021xx6A': ('DS', '1-n', 'Image Row', ''),  # noqa
+        '0021xx6B': ('DS', '1-n', 'Image Column', ''),  # noqa
         '0021xx70': ('CS', '1-n', 'Patient Orientation Set 1', ''),  # noqa
         '0021xx71': ('CS', '1-n', 'Patient Orientation Set 2', ''),  # noqa
         '0021xx80': ('LO', '1', 'Study Name', ''),  # noqa
@@ -6159,10 +7185,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0051xx10': ('LO', '1-n', 'Image Text', ''),  # noqa
         '6021xx00': ('CS', '1', 'Image Graphics Format Code', ''),  # noqa
         '6021xx10': ('OB', '1', 'Image Graphics', ''),  # noqa
-        '7fe1xx00': ('OB', '1-n', 'Binary Data', ''),  # noqa
+        '7FE1xx00': ('OB', '1-n', 'Binary Data', ''),  # noqa
     },
     'SIEMENS CM VA0  COAD': {
-        '0019xx3d': ('LO', '1', 'Reading Code RZ2 Comment 2', ''),  # noqa
+        '0019xx3D': ('LO', '1', 'Reading Code RZ2 Comment 2', ''),  # noqa
     },
     'SIEMENS CM VA0  LAB': {
         '0009xx10': ('LO', '1', 'Generator Identification Label', ''),  # noqa
@@ -6194,7 +7220,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx08': ('CS', '1', 'CSA Data Type', ''),  # noqa
         '0029xx09': ('LO', '1', 'CSA Data Version', ''),  # noqa
         '0029xx10': ('OB', '1', 'CSA Data Info', ''),  # noqa
-        '7fe1xx10': ('OB', '1', 'CSA Data', ''),  # noqa
+        '7FE1xx10': ('OB', '1', 'CSA Data', ''),  # noqa
     },
     'SIEMENS CSA REPORT': {
         '0029xx08': ('CS', '1', 'syngo Report Type', ''),  # noqa
@@ -6226,32 +7252,33 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx93': ('DS', '1', 'Osteo Regression Line Intercept', ''),  # noqa
         '0019xx94': ('IS', '1', 'Osteo Standardization Code', ''),  # noqa
         '0019xx96': ('IS', '1', 'Osteo Phantom Number', ''),  # noqa
-        '0019xxa0': ('DS', '1', 'Spiral Location Begin', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'Spiral Location End', ''),  # noqa
-        '0019xxa2': ('CS', '1', 'Spiral z Profile', ''),  # noqa
-        '0019xxa3': ('CS', '1', 'Spiral Reconstruction Direction', ''),  # noqa
-        '0019xxa4': ('DS', '1', 'Spiral Reconstruction Increment', ''),  # noqa
-        '0019xxa5': ('DS', '1', 'Scan Tilt Plane Distance', ''),  # noqa
-        '0019xxa6': ('UL', '1-n', 'Mode Processing Step Mask', ''),  # noqa
-        '0019xxa7': ('UL', '1', 'Mode Processing Control Mask', ''),  # noqa
-        '0019xxa8': ('UL', '1-n', 'Mode Master Mask', ''),  # noqa
-        '0019xxa9': ('IS', '1', 'Mode Store Step', ''),  # noqa
-        '0019xxaa': ('CS', '1', 'Focus Size Type', ''),  # noqa
-        '0019xxab': ('IS', '1', 'Mode Adaptive Filter Kind', ''),  # noqa
-        '0019xxac': ('IS', '1', 'Mode MBH Kind', ''),  # noqa
-        '0019xxad': ('IS', '1', 'Mode Balancing Kind', ''),  # noqa
-        '0019xxae': ('IS', '1', 'Number of Readings per Rotation', ''),  # noqa
-        '0019xxaf': ('DS', '1', 'Correction Table Reference Time', ''),  # noqa
-        '0019xxb0': ('DS', '1', 'Feed per Rotation', ''),  # noqa
-        '0019xxbd': ('IS', '1', 'Pulmo Trigger Level', ''),  # noqa
-        '0019xxbe': ('DS', '1', 'Expiratoric Reserve', ''),  # noqa
-        '0019xxbf': ('DS', '1', 'Vital Capacity', ''),  # noqa
-        '0019xxc0': ('DS', '1', 'Pulmo Water', ''),  # noqa
-        '0019xxc1': ('DS', '1', 'Pulmo Air', ''),  # noqa
-        '0019xxc2': ('DA', '1', 'Pulmo Date', ''),  # noqa
-        '0019xxc3': ('TM', '1', 'Pulmo Time', ''),  # noqa
-        '0019xxc4': ('UL', '1', 'Unknown', ''),  # noqa
-        '0019xxc5': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxA0': ('DS', '1', 'Spiral Location Begin', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'Spiral Location End', ''),  # noqa
+        '0019xxA2': ('CS', '1', 'Spiral z Profile', ''),  # noqa
+        '0019xxA3': ('CS', '1', 'Spiral Reconstruction Direction', ''),  # noqa
+        '0019xxA4': ('DS', '1', 'Spiral Reconstruction Increment', ''),  # noqa
+        '0019xxA5': ('DS', '1', 'Scan Tilt Plane Distance', ''),  # noqa
+        '0019xxA6': ('UL', '1-n', 'Mode Processing Step Mask', ''),  # noqa
+        '0019xxA7': ('UL', '1', 'Mode Processing Control Mask', ''),  # noqa
+        '0019xxA8': ('UL', '1-n', 'Mode Master Mask', ''),  # noqa
+        '0019xxA9': ('IS', '1', 'Mode Store Step', ''),  # noqa
+        '0019xxAA': ('CS', '1', 'Focus Size Type', ''),  # noqa
+        '0019xxAB': ('IS', '1', 'Mode Adaptive Filter Kind', ''),  # noqa
+        '0019xxAC': ('IS', '1', 'Mode MBH Kind', ''),  # noqa
+        '0019xxAD': ('IS', '1', 'Mode Balancing Kind', ''),  # noqa
+        '0019xxAE': ('IS', '1', 'Number of Readings per Rotation', ''),  # noqa
+        '0019xxAF': ('DS', '1', 'Correction Table Reference Time', ''),  # noqa
+        '0019xxB0': ('DS', '1', 'Feed per Rotation', ''),  # noqa
+        '0019xxB1': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xxBD': ('IS', '1', 'Pulmo Trigger Level', ''),  # noqa
+        '0019xxBE': ('DS', '1', 'Expiratoric Reserve', ''),  # noqa
+        '0019xxBF': ('DS', '1', 'Vital Capacity', ''),  # noqa
+        '0019xxC0': ('DS', '1', 'Pulmo Water', ''),  # noqa
+        '0019xxC1': ('DS', '1', 'Pulmo Air', ''),  # noqa
+        '0019xxC2': ('DA', '1', 'Pulmo Date', ''),  # noqa
+        '0019xxC3': ('TM', '1', 'Pulmo Time', ''),  # noqa
+        '0019xxC4': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019xxC5': ('IS', '1', 'Unknown', ''),  # noqa
     },
     'SIEMENS CT VA0  GEN': {
         '0019xx10': ('DS', '1', 'Source Side Collimator Aperture', ''),  # noqa
@@ -6288,7 +7315,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx47': ('IS', '1', 'VOI Start Column', ''),  # noqa
         '0021xx48': ('IS', '1', 'VOI Stop Column', ''),  # noqa
         '0021xx49': ('IS', '1', 'VOI Start Slice', ''),  # noqa
-        '0021xx4a': ('IS', '1', 'VOI Stop Slice', ''),  # noqa
+        '0021xx4A': ('IS', '1', 'VOI Stop Slice', ''),  # noqa
         '0021xx50': ('IS', '1', 'Vector Start Row', ''),  # noqa
         '0021xx51': ('IS', '1', 'Vector Row Step', ''),  # noqa
         '0021xx52': ('IS', '1', 'Vector Start Column', ''),  # noqa
@@ -6299,17 +7326,17 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx72': ('DS', '1-n', 'Light Orientation', ''),  # noqa
         '0021xx75': ('DS', '1', 'Light Brightness', ''),  # noqa
         '0021xx76': ('DS', '1', 'Light Contrast', ''),  # noqa
-        '0021xx7a': ('IS', '1-n', 'Overlay Threshold', ''),  # noqa
-        '0021xx7b': ('IS', '1-n', 'Surface Threshold', ''),  # noqa
-        '0021xx7c': ('IS', '1-n', 'Grey Scale Threshold', ''),  # noqa
-        '0021xxa0': ('IS', '1-n', 'Field of Interest', ''),  # noqa
-        '0021xxa1': ('CS', '1', 'Image Filter Label', ''),  # noqa
-        '0021xxa2': ('CS', '1', 'Exemplary Element 1', ''),  # noqa
-        '0021xxa3': ('IS', '1-n', 'Exemplary Element 2', ''),  # noqa
-        '0021xxa4': ('LO', '1', 'Exemplary Element 3', ''),  # noqa
-        '0021xxa5': ('IS', '1', 'Reference Data Set 1', ''),  # noqa
-        '0021xxa6': ('IS', '1', 'Reference Data Set 2', ''),  # noqa
-        '0021xxa7': ('LO', '1', 'Window Program Name', ''),  # noqa
+        '0021xx7A': ('IS', '1-n', 'Overlay Threshold', ''),  # noqa
+        '0021xx7B': ('IS', '1-n', 'Surface Threshold', ''),  # noqa
+        '0021xx7C': ('IS', '1-n', 'Grey Scale Threshold', ''),  # noqa
+        '0021xxA0': ('IS', '1-n', 'Field of Interest', ''),  # noqa
+        '0021xxA1': ('CS', '1', 'Image Filter Label', ''),  # noqa
+        '0021xxA2': ('CS', '1', 'Exemplary Element 1', ''),  # noqa
+        '0021xxA3': ('IS', '1-n', 'Exemplary Element 2', ''),  # noqa
+        '0021xxA4': ('LO', '1', 'Exemplary Element 3', ''),  # noqa
+        '0021xxA5': ('IS', '1', 'Reference Data Set 1', ''),  # noqa
+        '0021xxA6': ('IS', '1', 'Reference Data Set 2', ''),  # noqa
+        '0021xxA7': ('LO', '1', 'Window Program Name', ''),  # noqa
     },
     'SIEMENS CT VA0  IDE': {
         '0009xx10': ('LO', '1', 'SOMATOM Software Name', ''),  # noqa
@@ -6397,7 +7424,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx77': ('IS', '1', 'Pixel Shift Horizontal', ''),  # noqa
         '0017xx78': ('IS', '1', 'Pixel Shift Vertical', ''),  # noqa
         '0017xx79': ('US', '1', 'Image Flip', ''),  # noqa
-        '0017xx7a': ('US', '1', 'Invers Current', ''),  # noqa
+        '0017xx7A': ('US', '1', 'Invers Current', ''),  # noqa
         '0017xx80': ('US', '1', 'Unknown', ''),  # noqa
         '0017xx83': ('SH', '1', 'Documentation Flag', ''),  # noqa
         '0017xx84': ('LO', '1', 'Right Marker', ''),  # noqa
@@ -6405,10 +7432,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx92': ('US', '1', 'Summation Count Mask', ''),  # noqa
         '0017xx93': ('US', '1', 'PeakOp Start', ''),  # noqa
         '0017xx94': ('US', '1', 'PeakOp End', ''),  # noqa
-        '0017xxa0': ('IS', '1', 'Cine Rate', ''),  # noqa
-        '0017xxa1': ('LO', '1', 'Image Name', ''),  # noqa
-        '0017xxa2': ('LO', '1', 'Image Name Extension 1', ''),  # noqa
-        '0017xxa3': ('LO', '1', 'Image Name Extension 2', ''),  # noqa
+        '0017xxA0': ('IS', '1', 'Cine Rate', ''),  # noqa
+        '0017xxA1': ('LO', '1', 'Image Name', ''),  # noqa
+        '0017xxA2': ('LO', '1', 'Image Name Extension 1', ''),  # noqa
+        '0017xxA3': ('LO', '1', 'Image Name Extension 2', ''),  # noqa
     },
     'SIEMENS DFR.01 ORIGINAL': {
         '0017xx10': ('CS', '1', 'Image Type', ''),  # noqa
@@ -6425,7 +7452,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx25': ('DS', '1', 'Edge Enhancement Native Original', ''),  # noqa
         '0017xx26': ('US', '1', 'Filter Type Subtraction Original', ''),  # noqa
         '0017xx27': ('DS', '1', 'Edge Enhancement Subtraction Original', ''),  # noqa
-        '0017xx2a': ('US', '1', 'Unknown', ''),  # noqa
+        '0017xx2A': ('US', '1', 'Unknown', ''),  # noqa
         '0017xx30': ('IS', '1', 'Unknown', ''),  # noqa
         '0017xx31': ('US', '1', 'DSA Representation Original', ''),  # noqa
         '0017xx32': ('US', '1', 'Number of Maske Original', ''),  # noqa
@@ -6442,7 +7469,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx47': ('LO', '1', 'Exposure Curves', ''),  # noqa
         '0017xx48': ('IS', '1', 'Unknown', ''),  # noqa
         '0017xx49': ('LO', '1', 'Organ Program Name', ''),  # noqa
-        '0017xx4a': ('IS', '1', 'Count of Images in Series', ''),  # noqa
+        '0017xx4A': ('IS', '1', 'Count of Images in Series', ''),  # noqa
         '0017xx51': ('US', '1', 'Image Intensifier Zoom', ''),  # noqa
         '0017xx52': ('UL', '1', 'ROSA Receiver ErrCount', ''),  # noqa
         '0017xx61': ('US', '1', 'Table Position Peri', ''),  # noqa
@@ -6452,14 +7479,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx73': ('US', '1', 'Unknown', ''),  # noqa
         '0017xx74': ('US', '1', 'Unknown', ''),  # noqa
         '0017xx79': ('US', '1', 'Unknown', ''),  # noqa
-        '0017xx7a': ('US', '1', 'Invers Original', ''),  # noqa
-        '0017xx7b': ('IS', '1', 'Unknown', ''),  # noqa
-        '0017xxa0': ('IS', '1', 'Unknown', ''),  # noqa
-        '0017xxb1': ('CS', '1', 'L2 Image', ''),  # noqa
-        '0017xxb2': ('IS', '1', 'L2 Acquisition Monitor', ''),  # noqa
-        '0017xxc1': ('LO', '1', 'Folder UID', ''),  # noqa
-        '0017xxc2': ('LO', '1', 'Series UID', ''),  # noqa
-        '0017xxc3': ('LO', '1', 'Subseries UID', ''),  # noqa
+        '0017xx7A': ('US', '1', 'Invers Original', ''),  # noqa
+        '0017xx7B': ('IS', '1', 'Unknown', ''),  # noqa
+        '0017xxA0': ('IS', '1', 'Unknown', ''),  # noqa
+        '0017xxB1': ('CS', '1', 'L2 Image', ''),  # noqa
+        '0017xxB2': ('IS', '1', 'L2 Acquisition Monitor', ''),  # noqa
+        '0017xxC1': ('LO', '1', 'Folder UID', ''),  # noqa
+        '0017xxC2': ('LO', '1', 'Series UID', ''),  # noqa
+        '0017xxC3': ('LO', '1', 'Subseries UID', ''),  # noqa
     },
     'SIEMENS DFR.01 SERVICE': {
         '0021xx10': ('US', '1', '1 Plot', ''),  # noqa
@@ -6514,8 +7541,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx76': ('LO', '1', 'Filterset', ''),  # noqa
         '0019xx80': ('LO', '1', 'Reader Header', ''),  # noqa
         '0019xx90': ('LO', '1', 'PLA of Secondary Destination', ''),  # noqa
-        '0019xxa0': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA0': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'Unknown', ''),  # noqa
         '0041xx10': ('US', '1', 'Number of Hardcopies', ''),  # noqa
         '0041xx20': ('CS', '1', 'Film Format', ''),  # noqa
         '0041xx30': ('LO', '1', 'Film Size', ''),  # noqa
@@ -6534,25 +7561,25 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx14': ('SQ', '1', 'RIS Patient Info IMGEF', ''),  # noqa
         '0011xx03': ('LO', '1', 'Patient UID', ''),  # noqa
         '0011xx04': ('LO', '1', 'Patient ID', ''),  # noqa
-        '0011xx0a': ('LO', '1', 'Case ID', ''),  # noqa
+        '0011xx0A': ('LO', '1', 'Case ID', ''),  # noqa
         '0011xx22': ('LO', '1', 'Request ID', ''),  # noqa
         '0011xx23': ('LO', '1', 'Examination UID', ''),  # noqa
         '0011xx41': ('LO', '1', 'Medical Alerts', ''),  # noqa
         '0011xx42': ('LO', '1', 'Contrast Allergy', ''),  # noqa
-        '0011xxa1': ('DA', '1', 'Patient Registration Date', ''),  # noqa
-        '0011xxa2': ('TM', '1', 'Patient Registration Time', ''),  # noqa
-        '0011xxb0': ('LO', '1', 'Patient Last Name', ''),  # noqa
-        '0011xxb2': ('LO', '1', 'Patient First Name', ''),  # noqa
-        '0011xxb4': ('CS', '1', 'Patient Hospital Status', ''),  # noqa
-        '0011xxbc': ('LO', '1', 'Current Location Time', ''),  # noqa
-        '0011xxc0': ('CS', '1', 'Patient Insurance Status', ''),  # noqa
-        '0011xxd0': ('LO', '1', 'Patient Billing Type', ''),  # noqa
-        '0011xxd2': ('LO', '1', 'Patient Billing Address', ''),  # noqa
+        '0011xxA1': ('DA', '1', 'Patient Registration Date', ''),  # noqa
+        '0011xxA2': ('TM', '1', 'Patient Registration Time', ''),  # noqa
+        '0011xxB0': ('LO', '1', 'Patient Last Name', ''),  # noqa
+        '0011xxB2': ('LO', '1', 'Patient First Name', ''),  # noqa
+        '0011xxB4': ('CS', '1', 'Patient Hospital Status', ''),  # noqa
+        '0011xxBC': ('LO', '1', 'Current Location Time', ''),  # noqa
+        '0011xxC0': ('CS', '1', 'Patient Insurance Status', ''),  # noqa
+        '0011xxD0': ('LO', '1', 'Patient Billing Type', ''),  # noqa
+        '0011xxD2': ('LO', '1', 'Patient Billing Address', ''),  # noqa
         '0031xx12': ('LO', '1', 'Examination Reason', ''),  # noqa
         '0031xx30': ('DA', '1', 'Requested Date', ''),  # noqa
         '0031xx32': ('TM', '1', 'Worklist Request Start Time', ''),  # noqa
         '0031xx33': ('TM', '1', 'Worklist Request End Time', ''),  # noqa
-        '0031xx4a': ('TM', '1', 'Requested Time', ''),  # noqa
+        '0031xx4A': ('TM', '1', 'Requested Time', ''),  # noqa
         '0031xx80': ('LO', '1', 'Requested Location', ''),  # noqa
         '0055xx46': ('PN', '1', 'Current Ward', ''),  # noqa
         '0193xx02': ('LO', '1', 'RIS Key', ''),  # noqa
@@ -6562,10 +7589,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '4009xx20': ('CS', '1', 'Report Status', ''),  # noqa
         '4009xx30': ('DA', '1', 'Report Creation Date', ''),  # noqa
         '4009xx70': ('PN', '1', 'Report Approving Physician', ''),  # noqa
-        '4009xxe0': ('LO', '1', 'Report Text', ''),  # noqa
-        '4009xxe1': ('LO', '1', 'Report Author', ''),  # noqa
-        '4009xxe2': ('PN', '1', 'Report Transcriber', ''),  # noqa
-        '4009xxe3': ('PN', '1', 'Reporting Radiologist', ''),  # noqa
+        '4009xxE0': ('LO', '1', 'Report Text', ''),  # noqa
+        '4009xxE1': ('LO', '1', 'Report Author', ''),  # noqa
+        '4009xxE2': ('PN', '1', 'Report Transcriber', ''),  # noqa
+        '4009xxE3': ('PN', '1', 'Reporting Radiologist', ''),  # noqa
     },
     'SIEMENS MED': {
         '0009xx10': ('LO', '1', 'Recognition Code', ''),  # noqa
@@ -6576,8 +7603,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx50': ('LO', '1', 'Unknown', ''),  # noqa
         '0009xx51': ('LO', '1', 'Unknown', ''),  # noqa
         '0009xx80': ('ST', '1', '', ''),  # noqa
-        '0009xxf5': ('LO', '1', 'PDM EFID Placeholder', ''),  # noqa
-        '0009xxf6': ('LO', '1', 'PDM Data Object Type Extension', ''),  # noqa
+        '0009xxF5': ('LO', '1', 'PDM EFID Placeholder', ''),  # noqa
+        '0009xxF6': ('LO', '1', 'PDM Data Object Type Extension', ''),  # noqa
         '0011xx10': ('ST', '1', '', ''),  # noqa
         '0017xx00': ('ST', '1', '', ''),  # noqa
         '0017xx20': ('ST', '1', '', ''),  # noqa
@@ -6592,12 +7619,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('SL', '1', '', ''),  # noqa
         '0019xx08': ('SS', '1', '', ''),  # noqa
         '0019xx09': ('SS', '1', '', ''),  # noqa
-        '0019xx0a': ('ST', '1', '', ''),  # noqa
-        '0019xx0b': ('ST', '1', '', ''),  # noqa
-        '0019xx0c': ('SS', '1', '', ''),  # noqa
-        '0019xx0d': ('ST', '1', '', ''),  # noqa
-        '0019xx0e': ('ST', '1', '', ''),  # noqa
-        '0019xx0f': ('SL', '1', '', ''),  # noqa
+        '0019xx0A': ('ST', '1', '', ''),  # noqa
+        '0019xx0B': ('ST', '1', '', ''),  # noqa
+        '0019xx0C': ('SS', '1', '', ''),  # noqa
+        '0019xx0D': ('ST', '1', '', ''),  # noqa
+        '0019xx0E': ('ST', '1', '', ''),  # noqa
+        '0019xx0F': ('SL', '1', '', ''),  # noqa
         '0019xx11': ('ST', '1', '', ''),  # noqa
         '0019xx12': ('ST', '1', '', ''),  # noqa
         '0019xx13': ('SS', '1', '', ''),  # noqa
@@ -6607,10 +7634,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx17': ('SS', '1', '', ''),  # noqa
         '0019xx18': ('SS', '1', '', ''),  # noqa
         '0019xx19': ('SS', '1', '', ''),  # noqa
-        '0019xx1a': ('SS', '1', '', ''),  # noqa
-        '0019xx1b': ('SS', '1', '', ''),  # noqa
-        '0019xx1c': ('SS', '1', '', ''),  # noqa
-        '0019xx1d': ('SS', '1', '', ''),  # noqa
+        '0019xx1A': ('SS', '1', '', ''),  # noqa
+        '0019xx1B': ('SS', '1', '', ''),  # noqa
+        '0019xx1C': ('SS', '1', '', ''),  # noqa
+        '0019xx1D': ('SS', '1', '', ''),  # noqa
         '0019xx20': ('SL', '1', '', ''),  # noqa
         '0019xx21': ('SL', '1', '', ''),  # noqa
         '0019xx22': ('SL', '1', '', ''),  # noqa
@@ -6630,11 +7657,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx47': ('SL', '1', '', ''),  # noqa
         '0019xx48': ('ST', '1', '', ''),  # noqa
         '0019xx49': ('SL', '1', '', ''),  # noqa
-        '0019xx4a': ('SS', '1', '', ''),  # noqa
-        '0019xx4b': ('SS', '1', '', ''),  # noqa
-        '0019xx4c': ('SL', '1', '', ''),  # noqa
-        '0019xx4e': ('SS', '1', '', ''),  # noqa
-        '0019xx4f': ('SS', '1', '', ''),  # noqa
+        '0019xx4A': ('SS', '1', '', ''),  # noqa
+        '0019xx4B': ('SS', '1', '', ''),  # noqa
+        '0019xx4C': ('SL', '1', '', ''),  # noqa
+        '0019xx4E': ('SS', '1', '', ''),  # noqa
+        '0019xx4F': ('SS', '1', '', ''),  # noqa
         '0019xx50': ('SS', '1', '', ''),  # noqa
         '0019xx51': ('SS', '1', '', ''),  # noqa
         '0019xx52': ('SS', '1', '', ''),  # noqa
@@ -6645,12 +7672,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx57': ('SS', '1', '', ''),  # noqa
         '0019xx58': ('SS', '1', '', ''),  # noqa
         '0019xx59': ('SS', '1', '', ''),  # noqa
-        '0019xx5a': ('ST', '1', '', ''),  # noqa
-        '0019xx5b': ('SS', '1', '', ''),  # noqa
-        '0019xx5c': ('SS', '1', '', ''),  # noqa
-        '0019xx5d': ('SS', '1', '', ''),  # noqa
-        '0019xx5e': ('SS', '1', '', ''),  # noqa
-        '0019xx5f': ('SS', '1', '', ''),  # noqa
+        '0019xx5A': ('ST', '1', '', ''),  # noqa
+        '0019xx5B': ('SS', '1', '', ''),  # noqa
+        '0019xx5C': ('SS', '1', '', ''),  # noqa
+        '0019xx5D': ('SS', '1', '', ''),  # noqa
+        '0019xx5E': ('SS', '1', '', ''),  # noqa
+        '0019xx5F': ('SS', '1', '', ''),  # noqa
         '0019xx60': ('SS', '1', '', ''),  # noqa
         '0019xx61': ('SS', '1', '', ''),  # noqa
         '0019xx62': ('SS', '1', '', ''),  # noqa
@@ -6661,12 +7688,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx67': ('SS', '1', '', ''),  # noqa
         '0019xx68': ('SL', '1', '', ''),  # noqa
         '0019xx69': ('SS', '1', '', ''),  # noqa
-        '0019xx6a': ('SS', '1', '', ''),  # noqa
-        '0019xx6b': ('SL', '1', '', ''),  # noqa
-        '0019xx6c': ('SL', '1', '', ''),  # noqa
-        '0019xx6d': ('SS', '1', '', ''),  # noqa
-        '0019xx6e': ('SS', '1', '', ''),  # noqa
-        '0019xx6f': ('SS', '1', '', ''),  # noqa
+        '0019xx6A': ('SS', '1', '', ''),  # noqa
+        '0019xx6B': ('SL', '1', '', ''),  # noqa
+        '0019xx6C': ('SL', '1', '', ''),  # noqa
+        '0019xx6D': ('SS', '1', '', ''),  # noqa
+        '0019xx6E': ('SS', '1', '', ''),  # noqa
+        '0019xx6F': ('SS', '1', '', ''),  # noqa
         '0019xx70': ('ST', '1', '', ''),  # noqa
         '0019xx71': ('ST', '1', '', ''),  # noqa
         '0019xx72': ('SL', '1', '', ''),  # noqa
@@ -6676,7 +7703,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx76': ('SS', '1', '', ''),  # noqa
         '0019xx77': ('SS', '1', '', ''),  # noqa
         '0019xx78': ('SS', '1', '', ''),  # noqa
-        '0019xx7f': ('SS', '1', '', ''),  # noqa
+        '0019xx7F': ('SS', '1', '', ''),  # noqa
         '0019xx80': ('SS', '1', '', ''),  # noqa
         '0019xx81': ('SS', '1', '', ''),  # noqa
         '0019xx82': ('SL', '1', '', ''),  # noqa
@@ -6687,9 +7714,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx87': ('SS', '1', '', ''),  # noqa
         '0019xx88': ('SL', '1', '', ''),  # noqa
         '0019xx89': ('SS', '1', '', ''),  # noqa
-        '0019xx8a': ('SL', '1', '', ''),  # noqa
-        '0019xx8d': ('SL', '1', '', ''),  # noqa
-        '0019xx8e': ('SL', '1', '', ''),  # noqa
+        '0019xx8A': ('SL', '1', '', ''),  # noqa
+        '0019xx8D': ('SL', '1', '', ''),  # noqa
+        '0019xx8E': ('SL', '1', '', ''),  # noqa
         '0019xx91': ('SL', '1', '', ''),  # noqa
         '0019xx92': ('SL', '1', '', ''),  # noqa
         '0019xx93': ('SL', '1', '', ''),  # noqa
@@ -6697,19 +7724,19 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx95': ('SS', '1', '', ''),  # noqa
         '0019xx96': ('SL', '1', '', ''),  # noqa
         '0019xx97': ('SS', '1', '', ''),  # noqa
-        '0019xxa0': ('SS', '1', '', ''),  # noqa
-        '0019xxa1': ('SS', '1', '', ''),  # noqa
-        '0019xxa2': ('SL', '1', '', ''),  # noqa
-        '0019xxa3': ('SL', '1', '', ''),  # noqa
-        '0019xxa4': ('SL', '1', '', ''),  # noqa
-        '0019xxc0': ('SL', '1', '', ''),  # noqa
-        '0019xxc1': ('SS', '1', '', ''),  # noqa
-        '0019xxc2': ('SS', '1', '', ''),  # noqa
-        '0019xxf0': ('SL', '1', '', ''),  # noqa
-        '001fxx00': ('LO', '1', '', ''),  # noqa
-        '001fxx02': ('LO', '1', '', ''),  # noqa
-        '001fxx50': ('LO', '1', '', ''),  # noqa
-        '001fxx70': ('LO', '1', '', ''),  # noqa
+        '0019xxA0': ('SS', '1', '', ''),  # noqa
+        '0019xxA1': ('SS', '1', '', ''),  # noqa
+        '0019xxA2': ('SL', '1', '', ''),  # noqa
+        '0019xxA3': ('SL', '1', '', ''),  # noqa
+        '0019xxA4': ('SL', '1', '', ''),  # noqa
+        '0019xxC0': ('SL', '1', '', ''),  # noqa
+        '0019xxC1': ('SS', '1', '', ''),  # noqa
+        '0019xxC2': ('SS', '1', '', ''),  # noqa
+        '0019xxF0': ('SL', '1', '', ''),  # noqa
+        '001Fxx00': ('LO', '1', '', ''),  # noqa
+        '001Fxx02': ('LO', '1', '', ''),  # noqa
+        '001Fxx50': ('LO', '1', '', ''),  # noqa
+        '001Fxx70': ('LO', '1', '', ''),  # noqa
         '0021xx10': ('DS', '1', 'Zoom', ''),  # noqa
         '0021xx11': ('DS', '1-n', 'Target', ''),  # noqa
         '0021xx12': ('IS', '1', 'Tube Angle During Topogram', ''),  # noqa
@@ -6722,12 +7749,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0031xx07': ('SS', '1', '', ''),  # noqa
         '0031xx08': ('ST', '1', '', ''),  # noqa
         '0031xx09': ('SS', '1', '', ''),  # noqa
-        '0031xx0a': ('SS', '1', '', ''),  # noqa
-        '0031xx0b': ('SS', '1', '', ''),  # noqa
-        '0031xx0c': ('SS', '1', '', ''),  # noqa
-        '0031xx0d': ('SS', '1', '', ''),  # noqa
-        '0031xx0e': ('SS', '1', '', ''),  # noqa
-        '0031xx0f': ('SL', '1', '', ''),  # noqa
+        '0031xx0A': ('SS', '1', '', ''),  # noqa
+        '0031xx0B': ('SS', '1', '', ''),  # noqa
+        '0031xx0C': ('SS', '1', '', ''),  # noqa
+        '0031xx0D': ('SS', '1', '', ''),  # noqa
+        '0031xx0E': ('SS', '1', '', ''),  # noqa
+        '0031xx0F': ('SL', '1', '', ''),  # noqa
         '0031xx10': ('SL', '1', '', ''),  # noqa
         '0031xx11': ('SS', '1', '', ''),  # noqa
         '0041xx12': ('SL', '1', '', ''),  # noqa
@@ -6763,10 +7790,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0053xx17': ('SS', '1', '', ''),  # noqa
         '0053xx18': ('SL', '1', '', ''),  # noqa
         '0053xx19': ('SS', '1', '', ''),  # noqa
-        '0053xx1a': ('SS', '1', '', ''),  # noqa
-        '0053xx1b': ('SL', '1', '', ''),  # noqa
-        '0053xx1c': ('SS', '1', '', ''),  # noqa
-        '0053xx1d': ('SL', '1', '', ''),  # noqa
+        '0053xx1A': ('SS', '1', '', ''),  # noqa
+        '0053xx1B': ('SL', '1', '', ''),  # noqa
+        '0053xx1C': ('SS', '1', '', ''),  # noqa
+        '0053xx1D': ('SL', '1', '', ''),  # noqa
         '0053xx30': ('SS', '1', '', ''),  # noqa
         '0053xx31': ('SS', '1', '', ''),  # noqa
         '0053xx32': ('SS', '1', '', ''),  # noqa
@@ -6786,7 +7813,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx24': ('SS', '1', '', ''),  # noqa
         '0055xx25': ('ST', '1', '', ''),  # noqa
         '0055xx29': ('SL', '1', '', ''),  # noqa
-        '0055xx2a': ('SL', '1', '', ''),  # noqa
+        '0055xx2A': ('SL', '1', '', ''),  # noqa
         '0055xx30': ('SS', '1', '', ''),  # noqa
         '0055xx31': ('ST', '1', '', ''),  # noqa
         '0055xx32': ('SS', '1', '', ''),  # noqa
@@ -6795,7 +7822,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx35': ('ST', '1', '', ''),  # noqa
         '0055xx38': ('SL', '1', '', ''),  # noqa
         '0055xx39': ('SL', '1', '', ''),  # noqa
-        '0055xx3a': ('SL', '1', '', ''),  # noqa
+        '0055xx3A': ('SL', '1', '', ''),  # noqa
         '0055xx40': ('SS', '1', '', ''),  # noqa
         '0055xx48': ('SL', '1', '', ''),  # noqa
         '0055xx50': ('SS', '1', '', ''),  # noqa
@@ -6808,12 +7835,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx57': ('SS', '1', '', ''),  # noqa
         '0055xx58': ('SL', '1', '', ''),  # noqa
         '0055xx59': ('ST', '1', '', ''),  # noqa
-        '0055xx5a': ('SL', '1', '', ''),  # noqa
-        '0055xx5b': ('SS', '1', '', ''),  # noqa
-        '0055xx5c': ('ST', '1', '', ''),  # noqa
-        '0055xx5d': ('SS', '1', '', ''),  # noqa
-        '0055xx5e': ('SS', '1', '', ''),  # noqa
-        '0055xx5f': ('SL', '1', '', ''),  # noqa
+        '0055xx5A': ('SL', '1', '', ''),  # noqa
+        '0055xx5B': ('SS', '1', '', ''),  # noqa
+        '0055xx5C': ('ST', '1', '', ''),  # noqa
+        '0055xx5D': ('SS', '1', '', ''),  # noqa
+        '0055xx5E': ('SS', '1', '', ''),  # noqa
+        '0055xx5F': ('SL', '1', '', ''),  # noqa
         '0055xx60': ('SS', '1', '', ''),  # noqa
         '0055xx61': ('SS', '1', '', ''),  # noqa
         '0055xx64': ('SS', '1', '', ''),  # noqa
@@ -6822,10 +7849,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx67': ('SS', '1', '', ''),  # noqa
         '0055xx68': ('SS', '1', '', ''),  # noqa
         '0055xx69': ('SS', '1', '', ''),  # noqa
-        '0055xx6a': ('SS', '1', '', ''),  # noqa
-        '0055xx6b': ('SS', '1', '', ''),  # noqa
-        '0055xx6c': ('SS', '1', '', ''),  # noqa
-        '0055xx6d': ('SS', '1', '', ''),  # noqa
+        '0055xx6A': ('SS', '1', '', ''),  # noqa
+        '0055xx6B': ('SS', '1', '', ''),  # noqa
+        '0055xx6C': ('SS', '1', '', ''),  # noqa
+        '0055xx6D': ('SS', '1', '', ''),  # noqa
         '0055xx70': ('SL', '1', '', ''),  # noqa
         '0055xx71': ('SL', '1', '', ''),  # noqa
         '0055xx72': ('SL', '1', '', ''),  # noqa
@@ -6845,12 +7872,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx87': ('SL', '1', '', ''),  # noqa
         '0055xx88': ('SL', '1', '', ''),  # noqa
         '0055xx89': ('ST', '1', '', ''),  # noqa
-        '0055xx8a': ('SS', '1', '', ''),  # noqa
-        '0055xx8b': ('SL', '1', '', ''),  # noqa
-        '0055xx8c': ('SS', '1', '', ''),  # noqa
-        '0055xx8d': ('SL', '1', '', ''),  # noqa
-        '0055xx8e': ('SL', '1', '', ''),  # noqa
-        '0055xx8f': ('SL', '1', '', ''),  # noqa
+        '0055xx8A': ('SS', '1', '', ''),  # noqa
+        '0055xx8B': ('SL', '1', '', ''),  # noqa
+        '0055xx8C': ('SS', '1', '', ''),  # noqa
+        '0055xx8D': ('SL', '1', '', ''),  # noqa
+        '0055xx8E': ('SL', '1', '', ''),  # noqa
+        '0055xx8F': ('SL', '1', '', ''),  # noqa
         '0055xx90': ('SL', '1', '', ''),  # noqa
         '0055xx91': ('SS', '1', '', ''),  # noqa
         '0055xx92': ('ST', '1', '', ''),  # noqa
@@ -6861,24 +7888,24 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx97': ('SL', '1', '', ''),  # noqa
         '0055xx98': ('SS', '1', '', ''),  # noqa
         '0055xx99': ('SS', '1', '', ''),  # noqa
-        '0055xx9a': ('SS', '1', '', ''),  # noqa
-        '0055xx9b': ('SS', '1', '', ''),  # noqa
-        '0055xx9c': ('SS', '1', '', ''),  # noqa
-        '0055xx9d': ('SL', '1', '', ''),  # noqa
-        '0055xx9e': ('SL', '1', '', ''),  # noqa
-        '0055xx9f': ('SL', '1', '', ''),  # noqa
-        '0055xxa0': ('SL', '1', '', ''),  # noqa
-        '0055xxa1': ('SL', '1', '', ''),  # noqa
-        '0055xxa2': ('SL', '1', '', ''),  # noqa
-        '0055xxa3': ('SL', '1', '', ''),  # noqa
-        '0055xxa4': ('SS', '1', '', ''),  # noqa
-        '0055xxa5': ('SL', '1', '', ''),  # noqa
-        '0055xxa6': ('SL', '1', '', ''),  # noqa
-        '0055xxa7': ('SS', '1', '', ''),  # noqa
-        '0055xxa8': ('SS', '1', '', ''),  # noqa
-        '0055xxa9': ('SS', '1', '', ''),  # noqa
-        '0055xxb0': ('SS', '1', '', ''),  # noqa
-        '0055xxb1': ('SS', '1', '', ''),  # noqa
+        '0055xx9A': ('SS', '1', '', ''),  # noqa
+        '0055xx9B': ('SS', '1', '', ''),  # noqa
+        '0055xx9C': ('SS', '1', '', ''),  # noqa
+        '0055xx9D': ('SL', '1', '', ''),  # noqa
+        '0055xx9E': ('SL', '1', '', ''),  # noqa
+        '0055xx9F': ('SL', '1', '', ''),  # noqa
+        '0055xxA0': ('SL', '1', '', ''),  # noqa
+        '0055xxA1': ('SL', '1', '', ''),  # noqa
+        '0055xxA2': ('SL', '1', '', ''),  # noqa
+        '0055xxA3': ('SL', '1', '', ''),  # noqa
+        '0055xxA4': ('SS', '1', '', ''),  # noqa
+        '0055xxA5': ('SL', '1', '', ''),  # noqa
+        '0055xxA6': ('SL', '1', '', ''),  # noqa
+        '0055xxA7': ('SS', '1', '', ''),  # noqa
+        '0055xxA8': ('SS', '1', '', ''),  # noqa
+        '0055xxA9': ('SS', '1', '', ''),  # noqa
+        '0055xxB0': ('SS', '1', '', ''),  # noqa
+        '0055xxB1': ('SS', '1', '', ''),  # noqa
         '0057xx10': ('SS', '1', '', ''),  # noqa
         '0057xx20': ('SL', '1', '', ''),  # noqa
         '5001xx01': ('SS', '1', '', ''),  # noqa
@@ -6890,29 +7917,29 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx07': ('ST', '1', '', ''),  # noqa
         '5001xx08': ('ST', '1', '', ''),  # noqa
         '5001xx09': ('ST', '1', '', ''),  # noqa
-        '5001xx0a': ('ST', '1', '', ''),  # noqa
-        '5001xx0b': ('SL', '1', '', ''),  # noqa
+        '5001xx0A': ('ST', '1', '', ''),  # noqa
+        '5001xx0B': ('SL', '1', '', ''),  # noqa
         '7001xx10': ('SS', '1', '', ''),  # noqa
         '7003xx10': ('SL', '1', '', ''),  # noqa
         '7005xx10': ('SS', '1', '', ''),  # noqa
-        '7fe1xx10': ('SS', '1', '', ''),  # noqa
-        '7fe3xx14': ('SL', '1', '', ''),  # noqa
-        '7fe3xx15': ('SL', '1', '', ''),  # noqa
-        '7fe3xx16': ('SL', '1', '', ''),  # noqa
-        '7fe3xx17': ('SL', '1', '', ''),  # noqa
-        '7fe3xx18': ('SL', '1', '', ''),  # noqa
-        '7fe3xx19': ('ST', '1', '', ''),  # noqa
-        '7fe3xx1a': ('SL', '1', '', ''),  # noqa
-        '7fe3xx1b': ('SS', '1', '', ''),  # noqa
-        '7fe3xx1c': ('SS', '1', '', ''),  # noqa
-        '7fe3xx1e': ('SL', '1', '', ''),  # noqa
-        '7fe3xx1f': ('SL', '1', '', ''),  # noqa
-        '7fe3xx20': ('SL', '1', '', ''),  # noqa
-        '7fe3xx21': ('SL', '1', '', ''),  # noqa
-        '7fe3xx22': ('SL', '1', '', ''),  # noqa
-        '7fe3xx23': ('SL', '1', '', ''),  # noqa
-        '7fe3xx24': ('ST', '1', '', ''),  # noqa
-        '7fe3xx25': ('SS', '1', '', ''),  # noqa
+        '7FE1xx10': ('SS', '1', '', ''),  # noqa
+        '7FE3xx14': ('SL', '1', '', ''),  # noqa
+        '7FE3xx15': ('SL', '1', '', ''),  # noqa
+        '7FE3xx16': ('SL', '1', '', ''),  # noqa
+        '7FE3xx17': ('SL', '1', '', ''),  # noqa
+        '7FE3xx18': ('SL', '1', '', ''),  # noqa
+        '7FE3xx19': ('ST', '1', '', ''),  # noqa
+        '7FE3xx1A': ('SL', '1', '', ''),  # noqa
+        '7FE3xx1B': ('SS', '1', '', ''),  # noqa
+        '7FE3xx1C': ('SS', '1', '', ''),  # noqa
+        '7FE3xx1E': ('SL', '1', '', ''),  # noqa
+        '7FE3xx1F': ('SL', '1', '', ''),  # noqa
+        '7FE3xx20': ('SL', '1', '', ''),  # noqa
+        '7FE3xx21': ('SL', '1', '', ''),  # noqa
+        '7FE3xx22': ('SL', '1', '', ''),  # noqa
+        '7FE3xx23': ('SL', '1', '', ''),  # noqa
+        '7FE3xx24': ('ST', '1', '', ''),  # noqa
+        '7FE3xx25': ('SS', '1', '', ''),  # noqa
     },
     'SIEMENS MED DISPLAY': {
         '0029xx04': ('CS', '1', 'Photometric Interpretation', ''),  # noqa
@@ -6923,16 +7950,16 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx50': ('US', '2', 'Origin', ''),  # noqa
         '0029xx80': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx99': ('LO', '1', 'Shutter Type', ''),  # noqa
-        '0029xxa0': ('US', '1', 'Rows of Rectangular Shutter', ''),  # noqa
-        '0029xxa1': ('US', '1', 'Columns of Rectangular Shutter', ''),  # noqa
-        '0029xxa2': ('US', '1', 'Origin of Rectangular Shutter', ''),  # noqa
-        '0029xxb0': ('US', '1', 'Radius of Circular Shutter', ''),  # noqa
-        '0029xxb2': ('US', '1', 'Origin of Circular Shutter', ''),  # noqa
-        '0029xxc1': ('US', '1', 'Contour of Irregular Shutter', ''),  # noqa
+        '0029xxA0': ('US', '1', 'Rows of Rectangular Shutter', ''),  # noqa
+        '0029xxA1': ('US', '1', 'Columns of Rectangular Shutter', ''),  # noqa
+        '0029xxA2': ('US', '1', 'Origin of Rectangular Shutter', ''),  # noqa
+        '0029xxB0': ('US', '1', 'Radius of Circular Shutter', ''),  # noqa
+        '0029xxB2': ('US', '1', 'Origin of Circular Shutter', ''),  # noqa
+        '0029xxC1': ('US', '1', 'Contour of Irregular Shutter', ''),  # noqa
     },
     'SIEMENS MED DISPLAY 0000': {
         '0029xx99': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xxc1': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0029xxC1': ('US', '1-n', 'Unknown', ''),  # noqa
     },
     'SIEMENS MED ECAT FILE INFO': {
         '0021xx00': ('OB', '1', 'ECAT_Main_Header', ''),  # noqa
@@ -6949,7 +7976,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx70': ('LO', '1', 'List of Text Concatenation', ''),  # noqa
     },
     'SIEMENS MED MAMMO': {
-        '0029xx5a': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xx5A': ('CS', '1', 'Unknown', ''),  # noqa
     },
     'SIEMENS MED MG': {
         '0029xx10': ('US', '1', 'List of Group Numbers', ''),  # noqa
@@ -6978,12 +8005,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('SL', '1', 'Scaler Counts', ''),  # noqa
         '0019xx08': ('SS', '1', 'Processed Flag 0 Raw 1 Process', ''),  # noqa
         '0019xx09': ('SS', '1', 'MicroDELTA Parameter Blocks', ''),  # noqa
-        '0019xx0a': ('LO', '1', 'MicroDELTA File Extension', ''),  # noqa
-        '0019xx0b': ('LO', '1', 'MicroDELTA Write ID', ''),  # noqa
-        '0019xx0c': ('SS', '1', 'MicroDELTA Write Version', ''),  # noqa
-        '0019xx0d': ('CS', '1', 'MicroDELTA Mode', ''),  # noqa
-        '0019xx0e': ('LO', '1', 'MicroDELTA ESFR', ''),  # noqa
-        '0019xx0f': ('SL', '1', 'Siemens ICON Data Type', ''),  # noqa
+        '0019xx0A': ('LO', '1', 'MicroDELTA File Extension', ''),  # noqa
+        '0019xx0B': ('LO', '1', 'MicroDELTA Write ID', ''),  # noqa
+        '0019xx0C': ('SS', '1', 'MicroDELTA Write Version', ''),  # noqa
+        '0019xx0D': ('CS', '1', 'MicroDELTA Mode', ''),  # noqa
+        '0019xx0E': ('LO', '1', 'MicroDELTA ESFR', ''),  # noqa
+        '0019xx0F': ('SL', '1', 'Siemens ICON Data Type', ''),  # noqa
         '0019xx10': ('OW', '1', 'MicroDELTA Expansion Blocks', ''),  # noqa
         '0019xx11': ('CS', '1', 'MicroDELTA Version', ''),  # noqa
         '0019xx12': ('LO', '1', 'MicroDELTA Trend', ''),  # noqa
@@ -6994,10 +8021,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx17': ('SS', '1', 'MicroDELTA Thyroid Markers', ''),  # noqa
         '0019xx18': ('SS', '1', 'MicroDELTA Color Table Used', ''),  # noqa
         '0019xx19': ('SS', '1', 'Save Screen Flag 1 SaveScreen', ''),  # noqa
-        '0019xx1a': ('SS', '1', 'MicroDELTA Overlay Map', ''),  # noqa
-        '0019xx1b': ('SS', '1', 'SGI Converted LookUp Table', ''),  # noqa
-        '0019xx1c': ('SS', '1', 'MicroDELTA Mystery1', ''),  # noqa
-        '0019xx1d': ('SS', '1', 'MicroDELTA Mystery2', ''),  # noqa
+        '0019xx1A': ('SS', '1', 'MicroDELTA Overlay Map', ''),  # noqa
+        '0019xx1B': ('SS', '1', 'SGI Converted LookUp Table', ''),  # noqa
+        '0019xx1C': ('SS', '1', 'MicroDELTA Mystery1', ''),  # noqa
+        '0019xx1D': ('SS', '1', 'MicroDELTA Mystery2', ''),  # noqa
         '0019xx20': ('FL', '1', 'Time of Lasix Administration', ''),  # noqa
         '0019xx21': ('FL', '1', 'Lasix Dose mg', ''),  # noqa
         '0019xx22': ('FL', '1', 'Bladder Esidual Volume cc', ''),  # noqa
@@ -7017,11 +8044,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx47': ('FL', '1', 'Beat Rejection Parameter', ''),  # noqa
         '0019xx48': ('SH', '1', 'Rejection Scheme', ''),  # noqa
         '0019xx49': ('FL', '1', 'PVC Threshold msec', ''),  # noqa
-        '0019xx4a': ('SS', '1', 'Framing Mode 1 Forward 2 F/B', ''),  # noqa
-        '0019xx4b': ('SS', '1', 'Autobeat Window 0 No 1 Yes', ''),  # noqa
-        '0019xx4c': ('FL', '1', 'MicroDELTA Acquisition Time per Window msec', ''),  # noqa
-        '0019xx4e': ('SS', '1', 'CTQ Unknown Entry Count', ''),  # noqa
-        '0019xx4f': ('SS', '1', 'CTQ Matrix Size', ''),  # noqa
+        '0019xx4A': ('SS', '1', 'Framing Mode 1 Forward 2 F/B', ''),  # noqa
+        '0019xx4B': ('SS', '1', 'Autobeat Window 0 No 1 Yes', ''),  # noqa
+        '0019xx4C': ('FL', '1', 'MicroDELTA Acquisition Time per Window msec', ''),  # noqa
+        '0019xx4E': ('SS', '1', 'CTQ Unknown Entry Count', ''),  # noqa
+        '0019xx4F': ('SS', '1', 'CTQ Matrix Size', ''),  # noqa
         '0019xx50': ('SS', '1', 'CTQ has been used', ''),  # noqa
         '0019xx51': ('SS', '1', 'CTQ Male Entry Count', ''),  # noqa
         '0019xx52': ('SS', '1', 'CTQ Female Entry Count', ''),  # noqa
@@ -7032,12 +8059,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx57': ('SS', '1', 'CTQ Min Sagittal Stack Count', ''),  # noqa
         '0019xx58': ('SS', '1', 'CTQ Max Sagittal Stack Count', ''),  # noqa
         '0019xx59': ('SS', '1', 'CTQ Min Radius Percent', ''),  # noqa
-        '0019xx5a': ('UL', '1', 'CTQ Find Max or Average Flag', ''),  # noqa
-        '0019xx5b': ('SS', '1', 'CTQ Basal Slice Index Offset', ''),  # noqa
-        '0019xx5c': ('SS', '1', 'CTQ Starting Line Index', ''),  # noqa
-        '0019xx5d': ('SS', '1', 'CTQ Line Counts', ''),  # noqa
-        '0019xx5e': ('SS', '1', 'CTQ Radii Counts', ''),  # noqa
-        '0019xx5f': ('SS', '1', 'CTQ Radial Angle Increment', ''),  # noqa
+        '0019xx5A': ('UL', '1', 'CTQ Find Max or Average Flag', ''),  # noqa
+        '0019xx5B': ('SS', '1', 'CTQ Basal Slice Index Offset', ''),  # noqa
+        '0019xx5C': ('SS', '1', 'CTQ Starting Line Index', ''),  # noqa
+        '0019xx5D': ('SS', '1', 'CTQ Line Counts', ''),  # noqa
+        '0019xx5E': ('SS', '1', 'CTQ Radii Counts', ''),  # noqa
+        '0019xx5F': ('SS', '1', 'CTQ Radial Angle Increment', ''),  # noqa
         '0019xx60': ('SS', '1', 'Whole Body Processed Flag 0:Raw 1:Img1-Img2 2:Im', ''),  # noqa
         '0019xx61': ('SS', '1', 'Whole Body View', ''),  # noqa
         '0019xx62': ('SS', '1', 'WB Display Field Length in cm', ''),  # noqa
@@ -7048,12 +8075,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx67': ('SS', '1', 'WB Scan Direction 0 Lt to Rt 1 Rt to Lt', ''),  # noqa
         '0019xx68': ('FL', '1', 'WB Aperature Width in cm', ''),  # noqa
         '0019xx69': ('SS', '1', 'WB Number of Passes', ''),  # noqa
-        '0019xx6a': ('SS', '1', 'WB Scan Time msec', ''),  # noqa
-        '0019xx6b': ('FL', '1', 'WB Anterior kCounts View 1', ''),  # noqa
-        '0019xx6c': ('FL', '1', 'WB Anterior kCounts View 2', ''),  # noqa
-        '0019xx6d': ('FL', '1', 'WB Count Density', ''),  # noqa
-        '0019xx6e': ('SS', '1', 'WB Reference View Flag 1 Ref', ''),  # noqa
-        '0019xx6f': ('FL', '1', 'WB Coun Density Speed cm/min', ''),  # noqa
+        '0019xx6A': ('SS', '1', 'WB Scan Time msec', ''),  # noqa
+        '0019xx6B': ('FL', '1', 'WB Anterior kCounts View 1', ''),  # noqa
+        '0019xx6C': ('FL', '1', 'WB Anterior kCounts View 2', ''),  # noqa
+        '0019xx6D': ('FL', '1', 'WB Count Density', ''),  # noqa
+        '0019xx6E': ('SS', '1', 'WB Reference View Flag 1 Ref', ''),  # noqa
+        '0019xx6F': ('FL', '1', 'WB Coun Density Speed cm/min', ''),  # noqa
         '0019xx70': ('CS', '1', 'WB Scan Type', ''),  # noqa
         '0019xx71': ('LO', '1', 'WB IRIS Corr. File Name', ''),  # noqa
         '0019xx72': ('FL', '1', 'WB Posterior kCounts View 1', ''),  # noqa
@@ -7063,7 +8090,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx76': ('SS', '1', 'WB Post Scan Time msec', ''),  # noqa
         '0019xx77': ('SS', '1', 'WB Ant Pixel Overflow 1 Yes', ''),  # noqa
         '0019xx78': ('SS', '1', 'WB Post Pixel Overflow 1 Yes', ''),  # noqa
-        '0019xx7f': ('SS', '1', 'Segment Type 0 Segments 2 Time/Segment', ''),  # noqa
+        '0019xx7F': ('SS', '1', 'Segment Type 0 Segments 2 Time/Segment', ''),  # noqa
         '0019xx80': ('SS', '1', 'Number of Segments', ''),  # noqa
         '0019xx81': ('SS', '1', 'PVC Rejection Flag 1 Reject', ''),  # noqa
         '0019xx82': ('SL', '1', 'Total Counts Framed', ''),  # noqa
@@ -7074,9 +8101,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx87': ('LT', '1', 'BBA Miscellaneous Info', ''),  # noqa
         '0019xx88': ('SL', '1', 'Tolerance %', ''),  # noqa
         '0019xx89': ('SS', '1', 'SWG', ''),  # noqa
-        '0019xx8a': ('SL', '1', 'R-R Interval msec', ''),  # noqa
-        '0019xx8d': ('SL', '1', 'Total Counts in Acquisition', ''),  # noqa
-        '0019xx8e': ('SL', '1', 'Rejection Type', ''),  # noqa
+        '0019xx8A': ('SL', '1', 'R-R Interval msec', ''),  # noqa
+        '0019xx8D': ('SL', '1', 'Total Counts in Acquisition', ''),  # noqa
+        '0019xx8E': ('SL', '1', 'Rejection Type', ''),  # noqa
         '0019xx91': ('FL', '1', 'Phase Total Counts', ''),  # noqa
         '0019xx92': ('SL', '1', 'Phase Pause msec', ''),  # noqa
         '0019xx93': ('SL', '1', 'Phase Start msec', ''),  # noqa
@@ -7084,23 +8111,23 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx95': ('SS', '1', 'Number of Beats to Average', ''),  # noqa
         '0019xx96': ('FL', '1', 'Histogram Bin Interval msec', ''),  # noqa
         '0019xx97': ('SS', '1', 'Counts in Peak Bin', ''),  # noqa
-        '0019xxa0': ('SS', '1', 'VPDs Detected', ''),  # noqa
-        '0019xxa1': ('SS', '1', 'Number of Phases', ''),  # noqa
-        '0019xxa2': ('SL', '1', 'Requested Frame Duration msec', ''),  # noqa
-        '0019xxa3': ('SL', '1', 'Frames per Phase', ''),  # noqa
-        '0019xxa4': ('SL', '1', 'Frame Pause msec', ''),  # noqa
-        '0019xxa5': ('SS', '1-n', 'Number of repeats per phase', ''),  # noqa
-        '0019xxa6': ('SS', '1-n', 'Cycles per repeat', ''),  # noqa
-        '0019xxa7': ('SL', '1-n', 'Repeat start time', ''),  # noqa
-        '0019xxa8': ('SL', '1-n', 'Repeat stop time', ''),  # noqa
-        '0019xxa9': ('SL', '1-n', 'Effective repeat time', ''),  # noqa
-        '0019xxaa': ('SS', '1-n', 'Acquired cycles per repeat', ''),  # noqa
-        '0019xxc0': ('FL', '1', 'Head Tilt degrees', ''),  # noqa
-        '0019xxc1': ('SS', '1', 'Uniformity Correction Flag', ''),  # noqa
-        '0019xxc2': ('SS', '1', 'Overflow Flag', ''),  # noqa
-        '0019xxc3': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxf0': ('FL', '1', 'Pixel Dimensions', ''),  # noqa
-        '001fxx50': ('DS', '1', 'Location RET', ''),  # noqa
+        '0019xxA0': ('SS', '1', 'VPDs Detected', ''),  # noqa
+        '0019xxA1': ('SS', '1', 'Number of Phases', ''),  # noqa
+        '0019xxA2': ('SL', '1', 'Requested Frame Duration msec', ''),  # noqa
+        '0019xxA3': ('SL', '1', 'Frames per Phase', ''),  # noqa
+        '0019xxA4': ('SL', '1', 'Frame Pause msec', ''),  # noqa
+        '0019xxA5': ('SS', '1-n', 'Number of repeats per phase', ''),  # noqa
+        '0019xxA6': ('SS', '1-n', 'Cycles per repeat', ''),  # noqa
+        '0019xxA7': ('SL', '1-n', 'Repeat start time', ''),  # noqa
+        '0019xxA8': ('SL', '1-n', 'Repeat stop time', ''),  # noqa
+        '0019xxA9': ('SL', '1-n', 'Effective repeat time', ''),  # noqa
+        '0019xxAA': ('SS', '1-n', 'Acquired cycles per repeat', ''),  # noqa
+        '0019xxC0': ('FL', '1', 'Head Tilt degrees', ''),  # noqa
+        '0019xxC1': ('SS', '1', 'Uniformity Correction Flag', ''),  # noqa
+        '0019xxC2': ('SS', '1', 'Overflow Flag', ''),  # noqa
+        '0019xxC3': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxF0': ('FL', '1', 'Pixel Dimensions', ''),  # noqa
+        '001Fxx50': ('DS', '1', 'Location RET', ''),  # noqa
         '0021xx00': ('OB', '1', 'ECAT File Menu Header', ''),  # noqa
         '0021xx01': ('OB', '1', 'ECAT File Subheader', ''),  # noqa
         '0021xx10': ('ST', '1', 'Unknown', ''),  # noqa
@@ -7113,12 +8140,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0031xx07': ('SS', '1', 'CCD Peaking Mode', ''),  # noqa
         '0031xx08': ('LO', '1', 'CCD Autopeak Function', ''),  # noqa
         '0031xx09': ('SS', '1', 'CCD Count Rate Mode', ''),  # noqa
-        '0031xx0a': ('SS', '1', 'Analog Output Device', ''),  # noqa
-        '0031xx0b': ('SS', '1', 'Communication Type', ''),  # noqa
-        '0031xx0c': ('SS', '1', 'Control Unit 1 ICON 2 DOT 3 ScintiView', ''),  # noqa
-        '0031xx0d': ('SS', '1', 'WAM Mode', ''),  # noqa
-        '0031xx0e': ('SS', '1', 'Event Control Mode', ''),  # noqa
-        '0031xx0f': ('FL', '1', 'Zoom X Offset 0.1 mm', ''),  # noqa
+        '0031xx0A': ('SS', '1', 'Analog Output Device', ''),  # noqa
+        '0031xx0B': ('SS', '1', 'Communication Type', ''),  # noqa
+        '0031xx0C': ('SS', '1', 'Control Unit 1 ICON 2 DOT 3 ScintiView', ''),  # noqa
+        '0031xx0D': ('SS', '1', 'WAM Mode', ''),  # noqa
+        '0031xx0E': ('SS', '1', 'Event Control Mode', ''),  # noqa
+        '0031xx0F': ('FL', '1', 'Zoom X Offset 0.1 mm', ''),  # noqa
         '0031xx10': ('FL', '1', 'Zoom Y Offset 0.1 mm', ''),  # noqa
         '0031xx11': ('SS', '1', 'Gantry Zero Position', ''),  # noqa
         '0031xx12': ('SS', '1', 'Unknown', ''),  # noqa
@@ -7202,10 +8229,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0053xx17': ('SS', '1', 'Start Heart Rate Increasing Flag', ''),  # noqa
         '0053xx18': ('SL', '1', 'Start Heart Rate', ''),  # noqa
         '0053xx19': ('SL', '1', 'Manual Stop Flag 0 No 1 Yes', ''),  # noqa
-        '0053xx1a': ('SS', '1', 'Elapsed Time Stop Condition 0 None 1 Any 2 All', ''),  # noqa
-        '0053xx1b': ('SL', '1', 'Elapsed Time Stop', ''),  # noqa
-        '0053xx1c': ('SS', '1', 'Stop Heart Beat Count Condition 0 None 1 Any 2 A', ''),  # noqa
-        '0053xx1d': ('SL', '1', 'Stop Heart Beat Count', ''),  # noqa
+        '0053xx1A': ('SS', '1', 'Elapsed Time Stop Condition 0 None 1 Any 2 All', ''),  # noqa
+        '0053xx1B': ('SL', '1', 'Elapsed Time Stop', ''),  # noqa
+        '0053xx1C': ('SS', '1', 'Stop Heart Beat Count Condition 0 None 1 Any 2 A', ''),  # noqa
+        '0053xx1D': ('SL', '1', 'Stop Heart Beat Count', ''),  # noqa
         '0053xx30': ('SS', '1', 'Info Density Stop Condition', ''),  # noqa
         '0053xx31': ('SS', '1', 'Info Density Stop Scaler', ''),  # noqa
         '0053xx32': ('SS', '1', 'Info Density Stop Region', ''),  # noqa
@@ -7225,8 +8252,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx38': ('OW', '1', 'COR Data', ''),  # noqa
         '0055xx40': ('SS', '1', 'Noncircular Orbit Flag 1 NCO', ''),  # noqa
         '0055xx48': ('FL', '1', 'NCO Values', ''),  # noqa
-        '0055xx4c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0055xx4d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0055xx4C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0055xx4D': ('SL', '1', 'Unknown', ''),  # noqa
         '0055xx50': ('SS', '1', 'Prone Flag 0 Supine 1 Prone', ''),  # noqa
         '0055xx51': ('SS', '1', 'Orbit 0 Circular 1 Elliptical', ''),  # noqa
         '0055xx52': ('SS', '1', 'Total Rotation in Degrees', ''),  # noqa
@@ -7237,12 +8264,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx57': ('SS', '1', 'Scatter Corr. Flag 1 Corr', ''),  # noqa
         '0055xx58': ('FL', '1', 'Radial Map Info in 0.1 mm Inc.', ''),  # noqa
         '0055xx59': ('CS', '1', 'Direction H HeadIn F FeetIn', ''),  # noqa
-        '0055xx5a': ('FL', '1', 'Table Traverse cm', ''),  # noqa
-        '0055xx5b': ('SS', '1', 'Multiplexor Flag 1 Multiplexed', ''),  # noqa
-        '0055xx5c': ('DS', '1', 'Pixel Acquisition Date', ''),  # noqa
-        '0055xx5d': ('SS', '1', 'Angle Type 1 360o 2 128 Steps', ''),  # noqa
-        '0055xx5e': ('SL', '1', 'Orbit Definition', ''),  # noqa
-        '0055xx5f': ('FL', '1', 'Arm Length in cm', ''),  # noqa
+        '0055xx5A': ('FL', '1', 'Table Traverse cm', ''),  # noqa
+        '0055xx5B': ('SS', '1', 'Multiplexor Flag 1 Multiplexed', ''),  # noqa
+        '0055xx5C': ('DS', '1', 'Pixel Acquisition Date', ''),  # noqa
+        '0055xx5D': ('SS', '1', 'Angle Type 1 360o 2 128 Steps', ''),  # noqa
+        '0055xx5E': ('SL', '1', 'Orbit Definition', ''),  # noqa
+        '0055xx5F': ('FL', '1', 'Arm Length in cm', ''),  # noqa
         '0055xx60': ('SS', '1', 'Auto Window Beats', ''),  # noqa
         '0055xx61': ('SS', '1', 'Non-gated File Extension', ''),  # noqa
         '0055xx64': ('SS', '1', 'TIC Error Values', ''),  # noqa
@@ -7251,10 +8278,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx67': ('SS', '1', 'X2', ''),  # noqa
         '0055xx68': ('SS', '1', 'Y2', ''),  # noqa
         '0055xx69': ('SS', '1', 'X3', ''),  # noqa
-        '0055xx6a': ('SS', '1', 'Y3', ''),  # noqa
-        '0055xx6b': ('SS', '1', 'X4', ''),  # noqa
-        '0055xx6c': ('SS', '1', 'Y4', ''),  # noqa
-        '0055xx6d': ('SS', '1', 'Pixel Size Flag 1 Valid Size', ''),  # noqa
+        '0055xx6A': ('SS', '1', 'Y3', ''),  # noqa
+        '0055xx6B': ('SS', '1', 'X4', ''),  # noqa
+        '0055xx6C': ('SS', '1', 'Y4', ''),  # noqa
+        '0055xx6D': ('SS', '1', 'Pixel Size Flag 1 Valid Size', ''),  # noqa
         '0055xx70': ('FL', '1', 'X Focal Length', ''),  # noqa
         '0055xx71': ('FL', '1', 'Y Focal Length', ''),  # noqa
         '0055xx72': ('FL', '1', 'X Gains', ''),  # noqa
@@ -7264,8 +8291,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx76': ('FL', '1', 'X Principal Ray', ''),  # noqa
         '0055xx77': ('FL', '1', 'Y Principal Ray', ''),  # noqa
         '0055xx78': ('FL', '1', 'Total Flood Counts', ''),  # noqa
-        '0055xx7e': ('FL', '1-n', 'Collimator thickness', ''),  # noqa
-        '0055xx7f': ('FL', '1-n', 'Collimator angular resolution', ''),  # noqa
+        '0055xx7E': ('FL', '1-n', 'Collimator thickness', ''),  # noqa
+        '0055xx7F': ('FL', '1-n', 'Collimator angular resolution', ''),  # noqa
         '0055xx80': ('SS', '1', 'File Altered Flag 1 Altered', ''),  # noqa
         '0055xx81': ('SS', '1', 'Raw Data Extension', ''),  # noqa
         '0055xx82': ('SS', '1', 'Sagittal Extension', ''),  # noqa
@@ -7275,44 +8302,44 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0055xx86': ('SL', '1', 'Plane of Transverse Bottom Slice', ''),  # noqa
         '0055xx87': ('SL', '1', 'Plane of Transverse Top Slice', ''),  # noqa
         '0055xx88': ('SL', '1', 'Slice Step in Pixels', ''),  # noqa
-        '0055xx8a': ('SL', '1', 'Y-Axis Smooth Slice Weights', ''),  # noqa
-        '0055xx8b': ('SL', '1', 'Number of Transverse Slices', ''),  # noqa
-        '0055xx8c': ('SS', '1', 'Attenuation Flag 1 Chang 2 Sorenson', ''),  # noqa
-        '0055xx8d': ('SS', '1', 'Sagittal Right Limit', ''),  # noqa
-        '0055xx8e': ('SS', '1', 'Sagittal Left Limit', ''),  # noqa
-        '0055xx8f': ('SS', '1', 'Coronal Posterior Limit', ''),  # noqa
+        '0055xx8A': ('SL', '1', 'Y-Axis Smooth Slice Weights', ''),  # noqa
+        '0055xx8B': ('SL', '1', 'Number of Transverse Slices', ''),  # noqa
+        '0055xx8C': ('SS', '1', 'Attenuation Flag 1 Chang 2 Sorenson', ''),  # noqa
+        '0055xx8D': ('SS', '1', 'Sagittal Right Limit', ''),  # noqa
+        '0055xx8E': ('SS', '1', 'Sagittal Left Limit', ''),  # noqa
+        '0055xx8F': ('SS', '1', 'Coronal Posterior Limit', ''),  # noqa
         '0055xx90': ('SS', '1', 'Coronal Anterior Limit', ''),  # noqa
         '0055xx91': ('SS', '1', 'Isotope Used in Reconstruction', ''),  # noqa
         '0055xx93': ('FL', '1', 'Filter Cutoff Frequency', ''),  # noqa
         '0055xx94': ('FL', '1', 'Filter Alpha Coefficient', ''),  # noqa
         '0055xx95': ('FL', '1', 'Filter Order', ''),  # noqa
-        '0055xx96': ('FL', '1', 'Attenuation Cooefficient', ''),  # noqa
+        '0055xx96': ('FL', '1', 'Attenuation Coefficient', ''),  # noqa
         '0055xx97': ('SS', '1', 'Percent Ray', ''),  # noqa
         '0055xx98': ('SS', '1', 'Astigmatic Collimator 1 Neuro 2 Cardiac', ''),  # noqa
         '0055xx99': ('SS', '1', 'XP0', ''),  # noqa
-        '0055xx9a': ('SS', '1', 'ZP0', ''),  # noqa
-        '0055xx9b': ('SS', '1', 'XP1', ''),  # noqa
-        '0055xx9c': ('SS', '1', 'ZP1', ''),  # noqa
-        '0055xx9d': ('FL', '1', 'Rotation Matrix', ''),  # noqa
-        '0055xx9e': ('FL', '1', 'X0', ''),  # noqa
-        '0055xx9f': ('FL', '1', 'X1', ''),  # noqa
-        '0055xxa0': ('FL', '1', 'Y0', ''),  # noqa
-        '0055xxa1': ('FL', '1', 'Y1', ''),  # noqa
-        '0055xxa2': ('FL', '1', 'Z0', ''),  # noqa
-        '0055xxa3': ('FL', '1', 'Z1', ''),  # noqa
-        '0055xxa4': ('SS', '1', 'Transverse Scale', ''),  # noqa
-        '0055xxa5': ('FL', '1', 'Pixel Size X Direction mm', ''),  # noqa
-        '0055xxa6': ('FL', '1', 'Pixel Size Y Direction mm', ''),  # noqa
-        '0055xxa7': ('SS', '1', 'Regions File Extension', ''),  # noqa
-        '0055xxa8': ('SS', '1', 'Gated SPECT Bins Reconstructed', ''),  # noqa
-        '0055xxa9': ('SS', '1', 'Vertical Oblique Image', ''),  # noqa
-        '0055xxb0': ('SS', '1', 'Oblique Region First Slice', ''),  # noqa
-        '0055xxb1': ('SS', '1', 'Oblique Region Last Slice', ''),  # noqa
-        '0055xxc0': ('SS', '1-n', 'Unknown', ''),  # noqa
-        '0055xxc2': ('SS', '1', 'Unknown', ''),  # noqa
-        '0055xxc3': ('SS', '1', 'Unknown', ''),  # noqa
-        '0055xxc4': ('SS', '1', 'Unknown', ''),  # noqa
-        '0055xxd0': ('SS', '1', 'Unknown', ''),  # noqa
+        '0055xx9A': ('SS', '1', 'ZP0', ''),  # noqa
+        '0055xx9B': ('SS', '1', 'XP1', ''),  # noqa
+        '0055xx9C': ('SS', '1', 'ZP1', ''),  # noqa
+        '0055xx9D': ('FL', '1', 'Rotation Matrix', ''),  # noqa
+        '0055xx9E': ('FL', '1', 'X0', ''),  # noqa
+        '0055xx9F': ('FL', '1', 'X1', ''),  # noqa
+        '0055xxA0': ('FL', '1', 'Y0', ''),  # noqa
+        '0055xxA1': ('FL', '1', 'Y1', ''),  # noqa
+        '0055xxA2': ('FL', '1', 'Z0', ''),  # noqa
+        '0055xxA3': ('FL', '1', 'Z1', ''),  # noqa
+        '0055xxA4': ('SS', '1', 'Transverse Scale', ''),  # noqa
+        '0055xxA5': ('FL', '1', 'Pixel Size X Direction mm', ''),  # noqa
+        '0055xxA6': ('FL', '1', 'Pixel Size Y Direction mm', ''),  # noqa
+        '0055xxA7': ('SS', '1', 'Regions File Extension', ''),  # noqa
+        '0055xxA8': ('SS', '1', 'Gated SPECT Bins Reconstructed', ''),  # noqa
+        '0055xxA9': ('SS', '1', 'Vertical Oblique Image', ''),  # noqa
+        '0055xxB0': ('SS', '1', 'Oblique Region First Slice', ''),  # noqa
+        '0055xxB1': ('SS', '1', 'Oblique Region Last Slice', ''),  # noqa
+        '0055xxC0': ('SS', '1-n', 'Unknown', ''),  # noqa
+        '0055xxC2': ('SS', '1', 'Unknown', ''),  # noqa
+        '0055xxC3': ('SS', '1', 'Unknown', ''),  # noqa
+        '0055xxC4': ('SS', '1', 'Unknown', ''),  # noqa
+        '0055xxD0': ('SS', '1', 'Unknown', ''),  # noqa
         '0057xx01': ('LO', '1', 'e.soft DICOM original image type', ''),  # noqa
         '0057xx02': ('FL', '1', 'Dose calibration factor', ''),  # noqa
         '0057xx03': ('LO', '1', 'Units', ''),  # noqa
@@ -7322,9 +8349,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0057xx07': ('FL', '1', 'Rescale Slope', ''),  # noqa
         '0057xx08': ('FL', '1', 'Frame reference time', ''),  # noqa
         '0057xx09': ('SL', '1', 'Number of Radiopharmaceutical information seq', ''),  # noqa
-        '0057xx0a': ('FL', '1', 'Decay factor', ''),  # noqa
-        '0057xx0b': ('LO', '1', 'Counts source', ''),  # noqa
-        '0057xx0c': ('SL', '1-n', 'Radio Nuclide positron fraction', ''),  # noqa
+        '0057xx0A': ('FL', '1', 'Decay factor', ''),  # noqa
+        '0057xx0B': ('LO', '1', 'Counts source', ''),  # noqa
+        '0057xx0C': ('SL', '1-n', 'Radio Nuclide positron fraction', ''),  # noqa
         '0057xx10': ('SS', '1', 'Low Count', ''),  # noqa
         '0057xx20': ('SS', '1', 'Vertical Oblique Image', ''),  # noqa
         '5001xx02': ('SL', '1', 'Number of Points', ''),  # noqa
@@ -7335,31 +8362,31 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '5001xx07': ('LO', '1', 'Curve Name', ''),  # noqa
         '5001xx08': ('LO', '1', 'Curve Function Label', ''),  # noqa
         '5001xx09': ('SH', '1', 'X Axis Label', ''),  # noqa
-        '5001xx0a': ('SH', '1', 'Y Axis Label', ''),  # noqa
-        '5001xx0b': ('OW', '1', 'Curve Data', ''),  # noqa
-        '7fe1xx10': ('OW', '1', 'Compressed Pixel Data', ''),  # noqa
-        '7fe3xx00': ('UL', '1', 'Length of Group 0x7FE3', ''),  # noqa
-        '7fe3xx14': ('SL', '1', 'Lowest Pixel Value in THIS Frame', ''),  # noqa
-        '7fe3xx15': ('SL', '1', 'Highest Pixel Value in THIS Frame', ''),  # noqa
-        '7fe3xx16': ('SL', '1', 'Total Counts in THIS Frame', ''),  # noqa
-        '7fe3xx17': ('SL', '1', 'Duration of THIS Frame msec', ''),  # noqa
-        '7fe3xx18': ('FL', '1', 'Frame Angle', ''),  # noqa
-        '7fe3xx19': ('LO', '1', 'Frame Name', ''),  # noqa
-        '7fe3xx1a': ('FL', '1', 'View Number', ''),  # noqa
-        '7fe3xx1b': ('SS', '1', 'Pixel Overflow Flag 1 Pixel Overflow', ''),  # noqa
-        '7fe3xx1c': ('SS', '1', 'Buffer Overflow Flag 1 Buffer Overflow', ''),  # noqa
-        '7fe3xx1e': ('SL', '1', 'Start Time of THIS Frame From Start of Study', ''),  # noqa
-        '7fe3xx1f': ('SL', '1', 'ROI Maximum Pixel Value', ''),  # noqa
-        '7fe3xx20': ('SL', '1', 'ROI Average Pixel Value', ''),  # noqa
-        '7fe3xx21': ('SL', '1', 'ROI Total Counts', ''),  # noqa
-        '7fe3xx22': ('SL', '1', 'ROI Total Pixels', ''),  # noqa
-        '7fe3xx23': ('SL', '1', 'ROI Center Coordinates', ''),  # noqa
-        '7fe3xx24': ('LO', '1', 'ROI Name', ''),  # noqa
-        '7fe3xx25': ('SS', '1', 'ROI Data', ''),  # noqa
-        '7fe3xx26': ('OW', '1', 'Unknown', ''),  # noqa
-        '7fe3xx27': ('OW', '1', 'Unknown', ''),  # noqa
-        '7fe3xx28': ('OW', '1', 'Unknown', ''),  # noqa
-        '7fe3xx29': ('OW', '1', 'Unknown', ''),  # noqa
+        '5001xx0A': ('SH', '1', 'Y Axis Label', ''),  # noqa
+        '5001xx0B': ('OW', '1', 'Curve Data', ''),  # noqa
+        '7FE1xx10': ('OW', '1', 'Compressed Pixel Data', ''),  # noqa
+        '7FE3xx00': ('UL', '1', 'Length of Group 0x7FE3', ''),  # noqa
+        '7FE3xx14': ('SL', '1', 'Lowest Pixel Value in THIS Frame', ''),  # noqa
+        '7FE3xx15': ('SL', '1', 'Highest Pixel Value in THIS Frame', ''),  # noqa
+        '7FE3xx16': ('SL', '1', 'Total Counts in THIS Frame', ''),  # noqa
+        '7FE3xx17': ('SL', '1', 'Duration of THIS Frame msec', ''),  # noqa
+        '7FE3xx18': ('FL', '1', 'Frame Angle', ''),  # noqa
+        '7FE3xx19': ('LO', '1', 'Frame Name', ''),  # noqa
+        '7FE3xx1A': ('FL', '1', 'View Number', ''),  # noqa
+        '7FE3xx1B': ('SS', '1', 'Pixel Overflow Flag 1 Pixel Overflow', ''),  # noqa
+        '7FE3xx1C': ('SS', '1', 'Buffer Overflow Flag 1 Buffer Overflow', ''),  # noqa
+        '7FE3xx1E': ('SL', '1', 'Start Time of THIS Frame From Start of Study', ''),  # noqa
+        '7FE3xx1F': ('SL', '1', 'ROI Maximum Pixel Value', ''),  # noqa
+        '7FE3xx20': ('SL', '1', 'ROI Average Pixel Value', ''),  # noqa
+        '7FE3xx21': ('SL', '1', 'ROI Total Counts', ''),  # noqa
+        '7FE3xx22': ('SL', '1', 'ROI Total Pixels', ''),  # noqa
+        '7FE3xx23': ('SL', '1', 'ROI Center Coordinates', ''),  # noqa
+        '7FE3xx24': ('LO', '1', 'ROI Name', ''),  # noqa
+        '7FE3xx25': ('SS', '1', 'ROI Data', ''),  # noqa
+        '7FE3xx26': ('OW', '1', 'Unknown', ''),  # noqa
+        '7FE3xx27': ('OW', '1', 'Unknown', ''),  # noqa
+        '7FE3xx28': ('OW', '1', 'Unknown', ''),  # noqa
+        '7FE3xx29': ('OW', '1', 'Unknown', ''),  # noqa
     },
     'SIEMENS MED OCS ACKNOWLEDGE FLAG': {
         '0039xx81': ('IS', '1', 'Acknowledge Flag', ''),  # noqa
@@ -7475,8 +8502,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     'SIEMENS MED SMS USG ANTARES': {
         '0019xx00': ('SH', '1', 'Private Creator Version', ''),  # noqa
         '0019xx03': ('UN', '1', 'Frame Rate', ''),  # noqa
-        '0019xx0c': ('US', '1', 'Burned in Graphics', ''),  # noqa
-        '0019xx0d': ('UN', '1', 'SieClear Index', ''),  # noqa
+        '0019xx0C': ('US', '1', 'Burned in Graphics', ''),  # noqa
+        '0019xx0D': ('UN', '1', 'SieClear Index', ''),  # noqa
         '0019xx20': ('UN', '1', 'B-Mode Submode', ''),  # noqa
         '0019xx21': ('UN', '1', 'B-Mode Dynamic Range', ''),  # noqa
         '0019xx22': ('UN', '1', 'B-Mode Overall Gain', ''),  # noqa
@@ -7487,12 +8514,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx27': ('US', '1', '???', ''),  # noqa
         '0019xx28': ('US', '1', '???', ''),  # noqa
         '0019xx29': ('US', '1', '???', ''),  # noqa
-        '0019xx2a': ('US', '1', 'B-Mode Tint Type', ''),  # noqa
-        '0019xx2d': ('UN', '1', 'B-Mode Tint Index', ''),  # noqa
-        '0019xx2e': ('UN', '1', 'ClarifyVE Index', ''),  # noqa
+        '0019xx2A': ('US', '1', 'B-Mode Tint Type', ''),  # noqa
+        '0019xx2D': ('UN', '1', 'B-Mode Tint Index', ''),  # noqa
+        '0019xx2E': ('UN', '1', 'ClarifyVE Index', ''),  # noqa
         '0019xx31': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx3a': ('UN', '1', 'Image Flag', ''),  # noqa
-        '0019xx3b': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xx3A': ('UN', '1', 'Image Flag', ''),  # noqa
+        '0019xx3B': ('LT', '1', 'Unknown', ''),  # noqa
         '0019xx40': ('UN', '1', 'Color Flow state', ''),  # noqa
         '0019xx41': ('UN', '1', 'Color Flow Wall Filter Index', ''),  # noqa
         '0019xx42': ('UN', '1', 'Color Flow Submode', ''),  # noqa
@@ -7511,8 +8538,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx66': ('UN', '1', 'Doppler Submode', ''),  # noqa
         '0019xx67': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx69': ('UN', '1', 'Doppler Time/Freq Res Index', ''),  # noqa
-        '0019xx6a': ('US', '1', 'Doppler Trace Inverted', ''),  # noqa
-        '0019xx6c': ('US', '1', 'Doppler Tint Type', ''),  # noqa
+        '0019xx6A': ('US', '1', 'Doppler Trace Inverted', ''),  # noqa
+        '0019xx6C': ('US', '1', 'Doppler Tint Type', ''),  # noqa
         '0019xx72': ('UN', '1', 'Doppler Tint Index', ''),  # noqa
         '0019xx80': ('UN', '1', 'M-Mode Dynamic Range', ''),  # noqa
         '0019xx81': ('UN', '1', 'M-Mode Overall Gain', ''),  # noqa
@@ -7521,7 +8548,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx86': ('UN', '1', 'M-Mode Tint Type', ''),  # noqa
         '0019xx87': ('UN', '1', 'M-Mode Submode', ''),  # noqa
         '0019xx88': ('UN', '1', 'M-Mode Tint Index', ''),  # noqa
-        '0019xxa0': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019xxA0': ('LT', '1', 'Unknown', ''),  # noqa
     },
     'SIEMENS MED SMS USG ANTARES 3D VOLUME': {
         '0039xx00': ('UN', '1', 'Release Version', ''),  # noqa
@@ -7573,12 +8600,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx57': ('UN', '1', 'BVrContrast', ''),  # noqa
         '0039xx58': ('UN', '1', 'BVrColorMapIndex', ''),  # noqa
         '0039xx59': ('UN', '1', 'BVrDynamicRangeDb', ''),  # noqa
-        '0039xx5a': ('UN', '1', 'BVrGrayMapIndex', ''),  # noqa
-        '0039xx5b': ('UN', '1', 'BVrOpacity', ''),  # noqa
-        '0039xx5c': ('UN', '1', 'BVrThresholdHigh', ''),  # noqa
-        '0039xx5d': ('UN', '1', 'BVrThresholdLow', ''),  # noqa
-        '0039xx5e': ('UN', '1', 'BPreProcessFilterMix', ''),  # noqa
-        '0039xx5f': ('UN', '1', 'CCutPlaneEnable', ''),  # noqa
+        '0039xx5A': ('UN', '1', 'BVrGrayMapIndex', ''),  # noqa
+        '0039xx5B': ('UN', '1', 'BVrOpacity', ''),  # noqa
+        '0039xx5C': ('UN', '1', 'BVrThresholdHigh', ''),  # noqa
+        '0039xx5D': ('UN', '1', 'BVrThresholdLow', ''),  # noqa
+        '0039xx5E': ('UN', '1', 'BPreProcessFilterMix', ''),  # noqa
+        '0039xx5F': ('UN', '1', 'CCutPlaneEnable', ''),  # noqa
         '0039xx60': ('UN', '1', 'CFrontClipMode', ''),  # noqa
         '0039xx61': ('UN', '1', 'CMprColorMapIndex', ''),  # noqa
         '0039xx62': ('UN', '1', 'CMprColorFlowPriorityIndex', ''),  # noqa
@@ -7589,12 +8616,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx67': ('UN', '1', 'CVrThresholdHigh', ''),  # noqa
         '0039xx68': ('UN', '1', 'CVrThresholdLow', ''),  # noqa
         '0039xx69': ('UN', '1', 'VoiMode', ''),  # noqa
-        '0039xx6a': ('UN', '1', 'VoiRotationOffsetDeg', ''),  # noqa
-        '0039xx6b': ('UN', '1', 'VoiSizeRatioX', ''),  # noqa
-        '0039xx6c': ('UN', '1', 'VoiSizeRatioY', ''),  # noqa
-        '0039xx6d': ('UN', '1', 'VoiSizeRatioZ', ''),  # noqa
-        '0039xx6e': ('UN', '1', 'VoiSyncPlane', ''),  # noqa
-        '0039xx6f': ('UN', '1', 'VoiViewMode', ''),  # noqa
+        '0039xx6A': ('UN', '1', 'VoiRotationOffsetDeg', ''),  # noqa
+        '0039xx6B': ('UN', '1', 'VoiSizeRatioX', ''),  # noqa
+        '0039xx6C': ('UN', '1', 'VoiSizeRatioY', ''),  # noqa
+        '0039xx6D': ('UN', '1', 'VoiSizeRatioZ', ''),  # noqa
+        '0039xx6E': ('UN', '1', 'VoiSyncPlane', ''),  # noqa
+        '0039xx6F': ('UN', '1', 'VoiViewMode', ''),  # noqa
         '0039xx70': ('UN', '1', 'VrOrientationA', ''),  # noqa
         '0039xx71': ('UN', '1', 'MprOrientationA', ''),  # noqa
         '0039xx72': ('UN', '1', 'VrOffsetVector', ''),  # noqa
@@ -7605,12 +8632,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx77': ('UN', '1', 'SliceMode', ''),  # noqa
         '0039xx78': ('UN', '1', 'ActiveQuad', ''),  # noqa
         '0039xx79': ('UN', '1', 'ScreenMode', ''),  # noqa
-        '0039xx7a': ('UN', '1', 'CutPlaneSide', ''),  # noqa
-        '0039xx7b': ('UN', '1', 'WireframeMode', ''),  # noqa
-        '0039xx7c': ('UN', '1', 'CrossmarkMode', ''),  # noqa
-        '0039xx7d': ('UN', '1', 'MprDisplayType', ''),  # noqa
-        '0039xx7e': ('UN', '1', 'VolumeDisplayType', ''),  # noqa
-        '0039xx7f': ('UN', '1', 'LastReset', ''),  # noqa
+        '0039xx7A': ('UN', '1', 'CutPlaneSide', ''),  # noqa
+        '0039xx7B': ('UN', '1', 'WireframeMode', ''),  # noqa
+        '0039xx7C': ('UN', '1', 'CrossmarkMode', ''),  # noqa
+        '0039xx7D': ('UN', '1', 'MprDisplayType', ''),  # noqa
+        '0039xx7E': ('UN', '1', 'VolumeDisplayType', ''),  # noqa
+        '0039xx7F': ('UN', '1', 'LastReset', ''),  # noqa
         '0039xx80': ('UN', '1', 'LastNonFullScreenMode', ''),  # noqa
         '0039xx81': ('UN', '1', 'MprToolIndex', ''),  # noqa
         '0039xx82': ('UN', '1', 'VoiToolIndex', ''),  # noqa
@@ -7621,42 +8648,42 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0039xx87': ('UN', '1', 'ZoomLevelMpr', ''),  # noqa
         '0039xx88': ('UN', '1', 'ZoomLevelVolume', ''),  # noqa
         '0039xx89': ('UN', '1', 'IsAutoRotateEn', ''),  # noqa
-        '0039xx8a': ('UN', '1', 'AutoRotateAxis', ''),  # noqa
-        '0039xx8b': ('UN', '1', 'AutoRotateRangeIndex', ''),  # noqa
-        '0039xx8c': ('UN', '1', 'AutoRotateSpeedIndex', ''),  # noqa
-        '0039xx8d': ('UN', '1', 'CVrBrightness', ''),  # noqa
-        '0039xx8e': ('UN', '1', 'CFlowStateIndex', ''),  # noqa
-        '0039xx8f': ('UN', '1', 'BSubmodeIndex', ''),  # noqa
+        '0039xx8A': ('UN', '1', 'AutoRotateAxis', ''),  # noqa
+        '0039xx8B': ('UN', '1', 'AutoRotateRangeIndex', ''),  # noqa
+        '0039xx8C': ('UN', '1', 'AutoRotateSpeedIndex', ''),  # noqa
+        '0039xx8D': ('UN', '1', 'CVrBrightness', ''),  # noqa
+        '0039xx8E': ('UN', '1', 'CFlowStateIndex', ''),  # noqa
+        '0039xx8F': ('UN', '1', 'BSubmodeIndex', ''),  # noqa
         '0039xx90': ('UN', '1', 'CSubmodeIndex', ''),  # noqa
         '0039xx91': ('UN', '1', 'DICOMAttrNameCutPlane', ''),  # noqa
         '0039xx92': ('UN', '1', 'BookmarkChunkId', ''),  # noqa
         '0039xx93': ('UN', '1', 'SequenceMinChunkId', ''),  # noqa
         '0039xx94': ('UN', '1', 'SequenceMaxChunkId', ''),  # noqa
         '0039xx95': ('UN', '1', 'VolumeRateHz', ''),  # noqa
-        '0039xx9a': ('UN', '1', 'VoiPositionOffsetX', ''),  # noqa
-        '0039xx9b': ('UN', '1', 'VoiPositionOffsetY', ''),  # noqa
-        '0039xx9c': ('UN', '1', 'VoiPositionOffsetZ', ''),  # noqa
-        '0039xx9d': ('UN', '1', 'VrToolIndex', ''),  # noqa
-        '0039xx9e': ('UN', '1', 'ShadingPercent', ''),  # noqa
-        '0039xx9f': ('UN', '1', 'VolumeType', ''),  # noqa
-        '0039xxa0': ('UN', '1', 'DICOMAttrNameVrQuadDisplayType', ''),  # noqa
-        '0039xxa1': ('UN', '1', 'DICOMAttrNameMprCenterLocation', ''),  # noqa
-        '0039xxe0': ('UN', '1', 'DICOMAttrNameSliceRangeType', ''),  # noqa
-        '0039xxe1': ('UN', '1', 'DICOMAttrNameSliceMPRPlane', ''),  # noqa
-        '0039xxe2': ('UN', '1', 'DICOMAttrNameSliceLayout', ''),  # noqa
-        '0039xxe3': ('UN', '1', 'DICOMAttrNameSliceSpacing', ''),  # noqa
-        '0039xxe4': ('UN', '1', 'DICOMAttrNameThinVrMode', ''),  # noqa
-        '0039xxe5': ('UN', '1', 'DICOMAttrNameThinVrThickness', ''),  # noqa
-        '0039xxe6': ('UN', '1', 'DICOMAttrNameVoiPivotX', ''),  # noqa
-        '0039xxe7': ('UN', '1', 'DICOMAttrNameVoiPivotY', ''),  # noqa
-        '0039xxe8': ('UN', '1', 'DICOMAttrNameVoiPivotZ', ''),  # noqa
-        '0039xxe9': ('UN', '1', 'DICOMAttrNameCTopVoiQuad', ''),  # noqa
+        '0039xx9A': ('UN', '1', 'VoiPositionOffsetX', ''),  # noqa
+        '0039xx9B': ('UN', '1', 'VoiPositionOffsetY', ''),  # noqa
+        '0039xx9C': ('UN', '1', 'VoiPositionOffsetZ', ''),  # noqa
+        '0039xx9D': ('UN', '1', 'VrToolIndex', ''),  # noqa
+        '0039xx9E': ('UN', '1', 'ShadingPercent', ''),  # noqa
+        '0039xx9F': ('UN', '1', 'VolumeType', ''),  # noqa
+        '0039xxA0': ('UN', '1', 'DICOMAttrNameVrQuadDisplayType', ''),  # noqa
+        '0039xxA1': ('UN', '1', 'DICOMAttrNameMprCenterLocation', ''),  # noqa
+        '0039xxE0': ('UN', '1', 'DICOMAttrNameSliceRangeType', ''),  # noqa
+        '0039xxE1': ('UN', '1', 'DICOMAttrNameSliceMPRPlane', ''),  # noqa
+        '0039xxE2': ('UN', '1', 'DICOMAttrNameSliceLayout', ''),  # noqa
+        '0039xxE3': ('UN', '1', 'DICOMAttrNameSliceSpacing', ''),  # noqa
+        '0039xxE4': ('UN', '1', 'DICOMAttrNameThinVrMode', ''),  # noqa
+        '0039xxE5': ('UN', '1', 'DICOMAttrNameThinVrThickness', ''),  # noqa
+        '0039xxE6': ('UN', '1', 'DICOMAttrNameVoiPivotX', ''),  # noqa
+        '0039xxE7': ('UN', '1', 'DICOMAttrNameVoiPivotY', ''),  # noqa
+        '0039xxE8': ('UN', '1', 'DICOMAttrNameVoiPivotZ', ''),  # noqa
+        '0039xxE9': ('UN', '1', 'DICOMAttrNameCTopVoiQuad', ''),  # noqa
     },
     'SIEMENS MED SMS USG S2000': {
         '0019xx00': ('UN', '1', 'Private Creator Version', ''),  # noqa
         '0019xx03': ('FD', '1', 'Frame Rate', ''),  # noqa
-        '0019xx0c': ('US', '1', 'Burned in Graphics', ''),  # noqa
-        '0019xx0d': ('SH', '1', 'SieClear Index', ''),  # noqa
+        '0019xx0C': ('US', '1', 'Burned in Graphics', ''),  # noqa
+        '0019xx0D': ('SH', '1', 'SieClear Index', ''),  # noqa
         '0019xx20': ('SH', '1', 'B-Mode Submode', ''),  # noqa
         '0019xx21': ('FD', '1', 'B-Mode Dynamic Range', ''),  # noqa
         '0019xx22': ('FD', '1', 'B-Mode Overall Gain', ''),  # noqa
@@ -7667,12 +8694,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx27': ('US', '1', '??', ''),  # noqa
         '0019xx28': ('US', '1', '??', ''),  # noqa
         '0019xx29': ('US', '1', '??', ''),  # noqa
-        '0019xx2a': ('US', '1', 'B-Mode Tint Type', ''),  # noqa
-        '0019xx2d': ('US', '1', 'B-Mode Tint Index', ''),  # noqa
-        '0019xx2e': ('SH', '1', 'ClarifyVE Index', ''),  # noqa
-        '0019xx3a': ('UN', '1', 'Image Flag', ''),  # noqa
-        '0019xx3b': ('LT', '1', 'IPDA/MDA Data', ''),  # noqa
-        '0019xx3c': ('UT', '1', 'Thumbnail Data', ''),  # noqa
+        '0019xx2A': ('US', '1', 'B-Mode Tint Type', ''),  # noqa
+        '0019xx2D': ('US', '1', 'B-Mode Tint Index', ''),  # noqa
+        '0019xx2E': ('SH', '1', 'ClarifyVE Index', ''),  # noqa
+        '0019xx3A': ('UN', '1', 'Image Flag', ''),  # noqa
+        '0019xx3B': ('LT', '1', 'IPDA/MDA Data', ''),  # noqa
+        '0019xx3C': ('UT', '1', 'Thumbnail Data', ''),  # noqa
         '0019xx40': ('UN', '1', 'Color Flow state', ''),  # noqa
         '0019xx41': ('UN', '1', 'Color Flow Wall Filter Index', ''),  # noqa
         '0019xx42': ('UN', '1', 'Color Flow Submode', ''),  # noqa
@@ -7690,8 +8717,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx65': ('UN', '1', 'Doppler Map Index', ''),  # noqa
         '0019xx66': ('UN', '1', 'Doppler Submode', ''),  # noqa
         '0019xx69': ('UN', '1', 'Doppler Time/Freq Res Index', ''),  # noqa
-        '0019xx6a': ('UN', '1', 'Doppler Trace Inverted', ''),  # noqa
-        '0019xx6c': ('UN', '1', 'Doppler Tint Type', ''),  # noqa
+        '0019xx6A': ('UN', '1', 'Doppler Trace Inverted', ''),  # noqa
+        '0019xx6C': ('UN', '1', 'Doppler Tint Type', ''),  # noqa
         '0019xx72': ('UN', '1', 'Doppler Tint Index', ''),  # noqa
         '0019xx80': ('UN', '1', 'M-Mode Dynamic Range', ''),  # noqa
         '0019xx81': ('UN', '1', 'M-Mode Overall Gain', ''),  # noqa
@@ -7744,15 +8771,46 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx09': ('LO', '1', 'MedCom OOG Version', ''),  # noqa
         '0029xx10': ('OB', '1', 'MedCom OOG Info', ''),  # noqa
     },
+    'SIEMENS MR EXTRACTED CSA HEADER': {
+        '00250001': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00250002': ('LO', '1', 'Unknown', ''),  # noqa
+        '00250003': ('AT', '1', 'Unknown', ''),  # noqa
+        '00250004': ('SS', '1', 'Unknown', ''),  # noqa
+    },
+    'SIEMENS MR FMRI': {
+        '00210010': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210011': ('LO', '1', 'Unknown', ''),  # noqa
+        '00210012': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210013': ('US', '1', 'Unknown', ''),  # noqa
+        '00210014': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210015': ('US', '1', 'Unknown', ''),  # noqa
+        '00210016': ('LO', '1', 'Unknown', ''),  # noqa
+        '00210017': ('US', '1', 'Unknown', ''),  # noqa
+        '00210018': ('UL', '1', 'Unknown', ''),  # noqa
+        '00210019': ('FL', '1', 'Unknown', ''),  # noqa
+        '00210031': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210040': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210041': ('LO', '1', 'Unknown', ''),  # noqa
+        '00210042': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210043': ('LO', '1', 'Unknown', ''),  # noqa
+        '00210044': ('US', '1', 'Unknown', ''),  # noqa
+        '00210045': ('LO', '1-n', 'Unknown', ''),  # noqa
+        '00210046': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210047': ('UL', '1', 'Unknown', ''),  # noqa
+        '00210048': ('LO', '1', 'Unknown', ''),  # noqa
+        '00210049': ('FD', '1', 'Unknown', ''),  # noqa
+        '0021004A': ('FD', '1-n', 'Unknown', ''),  # noqa
+        '0021004B': ('FL', '1', 'Unknown', ''),  # noqa
+    },
     'SIEMENS MR HEADER': {
         '0019xx08': ('CS', '1', 'CSA Image Header Type', ''),  # noqa
         '0019xx09': ('LO', '1', 'CSA Image Header Version ??', ''),  # noqa
-        '0019xx0a': ('US', '1', 'NumberOfImagesInMosaic', ''),  # noqa
-        '0019xx0b': ('DS', '1', 'SliceMeasurementDuration', ''),  # noqa
-        '0019xx0c': ('IS', '1', 'B_value', ''),  # noqa
-        '0019xx0d': ('CS', '1', 'DiffusionDirectionality', ''),  # noqa
-        '0019xx0e': ('FD', '3', 'DiffusionGradientDirection', ''),  # noqa
-        '0019xx0f': ('SH', '1', 'GradientMode', ''),  # noqa
+        '0019xx0A': ('US', '1', 'NumberOfImagesInMosaic', ''),  # noqa
+        '0019xx0B': ('DS', '1', 'SliceMeasurementDuration', ''),  # noqa
+        '0019xx0C': ('IS', '1', 'B_value', ''),  # noqa
+        '0019xx0D': ('CS', '1', 'DiffusionDirectionality', ''),  # noqa
+        '0019xx0E': ('FD', '3', 'DiffusionGradientDirection', ''),  # noqa
+        '0019xx0F': ('SH', '1', 'GradientMode', ''),  # noqa
         '0019xx11': ('SH', '1', 'FlowCompensation', ''),  # noqa
         '0019xx12': ('SL', '3', 'TablePositionOrigin', ''),  # noqa
         '0019xx13': ('SL', '3', 'ImaAbsTablePosition', ''),  # noqa
@@ -7769,12 +8827,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx29': ('FD', '1', 'MosaicRefAcqTimes', ''),  # noqa
         '0051xx08': ('CS', '1', 'CSA Image Header Type', ''),  # noqa
         '0051xx09': ('LO', '1', 'CSA Image Header Version ??', ''),  # noqa
-        '0051xx0a': ('SH', '1', 'Unknown', ''),  # noqa
-        '0051xx0b': ('SH', '1', 'AcquisitionMatrixText', ''),  # noqa
-        '0051xx0c': ('SH', '1', 'Unknown', ''),  # noqa
-        '0051xx0d': ('SH', '1', 'Unknown', ''),  # noqa
-        '0051xx0e': ('SH', '1', 'Unknown', ''),  # noqa
-        '0051xx0f': ('LO', '1', 'CoilString', ''),  # noqa
+        '0051xx0A': ('SH', '1', 'Unknown', ''),  # noqa
+        '0051xx0B': ('SH', '1', 'AcquisitionMatrixText', ''),  # noqa
+        '0051xx0C': ('SH', '1', 'Unknown', ''),  # noqa
+        '0051xx0D': ('SH', '1', 'Unknown', ''),  # noqa
+        '0051xx0E': ('SH', '1', 'Unknown', ''),  # noqa
+        '0051xx0F': ('LO', '1', 'CoilString', ''),  # noqa
         '0051xx11': ('LO', '1', 'PATModeText', ''),  # noqa
         '0051xx12': ('SH', '1', 'Unknown', ''),  # noqa
         '0051xx13': ('SH', '1', 'PositivePCSDirections', ''),  # noqa
@@ -7783,6 +8841,16 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0051xx17': ('SH', '1', 'Unknown', ''),  # noqa
         '0051xx18': ('SH', '1', 'Unknown', ''),  # noqa
         '0051xx19': ('LO', '1', 'Unknown', ''),  # noqa
+    },
+    'SIEMENS MR SDI 02': {
+        '00210023': ('UN', '1', 'Unknown', ''),  # noqa
+        '00210046': ('UN', '1', 'Unknown', ''),  # noqa
+        '00210067': ('UN', '1', 'Unknown', ''),  # noqa
+        '00210068': ('UN', '1', 'Unknown', ''),  # noqa
+        '00210089': ('UN', '1', 'Unknown', ''),  # noqa
+    },
+    'SIEMENS MR SDS 01': {
+        '0021003F': ('UN', '1', 'Unknown', ''),  # noqa
     },
     'SIEMENS MR VA0  COAD': {
         '0019xx12': ('DS', '1', 'Magnetic Field Strength', ''),  # noqa
@@ -7809,27 +8877,27 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx90': ('LO', '1', 'Sensitivity Correction Label', ''),  # noqa
         '0019xx91': ('DS', '1-5', 'Saturation Phase Encoding Vector Coronal Component', ''),  # noqa
         '0019xx92': ('DS', '1-5', 'Saturation Readout Vector Coronal Component', ''),  # noqa
-        '0019xxa0': ('IS', '1', 'RF Watchdog Mask', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'EPI Reconstruction Slope', ''),  # noqa
-        '0019xxa2': ('DS', '1', 'RF Power Error Indicator', ''),  # noqa
-        '0019xxa5': ('DS', '1-n', 'Specific Absorption Rate SAR', ''),  # noqa
-        '0019xxa6': ('DS', '1-n', 'Specific Energy Dose SED', ''),  # noqa
-        '0019xxb0': ('UL', '1', 'Adjustment Status Mask', ''),  # noqa
-        '0019xxc1': ('DS', '1-n', 'EPI Capacity', ''),  # noqa
-        '0019xxc2': ('DS', '1-n', 'EPI Inductance', ''),  # noqa
-        '0019xxc3': ('IS', '1-n', 'EPI Switch Configuration Code', ''),  # noqa
-        '0019xxc4': ('IS', '1-n', 'EPI Switch Hardware Code', ''),  # noqa
-        '0019xxc5': ('DS', '1-n', 'EPI Switch Delay Time', ''),  # noqa
-        '0019xxd1': ('DS', '1', 'Flow Sensitivity', ''),  # noqa
-        '0019xxd2': ('CS', '1', 'Calculation Submode', ''),  # noqa
-        '0019xxd3': ('DS', '1', 'Field of View Ratio', ''),  # noqa
-        '0019xxd4': ('IS', '1', 'Base Raw Matrix Size', ''),  # noqa
-        '0019xxd5': ('IS', '1', '2D Phase Oversampling Lines', ''),  # noqa
-        '0019xxd6': ('IS', '1', '3D Phase Oversampling Part', ''),  # noqa
-        '0019xxd7': ('IS', '1', 'Echo Line Position', ''),  # noqa
-        '0019xxd8': ('IS', '1', 'Echo Column Position', ''),  # noqa
-        '0019xxd9': ('IS', '1', 'Lines per Segment', ''),  # noqa
-        '0019xxda': ('CS', '1', 'Phase Coding Direction', ''),  # noqa
+        '0019xxA0': ('IS', '1', 'RF Watchdog Mask', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'EPI Reconstruction Slope', ''),  # noqa
+        '0019xxA2': ('DS', '1', 'RF Power Error Indicator', ''),  # noqa
+        '0019xxA5': ('DS', '1-n', 'Specific Absorption Rate SAR', ''),  # noqa
+        '0019xxA6': ('DS', '1-n', 'Specific Energy Dose SED', ''),  # noqa
+        '0019xxB0': ('UL', '1', 'Adjustment Status Mask', ''),  # noqa
+        '0019xxC1': ('DS', '1-n', 'EPI Capacity', ''),  # noqa
+        '0019xxC2': ('DS', '1-n', 'EPI Inductance', ''),  # noqa
+        '0019xxC3': ('IS', '1-n', 'EPI Switch Configuration Code', ''),  # noqa
+        '0019xxC4': ('IS', '1-n', 'EPI Switch Hardware Code', ''),  # noqa
+        '0019xxC5': ('DS', '1-n', 'EPI Switch Delay Time', ''),  # noqa
+        '0019xxD1': ('DS', '1', 'Flow Sensitivity', ''),  # noqa
+        '0019xxD2': ('CS', '1', 'Calculation Submode', ''),  # noqa
+        '0019xxD3': ('DS', '1', 'Field of View Ratio', ''),  # noqa
+        '0019xxD4': ('IS', '1', 'Base Raw Matrix Size', ''),  # noqa
+        '0019xxD5': ('IS', '1', '2D Phase Oversampling Lines', ''),  # noqa
+        '0019xxD6': ('IS', '1', '3D Phase Oversampling Part', ''),  # noqa
+        '0019xxD7': ('IS', '1', 'Echo Line Position', ''),  # noqa
+        '0019xxD8': ('IS', '1', 'Echo Column Position', ''),  # noqa
+        '0019xxD9': ('IS', '1', 'Lines per Segment', ''),  # noqa
+        '0019xxDA': ('CS', '1', 'Phase Coding Direction', ''),  # noqa
     },
     'SIEMENS MR VA0  GEN': {
         '0019xx10': ('DS', '1', 'Total Measurement Time nominal', ''),  # noqa
@@ -7871,8 +8939,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx96': ('UL', '1-n', 'Coil ID Mask', ''),  # noqa
         '0019xx97': ('UL', '1-n', 'Coil Class Mask', ''),  # noqa
         '0019xx98': ('DS', '1-n', 'Coil Position', ''),  # noqa
-        '0019xxa0': ('DS', '1', 'EPI Reconstruction Phase', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'EPI Reconstruction Slope', ''),  # noqa
+        '0019xxA0': ('DS', '1', 'EPI Reconstruction Phase', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'EPI Reconstruction Slope', ''),  # noqa
         '0021xx20': ('IS', '1', 'Phase Corrections Rows sequence', ''),  # noqa
         '0021xx21': ('IS', '1', 'Phase Corrections Columns sequence', ''),  # noqa
         '0021xx22': ('IS', '1', 'Phase Corrections Rows reconstruction', ''),  # noqa
@@ -7892,8 +8960,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx47': ('IS', '1', 'MIP Start Column', ''),  # noqa
         '0021xx48': ('IS', '1', 'MIP Stop Column', ''),  # noqa
         '0021xx49': ('IS', '1', 'MIP Start Slice', ''),  # noqa
-        '0021xx4a': ('IS', '1', 'MIP Stop Slice', ''),  # noqa
-        '0021xx4f': ('CS', '1', 'Order of Slices', ''),  # noqa
+        '0021xx4A': ('IS', '1', 'MIP Stop Slice', ''),  # noqa
+        '0021xx4F': ('CS', '1', 'Order of Slices', ''),  # noqa
         '0021xx50': ('UL', '1', 'Signal Mask', ''),  # noqa
         '0021xx52': ('IS', '1', 'Delay after Trigger', ''),  # noqa
         '0021xx53': ('IS', '1', 'RRInterval', ''),  # noqa
@@ -7947,9 +9015,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx55': ('DS', '1-n', 'Saturation Distance', ''),  # noqa
     },
     'SIEMENS NUMARIS II': {
-        '7fe3xx00': ('LO', '1', 'Image Graphics Format Code', ''),  # noqa
-        '7fe3xx10': ('OB', '1', 'Image Graphics', ''),  # noqa
-        '7fe3xx20': ('OB', '1', 'Image Graphics Dummy', ''),  # noqa
+        '7FE3xx00': ('LO', '1', 'Image Graphics Format Code', ''),  # noqa
+        '7FE3xx10': ('OB', '1', 'Image Graphics', ''),  # noqa
+        '7FE3xx20': ('OB', '1', 'Image Graphics Dummy', ''),  # noqa
     },
     'SIEMENS RA GEN': {
         '0011xx20': ('UL', '1', 'Total Fluoro TimePatient', ''),  # noqa
@@ -7963,61 +9031,61 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx24': ('LO', '1', 'Scene Name', ''),  # noqa
         '0019xx26': ('US', '1', 'Acquisition Index', ''),  # noqa
         '0019xx28': ('US', '1', 'Mixed Pulse Mode', ''),  # noqa
-        '0019xx2a': ('US', '1', 'Number of Positions', ''),  # noqa
-        '0019xx2c': ('US', '1', 'Number of Phases', ''),  # noqa
-        '0019xx2e': ('US', '1-n', 'Framerate for 8 Positions', ''),  # noqa
+        '0019xx2A': ('US', '1', 'Number of Positions', ''),  # noqa
+        '0019xx2C': ('US', '1', 'Number of Phases', ''),  # noqa
+        '0019xx2E': ('US', '1-n', 'Framerate for 8 Positions', ''),  # noqa
         '0019xx30': ('US', '1-n', 'FramesPhase', ''),  # noqa
         '0019xx32': ('US', '1', 'Stepping Direction', ''),  # noqa
         '0019xx34': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx36': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx38': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx3a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx3c': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx3e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx3A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx3C': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx3E': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx40': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx42': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx44': ('US', '1', 'Image Transfer Delay', ''),  # noqa
         '0019xx46': ('UL', '1', 'InversNot Invers', ''),  # noqa
         '0019xx48': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx4a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx4c': ('US', '1', 'Blanking Circle Diameter', ''),  # noqa
+        '0019xx4A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx4C': ('US', '1', 'Blanking Circle Diameter', ''),  # noqa
         '0019xx50': ('US', '1', 'Stand Data Valid', ''),  # noqa
         '0019xx52': ('US', '1', 'Table Tilt', ''),  # noqa
         '0019xx54': ('US', '1', 'Table Axis Rotation', ''),  # noqa
         '0019xx56': ('US', '1', 'Table Longitudinal Position', ''),  # noqa
         '0019xx58': ('US', '1', 'Table Side Offset', ''),  # noqa
-        '0019xx5a': ('US', '1', 'Table Isocenter Height', ''),  # noqa
-        '0019xx5c': ('UN', '1', 'Unknown', ''),  # noqa
-        '0019xx5e': ('UL', '1', 'Collimation Data Valid', ''),  # noqa
+        '0019xx5A': ('US', '1', 'Table Isocenter Height', ''),  # noqa
+        '0019xx5C': ('UN', '1', 'Unknown', ''),  # noqa
+        '0019xx5E': ('UL', '1', 'Collimation Data Valid', ''),  # noqa
         '0019xx60': ('UL', '1', 'PERI Sequence Number', ''),  # noqa
         '0019xx62': ('UL', '1', 'PERI Total Scenes', ''),  # noqa
         '0019xx64': ('US', '1', 'PERI Overlap Top', ''),  # noqa
         '0019xx66': ('UL', '1', 'PERI Overlap Bottom', ''),  # noqa
         '0019xx68': ('UL', '1', 'Raw Image Number', ''),  # noqa
-        '0019xx6a': ('UL', '1', 'XRay Data Valid', ''),  # noqa
+        '0019xx6A': ('UL', '1', 'XRay Data Valid', ''),  # noqa
         '0019xx70': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx72': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx74': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx76': ('UL', '1', 'Filling Average Factor', ''),  # noqa
         '0019xx78': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx7a': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx7c': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx7e': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx7A': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx7C': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx7E': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx80': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx82': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx84': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx86': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx88': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx8a': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx8c': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx8e': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx8A': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx8C': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx8E': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx92': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx94': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx96': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx98': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx9a': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0019xx9c': ('UL', '1', 'II Level CalibrationFactor', ''),  # noqa
-        '0019xx9e': ('UL', '1', 'Nativ Review Flag', ''),  # noqa
+        '0019xx9A': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx9C': ('UL', '1', 'II Level CalibrationFactor', ''),  # noqa
+        '0019xx9E': ('UL', '1', 'Nativ Review Flag', ''),  # noqa
         '0021xx15': ('US', '1', 'Images in Study', ''),  # noqa
         '0021xx20': ('US', '1', 'Scenes in Study', ''),  # noqa
         '0021xx25': ('US', '1', 'Images in Photofile', ''),  # noqa
@@ -8030,72 +9098,72 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx24': ('US', '1', 'XRay System', ''),  # noqa
         '0019xx26': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx28': ('US', '1', 'Acquired Display Mode', ''),  # noqa
-        '0019xx2a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx2c': ('US', '1', 'Acquisition Framerate', ''),  # noqa
-        '0019xx2e': ('US', '1', 'Maximum Frame Limit', ''),  # noqa
+        '0019xx2A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx2C': ('US', '1', 'Acquisition Framerate', ''),  # noqa
+        '0019xx2E': ('US', '1', 'Maximum Frame Limit', ''),  # noqa
         '0019xx30': ('US', '1', 'Native Filter Type', ''),  # noqa
         '0019xx32': ('US', '1', 'Subtracted Filter Type', ''),  # noqa
         '0019xx34': ('US', '1', 'Filter Factor Native', ''),  # noqa
         '0019xx36': ('US', '1', 'Anatomic Blackground Factor', ''),  # noqa
         '0019xx38': ('US', '1', 'Window Upper Limit Native', ''),  # noqa
-        '0019xx3a': ('US', '1', 'Window Lower Limit Native', ''),  # noqa
-        '0019xx3c': ('US', '1', 'Window Brightness Phase 1 Sub', ''),  # noqa
-        '0019xx3e': ('US', '1', 'Window Brightness Phase 2 Sub', ''),  # noqa
+        '0019xx3A': ('US', '1', 'Window Lower Limit Native', ''),  # noqa
+        '0019xx3C': ('US', '1', 'Window Brightness Phase 1 Sub', ''),  # noqa
+        '0019xx3E': ('US', '1', 'Window Brightness Phase 2 Sub', ''),  # noqa
         '0019xx40': ('US', '1', 'Window Contrast Phase 1 Sub', ''),  # noqa
         '0019xx42': ('US', '1', 'Window Contrast Phase 2 Sub', ''),  # noqa
         '0019xx44': ('US', '1', 'Filter Factor Subtraction', ''),  # noqa
         '0019xx46': ('US', '1', 'Peak Opacified', ''),  # noqa
         '0019xx48': ('UL', '1', 'Mask Frame', ''),  # noqa
-        '0019xx4a': ('UL', '1', 'BIH Frame', ''),  # noqa
-        '0019xx4c': ('US', '1', 'Center Beam Angulation CaudCran', ''),  # noqa
-        '0019xx4e': ('US', '1', 'Center Beam Angulation LR Anterior', ''),  # noqa
+        '0019xx4A': ('UL', '1', 'BIH Frame', ''),  # noqa
+        '0019xx4C': ('US', '1', 'Center Beam Angulation CaudCran', ''),  # noqa
+        '0019xx4E': ('US', '1', 'Center Beam Angulation LR Anterior', ''),  # noqa
         '0019xx50': ('US', '1', 'Longitudinal Position', ''),  # noqa
         '0019xx52': ('US', '1', 'Side Offset', ''),  # noqa
         '0019xx54': ('US', '1', 'Isocenter Height', ''),  # noqa
         '0019xx56': ('US', '1', 'Image Twist', ''),  # noqa
         '0019xx58': ('US', '1', 'SourceImage Distance', ''),  # noqa
-        '0019xx5a': ('US', '1', 'Mechanical Magnet Factor', ''),  # noqa
-        '0019xx5c': ('UL', '1', 'Calibration Flag', ''),  # noqa
-        '0019xx5e': ('UL', '1', 'Calibration Angle CranCaud', ''),  # noqa
+        '0019xx5A': ('US', '1', 'Mechanical Magnet Factor', ''),  # noqa
+        '0019xx5C': ('UL', '1', 'Calibration Flag', ''),  # noqa
+        '0019xx5E': ('UL', '1', 'Calibration Angle CranCaud', ''),  # noqa
         '0019xx60': ('UL', '1', 'Calibration Angle RAOLAO', ''),  # noqa
         '0019xx62': ('UL', '1', 'Calibration Table to Floor Distance', ''),  # noqa
         '0019xx64': ('UL', '1', 'Calibration Isocenter to Floor Distance', ''),  # noqa
         '0019xx66': ('UL', '1', 'Calibration Isocenter to Source Distance', ''),  # noqa
         '0019xx68': ('UL', '1', 'Calibration Source to II Distance', ''),  # noqa
-        '0019xx6a': ('UL', '1', 'Calibration II Zoom', ''),  # noqa
-        '0019xx6c': ('UL', '1', 'Calibration II Field', ''),  # noqa
-        '0019xx6e': ('UL', '1', 'Calibration Factor', ''),  # noqa
+        '0019xx6A': ('UL', '1', 'Calibration II Zoom', ''),  # noqa
+        '0019xx6C': ('UL', '1', 'Calibration II Field', ''),  # noqa
+        '0019xx6E': ('UL', '1', 'Calibration Factor', ''),  # noqa
         '0019xx70': ('UL', '1', 'Calibration Object to Image Distance', ''),  # noqa
         '0019xx72': ('UL', '1-n', 'Calibration System Factor', ''),  # noqa
         '0019xx74': ('UL', '1-n', 'Calibration System Correction', ''),  # noqa
         '0019xx76': ('UL', '1-n', 'Calibration System II Formats', ''),  # noqa
         '0019xx78': ('UL', '1', 'Calibration Gantry Data Valid', ''),  # noqa
-        '0019xx7a': ('US', '1', 'Collimator Square Breadth', ''),  # noqa
-        '0019xx7c': ('US', '1', 'Collimator Square Height', ''),  # noqa
-        '0019xx7e': ('US', '1', 'Collimator Square Diameter', ''),  # noqa
+        '0019xx7A': ('US', '1', 'Collimator Square Breadth', ''),  # noqa
+        '0019xx7C': ('US', '1', 'Collimator Square Height', ''),  # noqa
+        '0019xx7E': ('US', '1', 'Collimator Square Diameter', ''),  # noqa
         '0019xx80': ('US', '1', 'Collimator Finger Turn Angle', ''),  # noqa
         '0019xx82': ('US', '1', 'Collimator Finger Position', ''),  # noqa
         '0019xx84': ('US', '1', 'Collimator Diaphragm Turn Angle', ''),  # noqa
         '0019xx86': ('US', '1', 'Collimator Diagphragm Position 1', ''),  # noqa
         '0019xx88': ('US', '1', 'Collimator Diaphragm Position 2', ''),  # noqa
-        '0019xx8a': ('US', '1', 'Collimator Diaphragm Mode', ''),  # noqa
-        '0019xx8c': ('US', '1', 'Collimator Beam Limit Breadth', ''),  # noqa
-        '0019xx8e': ('US', '1', 'Collimator Beam Limit Height', ''),  # noqa
+        '0019xx8A': ('US', '1', 'Collimator Diaphragm Mode', ''),  # noqa
+        '0019xx8C': ('US', '1', 'Collimator Beam Limit Breadth', ''),  # noqa
+        '0019xx8E': ('US', '1', 'Collimator Beam Limit Height', ''),  # noqa
         '0019xx90': ('US', '1', 'Collimator Beam Limit Diameter', ''),  # noqa
         '0019xx92': ('US', '1', 'XRay Control Mode', ''),  # noqa
         '0019xx94': ('US', '1', 'XRay System', ''),  # noqa
         '0019xx96': ('US', '1', 'Focal Spot', ''),  # noqa
         '0019xx98': ('US', '1', 'Exposure Control', ''),  # noqa
-        '0019xx9a': ('US', '1', 'XRay Voltage', ''),  # noqa
-        '0019xx9c': ('US', '1', 'XRay Current', ''),  # noqa
-        '0019xx9e': ('UL', '1', 'XRay Current Time Product', ''),  # noqa
-        '0019xxa0': ('US', '1', 'Pulse Time', ''),  # noqa
-        '0019xxa2': ('US', '1', 'Scene Time Fluoro Clock', ''),  # noqa
-        '0019xxa4': ('US', '1', 'Maximum PulseRate', ''),  # noqa
-        '0019xxa6': ('US', '1', 'Pulses per Scene', ''),  # noqa
-        '0019xxa8': ('UL', '1', 'Dose Area Product of Scene', ''),  # noqa
-        '0019xxaa': ('US', '1', 'Dose', ''),  # noqa
-        '0019xxac': ('US', '1', 'Dose Rate', ''),  # noqa
+        '0019xx9A': ('US', '1', 'XRay Voltage', ''),  # noqa
+        '0019xx9C': ('US', '1', 'XRay Current', ''),  # noqa
+        '0019xx9E': ('UL', '1', 'XRay Current Time Product', ''),  # noqa
+        '0019xxA0': ('US', '1', 'Pulse Time', ''),  # noqa
+        '0019xxA2': ('US', '1', 'Scene Time Fluoro Clock', ''),  # noqa
+        '0019xxA4': ('US', '1', 'Maximum PulseRate', ''),  # noqa
+        '0019xxA6': ('US', '1', 'Pulses per Scene', ''),  # noqa
+        '0019xxA8': ('UL', '1', 'Dose Area Product of Scene', ''),  # noqa
+        '0019xxAA': ('US', '1', 'Dose', ''),  # noqa
+        '0019xxAC': ('US', '1', 'Dose Rate', ''),  # noqa
     },
     'SIEMENS RA PLANE B': {
         '0019xx20': ('UL', '1', 'System Calibration Factor Plane B', ''),  # noqa
@@ -8103,72 +9171,72 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx24': ('US', '1', 'XRay System', ''),  # noqa
         '0019xx26': ('US', '1', 'Unknown', ''),  # noqa
         '0019xx28': ('US', '1', 'Acquired Display Mode', ''),  # noqa
-        '0019xx2a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xx2c': ('US', '1', 'Acquisition Framerate', ''),  # noqa
-        '0019xx2e': ('US', '1', 'Maximum Frame Limit', ''),  # noqa
+        '0019xx2A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xx2C': ('US', '1', 'Acquisition Framerate', ''),  # noqa
+        '0019xx2E': ('US', '1', 'Maximum Frame Limit', ''),  # noqa
         '0019xx30': ('US', '1', 'Native Filter Type', ''),  # noqa
         '0019xx32': ('US', '1', 'Subtracted Filter Type', ''),  # noqa
         '0019xx34': ('US', '1', 'Filter Factor Native', ''),  # noqa
         '0019xx36': ('US', '1', 'Anatomic Blackground Factor', ''),  # noqa
         '0019xx38': ('US', '1', 'Window Upper Limit Native', ''),  # noqa
-        '0019xx3a': ('US', '1', 'Window Lower Limit Native', ''),  # noqa
-        '0019xx3c': ('US', '1', 'Window Brightness Phase 1 Sub', ''),  # noqa
-        '0019xx3e': ('US', '1', 'Window Brightness Phase 2 Sub', ''),  # noqa
+        '0019xx3A': ('US', '1', 'Window Lower Limit Native', ''),  # noqa
+        '0019xx3C': ('US', '1', 'Window Brightness Phase 1 Sub', ''),  # noqa
+        '0019xx3E': ('US', '1', 'Window Brightness Phase 2 Sub', ''),  # noqa
         '0019xx40': ('US', '1', 'Window Contrast Phase 1 Sub', ''),  # noqa
         '0019xx42': ('US', '1', 'Window Contrast Phase 2 Sub', ''),  # noqa
         '0019xx44': ('US', '1', 'Filter Factor Subtraction', ''),  # noqa
         '0019xx46': ('US', '1', 'Peak Opacified', ''),  # noqa
         '0019xx48': ('UL', '1', 'Mask Frame', ''),  # noqa
-        '0019xx4a': ('UL', '1', 'BIH Frame', ''),  # noqa
-        '0019xx4c': ('US', '1', 'Center Beam Angulation CaudCran', ''),  # noqa
-        '0019xx4e': ('US', '1', 'Center Beam Angulation LR Anterior', ''),  # noqa
+        '0019xx4A': ('UL', '1', 'BIH Frame', ''),  # noqa
+        '0019xx4C': ('US', '1', 'Center Beam Angulation CaudCran', ''),  # noqa
+        '0019xx4E': ('US', '1', 'Center Beam Angulation LR Anterior', ''),  # noqa
         '0019xx50': ('US', '1', 'Longitudinal Position', ''),  # noqa
         '0019xx52': ('US', '1', 'Side Offset', ''),  # noqa
         '0019xx54': ('US', '1', 'Isocenter Height', ''),  # noqa
         '0019xx56': ('US', '1', 'Image Twist', ''),  # noqa
         '0019xx58': ('US', '1', 'SourceImage Distance', ''),  # noqa
-        '0019xx5a': ('US', '1', 'Mechanical Magnet Factor', ''),  # noqa
-        '0019xx5c': ('UL', '1', 'Calibration Flag', ''),  # noqa
-        '0019xx5e': ('UL', '1', 'Calibration Angle CranCaud', ''),  # noqa
+        '0019xx5A': ('US', '1', 'Mechanical Magnet Factor', ''),  # noqa
+        '0019xx5C': ('UL', '1', 'Calibration Flag', ''),  # noqa
+        '0019xx5E': ('UL', '1', 'Calibration Angle CranCaud', ''),  # noqa
         '0019xx60': ('UL', '1', 'Calibration Angle RAOLAO', ''),  # noqa
         '0019xx62': ('UL', '1', 'Calibration Table to Floor Distance', ''),  # noqa
         '0019xx64': ('UL', '1', 'Calibration Isocenter to Floor Distance', ''),  # noqa
         '0019xx66': ('UL', '1', 'Calibration Isocenter to Source Distance', ''),  # noqa
         '0019xx68': ('UL', '1', 'Calibration Source to II Distance', ''),  # noqa
-        '0019xx6a': ('UL', '1', 'Calibration II Zoom', ''),  # noqa
-        '0019xx6c': ('UL', '1', 'Calibration II Field', ''),  # noqa
-        '0019xx6e': ('UL', '1', 'Calibration Factor', ''),  # noqa
+        '0019xx6A': ('UL', '1', 'Calibration II Zoom', ''),  # noqa
+        '0019xx6C': ('UL', '1', 'Calibration II Field', ''),  # noqa
+        '0019xx6E': ('UL', '1', 'Calibration Factor', ''),  # noqa
         '0019xx70': ('UL', '1', 'Calibration Object to Image Distance', ''),  # noqa
         '0019xx72': ('UL', '1-n', 'Calibration System Factor', ''),  # noqa
         '0019xx74': ('UL', '1-n', 'Calibration System Correction', ''),  # noqa
         '0019xx76': ('UL', '1-n', 'Calibration System II Formats', ''),  # noqa
         '0019xx78': ('UL', '1', 'Calibration Gantry Data Valid', ''),  # noqa
-        '0019xx7a': ('US', '1', 'Collimator Square Breadth', ''),  # noqa
-        '0019xx7c': ('US', '1', 'Collimator Square Height', ''),  # noqa
-        '0019xx7e': ('US', '1', 'Collimator Square Diameter', ''),  # noqa
+        '0019xx7A': ('US', '1', 'Collimator Square Breadth', ''),  # noqa
+        '0019xx7C': ('US', '1', 'Collimator Square Height', ''),  # noqa
+        '0019xx7E': ('US', '1', 'Collimator Square Diameter', ''),  # noqa
         '0019xx80': ('US', '1', 'Collimator Finger Turn Angle', ''),  # noqa
         '0019xx82': ('US', '1', 'Collimator Finger Position', ''),  # noqa
         '0019xx84': ('US', '1', 'Collimator Diaphragm Turn Angle', ''),  # noqa
         '0019xx86': ('US', '1', 'Collimator Diagphragm Position 1', ''),  # noqa
         '0019xx88': ('US', '1', 'Collimator Diaphragm Position 2', ''),  # noqa
-        '0019xx8a': ('US', '1', 'Collimator Diaphragm Mode', ''),  # noqa
-        '0019xx8c': ('US', '1', 'Collimator Beam Limit Breadth', ''),  # noqa
-        '0019xx8e': ('US', '1', 'Collimator Beam Limit Height', ''),  # noqa
+        '0019xx8A': ('US', '1', 'Collimator Diaphragm Mode', ''),  # noqa
+        '0019xx8C': ('US', '1', 'Collimator Beam Limit Breadth', ''),  # noqa
+        '0019xx8E': ('US', '1', 'Collimator Beam Limit Height', ''),  # noqa
         '0019xx90': ('US', '1', 'Collimator Beam Limit Diameter', ''),  # noqa
         '0019xx92': ('US', '1', 'XRay Control Mode', ''),  # noqa
         '0019xx94': ('US', '1', 'XRay System', ''),  # noqa
         '0019xx96': ('US', '1', 'Focal Spot', ''),  # noqa
         '0019xx98': ('US', '1', 'Exposure Control', ''),  # noqa
-        '0019xx9a': ('US', '1', 'XRay Voltage', ''),  # noqa
-        '0019xx9c': ('US', '1', 'XRay Current', ''),  # noqa
-        '0019xx9e': ('UL', '1', 'XRay Current Time Product', ''),  # noqa
-        '0019xxa0': ('US', '1', 'Pulse Time', ''),  # noqa
-        '0019xxa2': ('US', '1', 'Scene Time Fluoro Clock', ''),  # noqa
-        '0019xxa4': ('US', '1', 'Maximum PulseRate', ''),  # noqa
-        '0019xxa6': ('US', '1', 'Pulses per Scene', ''),  # noqa
-        '0019xxa8': ('UL', '1', 'Dose Area Product of Scene', ''),  # noqa
-        '0019xxaa': ('US', '1', 'Dose', ''),  # noqa
-        '0019xxac': ('US', '1', 'Dose Rate', ''),  # noqa
+        '0019xx9A': ('US', '1', 'XRay Voltage', ''),  # noqa
+        '0019xx9C': ('US', '1', 'XRay Current', ''),  # noqa
+        '0019xx9E': ('UL', '1', 'XRay Current Time Product', ''),  # noqa
+        '0019xxA0': ('US', '1', 'Pulse Time', ''),  # noqa
+        '0019xxA2': ('US', '1', 'Scene Time Fluoro Clock', ''),  # noqa
+        '0019xxA4': ('US', '1', 'Maximum PulseRate', ''),  # noqa
+        '0019xxA6': ('US', '1', 'Pulses per Scene', ''),  # noqa
+        '0019xxA8': ('UL', '1', 'Dose Area Product of Scene', ''),  # noqa
+        '0019xxAA': ('US', '1', 'Dose', ''),  # noqa
+        '0019xxAC': ('US', '1', 'Dose Rate', ''),  # noqa
     },
     'SIEMENS RIS': {
         '0011xx10': ('LO', '1', 'Patient UID', ''),  # noqa
@@ -8199,12 +9267,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx07': ('SL', '1', 'Skin Dose Accumulation', ''),  # noqa
         '0021xx08': ('SL', '1', 'Skin Dose Rate', ''),  # noqa
         '0021xx09': ('UL', '1', 'Impac Filename', ''),  # noqa
-        '0021xx0a': ('UL', '1', 'Copper Filter', ''),  # noqa
-        '0021xx0b': ('US', '1', 'Measuring Field', ''),  # noqa
-        '0021xx0c': ('SS', '3', 'Post Blanking Circle', ''),  # noqa
-        '0021xx0d': ('SS', '2-2n', 'Dyna Angles', ''),  # noqa
-        '0021xx0e': ('SS', '1', 'Total Steps', ''),  # noqa
-        '0021xx0f': ('SL', '3-3n', 'Dyna X-Ray Info', ''),  # noqa
+        '0021xx0A': ('UL', '1', 'Copper Filter', ''),  # noqa
+        '0021xx0B': ('US', '1', 'Measuring Field', ''),  # noqa
+        '0021xx0C': ('SS', '3', 'Post Blanking Circle', ''),  # noqa
+        '0021xx0D': ('SS', '2-2n', 'Dyna Angles', ''),  # noqa
+        '0021xx0E': ('SS', '1', 'Total Steps', ''),  # noqa
+        '0021xx0F': ('SL', '3-3n', 'Dyna X-Ray Info', ''),  # noqa
         '0021xx10': ('US', '1', 'Modality LUT Input Gamma', ''),  # noqa
         '0021xx11': ('US', '1', 'Modality LUT Output Gamma', ''),  # noqa
         '0021xx12': ('OB', '1-n', 'SH_STPAR', ''),  # noqa
@@ -8215,12 +9283,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx17': ('SL', '1', 'Source to Isocenter', ''),  # noqa
         '0021xx18': ('US', '1', 'Pressure Data', ''),  # noqa
         '0021xx19': ('SL', '1', 'ECG Index Array', ''),  # noqa
-        '0021xx1a': ('US', '1', 'FD Flag', ''),  # noqa
-        '0021xx1b': ('OB', '1', 'SH_ZOOM', ''),  # noqa
-        '0021xx1c': ('OB', '1', 'SH_COLPAR', ''),  # noqa
-        '0021xx1d': ('US', '1', 'K-Factor', ''),  # noqa
-        '0021xx1e': ('US', '8', 'EVE', ''),  # noqa
-        '0021xx1f': ('SL', '1', 'Total Scene Time', ''),  # noqa
+        '0021xx1A': ('US', '1', 'FD Flag', ''),  # noqa
+        '0021xx1B': ('OB', '1', 'SH_ZOOM', ''),  # noqa
+        '0021xx1C': ('OB', '1', 'SH_COLPAR', ''),  # noqa
+        '0021xx1D': ('US', '1', 'K-Factor', ''),  # noqa
+        '0021xx1E': ('US', '8', 'EVE', ''),  # noqa
+        '0021xx1F': ('SL', '1', 'Total Scene Time', ''),  # noqa
         '0021xx20': ('US', '1', 'Restore Flag', ''),  # noqa
         '0021xx21': ('US', '1', 'Stand Movement Flag', ''),  # noqa
         '0021xx22': ('US', '1', 'FD Rows', ''),  # noqa
@@ -8248,12 +9316,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx07': ('US', '1', 'Original Frame Number', ''),  # noqa
         '0025xx08': ('US', '1', 'Original Mask Frame Number', ''),  # noqa
         '0025xx09': ('US', '1', 'Opac', ''),  # noqa
-        '0025xx0a': ('US', '1', 'Original Number of Frames', ''),  # noqa
-        '0025xx0b': ('DS', '1', 'Original Scene Duration', ''),  # noqa
-        '0025xx0c': ('LO', '1', 'Identifier LOID', ''),  # noqa
-        '0025xx0d': ('SS', '1-n', 'Original Scene VFR Info', ''),  # noqa
-        '0025xx0e': ('SS', '1', 'Original Frame ECG Position', ''),  # noqa
-        '0025xx0f': ('SS', '1', 'Original ECG 1st Frame Offset (retired)', ''),  # noqa
+        '0025xx0A': ('US', '1', 'Original Number of Frames', ''),  # noqa
+        '0025xx0B': ('DS', '1', 'Original Scene Duration', ''),  # noqa
+        '0025xx0C': ('LO', '1', 'Identifier LOID', ''),  # noqa
+        '0025xx0D': ('SS', '1-n', 'Original Scene VFR Info', ''),  # noqa
+        '0025xx0E': ('SS', '1', 'Original Frame ECG Position', ''),  # noqa
+        '0025xx0F': ('SS', '1', 'Original ECG 1st Frame Offset (retired)', ''),  # noqa
         '0025xx10': ('SS', '1', 'Zoom Flag', ''),  # noqa
         '0025xx11': ('US', '1', 'Flex', ''),  # noqa
         '0025xx12': ('US', '1', 'Number of Mask Frames', ''),  # noqa
@@ -8284,12 +9352,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('US', '1', 'Enabled', ''),  # noqa
         '0019xx08': ('US', '1', 'Native Edge Enh. Percent Gain', ''),  # noqa
         '0019xx09': ('SS', '1', 'Native Edge Enh. LUT Index', ''),  # noqa
-        '0019xx0a': ('SS', '1', 'Native Edge Enh. Kernel Size', ''),  # noqa
-        '0019xx0b': ('US', '1', 'Subtr. Edge Enh. Percent Gain', ''),  # noqa
-        '0019xx0c': ('SS', '1', 'Subtr. Edge Enh. LUT Index', ''),  # noqa
-        '0019xx0d': ('SS', '1', 'Subtr. Edge Enh. Kernel Size', ''),  # noqa
-        '0019xx0e': ('US', '1', 'Fade Percent', ''),  # noqa
-        '0019xx0f': ('US', '1', 'Flipped Before Laterality Applied', ''),  # noqa
+        '0019xx0A': ('SS', '1', 'Native Edge Enh. Kernel Size', ''),  # noqa
+        '0019xx0B': ('US', '1', 'Subtr. Edge Enh. Percent Gain', ''),  # noqa
+        '0019xx0C': ('SS', '1', 'Subtr. Edge Enh. LUT Index', ''),  # noqa
+        '0019xx0D': ('SS', '1', 'Subtr. Edge Enh. Kernel Size', ''),  # noqa
+        '0019xx0E': ('US', '1', 'Fade Percent', ''),  # noqa
+        '0019xx0F': ('US', '1', 'Flipped Before Laterality Applied', ''),  # noqa
         '0019xx10': ('US', '1', 'Apply Fade', ''),  # noqa
         '0019xx11': ('US', '1', 'RefImages Taken', ''),  # noqa
         '0019xx12': ('US', '1', 'Zoom', ''),  # noqa
@@ -8298,10 +9366,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx15': ('SS', '1', 'Native Edge Enh. Adv Perc. Gain', ''),  # noqa
         '0019xx16': ('SS', '1', 'Subtr. Edge Enh. Adv Perc. Gain', ''),  # noqa
         '0019xx17': ('US', '1', 'Invert Flag', ''),  # noqa
-        '0019xx1a': ('OB', '1', 'Quant 1K Overlay', ''),  # noqa
-        '0019xx1b': ('US', '1', 'Original Resolution', ''),  # noqa
-        '0019xx1c': ('DS', '1', 'Auto Window Center', ''),  # noqa
-        '0019xx1d': ('DS', '1', 'Auto Window Width', ''),  # noqa
+        '0019xx1A': ('OB', '1', 'Quant 1K Overlay', ''),  # noqa
+        '0019xx1B': ('US', '1', 'Original Resolution', ''),  # noqa
+        '0019xx1C': ('DS', '1', 'Auto Window Center', ''),  # noqa
+        '0019xx1D': ('DS', '1', 'Auto Window Width', ''),  # noqa
     },
     'SIEMENS Selma': {
         '0019xx06': ('IS', '1', 'Unknown', ''),  # noqa
@@ -8321,22 +9389,22 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0071xx02': ('LO', '1', 'Unknown', ''),  # noqa
     },
     'SIEMENS_FLCOMPACT_VA01A_PROC': {
-        '0017xx0a': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx0b': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx0c': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx0d': ('FL', '1', 'Internal Data', ''),  # noqa
-        '0017xx0e': ('LO', '1', 'Internal Data', ''),  # noqa
-        '0017xx0f': ('LO', '1', 'Internal Data', ''),  # noqa
+        '0017xx0A': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx0B': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx0C': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx0D': ('FL', '1', 'Internal Data', ''),  # noqa
+        '0017xx0E': ('LO', '1', 'Internal Data', ''),  # noqa
+        '0017xx0F': ('LO', '1', 'Internal Data', ''),  # noqa
         '0017xx14': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx16': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx17': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx18': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx19': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx1a': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx1b': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx1c': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx1e': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx1f': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx1A': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx1B': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx1C': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx1E': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx1F': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx20': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx21': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx22': ('US', '1', 'Internal Data', ''),  # noqa
@@ -8349,21 +9417,21 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx29': ('FL', '1', 'Internal Data', ''),  # noqa
         '0017xx48': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx49': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx4a': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx4b': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx4c': ('LO', '1', 'Internal Data', ''),  # noqa
-        '0017xx4d': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx4e': ('LO', '1', 'Internal Data', ''),  # noqa
-        '0017xx4f': ('LO', '1', 'Internal Data', ''),  # noqa
+        '0017xx4A': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx4B': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx4C': ('LO', '1', 'Internal Data', ''),  # noqa
+        '0017xx4D': ('SS', '1', 'Internal Data', ''),  # noqa
+        '0017xx4E': ('LO', '1', 'Internal Data', ''),  # noqa
+        '0017xx4F': ('LO', '1', 'Internal Data', ''),  # noqa
         '0017xx50': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx51': ('FL', '1', 'Internal Data', ''),  # noqa
         '0017xx52': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx53': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx54': ('SS', '1', 'Internal Data', ''),  # noqa
         '0017xx55': ('SS', '1', 'Internal Data', ''),  # noqa
-        '0017xx5a': ('OW', '1', 'Internal Data', ''),  # noqa
-        '0017xx5b': ('OW', '1', 'Internal Data', ''),  # noqa
-        '0017xx5c': ('OW', '1', 'Internal Data', ''),  # noqa
+        '0017xx5A': ('OW', '1', 'Internal Data', ''),  # noqa
+        '0017xx5B': ('OW', '1', 'Internal Data', ''),  # noqa
+        '0017xx5C': ('OW', '1', 'Internal Data', ''),  # noqa
         '0017xx64': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx66': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx67': ('US', '1', 'Internal Data', ''),  # noqa
@@ -8373,21 +9441,21 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx87': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx88': ('US', '1', 'Internal Data', ''),  # noqa
         '0017xx89': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx8a': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx8b': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx8c': ('FL', '1', 'Internal Data', ''),  # noqa
-        '0017xx8d': ('FL', '1', 'Internal Data', ''),  # noqa
-        '0017xx8e': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xx8f': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa0': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa1': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa2': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa3': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa4': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa5': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxa6': ('US', '1', 'Internal Data', ''),  # noqa
-        '0017xxb0': ('DS', '1', 'Internal Data', ''),  # noqa
-        '0017xxc0': ('LO', '1', 'Internal Data', ''),  # noqa
+        '0017xx8A': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx8B': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx8C': ('FL', '1', 'Internal Data', ''),  # noqa
+        '0017xx8D': ('FL', '1', 'Internal Data', ''),  # noqa
+        '0017xx8E': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xx8F': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA0': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA1': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA2': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA3': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA4': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA5': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxA6': ('US', '1', 'Internal Data', ''),  # noqa
+        '0017xxB0': ('DS', '1', 'Internal Data', ''),  # noqa
+        '0017xxC0': ('LO', '1', 'Internal Data', ''),  # noqa
     },
     'SIENET': {
         '0009xx01': ('US', '1', 'SIENET Command Field', ''),  # noqa
@@ -8402,11 +9470,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx75': ('LO', '1', 'Unknown', ''),  # noqa
         '0091xx20': ('PN', '1-n', 'Patient Name', ''),  # noqa
         '0095xx01': ('LO', '1', 'Examination Folder ID', ''),  # noqa
-        '0095xx04': ('UL', '1', 'Folder Reported Status', ''),  # noqa
+        '0095xx04': ('SL', '1', 'Folder Reported Status', ''),  # noqa
         '0095xx05': ('LO', '1', 'Folder Reporting Radiologist', ''),  # noqa
         '0095xx07': ('LO', '1', 'SIENET ISA PLA', ''),  # noqa
-        '0095xx0c': ('UL', '1', 'Folder Rebuild Status', ''),  # noqa
+        '0095xx0C': ('SL', '1', 'Folder Rebuild Status', ''),  # noqa
         '0095xx20': ('UN', '1', 'Unknown', ''),  # noqa
+        '0095xxFB': ('ST', '1', 'Unknown', ''),  # noqa
         '0099xx02': ('UL', '1', 'Key Images', ''),  # noqa
         '0099xx05': ('SL', '1', 'Image Number', ''),  # noqa
     },
@@ -8460,12 +9529,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx51': ('LO', '1', 'Study Unique Identifier', ''),  # noqa
         '0009xx61': ('LO', '1', 'Series Unique Identifier', ''),  # noqa
         '0009xx91': ('LT', '1', 'Unknown', ''),  # noqa
-        '0009xxa0': ('UN', '1', 'Unknown', ''),  # noqa
-        '0009xxf2': ('LT', '1', 'Unknown', ''),  # noqa
-        '0009xxf3': ('UN', '1', 'Unknown', ''),  # noqa
-        '0009xxf4': ('LT', '1', 'Unknown', ''),  # noqa
-        '0009xxf5': ('UN', '1', 'Unknown', ''),  # noqa
-        '0009xxf7': ('LT', '1', 'Unknown', ''),  # noqa
+        '0009xxA0': ('UN', '1', 'Unknown', ''),  # noqa
+        '0009xxF2': ('LT', '1', 'Unknown', ''),  # noqa
+        '0009xxF3': ('UN', '1', 'Unknown', ''),  # noqa
+        '0009xxF4': ('LT', '1', 'Unknown', ''),  # noqa
+        '0009xxF5': ('UN', '1', 'Unknown', ''),  # noqa
+        '0009xxF7': ('LT', '1', 'Unknown', ''),  # noqa
         '0011xx10': ('LT', '1', 'Patient Entry ID', ''),  # noqa
         '0011xx20': ('UN', '1', 'Unknown', ''),  # noqa
         '0011xx21': ('UN', '1', 'Unknown', ''),  # noqa
@@ -8496,8 +9565,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx80': ('DS', '1', 'Acquisition Delay', ''),  # noqa
         '0019xx81': ('UN', '1', 'Relative Image Time', ''),  # noqa
         '0019xx90': ('CS', '1', 'Video White Compression', ''),  # noqa
-        '0019xxa0': ('US', '1', 'Angulation', ''),  # noqa
-        '0019xxa1': ('US', '1', 'Rotation', ''),  # noqa
+        '0019xxA0': ('US', '1', 'Angulation', ''),  # noqa
+        '0019xxA1': ('US', '1', 'Rotation', ''),  # noqa
         '0021xx12': ('LT', '1', 'Series Unique Identifier', ''),  # noqa
         '0021xx14': ('LT', '1', 'Unknown', ''),  # noqa
         '0029xx00': ('DS', '4', 'Unknown', ''),  # noqa
@@ -8514,31 +9583,31 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx77': ('CS', '1', 'Window Select Status', ''),  # noqa
         '0029xx78': ('LT', '1', 'ECG Display Printing ID', ''),  # noqa
         '0029xx79': ('CS', '1', 'ECG Display Printing', ''),  # noqa
-        '0029xx7e': ('CS', '1', 'ECG Display Printing Enable Status', ''),  # noqa
-        '0029xx7f': ('CS', '1', 'ECG Display Printing Select Status', ''),  # noqa
+        '0029xx7E': ('CS', '1', 'ECG Display Printing Enable Status', ''),  # noqa
+        '0029xx7F': ('CS', '1', 'ECG Display Printing Select Status', ''),  # noqa
         '0029xx80': ('LT', '1', 'Physiological Display ID', ''),  # noqa
         '0029xx81': ('US', '1', 'Preferred Physiological Channel Display', ''),  # noqa
-        '0029xx8e': ('CS', '1', 'Physiological Display Enable Status', ''),  # noqa
-        '0029xx8f': ('CS', '1', 'Physiological Display Select Status', ''),  # noqa
+        '0029xx8E': ('CS', '1', 'Physiological Display Enable Status', ''),  # noqa
+        '0029xx8F': ('CS', '1', 'Physiological Display Select Status', ''),  # noqa
         '0029xx90': ('DS', '1-n', 'Unknown', ''),  # noqa
         '0029xx91': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx9f': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xxa0': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '0029xxa1': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxaf': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xxb0': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '0029xxb1': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxbf': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xxc0': ('LT', '1', 'Functional Shutter ID', ''),  # noqa
-        '0029xxc1': ('US', '1', 'Field Of Shutter', ''),  # noqa
-        '0029xxc5': ('LT', '1', 'Field Of Shutter Rectangle', ''),  # noqa
-        '0029xxce': ('CS', '1', 'Shutter Enable Status', ''),  # noqa
-        '0029xxcf': ('CS', '1', 'Shutter Select Status', ''),  # noqa
-        '7fe1xx10': ('UN', '1', 'Pixel Data', ''),  # noqa
+        '0029xx9F': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xxA0': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0029xxA1': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxAF': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xxB0': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0029xxB1': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxBF': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xxC0': ('LT', '1', 'Functional Shutter ID', ''),  # noqa
+        '0029xxC1': ('US', '1', 'Field Of Shutter', ''),  # noqa
+        '0029xxC5': ('LT', '1', 'Field Of Shutter Rectangle', ''),  # noqa
+        '0029xxCE': ('CS', '1', 'Shutter Enable Status', ''),  # noqa
+        '0029xxCF': ('CS', '1', 'Shutter Select Status', ''),  # noqa
+        '7FE1xx10': ('UN', '1', 'Pixel Data', ''),  # noqa
     },
     'SPI-P Release 1;1': {
-        '0009xxc0': ('LT', '1', 'Unknown', ''),  # noqa
-        '0009xxc1': ('LT', '1', 'Unknown', ''),  # noqa
+        '0009xxC0': ('LT', '1', 'Unknown', ''),  # noqa
+        '0009xxC1': ('LT', '1', 'Unknown', ''),  # noqa
         '0019xx00': ('UN', '1', 'Physiological Data Type', ''),  # noqa
         '0019xx01': ('UN', '1', 'Physiological Data Channel And Kind', ''),  # noqa
         '0019xx02': ('US', '1', 'Sample Bits Allocated', ''),  # noqa
@@ -8549,7 +9618,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('UN', '1', 'Largest Sample Value', ''),  # noqa
         '0019xx08': ('UN', '1', 'Number Of Samples', ''),  # noqa
         '0019xx09': ('UN', '1', 'Sample Data', ''),  # noqa
-        '0019xx0a': ('UN', '1', 'Sample Rate', ''),  # noqa
+        '0019xx0A': ('UN', '1', 'Sample Rate', ''),  # noqa
         '0019xx10': ('UN', '1', 'Physiological Data Type 2', ''),  # noqa
         '0019xx11': ('UN', '1', 'Physiological Data Channel And Kind 2', ''),  # noqa
         '0019xx12': ('US', '1', 'Sample Bits Allocated 2', ''),  # noqa
@@ -8560,7 +9629,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx17': ('UN', '1', 'Largest Sample Value 2', ''),  # noqa
         '0019xx18': ('UN', '1', 'Number Of Samples 2', ''),  # noqa
         '0019xx19': ('UN', '1', 'Sample Data 2', ''),  # noqa
-        '0019xx1a': ('UN', '1', 'Sample Rate 2', ''),  # noqa
+        '0019xx1A': ('UN', '1', 'Sample Rate 2', ''),  # noqa
         '0021xx41': ('LO', '1', 'Unknown', ''),  # noqa
         '0021xx42': ('US', '1', 'Unknown', ''),  # noqa
         '0021xx43': ('US', '1', 'Unknown', ''),  # noqa
@@ -8572,31 +9641,31 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx60': ('IS', '1-n', 'Unknown', ''),  # noqa
         '0021xx61': ('IS', '1-n', 'Unknown', ''),  # noqa
         '0021xx67': ('LO', '1-n', 'Unknown', ''),  # noqa
-        '0021xx6a': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '0021xx6b': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '0021xx6c': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0021xx6d': ('DS', '1-n', 'Unknown', ''),  # noqa
-        '0021xx6e': ('US', '1-n', 'Unknown', ''),  # noqa
-        '0021xx6f': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0021xx6A': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0021xx6B': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0021xx6C': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0021xx6D': ('DS', '1-n', 'Unknown', ''),  # noqa
+        '0021xx6E': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0021xx6F': ('DS', '1-n', 'Unknown', ''),  # noqa
         '0029xx00': ('LT', '1', 'Zoom ID', ''),  # noqa
         '0029xx01': ('DS', '1-n', 'Zoom Rectangle', ''),  # noqa
         '0029xx03': ('DS', '1', 'Zoom Factor', ''),  # noqa
         '0029xx04': ('US', '1', 'Zoom Function', ''),  # noqa
-        '0029xx0e': ('CS', '1', 'Zoom Enable Status', ''),  # noqa
-        '0029xx0f': ('CS', '1', 'Zoom Select Status', ''),  # noqa
+        '0029xx0E': ('CS', '1', 'Zoom Enable Status', ''),  # noqa
+        '0029xx0F': ('CS', '1', 'Zoom Select Status', ''),  # noqa
         '0029xx40': ('LT', '1', 'Magnifying Glass ID', ''),  # noqa
         '0029xx41': ('DS', '1-n', 'Magnifying Glass Rectangle', ''),  # noqa
         '0029xx43': ('DS', '1', 'Magnifying Glass Factor', ''),  # noqa
         '0029xx44': ('US', '1', 'Magnifying Glass Function', ''),  # noqa
-        '0029xx4e': ('CS', '1', 'Magnifying Glass Enable Status', ''),  # noqa
-        '0029xx4f': ('CS', '1', 'Magnifying Glass Select Status', ''),  # noqa
+        '0029xx4E': ('CS', '1', 'Magnifying Glass Enable Status', ''),  # noqa
+        '0029xx4F': ('CS', '1', 'Magnifying Glass Select Status', ''),  # noqa
     },
     'SPI-P Release 1;2': {
         '0029xx00': ('LT', '1', 'Subtraction Mask ID', ''),  # noqa
         '0029xx04': ('UN', '1', 'Masking Function', ''),  # noqa
-        '0029xx0c': ('UN', '1', 'Proprietary Masking Parameters', ''),  # noqa
-        '0029xx1e': ('CS', '1', 'Subtraction Mask Enable Status', ''),  # noqa
-        '0029xx1f': ('CS', '1', 'Subtraction Mask Select Status', ''),  # noqa
+        '0029xx0C': ('UN', '1', 'Proprietary Masking Parameters', ''),  # noqa
+        '0029xx1E': ('CS', '1', 'Subtraction Mask Enable Status', ''),  # noqa
+        '0029xx1F': ('CS', '1', 'Subtraction Mask Select Status', ''),  # noqa
     },
     'SPI-P Release 1;3': {
         '0029xx00': ('LT', '1', 'Image Enhancement ID', ''),  # noqa
@@ -8606,14 +9675,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx04': ('LT', '1', 'Convolution Kernel Size ID', ''),  # noqa
         '0029xx05': ('US', '2', 'Convolution Kernel Size', ''),  # noqa
         '0029xx06': ('US', '1-n', 'Convolution Kernel', ''),  # noqa
-        '0029xx0c': ('DS', '1', 'Enhancement Gain', ''),  # noqa
-        '0029xx1e': ('CS', '1', 'Image Enhancement Enable Status', ''),  # noqa
-        '0029xx1f': ('CS', '1', 'Image Enhancement Select Status', ''),  # noqa
+        '0029xx0C': ('DS', '1', 'Enhancement Gain', ''),  # noqa
+        '0029xx1E': ('CS', '1', 'Image Enhancement Enable Status', ''),  # noqa
+        '0029xx1F': ('CS', '1', 'Image Enhancement Select Status', ''),  # noqa
     },
     'SPI-P Release 2;1': {
         '0011xx18': ('LT', '1', 'Unknown', ''),  # noqa
-        '0023xx0d': ('UI', '1', 'Unknown', ''),  # noqa
-        '0023xx0e': ('UI', '1', 'Unknown', ''),  # noqa
+        '0023xx0D': ('UI', '1', 'Unknown', ''),  # noqa
+        '0023xx0E': ('UI', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-CTBE Release 1': {
         '0019xx00': ('IS', '1', 'Unknown', ''),  # noqa
@@ -8621,15 +9690,15 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx03': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx04': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx05': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx0b': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx0c': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx0B': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xx0C': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx14': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx18': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx19': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx1a': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx1b': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx1c': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx1d': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xx1A': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xx1B': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx1C': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx1D': ('DS', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-CTBE-Private Release 1': {
         '0021xx00': ('DS', '1', 'Unknown', ''),  # noqa
@@ -8648,7 +9717,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0009xx90': ('LO', '1', 'Unknown', ''),  # noqa
         '0019xx08': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx09': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx0a': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx0A': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx10': ('LO', '1', 'Unknown', ''),  # noqa
         '0019xx20': ('TM', '1', 'Unknown', ''),  # noqa
         '0019xx50': ('LO', '1', 'Unknown', ''),  # noqa
@@ -8661,12 +9730,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx80': ('LO', '1', 'Unknown', ''),  # noqa
         '0019xx81': ('LO', '1', 'Unknown', ''),  # noqa
         '0019xx90': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xxa0': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xxa1': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxa2': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxa3': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxb0': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019xxb1': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019xxA0': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019xxA1': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxA2': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxA3': ('US', '1', 'Unknown', ''),  # noqa
+        '0019xxB0': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019xxB1': ('LO', '1', 'Unknown', ''),  # noqa
         '0021xx20': ('LO', '1', 'Unknown', ''),  # noqa
         '0021xx30': ('DS', '1', 'Unknown', ''),  # noqa
         '0021xx40': ('LO', '1', 'Unknown', ''),  # noqa
@@ -8675,13 +9744,13 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx70': ('DS', '1', 'Unknown', ''),  # noqa
         '0021xx80': ('DS', '1', 'Unknown', ''),  # noqa
         '0021xx90': ('DS', '1', 'Unknown', ''),  # noqa
-        '0021xxa0': ('US', '1', 'Unknown', ''),  # noqa
-        '0021xxa1': ('DS', '1', 'Unknown', ''),  # noqa
-        '0021xxa2': ('DS', '1', 'Unknown', ''),  # noqa
-        '0021xxa3': ('LT', '1', 'Unknown', ''),  # noqa
-        '0021xxa4': ('LT', '1', 'Unknown', ''),  # noqa
-        '0021xxb0': ('LO', '1', 'Unknown', ''),  # noqa
-        '0021xxc0': ('LO', '1', 'Unknown', ''),  # noqa
+        '0021xxA0': ('US', '1', 'Unknown', ''),  # noqa
+        '0021xxA1': ('DS', '1', 'Unknown', ''),  # noqa
+        '0021xxA2': ('DS', '1', 'Unknown', ''),  # noqa
+        '0021xxA3': ('LT', '1', 'Unknown', ''),  # noqa
+        '0021xxA4': ('LT', '1', 'Unknown', ''),  # noqa
+        '0021xxB0': ('LO', '1', 'Unknown', ''),  # noqa
+        '0021xxC0': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx10': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx30': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx31': ('UL', '1', 'Unknown', ''),  # noqa
@@ -8689,8 +9758,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx33': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx80': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx90': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xxd0': ('IS', '1', 'Unknown', ''),  # noqa
-        '0029xxd1': ('IS', '1', 'Unknown', ''),  # noqa
+        '0029xxD0': ('IS', '1', 'Unknown', ''),  # noqa
+        '0029xxD1': ('IS', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-PCR Release 2': {
         '0019xx10': ('US', '1', 'Reader Mode', ''),  # noqa
@@ -8699,31 +9768,31 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx40': ('DS', '1', 'Latitude', ''),  # noqa
         '0019xx60': ('ST', '1', 'View Name', ''),  # noqa
         '0019xx80': ('US', '1', 'Unknown', ''),  # noqa
-        '0019xxa1': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxa3': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa4': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa5': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa6': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa7': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa8': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxa9': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxaa': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxab': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxac': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxad': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxae': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxaf': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxb0': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxb1': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxb2': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxb3': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxb4': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xxb5': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxb6': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxb7': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxb8': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xxb9': ('ST', '1', 'Unknown', ''),  # noqa
-        '0019xxba': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxA1': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxA3': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA4': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA5': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA6': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA7': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA8': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxA9': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxAA': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxAB': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxAC': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxAD': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxAE': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxAF': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxB0': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxB1': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxB2': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxB3': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxB4': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxB5': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxB6': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxB7': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxB8': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019xxB9': ('ST', '1', 'Unknown', ''),  # noqa
+        '0019xxBA': ('ST', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-Private-CWS Release 1': {
         '0021xx00': ('LT', '1', 'Window Of Images ID', ''),  # noqa
@@ -8754,9 +9823,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx27': ('LT', '1', 'SCPostString2', ''),  # noqa
         '0019xx28': ('LT', '1', 'SCMode', ''),  # noqa
         '0019xx29': ('IS', '1', 'SCStCommit', ''),  # noqa
-        '0019xx2a': ('IS', '1', 'SCExported', ''),  # noqa
-        '0019xx2b': ('IS', '1', 'SCPrinted', ''),  # noqa
-        '0019xx2c': ('LT', '1', 'SCOperator', ''),  # noqa
+        '0019xx2A': ('IS', '1', 'SCExported', ''),  # noqa
+        '0019xx2B': ('IS', '1', 'SCPrinted', ''),  # noqa
+        '0019xx2C': ('LT', '1', 'SCOperator', ''),  # noqa
         '0019xx40': ('LT', '1', 'SCPreName', ''),  # noqa
         '0019xx41': ('IS', '1', 'SCPreType', ''),  # noqa
     },
@@ -8770,29 +9839,29 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx31': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx07': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx08': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx0c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx0d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx0e': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx0f': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx0C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx0D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx0E': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx0F': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx10': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx18': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xx1b': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx1c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx1d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx1e': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx1B': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx1C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx1D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx1E': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx20': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx21': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx4c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx4d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx4e': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xx4f': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xx4C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx4D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx4E': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xx4F': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx50': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx51': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx66': ('DS', '4', 'Unknown', ''),  # noqa
         '0029xx67': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx68': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx6a': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx6b': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx6A': ('LO', '1', 'Unknown', ''),  # noqa
+        '0029xx6B': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx72': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx91': ('IS', '1', 'Unknown', ''),  # noqa
         '0029xx93': ('LO', '1-n', 'Unknown', ''),  # noqa
@@ -8810,14 +9879,14 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx25': ('FD', '1', 'Unknown', ''),  # noqa
         '0029xx26': ('FD', '1', 'Unknown', ''),  # noqa
         '0029xx30': ('ST', '1', 'Unknown', ''),  # noqa
-        '0029xx6b': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxc1': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxcb': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxcc': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxcd': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxd4': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxd5': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxd6': ('ST', '1', 'Unknown', ''),  # noqa
+        '0029xx6B': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxC1': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxCB': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxCC': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxCD': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxD4': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxD5': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxD6': ('ST', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-Private_ICS Release 1;2': {
         '0029xx00': ('FD', '1', 'Unknown', ''),  # noqa
@@ -8827,29 +9896,29 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx04': ('SL', '1', 'Unknown', ''),  # noqa
         '0029xx05': ('SL', '1', 'Unknown', ''),  # noqa
         '0029xx30': ('LT', '1', 'Unknown', ''),  # noqa
-        '0029xxa0': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxa1': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxa2': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxa3': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxa5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxa6': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxd9': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxA0': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxA1': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxA2': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxA3': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxA5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxA6': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxD9': ('SQ', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-Private_ICS Release 1;3': {
         '0029xx00': ('ST', '1', 'Unknown', ''),  # noqa
         '0029xx01': ('ST', '1', 'Unknown', ''),  # noqa
         '0029xx60': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxb0': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxb1': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxb2': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxb4': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxb9': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxc0': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxc1': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxc2': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxc3': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxc4': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxc5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxB0': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxB1': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxB2': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxB4': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxB9': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxC0': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxC1': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxC2': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxC3': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxC4': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxC5': ('SQ', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-Private_ICS Release 1;4': {
         '0029xx00': ('UL', '1', 'Unknown', ''),  # noqa
@@ -8859,33 +9928,33 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx07': ('SL', '1', 'Unknown', ''),  # noqa
         '0029xx08': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx09': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xx0a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xx0b': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xx0c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xx0e': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx0f': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx0A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xx0B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xx0C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xx0E': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx0F': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx10': ('SL', '1', 'Unknown', ''),  # noqa
         '0029xx90': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xx9a': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx9c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xxa0': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxa1': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxb1': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxb2': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxb3': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxb5': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xxb6': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxbc': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxbd': ('SL', '1', 'Unknown', ''),  # noqa
-        '0029xxbe': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xxd6': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxd7': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxd8': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xxd9': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xxda': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xxdc': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxdd': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xxe0': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx9A': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx9C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xxA0': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxA1': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxB1': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxB2': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxB3': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxB5': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xxB6': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxBC': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxBD': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029xxBE': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xxD6': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxD7': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxD8': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xxD9': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xxDA': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xxDC': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxDD': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xxE0': ('SQ', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-Private_ICS Release 1;5': {
         '0029xx50': ('CS', '1', 'Unknown', ''),  # noqa
@@ -8899,29 +9968,29 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx06': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx07': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx08': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx0a': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx0b': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx0c': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx0d': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx0f': ('LO', '1', 'Unknown', ''),  # noqa
+        '0029xx0A': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx0B': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx0C': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx0D': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx0F': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx10': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx14': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx15': ('UL', '2', 'Unknown', ''),  # noqa
         '0029xx16': ('FL', '1', 'Unknown', ''),  # noqa
         '0029xx17': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xx1a': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1d': ('US', '1', 'Unknown', ''),  # noqa
-        '0029xx1f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029xx1A': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx1D': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx1F': ('FL', '1', 'Unknown', ''),  # noqa
         '0029xx20': ('FL', '1', 'Unknown', ''),  # noqa
         '0029xx21': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx23': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx24': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx2a': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx2b': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx2c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx2d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx2e': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx2f': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx2A': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx2B': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx2C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx2D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx2E': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx2F': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx32': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx34': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx35': ('SQ', '1', 'Unknown', ''),  # noqa
@@ -8929,22 +9998,22 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx37': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx38': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx39': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029xx3d': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx3D': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx43': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx44': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx48': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx4f': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx5c': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0029xx5d': ('UL', '1-n', 'Unknown', ''),  # noqa
-        '0029xx5e': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx5f': ('US', '1', 'Unknown', ''),  # noqa
+        '0029xx4F': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx5C': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx5D': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '0029xx5E': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx5F': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx63': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx65': ('SQ', '1', 'Unknown', ''),  # noqa
         '0029xx66': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx67': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx68': ('UL', '1', 'Unknown', ''),  # noqa
         '0029xx69': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx6d': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0029xx6D': ('SQ', '1', 'Unknown', ''),  # noqa
     },
     'SPI-P-XSB-DCI Release 1': {
         '0019xx10': ('LT', '1', 'Video Beam Boost', ''),  # noqa
@@ -8964,19 +10033,19 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx00': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx01': ('DS', '1', 'Unknown', ''),  # noqa
         '0029xx02': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xx0f': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xx0F': ('CS', '1', 'Unknown', ''),  # noqa
         '0029xx10': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx11': ('DS', '1', 'Unknown', ''),  # noqa
         '0029xx12': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xx1f': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xx1F': ('CS', '1', 'Unknown', ''),  # noqa
         '0029xx20': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx21': ('DS', '1', 'Unknown', ''),  # noqa
         '0029xx22': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xx2f': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xx2F': ('CS', '1', 'Unknown', ''),  # noqa
         '0029xx30': ('LO', '1', 'Unknown', ''),  # noqa
         '0029xx31': ('DS', '1', 'Unknown', ''),  # noqa
         '0029xx32': ('CS', '1', 'Unknown', ''),  # noqa
-        '0029xx3f': ('CS', '1', 'Unknown', ''),  # noqa
+        '0029xx3F': ('CS', '1', 'Unknown', ''),  # noqa
     },
     'STENTOR': {
         '0073xx01': ('ST', '1', 'Unknown', ''),  # noqa
@@ -8989,8 +10058,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0017xx00': ('LO', '1', 'Extended Body Part', ''),  # noqa
         '0017xx10': ('LO', '1', 'Extended View Position', ''),  # noqa
         '0017xx20': ('SQ', '1', 'Scheduled Procedure Step', ''),  # noqa
-        '0017xxa0': ('IS', '1', 'Fixed Grid System', ''),  # noqa
-        '0017xxf0': ('IS', '1', 'Images SOP Class', ''),  # noqa
+        '0017xxA0': ('IS', '1', 'Fixed Grid System', ''),  # noqa
+        '0017xxF0': ('IS', '1', 'Images SOP Class', ''),  # noqa
         '0019xx00': ('IS', '1', 'AEC Field', ''),  # noqa
         '0019xx01': ('IS', '1', 'AEC Film Screen', ''),  # noqa
         '0019xx02': ('IS', '1', 'AEC Density', ''),  # noqa
@@ -9020,12 +10089,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx92': ('IS', '1', 'Central Beam Y', ''),  # noqa
         '0019xx93': ('IS', '1', 'Tube Turn Angle', ''),  # noqa
         '0019xx94': ('IS', '1', 'Stand drive level', ''),  # noqa
-        '0019xxa0': ('DS', '1', 'Extended Exposure Time', ''),  # noqa
-        '0019xxa1': ('DS', '1', 'Actual Exposure Time', ''),  # noqa
-        '0019xxa8': ('DS', '1', 'Extended X-ray Tube Current', ''),  # noqa
-        '0019xxb0': ('IS', '1', 'Dose Indicator', ''),  # noqa
-        '0019xxb1': ('IS', '1', 'Shift Reference Value', ''),  # noqa
-        '0019xxf0': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xxA0': ('DS', '1', 'Extended Exposure Time', ''),  # noqa
+        '0019xxA1': ('DS', '1', 'Actual Exposure Time', ''),  # noqa
+        '0019xxA8': ('DS', '1', 'Extended X-ray Tube Current', ''),  # noqa
+        '0019xxB0': ('IS', '1', 'Dose Indicator', ''),  # noqa
+        '0019xxB1': ('IS', '1', 'Shift Reference Value', ''),  # noqa
+        '0019xxF0': ('IS', '1', 'Unknown', ''),  # noqa
         '0021xx00': ('DS', '1', 'Noise Reduction', ''),  # noqa
         '0021xx01': ('DS', '1', 'Contrast Amplification', ''),  # noqa
         '0021xx02': ('DS', '1', 'Edge Contrast Boosting', ''),  # noqa
@@ -9048,7 +10117,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0023xx01': ('IS', '1', 'Letter Position', ''),  # noqa
         '0023xx02': ('IS', '1', 'Burned In Annotation', ''),  # noqa
         '0023xx03': ('LO', '1', 'Unknown', ''),  # noqa
-        '0023xxf0': ('IS', '1', 'Image SOP Class', ''),  # noqa
+        '0023xxF0': ('IS', '1', 'Image SOP Class', ''),  # noqa
         '0025xx00': ('IS', '1', 'Original Image', ''),  # noqa
         '0025xx01': ('IS', '1', 'Not Processed Image', ''),  # noqa
         '0025xx02': ('IS', '1', 'Cut Out Image', ''),  # noqa
@@ -9059,7 +10128,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx07': ('IS', '1', 'Media Stored Image', ''),  # noqa
         '0025xx08': ('IS', '1', 'Image State', ''),  # noqa
         '0025xx09': ('IS', '1', 'Image Stitched Manually', ''),  # noqa
-        '0025xx0a': ('IS', '1', 'Image Stitched Automatically', ''),  # noqa
+        '0025xx0A': ('IS', '1', 'Image Stitched Automatically', ''),  # noqa
         '0025xx20': ('LO', '1', 'Source Image File', ''),  # noqa
         '0025xx21': ('LO', '1', 'Source UID', ''),  # noqa
         '0027xx00': ('IS', '1', 'Number of Series', ''),  # noqa
@@ -9095,8 +10164,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx08': ('US', '1', 'Ortho Step Distance', ''),  # noqa
         '0021xx08': ('US', '1', 'Auto Window Flag', ''),  # noqa
         '0021xx09': ('SL', '1', 'Auto Window Center', ''),  # noqa
-        '0021xx0a': ('SL', '1', 'Auto Window Width', ''),  # noqa
-        '0021xx0b': ('SS', '1', 'Filter ID', ''),  # noqa
+        '0021xx0A': ('SL', '1', 'Auto Window Width', ''),  # noqa
+        '0021xx0B': ('SS', '1', 'Filter ID', ''),  # noqa
         '0021xx14': ('US', '1', 'Anatomic Correct View', ''),  # noqa
         '0021xx15': ('SS', '1', 'Auto Window Shift', ''),  # noqa
         '0021xx16': ('DS', '1', 'Auto Window Expansion', ''),  # noqa
@@ -9115,12 +10184,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx07': ('FL', '1', 'Label Right Percentage X', ''),  # noqa
         '0021xx08': ('US', '1', 'Auto Window Flag', ''),  # noqa
         '0021xx09': ('SL', '1', 'Auto Window Center', ''),  # noqa
-        '0021xx0a': ('SL', '1', 'Auto Window Width', ''),  # noqa
-        '0021xx0b': ('SS', '1', 'Filter ID', ''),  # noqa
-        '0021xx0c': ('FL', '1', 'Degree of Edge Enhancement', ''),  # noqa
-        '0021xx0d': ('SS', '1', 'Half Kernel Size', ''),  # noqa
-        '0021xx0e': ('US', '1', 'Dose Control Value', ''),  # noqa
-        '0021xx0f': ('US', '1', 'Deleted Image Flag', ''),  # noqa
+        '0021xx0A': ('SL', '1', 'Auto Window Width', ''),  # noqa
+        '0021xx0B': ('SS', '1', 'Filter ID', ''),  # noqa
+        '0021xx0C': ('FL', '1', 'Degree of Edge Enhancement', ''),  # noqa
+        '0021xx0D': ('SS', '1', 'Half Kernel Size', ''),  # noqa
+        '0021xx0E': ('US', '1', 'Dose Control Value', ''),  # noqa
+        '0021xx0F': ('US', '1', 'Deleted Image Flag', ''),  # noqa
         '0021xx10': ('US', '1', 'Same Size Support', ''),  # noqa
         '0021xx11': ('SS', '1', 'Label Left Init Position', ''),  # noqa
         '0021xx12': ('SS', '1', 'Label Right Init Position', ''),  # noqa
@@ -9140,12 +10209,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx07': ('FL', '1', 'Collimator Up Left Y Percentage', ''),  # noqa
         '0025xx08': ('FL', '1', 'Collimator Up Right Y Percentage', ''),  # noqa
         '0025xx09': ('FL', '1', 'Collimator Low Left Y Percentage', ''),  # noqa
-        '0025xx0a': ('FL', '1', 'Collimator Low Right Y Percentage', ''),  # noqa
-        '0025xx0b': ('US', '1', 'Set Gray', ''),  # noqa
-        '0025xx0c': ('SS', '1', 'Harmonization Kernel', ''),  # noqa
-        '0025xx0d': ('FL', '1', 'Harmonization Gain', ''),  # noqa
-        '0025xx0e': ('SS', '1', 'Edge Enhancement Kernel', ''),  # noqa
-        '0025xx0f': ('FL', '1', 'Edge Enhancement Gain', ''),  # noqa
+        '0025xx0A': ('FL', '1', 'Collimator Low Right Y Percentage', ''),  # noqa
+        '0025xx0B': ('US', '1', 'Set Gray', ''),  # noqa
+        '0025xx0C': ('SS', '1', 'Harmonization Kernel', ''),  # noqa
+        '0025xx0D': ('FL', '1', 'Harmonization Gain', ''),  # noqa
+        '0025xx0E': ('SS', '1', 'Edge Enhancement Kernel', ''),  # noqa
+        '0025xx0F': ('FL', '1', 'Edge Enhancement Gain', ''),  # noqa
         '0025xx10': ('LT', '1', 'Raw Image File Name', ''),  # noqa
         '0025xx11': ('SS', '1', 'Global Offset', ''),  # noqa
         '0025xx12': ('SS', '1', 'Image Columns', ''),  # noqa
@@ -9156,10 +10225,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0025xx17': ('LO', '1', 'System Type', ''),  # noqa
         '0025xx18': ('US', '1', 'Auto Gain', ''),  # noqa
         '0025xx19': ('US', '1', 'Ortho Sub Sampling', ''),  # noqa
-        '0025xx1a': ('US', '2', 'Image Crop Upper Left', ''),  # noqa
-        '0025xx1b': ('US', '2', 'Image Crop Upper Right', ''),  # noqa
-        '0025xx1c': ('US', '2', 'Image Crop Lower Left', ''),  # noqa
-        '0025xx1d': ('US', '2', 'Image Crop Lower Right', ''),  # noqa
+        '0025xx1A': ('US', '2', 'Image Crop Upper Left', ''),  # noqa
+        '0025xx1B': ('US', '2', 'Image Crop Upper Right', ''),  # noqa
+        '0025xx1C': ('US', '2', 'Image Crop Lower Left', ''),  # noqa
+        '0025xx1D': ('US', '2', 'Image Crop Lower Right', ''),  # noqa
         '0025xx30': ('US', '1', 'Manual Cropping', ''),  # noqa
         '0025xx31': ('SS', '1', 'Gamma LUT Parameter 1', ''),  # noqa
         '0025xx32': ('DS', '1', 'Gamma LUT Parameter 2', ''),  # noqa
@@ -9268,11 +10337,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx17': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx18': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx19': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1a': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xx1b': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1d': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xx1e': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xx1A': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xx1B': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx1C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx1D': ('UN', '1', 'Unknown', ''),  # noqa
+        '0029xx1E': ('UN', '1', 'Unknown', ''),  # noqa
         '0029xx21': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx22': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx23': ('US', '1', 'Unknown', ''),  # noqa
@@ -9295,11 +10364,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx17': ('FD', '2', 'Unknown', ''),  # noqa
         '0029xx18': ('FD', '2', 'Unknown', ''),  # noqa
         '0029xx19': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1a': ('FD', '1', 'Unknown', ''),  # noqa
-        '0029xx1b': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0029xx1d': ('UL', '3', 'Unknown', ''),  # noqa
-        '0029xx1e': ('UL', '3', 'Unknown', ''),  # noqa
+        '0029xx1A': ('FD', '1', 'Unknown', ''),  # noqa
+        '0029xx1B': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx1C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0029xx1D': ('UL', '3', 'Unknown', ''),  # noqa
+        '0029xx1E': ('UL', '3', 'Unknown', ''),  # noqa
         '0029xx27': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx28': ('OB', '1', 'Unknown', ''),  # noqa
         '0029xx30': ('US', '1', 'Unknown', ''),  # noqa
@@ -9309,40 +10378,40 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx36': ('US', '1', 'Unknown', ''),  # noqa
     },
     'Sound Technologies': {
-        'f001xx00': ('CS', '1', 'Patient Species', ''),  # noqa
-        'f001xx01': ('CS', '1', 'Patient Breed', ''),  # noqa
-        'f001xx02': ('CS', '1', 'Patient Category Size', ''),  # noqa
-        'f001xx03': ('CS', '1', 'Patient Sex Extended (including spay/neuter)', ''),  # noqa
-        'f001xx04': ('CS', '1', 'Image View', ''),  # noqa
-        'f001xx05': ('CS', '1', 'Anatomy Imaged', ''),  # noqa
-        'f001xx06': ('CS', '1', 'Image enhancements', ''),  # noqa
-        'f001xx07': ('CS', '1', 'Detector Settings', ''),  # noqa
-        'f001xx08': ('CS', '1', 'Application Version', ''),  # noqa
-        'f001xx09': ('LO', '1', 'Image Laterality Extended', ''),  # noqa
-        'f001xx0a': ('PN', '1', 'Client Name', ''),  # noqa
-        'f001xx0b': ('UI', '1', 'Reference Study Instance Uid', ''),  # noqa
-        'f001xx0c': ('UI', '1', 'Reference Series Instance Uid', ''),  # noqa
-        'f001xx0d': ('LO', '1', 'Exam Ref Id', ''),  # noqa
-        'f001xx0e': ('ST', '1', 'Physician Of Record Address', ''),  # noqa
-        'f001xx0f': ('SH', '1', 'Physician Of Record Phone Numbers', ''),  # noqa
-        'f001xx10': ('LT', '1', 'Reason For Study', ''),  # noqa
-        'f001xx11': ('LO', '1', 'Protocol', ''),  # noqa
-        'f001xx12': ('LO', '1', 'CaptureInputType', ''),  # noqa
-        'f001xx13': ('LT', '1', 'Exam Complaint', ''),  # noqa
-        'f001xx14': ('LO', '1', 'Exam Web Code', ''),  # noqa
-        'f001xx15': ('LO', '1', 'Exam Category', ''),  # noqa
-        'f001xx16': ('SH', '1', 'Exam Diagnosis', ''),  # noqa
-        'f001xx17': ('PN', '1', 'Exam Created By', ''),  # noqa
-        'f001xx18': ('LO', '1', 'Exam Created By Group', ''),  # noqa
-        'f001xx19': ('DT', '1', 'Exam Required By DateTime', ''),  # noqa
-        'f001xx1a': ('LO', '1', 'Capture Type', ''),  # noqa
-        'f001xx1b': ('IS', '1', 'Telemed Exam ID', ''),  # noqa
-        'f001xx1c': ('LO', '1', 'Exam Created By Guid', ''),  # noqa
-        'f001xx1d': ('LO', '1', 'Client Name Guid', ''),  # noqa
+        'F001xx00': ('CS', '1', 'Patient Species', ''),  # noqa
+        'F001xx01': ('CS', '1', 'Patient Breed', ''),  # noqa
+        'F001xx02': ('CS', '1', 'Patient Category Size', ''),  # noqa
+        'F001xx03': ('CS', '1', 'Patient Sex Extended (including spay/neuter)', ''),  # noqa
+        'F001xx04': ('CS', '1', 'Image View', ''),  # noqa
+        'F001xx05': ('CS', '1', 'Anatomy Imaged', ''),  # noqa
+        'F001xx06': ('CS', '1', 'Image enhancements', ''),  # noqa
+        'F001xx07': ('CS', '1', 'Detector Settings', ''),  # noqa
+        'F001xx08': ('CS', '1', 'Application Version', ''),  # noqa
+        'F001xx09': ('LO', '1', 'Image Laterality Extended', ''),  # noqa
+        'F001xx0A': ('PN', '1', 'Client Name', ''),  # noqa
+        'F001xx0B': ('UI', '1', 'Reference Study Instance Uid', ''),  # noqa
+        'F001xx0C': ('UI', '1', 'Reference Series Instance Uid', ''),  # noqa
+        'F001xx0D': ('LO', '1', 'Exam Ref Id', ''),  # noqa
+        'F001xx0E': ('ST', '1', 'Physician Of Record Address', ''),  # noqa
+        'F001xx0F': ('SH', '1', 'Physician Of Record Phone Numbers', ''),  # noqa
+        'F001xx10': ('LT', '1', 'Reason For Study', ''),  # noqa
+        'F001xx11': ('LO', '1', 'Protocol', ''),  # noqa
+        'F001xx12': ('LO', '1', 'CaptureInputType', ''),  # noqa
+        'F001xx13': ('LT', '1', 'Exam Complaint', ''),  # noqa
+        'F001xx14': ('LO', '1', 'Exam Web Code', ''),  # noqa
+        'F001xx15': ('LO', '1', 'Exam Category', ''),  # noqa
+        'F001xx16': ('SH', '1', 'Exam Diagnosis', ''),  # noqa
+        'F001xx17': ('PN', '1', 'Exam Created By', ''),  # noqa
+        'F001xx18': ('LO', '1', 'Exam Created By Group', ''),  # noqa
+        'F001xx19': ('DT', '1', 'Exam Required By DateTime', ''),  # noqa
+        'F001xx1A': ('LO', '1', 'Capture Type', ''),  # noqa
+        'F001xx1B': ('IS', '1', 'Telemed Exam ID', ''),  # noqa
+        'F001xx1C': ('LO', '1', 'Exam Created By Guid', ''),  # noqa
+        'F001xx1D': ('LO', '1', 'Client Name Guid', ''),  # noqa
     },
     'TMDTK': {
-        '7effxx21': ('SQ', '1', 'Unknown', ''),  # noqa
-        '7effxx2e': ('LT', '1', 'Unknown', ''),  # noqa
+        '7EFFxx21': ('SQ', '1', 'Unknown', ''),  # noqa
+        '7EFFxx2E': ('LT', '1', 'Unknown', ''),  # noqa
     },
     'TOSHIBA COMAPL HEADER': {
         '0029xx08': ('CS', '1', 'COMAPL Header Type', ''),  # noqa
@@ -9385,7 +10454,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx09': ('LO', '1', 'Application Header Version', ''),  # noqa
         '0029xx10': ('OB', '1', 'Application Header Data', ''),  # noqa
         '0029xx20': ('OB', '1', 'Application Header Data', ''),  # noqa
-        '7fe1xx10': ('OB', '1', 'Toshiba US Private Data', ''),  # noqa
+        '7FE1xx10': ('OB', '1', 'Toshiba US Private Data', ''),  # noqa
     },
     'TOSHIBA_MEC_1.0': {
         '0009xx01': ('LT', '1', 'Unknown', ''),  # noqa
@@ -9399,10 +10468,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0021xx01': ('US', '1-n', 'Unknown', ''),  # noqa
         '0021xx02': ('US', '1-n', 'Unknown', ''),  # noqa
         '0021xx03': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx01': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx02': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx03': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx10': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx01': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx02': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx03': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx10': ('US', '1-n', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_CT3': {
         '7005xx00': ('OB', '1-n', 'CT Private Data 1', ''),  # noqa
@@ -9413,12 +10482,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7005xx07': ('DS', '2', 'Reconstruction Center', ''),  # noqa
         '7005xx08': ('DS', '1', 'Detector Slice Thickness in mm', ''),  # noqa
         '7005xx09': ('LO', '1', 'Number of Detector rows to Reconstruct', ''),  # noqa
-        '7005xx0a': ('DS', '1', 'Table Speed in mm/rot', ''),  # noqa
-        '7005xx0b': ('SH', '1', 'Filter', ''),  # noqa
-        '7005xx0c': ('SH', '1', 'Reconstruction Correction Type', ''),  # noqa
-        '7005xx0d': ('CS', '1', 'Organ', ''),  # noqa
-        '7005xx0e': ('SH', '1', 'File Type Remarks', ''),  # noqa
-        '7005xx0f': ('SH', '1', 'Direction', ''),  # noqa
+        '7005xx0A': ('DS', '1', 'Table Speed in mm/rot', ''),  # noqa
+        '7005xx0B': ('SH', '1', 'Filter', ''),  # noqa
+        '7005xx0C': ('SH', '1', 'Reconstruction Correction Type', ''),  # noqa
+        '7005xx0D': ('CS', '1', 'Organ', ''),  # noqa
+        '7005xx0E': ('SH', '1', 'File Type Remarks', ''),  # noqa
+        '7005xx0F': ('SH', '1', 'Direction', ''),  # noqa
         '7005xx10': ('OB', '1-n', 'CT Private Data 2', ''),  # noqa
         '7005xx11': ('LT', '1', 'Series Comment', ''),  # noqa
         '7005xx12': ('SH', '1', 'Position', ''),  # noqa
@@ -9429,12 +10498,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7005xx17': ('US', '1', 'Total Frame Count in the Volume', ''),  # noqa
         '7005xx18': ('US', '1', 'Frame No.', ''),  # noqa
         '7005xx19': ('UL', '1', 'Frame Sort Key', ''),  # noqa
-        '7005xx1a': ('US', '1', 'Frame Sort Order', ''),  # noqa
-        '7005xx1b': ('SH', '1', 'Convolution Kernel', ''),  # noqa
-        '7005xx1c': ('LO', '1', 'Contrast/Bolus Agent', ''),  # noqa
-        '7005xx1d': ('UL', '1', 'Reconstruction Number', ''),  # noqa
-        '7005xx1e': ('UL', '1', 'Raw Data Number', ''),  # noqa
-        '7005xx1f': ('LO', '1', 'Volume Number', ''),  # noqa
+        '7005xx1A': ('US', '1', 'Frame Sort Order', ''),  # noqa
+        '7005xx1B': ('SH', '1', 'Convolution Kernel', ''),  # noqa
+        '7005xx1C': ('LO', '1', 'Contrast/Bolus Agent', ''),  # noqa
+        '7005xx1D': ('UL', '1', 'Reconstruction Number', ''),  # noqa
+        '7005xx1E': ('UL', '1', 'Raw Data Number', ''),  # noqa
+        '7005xx1F': ('LO', '1', 'Volume Number', ''),  # noqa
         '7005xx20': ('UL', '1', 'Local Series Number', ''),  # noqa
         '7005xx21': ('LO', '1', 'Decrease in Artifact Filter', ''),  # noqa
         '7005xx22': ('DS', '1', 'Reconstruction Interval', ''),  # noqa
@@ -9460,9 +10529,9 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7005xx47': ('DS', '1', 'Slice Pitch of 4D Volume', ''),  # noqa
         '7005xx48': ('LO', '1', 'Respiratory Gating Inf.', ''),  # noqa
         '7005xx49': ('SH', '1', 'Respiration Phase', ''),  # noqa
-        '7005xxf1': ('CS', '1', 'Protect Mark for Image, Curve or Private Record', ''),  # noqa
-        '7005xxf2': ('CS', '1', 'Protect Mark for Series Record', ''),  # noqa
-        '7005xxf3': ('CS', '1', 'Protect Mark for Study Record', ''),  # noqa
+        '7005xxF1': ('CS', '1', 'Protect Mark for Image, Curve or Private Record', ''),  # noqa
+        '7005xxF2': ('CS', '1', 'Protect Mark for Series Record', ''),  # noqa
+        '7005xxF3': ('CS', '1', 'Protect Mark for Study Record', ''),  # noqa
     },
     'TOSHIBA_MEC_CT_1.0': {
         '0019xx01': ('IS', '1', 'Unknown', ''),  # noqa
@@ -9474,56 +10543,56 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('US', '1-n', 'Unknown', ''),  # noqa
         '0019xx08': ('LT', '1', 'Orientation Head Feet', ''),  # noqa
         '0019xx09': ('LT', '1', 'View Direction', ''),  # noqa
-        '0019xx0a': ('LT', '1', 'Orientation Supine Prone', ''),  # noqa
-        '0019xx0b': ('DS', '1', 'Location', ''),  # noqa
-        '0019xx0c': ('CS', '1', 'Scan View Direction', ''),  # noqa
-        '0019xx0d': ('TM', '1', 'Time', ''),  # noqa
-        '0019xx0e': ('DS', '1', 'Unknown', ''),  # noqa
-        '7ff1xx01': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx02': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx03': ('IS', '1', 'Unknown', ''),  # noqa
-        '7ff1xx04': ('IS', '1', 'Unknown', ''),  # noqa
-        '7ff1xx05': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx07': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx08': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx09': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx0a': ('LT', '1', 'Unknown', ''),  # noqa
-        '7ff1xx0b': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx0c': ('US', '1-n', 'Unknown', ''),  # noqa
-        '7ff1xx0d': ('US', '1-n', 'Unknown', ''),  # noqa
+        '0019xx0A': ('LT', '1', 'Orientation Supine Prone', ''),  # noqa
+        '0019xx0B': ('DS', '1', 'Location', ''),  # noqa
+        '0019xx0C': ('CS', '1', 'Scan View Direction', ''),  # noqa
+        '0019xx0D': ('TM', '1', 'Time', ''),  # noqa
+        '0019xx0E': ('DS', '1', 'Unknown', ''),  # noqa
+        '7FF1xx01': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx02': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx03': ('IS', '1', 'Unknown', ''),  # noqa
+        '7FF1xx04': ('IS', '1', 'Unknown', ''),  # noqa
+        '7FF1xx05': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx07': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx08': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx09': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx0A': ('LT', '1', 'Unknown', ''),  # noqa
+        '7FF1xx0B': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx0C': ('US', '1-n', 'Unknown', ''),  # noqa
+        '7FF1xx0D': ('US', '1-n', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_MR3': {
         '00290089': ('LO', '1', 'Unknown', ''),  # noqa
-        '700dxx00': ('DS', '1', 'Scale Factor', ''),  # noqa
-        '700dxx01': ('OB', '1', 'Acquisition Order', ''),  # noqa
-        '700dxx02': ('DS', '9', 'Orientation Vector', ''),  # noqa
-        '700dxx03': ('SS', '1', 'Flip Flag', ''),  # noqa
-        '700dxx04': ('OB', '1', 'Rotate Information', ''),  # noqa
-        '700dxx05': ('DS', '1', 'FOV', ''),  # noqa
-        '700dxx06': ('US', '4', 'Image Matrix', ''),  # noqa
-        '700dxx07': ('OB', '1', 'Image Information', ''),  # noqa
-        '700dxx08': ('OB', '1', 'Original Data', ''),  # noqa
-        '700dxx09': ('SS', '1', 'Original Data Flag', ''),  # noqa
-        '700dxx0c': ('CS', '1', 'Receiver Gain Correction Check Flag', ''),  # noqa
-        '700dxx20': ('SH', '1', 'Identification Flag of 3D GDC', ''),  # noqa
-        '700dxx80': ('US', '1', 'Number of PAC channel', ''),  # noqa
-        '700dxx81': ('US', '1', 'Reference mode', ''),  # noqa
-        '700dxx82': ('SQ', '1', 'Gain value group for MRS', ''),  # noqa
-        '700dxx83': ('FL', '1', 'Gain value of each channel for MRS', ''),  # noqa
-        '700dxx84': ('FL', '1', 'Phase value of each channel for MRS', ''),  # noqa
-        '700dxx85': ('FL', '1', 'Reference gain value of each channel for MRS', ''),  # noqa
-        '700dxx86': ('FL', '1', 'Reference gain value of each channel for MRS', ''),  # noqa
-        '700dxx87': ('FL', '1', 'Receiver gain of reference scan', ''),  # noqa
-        '700dxx88': ('UL', '1', 'Flag of water Sat pulse', ''),  # noqa
-        '700dxx89': ('FL', '1', 'Selected contrast TE', ''),  # noqa
-        '700dxx8a': ('SQ', '1', 'Raw Data Set Sequence', ''),  # noqa
-        '700dxx8b': ('DS', '1', 'Multi Slice number', ''),  # noqa
-        '700dxx8c': ('DS', '1', 'Multi Coverage number', ''),  # noqa
-        '700dxx8d': ('SQ', '1', 'Raw Data Sequence', ''),  # noqa
-        '700dxx8e': ('DS', '1', 'Coil Channel No.', ''),  # noqa
-        '700dxx8f': ('OB', '1', 'MRS Raw Data', ''),  # noqa
-        '700dxx90': ('OF', '1', 'MRS Ref Raw Data', ''),  # noqa
-        '700dxx91': ('FL', '1', 'Receiver gain of prescan', ''),  # noqa
+        '700Dxx00': ('DS', '1', 'Scale Factor', ''),  # noqa
+        '700Dxx01': ('OB', '1', 'Acquisition Order', ''),  # noqa
+        '700Dxx02': ('DS', '9', 'Orientation Vector', ''),  # noqa
+        '700Dxx03': ('SS', '1', 'Flip Flag', ''),  # noqa
+        '700Dxx04': ('OB', '1', 'Rotate Information', ''),  # noqa
+        '700Dxx05': ('DS', '1', 'FOV', ''),  # noqa
+        '700Dxx06': ('US', '4', 'Image Matrix', ''),  # noqa
+        '700Dxx07': ('OB', '1', 'Image Information', ''),  # noqa
+        '700Dxx08': ('OB', '1', 'Original Data', ''),  # noqa
+        '700Dxx09': ('SS', '1', 'Original Data Flag', ''),  # noqa
+        '700Dxx0C': ('CS', '1', 'Receiver Gain Correction Check Flag', ''),  # noqa
+        '700Dxx20': ('SH', '1', 'Identification Flag of 3D GDC', ''),  # noqa
+        '700Dxx80': ('US', '1', 'Number of PAC channel', ''),  # noqa
+        '700Dxx81': ('US', '1', 'Reference mode', ''),  # noqa
+        '700Dxx82': ('SQ', '1', 'Gain value group for MRS', ''),  # noqa
+        '700Dxx83': ('FL', '1', 'Gain value of each channel for MRS', ''),  # noqa
+        '700Dxx84': ('FL', '1', 'Phase value of each channel for MRS', ''),  # noqa
+        '700Dxx85': ('FL', '1', 'Reference gain value of each channel for MRS', ''),  # noqa
+        '700Dxx86': ('FL', '1', 'Reference gain value of each channel for MRS', ''),  # noqa
+        '700Dxx87': ('FL', '1', 'Receiver gain of reference scan', ''),  # noqa
+        '700Dxx88': ('UL', '1', 'Flag of water Sat pulse', ''),  # noqa
+        '700Dxx89': ('FL', '1', 'Selected contrast TE', ''),  # noqa
+        '700Dxx8A': ('SQ', '1', 'Raw Data Set Sequence', ''),  # noqa
+        '700Dxx8B': ('DS', '1', 'Multi Slice number', ''),  # noqa
+        '700Dxx8C': ('DS', '1', 'Multi Coverage number', ''),  # noqa
+        '700Dxx8D': ('SQ', '1', 'Raw Data Sequence', ''),  # noqa
+        '700Dxx8E': ('DS', '1', 'Coil Channel No.', ''),  # noqa
+        '700Dxx8F': ('OB', '1', 'MRS Raw Data', ''),  # noqa
+        '700Dxx90': ('OF', '1', 'MRS Ref Raw Data', ''),  # noqa
+        '700Dxx91': ('FL', '1', 'Receiver gain of prescan', ''),  # noqa
     },
     'TOSHIBA_MEC_MR3^10': {
         '00090002': ('SH', '1', 'Unknown', ''),  # noqa
@@ -9533,7 +10602,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00110006': ('US', '1', 'Unknown', ''),  # noqa
         '00110007': ('US', '1-n', 'Unknown', ''),  # noqa
         '00110008': ('SH', '1', 'Unknown', ''),  # noqa
-        '0011000c': ('SS', '1', 'Unknown', ''),  # noqa
+        '0011000C': ('SS', '1', 'Unknown', ''),  # noqa
+        '0011000E': ('US', '2', 'Unknown', ''),  # noqa
         '00190001': ('UL', '1', 'Unknown', ''),  # noqa
         '00190002': ('SL', '1', 'Unknown', ''),  # noqa
         '00190003': ('US', '1', 'Unknown', ''),  # noqa
@@ -9543,12 +10613,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190007': ('FL', '3', 'Unknown', ''),  # noqa
         '00190008': ('US', '1', 'Unknown', ''),  # noqa
         '00190009': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019000a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019000b': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('US', '3', 'Unknown', ''),  # noqa
-        '0019000d': ('SL', '6', 'Unknown', ''),  # noqa
-        '0019000e': ('SL', '6', 'Unknown', ''),  # noqa
-        '0019000f': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('US', '3', 'Unknown', ''),  # noqa
+        '0019000D': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000E': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000F': ('SL', '6', 'Unknown', ''),  # noqa
         '00190010': ('US', '2', 'Unknown', ''),  # noqa
         '00190011': ('SL', '2', 'Unknown', ''),  # noqa
         '00190012': ('US', '1', 'Unknown', ''),  # noqa
@@ -9559,19 +10629,27 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190017': ('SL', '1', 'Unknown', ''),  # noqa
         '00190018': ('US', '1', 'Unknown', ''),  # noqa
         '00190019': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019001b': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019001e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001F': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190020': ('FL', '2', 'Unknown', ''),  # noqa
+        '00190021': ('US', '1', 'Unknown', ''),  # noqa
+        '00190022': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190023': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190024': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190025': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190026': ('SL', '1', 'Unknown', ''),  # noqa
         '00190027': ('SL', '1', 'Unknown', ''),  # noqa
         '00190028': ('SL', '1', 'Unknown', ''),  # noqa
         '00190029': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019002b': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019002c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019002d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019002e': ('US', '1', 'Unknown', ''),  # noqa
-        '0019002f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002B': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019002F': ('FL', '1', 'Unknown', ''),  # noqa
         '00190030': ('UL', '1', 'Unknown', ''),  # noqa
         '00190031': ('OF', '1-n', 'Unknown', ''),  # noqa
         '00190032': ('FL', '1', 'Unknown', ''),  # noqa
@@ -9580,12 +10658,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190035': ('SL', '1', 'Unknown', ''),  # noqa
         '00190036': ('SQ', '1', 'Unknown', ''),  # noqa
         '00190038': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003b': ('SL', '2', 'Unknown', ''),  # noqa
-        '0019003c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019003f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003B': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019003C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190042': ('US', '1', 'Unknown', ''),  # noqa
         '00190043': ('US', '1', 'Unknown', ''),  # noqa
         '00190044': ('SL', '1', 'Unknown', ''),  # noqa
@@ -9594,11 +10672,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190047': ('FL', '1', 'Unknown', ''),  # noqa
         '00190048': ('US', '1', 'Unknown', ''),  # noqa
         '00190049': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004b': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004c': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019004e': ('US', '1', 'Unknown', ''),  # noqa
-        '0019004f': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004C': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004E': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004F': ('US', '1', 'Unknown', ''),  # noqa
         '00190050': ('SL', '2', 'Unknown', ''),  # noqa
         '00190051': ('SL', '2', 'Unknown', ''),  # noqa
         '00190052': ('LO', '1', 'Unknown', ''),  # noqa
@@ -9607,10 +10685,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190057': ('FL', '3', 'Unknown', ''),  # noqa
         '00190058': ('FL', '3', 'Unknown', ''),  # noqa
         '00190059': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005a': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '0019005d': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '0019005e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019005A': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005D': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005F': ('FL', '1', 'Unknown', ''),  # noqa
         '00190060': ('US', '1', 'Unknown', ''),  # noqa
         '00190061': ('US', '1', 'Unknown', ''),  # noqa
         '00190062': ('US', '1', 'Unknown', ''),  # noqa
@@ -9618,166 +10696,171 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190064': ('FL', '1', 'Unknown', ''),  # noqa
         '00190065': ('SL', '2', 'Unknown', ''),  # noqa
         '00190069': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019006a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019006b': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019006d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019006e': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019006f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019006B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006E': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190070': ('LO', '1', 'Unknown', ''),  # noqa
         '00190071': ('LO', '1', 'Unknown', ''),  # noqa
         '00190073': ('LO', '1', 'Unknown', ''),  # noqa
         '00190075': ('LO', '1', 'Unknown', ''),  # noqa
         '00190076': ('LO', '1', 'Unknown', ''),  # noqa
         '00190078': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019007b': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019007c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019007d': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019007e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007B': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019007C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007D': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190085': ('FL', '1', 'Unknown', ''),  # noqa
         '00190086': ('SL', '1', 'Unknown', ''),  # noqa
         '00190087': ('FL', '1', 'Unknown', ''),  # noqa
         '00190088': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019008a': ('SL', '1-n', 'Unknown', ''),  # noqa
-        '0019008c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0019008e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '0019008C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019008D': ('TM', '1', 'Unknown', ''),  # noqa
+        '0019008E': ('SL', '1', 'Unknown', ''),  # noqa
         '00190092': ('SL', '1', 'Unknown', ''),  # noqa
         '00190093': ('FL', '3', 'Unknown', ''),  # noqa
         '00190096': ('US', '1', 'Unknown', ''),  # noqa
-        '0019009b': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019009c': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a0': ('SL', '4', 'Unknown', ''),  # noqa
-        '001900a1': ('DS', '1', 'Unknown', ''),  # noqa
-        '001900a2': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a3': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900a4': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900a5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a8': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ab': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ac': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ad': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900ae': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900af': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b7': ('FL', '2', 'Unknown', ''),  # noqa
-        '001900ba': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900bb': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900bc': ('FL', '2', 'Unknown', ''),  # noqa
-        '001900bd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900be': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c6': ('FL', '2', 'Unknown', ''),  # noqa
-        '001900c9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ca': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900cb': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900cc': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900cd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ce': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900cf': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d0': ('US', '1', 'Unknown', ''),  # noqa
-        '001900d1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d2': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900d3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900d8': ('US', '1', 'Unknown', ''),  # noqa
-        '001900d9': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900da': ('US', '1', 'Unknown', ''),  # noqa
-        '001900db': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900dc': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900e5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900e6': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900e9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ea': ('UI', '1', 'Unknown', ''),  # noqa
-        '001900eb': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ec': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ee': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900ef': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900f0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f1': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900f2': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900f3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f4': ('FD', '1', 'Unknown', ''),  # noqa
-        '001900f5': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f6': ('UI', '1', 'Unknown', ''),  # noqa
-        '001900f8': ('US', '1', 'Unknown', ''),  # noqa
-        '001900f9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fa': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fb': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900fc': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fd': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ff': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019009B': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009C': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('SL', '4', 'Unknown', ''),  # noqa
+        '001900A1': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900A4': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900A5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AB': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900AD': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B7': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900BA': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BC': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900BD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C6': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900C9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CA': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900CB': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CC': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900D1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D2': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900D3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900D8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900D9': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900DA': ('US', '1', 'Unknown', ''),  # noqa
+        '001900DB': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900DC': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900E5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900EA': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900EB': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900EC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900EF': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900F3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F4': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900F5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F6': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900F8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900F9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FF': ('SL', '3', 'Unknown', ''),  # noqa
         '00210002': ('SL', '1', 'Unknown', ''),  # noqa
         '00210003': ('SL', '1', 'Unknown', ''),  # noqa
         '00210004': ('US', '1', 'Unknown', ''),  # noqa
         '00210008': ('DS', '3', 'Unknown', ''),  # noqa
         '00210009': ('DS', '3', 'Unknown', ''),  # noqa
-        '0021000a': ('DS', '3', 'Unknown', ''),  # noqa
-        '0021000b': ('US', '1', 'Unknown', ''),  # noqa
-        '0021000c': ('US', '1', 'Unknown', ''),  # noqa
-        '0021000d': ('FL', '1', 'Unknown', ''),  # noqa
-        '0021000f': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000A': ('DS', '3', 'Unknown', ''),  # noqa
+        '0021000B': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000C': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000D': ('FL', '1', 'Unknown', ''),  # noqa
+        '0021000F': ('US', '1', 'Unknown', ''),  # noqa
         '00210012': ('DS', '3', 'Unknown', ''),  # noqa
         '00210014': ('SQ', '1', 'Unknown', ''),  # noqa
         '00210015': ('FL', '1', 'Unknown', ''),  # noqa
         '00210016': ('FL', '2', 'Unknown', ''),  # noqa
         '00210018': ('US', '1', 'Unknown', ''),  # noqa
-        '0021001d': ('IS', '1', 'Unknown', ''),  # noqa
-        '0021001f': ('US', '1', 'Unknown', ''),  # noqa
+        '0021001A': ('US', '1', 'Unknown', ''),  # noqa
+        '0021001D': ('IS', '1', 'Unknown', ''),  # noqa
+        '0021001F': ('US', '1', 'Unknown', ''),  # noqa
         '00210022': ('US', '1', 'Unknown', ''),  # noqa
+        '00210023': ('SS', '1', 'Unknown', ''),  # noqa
         '00290001': ('SL', '1', 'Unknown', ''),  # noqa
         '00290005': ('SQ', '1', 'Unknown', ''),  # noqa
         '00290006': ('FL', '1', 'Unknown', ''),  # noqa
         '00290007': ('FL', '1', 'Unknown', ''),  # noqa
-        '0029001c': ('FL', '2', 'Unknown', ''),  # noqa
+        '0029001C': ('FL', '2', 'Unknown', ''),  # noqa
         '00290021': ('SL', '3', 'Unknown', ''),  # noqa
-        '0029004e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0029004E': ('SL', '1', 'Unknown', ''),  # noqa
         '00290050': ('LO', '1', 'Unknown', ''),  # noqa
         '00290051': ('LO', '1', 'Unknown', ''),  # noqa
         '00290052': ('LO', '1', 'Unknown', ''),  # noqa
         '00290054': ('LO', '1', 'Unknown', ''),  # noqa
         '00290067': ('FD', '4', 'Unknown', ''),  # noqa
         '00290068': ('SS', '1', 'Unknown', ''),  # noqa
-        '0029006e': ('OB', '1', 'Unknown', ''),  # noqa
-        '700d0010': ('DS', '1', '2nd Flip Angle [degree]', ''),  # noqa
-        '700d0011': ('US', '2', 'Acquisition Inner Matrix', ''),  # noqa
-        '700d0012': ('US', '1', 'MP2RAGE Flag', ''),  # noqa
-        '700d0013': ('FL', '1', 'Inversion efficiency of inversion recovery pulse', ''),  # noqa
-        '700d0014': ('SL', '1', 'Number of dummy shot', ''),  # noqa
-        '700d0015': ('FL', '1', 'FFE total repetition time[s]', ''),  # noqa
-        '700d0016': ('LO', '3', 'PAS Name', ''),  # noqa
-        '700d0017': ('LT', '1', 'Intended Processing', ''),  # noqa
-        '700d0018': ('SS', '1-n', 'Scanned Orientation IDs', ''),  # noqa
-        '700d0019': ('OB', '1', 'PAS Reproduct Information', ''),  # noqa
-        '700d0080': ('US', '1', 'Unknown', ''),  # noqa
-        'e2010002': ('US', '1', 'Unknown', ''),  # noqa
-        'e3010000': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4010000': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010001': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010002': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010003': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010004': ('US', '1', 'Unknown', ''),  # noqa
-        'e4010005': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4010008': ('FL', '1', 'Unknown', ''),  # noqa
-        'e4010012': ('FL', '1', 'Unknown', ''),  # noqa
-        'e4010013': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4010020': ('SQ', '1', 'Unknown', ''),  # noqa
-        'e4010021': ('SQ', '1', 'Unknown', ''),  # noqa
-        'e4010022': ('LO', '1', 'Unknown', ''),  # noqa
-        'e4010023': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4010024': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4030000': ('SQ', '1', 'Unknown', ''),  # noqa
-        'ee010000': ('US', '1', 'Unknown', ''),  # noqa
-        'ee010001': ('OB', '1', 'Unknown', ''),  # noqa
-        'ee010002': ('US', '1', 'Unknown', ''),  # noqa
+        '0029006E': ('OB', '1', 'Unknown', ''),  # noqa
+        '700D0010': ('DS', '1', '2nd Flip Angle [degree]', ''),  # noqa
+        '700D0011': ('US', '2', 'Acquisition Inner Matrix', ''),  # noqa
+        '700D0012': ('US', '1', 'MP2RAGE Flag', ''),  # noqa
+        '700D0013': ('FL', '1', 'Inversion efficiency of inversion recovery pulse', ''),  # noqa
+        '700D0014': ('SL', '1', 'Number of dummy shot', ''),  # noqa
+        '700D0015': ('FL', '1', 'FFE total repetition time[s]', ''),  # noqa
+        '700D0016': ('LO', '3', 'PAS Name', ''),  # noqa
+        '700D0017': ('LT', '1', 'Intended Processing', ''),  # noqa
+        '700D0018': ('SS', '1-n', 'Scanned Orientation IDs', ''),  # noqa
+        '700D0019': ('OB', '1', 'PAS Reproduct Information', ''),  # noqa
+        '700D0080': ('US', '1', 'Unknown', ''),  # noqa
+        'E2010002': ('US', '1', 'Unknown', ''),  # noqa
+        'E3010000': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4010000': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010001': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010002': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010003': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010004': ('US', '1', 'Unknown', ''),  # noqa
+        'E4010005': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4010007': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010008': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010012': ('FL', '1', 'Unknown', ''),  # noqa
+        'E4010013': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4010020': ('SQ', '1', 'Unknown', ''),  # noqa
+        'E4010021': ('SQ', '1', 'Unknown', ''),  # noqa
+        'E4010022': ('LO', '1', 'Unknown', ''),  # noqa
+        'E4010023': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4010024': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030000': ('SQ', '1', 'Unknown', ''),  # noqa
+        'EE010000': ('US', '1', 'Unknown', ''),  # noqa
+        'EE010001': ('OB', '1', 'Unknown', ''),  # noqa
+        'EE010002': ('US', '1', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_MR3^11': {
         '00190002': ('SL', '1', 'Unknown', ''),  # noqa
@@ -9785,20 +10868,20 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190004': ('SL', '1', 'Unknown', ''),  # noqa
         '00190008': ('SH', '1', 'Unknown', ''),  # noqa
         '00190009': ('SL', '2', 'Unknown', ''),  # noqa
-        '0019000a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000b': ('OB', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('OB', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('SL', '1', 'Unknown', ''),  # noqa
         '00190019': ('SQ', '1', 'Unknown', ''),  # noqa
         '00190024': ('SL', '1', 'Unknown', ''),  # noqa
         '00190025': ('SL', '1', 'Unknown', ''),  # noqa
         '00190026': ('SL', '1', 'Unknown', ''),  # noqa
         '00190028': ('SL', '1', 'Unknown', ''),  # noqa
         '00190029': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019002a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019002b': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019002c': ('SL', '3', 'Unknown', ''),  # noqa
-        '0019002d': ('SL', '3', 'Unknown', ''),  # noqa
-        '0019002e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002B': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002C': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002D': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002E': ('SL', '1', 'Unknown', ''),  # noqa
         '00190030': ('SL', '1', 'Unknown', ''),  # noqa
         '00190031': ('SL', '1', 'Unknown', ''),  # noqa
         '00190032': ('SL', '1', 'Unknown', ''),  # noqa
@@ -9808,10 +10891,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190037': ('SL', '1', 'Unknown', ''),  # noqa
         '00190038': ('SL', '1', 'Unknown', ''),  # noqa
         '00190039': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019003a': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019003c': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019003e': ('FL', '9', 'Unknown', ''),  # noqa
-        '0019003f': ('UI', '1', 'Unknown', ''),  # noqa
+        '0019003A': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019003C': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019003E': ('FL', '9', 'Unknown', ''),  # noqa
+        '0019003F': ('UI', '1', 'Unknown', ''),  # noqa
         '00190040': ('US', '1', 'Unknown', ''),  # noqa
         '00190041': ('US', '1', 'Unknown', ''),  # noqa
         '00190042': ('SL', '1', 'Unknown', ''),  # noqa
@@ -9820,94 +10903,102 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190046': ('FL', '1', 'Unknown', ''),  # noqa
         '00190048': ('LT', '1', 'Unknown', ''),  # noqa
         '00190049': ('LT', '1', 'Unknown', ''),  # noqa
-        '0019004c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019004e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004E': ('SL', '1', 'Unknown', ''),  # noqa
         '00190055': ('LO', '1', 'Unknown', ''),  # noqa
         '00190057': ('FL', '1', 'Unknown', ''),  # noqa
         '00190058': ('US', '1', 'Unknown', ''),  # noqa
         '00190059': ('US', '1', 'Unknown', ''),  # noqa
-        '0019005c': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019005f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019005C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005F': ('FL', '1', 'Unknown', ''),  # noqa
         '00190060': ('SL', '1', 'Unknown', ''),  # noqa
         '00190061': ('FL', '1', 'Unknown', ''),  # noqa
         '00190062': ('FL', '1', 'Unknown', ''),  # noqa
         '00190063': ('SL', '1', 'Unknown', ''),  # noqa
         '00190067': ('FL', '1', 'Unknown', ''),  # noqa
         '00190068': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019006c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019006d': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019006e': ('SH', '1', 'Unknown', ''),  # noqa
-        '0019006f': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006D': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006E': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006F': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190070': ('FL', '1', 'Unknown', ''),  # noqa
         '00190071': ('SL', '1', 'Unknown', ''),  # noqa
         '00190072': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190073': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190077': ('FL', '1', 'Unknown', ''),  # noqa
         '00190078': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007a': ('SL', '2', 'Unknown', ''),  # noqa
-        '0019007c': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019007d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019007f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007A': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019007C': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019007D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190080': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190083': ('FL', '1', 'Unknown', ''),  # noqa
         '00190084': ('SL', '1', 'Unknown', ''),  # noqa
         '00190087': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019008a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019008f': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008C': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008F': ('SL', '1', 'Unknown', ''),  # noqa
         '00190091': ('SL', '1', 'Unknown', ''),  # noqa
         '00190092': ('SL', '1', 'Unknown', ''),  # noqa
         '00190094': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019009a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019009b': ('US', '1', 'Unknown', ''),  # noqa
-        '0019009c': ('FL', '1', 'Unknown', ''),  # noqa
-        '0019009d': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019009e': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019009f': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900a5': ('US', '1', 'Unknown', ''),  # noqa
-        '001900a6': ('US', '1', 'Unknown', ''),  # noqa
-        '001900a8': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ad': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ae': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b0': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900b1': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b2': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b3': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b4': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900b6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900b7': ('US', '1', 'Unknown', ''),  # noqa
-        '001900b9': ('US', '1', 'Unknown', ''),  # noqa
-        '001900bb': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900bc': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900bd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900be': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900bf': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c0': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c1': ('US', '1', 'Unknown', ''),  # noqa
-        '001900c3': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900c4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900cd': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900e0': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900e1': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900e3': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900e4': ('DS', '1', 'Unknown', ''),  # noqa
-        '001900e5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900e6': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900f0': ('SL', '4', 'Unknown', ''),  # noqa
-        '001900f1': ('SL', '3', 'Unknown', ''),  # noqa
-        '001900f2': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900f3': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f5': ('SQ', '1', 'Unknown', ''),  # noqa
-        '001900f6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f7': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f8': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900f9': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fa': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fb': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fc': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900fd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900ff': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009C': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019009D': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009E': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009F': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900A5': ('US', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('US', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AB': ('US', '1', 'Unknown', ''),  # noqa
+        '001900AD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900AE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900B1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B3': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900B6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900B7': ('US', '1', 'Unknown', ''),  # noqa
+        '001900B9': ('US', '1', 'Unknown', ''),  # noqa
+        '001900BB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BC': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900BE': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900BF': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C1': ('US', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900C4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900E0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900E3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900E4': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900E5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900E6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('SL', '4', 'Unknown', ''),  # noqa
+        '001900F1': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900F2': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900F3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900F6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F7': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900F9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FB': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FF': ('SL', '1', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_MR3^12': {
         '00190000': ('SL', '1', 'Unknown', ''),  # noqa
@@ -9920,11 +11011,11 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190007': ('UL', '1-n', 'Unknown', ''),  # noqa
         '00190008': ('UL', '1-n', 'Unknown', ''),  # noqa
         '00190009': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000a': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000b': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('UL', '1', 'Unknown', ''),  # noqa
-        '0019000d': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0019000e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000B': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019000D': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019000E': ('US', '1', 'Unknown', ''),  # noqa
         '00190010': ('SL', '1', 'Unknown', ''),  # noqa
         '00190011': ('SL', '1', 'Unknown', ''),  # noqa
         '00190012': ('SL', '1', 'Unknown', ''),  # noqa
@@ -9932,8 +11023,8 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190014': ('FL', '1', 'Unknown', ''),  # noqa
         '00190018': ('UL', '1', 'Unknown', ''),  # noqa
         '00190028': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019002a': ('DS', '3', 'Unknown', ''),  # noqa
-        '0019002b': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019002A': ('DS', '3', 'Unknown', ''),  # noqa
+        '0019002B': ('SQ', '1', 'Unknown', ''),  # noqa
         '00190032': ('SH', '1', 'Unknown', ''),  # noqa
         '00190034': ('SL', '1', 'Unknown', ''),  # noqa
         '00190052': ('FL', '2', 'Unknown', ''),  # noqa
@@ -9945,67 +11036,70 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190087': ('SQ', '1', 'Unknown', ''),  # noqa
         '00190088': ('US', '1', 'Unknown', ''),  # noqa
         '00190089': ('SL', '1', 'Unknown', ''),  # noqa
-        '0019008a': ('US', '1', 'Unknown', ''),  # noqa
-        '0019008b': ('US', '1', 'Unknown', ''),  # noqa
-        '0019008f': ('OB', '1', 'Unknown', ''),  # noqa
+        '0019008A': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008F': ('OB', '1', 'Unknown', ''),  # noqa
         '00190093': ('SL', '1', 'Unknown', ''),  # noqa
         '00190094': ('UI', '1', 'Unknown', ''),  # noqa
         '00190095': ('UI', '1', 'Unknown', ''),  # noqa
         '00190098': ('FL', '3', 'Unknown', ''),  # noqa
         '00190099': ('LO', '1', 'Unknown', ''),  # noqa
-        '0019009a': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019009c': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019009d': ('US', '1', 'Unknown', ''),  # noqa
-        '0019009e': ('FL', '3', 'Unknown', ''),  # noqa
-        '0019009f': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a0': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a1': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a2': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a3': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a4': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a6': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '001900a7': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900a8': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900aa': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ab': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ac': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ad': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900ae': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900af': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900b3': ('FD', '1', 'Unknown', ''),  # noqa
-        '001900b4': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900c2': ('US', '1', 'Unknown', ''),  # noqa
-        '001900c3': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900c4': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c5': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c6': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900c7': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900cd': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900ce': ('UL', '1', 'Unknown', ''),  # noqa
-        '001900cf': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900d1': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900d2': ('US', '3', 'Unknown', ''),  # noqa
-        '001900d3': ('SS', '1', 'Unknown', ''),  # noqa
-        '001900d4': ('US', '2', 'Unknown', ''),  # noqa
-        '001900d5': ('FL', '1', 'Unknown', ''),  # noqa
-        '001900d6': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900d7': ('US', '2', 'Unknown', ''),  # noqa
-        '001900d8': ('FL', '1-n', 'Unknown', ''),  # noqa
-        '001900de': ('US', '1', 'Unknown', ''),  # noqa
-        '001900df': ('US', '1', 'Unknown', ''),  # noqa
-        '001900e0': ('US', '1', 'Unknown', ''),  # noqa
-        '001900e1': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900e2': ('FL', '3', 'Unknown', ''),  # noqa
-        '001900e3': ('TM', '1', 'Unknown', ''),  # noqa
-        '001900e4': ('US', '2', 'Unknown', ''),  # noqa
-        '001900eb': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ec': ('US', '1', 'Unknown', ''),  # noqa
-        '001900ef': ('DS', '1', 'Unknown', ''),  # noqa
-        '001900f0': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900f1': ('LO', '1', 'Unknown', ''),  # noqa
-        '001900fd': ('SL', '1', 'Unknown', ''),  # noqa
-        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009A': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009B': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019009C': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009D': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009E': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009F': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A4': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A6': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '001900A7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900A8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900AA': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AB': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AC': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AD': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AE': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900AF': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900B3': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900B4': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900C2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900C3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900C4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900C7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900CD': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900CE': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900CF': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900D1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900D2': ('US', '3', 'Unknown', ''),  # noqa
+        '001900D3': ('SS', '1', 'Unknown', ''),  # noqa
+        '001900D4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900D5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900D6': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900D7': ('US', '2', 'Unknown', ''),  # noqa
+        '001900D8': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '001900DE': ('US', '1', 'Unknown', ''),  # noqa
+        '001900DF': ('US', '1', 'Unknown', ''),  # noqa
+        '001900E0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900E1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900E2': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900E3': ('TM', '1', 'Unknown', ''),  # noqa
+        '001900E4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900EB': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EC': ('US', '1', 'Unknown', ''),  # noqa
+        '001900EF': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900F0': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900F1': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900FA': ('LT', '1', 'Unknown', ''),  # noqa
+        '001900FC': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900FD': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900FE': ('SL', '1', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_MR3^13': {
         '00190002': ('US', '1', 'Unknown', ''),  # noqa
@@ -10014,14 +11108,19 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '00190005': ('SL', '1', 'Unknown', ''),  # noqa
         '00190008': ('SL', '1', 'Unknown', ''),  # noqa
         '00190009': ('SQ', '1', 'Unknown', ''),  # noqa
-        '0019000a': ('FD', '3', 'Unknown', ''),  # noqa
-        '0019000b': ('FD', '1', 'Unknown', ''),  # noqa
-        '0019000c': ('FD', '1', 'Unknown', ''),  # noqa
-        '0019000f': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4030000': ('SH', '1', 'Unknown', ''),  # noqa
-        'e4030001': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4030002': ('OB', '1', 'Unknown', ''),  # noqa
-        'e4030003': ('OB', '1', 'Unknown', ''),  # noqa
+        '0019000A': ('FD', '3', 'Unknown', ''),  # noqa
+        '0019000B': ('FD', '1', 'Unknown', ''),  # noqa
+        '0019000C': ('FD', '1', 'Unknown', ''),  # noqa
+        '0019000F': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190014': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190019': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001B': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001F': ('US', '1', 'Unknown', ''),  # noqa
+        '00190022': ('SL', '1', 'Unknown', ''),  # noqa
+        'E4030000': ('SH', '1', 'Unknown', ''),  # noqa
+        'E4030001': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030002': ('OB', '1', 'Unknown', ''),  # noqa
+        'E4030003': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_OT3': {
         '0009xx00': ('LO', '1', 'HIS/RIS Study ID', ''),  # noqa
@@ -10034,12 +11133,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7019xx77': ('CS', '1', 'Station name and version of quality assurance station', ''),  # noqa
         '7019xx78': ('CS', '1', 'Flag of completion of quality assurance', ''),  # noqa
         '7019xx79': ('CS', '1', 'Status of quality assurance review', ''),  # noqa
-        '7019xx7a': ('UI', '1', 'Original SOP Instance UID', ''),  # noqa
-        '7019xx7b': ('UI', '1', 'Original Series Instance UID', ''),  # noqa
-        '7019xx7c': ('UI', '1', 'Original Study Instance UID', ''),  # noqa
-        '7019xx7d': ('US', '1', 'Rotation information for image display from original image', ''),  # noqa
-        '7019xx7e': ('SQ', '1', 'Sequence of LR mark', ''),  # noqa
-        '7019xx7f': ('US', '1', 'Rotation status at creation of LR mark', ''),  # noqa
+        '7019xx7A': ('UI', '1', 'Original SOP Instance UID', ''),  # noqa
+        '7019xx7B': ('UI', '1', 'Original Series Instance UID', ''),  # noqa
+        '7019xx7C': ('UI', '1', 'Original Study Instance UID', ''),  # noqa
+        '7019xx7D': ('US', '1', 'Rotation information for image display from original image', ''),  # noqa
+        '7019xx7E': ('SQ', '1', 'Sequence of LR mark', ''),  # noqa
+        '7019xx7F': ('US', '1', 'Rotation status at creation of LR mark', ''),  # noqa
         '7019xx80': ('OB_OW', '1', 'Original image data on area of original LR mark', ''),  # noqa
         '7019xx81': ('SS', '1', 'X start position of LR mark', ''),  # noqa
         '7019xx82': ('SS', '1', 'Y start position of LR mark', ''),  # noqa
@@ -10059,12 +11158,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7079xx27': ('US', '2', '', ''),  # noqa
         '7079xx28': ('US', '1', '', ''),  # noqa
         '7079xx29': ('US', '10', '', ''),  # noqa
-        '7079xx2a': ('US', '5', '', ''),  # noqa
-        '7079xx2b': ('UN', '1', '', ''),  # noqa
-        '7079xx2c': ('SH', '3', '', ''),  # noqa
-        '7079xx2d': ('SS', '2', '', ''),  # noqa
-        '7079xx2e': ('SH', '1', '', ''),  # noqa
-        '7079xx2f': ('SH', '1', '', ''),  # noqa
+        '7079xx2A': ('US', '5', '', ''),  # noqa
+        '7079xx2B': ('UN', '1', '', ''),  # noqa
+        '7079xx2C': ('SH', '3', '', ''),  # noqa
+        '7079xx2D': ('SS', '2', '', ''),  # noqa
+        '7079xx2E': ('SH', '1', '', ''),  # noqa
+        '7079xx2F': ('SH', '1', '', ''),  # noqa
         '7079xx30': ('US', '1', '', ''),  # noqa
         '7079xx31': ('US', '1-n', '', ''),  # noqa
         '7079xx32': ('SH', '2', '', ''),  # noqa
@@ -10075,12 +11174,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7079xx37': ('US', '4', '', ''),  # noqa
         '7079xx38': ('SS', '1-n', '', ''),  # noqa
         '7079xx39': ('SS', '1-n', '', ''),  # noqa
-        '7079xx3a': ('US', '2', '', ''),  # noqa
-        '7079xx3b': ('SH', '1', '', ''),  # noqa
-        '7079xx3c': ('DS', '2', '', ''),  # noqa
-        '7079xx3d': ('SS', '2', '', ''),  # noqa
-        '7079xx3e': ('SH', '1', '', ''),  # noqa
-        '7079xx3f': ('US', '2', '', ''),  # noqa
+        '7079xx3A': ('US', '2', '', ''),  # noqa
+        '7079xx3B': ('SH', '1', '', ''),  # noqa
+        '7079xx3C': ('DS', '2', '', ''),  # noqa
+        '7079xx3D': ('SS', '2', '', ''),  # noqa
+        '7079xx3E': ('SH', '1', '', ''),  # noqa
+        '7079xx3F': ('US', '2', '', ''),  # noqa
         '7079xx40': ('SH', '2', '', ''),  # noqa
         '7079xx41': ('SS', '2', '', ''),  # noqa
         '7079xx42': ('SH', '1', '', ''),  # noqa
@@ -10091,12 +11190,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7079xx47': ('SS', '18', '', ''),  # noqa
         '7079xx48': ('US', '12', '', ''),  # noqa
         '7079xx49': ('US', '3', '', ''),  # noqa
-        '7079xx4a': ('US', '1', '', ''),  # noqa
-        '7079xx4b': ('LO', '3', '', ''),  # noqa
-        '7079xx4c': ('OB', '1', '', ''),  # noqa
-        '7079xx4d': ('LO', '3', '', ''),  # noqa
-        '7079xx4e': ('SL', '35', '', ''),  # noqa
-        '7079xx4f': ('SH', '3', '', ''),  # noqa
+        '7079xx4A': ('US', '1', '', ''),  # noqa
+        '7079xx4B': ('LO', '3', '', ''),  # noqa
+        '7079xx4C': ('OB', '1', '', ''),  # noqa
+        '7079xx4D': ('LO', '3', '', ''),  # noqa
+        '7079xx4E': ('SL', '35', '', ''),  # noqa
+        '7079xx4F': ('SH', '3', '', ''),  # noqa
         '7079xx50': ('US', '1-n', '', ''),  # noqa
         '7079xx51': ('US', '1-n', '', ''),  # noqa
         '7079xx52': ('US', '1', '', ''),  # noqa
@@ -10107,12 +11206,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7079xx57': ('US', '1-n', '', ''),  # noqa
         '7079xx58': ('US', '1', '', ''),  # noqa
         '7079xx59': ('US', '2-2n', '', ''),  # noqa
-        '7079xx5a': ('US', '1', '', ''),  # noqa
-        '7079xx5b': ('US', '2', '', ''),  # noqa
-        '7079xx5c': ('US', '2-2n', '', ''),  # noqa
-        '7079xx5d': ('SH', '1', '', ''),  # noqa
-        '7079xx5e': ('US', '2', '', ''),  # noqa
-        '7079xx5f': ('SS', '4-4n', '', ''),  # noqa
+        '7079xx5A': ('US', '1', '', ''),  # noqa
+        '7079xx5B': ('US', '2', '', ''),  # noqa
+        '7079xx5C': ('US', '2-2n', '', ''),  # noqa
+        '7079xx5D': ('SH', '1', '', ''),  # noqa
+        '7079xx5E': ('US', '2', '', ''),  # noqa
+        '7079xx5F': ('SS', '4-4n', '', ''),  # noqa
         '7079xx60': ('US', '1-n', '', ''),  # noqa
         '7079xx61': ('SS', '30-30n', '', ''),  # noqa
         '7079xx62': ('US', '4', '', ''),  # noqa
@@ -10123,12 +11222,12 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7079xx67': ('US', '1-n', '', ''),  # noqa
         '7079xx68': ('US', '1-n', '', ''),  # noqa
         '7079xx69': ('US', '1-n', '', ''),  # noqa
-        '7079xx6a': ('US', '1-n', '', ''),  # noqa
-        '7079xx6b': ('US', '1-n', '', ''),  # noqa
-        '7079xx6c': ('US', '1', '', ''),  # noqa
-        '7079xx6d': ('DS', '1', '', ''),  # noqa
-        '7079xx6e': ('LO', '1', '', ''),  # noqa
-        '7079xx6f': ('DS', '1', '', ''),  # noqa
+        '7079xx6A': ('US', '1-n', '', ''),  # noqa
+        '7079xx6B': ('US', '1-n', '', ''),  # noqa
+        '7079xx6C': ('US', '1', '', ''),  # noqa
+        '7079xx6D': ('DS', '1', '', ''),  # noqa
+        '7079xx6E': ('LO', '1', '', ''),  # noqa
+        '7079xx6F': ('DS', '1', '', ''),  # noqa
         '7079xx70': ('DS', '1', '', ''),  # noqa
         '7079xx71': ('DS', '1-n', '', ''),  # noqa
         '7079xx72': ('DS', '1-n', '', ''),  # noqa
@@ -10139,7 +11238,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '7079xx77': ('SL', '1', '', ''),  # noqa
         '7079xx78': ('US', '1', '', ''),  # noqa
         '7079xx79': ('US', '1', '', ''),  # noqa
-        '7079xx7b': ('SH', '1', 'Unknown', ''),  # noqa
+        '7079xx7B': ('SH', '1', 'Unknown', ''),  # noqa
         '7079xx80': ('LO', '1', '', ''),  # noqa
         '7079xx81': ('SS', '1-n', '', ''),  # noqa
         '7079xx82': ('SS', '1-n', '', ''),  # noqa
@@ -10147,6 +11246,10 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
     'TOSHIBA_SR': {
         '7015xx10': ('OB', '1', 'Unknown', ''),  # noqa
         '7015xx60': ('OB', '1', 'Unknown', ''),  # noqa
+    },
+    'Thinking Systems Private Creator': {
+        '7FDD0042': ('UN', '1', 'Unknown', ''),  # noqa
+        '7FDD0097': ('UN', '1', 'Unknown', ''),  # noqa
     },
     'V1': {
         '0011xx01': ('OB', '1', 'User Data', ''),  # noqa
@@ -10241,21 +11344,21 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0019xx07': ('SQ', '1', 'Image Data Type Sequence', ''),  # noqa
         '0019xx08': ('CS', '1', 'Data Type', ''),  # noqa
         '0019xx09': ('SQ', '1', 'Transducer Scan Geometry Code Sequence', ''),  # noqa
-        '0019xx0b': ('CS', '1', 'Aliased Data Type', ''),  # noqa
-        '0019xx0c': ('CS', '1', 'Position Measuring Device Used', ''),  # noqa
-        '0019xx0d': ('SQ', '1', 'Transducer Scanning Configuration Code Sequence', ''),  # noqa
-        '0019xx0e': ('SQ', '1', 'Transducer Beam Steering Code Sequence', ''),  # noqa
-        '0019xx0f': ('SQ', '1', 'Transducer Access Code Sequence', ''),  # noqa
+        '0019xx0B': ('CS', '1', 'Aliased Data Type', ''),  # noqa
+        '0019xx0C': ('CS', '1', 'Position Measuring Device Used', ''),  # noqa
+        '0019xx0D': ('SQ', '1', 'Transducer Scanning Configuration Code Sequence', ''),  # noqa
+        '0019xx0E': ('SQ', '1', 'Transducer Beam Steering Code Sequence', ''),  # noqa
+        '0019xx0F': ('SQ', '1', 'Transducer Access Code Sequence', ''),  # noqa
         '0021xx01': ('FD', '1', 'Image Position (Volume)', ''),  # noqa
         '0021xx02': ('FD', '1', 'Image Orientation (Volume)', ''),  # noqa
         '0021xx07': ('CS', '1', 'Ultrasound Acquisition Geometry', ''),  # noqa
         '0021xx08': ('FD', '1', 'Apex Position', ''),  # noqa
         '0021xx09': ('FD', '1', 'Volume to Transducer Mapping Matrix', ''),  # noqa
-        '0021xx0a': ('FD', '1', 'Volume to Table Mapping Matrix', ''),  # noqa
-        '0021xx0c': ('CS', '1', 'Patient Frame of Reference Source', ''),  # noqa
-        '0021xx0d': ('FD', '1', 'Temporal Position Time Offset', ''),  # noqa
-        '0021xx0e': ('SQ', '1', 'Plane Position (Volume) Sequence', ''),  # noqa
-        '0021xx0f': ('SQ', '1', 'Plane Orientation (Volume) Sequence', ''),  # noqa
+        '0021xx0A': ('FD', '1', 'Volume to Table Mapping Matrix', ''),  # noqa
+        '0021xx0C': ('CS', '1', 'Patient Frame of Reference Source', ''),  # noqa
+        '0021xx0D': ('FD', '1', 'Temporal Position Time Offset', ''),  # noqa
+        '0021xx0E': ('SQ', '1', 'Plane Position (Volume) Sequence', ''),  # noqa
+        '0021xx0F': ('SQ', '1', 'Plane Orientation (Volume) Sequence', ''),  # noqa
         '0021xx10': ('SQ', '1', 'Temporal Position Sequence', ''),  # noqa
         '0021xx11': ('CS', '1', 'Dimension Organization Type', ''),  # noqa
         '0029xx01': ('SQ', '1', 'Data Frame Assignment Sequence', ''),  # noqa
@@ -10266,13 +11369,22 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0029xx06': ('FD', '1', 'Opacity Constant', ''),  # noqa
         '0029xx07': ('US', '1', 'Opacity Lookup Table Descriptor', ''),  # noqa
         '0029xx08': ('OW', '1', 'Opacity Lookup Table Data', ''),  # noqa
-        '0029xx0b': ('SQ', '1', 'Enhanced Palette Color Lookup Table Sequence', ''),  # noqa
-        '0029xx0c': ('SQ', '1', 'Opacity 2 LUT Sequence', ''),  # noqa
-        '0029xx0d': ('CS', '1', 'Opacity 2 LUT Transfer Function', ''),  # noqa
-        '0029xx0e': ('CS', '1', 'Data Path ID', ''),  # noqa
-        '0029xx0f': ('CS', '1', 'RGB LUT Transfer Function', ''),  # noqa
+        '0029xx0B': ('SQ', '1', 'Enhanced Palette Color Lookup Table Sequence', ''),  # noqa
+        '0029xx0C': ('SQ', '1', 'Opacity 2 LUT Sequence', ''),  # noqa
+        '0029xx0D': ('CS', '1', 'Opacity 2 LUT Transfer Function', ''),  # noqa
+        '0029xx0E': ('CS', '1', 'Data Path ID', ''),  # noqa
+        '0029xx0F': ('CS', '1', 'RGB LUT Transfer Function', ''),  # noqa
         '0029xx10': ('CS', '1', 'Alpha LUT Transfer Function', ''),  # noqa
         '0041xx01': ('CS', '1', 'Performed Protocol Type', ''),  # noqa
+    },
+    'agfa/originalStudyUID': {
+        '7FDD0013': ('UN', '1', 'Unknown', ''),  # noqa
+    },
+    'agfa/seriesHeader': {
+        '7FDB0012': ('UN', '1', 'Unknown', ''),  # noqa
+        '7FDB0053': ('UN', '1', 'Unknown', ''),  # noqa
+        '7FDB0054': ('UN', '1', 'Unknown', ''),  # noqa
+        '7FDB0055': ('UN', '1', 'Unknown', ''),  # noqa
     },
     'http://www.gemedicalsystems.com/it_solutions/bamwallthickness/1.0': {
         '3119xx10': ('DT', '1', 'BAM WallThickness Session Date/Time', ''),  # noqa
@@ -10296,6 +11408,6 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '3115xx03': ('CS', '1', 'Pacs examnotes flag', ''),  # noqa
     },
     'syngoDynamics': {
-        '0021xxae': ('OB', '1', 'Unknown', ''),  # noqa
+        '0021xxAE': ('OB', '1', 'Unknown', ''),  # noqa
     },
 }
