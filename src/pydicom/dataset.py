@@ -1972,7 +1972,7 @@ class Dataset:
         return wave_handler.multiplex_array(self, index, as_raw=False)
 
     # Format strings spec'd according to python string formatting options
-    #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
+    #    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting # noqa
     default_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
     default_sequence_element_format = (
         "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"  # noqa
@@ -2742,7 +2742,7 @@ class FileDataset(Dataset):
             self.fileobj_type = open
         else:
             # use __class__ python <2.7?;
-            # http://docs.python.org/reference/datamodel.html
+            # https://docs.python.org/3/reference/datamodel.html
             self.fileobj_type = filename_or_obj.__class__
             if hasattr(filename_or_obj, "name"):
                 filename = filename_or_obj.name

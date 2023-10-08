@@ -201,10 +201,11 @@ following rules before submitting:
          "\npydicom", pydicom.__version__)
    ```
 
--  please include a [reproducible](http://stackoverflow.com/help/mcve) code
-   snippet or link to a [gist](https://gist.github.com). If an exception is
-   raised, please provide the traceback. (use `%xmode` in ipython to use the
-   non beautified version of the trackeback)
+-  please include a
+   [reproducible](https://stackoverflow.com/help/minimal-reproducible-example)
+   code snippet or link to a [gist](https://gist.github.com). If an
+   exception is raised, please provide the traceback. (use `%xmode`
+   in ipython to use the non beautified version of the trackeback)
 
 
 Documentation
@@ -224,9 +225,9 @@ be placed in ``_build/html/`` and are viewable in a web browser. See the
 
 For building the documentation, you will need
 [sphinx](https://www.sphinx-doc.org/),
-[numpy](http://numpy.org/),
-[matplotlib](http://matplotlib.org/), and
-[pillow](http://pillow.readthedocs.io/en/latest/).
+[numpy](https://numpy.org/),
+[matplotlib](https://matplotlib.org/), and
+[pillow](https://python-pillow.org/).
 
 When you are writing documentation that references DICOM, it is often
 helpful to reference the related part of the

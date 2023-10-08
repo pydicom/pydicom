@@ -18,15 +18,15 @@ is encoded in.
 
 The following packages can be used with *pydicom*:
 
-* `GDCM <http://gdcm.sourceforge.net/>`_ - this is the package that supports
-  most compressed formats
-* `Pillow <http://pillow.readthedocs.io/en/latest/>`_, ideally with
+* `GDCM <https://sourceforge.net/projects/gdcm/>`_ - this is the package
+  that supports most compressed formats
+* `Pillow <https://python-pillow.org/>`_, ideally with
   ``jpeg`` and ``jpeg2000`` plugins
 * `jpeg_ls <https://github.com/pydicom/pyjpegls>`_
 * :gh:`pylibjpeg <pylibjpeg>`, with the ``-libjpeg``, ``-openjpeg`` and
   ``-rle`` plugins
 
-Note that you always need the `NumPy <http://numpy.org/>`_ package to be able
+Note that you always need the `NumPy <https://numpy.org/>`_ package to be able
 to handle pixel data.
 
 .. caution:: We rely on the data handling capacity of the mentioned

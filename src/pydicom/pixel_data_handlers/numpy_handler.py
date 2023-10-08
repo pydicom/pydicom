@@ -73,7 +73,7 @@ if TYPE_CHECKING:  # pragma: no cover
 HANDLER_NAME = "Numpy"
 
 DEPENDENCIES = {
-    "numpy": ("http://www.numpy.org/", "NumPy"),
+    "numpy": ("https://numpy.org/", "NumPy"),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [

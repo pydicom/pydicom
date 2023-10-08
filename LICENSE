@@ -26,9 +26,8 @@ Portions of pydicom (private dictionary file(s)) were generated from the
 private dictionary of the GDCM library, released under the following license:
 
   Program: GDCM (Grassroots DICOM). A DICOM library
-  Module:  http://gdcm.sourceforge.net/Copyright.html
 
-Copyright (c) 2006-2010 Mathieu Malaterre
+Copyright (c) 2006-2016 Mathieu Malaterre
 Copyright (c) 1993-2005 CREATIS
 (CREATIS = Centre de Recherche et d'Applications en Traitement de l'Image)
 All rights reserved.

@@ -95,8 +95,8 @@ Installing Pillow
 that can handle the decompression of some JPEG and JPEG 2000 images.
 
 Using pip; you may need to make sure that the
-`libjpeg <http://libjpeg.sourceforge.net/>`_ (for JPEG) and
-`openjpeg <http://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
+`libjpeg <https://libjpeg.sourceforge.net/>`_ (for JPEG) and
+`openjpeg <https://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
 beforehand::
 
   pip install pillow
@@ -130,8 +130,8 @@ Through conda::
 Installing GDCM
 ---------------
 
-`GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
-DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
+`GDCM <https://sourceforge.net/projects/gdcm/>`_ is a C++ library for working
+with DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
 The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`__ are built by the
 `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current

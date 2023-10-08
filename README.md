@@ -11,7 +11,7 @@
 *pydicom* is a pure Python package for working with [DICOM](https://www.dicomstandard.org/) files.
 It lets you read, modify and write DICOM data in an easy "pythonic" way. As a pure Python package,
 *pydicom* can run anywhere Python runs without any other requirements, although if you're working 
-with *Pixel Data* then we recommend you also install [NumPy](http://www.numpy.org).
+with *Pixel Data* then we recommend you also install [NumPy](https://numpy.org).
 
 Note that *pydicom* is a general-purpose DICOM framework concerned with 
 reading and writing DICOM datasets. In order to keep the 
@@ -62,7 +62,7 @@ b'\xaf\x00'
 
 ```
 
-If [NumPy](http://www.numpy.org) is installed, *Pixel Data* can be converted to an [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) using the [Dataset.pixel_array](https://pydicom.github.io/pydicom/stable/reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array) property:
+If [NumPy](https://www.numpy.org) is installed, *Pixel Data* can be converted to an [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) using the [Dataset.pixel_array](https://pydicom.github.io/pydicom/stable/reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array) property:
 
 ```python
 >>> arr = ds.pixel_array
@@ -103,7 +103,7 @@ ds.save_as("/path/to/file_updated.dcm")
 
 **Display the Pixel Data**
 
-With [NumPy](http://www.numpy.org) and [matplotlib](https://matplotlib.org/)
+With [NumPy](https://numpy.org) and [matplotlib](https://matplotlib.org/)
 ```python
 import matplotlib.pyplot as plt
 from pydicom import dcmread

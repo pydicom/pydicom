@@ -40,7 +40,7 @@ all_cap_re = re.compile("([a-z0-9])([A-Z])")
 
 def camel_to_underscore(name: str) -> str:
     """Convert name from CamelCase to lower_case_with_underscores"""
-    # From http://stackoverflow.com/questions/1175208
+    # From https://stackoverflow.com/questions/1175208
     s1 = first_cap_re.sub(r"\1_\2", name)
     return all_cap_re.sub(r"\1_\2", s1).lower()
 

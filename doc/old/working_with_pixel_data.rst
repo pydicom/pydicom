@@ -61,7 +61,7 @@ an easy way to get it in a convenient form:
 .. warning::
 
     :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`
-    requires `NumPy <http://numpy.org/>`_.
+    requires `NumPy <https://numpy.org/>`_.
 
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` returns a
 :class:`numpy.ndarray` containing the pixel data::

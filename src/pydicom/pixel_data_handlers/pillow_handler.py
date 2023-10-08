@@ -57,7 +57,7 @@ PillowSupportedTransferSyntaxes = (
 
 HANDLER_NAME = "Pillow"
 DEPENDENCIES = {
-    "numpy": ("http://www.numpy.org/", "NumPy"),
+    "numpy": ("https://numpy.org/", "NumPy"),
     "PIL": ("https://python-pillow.org/", "Pillow"),
 }
 
