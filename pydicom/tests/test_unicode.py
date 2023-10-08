@@ -26,5 +26,5 @@ class TestUnicodeFilenames:
         except UnicodeEncodeError:
             self.fail("UnicodeEncodeError generated for unicode name")
         # ignore file doesn't exist error
-        except IOError:
+        except OSError:
             pass

@@ -1499,7 +1499,7 @@ class TestDeferredRead:
         """Deferred read raises error if file no longer exists."""
         ds = dcmread(self.testfile_name, defer_size=2000)
         os.remove(self.testfile_name)
-        with pytest.raises(IOError):
+        with pytest.raises(OSError):
             ds.PixelData
 
     def test_values_identical(self):

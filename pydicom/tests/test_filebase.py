@@ -226,15 +226,15 @@ class TestDicomFileLike:
                 pass
 
         fp = DicomFileLike(IntPlus)
-        with pytest.raises(IOError,
+        with pytest.raises(OSError,
                            match=r"This DicomFileLike object has no write\(\) "
                                  r"method"):
             fp.write(b'')
-        with pytest.raises(IOError,
+        with pytest.raises(OSError,
                            match=r"This DicomFileLike object has no read\(\) "
                                  r"method"):
             fp.parent_read(b'')
-        with pytest.raises(IOError,
+        with pytest.raises(OSError,
                            match=r"This DicomFileLike object has no seek\(\) "
                                  r"method"):
             fp.seek(0, 1)
