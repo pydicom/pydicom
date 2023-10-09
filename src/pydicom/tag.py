@@ -150,7 +150,7 @@ class BaseTag(int):
 
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
-    #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
+    #   https://docs.python.org/3/whatsnew/3.0.html#ordering-comparisons
     def __le__(self, other: Any) -> Any:
         """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
@@ -192,8 +192,7 @@ class BaseTag(int):
     # For python 3, any override of __cmp__ or __eq__
     # immutable requires explicit redirect of hash function
     # to the parent class
-    #   See http://docs.python.org/dev/3.0/reference/
-    #              datamodel.html#object.__hash__
+    #   See https://docs.python.org/3/reference/datamodel.html#object.__hash__
     __hash__ = int.__hash__
 
     def __str__(self) -> str:

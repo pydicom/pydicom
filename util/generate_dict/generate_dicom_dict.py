@@ -58,7 +58,7 @@ _PKG_DIRECTORY = Path(__file__).parent.parent.parent / "pydicom"
 PYDICOM_DICT_FILENAME = _PKG_DIRECTORY / "_dicom_dict.py"
 MAIN_DICT_NAME = "DicomDictionary: Dict[int, Tuple[str, str, str, str, str]]"
 MASK_DICT_NAME = "RepeatersDictionary: Dict[str, Tuple[str, str, str, str, str]]"
-BR = "{http://docbook.org/ns/docbook}"
+BR = "{https://docbook.org/ns/docbook}"
 
 
 def write_dict(fp, dict_name, attributes, tag_is_string):
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     root = tree.getroot()
 
     # Check the version is up to date
-    dcm_version = root.find("{http://docbook.org/ns/docbook}subtitle")
+    dcm_version = root.find("{https://docbook.org/ns/docbook}subtitle")
     dcm_version = dcm_version.text.split()[2]
     lib_version = getattr(_version, "__dicom_version__", None)
     if lib_version != dcm_version:

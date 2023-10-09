@@ -43,7 +43,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 HANDLER_NAME = "Numpy Waveform"
-DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
+DEPENDENCIES = {"numpy": ("https://numpy.org/", "NumPy")}
 WAVEFORM_DTYPES = {
     (8, "SB"): "int8",
     (8, "UB"): "uint8",

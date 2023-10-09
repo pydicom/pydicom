@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the `GDCM <http://gdcm.sourceforge.net/>`_ Python package to decode
-pixel transfer syntaxes.
+"""Use the `GDCM <https://sourceforge.net/projects/gdcm/>`_ Python package to
+decode pixel transfer syntaxes.
 """
 
 from copy import deepcopy
@@ -44,8 +44,8 @@ from pydicom.pixel_data_handlers.util import (
 HANDLER_NAME = "GDCM"
 
 DEPENDENCIES = {
-    "numpy": ("http://www.numpy.org/", "NumPy"),
-    "gdcm": ("http://gdcm.sourceforge.net/wiki/index.php/Main_Page", "GDCM"),
+    "numpy": ("https://numpy.org/", "NumPy"),
+    "gdcm": ("https://sourceforge.net/projects/gdcm/", "GDCM"),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [

@@ -21,7 +21,7 @@ Quick Start
    most directly.
 
 4. Questions and comments can be directed to the pydicom google group:
-   http://groups.google.com/group/pydicom
+   https://groups.google.com/g/pydicom
 
 5. Bugs and other issues can be reported in the issue tracker:
    https://www.github.com/pydicom/pydicom

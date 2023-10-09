@@ -46,7 +46,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 HANDLER_NAME = "Numpy Overlay"
-DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
+DEPENDENCIES = {"numpy": ("https://numpy.org/", "NumPy")}
 
 
 def is_available() -> bool:

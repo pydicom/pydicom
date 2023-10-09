@@ -227,7 +227,7 @@ def get_files(
 
         files.extend(fpaths)
 
-    # Search http://github.com/pydicom/pydicom-data or local cache
+    # Search https://github.com/pydicom/pydicom-data or local cache
     # To preserve backwards compatibility filter the downloaded files
     # as if they are stored within DATA_ROOT/test_files/*.dcm
     dummy_online_file_path_map = online_test_file_dummy_paths()

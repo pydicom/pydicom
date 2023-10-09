@@ -261,7 +261,7 @@ explicit_VR-UN.dcm
 
 == DICOMDIR tests ==
 
-dicomdirtests files were from http://www.pcir.org, freely available image sets.
+dicomdirtests files were from https://www.pcir.org, freely available image sets.
 They were downsized to 16x16 images to keep them very small so they
 could be added to the source distribution without bloating it. For the
 same reason, many were removed, leaving only samples of the studies,

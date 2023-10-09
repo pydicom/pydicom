@@ -58,7 +58,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 HANDLER_NAME = "RLE Lossless"
-DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
+DEPENDENCIES = {"numpy": ("https://numpy.org/", "NumPy")}
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 

@@ -96,7 +96,7 @@ intersphinx_mapping = {
     "python": (f"https://docs.python.org/{sys.version_info.major}", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "matplotlib": ("http://matplotlib.org", None),
+    "matplotlib": ("https://matplotlib.org", None),
 }
 
 sphinx_gallery_conf = {
@@ -310,7 +310,7 @@ def setup(app):
 
 # Example configuration for intersphinx: refer to
 # the Python standard library.
-# intersphinx_mapping = {'http://docs.python.org/': None}
+# intersphinx_mapping = {'https://docs.python.org/': None}
 
 
 # The following is used by sphinx.ext.linkcode to provide links to github

@@ -30,7 +30,7 @@ if TYPE_CHECKING:  # pragma: no cover
 HANDLER_NAME = "JPEG-LS"
 
 DEPENDENCIES = {
-    "numpy": ("http://www.numpy.org/", "NumPy"),
+    "numpy": ("https://numpy.org/", "NumPy"),
     "jpeg_ls": ("https://github.com/pydicom/pyjpegls", "pyjpegls"),
 }
 

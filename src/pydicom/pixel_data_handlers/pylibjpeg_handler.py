@@ -139,7 +139,7 @@ _OPENJPEG_SYNTAXES = [JPEG2000Lossless, JPEG2000]
 _RLE_SYNTAXES = [RLELossless]
 SUPPORTED_TRANSFER_SYNTAXES = _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES + _RLE_SYNTAXES
 
-DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
+DEPENDENCIES = {"numpy": ("https://numpy.org/", "NumPy")}
 
 
 def is_available() -> bool:

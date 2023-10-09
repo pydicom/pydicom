@@ -15,8 +15,8 @@ def retry(
 ) -> Callable[[Callable], Any]:
     """Retry calling the decorated function using an exponential backoff.
 
-    http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
-    original from: http://wiki.python.org/moin/PythonDecoratorLibrary#Retry
+    https://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
+    original from: https://wiki.python.org/moin/PythonDecoratorLibrary#Retry
 
     Parameters
     ----------

@@ -203,7 +203,7 @@ class UID(str):
 
 
 # Many thanks to the Medical Connections for offering free
-# valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
+# valid UIDs (https://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 PYDICOM_ROOT_UID = "1.2.826.0.1.3680043.8.498."
 """pydicom's root UID ``'1.2.826.0.1.3680043.8.498.'``"""
