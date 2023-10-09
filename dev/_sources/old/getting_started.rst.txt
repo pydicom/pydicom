@@ -11,7 +11,7 @@ Introduction
 ============
 
 *pydicom* is a pure Python package for working with `DICOM
-<http://en.wikipedia.org/wiki/DICOM>`_ files such as medical images, reports,
+<https://en.wikipedia.org/wiki/DICOM>`_ files such as medical images, reports,
 and radiotherapy objects.
 
 *pydicom* makes it easy to read these complex files into natural pythonic
@@ -75,7 +75,7 @@ Support
 =======
 
 Please join the `pydicom discussion group
-<http://groups.google.com/group/pydicom>`_ to ask questions or give feedback.
+<https://groups.google.com/group/pydicom>`_ to ask questions or give feedback.
 Bugs can be submitted through the :gh:`issue tracker <pydicom/issues>`.
 
 New versions, major bug fixes, etc. will also be announced through the group.

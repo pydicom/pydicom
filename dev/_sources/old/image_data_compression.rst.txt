@@ -78,10 +78,10 @@ Supported Transfer Syntaxes
 *Pixel Data* can be compressed natively using *pydicom* for the following
 transfer syntaxes:
 
-.. _np: http://numpy.org/
+.. _np: https://numpy.org/
 .. _pylj: https://github.com/pydicom/pylibjpeg
 .. _rle: https://github.com/pydicom/pylibjpeg-rle
-.. _gdcm: http://gdcm.sourceforge.net/
+.. _gdcm: https://sourceforge.net/projects/gdcm/
 
 +------------------------------------+------------------+-------------------------+
 | Transfer Syntax                    | Plugin names     | Dependencies            |

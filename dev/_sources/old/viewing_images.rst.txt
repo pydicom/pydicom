@@ -17,9 +17,8 @@ There are several options:
     programs available
   * use pydicom with `matplotlib <https://matplotlib.org/>`_
   * use pydicom with Python's stdlib `Tkinter <https://docs.python.org/3.4/library/tkinter.html>`_ module.
-  * use pydicom with the `Python Imaging Library (PIL)
-    <http://www.pythonware.com/products/pil/>`_
-  * use pydicom with `wxPython <http://www.wxpython.org/>`_
+  * use pydicom with `Pillow <https://python-pillow.org/>`_
+  * use pydicom with `wxPython <https://www.wxpython.org/>`_
 
 Using pydicom with matplotlib
 -----------------------------

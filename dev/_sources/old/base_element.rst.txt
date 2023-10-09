@@ -199,7 +199,7 @@ through the `PixelData` keyword::
 
 However its much more convenient to use
 :func:`Dataset.pixel_array<dataset.Dataset.pixel_array>` to return a
-:class:`numpy.ndarray` (requires the `NumPy library <http://numpy.org>`_)::
+:class:`numpy.ndarray` (requires the `NumPy library <https://numpy.org>`_)::
 
   >>> arr = ds.pixel_array
   >>> arr # doctest: +NORMALIZE_WHITESPACE

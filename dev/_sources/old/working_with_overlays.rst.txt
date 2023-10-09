@@ -41,7 +41,7 @@ it doesn't do anything with overlay data except read in the raw bytes::
 .. warning::
 
    :meth:`Dataset.overlay_array()<pydicom.dataset.Dataset.overlay_array>`
-   requires `NumPy <http://numpy.org/>`_.
+   requires `NumPy <https://numpy.org/>`_.
 
 The *Overlay Data* element contains the raw bytes exactly as found in the file
 as bit-packed data. To unpack and get an overlay in a more useful form you

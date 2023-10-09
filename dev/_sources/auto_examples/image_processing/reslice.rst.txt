@@ -38,7 +38,7 @@ location, building a 3D image and reslicing it in different planes.
    Uses numpy and matplotlib.
 
    Tested using series 2 from here
-   http://www.pcir.org/researchers/54879843_20060101.html
+   https://www.pcir.org/researchers/54879843_20060101.html
 
 .. GENERATED FROM PYTHON SOURCE LINES 24-85
 
