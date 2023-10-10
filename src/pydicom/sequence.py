@@ -126,34 +126,6 @@ class Sequence(MultiValue[Dataset]):
         if value != self._parent_dataset:
             self._parent_dataset = weakref.ref(value)
 
-    @property
-    def parent(self) -> "weakref.ReferenceType[Dataset] | None":
-        """Return a weak reference to the parent Dataset
-
-        .. deprecated:: 2.4
-        """
-        if config._use_future:
-            raise AttributeError("Future: Sequence.parent is removed in v3.x")
-        else:
-            warnings.warn(
-                "Sequence.parent will be removed in pydicom 3.0", DeprecationWarning
-            )
-            return self.parent_dataset
-
-    @parent.setter
-    def parent(self, value: "Dataset") -> None:
-        """Set the parent :class:`~pydicom.dataset.Dataset`
-
-        .. deprecated:: 2.4
-        """
-        if config._use_future:
-            raise AttributeError("Future: Sequence.parent is removed in v3.x")
-        else:
-            warnings.warn(
-                "Sequence.parent will be removed in pydicom 3.0", DeprecationWarning
-            )
-            self.parent_dataset = value  # type:ignore
-
     @overload  # type: ignore[override]
     def __setitem__(self, idx: int, val: Dataset) -> None:
         pass  # pragma: no cover

@@ -456,40 +456,6 @@ class Dataset:
         if value != self._parent_seq:
             self._parent_seq = weakref.ref(value)
 
-    @property
-    def parent(self) -> "weakref.ReferenceType[Dataset] | None":
-        """Return a weak reference to the parent Sequence's
-        parent Dataset.
-
-        .. deprecated:: 2.4
-        """
-        if config._use_future:
-            raise AttributeError("Future: Dataset.parent is removed in v3.x")
-        else:
-            warnings.warn(
-                "Dataset.parent will be removed in pydicom 3.0", DeprecationWarning
-            )
-
-            parent_ref = self.parent_seq
-            if parent_ref is None:
-                return None
-
-            return cast("Sequence", parent_ref()).parent_dataset
-
-    @parent.setter
-    def parent(self, value: "Dataset") -> None:
-        """Set the parent :class:`~pydicom.sequence.Sequence`
-
-        .. deprecated:: 2.4
-        """
-        if config._use_future:
-            raise AttributeError("Future: Dataset.parent is removed in v3.x")
-        else:
-            warnings.warn(
-                "Dataset.parent will be removed in pydicom 3.0", DeprecationWarning
-            )
-        self._parent = weakref.ref(value)
-
     def __deepcopy__(self, memo: dict[int, Any] | None) -> "Dataset":
         cls = self.__class__
         copied = cls.__new__(cls)
@@ -2232,19 +2198,9 @@ class Dataset:
 
     def _set_file_meta(self, value: Optional["Dataset"]) -> None:
         if value is not None and not isinstance(value, FileMetaDataset):
-            if config._use_future:
-                raise TypeError(
-                    "Pydicom Future: Dataset.file_meta must be an instance "
-                    "of FileMetaDataset"
-                )
+            raise TypeError("'Dataset.file_meta' must be a 'FileMetaDataset' instance")
 
-            FileMetaDataset.validate(value)
-            warnings.warn(
-                "Starting in pydicom 3.0, Dataset.file_meta must be a "
-                "FileMetaDataset class instance",
-                DeprecationWarning,
-            )
-
+        FileMetaDataset.validate(value)
         self.__dict__["file_meta"] = value
 
     def __setitem__(self, key: "slice | TagType", elem: _DatasetValue) -> None:
