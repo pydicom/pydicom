@@ -153,7 +153,7 @@ keyword (case insensitive).
    the dataset.
 
 You can also see all the names that *pydicom* knows about by viewing the
-:gh:`_dicom_dict.py<pydicom/blob/master/pydicom/_dicom_dict.py>` file. It
+:gh:`_dicom_dict.py<pydicom/blob/main/src/pydicom/_dicom_dict.py>` file. It
 should not normally be necessary, but you can add your own entries to the
 DICOM dictionary at run time using :func:`~datadict.add_dict_entry` or
 :func:`~datadict.add_dict_entries`. Similarly, you can add private data

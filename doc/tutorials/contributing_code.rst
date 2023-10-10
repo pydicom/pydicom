@@ -78,7 +78,7 @@ Create a new branch
 ===================
 Create a new branch ``new-uid`` for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
-it and won't affect the main copy (the ``master`` branch) of the code::
+it and won't affect the main copy (the ``main`` branch) of the code::
 
   $ git checkout -b new-uid
 
@@ -97,7 +97,7 @@ work as intended.
    find the following resources useful:
 
    * Take a look at the
-     :gh:`existing pydicom test suite <pydicom/tree/master/pydicom/tests>`
+     :gh:`existing pydicom test suite <pydicom/tree/main/tests>`
      and see how the tests are written. There are examples for writing
      :gh:`a single test <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137>`,
      :gh:`a group of related tests <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27>`,
@@ -119,7 +119,7 @@ work as intended.
 Let's say we wanted to add a new `pre-defined UID
 <https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids>`_
 to *pydicom* with a value of ``1.2.3.4.500``. We'd first add a new test at the
-bottom of :gh:`test_uid.py <pydicom/blob/master/pydicom/tests/test_uid.py>`::
+bottom of :gh:`test_uid.py <pydicom/blob/main/tests/test_uid.py>`::
 
   def test_new_uid():
       """Test uid.NewDefinedUID."""
@@ -147,7 +147,7 @@ file and that the test itself is written correctly.
 Make a code change and document it
 ==================================
 Next we'll make changes to the actual source code. Open
-:gh:`uid.py <pydicom/blob/master/pydicom/uid.py>` in a text editor and around
+:gh:`uid.py <pydicom/blob/main/src/pydicom/uid.py>` in a text editor and around
 :gh:`line 236 <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236>`
 make the following changes::
 
@@ -160,7 +160,7 @@ make the following changes::
 The line ``"""1.2.3.4.500"""`` is the `docstring
 <https://www.python.org/dev/peps/pep-0257/>`_ for our new UID. In order for
 it to be included in the API reference documentation we'll also need to update
-:gh:`uid.rst <pydicom/blob/master/doc/reference/uid.rst>`::
+:gh:`uid.rst <pydicom/blob/main/doc/reference/uid.rst>`::
 
   JPEG2000MultiComponentLossless
   JPEG2000MultiComponent
@@ -237,12 +237,12 @@ What happens next?
 One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
-``master`` branch where they would become part of *pydicom*.
+``main`` branch where they would become part of *pydicom*.
 
 However, because this is just an example, all we're going to do is clean up the
-changes we've made. First we switch back to the ``master`` branch::
+changes we've made. First we switch back to the ``main`` branch::
 
-  $ git checkout master
+  $ git checkout main
 
 We delete the local copy of the branch we created::
 
