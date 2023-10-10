@@ -56,6 +56,8 @@ Changes
 * The characters used by :func:`~pydicom.fileset.generate_filename` when
   `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
 * The ``Dataset.parent`` and ``Sequence.parent`` properties have been removed
+* :attr:`~pydicom.dataset.Dataset.file_meta` must now be set using a
+  :class:`~pydicom.dataset.FileMetaDataset` instance
 
 Enhancements
 ------------
