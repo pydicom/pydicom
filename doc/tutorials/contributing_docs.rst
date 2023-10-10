@@ -63,7 +63,7 @@ Create a new branch
 ===================
 Create a new branch ``doc-tut`` for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
-it and won't affect the main copy (the ``master`` branch) of
+it and won't affect the main copy (the ``main`` branch) of
 the documentation::
 
   git checkout -b doc-tut
@@ -237,12 +237,12 @@ What happens next?
 One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
-``master`` branch where they would become part of *pydicom*.
+``main`` branch where they would become part of *pydicom*.
 
 However, because this is just an example, all we're going to do is clean up the
-changes we've made. First we switch back to the ``master`` branch::
+changes we've made. First we switch back to the ``main`` branch::
 
-  git checkout master
+  git checkout main
 
 We delete the local copy of the branch we created::
 
