@@ -2196,11 +2196,13 @@ class Dataset:
             # XXX note if user misspells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
-    def _set_file_meta(self, value: Optional["FileMetaDataset"]) -> None:
+    def _set_file_meta(self, value: Optional["Dataset"]) -> None:
         if value is not None and not isinstance(value, FileMetaDataset):
             raise TypeError("'Dataset.file_meta' must be a 'FileMetaDataset' instance")
 
-        FileMetaDataset.validate(value)
+        if value is not None:
+            FileMetaDataset.validate(value)
+
         self.__dict__["file_meta"] = value
 
     def __setitem__(self, key: "slice | TagType", elem: _DatasetValue) -> None:
