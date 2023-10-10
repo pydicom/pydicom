@@ -55,7 +55,7 @@ DICOM file the same way as initially uncompressed data.
 License
 =======
 
-*pydicom* has an MIT-based :gh:`license <pydicom/blob/master/LICENSE>`.
+*pydicom* has an MIT-based :gh:`license <pydicom/blob/main/LICENSE>`.
 
 Installing
 ==========
@@ -67,7 +67,7 @@ Using pydicom
 
 Once installed, the package can be imported at a Python command line or used
 in your own Python program with ``import pydicom``.
-See the :gh:`examples directory <pydicom/tree/master/examples>`
+See the :gh:`examples directory <pydicom/tree/main/examples>`
 for both kinds of uses. Also see the :doc:`User Guide <pydicom_user_guide>`
 for more details of how to use the package.
 

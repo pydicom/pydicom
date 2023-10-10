@@ -96,7 +96,7 @@ An encoding plugin must implement three objects within the same module:
   required by the plugin.
 
 An example of the requirements of a plugin is available :gh:`here
-<pydicom/tree/master/pydicom/encoders/pylibjpeg.py>`.
+<pydicom/blob/main/src/pydicom/encoders/pylibjpeg.py>`.
 
 Adding Plugins to an Encoder
 ============================

@@ -200,7 +200,7 @@ relevant issues or create a new one if there are none.</p>
 <h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Link to this heading">¶</a></h2>
 <p>Create a new branch <code class="docutils literal notranslate"><span class="pre">new-uid</span></code> for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
-it and won’t affect the main copy (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) of the code:</p>
+it and won’t affect the main copy (the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch) of the code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b new-uid
 </pre></div>
 </div>
@@ -218,7 +218,7 @@ especially if you’re also learning how to use pytest from scratch. You may
 find the following resources useful:</p>
 <ul class="simple">
 <li><p>Take a look at the
-<a class="reference external" href="https://github.com/pydicom/pydicom/tree/master/pydicom/tests">existing pydicom test suite</a>
+<a class="reference external" href="https://github.com/pydicom/pydicom/tree/main/tests">existing pydicom test suite</a>
 and see how the tests are written. There are examples for writing
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137">a single test</a>,
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27">a group of related tests</a>,
@@ -238,7 +238,7 @@ asking for help.</p>
 </div>
 <p>Let’s say we wanted to add a new <a class="reference external" href="https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids">pre-defined UID</a>
 to <em>pydicom</em> with a value of <code class="docutils literal notranslate"><span class="pre">1.2.3.4.500</span></code>. We’d first add a new test at the
-bottom of <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/tests/test_uid.py">test_uid.py</a>:</p>
+bottom of <a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/tests/test_uid.py">test_uid.py</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_new_uid</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test uid.NewDefinedUID.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">NewDefinedUID</span>
@@ -264,7 +264,7 @@ file and that the test itself is written correctly.</p>
 <section id="make-a-code-change-and-document-it">
 <h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Link to this heading">¶</a></h2>
 <p>Next we’ll make changes to the actual source code. Open
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py">uid.py</a> in a text editor and around
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/uid.py">uid.py</a> in a text editor and around
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236">line 236</a>
 make the following changes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RLELossless</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.5&#39;</span><span class="p">)</span>
@@ -276,7 +276,7 @@ make the following changes:</p>
 </div>
 <p>The line <code class="docutils literal notranslate"><span class="pre">&quot;&quot;&quot;1.2.3.4.500&quot;&quot;&quot;</span></code> is the <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">docstring</a> for our new UID. In order for
 it to be included in the API reference documentation we’ll also need to update
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/doc/reference/uid.rst">uid.rst</a>:</p>
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/doc/reference/uid.rst">uid.rst</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JPEG2000MultiComponentLossless</span>
 <span class="n">JPEG2000MultiComponent</span>
 <span class="n">RLELossless</span>
@@ -348,10 +348,10 @@ for a review or help at any point after creating the PR.</p>
 <p>One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
-<code class="docutils literal notranslate"><span class="pre">master</span></code> branch where they would become part of <em>pydicom</em>.</p>
+<code class="docutils literal notranslate"><span class="pre">main</span></code> branch where they would become part of <em>pydicom</em>.</p>
 <p>However, because this is just an example, all we’re going to do is clean up the
-changes we’ve made. First we switch back to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout master
+changes we’ve made. First we switch back to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout main
 </pre></div>
 </div>
 <p>We delete the local copy of the branch we created:</p>

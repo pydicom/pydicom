@@ -18,7 +18,7 @@ Getting our example dataset
 
 In the tutorial we're going to be using a DICOM dataset included with
 *pydicom*: :gh:`CT_small.dcm
-<pydicom/blob/master/pydicom/data/test_files/CT_small.dcm>`.
+<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
 Starting with version 1.4 you can get the path to the file
 by using the :func:`~pydicom.data.get_testdata_file` function to return the
 path as a :class:`str` (your path may vary)::
