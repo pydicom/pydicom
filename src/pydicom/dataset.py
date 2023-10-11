@@ -2196,12 +2196,12 @@ class Dataset:
             # XXX note if user misspells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
-    def _set_file_meta(self, value: Optional["Dataset"]) -> None:
-        if value is not None and not isinstance(value, FileMetaDataset):
+    def _set_file_meta(self, value: Optional["FileMetaDataset"]) -> None:
+        if value is not None and not isinstance(value, Dataset):
             raise TypeError("'Dataset.file_meta' must be a 'FileMetaDataset' instance")
 
-        if value is not None:
-            FileMetaDataset.validate(value)
+        if isinstance(value, Dataset):
+            value = FileMetaDataset(value)
 
         self.__dict__["file_meta"] = value
 
@@ -2905,10 +2905,12 @@ class FileMetaDataset(Dataset):
                 f"Argument must be a dict or Dataset, not {type(init_value)}"
             )
 
-        non_group2 = [Tag(tag) for tag in init_value.keys() if Tag(tag).group != 2]
+        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]
         if non_group2:
-            msg = "Attempted to set non-group 2 elements: {}"
-            raise ValueError(msg.format(non_group2))
+            raise ValueError(
+                "File meta datasets may only contain group 2 elements but the "
+                f"following elements are present: {', '.join(non_group2)}"
+            )
 
     def __setitem__(self, key: "slice | TagType", value: _DatasetValue) -> None:
         """Override parent class to only allow setting of group 2 elements.

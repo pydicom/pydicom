@@ -2047,7 +2047,7 @@ class TestFileMeta:
         ds = Dataset()
         msg = "'Dataset.file_meta' must be a 'FileMetaDataset' instance"
         with pytest.raises(TypeError, match=msg):
-            ds.file_meta = Dataset()  # not FileMetaDataset
+            ds.file_meta = list()  # not FileMetaDataset
 
     def test_assign_file_meta(self):
         """Test can only set group 2 elements in File Meta"""
@@ -2068,6 +2068,26 @@ class TestFileMeta:
         # Error on assigning file meta if any non-group 2
         with pytest.raises(ValueError):
             ds_meta.PatientName = "x"
+
+    def test_file_meta_conversion(self):
+        """Test conversion to FileMetaDataset from Dataset."""
+        ds = Dataset()
+        meta = Dataset()
+        meta.TransferSyntaxUID = "1.2"
+        ds.file_meta = meta
+        assert isinstance(ds.file_meta, FileMetaDataset)
+        assert ds.file_meta.TransferSyntaxUID == "1.2"
+
+        ds.file_meta = None
+        meta.PatientID = "12345678"
+        msg = (
+            r"File meta datasets may only contain group 2 elements but the "
+            r"following elements are present: \(0010,0020\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.file_meta = meta
+
+        assert ds.file_meta is None
 
     def test_init_file_meta(self):
         """Check instantiation of FileMetaDataset"""
