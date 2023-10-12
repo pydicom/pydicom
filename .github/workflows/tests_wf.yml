@@ -25,11 +25,12 @@ jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
     steps:
+    - name: Install BLAS on ubuntu
+      if: startsWith(inputs.os, 'ubuntu')
+      run: sudo apt install -y libopenblas-dev
     - name: Set env variables for ubuntu and install BLAS
       if: inputs.upload-coverage && startsWith(inputs.os, 'ubuntu')
-      run: |
-        echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
-        sudo apt install
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
     - name: Set env variables for windows
       if: inputs.upload-coverage && startsWith(inputs.os, 'windows')
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$env:GITHUB_ENV"
