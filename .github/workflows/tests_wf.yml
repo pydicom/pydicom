@@ -25,8 +25,8 @@ jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
     steps:
-    - name: Install BLAS on ubuntu
-      if: startsWith(inputs.os, 'ubuntu')
+    - name: Install BLAS on PyPy3.10
+      if: startsWith(inputs.python-version, 'pypy')
       run: sudo apt install -y libopenblas-dev
     - name: Set env variables for ubuntu and install BLAS
       if: inputs.upload-coverage && startsWith(inputs.os, 'ubuntu')
