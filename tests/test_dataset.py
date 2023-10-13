@@ -1747,15 +1747,12 @@ class TestDatasetElements:
         assert "4.5.6" == self.ds.file_meta.MediaStorageSOPInstanceUID
         self.ds.fix_meta_info(enforce_standard=True)
 
-        with pytest.warns(DeprecationWarning):
-            self.ds.file_meta = Dataset()  # not FileMetaDataset
-        self.ds.file_meta.PatientID = "PatientID"
+        self.ds.file_meta = FileMetaDataset()
         with pytest.raises(
             ValueError,
-            match=r"Only File Meta Information Group "
-            r"\(0002,eeee\) elements must be present .*",
+            match=r"Only group 2 data elements are allowed in a FileMetaDataset",
         ):
-            self.ds.fix_meta_info(enforce_standard=True)
+            self.ds.file_meta.PatientID = "PatientID"
 
     def test_validate_and_correct_file_meta(self):
         file_meta = FileMetaDataset()
@@ -2045,11 +2042,12 @@ class TestDatasetOverlayArray:
 
 
 class TestFileMeta:
-    def test_deprecation_warning(self):
+    def test_type_exception(self):
         """Assigning ds.file_meta warns if not FileMetaDataset instance"""
         ds = Dataset()
-        with pytest.warns(DeprecationWarning):
-            ds.file_meta = Dataset()  # not FileMetaDataset
+        msg = "'Dataset.file_meta' must be a 'FileMetaDataset' instance"
+        with pytest.raises(TypeError, match=msg):
+            ds.file_meta = list()
 
     def test_assign_file_meta(self):
         """Test can only set group 2 elements in File Meta"""
@@ -2063,15 +2061,33 @@ class TestFileMeta:
         ds.file_meta = FileMetaDataset()
 
         # Can assign non-empty file_meta
-        ds_meta = Dataset()  # not FileMetaDataset
+        ds_meta = FileMetaDataset()
         ds_meta.TransferSyntaxUID = "1.2"
-        with pytest.warns(DeprecationWarning):
-            ds.file_meta = ds_meta
+        ds.file_meta = ds_meta
 
         # Error on assigning file meta if any non-group 2
-        ds_meta.PatientName = "x"
         with pytest.raises(ValueError):
-            ds.file_meta = ds_meta
+            ds_meta.PatientName = "x"
+
+    def test_file_meta_conversion(self):
+        """Test conversion to FileMetaDataset from Dataset."""
+        ds = Dataset()
+        meta = Dataset()
+        meta.TransferSyntaxUID = "1.2"
+        ds.file_meta = meta
+        assert isinstance(ds.file_meta, FileMetaDataset)
+        assert ds.file_meta.TransferSyntaxUID == "1.2"
+
+        ds.file_meta = None
+        meta.PatientID = "12345678"
+        msg = (
+            r"File meta datasets may only contain group 2 elements but the "
+            r"following elements are present: \(0010,0020\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.file_meta = meta
+
+        assert ds.file_meta is None
 
     def test_init_file_meta(self):
         """Check instantiation of FileMetaDataset"""

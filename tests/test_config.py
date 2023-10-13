@@ -132,12 +132,6 @@ class TestFuture:
         importlib.reload(config)
         assert not config._use_future
 
-    def test_file_meta_class(self, future_setter):
-        """FileMetaDataset required type in pydicom future behavior"""
-        ds = Dataset()
-        with pytest.raises(TypeError):
-            ds.file_meta = Dataset()
-
     def test_invalid_keyword_raise(self, future_setter):
         ds = Dataset()
         with pytest.raises(ValueError):

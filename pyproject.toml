@@ -63,7 +63,7 @@ pixeldata = [
     "pylibjpeg[openjpeg]",
     "pylibjpeg[rle]",
     "python-gdcm"
-]        
+]
 
 # Consider libjpeg-turbo (BSD-like license) when 12-bit available
 # https://github.com/libjpeg-turbo/libjpeg-turbo/issues/199
