@@ -2047,7 +2047,7 @@ class TestFileMeta:
         ds = Dataset()
         msg = "'Dataset.file_meta' must be a 'FileMetaDataset' instance"
         with pytest.raises(TypeError, match=msg):
-            ds.file_meta = list()  # not FileMetaDataset
+            ds.file_meta = list()
 
     def test_assign_file_meta(self):
         """Test can only set group 2 elements in File Meta"""

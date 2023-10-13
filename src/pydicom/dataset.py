@@ -2196,11 +2196,18 @@ class Dataset:
             # XXX note if user misspells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
-    def _set_file_meta(self, value: Optional["FileMetaDataset"]) -> None:
-        if value is not None and not isinstance(value, Dataset):
-            raise TypeError("'Dataset.file_meta' must be a 'FileMetaDataset' instance")
+    def _set_file_meta(self, value: Optional["Dataset"]) -> None:
+        """Set the Dataset's File Meta Information attribute."""
+        if value is None:
+            self.__dict__["file_meta"] = value
+            return
 
-        if isinstance(value, Dataset):
+        if not isinstance(value, Dataset):
+            cls_name = self.__class__.__name__
+            raise TypeError(f"'{cls_name}.file_meta' must be a 'FileMetaDataset' instance")
+
+        if not isinstance(value, FileMetaDataset):
+            # Also validates for only group 2 elements
             value = FileMetaDataset(value)
 
         self.__dict__["file_meta"] = value
