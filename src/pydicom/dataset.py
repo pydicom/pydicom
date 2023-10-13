@@ -2204,7 +2204,9 @@ class Dataset:
 
         if not isinstance(value, Dataset):
             cls_name = self.__class__.__name__
-            raise TypeError(f"'{cls_name}.file_meta' must be a 'FileMetaDataset' instance")
+            raise TypeError(
+                f"'{cls_name}.file_meta' must be a 'FileMetaDataset' instance"
+            )
 
         if not isinstance(value, FileMetaDataset):
             # Also validates for only group 2 elements
