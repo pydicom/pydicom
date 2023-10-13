@@ -67,7 +67,6 @@
       ~FileMetaDataset.default_sequence_element_format
       ~FileMetaDataset.indent_chars
       ~FileMetaDataset.is_original_encoding
-      ~FileMetaDataset.parent
       ~FileMetaDataset.parent_seq
       ~FileMetaDataset.pixel_array
    
