@@ -143,13 +143,16 @@ can display their description if needed.
 For standard tags, you can use :func:`datadict.add_dict_entry` or
 :func:`datadict.add_dict_entries` (to add multiple tags at once)::
 
-    >>> add_dict_entry(tag: 0x888800001, VR: "SH", keyword: "SomeNewTag", description: "Some New Tag")
+    >>> add_dict_entry(tag=0x888800001, VR="SH", keyword="SomeNewTag", description="Some New Tag")
 
-For private tags, you have to additionally add the private creator string. Respectively, you can use
+For private tags, the analogous functions are
 :func:`datadict.add_private_dict_entry` and :func:`datadict.add_private_dict_entries`::
 
-    >>> add_private_dict_entry(private_creator: "ACME 1.1", tag: 0x004100001, VR: "DA", description: "Release Date")
+    >>> add_private_dict_entry(private_creator="ACME 1.1", tag=0x004100001, VR="DA", description="Release Date")
 
 Note that private tags do not have a keyword, as they are not registered in the
-standard DICOM data dictionary. An example of how to use :func:`datadict.add_private_dict_entries` can
+standard DICOM data dictionary. As a private tag is defined by the tuple of private creator, group ID and tag offset,
+you always have to provide the private creator to define a new private tag.
+
+An example of how to use :func:`datadict.add_private_dict_entries` can
 be found in :ref:`this code snippet <sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py>`.
