@@ -142,7 +142,7 @@ def _decompress_single_frame(
                 )
             ]
             # Pillow 10.1+ made Image.mode read-only
-            if hasattr(image, '_mode'):
+            if hasattr(image, "_mode"):
                 image._mode = color_mode
             else:
                 image.mode = colour_mode
