@@ -145,7 +145,7 @@ def _decompress_single_frame(
             if hasattr(image, "_mode"):
                 image._mode = color_mode
             else:
-                image.mode = colour_mode
+                image.mode = color_mode
 
             image.rawmode = color_mode
     return image
