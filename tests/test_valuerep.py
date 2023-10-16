@@ -1630,6 +1630,7 @@ class TestVR:
         assert isinstance(VR.AE, str)
         assert VR.AE == "AE"
         assert VR.US_SS_OW == "US or SS or OW"
+        assert f"{VR.AE}" == "AE"
 
     def test_all_present(self):
         """Test all VRs are configured"""
