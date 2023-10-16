@@ -81,6 +81,7 @@ Fixes
   when the J2K stream disagrees with the dataset and
   :attr:`~pydicom.config.APPLY_J2K_CORRECTIONS` is `True` (:issue:`1689`)
 * Fixed pydicom codify error when relative path did not exist
+* Fixed the VR enum sometimes returning invalid values for Python 3.11+ (:issue:`1874`)
 * Fixed pixel data handler for Pillow 10.1 raising an AttributeError (:issue:`1907`)
 
 Pydicom Internals

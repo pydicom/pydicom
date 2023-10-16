@@ -481,6 +481,9 @@ class VR(str, Enum):
     US_OW = "US or OW"
     OB_OW = "OB or OW"
 
+    def __str__(self) -> str:
+        return str.__str__(self)
+
 
 # Standard VRs from Table 6.2-1 in Part 5
 STANDARD_VR = {
