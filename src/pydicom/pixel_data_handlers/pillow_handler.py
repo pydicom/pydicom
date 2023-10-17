@@ -146,8 +146,6 @@ def _decompress_single_frame(
                 image._mode = color_mode
             else:
                 image.mode = color_mode
-
-            image.rawmode = color_mode
     return image
 
 
