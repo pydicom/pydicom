@@ -126,3 +126,33 @@ might be contained in them.  Pydicom provides a convenient function
 This can also be helpful during interactive sessions when exploring DICOM
 files, to remove a large number of lines from the display of a dataset --
 lines which may not provide useful information.
+
+Adding new entries to the DICOM dictionary
+------------------------------------------
+*pydicom* contains a dictionary with all known DICOM tags from the latest DICOM standard
+at release time. It also contains a dictionary with a number of known private tags
+collected from various sources.
+Sometimes you may encounter tags unknown to *pydicom* - either tags defined in a newer version
+of the standard, or, the more common case, private tags that are not contained
+in the private tags dictionary.
+
+In this case, you can add these tags to the DICOM dictionary before reading or writing datasets
+containing these tags. After that, *pydicom* will correctly handle the type of these tags, and
+can display their description if needed.
+
+For standard tags, you can use :func:`datadict.add_dict_entry` or
+:func:`datadict.add_dict_entries` (to add multiple tags at once)::
+
+    >>> add_dict_entry(tag=0x888800001, VR="SH", keyword="SomeNewTag", description="Some New Tag")
+
+For private tags, the analogous functions are
+:func:`datadict.add_private_dict_entry` and :func:`datadict.add_private_dict_entries`::
+
+    >>> add_private_dict_entry(private_creator="ACME 1.1", tag=0x004100001, VR="DA", description="Release Date")
+
+Note that private tags do not have a keyword, as they are not registered in the
+standard DICOM data dictionary. As a private tag is defined by the tuple of private creator, group ID and tag offset,
+you always have to provide the private creator to define a new private tag.
+
+An example of how to use :func:`datadict.add_private_dict_entries` can
+be found in :ref:`this code snippet <sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py>`.

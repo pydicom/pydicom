@@ -282,23 +282,6 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add dictionary items to the &#x27;standard&#x27; DICOM dictionary dynami...">
-
-.. only:: html
-
-  .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_add_dict_entries_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Add dictionary items in the standard DICOM dictionary</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
 
 .. only:: html
@@ -328,6 +311,23 @@ metadata of DICOM data.
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Anonymize DICOM data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add private dictionary items to the DICOM dictionary dynamical...">
+
+.. only:: html
+
+  .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_add_dict_entries_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Add items to the private DICOM dictionary</div>
     </div>
 
 
