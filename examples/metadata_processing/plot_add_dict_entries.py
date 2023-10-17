@@ -1,7 +1,7 @@
 """
-=============================================================
-Add private dictionary items to the standard DICOM dictionary
-=============================================================
+=========================================
+Add items to the private DICOM dictionary
+=========================================
 
 This examples illustrates how to add private dictionary items to the DICOM
 dictionary dynamically. This allows you to read private tags not present in
