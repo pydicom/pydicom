@@ -130,24 +130,9 @@ def _decompress_single_frame(
     if (
         transfer_syntax in PillowJPEGTransferSyntaxes
         and photometric_interpretation == "RGB"
+        and "adobe_transform" not in image.info
     ):
-        if "adobe_transform" not in image.info:
-            color_mode = "YCbCr"
-            image.tile = [
-                (
-                    "jpeg",
-                    image.tile[0][1],
-                    image.tile[0][2],
-                    (color_mode, ""),
-                )
-            ]
-            # Pillow 10.1+ made Image.mode read-only
-            if hasattr(image, "_mode"):
-                image._mode = color_mode
-            else:
-                image.mode = color_mode
-
-            image.rawmode = color_mode
+        image.draft("YCbCr", image.size)
     return image
 
 
