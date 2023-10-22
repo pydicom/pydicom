@@ -225,6 +225,16 @@ with block object:</p>
 <span class="go">False</span>
 </pre></div>
 </div>
+<p>Since pydicom 3.0, there is also a convenience method to add a private tag without creating a private block first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">block</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">add_new_private</span><span class="p">(</span><span class="s2">&quot;My company 001&quot;</span><span class="p">,</span> <span class="mh">0x000B</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="s2">&quot;my value&quot;</span><span class="p">,</span> <span class="n">VR</span><span class="o">.</span><span class="n">SH</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
+<span class="gp">...</span>
+<span class="go">(000b, 0010) Private Creator                     LO: &#39;My company 001&#39;</span>
+<span class="go">(000b, 1001) Private tag data                    SH: &#39;my value&#39;</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>Note that for known private tags you don’t need to provide the VR in this function.</p>
 </section>
 <section id="removing-all-private-data-elements">
 <h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Link to this heading">¶</a></h2>

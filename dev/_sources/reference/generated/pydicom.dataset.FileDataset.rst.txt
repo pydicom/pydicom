@@ -16,6 +16,7 @@
       ~FileDataset.__init__
       ~FileDataset.add
       ~FileDataset.add_new
+      ~FileDataset.add_new_private
       ~FileDataset.clear
       ~FileDataset.compress
       ~FileDataset.convert_pixel_data
