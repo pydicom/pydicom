@@ -543,7 +543,7 @@ def get_private_entry(tag: TagType, private_creator: str) -> tuple[str, str, str
         private_dict = private_dictionaries[private_creator]
     except KeyError as exc:
         raise KeyError(
-            f"Private creator '{private_creator}' not in the private " "dictionary"
+            f"Private creator '{private_creator}' not in the private dictionary"
         ) from exc
     except TypeError as exc:
         msg = (
