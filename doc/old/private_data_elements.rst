@@ -113,10 +113,9 @@ with block object::
     >>> 0x01 in block
     False
 
-Since pydicom 3.0, there is also a convenience method to add a private tag without the need
-of creating a private block first::
+Since pydicom 3.0, there is also a convenience method to add a private tag without creating a private block first::
 
-    >>> block = ds.add_private("My company 001", 0x000B, 0x01, "my value", VR.SH)
+    >>> block = ds.add_new_private("My company 001", 0x000B, 0x01, "my value", VR.SH)
     >>> ds
     ...
     (000b, 0010) Private Creator                     LO: 'My company 001'

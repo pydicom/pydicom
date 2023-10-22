@@ -518,7 +518,7 @@ class Dataset:
         """
         self.add(DataElement(tag, VR, value))
 
-    def add_private(
+    def add_new_private(
         self,
         private_creator: str,
         group: int,

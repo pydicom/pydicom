@@ -76,7 +76,7 @@ Enhancements
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211030PCMDigitalAudio`
-* Added convenience method :meth:`~pydicom.dataset.Dataset.add_private` to add a private tag
+* Added convenience method :meth:`~pydicom.dataset.Dataset.add_new_private` to add a private tag
 
 Fixes
 -----

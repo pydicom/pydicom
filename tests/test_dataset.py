@@ -1059,16 +1059,16 @@ class TestDataset:
     def test_add_unknown_private_tag(self):
         ds = Dataset()
         with pytest.raises(ValueError, match="Tag must be private"):
-            ds.add_private("Creator 1.0", 0x0010, 0x01, "VALUE", VR.SH)
+            ds.add_new_private("Creator 1.0", 0x0010, 0x01, "VALUE", VR.SH)
         with pytest.raises(ValueError, match="Private creator must have a value"):
-            ds.add_private("", 0x0011, 0x01, "VALUE", VR.SH)
+            ds.add_new_private("", 0x0011, 0x01, "VALUE", VR.SH)
         with pytest.raises(
             KeyError,
             match="Private creator 'Creator 1.0' not in the private dictionary",
         ):
-            ds.add_private("Creator 1.0", 0x0011, 0x01, "VALUE")
+            ds.add_new_private("Creator 1.0", 0x0011, 0x01, "VALUE")
 
-        ds.add_private("Creator 1.0", 0x0011, 0x01, "VALUE", VR.SH)
+        ds.add_new_private("Creator 1.0", 0x0011, 0x01, "VALUE", VR.SH)
         item = ds.get_private_item(0x0011, 0x01, "Creator 1.0")
         assert item.value == "VALUE"
         assert item.private_creator == "Creator 1.0"
@@ -1076,14 +1076,14 @@ class TestDataset:
 
     def test_add_known_private_tag(self):
         ds = Dataset()
-        ds.add_private("GEMS_GENIE_1", 0x0009, 0x10, "Test Study")
+        ds.add_new_private("GEMS_GENIE_1", 0x0009, 0x10, "Test Study")
         item = ds.get_private_item(0x0009, 0x10, "GEMS_GENIE_1")
         assert item.value == "Test Study"
         assert item.private_creator == "GEMS_GENIE_1"
         assert item.VR == VR.LO
 
         add_private_dict_entry("Creator 1.0", 0x00110001, VR.SH, "Some Value")
-        ds.add_private("Creator 1.0", 0x0011, 0x01, "VALUE")
+        ds.add_new_private("Creator 1.0", 0x0011, 0x01, "VALUE")
         item = ds.get_private_item(0x0011, 0x01, "Creator 1.0")
         assert item.value == "VALUE"
         assert item.private_creator == "Creator 1.0"
