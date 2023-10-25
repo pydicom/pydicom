@@ -4,6 +4,7 @@
 # Many tests of DataElement class are implied in test_dataset also
 import datetime
 import math
+import io
 
 import pytest
 
@@ -1219,3 +1220,53 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
+
+
+class TestBufferedDataElement:
+    """Tests setting a DataElement value to a buffer"""
+    def test_reading_dataelement_value_unbuffers_the_value(self):
+        value = b'\x00\x01\x02\x03'
+        buffer = io.BytesIO(value)
+        de = DataElement("PixelData", "OB", buffer)
+
+        assert de.value == value
+        assert de.is_buffered == False
+
+    
+    def test_reading_dataelement_buffer(self):
+        value = b'\x00\x01\x02\x03'
+        buffer = io.BytesIO(value)
+        de = DataElement("PixelData", "OB", buffer)
+
+        data: bytes = b''
+        for chunk in de.value_generator():
+            data += chunk
+
+        assert data == value
+
+
+    def test_reading_dataelement_buffer_returns_bytes_read(self):
+        value = b'\x00\x01\x02\x03'
+        buffer = io.BytesIO(value)
+        de = DataElement("PixelData", "OB", buffer)
+
+        buffer_info = DataElement.BufferInfo()
+        for _ in de.value_generator(buffer_info=buffer_info):
+            # simulate 'throwing away' the data after reading it, ie
+            # reading the chunk then writing it to a file
+            pass
+
+        assert buffer_info.bytes_read == len(value)
+
+
+    def test_reading_dataelement_buffer_changing_read_size(self):
+        value = b'\x00\x01\x02\x03'
+        buffer = io.BytesIO(value)
+        
+        de = DataElement("PixelData", "OB", buffer)
+
+        call_count = 0
+        for _ in de.value_generator(chunk_size=1):
+            call_count += 1
+
+        assert call_count == len(value)
