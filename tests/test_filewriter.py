@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
 import tempfile
+import resource
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
@@ -2828,3 +2829,70 @@ class TestWriteUndefinedLengthPixelData:
 def test_all_writers():
     """Test that the VR writer functions are complete"""
     assert set(VR) == set(writers)
+
+
+class TestWritingBufferedPixelData:
+    def test_writing_dataset_with_buffered_pixel_data(self):
+        pixel_data = b"\x00\x01\x02\x03"
+
+        # Baseline
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.BitsAllocated = 8
+        ds.PixelData = pixel_data
+
+        ds.save_as(fp)
+
+        fp_buffered = DicomBytesIO()
+        fp_buffered.is_little_endian = True
+        fp_buffered.is_implicit_VR = False
+
+        ds_buffered = Dataset()
+        ds_buffered.is_little_endian = True
+        ds_buffered.is_implicit_VR = False
+        ds_buffered.BitsAllocated = 8
+        ds_buffered.PixelData = BytesIO(pixel_data)
+
+        ds_buffered.save_as(fp_buffered)
+
+        assert fp.getvalue() == fp_buffered.getvalue()
+
+    def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(self):
+        KILOBYTE = 1000
+        MEGABYTE = KILOBYTE * 1000
+        bytes_per_iter = MEGABYTE
+        
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.BitsAllocated = 8
+
+        with TemporaryFile("+wb") as large_dataset, TemporaryFile("+wb") as fp:
+            # generate 500 megabytes
+            data = BytesIO()
+            for _ in range(bytes_per_iter):
+                data.write(b'\x00')
+            
+            data.seek(0)
+
+            # 500 megabytes
+            for _ in range(500):
+                large_dataset.write(data.getbuffer())
+
+            large_dataset.seek(0)
+
+            # take a snapshot of memory
+            baseline_memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+            # set the pixel data to the buffer
+            ds.PixelData = large_dataset
+            ds.save_as(fp)
+
+            memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+            assert memory_usage < (baseline_memory_usage + MEGABYTE * 500)

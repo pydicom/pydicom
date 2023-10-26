@@ -1245,18 +1245,17 @@ class TestBufferedDataElement:
         assert data == value
 
 
-    def test_reading_dataelement_buffer_returns_bytes_read(self):
+    def test_reading_dataelement_buffer_stores_bytes_read(self):
         value = b'\x00\x01\x02\x03'
         buffer = io.BytesIO(value)
         de = DataElement("PixelData", "OB", buffer)
 
-        buffer_info = DataElement.BufferInfo()
-        for _ in de.value_generator(buffer_info=buffer_info):
+        for _ in de.value_generator():
             # simulate 'throwing away' the data after reading it, ie
             # reading the chunk then writing it to a file
             pass
 
-        assert buffer_info.bytes_read == len(value)
+        assert de.bytes_read_from_buffer == len(value)
 
 
     def test_reading_dataelement_buffer_changing_read_size(self):
