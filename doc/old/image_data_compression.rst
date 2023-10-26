@@ -33,13 +33,11 @@ for more information.
 
     from typing import List, Tuple
 
-    from pydicom import dcmread
-    from pydicom.data import get_testdata_file
+    from pydicom import dcmread, examples
     from pydicom.encaps import encapsulate, encapsulate_extended
     from pydicom.uid import JPEG2000Lossless
 
-    path = get_testdata_file("CT_small.dcm")
-    ds = dcmread(path)
+    ds = examples.ct
 
     # Use third-party package to compress
     # Let's assume it compresses to JPEG 2000 (lossless)
@@ -57,14 +55,14 @@ for more information.
     ds.is_implicit_VR = False
 
     # Save!
-    ds.save_as("CT_small_compressed_basic.dcm")
+    ds.save_as("ct_compressed_basic.dcm")
 
     # Extended encapsulation
     result: Tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
     ds.PixelData = result[0]
     ds.ExtendedOffsetTable = result[1]
     ds.ExtendedOffsetTableLength = result[2]
-    ds.save_as("CT_small_compressed_ext.dcm")
+    ds.save_as("ct_compressed_ext.dcm")
 
 
 Compressing using pydicom
@@ -107,12 +105,12 @@ be used to compress an uncompressed dataset in-place:
 
 .. code-block:: python
 
-    from pydicom.data import get_testdata_file
+    from pydicom import examples
     from pydicom.uid import RLELossless
 
-    ds = get_testdata_file("CT_small.dcm", read=True)
+    ds = examples.ct
     ds.compress(RLELossless)
-    ds.save_as("CT_small_rle.dcm")
+    ds.save_as("ct_rle_lossless.dcm")
 
 A specific encoding plugin can be used by passing the plugin name via the
 `encoding_plugin` argument:
@@ -121,7 +119,7 @@ A specific encoding plugin can be used by passing the plugin name via the
 
     # Will set `ds.is_little_endian` and `ds.is_implicit_VR` automatically
     ds.compress(RLELossless, encoding_plugin='pylibjpeg')
-    ds.save_as("CT_small_rle.dcm")
+    ds.save_as("ct_rle_lossless.dcm")
 
 
 Implicitly changing the compression on an already compressed dataset is not
@@ -133,7 +131,7 @@ original transfer syntax - *JPEG 2000 Lossless* - is required.
 .. code-block:: python
 
     # Requires a JPEG 2000 compatible image data handler
-    ds = get_testdata_file("US1_J2KR.dcm", read=True)
+    ds = examples.jpeg2k
     arr = ds.pixel_array
     ds.PhotometricInterpretation = 'RGB'
     ds.compress(RLELossless, arr)

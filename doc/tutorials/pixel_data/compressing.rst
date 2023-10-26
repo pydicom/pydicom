@@ -92,13 +92,11 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
 
     from typing import List, Tuple
 
-    from pydicom import dcmread
-    from pydicom.data import get_testdata_file
+    from pydicom import dcmread, examples
     from pydicom.encaps import encapsulate, encapsulate_extended
     from pydicom.uid import JPEG2000Lossless
 
-    path = get_testdata_file("CT_small.dcm")
-    ds = dcmread(path)
+    ds = examples.ct
 
     # Use third-party package to compress
     # Let's assume it compresses to JPEG 2000 (lossless)
@@ -110,14 +108,14 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
-    ds.save_as("CT_small_compressed_basic.dcm")
+    ds.save_as("ct_compressed_basic.dcm")
 
     # Extended encapsulation
     result: Tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
     ds.PixelData = result[0]
     ds.ExtendedOffsetTable = result[1]
     ds.ExtendedOffsetTableLength = result[2]
-    ds.save_as("CT_small_compressed_ext.dcm")
+    ds.save_as("ct_compressed_ext.dcm")
 
 
 Compressing using pydicom
@@ -130,16 +128,14 @@ pass the UID for *RLE Lossless* to :func:`Dataset.compress()
 
 .. code-block:: python
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
+    >>> from pydicom import dcmread, examples
     >>> from pydicom.uid import RLELossless
-    >>> path = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(path)
+    >>> ds = examples.ct
     >>> ds.compress(RLELossless)
-    >>> ds.save_as("CT_small_rle.dcm")
+    >>> ds.save_as("ct_rle_lossless.dcm")
 
 This will compress the existing *Pixel Data* and update the *Transfer Syntax
-UID* before saving the dataset to file as  ``CT_small_rle.dcm``.
+UID* before saving the dataset to file as  ``ct_rle_lossless.dcm``.
 
 If you're creating a dataset from scratch you can instead pass a
 :class:`~numpy.ndarray` to be compressed and used as the *Pixel Data*:
@@ -191,7 +187,7 @@ original transfer syntax - *JPEG 2000 Lossless* - is required.
 
 .. code-block:: python
 
-    >>> ds = get_testdata_file("US1_J2KR.dcm", read=True)
+    >>> ds = examples.jpeg2k
     >>> ds.SamplesPerPixel
     3
     >>> ds.PhotometricInterpretation

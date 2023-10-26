@@ -112,36 +112,35 @@ Compressing grayscale pixel data in-place:
 
 .. code-block:: python
 
-    >>> from pydicom.data import get_testdata_file
+    >>> from pydicom.examples import ct
     >>> from pydicom.uid import RLELossless
-    >>> ds = get_testdata_file("CT_small.dcm", read=True)
-    >>> ds.SamplesPerPixel
+    >>> ct.SamplesPerPixel
     1
-    >>> ds.PhotometricInterpretation
+    >>> ct.PhotometricInterpretation
     'MONOCHROME2'
-    >>> ds.BitsAllocated
+    >>> ct.BitsAllocated
     16
-    >>> ds.PixelRepresentation
+    >>> ct.PixelRepresentation
     1
-    >>> ds.compress(RLELossless)
+    >>> ct.compress(RLELossless)
 
 Compressing RGB pixel data in-place:
 
 .. code-block:: python
 
-    >>> ds = get_testdata_file("US1_UNCR.dcm", read=True)
-    >>> ds.SamplesPerPixel
+    >>> from pydicom.examples import rgb_color
+    >>> rgb_color.SamplesPerPixel
     3
-    >>> ds.PhotometricInterpretation
+    >>> rgb_color.PhotometricInterpretation
     'RGB'
-    >>> ds.BitsAllocated
+    >>> rgb_color.BitsAllocated
     8
-    >>> ds.PixelRepresentation
+    >>> rgb_color.PixelRepresentation
     0
-    >>> len(ds.PixelData)
+    >>> len(rgb_color.PixelData)
     921600
-    >>> ds.compress(RLELossless)
-    >>> len(ds.PixelData)
+    >>> rgb_color.compress(RLELossless)
+    >>> len(rgb_color.PixelData)
     424152
 
 
@@ -151,13 +150,13 @@ new *SOP Instance UID*:
 
 .. code-block:: python
 
+    >>> from pydicom.examples import rgb_color
     >>> from pydicom.pixel_data_handlers import convert_color_space
     >>> from pydicom.uid import generate_uid
-    >>> ds = get_testdata_file("US1_UNCR.dcm", read=True)
-    >>> rgb = ds.pixel_array
+    >>> rgb = rgb_color.pixel_array
     >>> ybr = convert_color_space(rgb, 'RGB', 'YBR_FULL')
-    >>> ds.PhotometricInterpretation = 'YBR_FULL'
-    >>> ds.compress(RLELossless, ybr)
-    >>> ds.SOPInstanceUID = generate_uid()
-    >>> len(ds.PixelData)
+    >>> rgb_color.PhotometricInterpretation = 'YBR_FULL'
+    >>> rgb_color.compress(RLELossless, ybr)
+    >>> rgb_color.SOPInstanceUID = generate_uid()
+    >>> len(rgb_color.PixelData)
     187460

@@ -19,8 +19,9 @@ This API reference guide details the functions, modules and objects included in
    config
    data
    datadict
-   elem
    dataset
+   elem
+   examples
    handlers
    encoders
    fileset

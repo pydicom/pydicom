@@ -29,13 +29,10 @@ elements using pydicom.
 Displaying Private Data Elements in pydicom
 -------------------------------------------
 
-Here is an example of some private tags displayed for pydicom's test file
-'CT_small.dcm'::
+Here is an example of some private tags displayed for pydicom's example CT
+dataset::
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
-    >>> ct_filename = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(ct_filename)
+    >>> ds = pydicom.examples.ct
     >>> ds
     Dataset.file_meta -------------------------------
     (0002, 0000) File Meta Information Group Length  UL: 192
@@ -48,8 +45,7 @@ Here is an example of some private tags displayed for pydicom's test file
     (0002, 0016) Source Application Entity Title     AE: 'CLUNIE1'
     -------------------------------------------------
     (0008, 0005) Specific Character Set              CS: 'ISO_IR 100'
-    (0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AX
-    IAL']
+    (0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
     ...
     ...
     (0009, 0010) Private Creator                     LO: 'GEMS_IDEN_01'

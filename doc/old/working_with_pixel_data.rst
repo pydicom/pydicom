@@ -29,10 +29,8 @@ The only exception to this is :dcm:`Parametric Map Storage
 
 By default *pydicom* reads in pixel data as the raw bytes found in the file::
 
-  >>> from pydicom import dcmread
-  >>> from pydicom.data import get_testdata_file
-  >>> filename = get_testdata_file("MR_small.dcm")
-  >>> ds = dcmread(filename)
+  >>> from pydicom import examples
+  >>> ds = examples.mr
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
@@ -149,10 +147,10 @@ to apply a palette color LUT to the pixel data to produce an RGB image.
 
 .. code-block:: python
 
+    from pydicom import examples
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
-    fname = get_testdata_file("OBXXXX1A.dcm")
-    ds = dcmread(fname)
+    ds = examples.palette_color
     arr = ds.pixel_array
     rgb = apply_color_lut(arr, ds)
 
@@ -163,10 +161,10 @@ of the pixel data is 8-bit.
 
 .. code-block:: python
 
+    from pydicom import examples
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
-    fname = get_testdata_file("OBXXXX1A.dcm")
-    ds = dcmread(fname)
+    ds = examples.palette_color
     arr = ds.pixel_array
     # You could also use the corresponding well-known SOP Instance UID
     rgb = apply_color_lut(arr, palette='PET')
@@ -193,10 +191,10 @@ first.
 
 .. code-block:: python
 
+    from pydicom import examples
     from pydicom.pixel_data_handlers.util import apply_modality_lut
 
-    fname = get_testdata_file("CT_small.dcm")
-    ds = dcmread(fname)
+    ds = examples.ct
     arr = ds.pixel_array
     hu = apply_modality_lut(arr, ds)
 
@@ -217,9 +215,9 @@ that the modality LUT or rescale operation has already been applied.
 
 .. code-block:: python
 
+    from pydicom import examples
     from pydicom.pixel_data_handlers.util import apply_voi_lut
 
-    fname = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
-    ds = dcmread(fname)
+    ds = examples.overlay
     arr = ds.pixel_array
     out = apply_voi_lut(arr, ds, index=0)

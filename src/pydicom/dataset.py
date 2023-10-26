@@ -1706,11 +1706,11 @@ class Dataset:
 
         Compress the existing uncompressed *Pixel Data* in place:
 
-        >>> from pydicom.data import get_testdata_file
+        >>> from pydicom import examples
         >>> from pydicom.uid import RLELossless
-        >>> ds = get_testdata_file("CT_small.dcm", read=True)
+        >>> ds = examples.ct
         >>> ds.compress(RLELossless)
-        >>> ds.save_as("CT_small_rle.dcm")
+        >>> ds.save_as("ct_rle_lossless.dcm")
 
         Parameters
         ----------

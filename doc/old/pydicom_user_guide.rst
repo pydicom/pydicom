@@ -16,4 +16,3 @@ pydicom User Guide
    viewing_images
    private_data_elements
    best_practices
-   python2_support

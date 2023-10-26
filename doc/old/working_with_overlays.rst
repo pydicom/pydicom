@@ -21,9 +21,7 @@ same group number. Because of this, the only way to access a particular
 element from an overlay is to use the ``Dataset[group, elem]`` method:
 
 >>> import pydicom
->>> from pydicom.data import get_testdata_files
->>> fpath = get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
->>> ds = pydicom.dcmread(fpath)
+>>> ds = pydicom.examples.overlay
 >>> elem = ds[0x6000, 0x3000]  # returns a DataElement
 >>> print(elem)
 (6000, 3000) Overlay Data                        OW: Array of 29282 elements
