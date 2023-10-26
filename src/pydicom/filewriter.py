@@ -634,6 +634,7 @@ def write_data_element(
         if vr in EXPLICIT_VR_LENGTH_32:
             fp.write_US(0)  # reserved 2 bytes
 
+    vr_length_seek_pos = fp.tell()
     if (
         not fp.is_implicit_VR
         and vr not in EXPLICIT_VR_LENGTH_32
@@ -652,6 +653,11 @@ def write_data_element(
     else:
         # copy the buffer to the file
         fp.write(buffer.getvalue())
+        # write the length now that we know it
+        curr_pos = fp.tell()
+        fp.seek(vr_length_seek_pos)
+        fp.write_UL(elem.bytes_read_from_buffer)
+        fp.seek(curr_pos)
 
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
