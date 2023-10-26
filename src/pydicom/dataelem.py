@@ -469,6 +469,7 @@ class DataElement:
                 raise ValueError(f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}.")
             
             self._value = val
+            return
 
         if self.VR not in ALLOW_BACKSLASH:
             if isinstance(val, str):
