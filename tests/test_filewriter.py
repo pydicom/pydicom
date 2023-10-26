@@ -6,6 +6,7 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
 import os
+import sys
 from pathlib import Path
 from platform import python_implementation
 
@@ -2895,4 +2896,17 @@ class TestWritingBufferedPixelData:
 
             memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-            assert memory_usage < (baseline_memory_usage + MEGABYTE * 500)
+            # on MacOS, maxrss is in bytes. On unix, its in kilobytes
+            limit = 0
+            if sys.platform.startswith('linux'):
+                # memory usage is in kilobytes
+                limit = (MEGABYTE * 400) / KILOBYTE
+            elif sys.platform.startswith('darwin'):
+                # memory usage is in bytes
+                limit = MEGABYTE * 400
+            else:
+                pytest.skip("This test is not setup to run on this platform")
+
+            # if we have successfully kept the PixelData out of memory, then our peak memory usage
+            # usage be less than prev peak + the size of the file
+            assert memory_usage < (baseline_memory_usage + limit)

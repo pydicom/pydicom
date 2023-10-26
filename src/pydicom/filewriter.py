@@ -303,15 +303,47 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
         raise OSError(f"{str(e)}\nfor data_element:\n{str(elem)}")
 
 
+def _check_encaps_pixel_data(fp: DicomIO, value: bytes):
+    # valid pixel data with undefined length shall contain encapsulated
+    # data, e.g. sequence items - raise ValueError otherwise (see #238)
+
+    encap_item = b"\xfe\xff\x00\xe0"
+    if not fp.is_little_endian:
+        # Non-conformant endianness
+        encap_item = b"\xff\xfe\xe0\x00"
+    if not value.startswith(encap_item):
+        raise ValueError(
+            "(7FE0,0010) Pixel Data has an undefined length indicating "
+            "that it's compressed, but the data isn't encapsulated as "
+            "required. See pydicom.encaps.encapsulate() for more "
+            "information"
+        )
+
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other byte' (OB)."""
-    if len(elem.value) % 2:
-        # Pad odd length values
-        fp.write(cast(bytes, elem.value))
-        fp.write(b"\x00")
+    value_length = 0
+    encaps_bytes: bytes = b''
+    if elem.is_buffered:
+        # stream data instead of reading the whole value at once
+        for chunk in elem.value_generator():
+            # need to store the first few bytes to check if the pixel data
+            # is encapsulated or not
+            if not encaps_bytes:
+                encaps_bytes = chunk[0:4]
+
+            fp.write(chunk)
+
+        value_length = elem.bytes_read_from_buffer
     else:
         fp.write(cast(bytes, elem.value))
+        value_length = len(elem.value)
+    
+    if value_length % 2:
+        # Pad odd length values
+        fp.write(b"\x00")
 
+    if elem.is_undefined_length and elem.tag == 0x7FE00010:
+        _check_encaps_pixel_data(fp, cast(bytes, elem.value))
 
 def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other word' (OW).
@@ -522,6 +554,33 @@ def write_TM(fp: DicomIO, elem: DataElement) -> None:
         fp.write(val)
 
 
+def _check_ts_value_length(
+    fp: DicomIO,
+    *,
+    is_undefined_length: bool,
+    value_length: int,
+    vr: str,
+    elem: DataElement,
+) -> str:
+    if (
+        not fp.is_implicit_VR
+        and vr not in EXPLICIT_VR_LENGTH_32
+        and not is_undefined_length
+        and value_length > 0xFFFF
+    ):
+        # see PS 3.5, section 6.2.2 for handling of this case
+        msg = (
+            f"The value for the data element {elem.tag} exceeds the "
+            f"size of 64 kByte and cannot be written in an explicit transfer "
+            f"syntax. The data element VR is changed from '{vr}' to 'UN' "
+            f"to allow saving the data."
+        )
+        warnings.warn(msg)
+        return VR.UN
+
+    return vr
+
+
 def write_data_element(
     fp: DicomIO,
     elem: DataElement | RawDataElement,
@@ -571,40 +630,21 @@ def write_data_element(
                 # numeric format parameter
                 if param is not None:
                     fn(buffer, elem, param)  # type: ignore[operator]
+                elif elem.is_buffered:
+                    # skip memory and write directly to the file
+                    fn(fp, elem)
                 else:
                     fn(buffer, elem)  # type: ignore[operator]
 
-    # valid pixel data with undefined length shall contain encapsulated
-    # data, e.g. sequence items - raise ValueError otherwise (see #238)
-    if is_undefined_length and elem.tag == 0x7FE00010:
-        encap_item = b"\xfe\xff\x00\xe0"
-        if not fp.is_little_endian:
-            # Non-conformant endianness
-            encap_item = b"\xff\xfe\xe0\x00"
-        if not cast(bytes, elem.value).startswith(encap_item):
-            raise ValueError(
-                "(7FE0,0010) Pixel Data has an undefined length indicating "
-                "that it's compressed, but the data isn't encapsulated as "
-                "required. See pydicom.encaps.encapsulate() for more "
-                "information"
-            )
 
-    value_length = buffer.tell()
-    if (
-        not fp.is_implicit_VR
-        and vr not in EXPLICIT_VR_LENGTH_32
-        and not is_undefined_length
-        and value_length > 0xFFFF
-    ):
-        # see PS 3.5, section 6.2.2 for handling of this case
-        msg = (
-            f"The value for the data element {elem.tag} exceeds the "
-            f"size of 64 kByte and cannot be written in an explicit transfer "
-            f"syntax. The data element VR is changed from '{vr}' to 'UN' "
-            f"to allow saving the data."
-        )
-        warnings.warn(msg)
-        vr = VR.UN
+    value_length = elem.bytes_read_from_buffer if elem.is_buffered else buffer.tell()
+    _check_ts_value_length(
+        fp,
+        is_undefined_length=is_undefined_length,
+        value_length=value_length,
+        vr=vr,
+        elem=elem,
+    )
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:

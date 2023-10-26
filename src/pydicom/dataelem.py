@@ -449,9 +449,6 @@ class DataElement:
     def value(self) -> Any:
         """Return the element's value. If the value is a Buffer, the buffer will be read and returned.
         To read the buffer in chunks, see value_generator."""
-        if self.is_buffered:
-            self._value = cast(BufferedIOBase, self._value).read()
-
         return self._value
 
     @value.setter
@@ -525,7 +522,7 @@ class DataElement:
         """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
-        if isinstance(self.value, str | bytes | PersonName):
+        if isinstance(self.value, str | bytes | PersonName | BufferedIOBase):
             return 1 if self.value else 0
         try:
             iter(self.value)
