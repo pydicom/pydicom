@@ -319,10 +319,11 @@ def _check_encaps_pixel_data(fp: DicomIO, value: bytes):
             "information"
         )
 
+
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other byte' (OB)."""
     value_length = 0
-    encaps_bytes: bytes = b''
+    encaps_bytes: bytes = b""
     if elem.is_buffered:
         # stream data instead of reading the whole value at once
         for chunk in elem.value_generator():
@@ -337,13 +338,14 @@ def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
     else:
         fp.write(cast(bytes, elem.value))
         value_length = len(elem.value)
-    
+
     if value_length % 2:
         # Pad odd length values
         fp.write(b"\x00")
 
     if elem.is_undefined_length and elem.tag == 0x7FE00010:
         _check_encaps_pixel_data(fp, cast(bytes, elem.value))
+
 
 def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other word' (OW).
@@ -554,33 +556,6 @@ def write_TM(fp: DicomIO, elem: DataElement) -> None:
         fp.write(val)
 
 
-def _check_ts_value_length(
-    fp: DicomIO,
-    *,
-    is_undefined_length: bool,
-    value_length: int,
-    vr: str,
-    elem: DataElement,
-) -> str:
-    if (
-        not fp.is_implicit_VR
-        and vr not in EXPLICIT_VR_LENGTH_32
-        and not is_undefined_length
-        and value_length > 0xFFFF
-    ):
-        # see PS 3.5, section 6.2.2 for handling of this case
-        msg = (
-            f"The value for the data element {elem.tag} exceeds the "
-            f"size of 64 kByte and cannot be written in an explicit transfer "
-            f"syntax. The data element VR is changed from '{vr}' to 'UN' "
-            f"to allow saving the data."
-        )
-        warnings.warn(msg)
-        return VR.UN
-
-    return vr
-
-
 def write_data_element(
     fp: DicomIO,
     elem: DataElement | RawDataElement,
@@ -630,21 +605,26 @@ def write_data_element(
                 # numeric format parameter
                 if param is not None:
                     fn(buffer, elem, param)  # type: ignore[operator]
-                elif elem.is_buffered:
-                    # skip memory and write directly to the file
-                    fn(fp, elem)
-                else:
+                elif not elem.is_buffered:
+                    # defer writing from the buffer until we write the rest of the required
+                    # elements
                     fn(buffer, elem)  # type: ignore[operator]
 
-
     value_length = elem.bytes_read_from_buffer if elem.is_buffered else buffer.tell()
-    _check_ts_value_length(
-        fp,
-        is_undefined_length=is_undefined_length,
-        value_length=value_length,
-        vr=vr,
-        elem=elem,
-    )
+    if (
+        not fp.is_implicit_VR
+        and vr not in EXPLICIT_VR_LENGTH_32
+        and not is_undefined_length
+        and value_length > 0xFFFF
+    ):
+        # see PS 3.5, section 6.2.2 for handling of this case
+        msg = (
+            f"The value for the data element {elem.tag} exceeds the "
+            f"size of 64 kByte and cannot be written in an explicit transfer "
+            f"syntax. The data element VR is changed from '{vr}' to 'UN' "
+            f"to allow saving the data."
+        )
+        warnings.warn(msg)
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
@@ -665,7 +645,14 @@ def write_data_element(
         # unless is SQ with undefined length.
         fp.write_UL(0xFFFFFFFF if is_undefined_length else value_length)
 
-    fp.write(buffer.getvalue())
+    # if the element was buffered, we wrote directly to the file already
+    if elem.is_buffered:
+        # write to the file directly
+        fn(fp, elem)
+    else:
+        # copy the buffer to the file
+        fp.write(buffer.getvalue())
+
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item

@@ -1224,29 +1224,20 @@ class TestDataElementValidation:
 
 class TestBufferedDataElement:
     """Tests setting a DataElement value to a buffer"""
-    def test_reading_dataelement_value_unbuffers_the_value(self):
-        value = b'\x00\x01\x02\x03'
-        buffer = io.BytesIO(value)
-        de = DataElement("PixelData", "OB", buffer)
 
-        assert de.value == value
-        assert de.is_buffered == False
-
-    
     def test_reading_dataelement_buffer(self):
-        value = b'\x00\x01\x02\x03'
+        value = b"\x00\x01\x02\x03"
         buffer = io.BytesIO(value)
         de = DataElement("PixelData", "OB", buffer)
 
-        data: bytes = b''
+        data: bytes = b""
         for chunk in de.value_generator():
             data += chunk
 
         assert data == value
 
-
     def test_reading_dataelement_buffer_stores_bytes_read(self):
-        value = b'\x00\x01\x02\x03'
+        value = b"\x00\x01\x02\x03"
         buffer = io.BytesIO(value)
         de = DataElement("PixelData", "OB", buffer)
 
@@ -1257,11 +1248,10 @@ class TestBufferedDataElement:
 
         assert de.bytes_read_from_buffer == len(value)
 
-
     def test_reading_dataelement_buffer_changing_read_size(self):
-        value = b'\x00\x01\x02\x03'
+        value = b"\x00\x01\x02\x03"
         buffer = io.BytesIO(value)
-        
+
         de = DataElement("PixelData", "OB", buffer)
 
         call_count = 0

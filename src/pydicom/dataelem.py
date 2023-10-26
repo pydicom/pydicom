@@ -164,7 +164,6 @@ class DataElement:
     is_raw = False
     bytes_read_from_buffer: int = 0
 
-
     def __init__(
         self,
         tag: int | str | tuple[int, int],
@@ -219,8 +218,10 @@ class DataElement:
             is_buffered = True
             valid_vrs = (VR_.OB, VR_.OB_OW, VR_.OW)
             if VR not in valid_vrs:
-                raise ValueError(f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}.")
-            
+                raise ValueError(
+                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}."
+                )
+
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
@@ -463,8 +464,10 @@ class DataElement:
         if isinstance(val, BufferedIOBase):
             valid_vrs = (VR_.OB, VR_.OB_OW, VR_.OW)
             if self.VR not in valid_vrs:
-                raise ValueError(f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}.")
-            
+                raise ValueError(
+                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}."
+                )
+
             self._value = val
             return
 
@@ -476,15 +479,14 @@ class DataElement:
 
         self._value = self._convert_value(val)
 
-    
     @property
     def is_buffered(self):
         return isinstance(self._value, BufferedIOBase)
 
-    def value_generator(self, *, chunk_size = 8192) -> Iterator[bytes]:
+    def value_generator(self, *, chunk_size=8192) -> Iterator[bytes]:
         """Consume data from a buffered value. The value must be a buffer, the buffer must be
         readable, and the buffer must not be closed. The amount of data read will be stored
-        in the passed in buffer_info instance.    
+        in the passed in buffer_info instance.
 
         Parameters
         ----------
@@ -497,13 +499,15 @@ class DataElement:
         Iterator
             An iterator that yields bytes up to the specified chunk_size.
         """
-        assert self.is_buffered, "value_generator is only applicable for a buffered value"
+        assert (
+            self.is_buffered
+        ), "value_generator is only applicable for a buffered value"
 
         buffer = cast(BufferedIOBase, self._value)
         # operations on a closed stream are undefined, ensure the stream is still open
         assert not buffer.closed, "The stream has been closed"
         assert buffer.readable(), "The stream is not readable"
-            
+
         self.bytes_read_from_buffer = 0
 
         while chunk := buffer.read(chunk_size):
@@ -515,7 +519,6 @@ class DataElement:
         # if the buffer is seekable, seek back to the beginning so that the buffer can be re-used
         if buffer.seekable():
             buffer.seek(0)
-
 
     @property
     def VM(self) -> int:
@@ -561,7 +564,7 @@ class DataElement:
         See :func:`empty_value_for_VR`.
         """
         self._value = self.empty_value
-        
+
     def _convert_value(self, val: Any) -> Any:
         """Convert `val` to an appropriate type and return the result.
 
@@ -670,7 +673,7 @@ class DataElement:
             # in case the buffer is a stream and non-seekable we don't want
             # to consume any bytes
             return repr(self._value)
-        
+
         # If the VR is byte-like or long text (1024+), show a summary instead
         if self.VR in LONG_VALUE_VR:
             try:

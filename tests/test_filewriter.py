@@ -2867,7 +2867,7 @@ class TestWritingBufferedPixelData:
         KILOBYTE = 1000
         MEGABYTE = KILOBYTE * 1000
         bytes_per_iter = MEGABYTE
-        
+
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
@@ -2877,8 +2877,8 @@ class TestWritingBufferedPixelData:
             # generate 500 megabytes
             data = BytesIO()
             for _ in range(bytes_per_iter):
-                data.write(b'\x00')
-            
+                data.write(b"\x00")
+
             data.seek(0)
 
             # 500 megabytes
@@ -2898,10 +2898,10 @@ class TestWritingBufferedPixelData:
 
             # on MacOS, maxrss is in bytes. On unix, its in kilobytes
             limit = 0
-            if sys.platform.startswith('linux'):
+            if sys.platform.startswith("linux"):
                 # memory usage is in kilobytes
                 limit = (MEGABYTE * 400) / KILOBYTE
-            elif sys.platform.startswith('darwin'):
+            elif sys.platform.startswith("darwin"):
                 # memory usage is in bytes
                 limit = MEGABYTE * 400
             else:
