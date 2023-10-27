@@ -19,9 +19,7 @@ print(__doc__)
 
 def list_beams(ds):
     """Summarizes the RTPLAN beam information in the dataset."""
-    lines = [
-        f"{'Beam name':^13s} {'Number':^8s} {'Gantry':^8s} {'SSD (cm)':^11s}"
-    ]
+    lines = [f"{'Beam name':^13s} {'Number':^8s} {'Gantry':^8s} {'SSD (cm)':^11s}"]
     for beam in ds.BeamSequence:
         cp0 = beam.ControlPointSequence[0]
         ssd = float(cp0.SourceToSurfaceDistance / 10)
