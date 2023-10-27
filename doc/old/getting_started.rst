@@ -21,12 +21,11 @@ DICOM format files.
 Below is a simple example of using *pydicom* in an interactive session. In it we
 use the :func:`~pydicom.data.get_testdata_file` helper function to get the
 path to one of the pydicom test datasets, which in this case is a radiotherapy
-plan file.
-
-We then read the dataset from the path using :func:`~pydicom.filereader.dcmread`,
-which returns a :class:`~pydicom.dataset.FileDataset` instance `ds`. This can then
-be used to print the *Patient Name* and change the *Patient Position* from
-head-first-supine (HFS) to head-first-prone (HFP) and save to a new file `rtplan2.dcm`::
+plan file. We then read the dataset from the path using :func:`~pydicom.filereader.dcmread`,
+which returns a :class:`~pydicom.dataset.FileDataset` instance `ds`. This is then
+used to print the *Patient Name* and change the *Patient Position* from
+head-first-supine (HFS) to head-first-prone (HFP). The changes are then saved to a
+new file `rtplan2.dcm`::
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_file
@@ -49,6 +48,9 @@ head-first-supine (HFS) to head-first-prone (HFP) and save to a new file `rtplan
 ..
   >>> os.remove("rtplan2.dcm")
 
+A more thorough introduction to pydicom can be found in the :doc:`dataset basics
+tutorial</tutorials/dataset_basics>`.
+
 *pydicom* is not a DICOM server (see :gh:`pynetdicom <pynetdicom>` instead),
 and is not primarily about viewing images. It is designed to let you manipulate
 data elements in DICOM files with Python code.
@@ -61,8 +63,6 @@ altered in an intelligent way if :doc:`decompressing <image_data_handlers>`
 it first. Once decompressed, it can be altered and written back to a
 DICOM file the same way as initially uncompressed data.
 
-A more thorough introduction to pydicom can be found in the :doc:`dataset basics
-tutorial</tutorials/dataset_basics>`.
 
 License
 =======
