@@ -12,11 +12,9 @@ information, and show it using matplotlib.
 # license : MIT
 
 import matplotlib.pyplot as plt
-from pydicom import dcmread
-from pydicom.data import get_testdata_file
+from pydicom import examples
 
-fpath = get_testdata_file("CT_small.dcm")
-ds = dcmread(fpath)
+ds = examples.ct
 
 # Normal mode:
 print()

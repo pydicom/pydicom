@@ -128,7 +128,7 @@ pass the UID for *RLE Lossless* to :func:`Dataset.compress()
 
 .. code-block:: python
 
-    >>> from pydicom import dcmread, examples
+    >>> from pydicom import examples
     >>> from pydicom.uid import RLELossless
     >>> ds = examples.ct
     >>> ds.compress(RLELossless)

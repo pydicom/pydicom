@@ -171,7 +171,7 @@ you can use the access the item using either the keyword (for official DICOM
 elements) or tag number::
 
   >>> # reload the data
-  >>> ds = pydicom.dcmread(filename)
+  >>> ds = pydicom.dcmread(path)
   >>> elem = ds['PatientName']
   >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
