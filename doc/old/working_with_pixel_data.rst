@@ -29,8 +29,10 @@ The only exception to this is :dcm:`Parametric Map Storage
 
 By default *pydicom* reads in pixel data as the raw bytes found in the file::
 
-  >>> from pydicom import examples
-  >>> ds = examples.mr
+  >>> from pydicom import dcmread
+  >>> from pydicom.data import get_testdata_file
+  >>> path = get_testdata_file("MR_small.dcm")
+  >>> ds = dcmread(path)
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
@@ -150,6 +152,7 @@ to apply a palette color LUT to the pixel data to produce an RGB image.
     from pydicom import examples
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
+    # Fetch an example PALETTE COLOR dataset
     ds = examples.palette_color
     arr = ds.pixel_array
     rgb = apply_color_lut(arr, ds)

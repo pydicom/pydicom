@@ -33,10 +33,11 @@ for more information.
 
     from typing import List, Tuple
 
-    from pydicom import dcmread, examples
+    from pydicom import examples
     from pydicom.encaps import encapsulate, encapsulate_extended
     from pydicom.uid import JPEG2000Lossless
 
+    # Fetch an example dataset
     ds = examples.ct
 
     # Use third-party package to compress

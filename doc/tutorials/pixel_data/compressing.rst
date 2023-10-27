@@ -96,6 +96,7 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
     from pydicom.encaps import encapsulate, encapsulate_extended
     from pydicom.uid import JPEG2000Lossless
 
+    # Fetch an example dataset
     ds = examples.ct
 
     # Use third-party package to compress

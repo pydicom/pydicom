@@ -5,7 +5,7 @@ Example Datasets (:mod:`pydicom.examples`)
 
 .. currentmodule:: pydicom.examples
 
-The `examples` module contains the following DICOM datasets:
+The ``examples`` module contains the following DICOM datasets:
 
 +-------------------+---------------------------------------+------------------+
 | Module Attribute  | File                                  | SOP Class        |

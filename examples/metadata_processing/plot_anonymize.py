@@ -5,25 +5,22 @@ Anonymize DICOM data
 
 This example is a starting point to anonymize DICOM data.
 
-It shows how to read data and replace tags: person names, patient id,
+It shows how to read data and replace tags: person names, patient ID,
 optionally remove curves and private tags, and write the results in a new file.
 
 """
+
+###############################################################################
+# Anonymize a single file
+###############################################################################
 
 # authors : Darcy Mason
 #           Guillaume Lemaitre <g.lemaitre58@gmail.com>
 # license : MIT
 
-
 import tempfile
 
 from pydicom import examples
-
-print(__doc__)
-
-###############################################################################
-# Anonymize a single file
-###############################################################################
 
 ds = examples.mr
 

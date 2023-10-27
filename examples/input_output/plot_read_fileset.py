@@ -9,14 +9,12 @@ This example shows how to read and interact with a DICOM File-set.
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import warnings
 
-from pydicom import examples
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
 from pydicom.uid import generate_uid
 
-warnings.filterwarnings("ignore")
 
 path = get_testdata_file("DICOMDIR")
 # A File-set can be loaded from the path to its DICOMDIR dataset or the
