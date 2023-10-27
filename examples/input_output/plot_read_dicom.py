@@ -12,13 +12,15 @@ information, and show it using matplotlib.
 # license : MIT
 
 import matplotlib.pyplot as plt
-from pydicom import examples
+from pydicom import dcmread
+from pydicom.data import get_testdata_file
 
-ds = examples.ct
+path = get_testdata_file("CT_small.dcm")
+ds = dcmread(path)
 
 # Normal mode:
 print()
-print(f"File path........: {fpath}")
+print(f"File path........: {path}")
 print(f"SOP Class........: {ds.SOPClassUID} ({ds.SOPClassUID.name})")
 print()
 
