@@ -112,35 +112,37 @@ Compressing grayscale pixel data in-place:
 
 .. code-block:: python
 
-    >>> from pydicom.examples import ct
+    >>> from pydicom import examples
     >>> from pydicom.uid import RLELossless
-    >>> ct.SamplesPerPixel
+    >>> ds = examples.ct
+    >>> ds.SamplesPerPixel
     1
-    >>> ct.PhotometricInterpretation
+    >>> ds.PhotometricInterpretation
     'MONOCHROME2'
-    >>> ct.BitsAllocated
+    >>> ds.BitsAllocated
     16
-    >>> ct.PixelRepresentation
+    >>> ds.PixelRepresentation
     1
-    >>> ct.compress(RLELossless)
+    >>> ds.compress(RLELossless)
 
 Compressing RGB pixel data in-place:
 
 .. code-block:: python
 
-    >>> from pydicom.examples import rgb_color
-    >>> rgb_color.SamplesPerPixel
+    >>> from pydicom import examples
+    >>> ds = examples.rgb_color
+    >>> ds.SamplesPerPixel
     3
-    >>> rgb_color.PhotometricInterpretation
+    >>> ds.PhotometricInterpretation
     'RGB'
-    >>> rgb_color.BitsAllocated
+    >>> ds.BitsAllocated
     8
-    >>> rgb_color.PixelRepresentation
+    >>> ds.PixelRepresentation
     0
-    >>> len(rgb_color.PixelData)
+    >>> len(ds.PixelData)
     921600
-    >>> rgb_color.compress(RLELossless)
-    >>> len(rgb_color.PixelData)
+    >>> ds.compress(RLELossless)
+    >>> len(ds.PixelData)
     424152
 
 
@@ -150,13 +152,14 @@ new *SOP Instance UID*:
 
 .. code-block:: python
 
-    >>> from pydicom.examples import rgb_color
+    >>> from pydicom import examples
     >>> from pydicom.pixel_data_handlers import convert_color_space
     >>> from pydicom.uid import generate_uid
-    >>> rgb = rgb_color.pixel_array
+    >>> ds = examples.rgb_color
+    >>> rgb = ds.pixel_array
     >>> ybr = convert_color_space(rgb, 'RGB', 'YBR_FULL')
-    >>> rgb_color.PhotometricInterpretation = 'YBR_FULL'
-    >>> rgb_color.compress(RLELossless, ybr)
-    >>> rgb_color.SOPInstanceUID = generate_uid()
-    >>> len(rgb_color.PixelData)
+    >>> ds.PhotometricInterpretation = 'YBR_FULL'
+    >>> ds.compress(RLELossless, ybr)
+    >>> ds.SOPInstanceUID = generate_uid()
+    >>> len(ds.PixelData)
     187460

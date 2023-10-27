@@ -18,13 +18,13 @@ example, the tag's group number for (60xx,3000) *Overlay Data* may be (in hex)
 ``6000``, ``6002``, or any even value up to ``601E``. This allows a dataset to
 include multiple overlays, where the related elements for each overlay use the
 same group number. Because of this, the only way to access a particular
-element from an overlay is to use the ``Dataset[group, elem]`` method:
+element from an overlay is to use the ``Dataset[group, elem]`` method::
 
->>> import pydicom
->>> ds = pydicom.examples.overlay
->>> elem = ds[0x6000, 0x3000]  # returns a DataElement
->>> print(elem)
-(6000, 3000) Overlay Data                        OW: Array of 29282 elements
+  >>> import pydicom
+  >>> ds = pydicom.examples.overlay
+  >>> elem = ds[0x6000, 0x3000]  # returns a DataElement
+  >>> print(elem)
+  (6000, 3000) Overlay Data                        OW: Array of 29282 elements
 
 
 pydicom tends to be "lazy" in interpreting DICOM data. For example, by default

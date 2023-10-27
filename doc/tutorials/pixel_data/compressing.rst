@@ -92,7 +92,7 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
 
     from typing import List, Tuple
 
-    from pydicom import dcmread, examples
+    from pydicom import examples
     from pydicom.encaps import encapsulate, encapsulate_extended
     from pydicom.uid import JPEG2000Lossless
 

@@ -77,8 +77,8 @@ Enhancements
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211030PCMDigitalAudio`
 * Added convenience method :meth:`~pydicom.dataset.Dataset.add_new_private` to add a private tag
-* Added the examples module to make it easier and less confusing to work with the
-  example datasets used by the documentation
+* Added the :mod:`~pydicom.examples` module to make it easier and less
+  confusing for users to work with the example datasets used by the documentation
 
 Fixes
 -----

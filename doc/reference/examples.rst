@@ -38,7 +38,7 @@ Usage
 -----
 
 The module attributes are all normal :class:`~pydicom.dataset.FileDataset`
-instances:
+instances::
 
   >>> from pydicom import examples
   >>> type(examples.ct)
@@ -47,7 +47,7 @@ instances:
   'CompressedSamples^CT1'
 
 Each time the module attribute is accessed a new
-:class:`~pydicom.dataset.FileDataset` instance  of the dataset will be returned:
+:class:`~pydicom.dataset.FileDataset` instance  of the dataset will be returned::
 
   >>> examples.ct is examples.ct
   False
@@ -55,6 +55,6 @@ Each time the module attribute is accessed a new
   True
 
 Because of this, best practice is to assign the returned dataset to a local
-variable:
+variable::
 
    >>> ds = examples.ct

@@ -73,7 +73,6 @@ Note that only data greater than ``bulk_data_threshold`` (by default set to
 1024) is handled by the bulk data handler - smaller data is encoded inline.
 
   >>> import pydicom
-  >>> from pydicom import examples
   >>> def bulk_data_handler(data_element):
   >>>     uri = store_data_and_return_uri(data_element)
   >>>     return uri

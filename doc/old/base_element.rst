@@ -30,8 +30,8 @@ usually get one by reading an existing DICOM dataset from file::
   >>> from pydicom.data import get_testdata_file
   >>> # get some test data
   >>> path = get_testdata_file("rtplan.dcm")
-  >>> type(path)
-  str
+  >>> path
+  '/path/to/pydicom/data/test_files/rtplan.dcm'
   >>> ds = pydicom.dcmread(path)
 
 You can display the entire dataset by simply printing its string
