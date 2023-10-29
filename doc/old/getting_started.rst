@@ -21,10 +21,10 @@ DICOM format files.
 Below is a simple example of using *pydicom* in an interactive session. In it we
 use the :func:`~pydicom.data.get_testdata_file` helper function to get the
 path to one of the pydicom test datasets, which in this case is a radiotherapy
-plan file. We then read the dataset from the path using :func:`~pydicom.filereader.dcmread`,
+plan file. We read the dataset from the path using :func:`~pydicom.filereader.dcmread`,
 which returns a :class:`~pydicom.dataset.FileDataset` instance `ds`. This is then
 used to print the *Patient Name* and change the *Patient Position* from
-head-first-supine (HFS) to head-first-prone (HFP). The changes are then saved to a
+head-first-supine (HFS) to head-first-prone (HFP). Finally, the changes are saved to a
 new file `rtplan2.dcm`::
 
   >>> import pydicom
