@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
 import tempfile
-import resource
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
@@ -2883,6 +2882,11 @@ class TestWritingBufferedPixelData:
     def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(
         self, bits_allocated
     ):
+        try:
+            import resource
+        except ImportError:
+            pytest.skip("The 'resource' module is not supported on this platform")
+
         KILOBYTE = 1000
         MEGABYTE = KILOBYTE * 1000
         bytes_per_iter = MEGABYTE
