@@ -321,7 +321,7 @@ accessed and loaded:
     >>> instance.for_addition
     True
     >>> instance.path
-    '/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322'
+    '/tmp/tmp0aalrzir/86e6b75b-b764-46af-bec3-51698a8366f2'
     >>> type(instance.load())
     <class 'pydicom.dataset.FileDataset'>
 
