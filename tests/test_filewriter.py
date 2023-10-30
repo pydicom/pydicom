@@ -436,7 +436,9 @@ class TestWriteDataElement:
     def test_write_DA(self):
         data_elem = DataElement(0x00080022, "DA", "20000101")
         expected = (
-            b"\x08\x00\x22\x00" b"\x08\x00\x00\x00" b"20000101"  # tag  # length
+            b"\x08\x00\x22\x00"
+            b"\x08\x00\x00\x00"
+            b"20000101"  # tag  # length
         )  # value
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x00080022, "DA", date(2000, 1, 1))
@@ -458,7 +460,9 @@ class TestWriteDataElement:
     def test_write_TM(self):
         data_elem = DataElement(0x00080030, "TM", "010203")
         expected = (
-            b"\x08\x00\x30\x00" b"\x06\x00\x00\x00" b"010203"  # tag  # length
+            b"\x08\x00\x30\x00"
+            b"\x06\x00\x00\x00"
+            b"010203"  # tag  # length
         )  # padded value
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x00080030, "TM", b"010203")
@@ -469,7 +473,9 @@ class TestWriteDataElement:
     def test_write_multi_TM(self):
         data_elem = DataElement(0x0014407C, "TM", ["082500", b"092655"])
         expected = (
-            b"\x14\x00\x7C\x40" b"\x0E\x00\x00\x00" b"082500\\092655 "  # tag  # length
+            b"\x14\x00\x7C\x40"
+            b"\x0E\x00\x00\x00"
+            b"082500\\092655 "  # tag  # length
         )  # padded value
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x0014407C, "TM", [time(8, 25), time(9, 26, 55)])
@@ -478,7 +484,9 @@ class TestWriteDataElement:
     def test_write_DT(self):
         data_elem = DataElement(0x0008002A, "DT", "20170101120000")
         expected = (
-            b"\x08\x00\x2A\x00" b"\x0E\x00\x00\x00" b"20170101120000"  # tag  # length
+            b"\x08\x00\x2A\x00"
+            b"\x0E\x00\x00\x00"
+            b"20170101120000"  # tag  # length
         )  # value
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x0008002A, "DT", b"20170101120000")
@@ -508,7 +516,9 @@ class TestWriteDataElement:
 
     def test_write_ascii_vr_with_padding(self):
         expected = (
-            b"\x08\x00\x54\x00" b"\x0C\x00\x00\x00" b"CONQUESTSRV "  # tag  # length
+            b"\x08\x00\x54\x00"
+            b"\x0C\x00\x00\x00"
+            b"CONQUESTSRV "  # tag  # length
         )  # padded value
         data_elem = DataElement(0x00080054, "AE", "CONQUESTSRV")
         self.check_data_element(data_elem, expected)
@@ -516,7 +526,9 @@ class TestWriteDataElement:
         self.check_data_element(data_elem, expected)
 
         expected = (
-            b"\x08\x00\x62\x00" b"\x06\x00\x00\x00" b"1.2.3\x00"  # tag  # length
+            b"\x08\x00\x62\x00"
+            b"\x06\x00\x00\x00"
+            b"1.2.3\x00"  # tag  # length
         )  # padded value
         data_elem = DataElement(0x00080062, "UI", "1.2.3")
         self.check_data_element(data_elem, expected)
