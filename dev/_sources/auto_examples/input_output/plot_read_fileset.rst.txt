@@ -24,7 +24,7 @@ Read a DICOM File-set
 
 This example shows how to read and interact with a DICOM File-set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-120
+.. GENERATED FROM PYTHON SOURCE LINES 9-119
 
 
 
@@ -100,10 +100,12 @@ This example shows how to read and interact with a DICOM File-set.
         Modality=MR - 7 SOP Instances
 
     Found 7 instances for SeriesInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.118
+    /root/project/src/pydicom/fileset.py:1475: UserWarning: None of the records in the DICOMDIR dataset contain all the query elements, consider using the 'load' parameter to expand the search to the corresponding SOP instances
+      warnings.warn(
     Found 0 instances with PhotometricInterpretation='MONOCHROME1' without loading the stored instances and 3 instances with loading
 
     Original File-set still at /root/project/src/pydicom/data/test_files/dicomdirtests
-    File-set copied to /tmp/tmp75hzka4r and contains the following files:
+    File-set copied to /tmp/tmpw6jrgxog and contains the following files:
       DICOMDIR
       PT000000/ST000000/SE000000/IM000000
       PT000000/ST000000/SE000001/IM000000
@@ -151,13 +153,12 @@ This example shows how to read and interact with a DICOM File-set.
 
     from pathlib import Path
     from tempfile import TemporaryDirectory
-    import warnings
 
+    from pydicom import dcmread, examples
     from pydicom.data import get_testdata_file
     from pydicom.fileset import FileSet
     from pydicom.uid import generate_uid
 
-    warnings.filterwarnings("ignore")
 
     path = get_testdata_file("DICOMDIR")
     # A File-set can be loaded from the path to its DICOMDIR dataset or the
@@ -223,8 +224,8 @@ This example shows how to read and interact with a DICOM File-set.
     )
 
     # We can remove and add instances to the File-set
-    fs.add(get_testdata_file("CT_small.dcm"))
-    fs.add(get_testdata_file("MR_small.dcm"))
+    fs.add(examples.ct)
+    fs.add(examples.mr)
     result = fs.find(StudyDescription="'XR C Spine Comp Min 4 Views'")
     fs.remove(result)
 
@@ -263,7 +264,7 @@ This example shows how to read and interact with a DICOM File-set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.248 seconds)
+   **Total running time of the script:** (0 minutes 0.209 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_fileset.py:

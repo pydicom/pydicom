@@ -121,13 +121,21 @@ and radiotherapy objects.</p>
 <p><em>pydicom</em> makes it easy to read these complex files into natural pythonic
 structures for easy manipulation. Modified datasets can be written again to
 DICOM format files.</p>
-<p>Here is a simple example of using <em>pydicom</em> in an interactive session, to read a
-radiotherapy plan file, change the patient setup from head-first-supine to
-head-first-prone, and save to a new file:</p>
+<p>Below is a simple example of using <em>pydicom</em> in an interactive session. In it we
+use the <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a> helper function to get the
+path to one of the pydicom test datasets, which in this case is a radiotherapy
+plan file. We read the dataset from the path using <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>,
+which returns a <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance <cite>ds</cite>. This is then
+used to print the <em>Patient Name</em> and change the <em>Patient Position</em> from
+head-first-supine (HFS) to head-first-prone (HFP). Finally, the changes are saved to a
+new file <cite>rtplan2.dcm</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>  <span class="c1"># plan dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fetch the path to the example dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span>
+<span class="go">&#39;/path/to/pydicom/data/test_files/rtplan.dcm&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
 <span class="go">&#39;Last^First^mid^pre&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;setup&quot;</span><span class="p">)</span>  <span class="c1"># get a list of tags with &quot;setup&quot; somewhere in the name</span>
@@ -140,6 +148,8 @@ head-first-prone, and save to a new file:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;rtplan2.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>A more thorough introduction to pydicom can be found in the <a class="reference internal" href="../tutorials/dataset_basics.html"><span class="doc">dataset basics
+tutorial</span></a>.</p>
 <p><em>pydicom</em> is not a DICOM server (see <a class="reference external" href="https://github.com/pydicom/pynetdicom">pynetdicom</a> instead),
 and is not primarily about viewing images. It is designed to let you manipulate
 data elements in DICOM files with Python code.</p>

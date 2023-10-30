@@ -268,10 +268,10 @@ In a command window start a new **Python** session::
 
   &gt;&gt;&gt; from pydicom import dcmread
   &gt;&gt;&gt; from pydicom.data import get_testdata_file
-  &gt;&gt;&gt; fpath = get_testdata_file(&quot;CT_small.dcm&quot;)
-  &gt;&gt;&gt; fpath
+  &gt;&gt;&gt; path = get_testdata_file(&quot;CT_small.dcm&quot;)
+  &gt;&gt;&gt; path
   &#39;[path/to]/pydicom/data/test_files/CT_small.dcm&#39;
-  &gt;&gt;&gt; ds = dcmread(fpath)
+  &gt;&gt;&gt; ds = dcmread(path)
 
 Printing an element
 ===================

@@ -78,7 +78,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -144,12 +143,9 @@ elements using pydicom.</p>
 </section>
 <section id="displaying-private-data-elements-in-pydicom">
 <h2>Displaying Private Data Elements in pydicom<a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Link to this heading">¶</a></h2>
-<p>Here is an example of some private tags displayed for pydicom’s test file
-‘CT_small.dcm’:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ct_filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">ct_filename</span><span class="p">)</span>
+<p>Here is an example of some private tags displayed for pydicom’s example CT
+dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
 <span class="go">Dataset.file_meta -------------------------------</span>
 <span class="go">(0002, 0000) File Meta Information Group Length  UL: 192</span>
@@ -162,8 +158,7 @@ elements using pydicom.</p>
 <span class="go">(0002, 0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
 <span class="go">-------------------------------------------------</span>
 <span class="go">(0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
-<span class="go">(0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AX</span>
-<span class="go">IAL&#39;]</span>
+<span class="go">(0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
 <span class="go">...</span>
 <span class="go">...</span>
 <span class="go">(0009, 0010) Private Creator                     LO: &#39;GEMS_IDEN_01&#39;</span>

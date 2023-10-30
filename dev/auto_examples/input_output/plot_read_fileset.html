@@ -192,10 +192,12 @@ PatientName=Doe^Peter, PatientID=98890234
     Modality=MR - 7 SOP Instances
 
 Found 7 instances for SeriesInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.118
+/root/project/src/pydicom/fileset.py:1475: UserWarning: None of the records in the DICOMDIR dataset contain all the query elements, consider using the &#39;load&#39; parameter to expand the search to the corresponding SOP instances
+  warnings.warn(
 Found 0 instances with PhotometricInterpretation=&#39;MONOCHROME1&#39; without loading the stored instances and 3 instances with loading
 
 Original File-set still at /root/project/src/pydicom/data/test_files/dicomdirtests
-File-set copied to /tmp/tmp75hzka4r and contains the following files:
+File-set copied to /tmp/tmpw6jrgxog and contains the following files:
   DICOMDIR
   PT000000/ST000000/SE000000/IM000000
   PT000000/ST000000/SE000001/IM000000
@@ -237,13 +239,12 @@ File-set copied to /tmp/tmp75hzka4r and contains the following files:
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class"><span class="n">Path</span></a>
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory" title="tempfile.TemporaryDirectory" class="sphx-glr-backref-module-tempfile sphx-glr-backref-type-py-class"><span class="n">TemporaryDirectory</span></a>
-<span class="kn">import</span> <span class="nn">warnings</span>
 
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
 <span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a>
 <span class="kn">from</span> <span class="nn">pydicom.fileset</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-class"><span class="n">FileSet</span></a>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-function"><span class="n">generate_uid</span></a>
 
-<a href="https://docs.python.org/3/library/warnings.html#warnings.filterwarnings" title="warnings.filterwarnings" class="sphx-glr-backref-module-warnings sphx-glr-backref-type-py-function"><span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span></a><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
 <span class="c1"># A File-set can be loaded from the path to its DICOMDIR dataset or the</span>
@@ -309,8 +310,8 @@ File-set copied to /tmp/tmp75hzka4r and contains the following files:
 <span class="p">)</span>
 
 <span class="c1"># We can remove and add instances to the File-set</span>
-<a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-method"><span class="n">fs</span><span class="o">.</span><span class="n">add</span></a><span class="p">(</span><a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">))</span>
-<a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-method"><span class="n">fs</span><span class="o">.</span><span class="n">add</span></a><span class="p">(</span><a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">))</span>
+<a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-method"><span class="n">fs</span><span class="o">.</span><span class="n">add</span></a><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">ct</span><span class="p">)</span>
+<a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-method"><span class="n">fs</span><span class="o">.</span><span class="n">add</span></a><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">mr</span><span class="p">)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">result</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find" title="pydicom.fileset.FileSet.find" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-method"><span class="n">fs</span><span class="o">.</span><span class="n">find</span></a><span class="p">(</span><span class="n">StudyDescription</span><span class="o">=</span><span class="s2">&quot;&#39;XR C Spine Comp Min 4 Views&#39;&quot;</span><span class="p">)</span>
 <a href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.remove" title="pydicom.fileset.FileSet.remove" class="sphx-glr-backref-module-pydicom-fileset sphx-glr-backref-type-py-method"><span class="n">fs</span><span class="o">.</span><span class="n">remove</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">result</span></a><span class="p">)</span>
 
@@ -347,7 +348,7 @@ File-set copied to /tmp/tmp75hzka4r and contains the following files:
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><a href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.relative_to" title="pathlib.PurePath.relative_to" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-method"><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">root</span></a><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.248 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.209 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-fileset-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d9277387ad11dc0847c817c16906fc77/plot_read_fileset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_fileset.py</span></code></a></p>

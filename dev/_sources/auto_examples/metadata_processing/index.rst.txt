@@ -19,23 +19,6 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
-
-.. only:: html
-
-  .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Working with sequences</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example is a starting point to anonymize DICOM data.">
 
 .. only:: html
@@ -48,6 +31,23 @@ metadata of DICOM data.
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Anonymize DICOM data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
+
+.. only:: html
+
+  .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Working with sequences</div>
     </div>
 
 
@@ -76,7 +76,7 @@ metadata of DICOM data.
 .. toctree::
    :hidden:
 
-   /auto_examples/metadata_processing/plot_sequences
    /auto_examples/metadata_processing/plot_anonymize
+   /auto_examples/metadata_processing/plot_sequences
    /auto_examples/metadata_processing/plot_add_dict_entries
 

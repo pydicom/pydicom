@@ -46,10 +46,8 @@ The waveforms within a dataset are contained in the items of the (5400,0100)
 
 .. code-block:: python
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("waveform_ecg.dcm")
-    >>> ds = dcmread(fpath)
+    >>> from pydicom import examples
+    >>> ds = examples.waveform
     >>> ds.SOPClassUID.name
     '12-lead ECG Waveform Storage'
     >>> waveforms = ds.WaveformSequence
@@ -141,7 +139,7 @@ function. The following decodes and returns the raw data from the multiplex at
 
 If (003A,0210) *Channel Sensitivity* is present within the multiplex's *Channel
 Definition Sequence* then the raw sample data needs to be corrected before it's
-in the quantity it represents. This correction is given by sample x *Channel 
+in the quantity it represents. This correction is given by sample x *Channel
 Sensitivity* x *Channel Sensitivity Correction Factor* + *Channel Baseline*
 and will be applied when `as_raw` is ``False`` or when using the
 :meth:`Dataset.waveform_array()<pydicom.dataset.Dataset.waveform_array>`
@@ -259,6 +257,7 @@ We should now be able to plot our new waveforms:
 
 .. code-block:: python
 
+    >>> from pydicom import dcmread
     >>> ds = dcmread("my_waveform.dcm")
     >>> arr = ds.waveform_array(2)
     >>> fig, (ax1, ax2) = plt.subplots(2)

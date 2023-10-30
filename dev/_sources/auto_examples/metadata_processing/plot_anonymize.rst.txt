@@ -24,10 +24,15 @@ Anonymize DICOM data
 
 This example is a starting point to anonymize DICOM data.
 
-It shows how to read data and replace tags: person names, patient id,
+It shows how to read data and replace tags: person names, patient ID,
 optionally remove curves and private tags, and write the results in a new file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-25
+.. GENERATED FROM PYTHON SOURCE LINES 14-16
+
+Anonymize a single file
+##############################################################################
+
+.. GENERATED FROM PYTHON SOURCE LINES 16-30
 
 .. code-block:: default
 
@@ -36,37 +41,14 @@ optionally remove curves and private tags, and write the results in a new file.
     #           Guillaume Lemaitre <g.lemaitre58@gmail.com>
     # license : MIT
 
-
     import tempfile
 
-    import pydicom
-    from pydicom.data import get_testdata_file
+    from pydicom import examples
 
-    print(__doc__)
+    ds = examples.mr
 
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 26-28
-
-Anonymize a single file
-##############################################################################
-
-.. GENERATED FROM PYTHON SOURCE LINES 28-36
-
-.. code-block:: default
-
-
-    filename = get_testdata_file("MR_small.dcm")
-    dataset = pydicom.dcmread(filename)
-
-    data_elements = ["PatientID", "PatientBirthDate"]
-    for de in data_elements:
-        print(dataset.data_element(de))
+    for keyword in ["PatientID", "PatientBirthDate"]:
+        print(ds.data_element(keyword))
 
 
 
@@ -82,48 +64,48 @@ Anonymize a single file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-40
+.. GENERATED FROM PYTHON SOURCE LINES 31-34
 
 We can define a callback function to find all tags corresponding to a person
 names inside the dataset. We can also define a callback function to remove
 curves tags.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-52
+.. GENERATED FROM PYTHON SOURCE LINES 34-46
 
 .. code-block:: default
 
 
 
-    def person_names_callback(dataset, data_element):
-        if data_element.VR == "PN":
-            data_element.value = "anonymous"
+    def person_names_callback(ds, elem):
+        if elem.VR == "PN":
+            elem.value = "anonymous"
 
 
-    def curves_callback(dataset, data_element):
-        if data_element.tag.group & 0xFF00 == 0x5000:
-            del dataset[data_element.tag]
-
-
-
+    def curves_callback(ds, elem):
+        if elem.tag.group & 0xFF00 == 0x5000:
+            del ds[elem.tag]
 
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-55
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 47-49
 
 We can use the different callback function to iterate through the dataset but
 also some other tags such that patient ID, etc.
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-60
+.. GENERATED FROM PYTHON SOURCE LINES 49-54
 
 .. code-block:: default
 
 
-    dataset.PatientID = "id"
-    dataset.walk(person_names_callback)
-    dataset.walk(curves_callback)
+    ds.PatientID = "id"
+    ds.walk(person_names_callback)
+    ds.walk(curves_callback)
 
 
 
@@ -132,16 +114,16 @@ also some other tags such that patient ID, etc.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-62
+.. GENERATED FROM PYTHON SOURCE LINES 55-56
 
 pydicom allows to remove private tags using ``remove_private_tags`` method
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-65
+.. GENERATED FROM PYTHON SOURCE LINES 56-59
 
 .. code-block:: default
 
 
-    dataset.remove_private_tags()
+    ds.remove_private_tags()
 
 
 
@@ -150,42 +132,42 @@ pydicom allows to remove private tags using ``remove_private_tags`` method
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-68
+.. GENERATED FROM PYTHON SOURCE LINES 60-62
 
 Data elements of type 3 (optional) can be easily deleted using ``del`` or
 ``delattr``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-75
+.. GENERATED FROM PYTHON SOURCE LINES 62-69
 
 .. code-block:: default
 
 
-    if "OtherPatientIDs" in dataset:
-        delattr(dataset, "OtherPatientIDs")
+    if "OtherPatientIDs" in ds:
+        delattr(ds, "OtherPatientIDs")
 
-    if "OtherPatientIDsSequence" in dataset:
-        del dataset.OtherPatientIDsSequence
-
-
+    if "OtherPatientIDsSequence" in ds:
+        del ds.OtherPatientIDsSequence
 
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-78
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 For data elements of type 2, this is possible to blank it by assigning a
 blank string.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-83
+.. GENERATED FROM PYTHON SOURCE LINES 72-77
 
 .. code-block:: default
 
 
     tag = "PatientBirthDate"
-    if tag in dataset:
-        dataset.data_element(tag).value = "19000101"
+    if tag in ds:
+        ds.data_element(tag).value = "19000101"
 
 
 
@@ -194,21 +176,20 @@ blank string.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 78-79
 
 Finally, this is possible to store the image
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-92
+.. GENERATED FROM PYTHON SOURCE LINES 79-85
 
 .. code-block:: default
 
 
-    data_elements = ["PatientID", "PatientBirthDate"]
-    for de in data_elements:
-        print(dataset.data_element(de))
+    for keyword in ["PatientID", "PatientBirthDate"]:
+        print(ds.data_element(keyword))
 
-    output_filename = tempfile.NamedTemporaryFile().name
-    dataset.save_as(output_filename)
+    path = tempfile.NamedTemporaryFile().name
+    ds.save_as(path)
 
 
 
@@ -226,7 +207,7 @@ Finally, this is possible to store the image
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.011 seconds)
+   **Total running time of the script:** (0 minutes 0.007 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_anonymize.py:

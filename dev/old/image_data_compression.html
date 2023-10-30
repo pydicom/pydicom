@@ -79,7 +79,6 @@
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -148,13 +147,12 @@ encoding</p></li>
 for more information.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
 <span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
 
-<span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="c1"># Fetch an example dataset</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 
 <span class="c1"># Use third-party package to compress</span>
 <span class="c1"># Let&#39;s assume it compresses to JPEG 2000 (lossless)</span>
@@ -172,14 +170,14 @@ for more information.</p>
 <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="c1"># Save!</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_basic.dcm&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_basic.dcm&quot;</span><span class="p">)</span>
 
 <span class="c1"># Extended encapsulation</span>
 <span class="n">result</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTableLength</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_ext.dcm&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_ext.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -223,19 +221,19 @@ transfer syntaxes:</p>
 <h3>Compressing with <code class="docutils literal notranslate"><span class="pre">Dataset.compress()</span></code><a class="headerlink" href="#compressing-with-dataset-compress" title="Link to this heading">¶</a></h3>
 <p>The <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> method can
 be used to compress an uncompressed dataset in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
 
-<span class="n">ds</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_rle.dcm&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_rle_lossless.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>A specific encoding plugin can be used by passing the plugin name via the
 <cite>encoding_plugin</cite> argument:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Will set `ds.is_little_endian` and `ds.is_implicit_VR` automatically</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s1">&#39;pylibjpeg&#39;</span><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_rle.dcm&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_rle_lossless.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Implicitly changing the compression on an already compressed dataset is not
@@ -244,7 +242,7 @@ prior to calling <a class="reference internal" href="../reference/generated/pydi
 below, a matching <a class="reference internal" href="image_data_handlers.html"><span class="doc">image data handler</span></a> for the
 original transfer syntax - <em>JPEG 2000 Lossless</em> - is required.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Requires a JPEG 2000 compatible image data handler</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;US1_J2KR.dcm&quot;</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s1">&#39;RGB&#39;</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>

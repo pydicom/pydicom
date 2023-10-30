@@ -75,7 +75,6 @@
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -136,10 +135,8 @@ Standard.</p>
 common sampling frequency (in Hz), which is given by the (003A,001A) <em>Sampling
 Frequency</em>. The waveform data for each multiplex is encoded in the
 corresponding (5400,1010) <em>Waveform Data</em> element.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;waveform_ecg.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">waveform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span>
 <span class="go">&lt;Sequence, length 2&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

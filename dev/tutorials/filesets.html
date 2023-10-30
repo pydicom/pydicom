@@ -178,10 +178,8 @@ require recalculating the offsets for each directory record. Use the
 <p>The DICOMDIR file is used to summarize the contents of the File-set and is a
 <em>Media Storage Directory</em> instance that follows the
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">dicomdir</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;Media Storage Directory Storage&#39;</span>
 </pre></div>
@@ -222,6 +220,7 @@ system changes. A more user-friendly way to interact with one is via the
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or the path to the DICOMDIR file to
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.fileset</span> <span class="kn">import</span> <span class="n">FileSet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FileSet</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>  <span class="c1"># or FileSet(path)</span>
@@ -339,7 +338,7 @@ parameter:</p>
 </div>
 <p>This will create a completely conformant File-set, however it won’t contain
 any SOP instances. Since empty File-sets aren’t very useful, our next step
-will be to add some.</p>
+will be to add some SOP instances to it.</p>
 </section>
 <section id="modifying-a-file-set">
 <h3>Modifying a File-set<a class="headerlink" href="#modifying-a-file-set" title="Link to this heading">¶</a></h3>
@@ -395,8 +394,7 @@ returns the addition as a <a class="reference internal" href="../reference/gener
 temporary directory and only copied to the File-set itself when
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> is called. However, they can still be
 accessed and loaded:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">ct</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span><span class="o">.</span><span class="n">is_staged</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span><span class="o">.</span><span class="n">for_addition</span>
@@ -415,8 +413,8 @@ directory record creation functions to create the necessary records based on
 the SOP instance’s attributes, such as <em>SOP Class UID</em> and <em>Modality</em>.
 Occasionally, they may fail when an element required by these functions
 is empty or missing:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtdose.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rt_dose</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rt_dose</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rt_dose</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1858</span>, in <span class="n">_recordify</span>
 <span class="w">    </span><span class="n">record</span> <span class="o">=</span> <span class="n">DIRECTORY_RECORDERS</span><span class="p">[</span><span class="n">record_type</span><span class="p">](</span><span class="n">ds</span><span class="p">)</span>
@@ -446,9 +444,8 @@ is empty or missing:</p>
 </ul>
 <p>According to the exception message above, the <em>Instance Number</em> element is empty.
 Let’s update the instance and try adding it again:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">InstanceNumber</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rt_dose</span><span class="o">.</span><span class="n">InstanceNumber</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rt_dose</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -473,8 +470,8 @@ Let’s update the instance and try adding it again:</p>
 <section id="applying-the-changes">
 <h3>Applying the changes<a class="headerlink" href="#applying-the-changes" title="Link to this heading">¶</a></h3>
 <p>Let’s add a couple of SOP instances back to the File-set:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">ct</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">mr</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To apply the changes we’ve made to the File-set we use

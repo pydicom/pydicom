@@ -13,36 +13,18 @@ If you haven't installed *pydicom* yet, follow the instructions in our
 :doc:`installation guide</tutorials/installation>`.
 
 
-Getting our example dataset
-===========================
+Getting the path to the example dataset
+=======================================
 
 In the tutorial we're going to be using a DICOM dataset included with
-*pydicom*: :gh:`CT_small.dcm
-<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
-Starting with version 1.4 you can get the path to the file
-by using the :func:`~pydicom.data.get_testdata_file` function to return the
-path as a :class:`str` (your path may vary)::
+*pydicom*: :gh:`CT_small.dcm<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
+You can get the file path to the dataset by using the :func:`~pydicom.data.get_testdata_file`
+function to return the path as a :class:`str` (your path may vary)::
 
     >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> fpath
-    '/home/user/env/pyd/lib/python3.7/site-packages/pydicom/data/test_files/CT_small.dcm'
-
-If you're using an earlier version then you'll have to use
-:func:`~pydicom.data.get_testdata_files` instead, which returns a list
-containing matching paths::
-
-    >>> from pydicom.data import get_testdata_files
-    >>> fpath = get_testdata_files("CT_small.dcm")[0]
-    >>> fpath
-    '/home/user/env/pyd/lib/python3.7/site-packages/pydicom/data/test_files/CT_small.dcm'
-
-To get the version of *pydicom* you're using you can do the following::
-
-    >>> import pydicom
-    >>> pydicom.__version__
-    '1.3.0'
-
+    >>> path = get_testdata_file("CT_small.dcm")
+    >>> path
+    '/path/to/pydicom/data/test_files/CT_small.dcm'
 
 Reading
 =======
@@ -53,17 +35,17 @@ To read the DICOM dataset at a given file path we use
 
     >>> from pydicom import dcmread
     >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(fpath)
+    >>> path = get_testdata_file("CT_small.dcm")
+    >>> ds = dcmread(path)
 
 :func:`~pydicom.filereader.dcmread` can also handle file-likes::
 
-    >>> with open(fpath, 'rb') as infile:
+    >>> with open(path, 'rb') as infile:
     ...     ds = dcmread(infile)
 
 And can even be used as a context manager::
 
-    >>> with dcmread(fpath) as ds:
+    >>> with dcmread(path) as ds:
     ...    type(ds)
     ...
     <class 'pydicom.dataset.FileDataset'>
@@ -75,8 +57,8 @@ exception:
 
 .. code-block:: pycon
 
-    >>> no_meta = get_testdata_file('no_meta.dcm')
-    >>> ds = dcmread(no_meta)
+    >>> no_meta_path = get_testdata_file('no_meta.dcm')
+    >>> ds = dcmread(no_meta_path)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
       File ".../pydicom/filereader.py", line 887, in dcmread
@@ -95,7 +77,7 @@ This indicates that either:
 If you're sure that the file contains DICOM data then you can use the `force`
 keyword parameter to force reading::
 
-  >>> ds = dcmread(no_meta, force=True)
+  >>> ds = dcmread(no_meta_path, force=True)
 
 A note of caution about using ``force=True``; because *pydicom* uses a
 deferred-read system, **no exceptions** will be raised at the time of reading,
@@ -128,10 +110,12 @@ You'll only run into problems when trying to use the dataset::
 Viewing and accessing
 =====================
 
-Let's go back to our ``CT_small.dcm`` dataset::
+The ``CT_small.dcm`` dataset is also included as an example dataset:
 
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(fpath)
+    >>> from pydicom import examples
+    >>> ds = examples.ct
+    >>> type(ds)
+    <class 'pydicom.dataset.FileDataset'>
 
 You can view the contents of the entire dataset by using :func:`print`::
 

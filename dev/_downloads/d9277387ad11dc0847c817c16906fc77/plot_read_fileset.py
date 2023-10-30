@@ -9,13 +9,12 @@ This example shows how to read and interact with a DICOM File-set.
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import warnings
 
+from pydicom import dcmread, examples
 from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
 from pydicom.uid import generate_uid
 
-warnings.filterwarnings("ignore")
 
 path = get_testdata_file("DICOMDIR")
 # A File-set can be loaded from the path to its DICOMDIR dataset or the
@@ -81,8 +80,8 @@ print(
 )
 
 # We can remove and add instances to the File-set
-fs.add(get_testdata_file("CT_small.dcm"))
-fs.add(get_testdata_file("MR_small.dcm"))
+fs.add(examples.ct)
+fs.add(examples.mr)
 result = fs.find(StudyDescription="'XR C Spine Comp Min 4 Views'")
 fs.remove(result)
 

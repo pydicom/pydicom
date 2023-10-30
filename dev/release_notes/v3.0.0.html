@@ -113,11 +113,11 @@
 gracefully (extra bytes are ignored with a warning)</p></li>
 <li><p>A value of 0 for <code class="docutils literal notranslate"><span class="pre">NumberOfFrames</span></code> is now handled as 1 frame, with a user warning issued
 on reading the pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1844">#1844</a>)</p></li>
-<li><p>The <cite>dicomdir</cite> module and <cite>DicomDir</cite> class have been removed and reading a
+<li><p>The <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module and <code class="docutils literal notranslate"><span class="pre">DicomDir</span></code> class have been removed and reading a
 DICOMDIR dataset now returns a normal <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance.
 For handling DICOM File-sets and DICOMDIR datasets use the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class instead.</p></li>
-<li><p>The <cite>read_file</cite> and <cite>write_file</cite> functions have been removed, use
+<li><p>The <code class="docutils literal notranslate"><span class="pre">read_file</span></code> and <code class="docutils literal notranslate"><span class="pre">write_file</span></code> functions have been removed, use
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> and <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a>
 instead.</p></li>
 <li><p>The value for <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLossless.html#pydicom.uid.JPEGLossless" title="pydicom.uid.JPEGLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLossless</span></code></a> has changed from
@@ -152,14 +152,14 @@ instead.</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p>The <cite>PersonNameUnicode</cite> class has been removed, use
+<li><p>The <code class="docutils literal notranslate"><span class="pre">PersonNameUnicode</span></code> class has been removed, use
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> instead</p></li>
-<li><p>The <cite>DataElement.description</cite> attribute has been removed, use
+<li><p>The <code class="docutils literal notranslate"><span class="pre">DataElement.description</span></code> attribute has been removed, use
 <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.name" title="pydicom.dataelem.DataElement.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.name</span></code></a> instead</p></li>
-<li><p>The <cite>pixel_data_handlers.rle_handler.rle_encode_frame</cite> function has been
+<li><p>The <code class="docutils literal notranslate"><span class="pre">pixel_data_handlers.rle_handler.rle_encode_frame</span></code> function has been
 removed, use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
 <a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
-<li><p>Removed the <cite>_storage_sopclass_uids</cite> module, import UIDs from the <cite>uid</cite> module
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code> module, import UIDs from the <cite>uid</cite> module
 instead</p></li>
 <li><p>The theoretical maximum number of instances supported by
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> has been reduced to 1838265625 to ensure support
@@ -193,6 +193,8 @@ File-set (<a class="reference external" href="https://github.com/pydicom/pydicom
 </div></blockquote>
 </li>
 <li><p>Added convenience method <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new_private" title="pydicom.dataset.Dataset.add_new_private"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new_private()</span></code></a> to add a private tag</p></li>
+<li><p>Added the <a class="reference internal" href="../reference/examples.html#api-examples"><span class="std std-ref">examples</span></a> module to make it easier and less
+confusing for users to work with the example datasets used by the documentation</p></li>
 </ul>
 </section>
 <section id="fixes">
