@@ -1100,13 +1100,12 @@ class FileSet:
 
         .. code-block:: python
 
-            from pydicom import dcmread, Dataset
-            from pydicom.data import get_testdata_file
+            from pydicom import Dataset, examples
             from pydicom.fileset import FileSet, RecordNode
             from pydicom.uid import generate_uid
 
             # The instance to be added
-            ds = dcmread(get_testdata_file("CT_small.dcm"))
+            ds = examples.ct
 
             # Define the leaf node (the PRIVATE record)
             record = Dataset()

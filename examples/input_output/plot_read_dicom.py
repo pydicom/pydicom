@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 
-fpath = get_testdata_file("CT_small.dcm")
-ds = dcmread(fpath)
+path = get_testdata_file("CT_small.dcm")
+ds = dcmread(path)
 
 # Normal mode:
 print()
-print(f"File path........: {fpath}")
+print(f"File path........: {path}")
 print(f"SOP Class........: {ds.SOPClassUID} ({ds.SOPClassUID.name})")
 print()
 
