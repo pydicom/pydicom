@@ -462,7 +462,7 @@ class DataElement:
                 raise ValueError(
                     f"Invalid VR: {self.VR}. Only the following VRs support buffers: {BUFFERED_VRS}."
                 )
-            
+
             # ensure pre-conditions are met - we will check these when reading the value as well
             # but better to fail early if possible
             buffer_assertions(val)

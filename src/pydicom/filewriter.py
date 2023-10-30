@@ -315,7 +315,7 @@ def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
         with reset_buffer_position(buffer) as starting_position:
             for chunk in read_bytes(buffer):
                 fp.write(chunk)
-            
+
             value_length = buffer.tell() - starting_position
     else:
         fp.write(cast(bytes, elem.value))
@@ -336,7 +336,7 @@ def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
         buffer = cast(BufferedIOBase, elem.value)
         with reset_buffer_position(buffer):
             for chunk in read_bytes(buffer):
-                fp.write(chunk)            
+                fp.write(chunk)
     else:
         fp.write(cast(bytes, elem.value))
 
@@ -602,15 +602,15 @@ def write_data_element(
         if not fp.is_little_endian:
             # Non-conformant endianness
             encap_item = b"\xff\xfe\xe0\x00"
-        
-        pixel_data_bytes: bytes = b''
+
+        pixel_data_bytes: bytes = b""
 
         if elem.is_buffered:
             buffer = cast(BufferedIOBase, elem.value)
             with reset_buffer_position(buffer):
                 pixel_data_bytes = buffer.read(len(encap_item))
         else:
-            pixel_data_bytes = cast(bytes, elem.value)[:len(encap_item)]
+            pixel_data_bytes = cast(bytes, elem.value)[: len(encap_item)]
 
         if not pixel_data_bytes.startswith(encap_item):
             raise ValueError(
@@ -620,7 +620,11 @@ def write_data_element(
                 "information"
             )
 
-    value_length: int = buffer.tell() if not elem.is_buffered else buffer_length(cast(BufferedIOBase, elem.value))
+    value_length: int = (
+        buffer.tell()
+        if not elem.is_buffered
+        else buffer_length(cast(BufferedIOBase, elem.value))
+    )
     if (
         not fp.is_implicit_VR
         and vr not in EXPLICIT_VR_LENGTH_32

@@ -8,10 +8,11 @@ from io import BufferedIOBase
 import os
 from typing import Iterator
 
+
 def buffer_assertions(buffer: BufferedIOBase):
     """
     Asserts pre-conditions for working with a readable and seekable buffer.
-    
+
     Parameters
     ----------
     buffer:
