@@ -22,9 +22,10 @@ from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
+from pydicom.util.buffers import read_bytes
 from .test_util import save_private_dict
 from pydicom.uid import UID
-from pydicom.valuerep import DSfloat, validate_value
+from pydicom.valuerep import BUFFERED_VRS, DSfloat, validate_value
 
 
 class TestDataElement:
@@ -1225,37 +1226,20 @@ class TestDataElementValidation:
 class TestBufferedDataElement:
     """Tests setting a DataElement value to a buffer"""
 
-    def test_reading_dataelement_buffer(self):
+    @pytest.mark.parametrize("vr", BUFFERED_VRS)
+    def test_reading_dataelement_buffer(self, vr):
         value = b"\x00\x01\x02\x03"
         buffer = io.BytesIO(value)
-        de = DataElement("PixelData", "OB", buffer)
+        de = DataElement("PixelData", vr, buffer)
 
         data: bytes = b""
-        for chunk in de.value_generator():
+        # while read_bytes is tested in test_buffer.py, this tests the integration
+        # between the helper and DataElement since this is the main use case
+        for chunk in read_bytes(de.value):
             data += chunk
 
         assert data == value
 
-    def test_reading_dataelement_buffer_stores_bytes_read(self):
-        value = b"\x00\x01\x02\x03"
-        buffer = io.BytesIO(value)
-        de = DataElement("PixelData", "OB", buffer)
-
-        for _ in de.value_generator():
-            # simulate 'throwing away' the data after reading it, ie
-            # reading the chunk then writing it to a file
-            pass
-
-        assert de.bytes_read_from_buffer == len(value)
-
-    def test_reading_dataelement_buffer_changing_read_size(self):
-        value = b"\x00\x01\x02\x03"
-        buffer = io.BytesIO(value)
-
-        de = DataElement("PixelData", "OB", buffer)
-
-        call_count = 0
-        for _ in de.value_generator(chunk_size=1):
-            call_count += 1
-
-        assert call_count == len(value)
+    def test_setting_value_to_buffer_for_unsupported_vr_raises_an_exception(self):
+        with pytest.raises(ValueError, match="Only the following VRs support buffers"):
+            DataElement("PersonName", "PN", io.BytesIO())

@@ -33,8 +33,10 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
+from pydicom.util.buffers import buffer_assertions
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
+    BUFFERED_VRS,
     PersonName,
     BYTES_VR,
     AMBIGUOUS_VR,
@@ -162,7 +164,6 @@ class DataElement:
     maxBytesToDisplay = 16
     showVR = True
     is_raw = False
-    bytes_read_from_buffer: int = 0
 
     def __init__(
         self,
@@ -216,11 +217,6 @@ class DataElement:
         is_buffered = False
         if isinstance(value, BufferedIOBase):
             is_buffered = True
-            valid_vrs = (VR_.OB, VR_.OB_OW, VR_.OW)
-            if VR not in valid_vrs:
-                raise ValueError(
-                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}."
-                )
 
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
@@ -462,11 +458,14 @@ class DataElement:
         # * All byte-like VRs
         # * Ambiguous VRs that may be byte-like
         if isinstance(val, BufferedIOBase):
-            valid_vrs = (VR_.OB, VR_.OB_OW, VR_.OW)
-            if self.VR not in valid_vrs:
+            if self.VR not in BUFFERED_VRS:
                 raise ValueError(
-                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {valid_vrs}."
+                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {BUFFERED_VRS}."
                 )
+            
+            # ensure pre-conditions are met - we will check these when reading the value as well
+            # but better to fail early if possible
+            buffer_assertions(val)
 
             self._value = val
             return
@@ -482,43 +481,6 @@ class DataElement:
     @property
     def is_buffered(self):
         return isinstance(self._value, BufferedIOBase)
-
-    def value_generator(self, *, chunk_size=8192) -> Iterator[bytes]:
-        """Consume data from a buffered value. The value must be a buffer, the buffer must be
-        readable, and the buffer must not be closed. The amount of data read will be stored
-        in the passed in buffer_info instance.
-
-        Parameters
-        ----------
-        chunk_size:
-            The amount of bytes to read at a time. Less bytes may be read if there are less
-            than the specified amount of bytes in the stream. Default is 1024.
-
-        Returns
-        -------
-        Iterator
-            An iterator that yields bytes up to the specified chunk_size.
-        """
-        assert (
-            self.is_buffered
-        ), "value_generator is only applicable for a buffered value"
-
-        buffer = cast(BufferedIOBase, self._value)
-        # operations on a closed stream are undefined, ensure the stream is still open
-        assert not buffer.closed, "The stream has been closed"
-        assert buffer.readable(), "The stream is not readable"
-
-        self.bytes_read_from_buffer = 0
-
-        while chunk := buffer.read(chunk_size):
-            if chunk:
-                yield chunk
-
-        self.bytes_read_from_buffer = buffer.tell()
-
-        # if the buffer is seekable, seek back to the beginning so that the buffer can be re-used
-        if buffer.seekable():
-            buffer.seek(0)
 
     @property
     def VM(self) -> int:
