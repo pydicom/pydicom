@@ -51,7 +51,7 @@ def reset_buffer_position(value: BufferedIOBase) -> Generator[int, None, None]:
     value.seek(startion_position)
 
 
-def read_bytes(value: BufferedIOBase, *, chunk_size=8192) -> Iterator[bytes]:
+def read_bytes(value: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[bytes]:
     """Consume data from a buffered value. The value must be a buffer, the buffer must be
     readable, the buffer must be seekable, and the buffer must not be closed.
 
@@ -63,7 +63,7 @@ def read_bytes(value: BufferedIOBase, *, chunk_size=8192) -> Iterator[bytes]:
         The buffer to read from. It must meet the required pre-conditions.
     chunk_size:
         The amount of bytes to read at a time. Less bytes may be read if there are less
-        than the specified amount of bytes in the stream. Default is 8192.
+        than the specified amount of bytes in the stream. Must be > 0. Default is 8192.
 
     Returns
     -------
@@ -75,6 +75,7 @@ def read_bytes(value: BufferedIOBase, *, chunk_size=8192) -> Iterator[bytes]:
     AssertionError
         If the buffer is not seekable, readable, or is closed.
     """
+    assert chunk_size > 0, "chunk_size must be > 0: {chunk_size}"
 
     buffer_assertions(value)
     while chunk := value.read(chunk_size):
