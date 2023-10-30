@@ -25,7 +25,7 @@ from pydicom.tag import (
     tag_in_exception,
 )
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
-from pydicom.util.buffers import read_bytes, reset_buffer_position
+from pydicom.util.buffers import buffer_length, read_bytes, reset_buffer_position
 from pydicom.valuerep import (
     PersonName,
     IS,
@@ -319,6 +319,7 @@ def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
             value_length = buffer.tell() - starting_position
     else:
         fp.write(cast(bytes, elem.value))
+        value_length = len(elem.value)
 
     if value_length % 2:
         # Pad odd length values
@@ -619,15 +620,7 @@ def write_data_element(
                 "information"
             )
 
-    value_length: int = -1
-    if elem.is_buffered:
-        buffer = cast(BufferedIOBase, elem.value)
-        with reset_buffer_position(buffer) as starting_position:
-            buffer.seek(0, os.SEEK_END)
-            value_length = buffer.tell() - starting_position
-    else:
-        value_length = buffer.tell()
-
+    value_length: int = buffer.tell() if not elem.is_buffered else buffer_length(cast(BufferedIOBase, elem.value))
     if (
         not fp.is_implicit_VR
         and vr not in EXPLICIT_VR_LENGTH_32

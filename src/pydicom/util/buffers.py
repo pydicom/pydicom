@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from collections.abc import Generator
 
 from io import BufferedIOBase
+import os
 from typing import Iterator
 
 def buffer_assertions(buffer: BufferedIOBase):
@@ -79,3 +80,16 @@ def read_bytes(value: BufferedIOBase, *, chunk_size=8192) -> Iterator[bytes]:
         if chunk:
             yield chunk
 
+
+def buffer_length(value: BufferedIOBase) -> int:
+    """
+    Gets the length of the buffer with respect to the starting position of the buffer.
+
+    Returns
+    -------
+    int
+        The length of the buffer minus the starting position of the buffer.
+    """
+    with reset_buffer_position(value) as starting_position:
+        value.seek(0, os.SEEK_END)
+        return value.tell() - starting_position
