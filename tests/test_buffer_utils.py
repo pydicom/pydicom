@@ -11,7 +11,7 @@ class TestBufferUtils:
             b"\x00\x01\x02\x03",
             b"",
             # big value
-            bytes(("test" * 10_000), encoding="utf-8"),
+            bytes(("0" * 10_000), encoding="utf-8"),
         ),
     )
     @pytest.mark.parametrize("chunk_size", (None, 1, 100_000_000))
