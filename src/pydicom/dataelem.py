@@ -11,7 +11,8 @@ import base64
 from dataclasses import dataclass
 from io import BufferedIOBase
 import json
-from typing import Iterator, Optional, Any, TYPE_CHECKING, NamedTuple, cast
+from typing import Optional, Any, TYPE_CHECKING, NamedTuple, cast
+from collections.abc import Iterator
 from collections.abc import Callable, MutableSequence
 import warnings
 
@@ -757,6 +758,7 @@ class RawDataElement(NamedTuple):
     is_implicit_VR: bool
     is_little_endian: bool
     is_raw: bool = True
+    is_buffered: bool = False
 
 
 # The first and third values of the following elements are always US

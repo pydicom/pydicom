@@ -6,7 +6,7 @@ from collections.abc import Generator
 
 from io import BufferedIOBase
 import os
-from typing import Iterator
+from collections.abc import Iterator
 
 
 def buffer_assertions(buffer: BufferedIOBase):
@@ -55,7 +55,7 @@ def read_bytes(value: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[byt
     """Consume data from a buffered value. The value must be a buffer, the buffer must be
     readable, the buffer must be seekable, and the buffer must not be closed.
 
-    NOTE: The buffer is NOT seeked back to its starting position.
+    NOTE: The buffer is NOT sought back to its starting position.
 
     Parameters
     ----------
