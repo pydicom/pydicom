@@ -6,7 +6,7 @@ from pydicom.util.buffers import buffer_length, read_bytes, reset_buffer_positio
 
 class TestBufferUtils:
     @pytest.mark.parametrize(
-        "data",
+        "buffer_data",
         (
             b"\x00\x01\x02\x03",
             b"",
@@ -15,8 +15,8 @@ class TestBufferUtils:
         ),
     )
     @pytest.mark.parametrize("chunk_size", (None, 1, 100_000_000))
-    def test_reading_data_from_a_buffer(self, data, chunk_size):
-        buffer = BytesIO(data)
+    def test_reading_data_from_a_buffer(self, buffer_data, chunk_size):
+        buffer = BytesIO(buffer_data)
         data = b""
 
         kwargs = {}
@@ -27,7 +27,7 @@ class TestBufferUtils:
         for chunk in read_bytes(buffer, **kwargs):
             data += chunk
 
-        assert data == data
+        assert data == buffer_data
 
     def test_reading_data_from_a_buffer_from_middle_of_buffer(self):
         buffer = BytesIO(b"\x00\x01\x02\x03")
