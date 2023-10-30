@@ -635,7 +635,7 @@ class DataElement:
         if self.is_buffered:
             # in case the buffer is a stream and non-seekable we don't want
             # to consume any bytes
-            return repr(self._value)
+            return repr(self.value)
 
         # If the VR is byte-like or long text (1024+), show a summary instead
         if self.VR in LONG_VALUE_VR:
@@ -742,7 +742,7 @@ class DataElement:
     def __repr__(self) -> str:
         """Return the representation of the element."""
         if self.is_buffered:
-            return repr(self._value)
+            return repr(self.value)
 
         return repr(self.value) if self.VR == VR_.SQ else str(self)
 

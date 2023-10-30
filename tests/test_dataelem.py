@@ -5,6 +5,7 @@
 import datetime
 import math
 import io
+import re
 
 import pytest
 
@@ -1243,3 +1244,12 @@ class TestBufferedDataElement:
     def test_setting_value_to_buffer_for_unsupported_vr_raises_an_exception(self):
         with pytest.raises(ValueError, match="Only the following VRs support buffers"):
             DataElement("PersonName", "PN", io.BytesIO())
+
+    def test_printing_value(self):
+        value = b"\x00\x01\x02\x03"
+        buffer = io.BytesIO(value)
+        de = DataElement("PixelData", "OB", buffer)
+        assert re.compile(
+            r"^\(7FE0,0010\) Pixel Data\W*OB: <_io.BytesIO object.*$"
+        ).match(str(de))
+        assert de.repval.startswith("<_io.BytesIO object at")

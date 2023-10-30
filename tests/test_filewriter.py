@@ -12,6 +12,7 @@ from platform import python_implementation
 
 from struct import unpack
 from tempfile import TemporaryFile
+from typing import cast
 import zlib
 
 import pytest
@@ -47,7 +48,7 @@ from pydicom.uid import (
     CTImageStorage,
 )
 from pydicom.util.hexutil import hex2bytes
-from pydicom.valuerep import DA, DT, TM, VR
+from pydicom.valuerep import BUFFERED_VRS, DA, DT, TM, VR
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
@@ -2736,14 +2737,21 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.seek(0)
         assert self.fp.read() == expected
 
-    def test_little_endian_incorrect_data(self):
+    @pytest.mark.parametrize(
+        "data",
+        (
+            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
+            BytesIO(b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0"),
+        ),
+    )
+    def test_little_endian_incorrect_data(self, data):
         """Writing pixel data not starting with an item tag raises."""
         self.fp.is_little_endian = True
         self.fp.is_implicit_VR = False
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
+            data,
             is_undefined_length=True,
         )
         msg = (
@@ -2753,14 +2761,21 @@ class TestWriteUndefinedLengthPixelData:
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
 
-    def test_big_endian_incorrect_data(self):
+    @pytest.mark.parametrize(
+        "data",
+        (
+            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
+            BytesIO(b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd"),
+        ),
+    )
+    def test_big_endian_incorrect_data(self, data):
         """Writing pixel data not starting with an item tag raises."""
         self.fp.is_little_endian = False
         self.fp.is_implicit_VR = False
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
+            data,
             is_undefined_length=True,
         )
         msg = (
@@ -2914,3 +2929,17 @@ class TestWritingBufferedPixelData:
             # if we have successfully kept the PixelData out of memory, then our peak memory usage
             # usage be less than prev peak + the size of the file
             assert memory_usage < (baseline_memory_usage + limit)
+
+    @pytest.mark.parametrize("vr", BUFFERED_VRS)
+    def test_all_supported_VRS_can_write_a_buffered_value(self, vr):
+        data = b"\x00\x01\x02\x03"
+        buffer = BytesIO(data)
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+
+        fn, _ = writers[cast(VR, vr)]
+        fn(fp, DataElement("PixelData", vr, buffer))
+
+        assert fp.getvalue() == data
