@@ -206,6 +206,9 @@ when the J2K stream disagrees with the dataset and
 <li><p>Fixed pydicom codify error when relative path did not exist</p></li>
 <li><p>Fixed the VR enum sometimes returning invalid values for Python 3.11+ (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1874">#1874</a>)</p></li>
 <li><p>Fixed pixel data handler for Pillow 10.1 raising an AttributeError (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1907">#1907</a>)</p></li>
+<li><p>Fixed a possible security issue with <a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> instances
+being able to escape the temporary directory when being added to a
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1922">#1922</a>)</p></li>
 </ul>
 </section>
 <section id="pydicom-internals">

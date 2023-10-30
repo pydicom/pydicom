@@ -37,21 +37,21 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpvh_b7lyk.dcm
+    Writing test file /tmp/tmpgcuw1b7v.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmppkdkon9p.dcm
-    Load file /tmp/tmpvh_b7lyk.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmprgx2ef9l.dcm
+    Load file /tmp/tmpgcuw1b7v.dcm ...
     Dataset.file_meta -------------------------------
     (0002,0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002,0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002,0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
     (0008,0023) Content Date                        DA: '20231030'
-    (0008,0033) Content Time                        TM: '185704.757174'
+    (0008,0033) Content Time                        TM: '192822.540507'
     (0010,0010) Patient's Name                      PN: 'Test^Firstname'
     (0010,0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpvh_b7lyk.dcm ...
-    Load file /tmp/tmppkdkon9p.dcm ...
+    Remove file /tmp/tmpgcuw1b7v.dcm ...
+    Load file /tmp/tmprgx2ef9l.dcm ...
     Dataset.file_meta -------------------------------
     (0002,0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002,0003) Media Storage SOP Instance UID      UI: 1.2.3
@@ -59,10 +59,10 @@ have to change UIDs to valid values and add all required DICOM data elements.
     (0002,0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
     (0008,0023) Content Date                        DA: '20231030'
-    (0008,0033) Content Time                        TM: '185704.757174'
+    (0008,0033) Content Time                        TM: '192822.540507'
     (0010,0010) Patient's Name                      PN: 'Test^Firstname'
     (0010,0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmppkdkon9p.dcm ...
+    Remove file /tmp/tmprgx2ef9l.dcm ...
 
 
 

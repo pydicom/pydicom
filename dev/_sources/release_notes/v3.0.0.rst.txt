@@ -88,6 +88,9 @@ Fixes
 * Fixed pydicom codify error when relative path did not exist
 * Fixed the VR enum sometimes returning invalid values for Python 3.11+ (:issue:`1874`)
 * Fixed pixel data handler for Pillow 10.1 raising an AttributeError (:issue:`1907`)
+* Fixed a possible security issue with :class:`~pydicom.fileset.FileInstance` instances
+  being able to escape the temporary directory when being added to a
+  :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
 
 Pydicom Internals
 -----------------
