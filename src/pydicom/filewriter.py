@@ -606,9 +606,9 @@ def write_data_element(
         pixel_data_bytes: bytes = b""
 
         if elem.is_buffered:
-            buffer = cast(BufferedIOBase, elem.value)
-            with reset_buffer_position(buffer):
-                pixel_data_bytes = buffer.read(len(encap_item))
+            elem_buffer = cast(BufferedIOBase, elem.value)
+            with reset_buffer_position(elem_buffer):
+                pixel_data_bytes = elem_buffer.read(len(encap_item))
         else:
             pixel_data_bytes = cast(bytes, elem.value)[: len(encap_item)]
 
@@ -662,7 +662,7 @@ def write_data_element(
 
     # if the value is buffered, now we want to write the value directly to the fp
     if elem.is_buffered:
-        fn(fp, elem)
+        fn(fp, elem)  # type: ignore[operator]
     else:
         fp.write(buffer.getvalue())
     if is_undefined_length:

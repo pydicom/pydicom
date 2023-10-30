@@ -9,7 +9,7 @@ import os
 from collections.abc import Iterator
 
 
-def buffer_assertions(buffer: BufferedIOBase):
+def buffer_assertions(buffer: BufferedIOBase) -> None:
     """
     Asserts pre-conditions for working with a readable and seekable buffer.
 

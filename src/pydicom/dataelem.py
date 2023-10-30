@@ -480,7 +480,7 @@ class DataElement:
         self._value = self._convert_value(val)
 
     @property
-    def is_buffered(self):
+    def is_buffered(self) -> bool:
         return isinstance(self._value, BufferedIOBase)
 
     @property
