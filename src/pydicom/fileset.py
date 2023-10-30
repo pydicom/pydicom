@@ -9,6 +9,7 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import Optional, Union, Any, cast
+import uuid
 import warnings
 
 from pydicom.charset import default_encoding
@@ -719,6 +720,7 @@ class FileInstance:
             add: bool
             remove: bool
 
+        self._uuid = uuid.uuid4()
         self._flags = Flags()
         self._apply_stage("x")
         self._stage_path: Path | None = None
@@ -746,7 +748,7 @@ class FileInstance:
                 self._stage_path = None
             else:
                 self._flags.add = True
-                self._stage_path = self.file_set._stage["path"] / self.SOPInstanceUID
+                self._stage_path = self.file_set._stage["path"] / f"{self._uuid}"
 
         elif flag == "-":
             # add + remove = no change
