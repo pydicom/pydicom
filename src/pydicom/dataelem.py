@@ -445,8 +445,7 @@ class DataElement:
 
     @property
     def value(self) -> Any:
-        """Return the element's value. If the value is a Buffer, the buffer will be read and returned.
-        To read the buffer in chunks, see value_generator."""
+        """Return the element's value."""
         return self._value
 
     @value.setter
