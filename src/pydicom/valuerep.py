@@ -593,7 +593,7 @@ EXPLICIT_VR_LENGTH_16 = {
 EXPLICIT_VR_LENGTH_32 = STANDARD_VR - EXPLICIT_VR_LENGTH_16
 
 # VRs that are allowed to be buffers
-BUFFERED_VRS = (BYTES_VR | {VR.OB_OW}) - {VR.UN}
+BUFFERABLE_VRS = (BYTES_VR | {VR.OB_OW}) - {VR.UN}
 
 
 class _DateTimeBase:

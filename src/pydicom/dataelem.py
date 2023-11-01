@@ -37,7 +37,7 @@ from pydicom import jsonrep
 from pydicom.util.buffers import buffer_assertions
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    BUFFERED_VRS,
+    BUFFERABLE_VRS,
     PersonName,
     BYTES_VR,
     AMBIGUOUS_VR,
@@ -213,12 +213,6 @@ class DataElement:
             tag = Tag(tag)
         self.tag = tag
 
-        # check if the value is a buffer. If so, we can't check the length or access
-        # the value directly
-        is_buffered = False
-        if isinstance(value, BufferedIOBase):
-            is_buffered = True
-
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
@@ -226,9 +220,6 @@ class DataElement:
             VR == VR_.UN
             and not tag.is_private
             and config.replace_un_with_known_vr
-            # we don't know the length and such can't determine if the length exceeds
-            # 0xFFFF
-            and not is_buffered
             and (is_undefined_length or value is None or len(value) < 0xFFFF)
         ):
             try:
@@ -458,9 +449,9 @@ class DataElement:
         # * All byte-like VRs
         # * Ambiguous VRs that may be byte-like
         if isinstance(val, BufferedIOBase):
-            if self.VR not in BUFFERED_VRS:
+            if self.VR not in BUFFERABLE_VRS:
                 raise ValueError(
-                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {BUFFERED_VRS}."
+                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {BUFFERABLE_VRS}."
                 )
 
             # ensure pre-conditions are met - we will check these when reading the value as well
@@ -740,9 +731,6 @@ class DataElement:
 
     def __repr__(self) -> str:
         """Return the representation of the element."""
-        if self.is_buffered:
-            return repr(self.value)
-
         return repr(self.value) if self.VR == VR_.SQ else str(self)
 
 

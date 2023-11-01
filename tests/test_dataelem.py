@@ -26,7 +26,7 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.util.buffers import read_bytes
 from .test_util import save_private_dict
 from pydicom.uid import UID
-from pydicom.valuerep import BUFFERED_VRS, DSfloat, validate_value
+from pydicom.valuerep import BUFFERABLE_VRS, DSfloat, validate_value
 
 
 class TestDataElement:
@@ -1227,7 +1227,7 @@ class TestDataElementValidation:
 class TestBufferedDataElement:
     """Tests setting a DataElement value to a buffer"""
 
-    @pytest.mark.parametrize("vr", BUFFERED_VRS)
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
     def test_reading_dataelement_buffer(self, vr):
         value = b"\x00\x01\x02\x03"
         buffer = io.BytesIO(value)
@@ -1253,3 +1253,4 @@ class TestBufferedDataElement:
             r"^\(7FE0,0010\) Pixel Data\W*OB: <_io.BytesIO object.*$"
         ).match(str(de))
         assert de.repval.startswith("<_io.BytesIO object at")
+        assert repr(de) == str(de)
