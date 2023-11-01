@@ -1,3 +1,7 @@
+"""
+Demonstrates writing a video file to a DICOM dataset in an uncompressed format
+while keeping the data out of memory.
+"""
 import os
 import cv2
 from tempfile import TemporaryFile
