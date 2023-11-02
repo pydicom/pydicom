@@ -11,8 +11,7 @@ import base64
 from dataclasses import dataclass
 from io import BufferedIOBase
 import json
-from typing import Optional, Any, TYPE_CHECKING, NamedTuple, cast
-from collections.abc import Iterator
+from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
 import warnings
 
