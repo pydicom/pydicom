@@ -559,7 +559,7 @@ class DataElement:
             memo[id(self)] = copied
 
         # Fix for #1816: don't deepcopy the parent!
-        for key in (k for k in self.__dict__ if k not in ("parent")):
+        for key in (k for k in self.__dict__ if k != "parent"):
             copied.__dict__[key] = copy.deepcopy(self.__dict__[key], memo)
 
         return copied
