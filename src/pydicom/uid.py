@@ -457,7 +457,7 @@ def generate_uid(
         )
 
     if entropy_srcs is None:
-        maximum = int(f"1{'0' * (64 - len(prefix))}")
+        maximum = 10 ** (64 - len(prefix))
         # randbelow is in [0, maximum)
         # {prefix}.0, and {prefix}0 are both valid
         return UID(f"{prefix}{secrets.randbelow(maximum)}"[:64])
