@@ -467,6 +467,8 @@ class Dataset:
         for elem in copied:  # DICOM elements
             if elem.VR == VR_.SQ:
                 elem.value.parent_dataset = copied  # setter does weakref
+                elem.parent = copied
+
         return copied
 
     def __enter__(self) -> "Dataset":
@@ -2412,6 +2414,8 @@ class Dataset:
                 setattr(self, key, value)
             else:
                 self[Tag(cast(int, key))] = value
+                if value.parent:
+                    value.parent = self
 
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.

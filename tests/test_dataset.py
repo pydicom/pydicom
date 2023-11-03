@@ -2012,10 +2012,17 @@ class TestFileDataset:
         """Regression test for #1816"""
         ds = Dataset()
         ds.BeamSequence = []
+        elem = ds["BeamSequence"]
+        assert elem.parent is ds
 
         ds2 = Dataset()
         ds2.update(ds)
-        copy.deepcopy(ds2)
+        elem = ds2["BeamSequence"]
+        assert elem.parent is ds2
+
+        ds3 = copy.deepcopy(ds2)
+        elem = ds3["BeamSequence"]
+        assert elem.parent is ds3
 
 
 class TestDatasetOverlayArray:

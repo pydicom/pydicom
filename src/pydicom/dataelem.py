@@ -562,8 +562,6 @@ class DataElement:
         for key in (k for k in self.__dict__ if k not in ("parent")):
             copied.__dict__[key] = copy.deepcopy(self.__dict__[key], memo)
 
-        copied.parent = self.parent
-
         return copied
 
     def __eq__(self, other: Any) -> Any:
