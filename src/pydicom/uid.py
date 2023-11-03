@@ -400,19 +400,16 @@ def generate_uid(
     ----------
     prefix : str or None, optional
         The UID prefix to use when creating the UID. Default is the *pydicom*
-        root UID ``'1.2.826.0.1.3680043.8.498.'``. If `prefix` is ``None then
+        root UID ``'1.2.826.0.1.3680043.8.498.'``. If `prefix` is ``None`` then
         a prefix of ``'2.25.'`` will be used with the integer form of a UUID
-        generated using the :func:`uuid.uuid4` algorithm. Because the UUID
-        suffix can be at most 39 characters, a `prefix` longer than 25
-        characters starts to increase the probability that the returned UID
-        will not be unique.
+        generated using the :func:`uuid.uuid4` algorithm.
     entropy_srcs : list of str, optional
         If `prefix` is used then the `prefix` will be appended with a
         SHA512 hash of the supplied :class:`list` which means the result is
         deterministic and should make the original data unrecoverable. If
         `entropy_srcs` isn't used then a random number from
         :func:`secrets.randbelow` will be appended to the `prefix`. If `prefix`
-        is not used then `entropy_srcs` has no effect.
+        is ``None`` then `entropy_srcs` has no effect.
 
     Returns
     -------
@@ -460,7 +457,7 @@ def generate_uid(
         )
 
     if entropy_srcs is None:
-        maximum = int("9" * (64 - len(prefix))) + 1
+        maximum = int(f"1{'0' * (64 - len(prefix))}")
         # randbelow is in [0, maximum)
         # {prefix}.0, and {prefix}0 are both valid
         return UID(f"{prefix}{secrets.randbelow(maximum)}"[:64])
