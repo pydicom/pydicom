@@ -2414,7 +2414,7 @@ class Dataset:
                 setattr(self, key, value)
             else:
                 self[Tag(cast(int, key))] = value
-                if value.parent:
+                if getattr(value, "parent", None):
                     value.parent = self
 
     def iterall(self) -> Iterator[DataElement]:
