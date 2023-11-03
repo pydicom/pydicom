@@ -5,9 +5,10 @@ import hashlib
 import os
 import random
 import re
+import secrets
 import sys
-import uuid
 from typing import Any
+import uuid
 
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary
@@ -375,6 +376,9 @@ UncompressedTransferSyntaxes = [
 """Uncompressed (native) transfer syntaxes."""
 
 
+_MAX_PREFIX_LENGTH = 54
+
+
 def generate_uid(
     prefix: str | None = PYDICOM_ROOT_UID,
     entropy_srcs: list[str] | None = None,
@@ -386,19 +390,29 @@ def generate_uid(
        When `prefix` is ``None`` a conformant UUID suffix of up to
        39 characters will be used instead of a hashed value.
 
+    .. versionchanged:: 3.0
+
+       * When `entropy_srcs` is ``None`` the suffix is now generated using
+         :func:`~secrets.randbelow`
+       * The maximum length of `prefix` is now 54 characters
+
     Parameters
     ----------
     prefix : str or None, optional
         The UID prefix to use when creating the UID. Default is the *pydicom*
-        root UID ``'1.2.826.0.1.3680043.8.498.'``. If not used then a prefix of
-        ``'2.25.'`` will be used with the integer form of a UUID generated
-        using the :func:`uuid.uuid4` algorithm.
+        root UID ``'1.2.826.0.1.3680043.8.498.'``. If `prefix` is ``None then
+        a prefix of ``'2.25.'`` will be used with the integer form of a UUID
+        generated using the :func:`uuid.uuid4` algorithm. Because the UUID
+        suffix can be at most 39 characters, a `prefix` longer than 25
+        characters starts to increase the probability that the returned UID
+        will not be unique.
     entropy_srcs : list of str, optional
         If `prefix` is used then the `prefix` will be appended with a
         SHA512 hash of the supplied :class:`list` which means the result is
         deterministic and should make the original data unrecoverable. If
-        `entropy_srcs` isn't used then random data will be appended instead
-        (default). If `prefix` is not used then `entropy_srcs` has no effect.
+        `entropy_srcs` isn't used then a random number from
+        :func:`secrets.randbelow` will be appended to the `prefix`. If `prefix`
+        is not used then `entropy_srcs` has no effect.
 
     Returns
     -------
@@ -408,7 +422,7 @@ def generate_uid(
     Raises
     ------
     ValueError
-        If `prefix` is invalid or greater than 63 characters.
+        If `prefix` is invalid or greater than 54 characters.
 
     Examples
     --------
@@ -422,31 +436,39 @@ def generate_uid(
     1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463
     >>> generate_uid(entropy_srcs=['lorem', 'ipsum'])
     1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463
+
+    References
+    ----------
+
+    * DICOM Standard, Part 5, :dcm:`Chapters 9`<part05/chapter_9.html>` and
+      :dcm:`Annex B<part05/chapter_B.html>`
+    * ISO/IEC 9834-8/`ITU-T X.667<https://www.itu.int/rec/T-REC-X.667-201210-I/en>`_
     """
     if prefix is None:
         # UUID -> as 128-bit int -> max 39 characters long
         return UID(f"2.25.{uuid.uuid4().int}")
 
-    max_uid_len = 64
-    if len(prefix) > max_uid_len - 1:
-        raise ValueError("The prefix must be less than 63 chars")
-    if not re.match(RE_VALID_UID_PREFIX, prefix):
-        raise ValueError("The prefix is not in a valid format")
+    if len(prefix) > _MAX_PREFIX_LENGTH:
+        raise ValueError(
+            f"The 'prefix' should be no more than {_MAX_PREFIX_LENGTH} characters long"
+        )
 
-    avail_digits = max_uid_len - len(prefix)
+    if not re.match(RE_VALID_UID_PREFIX, prefix):
+        raise ValueError(
+            "The 'prefix' is not valid for use with a UID, see Part 5, Section "
+            "9.1 of the DICOM Standard"
+        )
 
     if entropy_srcs is None:
-        entropy_srcs = [
-            str(uuid.uuid1()),  # 128-bit from MAC/time/randomness
-            str(os.getpid()),  # Current process ID
-            hex(random.getrandbits(64)),  # 64 bits randomness
-        ]
+        maximum = int("9" * (64 - len(prefix))) + 1
+        # randbelow is in [0, maximum)
+        # {prefix}.0, and {prefix}0 are both valid
+        return UID(f"{prefix}{secrets.randbelow(maximum)}"[:64])
+
     hash_val = hashlib.sha512("".join(entropy_srcs).encode("utf-8"))
 
     # Convert this to an int with the maximum available digits
-    dicom_uid = prefix + str(int(hash_val.hexdigest(), 16))[:avail_digits]
-
-    return UID(dicom_uid)
+    return UID(f"{prefix}{int(hash_val.hexdigest(), 16)}"[:64])
 
 
 # Only auto-generated Storage SOP Class UIDs below - do not edit manually

@@ -58,6 +58,10 @@ Changes
 * The ``Dataset.parent`` and ``Sequence.parent`` properties have been removed
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
+* :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
+  generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
+  the maximum allowed length of the `prefix` has been changed to 54 characters
+  (:issue:`1773`)
 
 
 Enhancements
