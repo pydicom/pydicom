@@ -202,9 +202,6 @@ class DataElement:
             Defines if values are validated and how validation errors are
             handled.
         """
-        # Missing: _value, file_tell, is_undefined_length, parent,
-        #   private_creator, tag, validation_mode, VR
-
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
 
