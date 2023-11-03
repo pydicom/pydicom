@@ -91,6 +91,8 @@ Fixes
 * Fixed a possible security issue with :class:`~pydicom.fileset.FileInstance` instances
   being able to escape the temporary directory when being added to a
   :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
+* Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
+  :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
 
 Pydicom Internals
 -----------------
