@@ -437,9 +437,9 @@ def generate_uid(
     References
     ----------
 
-    * DICOM Standard, Part 5, :dcm:`Chapters 9`<part05/chapter_9.html>` and
+    * DICOM Standard, Part 5, :dcm:`Chapters 9<part05/chapter_9.html>` and
       :dcm:`Annex B<part05/chapter_B.html>`
-    * ISO/IEC 9834-8/`ITU-T X.667<https://www.itu.int/rec/T-REC-X.667-201210-I/en>`_
+    * ISO/IEC 9834-8 (`ITU-T X.667<https://www.itu.int/rec/T-REC-X.667-201210-I/en>`_)
     """
     if prefix is None:
         # UUID -> as 128-bit int -> max 39 characters long
