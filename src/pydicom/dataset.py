@@ -2414,8 +2414,8 @@ class Dataset:
                 setattr(self, key, value)
             else:
                 self[Tag(cast(int, key))] = value
-                if getattr(value, "parent", None):  # ignore[union-attr]
-                    value.parent = self
+                if getattr(value, "parent", None):
+                    value.parent = self  # ignore[union-attr]
 
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.
