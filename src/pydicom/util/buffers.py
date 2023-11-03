@@ -1,5 +1,5 @@
 """
-Utilities to help with reading/writing from python's IOBufferedBase.
+Utilities to help with reading/writing from python's BufferedIOBase.
 """
 from contextlib import contextmanager
 from collections.abc import Generator
