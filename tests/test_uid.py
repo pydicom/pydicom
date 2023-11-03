@@ -36,7 +36,7 @@ class TestGenerateUID:
 
         # Test invalid UID prefixes
         for invalid_prefix in (
-            ("1" * 63) + ".",
+            ("1" * 54) + ".",
             "",
             ".",
             "1",
@@ -54,7 +54,7 @@ class TestGenerateUID:
             "1.",
             "1.23.",
             "1.0.23.",
-            ("1" * 62) + ".",
+            ("1" * 53) + ".",
             "1.2.3.444444.",
         ):
             uid = generate_uid(prefix=valid_prefix)
