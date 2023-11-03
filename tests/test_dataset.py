@@ -2008,6 +2008,15 @@ class TestFileDataset:
         ds2 = copy.deepcopy(my_dataset_subclass)
         assert ds2.__class__ is MyDatasetSubclass
 
+    def test_deepcopy_after_update(self):
+        """Regression test for #1816"""
+        ds = Dataset()
+        ds.BeamSequence = []
+
+        ds2 = Dataset()
+        ds2.update(ds)
+        copy.deepcopy(ds2)
+
 
 class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""

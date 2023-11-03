@@ -8,6 +8,7 @@ A DataElement has a tag,
 """
 
 import base64
+import copy
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
@@ -201,6 +202,9 @@ class DataElement:
             Defines if values are validated and how validation errors are
             handled.
         """
+        # Missing: _value, file_tell, is_undefined_length, parent,
+        #   private_creator, tag, validation_mode, VR
+
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
 
@@ -550,6 +554,20 @@ class DataElement:
 
         self.validate(val)
         return val
+
+    def __deepcopy__(self, memo: dict[int, Any] | None) -> "DataElement":
+        cls = self.__class__
+        copied = cls.__new__(cls)
+        if memo:
+            memo[id(self)] = copied
+
+        # Fix for #1816: don't deepcopy the parent!
+        for key in (k for k in self.__dict__ if k not in ("parent")):
+            copied.__dict__[key] = copy.deepcopy(self.__dict__[key], memo)
+
+        copied.parent = self.parent
+
+        return copied
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
