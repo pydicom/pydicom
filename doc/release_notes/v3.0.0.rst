@@ -10,11 +10,11 @@ Changes
   gracefully (extra bytes are ignored with a warning)
 * A value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued
   on reading the pixel data (:issue:`1844`)
-* The `dicomdir` module and `DicomDir` class have been removed and reading a
+* The ``dicomdir`` module and ``DicomDir`` class have been removed and reading a
   DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
   For handling DICOM File-sets and DICOMDIR datasets use the
   :class:`~pydicom.fileset.FileSet` class instead.
-* The `read_file` and `write_file` functions have been removed, use
+* The ``read_file`` and ``write_file`` functions have been removed, use
   :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite`
   instead.
 * The value for :attr:`~pydicom.uid.JPEGLossless` has changed from
@@ -41,14 +41,14 @@ Changes
     * ``UncompressedPixelTransferSyntaxes``: use
       :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
     * ``PILSupportedCompressedPixelTransferSyntaxes``
-* The `PersonNameUnicode` class has been removed, use
+* The ``PersonNameUnicode`` class has been removed, use
   :class:`~pydicom.valuerep.PersonName` instead
-* The `DataElement.description` attribute has been removed, use
+* The ``DataElement.description`` attribute has been removed, use
   :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead
-* The `pixel_data_handlers.rle_handler.rle_encode_frame` function has been
+* The ``pixel_data_handlers.rle_handler.rle_encode_frame`` function has been
   removed, use :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
-* Removed the `_storage_sopclass_uids` module, import UIDs from the `uid` module
+* Removed the ``_storage_sopclass_uids`` module, import UIDs from the `uid` module
   instead
 * The theoretical maximum number of instances supported by
   :class:`~pydicom.fileset.FileSet` has been reduced to 1838265625 to ensure support
@@ -76,6 +76,9 @@ Enhancements
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211030PCMDigitalAudio`
+* Added convenience method :meth:`~pydicom.dataset.Dataset.add_new_private` to add a private tag
+* Added the :ref:`examples<api_examples>` module to make it easier and less
+  confusing for users to work with the example datasets used by the documentation
 
 Fixes
 -----
@@ -85,6 +88,11 @@ Fixes
 * Fixed pydicom codify error when relative path did not exist
 * Fixed the VR enum sometimes returning invalid values for Python 3.11+ (:issue:`1874`)
 * Fixed pixel data handler for Pillow 10.1 raising an AttributeError (:issue:`1907`)
+* Fixed a possible security issue with :class:`~pydicom.fileset.FileInstance` instances
+  being able to escape the temporary directory when being added to a
+  :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
+* Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
+  :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
 
 Pydicom Internals
 -----------------

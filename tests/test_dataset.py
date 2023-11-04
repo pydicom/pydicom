@@ -10,6 +10,8 @@ import weakref
 from platform import python_implementation
 
 import pytest
+
+from pydicom.datadict import add_private_dict_entry
 from .test_helpers import assert_no_warning
 
 try:
@@ -39,7 +41,7 @@ from pydicom.uid import (
     ExplicitVRLittleEndian,
     MediaStorageDirectoryStorage,
 )
-from pydicom.valuerep import DS
+from pydicom.valuerep import DS, VR
 
 
 class BadRepr:
@@ -1054,6 +1056,39 @@ class TestDataset:
         item = ds.get_private_item(0x0009, 0x02, "Creator 2.0")
         assert 2 == item.value
 
+    def test_add_unknown_private_tag(self):
+        ds = Dataset()
+        with pytest.raises(ValueError, match="Tag must be private"):
+            ds.add_new_private("Creator 1.0", 0x0010, 0x01, "VALUE", VR.SH)
+        with pytest.raises(ValueError, match="Private creator must have a value"):
+            ds.add_new_private("", 0x0011, 0x01, "VALUE", VR.SH)
+        with pytest.raises(
+            KeyError,
+            match="Private creator 'Creator 1.0' not in the private dictionary",
+        ):
+            ds.add_new_private("Creator 1.0", 0x0011, 0x01, "VALUE")
+
+        ds.add_new_private("Creator 1.0", 0x0011, 0x01, "VALUE", VR.SH)
+        item = ds.get_private_item(0x0011, 0x01, "Creator 1.0")
+        assert item.value == "VALUE"
+        assert item.private_creator == "Creator 1.0"
+        assert item.VR == VR.SH
+
+    def test_add_known_private_tag(self):
+        ds = Dataset()
+        ds.add_new_private("GEMS_GENIE_1", 0x0009, 0x10, "Test Study")
+        item = ds.get_private_item(0x0009, 0x10, "GEMS_GENIE_1")
+        assert item.value == "Test Study"
+        assert item.private_creator == "GEMS_GENIE_1"
+        assert item.VR == VR.LO
+
+        add_private_dict_entry("Creator 1.0", 0x00110001, VR.SH, "Some Value")
+        ds.add_new_private("Creator 1.0", 0x0011, 0x01, "VALUE")
+        item = ds.get_private_item(0x0011, 0x01, "Creator 1.0")
+        assert item.value == "VALUE"
+        assert item.private_creator == "Creator 1.0"
+        assert item.VR == VR.SH
+
     def test_private_block(self):
         ds = Dataset()
         ds.add_new(0x00080005, "CS", "ISO_IR 100")
@@ -1972,6 +2007,22 @@ class TestFileDataset:
 
         ds2 = copy.deepcopy(my_dataset_subclass)
         assert ds2.__class__ is MyDatasetSubclass
+
+    def test_deepcopy_after_update(self):
+        """Regression test for #1816"""
+        ds = Dataset()
+        ds.BeamSequence = []
+        elem = ds["BeamSequence"]
+        assert elem.parent is ds
+
+        ds2 = Dataset()
+        ds2.update(ds)
+        elem = ds2["BeamSequence"]
+        assert elem.parent is ds2
+
+        ds3 = copy.deepcopy(ds2)
+        elem = ds3["BeamSequence"]
+        assert elem.parent is ds3
 
 
 class TestDatasetOverlayArray:

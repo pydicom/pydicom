@@ -112,9 +112,9 @@ Compressing grayscale pixel data in-place:
 
 .. code-block:: python
 
-    >>> from pydicom.data import get_testdata_file
+    >>> from pydicom import examples
     >>> from pydicom.uid import RLELossless
-    >>> ds = get_testdata_file("CT_small.dcm", read=True)
+    >>> ds = examples.ct
     >>> ds.SamplesPerPixel
     1
     >>> ds.PhotometricInterpretation
@@ -129,7 +129,8 @@ Compressing RGB pixel data in-place:
 
 .. code-block:: python
 
-    >>> ds = get_testdata_file("US1_UNCR.dcm", read=True)
+    >>> from pydicom import examples
+    >>> ds = examples.rgb_color
     >>> ds.SamplesPerPixel
     3
     >>> ds.PhotometricInterpretation
@@ -151,9 +152,10 @@ new *SOP Instance UID*:
 
 .. code-block:: python
 
+    >>> from pydicom import examples
     >>> from pydicom.pixel_data_handlers import convert_color_space
     >>> from pydicom.uid import generate_uid
-    >>> ds = get_testdata_file("US1_UNCR.dcm", read=True)
+    >>> ds = examples.rgb_color
     >>> rgb = ds.pixel_array
     >>> ybr = convert_color_space(rgb, 'RGB', 'YBR_FULL')
     >>> ds.PhotometricInterpretation = 'YBR_FULL'

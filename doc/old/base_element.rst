@@ -24,13 +24,15 @@ via their tags, as shown below.
   dictionary instead of the keys normally yielded by iterating a :class:`dict`.
 
 A :class:`~dataset.Dataset` could be created directly, but you will
-usually get one by reading an existing DICOM file::
+usually get one by reading an existing DICOM dataset from file::
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_file
   >>> # get some test data
-  >>> filename = get_testdata_file("rtplan.dcm")
-  >>> ds = pydicom.dcmread(filename)
+  >>> path = get_testdata_file("rtplan.dcm")
+  >>> path
+  '/path/to/pydicom/data/test_files/rtplan.dcm'
+  >>> ds = pydicom.dcmread(path)
 
 You can display the entire dataset by simply printing its string
 (:class:`str()<str>` or :func:`repr`) value::
@@ -169,7 +171,7 @@ you can use the access the item using either the keyword (for official DICOM
 elements) or tag number::
 
   >>> # reload the data
-  >>> ds = pydicom.dcmread(filename)
+  >>> ds = pydicom.dcmread(path)
   >>> elem = ds['PatientName']
   >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
@@ -192,9 +194,8 @@ operator::
 To work with (7FE0,0010) *Pixel Data*, the raw :class:`bytes` are available
 through the `PixelData` keyword::
 
-  >>> # read data with actual pixel data
-  >>> filename = get_testdata_file("CT_small.dcm")
-  >>> ds = pydicom.dcmread(filename)
+  >>> # example CT dataset with actual pixel data
+  >>> ds = pydicom.examples.ct
   >>> pixel_bytes = ds.PixelData
 
 However its much more convenient to use

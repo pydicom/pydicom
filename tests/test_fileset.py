@@ -881,9 +881,7 @@ class TestFileInstance:
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_addition
-        assert (Path(fs._stage["path"]) / Path(instance.SOPInstanceUID)) == Path(
-            instance.path
-        )
+        assert Path(fs._stage["path"]) / f"{instance._uuid}" == Path(instance.path)
         assert isinstance(instance.path, str)
 
     def test_path_move(self, dicomdir):

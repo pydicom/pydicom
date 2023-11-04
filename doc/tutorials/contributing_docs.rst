@@ -156,10 +156,10 @@ markup::
 
     >>> from pydicom import dcmread
     >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> fpath
+    >>> path = get_testdata_file("CT_small.dcm")
+    >>> path
     '[path/to]/pydicom/data/test_files/CT_small.dcm'
-    >>> ds = dcmread(fpath)
+    >>> ds = dcmread(path)
 
   Printing an element
   ===================

@@ -15,28 +15,14 @@ Dataset (dict subclass)
             contains its own DataElements, and so on in a recursive manner.
 """
 import copy
-from bisect import bisect_left
-from contextlib import nullcontext
 import io
-from importlib.util import find_spec as have_package
-from itertools import takewhile
 import json
 import os
 import os.path
 import re
-from types import TracebackType
-from typing import (
-    Optional,
-    TypeAlias,
-    Union,
-    Any,
-    cast,
-    BinaryIO,
-    AnyStr,
-    TypeVar,
-    overload,
-    TYPE_CHECKING,
-)
+import warnings
+import weakref
+from bisect import bisect_left
 from collections.abc import (
     ValuesView,
     Iterator,
@@ -45,8 +31,21 @@ from collections.abc import (
     MutableMapping,
     Set,
 )
-import warnings
-import weakref
+from contextlib import nullcontext
+from importlib.util import find_spec as have_package
+from itertools import takewhile
+from types import TracebackType
+from typing import (
+    Optional,
+    TypeAlias,
+    Any,
+    AnyStr,
+    cast,
+    BinaryIO,
+    TypeVar,
+    overload,
+    TYPE_CHECKING,
+)
 
 from pydicom.filebase import DicomFileLike
 
@@ -65,6 +64,7 @@ from pydicom.datadict import (
     tag_for_keyword,
     keyword_for_tag,
     repeater_has_keyword,
+    get_private_entry,
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
@@ -467,6 +467,8 @@ class Dataset:
         for elem in copied:  # DICOM elements
             if elem.VR == VR_.SQ:
                 elem.value.parent_dataset = copied  # setter does weakref
+                elem.parent = copied
+
         return copied
 
     def __enter__(self) -> "Dataset":
@@ -517,6 +519,51 @@ class Dataset:
               :class:`Dataset`
         """
         self.add(DataElement(tag, VR, value))
+
+    def add_new_private(
+        self,
+        private_creator: str,
+        group: int,
+        element_offset: int,
+        value: Any,
+        vr: str | None = None,
+    ) -> None:
+        """Create a new private element and add it to the :class:`Dataset`.
+
+        Parameters
+        ----------
+        private_creator : str
+            The private creator string related to the new tag.
+        group : int
+            The group ID (0x0009 - 0xFFFF) for the private tag.
+            Must be an odd number.
+        element_offset : int
+            The tag offset, e.g. the lower byte of the tag element of the
+            private tag (0x00 - 0xFF). The higher byte is defined by the location
+            of the private creator tag.
+        value : Any
+            The value of the data element. One of the following:
+
+            * a single string or number
+            * a :class:`list` or :class:`tuple` with all strings or all numbers
+            * a multi-value string with backslash separator
+            * for a sequence element, an empty :class:`list` or ``list`` of
+              :class:`Dataset`
+        vr : str | None
+            The two-letter DICOM value representation, or ``None``.
+            If set to ``None``, it is taken from the private tag dictionary.
+
+        Raises
+        ------
+        ValueError
+            If `group` doesn't belong to a private tag or `private_creator` is empty.
+        KeyError
+            If `vr` is ``None`` and the tag is not found in the private tag dictionary.
+        """
+        block = self.private_block(group, private_creator, create=True)
+        if vr is None:
+            vr = get_private_entry((group, element_offset), private_creator)[0]
+        block.add_new(element_offset, vr, value)
 
     def __array__(self) -> "numpy.ndarray":
         """Support accessing the dataset from a numpy array."""
@@ -1661,11 +1708,11 @@ class Dataset:
 
         Compress the existing uncompressed *Pixel Data* in place:
 
-        >>> from pydicom.data import get_testdata_file
+        >>> from pydicom import examples
         >>> from pydicom.uid import RLELossless
-        >>> ds = get_testdata_file("CT_small.dcm", read=True)
+        >>> ds = examples.ct
         >>> ds.compress(RLELossless)
-        >>> ds.save_as("CT_small_rle.dcm")
+        >>> ds.save_as("ct_rle_lossless.dcm")
 
         Parameters
         ----------
@@ -2367,6 +2414,8 @@ class Dataset:
                 setattr(self, key, value)
             else:
                 self[Tag(cast(int, key))] = value
+                if getattr(value, "parent", None):
+                    value.parent = self  # type: ignore[union-attr]
 
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.

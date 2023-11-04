@@ -60,10 +60,8 @@ The DICOMDIR file is used to summarize the contents of the File-set and is a
 
 .. code-block:: python
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
-    >>> path = get_testdata_file("DICOMDIR")
-    >>> ds = dcmread(path)
+    >>> from pydicom import examples
+    >>> ds = examples.dicomdir
     >>> ds.file_meta.MediaStorageSOPClassUID.name
     'Media Storage Directory Storage'
 
@@ -113,6 +111,7 @@ To load an existing File-set just pass a DICOMDIR
 .. code-block:: python
 
     >>> from pydicom.fileset import FileSet
+    >>> from pydicom.data import get_testdata_file
     >>> path = get_testdata_file("DICOMDIR")
     >>> ds = dcmread(path)
     >>> fs = FileSet(ds)  # or FileSet(path)
@@ -245,7 +244,7 @@ You can create a new File-set by creating a new
 
 This will create a completely conformant File-set, however it won't contain
 any SOP instances. Since empty File-sets aren't very useful, our next step
-will be to add some.
+will be to add some SOP instances to it.
 
 Modifying a File-set
 --------------------
@@ -314,14 +313,13 @@ accessed and loaded:
 
 .. code-block:: python
 
-    >>> path = get_testdata_file("CT_small.dcm")
-    >>> instance = fs.add(path)
+    >>> instance = fs.add(examples.ct)
     >>> instance.is_staged
     True
     >>> instance.for_addition
     True
     >>> instance.path
-    '/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322'
+    '/tmp/tmp0aalrzir/86e6b75b-b764-46af-bec3-51698a8366f2'
     >>> type(instance.load())
     <class 'pydicom.dataset.FileDataset'>
 
@@ -337,8 +335,8 @@ is empty or missing:
 
 .. code-block:: python
 
-    >>> path = get_testdata_file("rtdose.dcm")
-    >>> fs.add(path)
+    >>> rt_dose = examples.rt_dose
+    >>> fs.add(rt_dose)
     Traceback (most recent call last):
       File ".../pydicom/fileset.py", line 1858, in _recordify
         record = DIRECTORY_RECORDERS[record_type](ds)
@@ -370,9 +368,8 @@ Let's update the instance and try adding it again:
 
 .. code-block:: python
 
-    >>> ds = dcmread(path)
-    >>> ds.InstanceNumber = "1"
-    >>> fs.add(ds)
+    >>> rt_dose.InstanceNumber = "1"
+    >>> fs.add(rt_dose)
 
 
 Removing instances
@@ -401,8 +398,8 @@ Let's add a couple of SOP instances back to the File-set:
 
 .. code-block:: python
 
-    >>> fs.add(get_testdata_file("CT_small.dcm"))
-    >>> fs.add(get_testdata_file("MR_small.dcm"))
+    >>> fs.add(examples.ct)
+    >>> fs.add(examples.mr)
 
 To apply the changes we've made to the File-set we use
 :meth:`~pydicom.fileset.FileSet.write`. For new File-sets, we have to supply the

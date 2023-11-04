@@ -18,14 +18,22 @@ and radiotherapy objects.
 structures for easy manipulation. Modified datasets can be written again to
 DICOM format files.
 
-Here is a simple example of using *pydicom* in an interactive session, to read a
-radiotherapy plan file, change the patient setup from head-first-supine to
-head-first-prone, and save to a new file::
+Below is a simple example of using *pydicom* in an interactive session. In it we
+use the :func:`~pydicom.data.get_testdata_file` helper function to get the
+path to one of the pydicom test datasets, which in this case is a radiotherapy
+plan file. We read the dataset from the path using :func:`~pydicom.filereader.dcmread`,
+which returns a :class:`~pydicom.dataset.FileDataset` instance `ds`. This is then
+used to print the *Patient Name* and change the *Patient Position* from
+head-first-supine (HFS) to head-first-prone (HFP). Finally, the changes are saved to a
+new file `rtplan2.dcm`::
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_file
-  >>> filename = get_testdata_file("rtplan.dcm")
-  >>> ds = pydicom.dcmread(filename)  # plan dataset
+  >>> # Fetch the path to the example dataset
+  >>> path = get_testdata_file("rtplan.dcm")
+  >>> path
+  '/path/to/pydicom/data/test_files/rtplan.dcm'
+  >>> ds = pydicom.dcmread(path)
   >>> ds.PatientName
   'Last^First^mid^pre'
   >>> ds.dir("setup")  # get a list of tags with "setup" somewhere in the name
@@ -40,6 +48,9 @@ head-first-prone, and save to a new file::
 ..
   >>> os.remove("rtplan2.dcm")
 
+A more thorough introduction to pydicom can be found in the :doc:`dataset basics
+tutorial</tutorials/dataset_basics>`.
+
 *pydicom* is not a DICOM server (see :gh:`pynetdicom <pynetdicom>` instead),
 and is not primarily about viewing images. It is designed to let you manipulate
 data elements in DICOM files with Python code.
@@ -51,6 +62,7 @@ One limitation is that compressed pixel data (e.g. JPEG) can only be
 altered in an intelligent way if :doc:`decompressing <image_data_handlers>`
 it first. Once decompressed, it can be altered and written back to a
 DICOM file the same way as initially uncompressed data.
+
 
 License
 =======

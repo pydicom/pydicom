@@ -30,6 +30,7 @@ Quick Start
 
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
+import pydicom.examples
 from pydicom.filereader import dcmread
 from pydicom.filewriter import dcmwrite
 from pydicom.sequence import Sequence
