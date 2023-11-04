@@ -129,7 +129,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
     # Get the pydicom test filename even without prefix, in case user forgot it
     try:
         pydicom_filename = cast(str, get_testdata_file(filename))
-    except NotImplementedError:  # will get this if absolute path passed
+    except ValueError:  # will get this if absolute path passed
         pydicom_filename = ""
 
     # Check if filename is in charset files

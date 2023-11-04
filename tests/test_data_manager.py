@@ -113,6 +113,23 @@ class TestGetData:
         for x in palettes:
             assert palbase in x
 
+    def test_no_absolute_path_in_get_testdata_file(self):
+        msg = (
+            "'get_testdata_file' does not support absolute paths, "
+            "as it only works with internal pydicom test data - "
+            rf"did you mean 'dcmread\(\"/foo/bar.dcm\"\)'?"
+        )
+        with pytest.raises(ValueError, match=msg):
+            get_testdata_file("/foo/bar.dcm")
+
+    def test_no_absolute_path_in_get_testdata_files(self):
+        msg = (
+            "'get_testdata_files' does not support absolute paths, as it only works "
+            "with internal pydicom test data."
+        )
+        with pytest.raises(ValueError, match=msg):
+            get_testdata_files("/foo/*.dcm")
+
 
 @pytest.mark.skipif(not EXT_PYDICOM, reason="pydicom-data not installed")
 class TestExternalDataSource:
