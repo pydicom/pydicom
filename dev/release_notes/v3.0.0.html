@@ -169,6 +169,8 @@ for 32-bit systems (<a class="reference external" href="https://github.com/pydic
 <li><p>The <code class="docutils literal notranslate"><span class="pre">Dataset.parent</span></code> and <code class="docutils literal notranslate"><span class="pre">Sequence.parent</span></code> properties have been removed</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code> module has been removed, use the <a class="reference internal" href="../reference/handlers.overlay_data.html#module-pydicom.overlays" title="pydicom.overlays"><code class="xref py py-mod docutils literal notranslate"><span class="pre">overlays</span></code></a>
 module instead</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_files()</span></code>
+now raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if called with an absolute path or pattern</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -202,7 +204,7 @@ confusing for users to work with the example datasets used by the documentation<
 <ul class="simple">
 <li><p>Fixed the GDCM and pylibjpeg handlers changing the <em>Pixel Representation</em> value to 0
 when the J2K stream disagrees with the dataset and
-<a class="reference internal" href="../reference/generated/pydicom.config.APPLY_J2K_CORRECTIONS.html#pydicom.config.APPLY_J2K_CORRECTIONS" title="pydicom.config.APPLY_J2K_CORRECTIONS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">APPLY_J2K_CORRECTIONS</span></code></a> is <cite>True</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1689">#1689</a>)</p></li>
+<a class="reference internal" href="../reference/generated/pydicom.config.APPLY_J2K_CORRECTIONS.html#pydicom.config.APPLY_J2K_CORRECTIONS" title="pydicom.config.APPLY_J2K_CORRECTIONS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">APPLY_J2K_CORRECTIONS</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1689">#1689</a>)</p></li>
 <li><p>Fixed pydicom codify error when relative path did not exist</p></li>
 <li><p>Fixed the VR enum sometimes returning invalid values for Python 3.11+ (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1874">#1874</a>)</p></li>
 <li><p>Fixed pixel data handler for Pillow 10.1 raising an AttributeError (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1907">#1907</a>)</p></li>

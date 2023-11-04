@@ -58,6 +58,8 @@ Changes
 * The ``Dataset.parent`` and ``Sequence.parent`` properties have been removed
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
+* :func:`~pydicom.data_manager.get_testdata_file` and :func:`~pydicom.data_manager.get_testdata_files`
+  now raise ``ValueError`` if called with an absolute path or pattern
 
 
 Enhancements
@@ -84,7 +86,7 @@ Fixes
 -----
 * Fixed the GDCM and pylibjpeg handlers changing the *Pixel Representation* value to 0
   when the J2K stream disagrees with the dataset and
-  :attr:`~pydicom.config.APPLY_J2K_CORRECTIONS` is `True` (:issue:`1689`)
+  :attr:`~pydicom.config.APPLY_J2K_CORRECTIONS` is ``True`` (:issue:`1689`)
 * Fixed pydicom codify error when relative path did not exist
 * Fixed the VR enum sometimes returning invalid values for Python 3.11+ (:issue:`1874`)
 * Fixed pixel data handler for Pillow 10.1 raising an AttributeError (:issue:`1907`)
