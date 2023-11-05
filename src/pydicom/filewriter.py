@@ -217,6 +217,10 @@ def correct_ambiguous_vr_element(
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
     using the :func:`~pydicom.values.convert_numbers` function.
 
+    .. versionchanged:: 3.0
+
+        The `ancestors` keyword argument was added.
+
     Parameters
     ----------
     elem : dataelem.DataElement
@@ -267,6 +271,10 @@ def correct_ambiguous_vr(
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
     using the :func:`~pydicom.values.convert_numbers` function.
+
+    .. versionchanged:: 3.0
+
+        The `ancestors` keyword argument was added.
 
     Parameters
     ----------
