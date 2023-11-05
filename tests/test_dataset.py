@@ -1756,6 +1756,7 @@ class TestDataset:
         assert ds.BeamSequence == []
         assert ds._pixel_rep == 1
 
+
 class TestDatasetElements:
     """Test valid assignments of data elements"""
 
