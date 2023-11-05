@@ -1717,6 +1717,44 @@ class TestDataset:
         with pytest.raises(ValueError, match=msg):
             ds["invalid"] = ds["PatientName"]
 
+    def test_values(self):
+        """Test Dataset.values()."""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientID = "Bar"
+
+        values = list(ds.values())
+        assert values[0] == ds["PatientName"]
+        assert values[1] == ds["BeamSequence"]
+        assert len(values) == 2
+
+    def test_pixel_rep(self):
+        """Tests for Dataset._pixel_rep"""
+        ds = Dataset()
+        ds.PixelRepresentation = None
+        ds.BeamSequence = []
+
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        fp = io.BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        assert not hasattr(ds, "_pixel_rep")
+        assert ds.PixelRepresentation is None
+        assert ds.BeamSequence == []
+        # Attribute not set if Pixel Representation is None
+        assert not hasattr(ds, "_pixel_rep")
+
+        ds = dcmread(fp, force=True)
+        ds.PixelRepresentation = 0
+        assert ds.BeamSequence == []
+        assert ds._pixel_rep == 0
+
+        ds = dcmread(fp, force=True)
+        ds.PixelRepresentation = 1
+        assert ds.BeamSequence == []
+        assert ds._pixel_rep == 1
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
