@@ -1011,6 +1011,7 @@ class Dataset:
 
                 def _set_pixel_rep(ds: "Dataset") -> None:
                     """Set the `Dataset._pixel_rep` attribute, if possible."""
+                    # `TAG_PIXREP` is (0028,0103) *Pixel Representation*
                     if TAG_PIXREP not in ds._dict:
                         return
 
@@ -1024,14 +1025,13 @@ class Dataset:
                 # Note that the value of `_pixel_rep` gets updated as we move
                 #   down the tree - the value used to correct ambiguous
                 #   elements will be from the closest dataset to that element
-                # `TAG_PIXREP` is (0028,0103) *Pixel Representation*
                 _set_pixel_rep(self)
 
                 for item in self[tag].value:
-                    if TAG_PIXREP not in item._dict and hasattr(self, "_pixel_rep"):
-                        item._pixel_rep = self._pixel_rep
-                    else:
+                    if TAG_PIXREP in item._dict:
                         _set_pixel_rep(item)
+                    elif hasattr(self, "_pixel_rep"):
+                        item._pixel_rep = self._pixel_rep
 
             # If the Element has an ambiguous VR, try to correct it
             if self[tag].VR in AMBIGUOUS_VR:

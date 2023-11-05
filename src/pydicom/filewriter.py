@@ -89,7 +89,7 @@ _OVERLAY_DATA_TAGS = {x << 16 | 0x3000 for x in range(0x6000, 0x601F, 2)}
 
 def _correct_ambiguous_vr_element(
     elem: DataElement,
-    ancestors: list["Dataset"],
+    ancestors: list[Dataset],
     is_little_endian: bool,
 ) -> DataElement:
     """Implementation for `correct_ambiguous_vr_element`.
@@ -126,15 +126,17 @@ def _correct_ambiguous_vr_element(
         #   https://github.com/pydicom/pydicom/pull/298
         # PixelRepresentation is usually set in the root dataset
 
-        # This list of ancestor datasets is most useful when writing, o duringr
+        # This list of ancestor datasets is most useful when writing, or during
         #   reading if the element is on the same level as pixel representation
         anc_ds: list[Dataset] = [x for x in ancestors if "PixelRepresentation" in x]
         # This list is useful during reading if the element isn't on the same
         #   level as pixel representation
-        anc_pr: list[int] = [x._pixel_rep for x in ancestors if hasattr(x, "_pixel_rep")]
+        anc_pr: list[int] = [
+            x._pixel_rep for x in ancestors if hasattr(x, "_pixel_rep")
+        ]
 
         if anc_ds:
-            pixel_rep = anc_ds[0].PixelRepresentation
+            pixel_rep = cast(int, anc_ds[0].PixelRepresentation)
         elif anc_pr:
             pixel_rep = anc_pr[0]
         else:
@@ -202,9 +204,9 @@ def _correct_ambiguous_vr_element(
 
 def correct_ambiguous_vr_element(
     elem: DataElement,
-    ds: "Dataset",
+    ds: Dataset,
     is_little_endian: bool,
-    ancestors: list["Dataset"] | None = None,
+    ancestors: list[Dataset] | None = None,
 ) -> DataElement:
     """Attempt to correct the ambiguous VR element `elem`.
 
@@ -253,10 +255,10 @@ def correct_ambiguous_vr_element(
 
 
 def correct_ambiguous_vr(
-    ds: "Dataset",
+    ds: Dataset,
     is_little_endian: bool,
-    ancestors: list["Dataset"] | None = None,
-) -> "Dataset":
+    ancestors: list[Dataset] | None = None,
+) -> Dataset:
     """Iterate through `ds` correcting ambiguous VR elements (if possible).
 
     When it's not possible to correct the VR, the element will be returned
@@ -289,7 +291,7 @@ def correct_ambiguous_vr(
         If a tag is missing in `ds` that is required to resolve the ambiguity.
     """
     # Construct the tree if `ds` is the root level dataset
-    #tree = Tree(ds) if tree is None else tree
+    # tree = Tree(ds) if tree is None else tree
     ancestors = [ds] if ancestors is None else ancestors
 
     # Iterate through the elements
