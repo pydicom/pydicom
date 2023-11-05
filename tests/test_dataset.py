@@ -1841,13 +1841,11 @@ class TestFileDataset:
 
     def test_pickle_data_elements(self):
         ds = pydicom.dcmread(self.test_file)
-        assert ds.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         for e in ds:
             # make sure all data elements have been loaded
             pass
         s = pickle.dumps({"ds": ds})
         ds1 = pickle.loads(s)["ds"]
-        assert ds1.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         assert ds == ds1
 
     def test_pickle_nested_sequence(self):
@@ -2012,17 +2010,12 @@ class TestFileDataset:
         """Regression test for #1816"""
         ds = Dataset()
         ds.BeamSequence = []
-        elem = ds["BeamSequence"]
-        assert elem.parent is ds
 
         ds2 = Dataset()
         ds2.update(ds)
-        elem = ds2["BeamSequence"]
-        assert elem.parent is ds2
 
         ds3 = copy.deepcopy(ds2)
-        elem = ds3["BeamSequence"]
-        assert elem.parent is ds3
+        assert ds3 == ds
 
 
 class TestDatasetOverlayArray:
@@ -2225,12 +2218,6 @@ class TestFileMeta:
         assert ds_copy.BeamSequence[1].Manufacturer == "Linac and Sons, co."
         if copy_method == copy.deepcopy:
             assert id(ds_copy.BeamSequence[0]) != id(ds.BeamSequence[0])
-
-            # dereference weakrefs and check are pointing to correct objects
-            assert ds.BeamSequence is ds.BeamSequence[0].parent_seq()
-            assert ds is ds.BeamSequence.parent_dataset()
-            assert ds_copy.BeamSequence is ds_copy.BeamSequence[0].parent_seq()
-            assert ds_copy is ds_copy.BeamSequence.parent_dataset()
         else:
             # shallow copy
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])

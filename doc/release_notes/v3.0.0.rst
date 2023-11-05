@@ -55,7 +55,11 @@ Changes
   for 32-bit systems (:issue:`1743`)
 * The characters used by :func:`~pydicom.fileset.generate_filename` when
   `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
-* The ``Dataset.parent`` and ``Sequence.parent`` properties have been removed
+* The following properties have been removed:
+
+    * ``Dataset.parent`` and ``Dataset.parent_seq``
+    * ``Sequence.parent`` and ``Sequence.parent_dataset``
+    * ``DataElement.parent``
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
 

@@ -1058,6 +1058,7 @@ class TestCorrectAmbiguousVR:
         ds = Dataset()
         ds.PixelRepresentation = pixel_repr
         ds.ModalityLUTSequence = [Dataset()]
+        #ds.ModalityLUTSequence[0].PixelRepresentation = 0
         ds.ModalityLUTSequence[0].LUTDescriptor = [0, 0, 16]
         ds.ModalityLUTSequence[0].LUTExplanation = None
         ds.ModalityLUTSequence[0].ModalityLUTType = "US"  # US = unspecified

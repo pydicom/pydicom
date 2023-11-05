@@ -232,7 +232,6 @@ class DataElement:
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
         self.private_creator: str | None = None
-        self.parent: Dataset | None = None
 
     def validate(self, value: Any) -> None:
         """Validate the current value against the DICOM standard.
@@ -551,18 +550,6 @@ class DataElement:
 
         self.validate(val)
         return val
-
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "DataElement":
-        cls = self.__class__
-        copied = cls.__new__(cls)
-        if memo:
-            memo[id(self)] = copied
-
-        # Fix for #1816: don't deepcopy the parent!
-        for key in (k for k in self.__dict__ if k != "parent"):
-            copied.__dict__[key] = copy.deepcopy(self.__dict__[key], memo)
-
-        return copied
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.

@@ -75,7 +75,7 @@ from pydicom.pixel_data_handlers.util import (
     get_image_pixel_ids,
     get_nr_frames,
 )
-from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType
+from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
 from pydicom.uid import (
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
@@ -436,40 +436,12 @@ class Dataset:
 
         self.file_meta: FileMetaDataset
 
-    @property
-    def parent_seq(self) -> "weakref.ReferenceType[Sequence] | None":
-        """Return a weak reference to the parent
-        :class:`~pydicom.sequence.Sequence`.
-
-        .. versionadded:: 2.4
-
-            Returned value is a weak reference to the parent ``Sequence``.
-        """
-        return self._parent_seq
-
-    @parent_seq.setter
-    def parent_seq(self, value: "Sequence") -> None:
-        """Set the parent :class:`~pydicom.sequence.Sequence`
-
-        .. versionadded:: 2.4
-        """
-        if value != self._parent_seq:
-            self._parent_seq = weakref.ref(value)
-
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "Dataset":
-        cls = self.__class__
-        copied = cls.__new__(cls)
-        if memo:
-            memo[id(self)] = copied  # add the new class to the memo
-        # Insert a deepcopy of all instance attributes
-        copied.__dict__.update(copy.deepcopy(self.__dict__, memo))
-        # Manually update the weakref to be correct
-        for elem in copied:  # DICOM elements
-            if elem.VR == VR_.SQ:
-                elem.value.parent_dataset = copied  # setter does weakref
-                elem.parent = copied
-
-        return copied
+        # Used after reading an implicit dataset to help determine the VR of
+        #   ambiguous US or SS elements that depend on the value of (0028,0103)
+        #   *Pixel Representation*
+        # It gets set by __getitem__() and is checked by the ambiguous VR
+        #   correction function
+        self._pixel_rep: int
 
     def __enter__(self) -> "Dataset":
         """Method invoked on entry to a with statement."""
@@ -1031,6 +1003,35 @@ class Dataset:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(elem, character_set, self)
+
+            # On initial read of the dataset, propagate the pixel representation
+            #   (if any) to child datasets in any sequences.
+            # This is used as part of the ambiguous VR correction for US or SS
+            if self[tag].VR == VR_.SQ:
+
+                def _set_pixel_rep(ds: "Dataset") -> None:
+                    """Set the `Dataset._pixel_rep` attribute, if possible."""
+                    if TAG_PIXREP not in ds._dict:
+                        return
+
+                    pr: int | bytes | None = ds._dict[TAG_PIXREP].value
+                    if pr is None:
+                        return
+
+                    pr = int(b"\x01" in pr) if isinstance(pr, bytes) else pr
+                    ds._pixel_rep = pr
+
+                # Note that the value of `_pixel_rep` gets updated as we move
+                #   down the tree - the value used to correct ambiguous
+                #   elements will be from the closest dataset to that element
+                # `TAG_PIXREP` is (0028,0103) *Pixel Representation*
+                _set_pixel_rep(self)
+
+                for item in self[tag].value:
+                    if TAG_PIXREP not in item._dict and hasattr(self, "_pixel_rep"):
+                        item._pixel_rep = self._pixel_rep
+                    else:
+                        _set_pixel_rep(item)
 
             # If the Element has an ambiguous VR, try to correct it
             if self[tag].VR in AMBIGUOUS_VR:
@@ -2208,18 +2209,13 @@ class Dataset:
             if tag not in self:
                 # don't have this tag yet->create the data_element instance
                 vr = dictionary_VR(tag)
-                data_element = DataElement(tag, vr, value)
-                if vr == VR_.SQ:
-                    # let a sequence know its parent dataset to pass it
-                    # to its items, who may need parent dataset tags
-                    # to resolve ambiguous tags
-                    data_element.parent = self
+                elem = DataElement(tag, vr, value)
             else:
                 # already have this data_element, just changing its value
-                data_element = self[tag]
-                data_element.value = value
+                elem = self[tag]
+                elem.value = value
             # Now have data_element - store it in this dict
-            self[tag] = data_element
+            self[tag] = elem
         elif repeater_has_keyword(name):
             # Check if `name` is repeaters element
             raise ValueError(
@@ -2319,10 +2315,6 @@ class Dataset:
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
             if not isinstance(elem.value, pydicom.Sequence):
                 elem.value = pydicom.Sequence(elem.value)  # type: ignore
-            if elem.value is not None:
-                # let a sequence know its parent dataset, as sequence items
-                # may need parent dataset tags to resolve ambiguous tags
-                elem.value.parent_dataset = self  # type:ignore
 
     def _slice_dataset(
         self, start: "TagType | None", stop: "TagType | None", step: int | None
@@ -2414,8 +2406,6 @@ class Dataset:
                 setattr(self, key, value)
             else:
                 self[Tag(cast(int, key))] = value
-                if getattr(value, "parent", None):
-                    value.parent = self  # type: ignore[union-attr]
 
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.
@@ -2651,21 +2641,6 @@ class Dataset:
                 suppress_invalid_tags=suppress_invalid_tags,
             )
         )
-
-    # For Pickle, need to make weakref a strong reference
-    # Adapted from https://stackoverflow.com/a/45588812/1987276
-    def __getstate__(self) -> dict[str, Any]:
-        if self.parent_seq is not None:
-            s = self.__dict__.copy()
-            s["_parent_seq"] = s["_parent_seq"]()
-            return s
-        return self.__dict__
-
-    # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        if self.__dict__["_parent_seq"] is not None:
-            self.__dict__["_parent_seq"] = weakref.ref(self.__dict__["_parent_seq"])
 
     __repr__ = __str__
 
