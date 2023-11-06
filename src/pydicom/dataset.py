@@ -2293,6 +2293,9 @@ class Dataset:
             if not isinstance(elem.value, pydicom.Sequence):
                 elem.value = pydicom.Sequence(elem.value)  # type: ignore
 
+            # Update the `_pixel_rep` attribute when nested sequences
+            #   containing RawDataElements are being added to a different
+            #   dataset
             self._set_pixel_representation(cast(DataElement, elem))
 
     def _set_pixel_representation(self, elem: DataElement) -> None:
@@ -2318,12 +2321,12 @@ class Dataset:
         for item in elem.value:
             if TAG_PIXREP in item._dict:
                 pr = item._dict[TAG_PIXREP].value
-                if pr is None and hasattr(self, "_pixel_rep"):
-                    item._pixel_rep = self._pixel_rep
-                else:
+                if pr is not None:
                     item._pixel_rep = (
                         int(b"\x01" in pr) if isinstance(pr, bytes) else pr
                     )
+                elif hasattr(self, "_pixel_rep"):
+                    item._pixel_rep = self._pixel_rep
             elif hasattr(self, "_pixel_rep"):
                 item._pixel_rep = self._pixel_rep
 
