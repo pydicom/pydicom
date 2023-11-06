@@ -8,6 +8,7 @@ A DataElement has a tag,
 """
 
 import base64
+import copy
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
@@ -550,6 +551,18 @@ class DataElement:
 
         self.validate(val)
         return val
+
+    def __deepcopy__(self, memo: dict[int, Any] | None) -> "DataElement":
+        cls = self.__class__
+        copied = cls.__new__(cls)
+        if memo:
+            memo[id(self)] = copied
+
+        # Fix for #1816: don't deepcopy the parent!
+        for key in (k for k in self.__dict__ if k != "parent"):
+            copied.__dict__[key] = copy.deepcopy(self.__dict__[key], memo)
+
+        return copied
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
