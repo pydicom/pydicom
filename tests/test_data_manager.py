@@ -122,7 +122,9 @@ class TestGetData:
             assert palbase in x
 
 
-@pytest.mark.skipif(not EXT_PYDICOM or not IS_WRITEABLE, reason="pydicom-data not installed or RO")
+@pytest.mark.skipif(
+    not EXT_PYDICOM or not IS_WRITEABLE, reason="pydicom-data not installed or RO"
+)
 class TestExternalDataSource:
     """Tests for the external data sources."""
 
