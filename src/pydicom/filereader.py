@@ -886,8 +886,6 @@ def read_partial(
 
     # Add the command set elements to the dataset (if any)
     dataset.update(command_set)
-
-    # (0002,0002) Media Storage SOP Class UID
     ds = FileDataset(
         fileobj,
         dataset,
