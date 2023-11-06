@@ -1756,6 +1756,11 @@ class TestDataset:
         assert ds.BeamSequence == []
         assert ds._pixel_rep == 1
 
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds._set_pixel_representation(ds["PixelRepresentation"])
+        assert ds._pixel_rep == 0
+
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""

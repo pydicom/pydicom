@@ -1289,7 +1289,7 @@ class TestCorrectAmbiguousVR:
         assert "US" == item[0x00283002].VR
 
     def test_pixel_repr_none_in_further_implicit(self):
-        """Test a pixel representation of None in a nearer dataset."""
+        """Test a pixel representation of None in a further dataset."""
         ds = self.dataset_with_modality_lut_sequence(None)
         ds.ModalityLUTSequence[0].PixelRepresentation = 0
         ds.is_implicit_VR = True
