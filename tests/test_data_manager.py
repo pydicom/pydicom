@@ -29,9 +29,9 @@ EXT_PYDICOM = "pydicom-data" in external_data_sources()
 if EXT_PYDICOM:
     DATA_SRC = external_data_sources()["pydicom-data"].data_path
     try:
-        with open(SRC / "test", "wb") as f:
+        with open(DATA_SRC / "test", "wb") as f:
             pass
-        os.remove(SRC / "test")
+        os.remove(DATA_SRC / "test")
         IS_WRITEABLE = True
     except Exception as exc:
         IS_WRITEABLE = False
@@ -131,14 +131,14 @@ class TestExternalDataSource:
 
         # Backup the 693_UNCI.dcm file
         self.src = self.dpath / "693_UNCI.dcm"
-        self.tdir = TemporaryDirectory()
+        self.tdir = TemporaryDirectory(ignore_cleanup_errors=True)
         self.dst = Path(self.tdir.name) / "PYTEST_BACKUP"
         shutil.copy(self.src, self.dst)
 
     def teardown_method(self):
         # Restore the backed-up file
         shutil.copy(self.dst, self.src)
-
+        self.tdir.cleanup()
 
         if "mylib" in external_data_sources():
             del external_data_sources()["mylib"]
