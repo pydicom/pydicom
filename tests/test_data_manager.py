@@ -6,6 +6,7 @@ import os
 from os.path import basename
 from pathlib import Path
 import shutil
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -24,9 +25,16 @@ from pydicom.data import download
 from pydicom.data.download import get_data_dir, calculate_file_hash, get_cached_filehash
 
 
-EXT_PYDICOM = False
-if "pydicom-data" in external_data_sources():
-    EXT_PYDICOM = True
+EXT_PYDICOM = "pydicom-data" in external_data_sources()
+if EXT_PYDICOM:
+    DATA_SRC = external_data_sources()["pydicom-data"].data_path
+    try:
+        with open(DATA_SRC / "test", "wb") as f:
+            pass
+        os.remove(DATA_SRC / "test")
+        IS_WRITEABLE = True
+    except Exception as exc:
+        IS_WRITEABLE = False
 
 
 @pytest.fixture
@@ -131,7 +139,9 @@ class TestGetData:
             get_testdata_files("/foo/*.dcm")
 
 
-@pytest.mark.skipif(not EXT_PYDICOM, reason="pydicom-data not installed")
+@pytest.mark.skipif(
+    not EXT_PYDICOM or not IS_WRITEABLE, reason="pydicom-data not installed or RO"
+)
 class TestExternalDataSource:
     """Tests for the external data sources."""
 
@@ -139,14 +149,15 @@ class TestExternalDataSource:
         self.dpath = external_data_sources()["pydicom-data"].data_path
 
         # Backup the 693_UNCI.dcm file
-        p = self.dpath / "693_UNCI.dcm"
-        shutil.copy(p, self.dpath / "PYTEST_BACKUP")
+        self.src = self.dpath / "693_UNCI.dcm"
+        self.tdir = TemporaryDirectory(ignore_cleanup_errors=True)
+        self.dst = Path(self.tdir.name) / "PYTEST_BACKUP"
+        shutil.copy(self.src, self.dst)
 
     def teardown_method(self):
         # Restore the backed-up file
-        p = self.dpath / "693_UNCI.dcm"
-        shutil.copy(self.dpath / "PYTEST_BACKUP", p)
-        os.remove(self.dpath / "PYTEST_BACKUP")
+        shutil.copy(self.dst, self.src)
+        self.tdir.cleanup()
 
         if "mylib" in external_data_sources():
             del external_data_sources()["mylib"]
