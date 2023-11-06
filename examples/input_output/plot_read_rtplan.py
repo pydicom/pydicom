@@ -17,7 +17,7 @@ from pydicom.data import get_testdata_file
 print(__doc__)
 
 
-def list_beams(ds):
+def list_beams(ds: pydicom.Dataset) -> str:
     """Summarizes the RTPLAN beam information in the dataset."""
     lines = [f"{'Beam name':^13s} {'Number':^8s} {'Gantry':^8s} {'SSD (cm)':^11s}"]
     for beam in ds.BeamSequence:
