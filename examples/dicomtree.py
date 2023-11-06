@@ -18,7 +18,9 @@ import pydicom
 print(__doc__)
 
 
-def build_tree(tree: ttk.Treeview, ds: pydicom.Dataset, parent: str | None = None) -> None:
+def build_tree(
+    tree: ttk.Treeview, ds: pydicom.Dataset, parent: str | None = None
+) -> None:
     """Build out the tree.
 
     Parameters
@@ -38,18 +40,15 @@ def build_tree(tree: ttk.Treeview, ds: pydicom.Dataset, parent: str | None = Non
         if elem.VR == "SQ":
             for seq_idx, seq_item in enumerate(elem.value):
                 tree_seq_item = tree.insert(
-                    "",
-                    tk.END,
-                    text=f"{elem.name} Item {seq_idx + 1}")
+                    "", tk.END, text=f"{elem.name} Item {seq_idx + 1}"
+                )
                 tree.move(tree_seq_item, tree_item, seq_idx)
                 build_tree(tree, seq_item, tree_seq_item)
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(
-            "Please supply the path to a DICOM file: python dicomtree.py path"
-        )
+        print("Please supply the path to a DICOM file: python dicomtree.py path")
         sys.exit(-1)
 
     path = Path(sys.argv[1]).resolve(strict=True)
