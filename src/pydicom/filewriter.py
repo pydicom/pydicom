@@ -128,7 +128,9 @@ def _correct_ambiguous_vr_element(
 
         # This list of ancestor datasets is most useful when writing, or during
         #   reading if the element is on the same level as pixel representation
-        anc_ds: list[Dataset] = [x for x in ancestors if "PixelRepresentation" in x]
+        anc_ds = [
+            x for x in ancestors if getattr(x, "PixelRepresentation", None) is not None
+        ]
         # This list is useful during reading if the element isn't on the same
         #   level as pixel representation
         anc_pr: list[int] = [

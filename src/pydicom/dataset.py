@@ -439,8 +439,8 @@ class Dataset:
         # Used after reading an implicit dataset to help determine the VR of
         #   ambiguous US or SS elements that depend on the value of (0028,0103)
         #   *Pixel Representation*
-        # It gets set by __getitem__() and is checked by the ambiguous VR
-        #   correction function
+        # It gets set by __getitem__() and __setitem()__ and is used by the
+        #   ambiguous VR correction function
         self._pixel_rep: int
 
     def __enter__(self) -> "Dataset":
@@ -1008,30 +1008,7 @@ class Dataset:
             #   (if any) to child datasets in any sequences.
             # This is used as part of the ambiguous VR correction for US or SS
             if self[tag].VR == VR_.SQ:
-
-                def _set_pixel_rep(ds: "Dataset") -> None:
-                    """Set the `Dataset._pixel_rep` attribute, if possible."""
-                    # `TAG_PIXREP` is (0028,0103) *Pixel Representation*
-                    if TAG_PIXREP not in ds._dict:
-                        return
-
-                    pr: int | bytes | None = ds._dict[TAG_PIXREP].value
-                    if pr is None:
-                        return
-
-                    pr = int(b"\x01" in pr) if isinstance(pr, bytes) else pr
-                    ds._pixel_rep = pr
-
-                # Note that the value of `_pixel_rep` gets updated as we move
-                #   down the tree - the value used to correct ambiguous
-                #   elements will be from the closest dataset to that element
-                _set_pixel_rep(self)
-
-                for item in self[tag].value:
-                    if TAG_PIXREP in item._dict:
-                        _set_pixel_rep(item)
-                    elif hasattr(self, "_pixel_rep"):
-                        item._pixel_rep = self._pixel_rep
+                self._set_pixel_representation(self[tag])
 
             # If the Element has an ambiguous VR, try to correct it
             if self[tag].VR in AMBIGUOUS_VR:
@@ -2315,6 +2292,40 @@ class Dataset:
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
             if not isinstance(elem.value, pydicom.Sequence):
                 elem.value = pydicom.Sequence(elem.value)  # type: ignore
+
+            self._set_pixel_representation(cast(DataElement, elem))
+
+    def _set_pixel_representation(self, elem: DataElement) -> None:
+        """Set the `_pixel_rep` attribute for the current dataset and child
+        datasets of the sequence element `elem`."""
+        # `TAG_PIXREP` is (0028,0103) *Pixel Representation*
+        # May be DataElement or RawDataElement, also value may be None
+        pr: int | bytes | None = None
+        if TAG_PIXREP in self._dict:
+            pr = self[TAG_PIXREP].value
+        elif hasattr(self, "_pixel_rep"):  # Must be second conditional
+            pr = self._pixel_rep
+
+        if pr is not None:
+            self._pixel_rep = int(b"\x01" in pr) if isinstance(pr, bytes) else pr
+
+        if elem.VR != VR_.SQ:
+            return
+
+        # Note that the value of `_pixel_rep` gets updated as we move
+        #   down the tree - the value used to correct ambiguous
+        #   elements will be from the closest dataset to that element
+        for item in elem.value:
+            if TAG_PIXREP in item._dict:
+                pr = item._dict[TAG_PIXREP].value
+                if pr is None and hasattr(self, "_pixel_rep"):
+                    item._pixel_rep = self._pixel_rep
+                else:
+                    item._pixel_rep = (
+                        int(b"\x01" in pr) if isinstance(pr, bytes) else pr
+                    )
+            elif hasattr(self, "_pixel_rep"):
+                item._pixel_rep = self._pixel_rep
 
     def _slice_dataset(
         self, start: "TagType | None", stop: "TagType | None", step: int | None
