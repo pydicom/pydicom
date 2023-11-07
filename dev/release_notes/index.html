@@ -353,6 +353,10 @@ for 32-bit systems (<a class="reference external" href="https://github.com/pydic
 module instead</p></li>
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_files()</span></code>
 now raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if called with an absolute path or pattern</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_uid()</span></code></a> has been changed to use a random suffix
+generated using <a class="reference external" href="https://docs.python.org/3/library/secrets.html#secrets.randbelow" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randbelow()</span></code></a> when <cite>entropy_srcs</cite> isn’t used, and
+the maximum allowed length of the <cite>prefix</cite> has been changed to 54 characters
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1773">#1773</a>)</p></li>
 </ul>
 </section>
 <section id="enhancements">
