@@ -60,6 +60,10 @@ Changes
   module instead
 * :func:`~pydicom.data_manager.get_testdata_file` and :func:`~pydicom.data_manager.get_testdata_files`
   now raise ``ValueError`` if called with an absolute path or pattern
+* :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
+  generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
+  the maximum allowed length of the `prefix` has been changed to 54 characters
+  (:issue:`1773`)
 
 
 Enhancements
