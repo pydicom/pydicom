@@ -9,6 +9,8 @@ A DataElement has a tag,
 
 import base64
 import copy
+from dataclasses import dataclass
+from io import BufferedIOBase
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
@@ -32,8 +34,10 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
+from pydicom.util.buffers import buffer_assertions
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
+    BUFFERABLE_VRS,
     PersonName,
     BYTES_VR,
     AMBIGUOUS_VR,
@@ -225,10 +229,12 @@ class DataElement:
 
         self.VR = VR  # Note: you must set VR before setting value
         self.validation_mode = validation_mode
+
         if already_converted:
             self._value = value
         else:
             self.value = value  # calls property setter which will convert
+
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
         self.private_creator: str | None = None
@@ -442,6 +448,19 @@ class DataElement:
         # * Which str-like VRs can have backslashes in Part 5, Section 6.2
         # * All byte-like VRs
         # * Ambiguous VRs that may be byte-like
+        if isinstance(val, BufferedIOBase):
+            if self.VR not in BUFFERABLE_VRS:
+                raise ValueError(
+                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {BUFFERABLE_VRS}."
+                )
+
+            # ensure pre-conditions are met - we will check these when reading the value as well
+            # but better to fail early if possible
+            buffer_assertions(val)
+
+            self._value = val
+            return
+
         if self.VR not in ALLOW_BACKSLASH:
             if isinstance(val, str):
                 val = val.split("\\") if "\\" in val else val
@@ -451,11 +470,15 @@ class DataElement:
         self._value = self._convert_value(val)
 
     @property
+    def is_buffered(self) -> bool:
+        return isinstance(self._value, BufferedIOBase)
+
+    @property
     def VM(self) -> int:
         """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
-        if isinstance(self.value, str | bytes | PersonName):
+        if isinstance(self.value, str | bytes | PersonName | BufferedIOBase):
             return 1 if self.value else 0
         try:
             iter(self.value)
@@ -611,6 +634,11 @@ class DataElement:
     @property
     def repval(self) -> str:
         """Return a :class:`str` representation of the element's value."""
+        if self.is_buffered:
+            # in case the buffer is a stream and non-seekable we don't want
+            # to consume any bytes
+            return repr(self.value)
+
         # If the VR is byte-like or long text (1024+), show a summary instead
         if self.VR in LONG_VALUE_VR:
             try:
@@ -729,6 +757,7 @@ class RawDataElement(NamedTuple):
     is_implicit_VR: bool
     is_little_endian: bool
     is_raw: bool = True
+    is_buffered: bool = False
 
 
 # The first and third values of the following elements are always US

@@ -20,7 +20,7 @@ class TestRawReaderExplVRTests:
         # (0002,0001) OB 2-byte-reserved 4-byte-length, value 0x00 0x01
         bytes_input = "02 00 01 00 4f 42 00 00 02 00 00 00 00 01"
         infile = BytesIO(hex2bytes(bytes_input))
-        expected = ((2, 1), "OB", 2, b"\00\01", 0xC, False, True, True)
+        expected = ((2, 1), "OB", 2, b"\00\01", 0xC, False, True, True, False)
 
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True
@@ -36,7 +36,7 @@ class TestRawReaderExplVRTests:
         # XXX Assumes that a RawDataElement doesn't convert the value based
         # upon the VR value, thus it will remain a byte string since that is
         # the input
-        expected = ((8, 0x212A), "IS", 2, b"1 ", 0x8, False, True, True)
+        expected = ((8, 0x212A), "IS", 2, b"1 ", 0x8, False, True, True, False)
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True
         )
@@ -59,6 +59,7 @@ class TestRawReaderExplVRTests:
             False,
             True,
             True,
+            False,  # is buffered
         )
 
         de_gen = data_element_generator(
@@ -92,7 +93,7 @@ class TestRawReaderImplVR:
         # (0008,212A) {IS} 4-byte-length, value '1 '
         infile = BytesIO(hex2bytes("08 00 2a 21 02 00 00 00 31 20"))
 
-        expected = ((8, 0x212A), None, 2, b"1 ", 0x8, True, True, True)
+        expected = ((8, 0x212A), None, 2, b"1 ", 0x8, True, True, True, False)
 
         de_gen = data_element_generator(
             infile, is_implicit_VR=True, is_little_endian=True
@@ -116,6 +117,7 @@ class TestRawReaderImplVR:
             True,
             True,
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=True, is_little_endian=True
@@ -166,6 +168,7 @@ class TestRawReaderImplVR:
             False,  # is Implicit VR
             True,  # is Little Endian
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True
@@ -213,6 +216,7 @@ class TestRawReaderImplVR:
             False,  # is Implicit VR
             True,  # is Little Endian
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True
@@ -251,6 +255,7 @@ class TestRawReaderImplVR:
             False,  # is Implicit VR
             True,  # is Little Endian
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True
@@ -289,6 +294,7 @@ class TestRawReaderImplVR:
             False,  # is Implicit VR
             True,  # is Little Endian
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True
@@ -344,6 +350,7 @@ class TestRawReaderImplVR:
             False,  # is Implicit VR
             True,  # is Little Endian
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True, defer_size=16
@@ -379,6 +386,7 @@ class TestRawReaderImplVR:
             False,  # is Implicit VR
             True,  # is Little Endian
             True,
+            False,  # is buffered
         )
         de_gen = data_element_generator(
             infile, is_implicit_VR=False, is_little_endian=True

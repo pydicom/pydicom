@@ -4,6 +4,8 @@
 # Many tests of DataElement class are implied in test_dataset also
 import datetime
 import math
+import io
+import re
 
 import pytest
 
@@ -21,9 +23,10 @@ from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
+from pydicom.util.buffers import read_bytes
 from .test_util import save_private_dict
 from pydicom.uid import UID
-from pydicom.valuerep import DSfloat, validate_value
+from pydicom.valuerep import BUFFERABLE_VRS, DSfloat, validate_value
 
 
 class TestDataElement:
@@ -1219,3 +1222,35 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
+
+
+class TestBufferedDataElement:
+    """Tests setting a DataElement value to a buffer"""
+
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
+    def test_reading_dataelement_buffer(self, vr):
+        value = b"\x00\x01\x02\x03"
+        buffer = io.BytesIO(value)
+        de = DataElement("PixelData", vr, buffer)
+
+        data: bytes = b""
+        # while read_bytes is tested in test_buffer.py, this tests the integration
+        # between the helper and DataElement since this is the main use case
+        for chunk in read_bytes(de.value):
+            data += chunk
+
+        assert data == value
+
+    def test_setting_value_to_buffer_for_unsupported_vr_raises_an_exception(self):
+        with pytest.raises(ValueError, match="Only the following VRs support buffers"):
+            DataElement("PersonName", "PN", io.BytesIO())
+
+    def test_printing_value(self):
+        value = b"\x00\x01\x02\x03"
+        buffer = io.BytesIO(value)
+        de = DataElement("PixelData", "OB", buffer)
+        assert re.compile(
+            r"^\(7FE0,0010\) Pixel Data\W*OB: <_io.BytesIO object.*$"
+        ).match(str(de))
+        assert de.repval.startswith("<_io.BytesIO object at")
+        assert repr(de) == str(de)

@@ -1,8 +1,8 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
+from io import BufferedIOBase
 from struct import pack
-import sys
 from typing import BinaryIO, Any, cast
 from collections.abc import Sequence, MutableSequence, Iterable
 import warnings
@@ -23,6 +23,7 @@ from pydicom.tag import (
     tag_in_exception,
 )
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
+from pydicom.util.buffers import buffer_length, read_bytes, reset_buffer_position
 from pydicom.valuerep import (
     PersonName,
     IS,
@@ -305,12 +306,22 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
 
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other byte' (OB)."""
-    if len(elem.value) % 2:
-        # Pad odd length values
-        fp.write(cast(bytes, elem.value))
-        fp.write(b"\x00")
+    value_length: int = 0
+
+    if elem.is_buffered:
+        buffer = cast(BufferedIOBase, elem.value)
+        with reset_buffer_position(buffer) as starting_position:
+            for chunk in read_bytes(buffer):
+                fp.write(chunk)
+
+            value_length = buffer.tell() - starting_position
     else:
         fp.write(cast(bytes, elem.value))
+        value_length = len(elem.value)
+
+    if value_length % 2:
+        # Pad odd length values
+        fp.write(b"\x00")
 
 
 def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
@@ -319,7 +330,13 @@ def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
     Note: This **does not currently do the byte swapping** for Endian state.
     """
     # XXX for now just write the raw bytes without endian swapping
-    fp.write(cast(bytes, elem.value))
+    if elem.is_buffered:
+        buffer = cast(BufferedIOBase, elem.value)
+        with reset_buffer_position(buffer):
+            for chunk in read_bytes(buffer):
+                fp.write(chunk)
+    else:
+        fp.write(cast(bytes, elem.value))
 
 
 def write_UI(fp: DicomIO, elem: DataElement) -> None:
@@ -571,7 +588,9 @@ def write_data_element(
                 # numeric format parameter
                 if param is not None:
                     fn(buffer, elem, param)  # type: ignore[operator]
-                else:
+                elif not elem.is_buffered:
+                    # defer writing a buffered value until after we have written the tag and length
+                    # in the file
                     fn(buffer, elem)  # type: ignore[operator]
 
     # valid pixel data with undefined length shall contain encapsulated
@@ -581,7 +600,17 @@ def write_data_element(
         if not fp.is_little_endian:
             # Non-conformant endianness
             encap_item = b"\xff\xfe\xe0\x00"
-        if not cast(bytes, elem.value).startswith(encap_item):
+
+        pixel_data_bytes: bytes = b""
+
+        if elem.is_buffered:
+            elem_buffer = cast(BufferedIOBase, elem.value)
+            with reset_buffer_position(elem_buffer):
+                pixel_data_bytes = elem_buffer.read(len(encap_item))
+        else:
+            pixel_data_bytes = cast(bytes, elem.value)[: len(encap_item)]
+
+        if not pixel_data_bytes.startswith(encap_item):
             raise ValueError(
                 "(7FE0,0010) Pixel Data has an undefined length indicating "
                 "that it's compressed, but the data isn't encapsulated as "
@@ -589,7 +618,11 @@ def write_data_element(
                 "information"
             )
 
-    value_length = buffer.tell()
+    value_length: int = (
+        buffer.tell()
+        if not elem.is_buffered
+        else buffer_length(cast(BufferedIOBase, elem.value))
+    )
     if (
         not fp.is_implicit_VR
         and vr not in EXPLICIT_VR_LENGTH_32
@@ -625,7 +658,11 @@ def write_data_element(
         # unless is SQ with undefined length.
         fp.write_UL(0xFFFFFFFF if is_undefined_length else value_length)
 
-    fp.write(buffer.getvalue())
+    # if the value is buffered, now we want to write the value directly to the fp
+    if elem.is_buffered:
+        fn(fp, elem)  # type: ignore[operator]
+    else:
+        fp.write(buffer.getvalue())
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
