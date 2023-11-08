@@ -1,4 +1,5 @@
 from io import BytesIO
+from tempfile import TemporaryFile
 import pytest
 
 from pydicom.util.buffers import buffer_length, read_bytes, reset_buffer_position
@@ -96,3 +97,15 @@ class TestBufferUtils:
             buffer.read()
 
         assert buffer.tell() == 2
+
+    def test_reading_buffer_thats_been_closed(self):
+        with TemporaryFile("rb") as file:
+            buffer = file
+
+        with pytest.raises(AssertionError, match="The stream has been closed"):
+            next(read_bytes(buffer))
+
+    def test_reading_buffer_thats_not_readable(self):
+        with TemporaryFile("wb") as file:
+            with pytest.raises(AssertionError, match="The stream is not readable"):
+                next(read_bytes(file))

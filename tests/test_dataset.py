@@ -7,6 +7,7 @@ import math
 import pickle
 import sys
 import weakref
+import tempfile
 from platform import python_implementation
 
 import pytest
@@ -2399,3 +2400,15 @@ def test_setattr_ignore(setattr_ignore):
         with assert_no_warning():
             getattr(ds, s, None)
             setattr(ds, s, None)
+
+
+def test_pickling_and_unpickling_buffered_pixel_data():
+    with tempfile.NamedTemporaryFile("+wb") as file:
+        file.write(b"\x00\x01\x02\x03\x04")
+        file.seek(0)
+
+        ds = Dataset()
+        ds.PixelData = file
+        s = pickle.dumps({"ds": ds})
+        ds1 = pickle.loads(s)["ds"]
+        assert ds == ds1

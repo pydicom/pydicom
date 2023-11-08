@@ -2959,3 +2959,16 @@ class TestWritingBufferedPixelData:
         fn(fp, DataElement("PixelData", vr, buffer))
 
         assert fp.getvalue() == data
+
+    def test_saving_a_file_with_a_closed_file(self):
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.BitsAllocated = 8
+
+        with TemporaryFile("+wb") as file:
+            ds.PixelData = file
+
+        with TemporaryFile("+wb") as file:
+            with pytest.raises(AssertionError, match="The stream has been closed"):
+                ds.save_as(file)
