@@ -126,23 +126,27 @@ def _correct_ambiguous_vr_element(
         #   https://github.com/pydicom/pydicom/pull/298
         # PixelRepresentation is usually set in the root dataset
 
-        # This list of ancestor datasets is most useful when writing, or during
-        #   reading if the element is on the same level as pixel representation
-        anc_ds = [
-            x for x in ancestors if getattr(x, "PixelRepresentation", None) is not None
-        ]
-        # This list is useful during reading if the element isn't on the same
-        #   level as pixel representation
-        anc_pr: list[int] = [
-            x._pixel_rep for x in ancestors if hasattr(x, "_pixel_rep")
-        ]
+        # If correcting during write, or after implicit read when the
+        #   element is on the same level as pixel representation
+        pixel_rep = next(
+            (
+                cast(int, x.PixelRepresentation)
+                for x in ancestors
+                if getattr(x, "PixelRepresentation", None) is not None
+            ),
+            None,
+        )
 
-        if anc_ds:
-            pixel_rep = cast(int, anc_ds[0].PixelRepresentation)
-        elif anc_pr:
-            pixel_rep = anc_pr[0]
-        else:
-            # if no pixel data is present, none if these tags is used,
+        if pixel_rep is None:
+            # If correcting after implicit read when the element isn't
+            #   on the same level as pixel representation
+            pixel_rep = next(
+                (x._pixel_rep for x in ancestors if hasattr(x, "_pixel_rep")),
+                None,
+            )
+
+        if pixel_rep is None:
+            # If no pixel data is present, none if these tags is used,
             # so we can just ignore a missing PixelRepresentation in this case
             pixel_rep = 1
             if (
