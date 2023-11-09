@@ -66,7 +66,7 @@ if __name__ == "__main__":
     root.rowconfigure(0, weight=1)
     root.columnconfigure(0, weight=1)
 
-    # Used a monospaced font
+    # Use a monospaced font
     s = ttk.Style()
     s.theme_use("clam")
     s.configure("Treeview", font=("Courier", 12))
