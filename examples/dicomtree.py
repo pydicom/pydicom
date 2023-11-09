@@ -40,7 +40,6 @@ def build_tree(
 
         if elem.VR == "SQ":
             # DataElement is a sequence, containing 0 or more Datasets
-            tree_item = tree.insert("", tk.END, text=str(elem))
             for seq_idx, seq_item in enumerate(elem.value):
                 tree_seq_item = tree.insert(
                     "", tk.END, text=f"{elem.name} Item {seq_idx + 1}"
