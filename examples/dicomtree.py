@@ -32,17 +32,22 @@ def build_tree(
     parent : str | None
         The item ID of the parent item in the tree (if any), default ``None``.
     """
+    # For each DataElement in the current Dataset
     for idx, elem in enumerate(ds):
         tree_item = tree.insert("", tk.END, text=str(elem))
         if parent:
             tree.move(tree_item, parent, idx)
 
         if elem.VR == "SQ":
+            # DataElement is a sequence, containing 0 or more Datasets
+            tree_item = tree.insert("", tk.END, text=str(elem))
             for seq_idx, seq_item in enumerate(elem.value):
                 tree_seq_item = tree.insert(
                     "", tk.END, text=f"{elem.name} Item {seq_idx + 1}"
                 )
                 tree.move(tree_seq_item, tree_item, seq_idx)
+
+                # Recurse into the sequence item(s)
                 build_tree(tree, seq_item, tree_seq_item)
 
 
@@ -51,21 +56,26 @@ if __name__ == "__main__":
         print("Please supply the path to a DICOM file: python dicomtree.py path")
         sys.exit(-1)
 
+    # Read the supplied DICOM dataset
     path = Path(sys.argv[1]).resolve(strict=True)
     ds = pydicom.dcmread(path)
 
+    # Create the root Tk widget
     root = tk.Tk()
     root.geometry("1200x900")
     root.title(f"DICOM tree viewer - {path.name}")
     root.rowconfigure(0, weight=1)
     root.columnconfigure(0, weight=1)
 
+    # Used a monospaced font
     s = ttk.Style()
     s.theme_use("clam")
-    s.configure("Treeview", rowheight=50)
+    s.configure("Treeview", font=("Courier", 12))
 
+    # Create the tree and populate it
     tree = ttk.Treeview(root)
     build_tree(tree, ds, None)
     tree.grid(row=0, column=0, sticky=tk.NSEW)
 
+    # Start the DICOM tree widget
     root.mainloop()
