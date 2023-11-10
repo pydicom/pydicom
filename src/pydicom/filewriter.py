@@ -886,7 +886,9 @@ def _write_dataset(fp: DicomIO, dataset: Dataset, write_like_original: bool) -> 
 
 
 def dcmwrite(
-    filename: PathType | BinaryIO, dataset: Dataset, write_like_original: bool = True
+    filename: PathType | BinaryIO | DicomFileLike,
+    dataset: Dataset,
+    write_like_original: bool = True,
 ) -> None:
     """Write `dataset` to the `filename` specified.
 

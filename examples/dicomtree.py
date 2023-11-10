@@ -5,94 +5,76 @@ Show a dicom file using hierarchical tree
 =========================================
 Show a dicom file using a hierarchical tree in a graphical window.
 
-sudo apt install tix-dev
-sudo pip install -U pydicom
-python3 dicomtree.py file.dcm
-Or in file browser, right click on file.dcm, open with custom command:
-python3 dicomtree.py
 """
+from pathlib import Path
+import sys
 
+import tkinter as tk
+from tkinter import ttk
 
-import tkinter.tix as tkinter_tix
+import pydicom
+
 
 print(__doc__)
 
-usage = "Usage: python dicomtree.py dicom_filename"
 
+def build_tree(
+    tree: ttk.Treeview, ds: pydicom.Dataset, parent: str | None = None
+) -> None:
+    """Build out the tree.
 
-def RunTree(w, filename):
-    top = tkinter_tix.Frame(w, relief=tkinter_tix.RAISED, bd=1)
-    tree = tkinter_tix.Tree(top, options="hlist.columns 2")
-    tree.pack(expand=1, fill=tkinter_tix.BOTH, padx=10, pady=10, side=tkinter_tix.LEFT)
-    # print(tree.hlist.keys())   # use to see the available configure() options
-    tree.hlist.configure(bg="white", font="Courier 10", indent=30)
-    tree.hlist.configure(selectbackground="light yellow", gap=150)
+    Parameters
+    ----------
+    tree : ttk.Treeview
+        The treeview object.
+    ds : pydicom.dataset.Dataset
+        The dataset object to add to the `tree`.
+    parent : str | None
+        The item ID of the parent item in the tree (if any), default ``None``.
+    """
+    # For each DataElement in the current Dataset
+    for idx, elem in enumerate(ds):
+        tree_item = tree.insert("", tk.END, text=str(elem))
+        if parent:
+            tree.move(tree_item, parent, idx)
 
-    box = tkinter_tix.ButtonBox(w, orientation=tkinter_tix.HORIZONTAL)
-    # box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
-    box.add("exit", text="Exit", underline=0, command=w.destroy, width=6)
-    box.pack(side=tkinter_tix.BOTTOM, fill=tkinter_tix.X)
-    top.pack(side=tkinter_tix.TOP, fill=tkinter_tix.BOTH, expand=1)
-    # https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
-    tree.bind_all(
-        "<MouseWheel>",
-        lambda event: tree.hlist.yview_scroll(  # Wheel in Windows
-            int(-1 * event.delta / 120.0), "units"
-        ),
-    )
-    tree.bind_all(
-        "<Button-4>",
-        lambda event: tree.hlist.yview_scroll(int(-1), "units"),  # Wheel up in Linux
-    )
-    tree.bind_all(
-        "<Button-5>",
-        lambda event: tree.hlist.yview_scroll(int(+1), "units"),  # Wheel down in Linux
-    )
+        if elem.VR == "SQ":
+            # DataElement is a sequence, containing 0 or more Datasets
+            for seq_idx, seq_item in enumerate(elem.value):
+                tree_seq_item = tree.insert(
+                    "", tk.END, text=f"{elem.name} Item {seq_idx + 1}"
+                )
+                tree.move(tree_seq_item, tree_item, seq_idx)
 
-    show_file(filename, tree)
-
-
-def show_file(filename, tree):
-    tree.hlist.add("root", text=filename)
-    ds = pydicom.dcmread(filename)
-    ds.decode()  # change strings to unicode
-    recurse_tree(tree, ds, "root", False)
-    tree.autosetmode()
-
-
-def recurse_tree(tree, dataset, parent, hide=False):
-    # order the dicom tags
-    for data_element in dataset:
-        node_id = parent + "." + hex(id(data_element))
-        if isinstance(data_element.value, str):
-            tree.hlist.add(node_id, text=str(data_element))
-        else:
-            tree.hlist.add(node_id, text=str(data_element))
-        if hide:
-            tree.hlist.hide_entry(node_id)
-        if data_element.VR == "SQ":  # a sequence
-            for i, dataset in enumerate(data_element.value):
-                item_id = node_id + "." + str(i + 1)
-                sq_item_description = data_element.name.replace(
-                    " Sequence", ""
-                )  # XXX not i18n
-                item_text = f"{sq_item_description:s} {i + 1:d}"
-                tree.hlist.add(item_id, text=item_text)
-                tree.hlist.hide_entry(item_id)
-                recurse_tree(tree, dataset, item_id, hide=True)
+                # Recurse into the sequence item(s)
+                build_tree(tree, seq_item, tree_seq_item)
 
 
 if __name__ == "__main__":
-    import sys
-    import pydicom
-
     if len(sys.argv) != 2:
-        print("Please supply a dicom file name:\n")
-        print(usage)
+        print("Please supply the path to a DICOM file: python dicomtree.py path")
         sys.exit(-1)
-    root = tkinter_tix.Tk()
-    root.geometry("1200x900+0+0")
-    root.title("DICOM tree viewer - " + sys.argv[1])
 
-    RunTree(root, sys.argv[1])
+    # Read the supplied DICOM dataset
+    path = Path(sys.argv[1]).resolve(strict=True)
+    ds = pydicom.dcmread(path)
+
+    # Create the root Tk widget
+    root = tk.Tk()
+    root.geometry("1200x900")
+    root.title(f"DICOM tree viewer - {path.name}")
+    root.rowconfigure(0, weight=1)
+    root.columnconfigure(0, weight=1)
+
+    # Use a monospaced font
+    s = ttk.Style()
+    s.theme_use("clam")
+    s.configure("Treeview", font=("Courier", 12))
+
+    # Create the tree and populate it
+    tree = ttk.Treeview(root)
+    build_tree(tree, ds, None)
+    tree.grid(row=0, column=0, sticky=tk.NSEW)
+
+    # Start the DICOM tree widget
     root.mainloop()
