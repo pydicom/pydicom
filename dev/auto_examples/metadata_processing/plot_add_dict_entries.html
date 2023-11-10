@@ -144,11 +144,11 @@ Output with registered private tags:
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Darcy Mason and pydicom contributors</span>
 <span class="c1"># license : MIT</span>
 
+<span class="kn">import</span> <span class="nn">io</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries" class="sphx-glr-backref-module-pydicom-datadict sphx-glr-backref-type-py-function"><span class="n">add_private_dict_entries</span></a>
 <span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class"><span class="n">DicomBytesIO</span></a>
 <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <span class="n">VR</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
@@ -169,9 +169,9 @@ Output with registered private tags:
 
 <span class="c1"># write the dataset into a memory file and read it back</span>
 <span class="c1"># this simulates reading from a normal DICOM file</span>
-<a href="../../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class"><span class="n">DicomBytesIO</span></a><span class="p">()</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="../../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">)</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="../../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class"><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span></a><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output for unknown private tags:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -197,7 +197,7 @@ Output with registered private tags:
 <a href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries" class="sphx-glr-backref-module-pydicom-datadict sphx-glr-backref-type-py-function"><span class="n">add_private_dict_entries</span></a><span class="p">(</span><span class="n">private_creator</span><span class="o">=</span><span class="s2">&quot;ACME 3.1&quot;</span><span class="p">,</span> <span class="n">new_entries_dict</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">new_dict_items</span></a><span class="p">)</span>
 
 <span class="c1"># re-read the dataset for the new dictionary entries to be applied</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="../../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Output with registered private tags:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>

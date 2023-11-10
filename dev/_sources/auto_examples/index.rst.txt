@@ -50,6 +50,23 @@ Somewhere to start
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Show a dicom file using hierarchical tree">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_dicomtree_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_dicomtree.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Show a dicom file using hierarchical tree</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Show how to write a DICOM dataset into a byte array and to read it back from a byte array. This...">
 
 .. only:: html
@@ -67,23 +84,6 @@ Somewhere to start
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="sudo apt install tix-dev sudo pip install -U pydicom python3 dicomtree.py file.dcm Or in file b...">
-
-.. only:: html
-
-  .. image:: /auto_examples/images/thumb/sphx_glr_dicomtree_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_dicomtree.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Show a dicom file using hierarchical tree</div>
-    </div>
-
-
-.. raw:: html
-
     </div>
 
 
@@ -92,8 +92,8 @@ Somewhere to start
 
    /auto_examples/plot_dicom_difference
    /auto_examples/show_charset_name
-   /auto_examples/memory_dataset
    /auto_examples/dicomtree
+   /auto_examples/memory_dataset
 
 
 Image processing

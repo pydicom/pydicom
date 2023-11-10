@@ -57,7 +57,7 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
     print(__doc__)
 
 
-    def list_beams(ds):
+    def list_beams(ds: pydicom.Dataset) -> str:
         """Summarizes the RTPLAN beam information in the dataset."""
         lines = [f"{'Beam name':^13s} {'Number':^8s} {'Gantry':^8s} {'SSD (cm)':^11s}"]
         for beam in ds.BeamSequence:
