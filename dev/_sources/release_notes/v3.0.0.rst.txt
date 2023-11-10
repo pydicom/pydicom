@@ -64,6 +64,8 @@ Changes
   generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
   the maximum allowed length of the `prefix` has been changed to 54 characters
   (:issue:`1773`)
+* :attr:`~pydicom.dataelem.DataElement.VM` always returns ``1`` for **SQ**
+  elements (:issue:`1481`)
 
 
 Enhancements
