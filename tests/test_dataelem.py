@@ -544,7 +544,6 @@ class TestDataElement:
         ds.AcquisitionContextSequence = []
         elem = ds["AcquisitionContextSequence"]
         assert bool(elem.value) is False
-        assert 0 == elem.VM
         assert elem.value == []
 
         fp = DicomBytesIO()
@@ -553,7 +552,6 @@ class TestDataElement:
         filewriter.write_dataset(fp, ds)
         ds_read = dcmread(fp, force=True)
         elem = ds_read["AcquisitionContextSequence"]
-        assert 0 == elem.VM
         assert elem.value == []
 
     def test_is_private(self):
@@ -562,6 +560,26 @@ class TestDataElement:
         assert elem.is_private
         elem = DataElement(0x00080010, "UN", None)
         assert not elem.is_private
+
+    def test_is_empty_sequence(self):
+        """Test DataElement.is_empty for SQ."""
+        elem = DataElement(0x300A00B0, "SQ", [])
+        assert elem.VR == "SQ"
+        assert len(elem.value) == 0
+        assert elem.is_empty
+        elem.value = [Dataset()]
+        assert len(elem.value) == 1
+        assert not elem.is_empty
+
+    def test_vm_sequence(self):
+        """Test DataElement.VM for SQ."""
+        elem = DataElement(0x300A00B0, "SQ", [])
+        assert elem.VR == "SQ"
+        assert len(elem.value) == 0
+        assert elem.VM == 1
+        elem.value = [Dataset(), Dataset()]
+        assert len(elem.value) == 2
+        assert elem.VM == 1
 
 
 class TestRawDataElement:

@@ -452,15 +452,26 @@ class DataElement:
 
     @property
     def VM(self) -> int:
-        """Return the value multiplicity of the element as :class:`int`."""
+        """Return the value multiplicity of the element as :class:`int`.
+
+        .. versionchanged:: 3.0
+
+            **SQ** elements now always return a VM of ``1``.
+        """
+        if self.VR == VR_.SQ:
+            return 1
+
         if self.value is None:
             return 0
+
         if isinstance(self.value, str | bytes | PersonName):
             return 1 if self.value else 0
+
         try:
             iter(self.value)
         except TypeError:
             return 1
+
         return len(self.value)
 
     @property
@@ -469,6 +480,9 @@ class DataElement:
 
         .. versionadded:: 1.4
         """
+        if self.VR == VR_.SQ:
+            return not bool(self.value)
+
         return self.VM == 0
 
     @property
