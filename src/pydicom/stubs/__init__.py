@@ -44,9 +44,10 @@ PersonNameType = None | str | PersonName
 PersonNameListType = None | StrSequence | MutableSequence[PersonName]
 StringType = None | str
 StringListType = None | StrSequence
-TagType = int | str | tuple[int, int] | BaseTag
+TagType = None | int | str | tuple[int, int] | BaseTag
 TagListType = (
-    IntSequence
+    None
+    | IntSequence
     | StrSequence
     | MutableSequence[tuple[int, int]]
     | MutableSequence[BaseTag]
@@ -66,9 +67,9 @@ AS_1_Type = StringType
 AS_1N_Type = StringType | StringListType
 AS_N_Type = StringListType
 
-AT_1_Type = None | TagType
-AT_1N_Type = None | TagType | TagListType
-AT_N_Type = None | TagListType
+AT_1_Type = TagType
+AT_1N_Type = TagType | TagListType
+AT_N_Type = TagListType
 
 CS_1_Type = StringType
 CS_1N_Type = StringType | StringListType
