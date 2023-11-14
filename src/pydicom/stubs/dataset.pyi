@@ -110,23 +110,24 @@ from pydicom.stubs import (
 from pydicom.uid import UID
 
 class Dataset:
-    # File Meta Information Elements: type  # VR, VM, Type
+    # Keyword: type hint  # VR, VM, Type
+    # Part 10, 7.1: File Meta Information Elements
     FileMetaInformationGroupLength: int  # UL, 1, 1
     FileMetaInformationVersion: bytes  # OB, 1, 1
-    MediaStorageSOPClassUID: UID  # UI, 1, 1
-    MediaStorageSOPInstanceUID: UID  # UI, 1, 1
-    TransferSyntaxUID: UID  # UI, 1, 1
-    ImplementationClassUID: UID  # UI, 1, 1
+    MediaStorageSOPClassUID: str | UID  # UI, 1, 1
+    MediaStorageSOPInstanceUID: str | UID  # UI, 1, 1
+    TransferSyntaxUID: str | UID  # UI, 1, 1
+    ImplementationClassUID: str | UID  # UI, 1, 1
     ImplementationVersionName: str | None  # SH, 1, 3
     SourceApplicationEntityTitle: str | None  # AE, 1, 3
     SendingApplicationEntityTitle: str | None  # AE, 1, 3
     ReceivingApplicationEntityTitle: str | None  # AE, 1, 3
     SourcePresentationAddress: str | None  # UR, 1, 3
     ReceivingPresentationAddress: str | None  # UR, 1, 3
-    PrivateInformationCreatorUID: UID | None  # UI, 1, 3
+    PrivateInformationCreatorUID: str | UID | None  # UI, 1, 3
     PrivateInformation: bytes  # OB, 1, 1C
 
-    # C.7.6.3.3: Image Pixel Description Macro
+    # Part 3, C.7.6.3.3: Image Pixel Description Macro
     SamplesPerPixel: int  # US, 1, 1
     PhotometricInterpretation: str  # CS, 1, 1
     Rows: int  # US, 1, 1
