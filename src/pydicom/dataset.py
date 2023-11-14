@@ -2923,22 +2923,6 @@ class FileMetaDataset(Dataset):
         super().__init__(*args, **kwargs)
         FileMetaDataset.validate(self._dict)
 
-        # Set type hints for the possible contents - VR, Type (1|1C|3)
-        self.FileMetaInformationGroupLength: int  # UL, 1
-        self.FileMetaInformationVersion: bytes  # OB, 1
-        self.MediaStorageSOPClassUID: UID  # UI, 1
-        self.MediaStorageSOPInstanceUID: UID  # UI, 1
-        self.TransferSyntaxUID: UID  # UI, 1
-        self.ImplementationClassUID: UID  # UI, 1
-        self.ImplementationVersionName: str | None  # SH, 3
-        self.SourceApplicationEntityTitle: str | None  # AE, 3
-        self.SendingApplicationEntityTitle: str | None  # AE, 3
-        self.ReceivingApplicationEntityTitle: str | None  # AE, 3
-        self.SourcePresentationAddress: str | None  # UR, 3
-        self.ReceivingPresentationAddress: str | None  # UR, 3
-        self.PrivateInformationCreatorUID: UID | None  # UI, 3
-        self.PrivateInformation: bytes  # OB, 1C
-
     @staticmethod
     def validate(init_value: _DatasetType) -> None:
         """Raise errors if initialization value is not acceptable for file_meta
