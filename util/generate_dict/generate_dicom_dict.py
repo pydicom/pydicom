@@ -93,7 +93,7 @@ def write_dataset_stub(attributes):
     ]
 
     retained_lines = []
-    with open(PYDICOM_DATASET_STUB, "r") as f:
+    with open(PYDICOM_DATASET_STUB) as f:
         for line in f:
             retained_lines.append(line)
             if line.startswith(autogen_comment):
@@ -110,7 +110,7 @@ def write_dataset_stub(attributes):
             vr = attr["VR"]
             vm = attr["VM"]
             is_retired = attr["Retired"] == "Retired"
-            if is_retired or not keyword or keyword in exclusions or vr == "NONE" :
+            if is_retired or not keyword or keyword in exclusions or vr == "NONE":
                 continue
 
             if len(vr) > 2:
