@@ -2,12 +2,8 @@
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
 import hashlib
-import os
-import random
 import re
 import secrets
-import sys
-from typing import Any
 import uuid
 
 from pydicom import config
