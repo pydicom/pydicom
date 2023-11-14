@@ -511,6 +511,10 @@ MultipleVolumeRenderingVolumetricPresentationStateStorage = UID(
     "1.2.840.10008.5.1.4.1.1.11.11"
 )  # noqa
 """1.2.840.10008.5.1.4.1.1.11.11"""
+VariableModalityLUTSoftcopyPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.12"
+)  # noqa
+"""1.2.840.10008.5.1.4.1.1.11.12"""
 ColorSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.11.2"""
 PseudoColorSoftcopyPresentationStateStorage = UID(
@@ -593,6 +597,8 @@ XADefinedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.7"""
 XAPerformedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.8")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.8"""
+InventoryStorage = UID("1.2.840.10008.5.1.4.1.1.201.1")  # noqa
+"""1.2.840.10008.5.1.4.1.1.201.1"""
 UltrasoundMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.3.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.3.1"""
 ParametricMapStorage = UID("1.2.840.10008.5.1.4.1.1.30")  # noqa
@@ -637,6 +643,14 @@ RTRadiationSetDeliveryInstructionStorage = UID("1.2.840.10008.5.1.4.1.1.481.21")
 """1.2.840.10008.5.1.4.1.1.481.21"""
 RTTreatmentPreparationStorage = UID("1.2.840.10008.5.1.4.1.1.481.22")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.22"""
+EnhancedRTImageStorage = UID("1.2.840.10008.5.1.4.1.1.481.23")  # noqa
+"""1.2.840.10008.5.1.4.1.1.481.23"""
+EnhancedContinuousRTImageStorage = UID("1.2.840.10008.5.1.4.1.1.481.24")  # noqa
+"""1.2.840.10008.5.1.4.1.1.481.24"""
+RTPatientPositionAcquisitionInstructionStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.481.25"
+)  # noqa
+"""1.2.840.10008.5.1.4.1.1.481.25"""
 RTStructureSetStorage = UID("1.2.840.10008.5.1.4.1.1.481.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.3"""
 RTBeamsTreatmentRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.4")  # noqa
@@ -673,6 +687,8 @@ UltrasoundImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.6.1"""
 EnhancedUSVolumeStorage = UID("1.2.840.10008.5.1.4.1.1.6.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.6.2"""
+PhotoacousticImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.3")  # noqa
+"""1.2.840.10008.5.1.4.1.1.6.3"""
 EddyCurrentImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.601.1"""
 EddyCurrentMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.2")  # noqa
@@ -833,6 +849,8 @@ GeneralECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.2"""
 AmbulatoryECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.3"""
+General32bitECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.4")  # noqa
+"""1.2.840.10008.5.1.4.1.1.9.1.4"""
 HemodynamicWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.2.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.2.1"""
 CardiacElectrophysiologyWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.3.1")  # noqa
