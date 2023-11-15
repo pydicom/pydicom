@@ -11,39 +11,24 @@ import warnings
 
 from pydicom import config
 from pydicom.dataset import Dataset
+from pydicom.multival import ConstrainedList
 
 
 # Python 3.11 adds typing.Self, until then...
 Self = TypeVar("Self", bound="Sequence")
 
 
-class Sequence(MutableSequence[Dataset]):
+class Sequence(ConstrainedList[Dataset]):
     """Class to hold multiple :class:`~pydicom.dataset.Dataset` in a :class:`list`."""
 
     def __init__(self, iterable: Iterable[Dataset] | None = None) -> None:
-        """Initialize a list of :class:`~pydicom.dataset.Dataset`.
-
-        Parameters
-        ----------
-        iterable : Iterable[Dataset] | None
-            An iterable object (e.g. :class:`list`, :class:`tuple`) containing
-            :class:`~pydicom.dataset.Dataset`. If not used then an empty
-            :class:`Sequence` is generated.
-        """
-        # We add this extra check to throw a relevant error. Without it, the
-        # error will be simply that a Sequence must contain Datasets (since a
-        # Dataset IS iterable). This error, however, doesn't inform the user
-        # that the actual issue is that their Dataset needs to be INSIDE an
-        # iterable object
         if isinstance(iterable, Dataset):
             raise TypeError("The Sequence constructor requires an iterable")
 
         # If True, SQ element uses an undefined length of 0xFFFFFFFF
         self.is_undefined_length: bool
 
-        self._list: list[Dataset] = []
-        if iterable is not None:
-            self._list = [self._validate(item) for item in iterable]
+        super().__init__(iterable)
 
         # The dataset that contains the SQ element this is the value of
         self._parent_dataset: weakref.ReferenceType[Dataset] | None = None
@@ -53,12 +38,8 @@ class Sequence(MutableSequence[Dataset]):
 
     def append(self, val: Dataset) -> None:
         """Append a :class:`~pydicom.dataset.Dataset` to the Sequence."""
-        self._list.append(self._validate(val))
+        super().append(val)
         val.parent_seq = self  # type: ignore[assignment]
-
-    def __delitem__(self, index: slice | int) -> None:
-        """Remove the item(s) at `index` from the Sequence."""
-        del self._list[index]
 
     def extend(self, val: Iterable[Dataset]) -> None:
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
@@ -67,7 +48,7 @@ class Sequence(MutableSequence[Dataset]):
         if isinstance(val, Dataset):
             raise TypeError("An iterable of 'Dataset' is required")
 
-        self._list.extend([self._validate(item) for item in val])
+        super().extend(val)
 
         for ds in val:
             ds.parent_seq = self  # type: ignore[assignment]
@@ -83,49 +64,21 @@ class Sequence(MutableSequence[Dataset]):
             ds.parent_seq = copied  # type: ignore[assignment]
         return copied
 
-    def __eq__(self, other: Any) -> Any:
-        """Return ``True`` if `other` is equal to the Sequence."""
-        return self._list == other
-
-    @overload
-    def __getitem__(self, index: int) -> Dataset:
-        ...
-
-    @overload
-    def __getitem__(self, index: slice) -> MutableSequence[Dataset]:
-        ...
-
-    def __getitem__(self, index: slice | int) -> MutableSequence[Dataset] | Dataset:
-        """Return item(s) from the Sequence."""
-        return self._list[index]
-
     def __iadd__(self: Self, other: Iterable[Dataset]) -> Self:
         """Implement Sequence() += [Dataset()]."""
         if isinstance(other, Dataset):
             raise TypeError("An iterable of 'Dataset' is required")
 
-        self._list += [self._validate(item) for item in other]
+        result = super().__iadd__(other)
         for ds in other:
             ds.parent_seq = self  # type: ignore[assignment]
 
-        return self
+        return result
 
     def insert(self, position: int, val: Dataset) -> None:
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
-        self._list.insert(position, self._validate(val))
+        super().insert(position, val)
         val.parent_seq = self  # type: ignore[assignment]
-
-    def __iter__(self) -> Iterator[Dataset]:
-        """Yield items from the Sequence."""
-        yield from self._list
-
-    def __len__(self) -> int:
-        """Return the number of items in the Sequence."""
-        return len(self._list)
-
-    def __ne__(self, other: Any) -> Any:
-        """Return ``True`` if `other` is not equal to the Sequence."""
-        return self._list != other
 
     @property
     def parent_dataset(self) -> "weakref.ReferenceType[Dataset] | None":
@@ -147,14 +100,6 @@ class Sequence(MutableSequence[Dataset]):
         if value != self._parent_dataset:
             self._parent_dataset = weakref.ref(value)
 
-    @overload
-    def __setitem__(self, idx: int, val: Dataset) -> None:
-        ...
-
-    @overload
-    def __setitem__(self, idx: slice, val: Iterable[Dataset]) -> None:
-        ...
-
     def __setitem__(self, idx: slice | int, val: Iterable[Dataset] | Dataset) -> None:
         """Add item(s) to the Sequence at `idx`.
 
@@ -165,12 +110,12 @@ class Sequence(MutableSequence[Dataset]):
             if isinstance(val, Dataset):
                 raise TypeError("Can only assign an iterable of 'Dataset'")
 
-            self._list.__setitem__(idx, [self._validate(item) for item in val])
+            super().__setitem__(idx, val)
             for ds in val:
                 ds.parent_seq = self  # type: ignore[assignment]
         else:
             val = cast(Dataset, val)
-            self._list.__setitem__(idx, self._validate(val))
+            super().__setitem__(idx, val)
             val.parent_seq = self  # type: ignore[assignment]
 
     def __str__(self) -> str:
