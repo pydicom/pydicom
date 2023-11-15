@@ -142,7 +142,7 @@ class MultiValue(ConstrainedList):
             is passed to `type_constructor` and the returned value added to
             the :class:`MultiValue`.
         """
-        self._list: list[T] = list()
+        self._list: list[T] = []
         self._constructor = type_constructor
         self._valmode = config.settings.reading_validation_mode
         if validation_mode is not None:
