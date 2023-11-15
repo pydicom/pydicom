@@ -7,12 +7,10 @@ from pydicom.tag import BaseTag
 from pydicom.uid import UID
 from pydicom.valuerep import PersonName, DA, DSfloat, DSdecimal, DT, IS, ISfloat, TM
 
-
 BytesSequence = MutableSequence[bytes]
 StrSequence = MutableSequence[str]
 IntSequence = MutableSequence[int]
 FloatSequence = MutableSequence[float]
-
 
 BytesType = None | bytes
 BytesListType = None | BytesSequence

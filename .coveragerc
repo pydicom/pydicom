@@ -2,4 +2,3 @@
 omit =
     tests/*
     benchmarks/*
-    src/pydicom/stubs/*
