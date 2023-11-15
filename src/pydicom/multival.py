@@ -10,7 +10,6 @@ from pydicom import config
 
 
 T = TypeVar("T")
-S = TypeVar("S")
 Self = TypeVar("Self", bound="ConstrainedList")
 
 
