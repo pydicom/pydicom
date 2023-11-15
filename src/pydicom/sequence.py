@@ -63,7 +63,6 @@ class Sequence(ConstrainedList[Dataset]):
             raise TypeError("An iterable of 'Dataset' is required")
 
         super().extend(val)
-
         for ds in val:
             ds.parent_seq = self  # type: ignore[assignment]
 

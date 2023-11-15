@@ -50,11 +50,11 @@ class ConstrainedList(MutableSequence[T]):
 
     @overload
     def __getitem__(self, index: int) -> T:
-        ...
+        pass  # pragma: no cover
 
     @overload
     def __getitem__(self, index: slice) -> MutableSequence[T]:
-        ...
+        pass  # pragma: no cover
 
     def __getitem__(self, index: slice | int) -> MutableSequence[T] | T:
         """Return item(s) from self."""
@@ -86,11 +86,11 @@ class ConstrainedList(MutableSequence[T]):
 
     @overload
     def __setitem__(self, idx: int, val: T) -> None:
-        ...
+        pass  # pragma: no cover
 
     @overload
     def __setitem__(self, idx: slice, val: Iterable[T]) -> None:
-        ...
+        pass  # pragma: no cover
 
     def __setitem__(self, index: slice | int, val: Iterable[T] | T) -> None:
         """Add item(s) at `index`."""
@@ -103,7 +103,9 @@ class ConstrainedList(MutableSequence[T]):
 
     def _validate(self, item: Any) -> T:
         """Return items that have been validated as being of the expected type"""
-        raise NotImplementedError("'ConstrainedList._validate()' must be implemented")
+        raise NotImplementedError(
+            f"'{type(self).__name__}._validate()' must be implemented"
+        )
 
 
 class MultiValue(ConstrainedList):
@@ -142,7 +144,6 @@ class MultiValue(ConstrainedList):
             is passed to `type_constructor` and the returned value added to
             the :class:`MultiValue`.
         """
-        self._list: list[T] = []
         self._constructor = type_constructor
         self._valmode = config.settings.reading_validation_mode
         if validation_mode is not None:
@@ -170,7 +171,6 @@ class MultiValue(ConstrainedList):
     def __str__(self) -> str:
         if not self:
             return ""
-
         lines = (f"{x!r}" if isinstance(x, str | bytes) else str(x) for x in self)
         return f"[{', '.join(lines)}]"
 
