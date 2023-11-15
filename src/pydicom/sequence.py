@@ -4,41 +4,28 @@
 Sequence is a list of pydicom Dataset objects.
 """
 from copy import deepcopy
-from typing import cast, overload, Any
-from collections.abc import Iterable, MutableSequence
+from typing import cast, overload, Any, TypeVar
+from collections.abc import Iterable, Iterator, MutableSequence
 import weakref
 import warnings
 
 from pydicom import config
 from pydicom.dataset import Dataset
-from pydicom.multival import MultiValue
 
 
-def validate_dataset(elem: object) -> Dataset:
-    """Check that `elem` is a :class:`~pydicom.dataset.Dataset` instance."""
-    if not isinstance(elem, Dataset):
-        raise TypeError("Sequence contents must be Dataset instances.")
-
-    return elem
+# Python 3.11 adds typing.Self, until then...
+Self = TypeVar("Self", bound="Sequence")
 
 
-class Sequence(MultiValue[Dataset]):
-    """Class to hold multiple :class:`~pydicom.dataset.Dataset` in a
-    :class:`list`.
-
-    This class is derived from :class:`~pydicom.multival.MultiValue`
-    and as such enforces that all items added to the list are
-    :class:`~pydicom.dataset.Dataset` instances. In order to do this,
-    a validator is substituted for `type_constructor` when constructing the
-    :class:`~pydicom.multival.MultiValue` super class.
-    """
+class Sequence(MutableSequence[Dataset]):
+    """Class to hold multiple :class:`~pydicom.dataset.Dataset` in a :class:`list`."""
 
     def __init__(self, iterable: Iterable[Dataset] | None = None) -> None:
         """Initialize a list of :class:`~pydicom.dataset.Dataset`.
 
         Parameters
         ----------
-        iterable : list-like of dataset.Dataset, optional
+        iterable : Iterable[Dataset] | None
             An iterable object (e.g. :class:`list`, :class:`tuple`) containing
             :class:`~pydicom.dataset.Dataset`. If not used then an empty
             :class:`Sequence` is generated.
@@ -51,60 +38,94 @@ class Sequence(MultiValue[Dataset]):
         if isinstance(iterable, Dataset):
             raise TypeError("The Sequence constructor requires an iterable")
 
-        # the parent dataset
-        self._parent_dataset: weakref.ReferenceType[Dataset] | None = None
-
-        # validate_dataset is used as a pseudo type_constructor
-        self._list: list[Dataset] = []
-        # If no inputs are provided, we create an empty Sequence
-        super().__init__(validate_dataset, iterable or [])
-        for ds in self:
-            ds.parent_seq = self  # type: ignore
+        # If True, SQ element uses an undefined length of 0xFFFFFFFF
         self.is_undefined_length: bool
 
-    def append(self, val: Dataset) -> None:  # type: ignore[override]
-        """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
-        super().append(val)
-        val.parent_seq = self  # type: ignore
+        self._list: list[Dataset] = []
+        if iterable is not None:
+            self._list = [self._validate(item) for item in iterable]
 
-    def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
+        # The dataset that contains the SQ element this is the value of
+        self._parent_dataset: weakref.ReferenceType[Dataset] | None = None
+
+        for ds in self:
+            ds.parent_seq = self  # type: ignore[assignment]
+
+    def append(self, val: Dataset) -> None:
+        """Append a :class:`~pydicom.dataset.Dataset` to the Sequence."""
+        self._list.append(self._validate(val))
+        val.parent_seq = self  # type: ignore[assignment]
+
+    def __delitem__(self, index: slice | int) -> None:
+        """Remove the item(s) at `index` from the Sequence."""
+        del self._list[index]
+
+    def extend(self, val: Iterable[Dataset]) -> None:
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
         of :class:`~pydicom.dataset.Dataset` instances.
         """
         if isinstance(val, Dataset):
             raise TypeError("An iterable of 'Dataset' is required")
 
-        super().extend(val)
+        self._list.extend([self._validate(item) for item in val])
+
         for ds in val:
-            ds.parent_seq = self  # type: ignore
+            ds.parent_seq = self  # type: ignore[assignment]
 
     def __deepcopy__(self, memo: dict[int, Any] | None) -> "Sequence":
+        """Create a deepcopy of the Sequence."""
         cls = self.__class__
         copied = cls.__new__(cls)
         if memo is not None:
             memo[id(self)] = copied
         copied.__dict__.update(deepcopy(self.__dict__, memo))
         for ds in copied:
-            ds.parent_seq = copied  # type:ignore
+            ds.parent_seq = copied  # type: ignore[assignment]
         return copied
 
-    def __iadd__(  # type: ignore[override]
-        self, other: Iterable[Dataset]
-    ) -> MutableSequence[Dataset]:
+    def __eq__(self, other: Any) -> Any:
+        """Return ``True`` if `other` is equal to the Sequence."""
+        return self._list == other
+
+    @overload
+    def __getitem__(self, index: int) -> Dataset:
+        ...
+
+    @overload
+    def __getitem__(self, index: slice) -> MutableSequence[Dataset]:
+        ...
+
+    def __getitem__(self, index: slice | int) -> MutableSequence[Dataset] | Dataset:
+        """Return item(s) from the Sequence."""
+        return self._list[index]
+
+    def __iadd__(self: Self, other: Iterable[Dataset]) -> Self:
         """Implement Sequence() += [Dataset()]."""
         if isinstance(other, Dataset):
             raise TypeError("An iterable of 'Dataset' is required")
 
-        result = super().__iadd__(other)
+        self._list += [self._validate(item) for item in other]
         for ds in other:
-            ds.parent_seq = self  # type: ignore
+            ds.parent_seq = self  # type: ignore[assignment]
 
-        return result
+        return self
 
-    def insert(self, position: int, val: Dataset) -> None:  # type: ignore[override]
+    def insert(self, position: int, val: Dataset) -> None:
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
-        super().insert(position, val)
-        val.parent_seq = self  # type: ignore
+        self._list.insert(position, self._validate(val))
+        val.parent_seq = self  # type: ignore[assignment]
+
+    def __iter__(self) -> Iterator[Dataset]:
+        """Yield items from the Sequence."""
+        yield from self._list
+
+    def __len__(self) -> int:
+        """Return the number of items in the Sequence."""
+        return len(self._list)
+
+    def __ne__(self, other: Any) -> Any:
+        """Return ``True`` if `other` is not equal to the Sequence."""
+        return self._list != other
 
     @property
     def parent_dataset(self) -> "weakref.ReferenceType[Dataset] | None":
@@ -126,35 +147,37 @@ class Sequence(MultiValue[Dataset]):
         if value != self._parent_dataset:
             self._parent_dataset = weakref.ref(value)
 
-    @overload  # type: ignore[override]
+    @overload
     def __setitem__(self, idx: int, val: Dataset) -> None:
-        pass  # pragma: no cover
+        ...
 
     @overload
     def __setitem__(self, idx: slice, val: Iterable[Dataset]) -> None:
-        pass  # pragma: no cover
+        ...
 
     def __setitem__(self, idx: slice | int, val: Iterable[Dataset] | Dataset) -> None:
-        """Set the parent :class:`~pydicom.dataset.Dataset` to the new
-        :class:`Sequence` item
+        """Add item(s) to the Sequence at `idx`.
+
+        Also sets the parent :class:`~pydicom.dataset.Dataset` to the new
+        :class:`Sequence` item(s)
         """
         if isinstance(idx, slice):
             if isinstance(val, Dataset):
                 raise TypeError("Can only assign an iterable of 'Dataset'")
 
-            super().__setitem__(idx, val)
+            self._list.__setitem__(idx, [self._validate(item) for item in val])
             for ds in val:
-                ds.parent_seq = self  # type: ignore
+                ds.parent_seq = self  # type: ignore[assignment]
         else:
             val = cast(Dataset, val)
-            super().__setitem__(idx, val)
-            val.parent_seq = self  # type: ignore
+            self._list.__setitem__(idx, self._validate(val))
+            val.parent_seq = self  # type: ignore[assignment]
 
     def __str__(self) -> str:
         """String description of the Sequence."""
         return f"[{''.join([str(x) for x in self])}]"
 
-    def __repr__(self) -> str:  # type: ignore[override]
+    def __repr__(self) -> str:
         """String representation of the Sequence."""
         return f"<{self.__class__.__name__}, length {len(self)}>"
 
@@ -172,3 +195,11 @@ class Sequence(MultiValue[Dataset]):
             self.__dict__["_parent_dataset"] = weakref.ref(
                 self.__dict__["_parent_dataset"]
             )
+
+    @staticmethod
+    def _validate(item: Any) -> Dataset:
+        """Check that `item` is a :class:`~pydicom.dataset.Dataset` instance."""
+        if not isinstance(item, Dataset):
+            raise TypeError("Sequence contents must be 'Dataset' instances.")
+
+        return item

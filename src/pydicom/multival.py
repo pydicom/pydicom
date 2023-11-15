@@ -8,11 +8,12 @@ from collections.abc import Iterable, Callable, MutableSequence, Iterator
 
 from pydicom import config
 
-_T = TypeVar("_T")
-_ItemType = TypeVar("_ItemType")
+
+T = TypeVar("T")
+S = TypeVar("S")
 
 
-class MultiValue(MutableSequence[_ItemType]):
+class MultiValue(MutableSequence[T]):
     """Class to hold any multi-valued DICOM value, or any list of items that
     are all of the same type.
 
@@ -28,8 +29,8 @@ class MultiValue(MutableSequence[_ItemType]):
 
     def __init__(
         self,
-        type_constructor: Callable[[_T], _ItemType],
-        iterable: Iterable[_T],
+        type_constructor: Callable[[S], T],
+        iterable: Iterable[S],
         validation_mode: int | None = None,
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
@@ -50,18 +51,18 @@ class MultiValue(MutableSequence[_ItemType]):
         """
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
-        def DS_IS_constructor(x: _T) -> _ItemType:
+        def DS_IS_constructor(x: S) -> T:
             return (  # type: ignore[no-any-return]
                 self.type_constructor(  # type: ignore[has-type]
                     x, validation_mode=validation_mode
                 )
                 if x != ""
-                else cast(_ItemType, x)
+                else cast(T, x)
             )
 
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
-        self._list: list[_ItemType] = list()
+        self._list: list[T] = list()
         self.type_constructor = type_constructor
         if type_constructor in (DSfloat, IS, DSdecimal):
             type_constructor = DS_IS_constructor
@@ -69,21 +70,21 @@ class MultiValue(MutableSequence[_ItemType]):
         for x in iterable:
             self._list.append(type_constructor(x))
 
-    def append(self, val: _T) -> None:
+    def append(self, val: S) -> None:
         self._list.append(self.type_constructor(val))
 
     def __delitem__(self, index: slice | int) -> None:
         del self._list[index]
 
-    def extend(self, val: Iterable[_T]) -> None:
+    def extend(self, val: Iterable[S]) -> None:
         """Extend the :class:`~pydicom.multival.MultiValue` using an iterable
         of objects.
         """
         self._list.extend([self.type_constructor(x) for x in val])
 
     def __iadd__(  # type: ignore[override]
-        self, other: Iterable[_T]
-    ) -> MutableSequence[_ItemType]:
+        self, other: Iterable[S]
+    ) -> MutableSequence[T]:
         """Implement MultiValue() += Iterable[Any]."""
         self._list += [self.type_constructor(x) for x in other]
         return self
@@ -92,20 +93,20 @@ class MultiValue(MutableSequence[_ItemType]):
         return self._list == other
 
     @overload
-    def __getitem__(self, index: int) -> _ItemType:
-        pass  # pragma: no cover
+    def __getitem__(self, index: int) -> T:
+        ...
 
     @overload
-    def __getitem__(self, index: slice) -> MutableSequence[_ItemType]:
-        pass  # pragma: no cover
+    def __getitem__(self, index: slice) -> MutableSequence[T]:
+        ...
 
-    def __getitem__(self, index: slice | int) -> MutableSequence[_ItemType] | _ItemType:
+    def __getitem__(self, index: slice | int) -> MutableSequence[T] | T:
         return self._list[index]
 
-    def insert(self, position: int, val: _T) -> None:
+    def insert(self, position: int, val: S) -> None:
         self._list.insert(position, self.type_constructor(val))
 
-    def __iter__(self) -> Iterator[_ItemType]:
+    def __iter__(self) -> Iterator[T]:
         yield from self._list
 
     def __len__(self) -> int:
@@ -115,23 +116,23 @@ class MultiValue(MutableSequence[_ItemType]):
         return self._list != other
 
     @overload
-    def __setitem__(self, idx: int, val: _T) -> None:
-        pass  # pragma: no cover
+    def __setitem__(self, idx: int, val: S) -> None:
+        ...
 
     @overload
-    def __setitem__(self, idx: slice, val: Iterable[_T]) -> None:
-        pass  # pragma: no cover
+    def __setitem__(self, idx: slice, val: Iterable[S]) -> None:
+        ...
 
     def __setitem__(  # type: ignore[misc]
-        self, idx: int | slice, val: _T | Iterable[_T]
+        self, idx: int | slice, val: S | Iterable[S]
     ) -> None:
         """Set an item of the list, making sure it is of the right VR type"""
         if isinstance(idx, slice):
-            val = cast(Iterable[_T], val)
+            val = cast(Iterable[S], val)
             out = [self.type_constructor(v) for v in val]
             self._list.__setitem__(idx, out)
         else:
-            val = cast(_T, val)
+            val = cast(S, val)
             self._list.__setitem__(idx, self.type_constructor(val))
 
     def sort(self, *args: Any, **kwargs: Any) -> None:
