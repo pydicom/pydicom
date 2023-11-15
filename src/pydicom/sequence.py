@@ -22,6 +22,20 @@ class Sequence(ConstrainedList[Dataset]):
     """Class to hold multiple :class:`~pydicom.dataset.Dataset` in a :class:`list`."""
 
     def __init__(self, iterable: Iterable[Dataset] | None = None) -> None:
+        """Initialize a list of :class:`~pydicom.dataset.Dataset`.
+
+        Parameters
+        ----------
+        iterable : Iterable[Dataset] | None
+            An iterable object (e.g. :class:`list`, :class:`tuple`) containing
+            :class:`~pydicom.dataset.Dataset`. If not used then an empty
+            :class:`Sequence` is generated.
+        """
+        # We add this extra check to throw a relevant error. Without it, the
+        # error will be simply that a Sequence must contain Datasets (since a
+        # Dataset IS iterable). This error, however, doesn't inform the user
+        # that the actual issue is that their Dataset needs to be INSIDE an
+        # iterable object
         if isinstance(iterable, Dataset):
             raise TypeError("The Sequence constructor requires an iterable")
 
@@ -30,7 +44,7 @@ class Sequence(ConstrainedList[Dataset]):
 
         super().__init__(iterable)
 
-        # The dataset that contains the SQ element this is the value of
+        # the parent dataset
         self._parent_dataset: weakref.ReferenceType[Dataset] | None = None
 
         for ds in self:
@@ -100,22 +114,22 @@ class Sequence(ConstrainedList[Dataset]):
         if value != self._parent_dataset:
             self._parent_dataset = weakref.ref(value)
 
-    def __setitem__(self, idx: slice | int, val: Iterable[Dataset] | Dataset) -> None:
-        """Add item(s) to the Sequence at `idx`.
+    def __setitem__(self, index: slice | int, val: Iterable[Dataset] | Dataset) -> None:
+        """Add item(s) to the Sequence at `index`.
 
         Also sets the parent :class:`~pydicom.dataset.Dataset` to the new
         :class:`Sequence` item(s)
         """
-        if isinstance(idx, slice):
+        if isinstance(index, slice):
             if isinstance(val, Dataset):
                 raise TypeError("Can only assign an iterable of 'Dataset'")
 
-            super().__setitem__(idx, val)
+            super().__setitem__(index, val)
             for ds in val:
                 ds.parent_seq = self  # type: ignore[assignment]
         else:
             val = cast(Dataset, val)
-            super().__setitem__(idx, val)
+            super().__setitem__(index, val)
             val.parent_seq = self  # type: ignore[assignment]
 
     def __str__(self) -> str:

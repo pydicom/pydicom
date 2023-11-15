@@ -123,8 +123,8 @@ class MultiValue(ConstrainedList):
 
     def __init__(
         self,
-        type_constructor: Callable[[S], T],
-        iterable: Iterable[S],
+        type_constructor: Callable[[Any], T],
+        iterable: Iterable[Any],
         validation_mode: int | None = None,
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
@@ -151,7 +151,7 @@ class MultiValue(ConstrainedList):
 
         super().__init__(iterable)
 
-    def _validate(self, item: S) -> T:  # type: ignore[type-var]
+    def _validate(self, item: Any) -> T:  # type: ignore[type-var]
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
         if self._constructor in (DSfloat, DSdecimal, IS):
