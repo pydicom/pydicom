@@ -154,6 +154,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.6': ('Ultrasound Image Storage', 'SOP Class', '', 'Retired', 'UltrasoundImageStorageRetired'),  # noqa
     '1.2.840.10008.5.1.4.1.1.6.1': ('Ultrasound Image Storage', 'SOP Class', '', '', 'UltrasoundImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.6.2': ('Enhanced US Volume Storage', 'SOP Class', '', '', 'EnhancedUSVolumeStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.6.3': ('Photoacoustic Image Storage', 'SOP Class', '', '', 'PhotoacousticImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.7': ('Secondary Capture Image Storage', 'SOP Class', '', '', 'SecondaryCaptureImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.7.1': ('Multi-frame Single Bit Secondary Capture Image Storage', 'SOP Class', '', '', 'MultiFrameSingleBitSecondaryCaptureImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.7.2': ('Multi-frame Grayscale Byte Secondary Capture Image Storage', 'SOP Class', '', '', 'MultiFrameGrayscaleByteSecondaryCaptureImageStorage'),  # noqa
@@ -165,6 +166,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.9.1.1': ('12-lead ECG Waveform Storage', 'SOP Class', '', '', 'TwelveLeadECGWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.1.2': ('General ECG Waveform Storage', 'SOP Class', '', '', 'GeneralECGWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.1.3': ('Ambulatory ECG Waveform Storage', 'SOP Class', '', '', 'AmbulatoryECGWaveformStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.1.4': ('General 32-bit ECG Waveform Storage', 'SOP Class', '', '', 'General32bitECGWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.2.1': ('Hemodynamic Waveform Storage', 'SOP Class', '', '', 'HemodynamicWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.3.1': ('Cardiac Electrophysiology Waveform Storage', 'SOP Class', '', '', 'CardiacElectrophysiologyWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.4.1': ('Basic Voice Audio Waveform Storage', 'SOP Class', '', '', 'BasicVoiceAudioWaveformStorage'),  # noqa
@@ -190,7 +192,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.11.9': ('Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'VolumeRenderingVolumetricPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.10': ('Segmented Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'SegmentedVolumeRenderingVolumetricPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.11': ('Multiple Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'MultipleVolumeRenderingVolumetricPresentationStateStorage'),  # noqa
-    '1.2.840.10008.5.1.4.1.1.11.12': ('Variable Modality LUT Softcopy Presentation State Storage', 'SOP Class', '', '', 'VariableModalityLUTPresentationStateStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.11.12': ('Variable Modality LUT Softcopy Presentation State Storage', 'SOP Class', '', '', 'VariableModalityLUTSoftcopyPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.1': ('X-Ray Angiographic Image Storage', 'SOP Class', '', '', 'XRayAngiographicImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.1.1': ('Enhanced XA Image Storage', 'SOP Class', '', '', 'EnhancedXAImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.2': ('X-Ray Radiofluoroscopic Image Storage', 'SOP Class', '', '', 'XRayRadiofluoroscopicImageStorage'),  # noqa
