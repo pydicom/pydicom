@@ -1,0 +1,6 @@
+﻿pydicom.uid.VariableModalityLUTSoftcopyPresentationStateStorage
+===============================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: VariableModalityLUTSoftcopyPresentationStateStorage

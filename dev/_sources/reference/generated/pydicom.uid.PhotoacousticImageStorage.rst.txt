@@ -1,0 +1,6 @@
+﻿pydicom.uid.PhotoacousticImageStorage
+=====================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: PhotoacousticImageStorage

@@ -1,0 +1,6 @@
+﻿pydicom.uid.RTPatientPositionAcquisitionInstructionStorage
+==========================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RTPatientPositionAcquisitionInstructionStorage
