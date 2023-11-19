@@ -958,6 +958,8 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x00181201: ('TM', '1-n', "Time of Last Calibration", '', 'TimeOfLastCalibration'),  # noqa
     0x00181202: ('DT', '1', "DateTime of Last Calibration", '', 'DateTimeOfLastCalibration'),  # noqa
     0x00181203: ('DT', '1', "Calibration DateTime", '', 'CalibrationDateTime'),  # noqa
+    0x00181204: ('DA', '1', "Date of Manufacture", '', 'DateOfManufacture'),  # noqa
+    0x00181205: ('DA', '1', "Date of Installation", '', 'DateOfInstallation'),  # noqa
     0x00181210: ('SH', '1-n', "Convolution Kernel", '', 'ConvolutionKernel'),  # noqa
     0x00181240: ('IS', '1-n', "Upper/Lower Pixel Values", 'Retired', 'UpperLowerPixelValues'),  # noqa
     0x00181242: ('IS', '1', "Actual Frame Duration", '', 'ActualFrameDuration'),  # noqa
@@ -1576,6 +1578,27 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x0018980E: ('SQ', '1', "Transducer Beam Steering Code Sequence", '', 'TransducerBeamSteeringCodeSequence'),  # noqa
     0x0018980F: ('SQ', '1', "Transducer Application Code Sequence", '', 'TransducerApplicationCodeSequence'),  # noqa
     0x00189810: ('US or SS', '1', "Zero Velocity Pixel Value", '', 'ZeroVelocityPixelValue'),  # noqa
+    0x00189821: ('SQ', '1', "Photoacoustic Excitation Characteristics Sequence", '', 'PhotoacousticExcitationCharacteristicsSequence'),  # noqa
+    0x00189822: ('FD', '1', "Excitation Spectral Width", '', 'ExcitationSpectralWidth'),  # noqa
+    0x00189823: ('FD', '1', "Excitation Energy", '', 'ExcitationEnergy'),  # noqa
+    0x00189824: ('FD', '1', "Excitation Pulse Duration", '', 'ExcitationPulseDuration'),  # noqa
+    0x00189825: ('SQ', '1', "Excitation Wavelength Sequence", '', 'ExcitationWavelengthSequence'),  # noqa
+    0x00189826: ('FD', '1', "Excitation Wavelength", '', 'ExcitationWavelength'),  # noqa
+    0x00189828: ('CS', '1', "Illumination Translation Flag", '', 'IlluminationTranslationFlag'),  # noqa
+    0x00189829: ('CS', '1', "Acoustic Coupling Medium Flag", '', 'AcousticCouplingMediumFlag'),  # noqa
+    0x0018982A: ('SQ', '1', "Acoustic Coupling Medium Code Sequence", '', 'AcousticCouplingMediumCodeSequence'),  # noqa
+    0x0018982B: ('FD', '1', "Acoustic Coupling Medium Temperature", '', 'AcousticCouplingMediumTemperature'),  # noqa
+    0x0018982C: ('SQ', '1', "Transducer Response Sequence", '', 'TransducerResponseSequence'),  # noqa
+    0x0018982D: ('FD', '1', "Center Frequency", '', 'CenterFrequency'),  # noqa
+    0x0018982E: ('FD', '1', "Fractional Bandwidth", '', 'FractionalBandwidth'),  # noqa
+    0x0018982F: ('FD', '1', "Lower Cutoff Frequency", '', 'LowerCutoffFrequency'),  # noqa
+    0x00189830: ('FD', '1', "Upper Cutoff Frequency", '', 'UpperCutoffFrequency'),  # noqa
+    0x00189831: ('SQ', '1', "Transducer Technology Sequence", '', 'TransducerTechnologySequence'),  # noqa
+    0x00189832: ('SQ', '1', "Sound Speed Correction Mechanism Code Sequence", '', 'SoundSpeedCorrectionMechanismCodeSequence'),  # noqa
+    0x00189833: ('FD', '1', "Object Sound Speed", '', 'ObjectSoundSpeed'),  # noqa
+    0x00189834: ('FD', '1', "Acoustic Coupling Medium Sound Speed", '', 'AcousticCouplingMediumSoundSpeed'),  # noqa
+    0x00189835: ('SQ', '1', "Photoacoustic Image Frame Type Sequence", '', 'PhotoacousticImageFrameTypeSequence'),  # noqa
+    0x00189836: ('SQ', '1', "Image Data Type Code Sequence", '', 'ImageDataTypeCodeSequence'),  # noqa
     0x00189900: ('LO', '1', "Reference Location Label", '', 'ReferenceLocationLabel'),  # noqa
     0x00189901: ('UT', '1', "Reference Location Description", '', 'ReferenceLocationDescription'),  # noqa
     0x00189902: ('SQ', '1', "Reference Basis Code Sequence", '', 'ReferenceBasisCodeSequence'),  # noqa
