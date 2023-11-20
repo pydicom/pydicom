@@ -2139,7 +2139,10 @@ class Dataset:
         .. versionadded:: 1.2
         """
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
-        if not hasattr(self, "file_meta"):
+        if (
+            not hasattr(self, "file_meta")
+            or not isinstance(self.file_meta, FileMetaDataset)
+        ):
             self.file_meta = FileMetaDataset()
 
     def fix_meta_info(self, enforce_standard: bool = True) -> None:
@@ -2880,23 +2883,36 @@ def validate_file_meta(
             file_meta.ImplementationClassUID = UID(PYDICOM_IMPLEMENTATION_UID)
 
         if "ImplementationVersionName" not in file_meta:
-            file_meta.ImplementationVersionName = "PYDICOM " + ".".join(
-                str(x) for x in __version_info__
+            file_meta.ImplementationVersionName = (
+                f"PYDICOM {'.'.join(str(x) for x in __version_info__)}"
             )
 
         # Check that required File Meta Information elements are present
         missing = []
+        empty = []
         for element in [0x0002, 0x0003, 0x0010]:
-            if Tag(0x0002, element) not in file_meta:
-                missing.append(Tag(0x0002, element))
+            tag = Tag(0x0002, element)
+            if tag not in file_meta:
+                missing.append(tag)
+
+            if not file_meta[tag].value:
+                empty.append(tag)
+
         if missing:
             msg = (
-                "Missing required File Meta Information elements from " "'file_meta':\n"
+                "Missing required File Meta Information elements from 'file_meta':\n"
             )
             for tag in missing:
                 msg += f"\t{tag} {keyword_for_tag(tag)}\n"
             raise ValueError(msg[:-1])  # Remove final newline
 
+        if empty:
+            msg = (
+                "The following File Meta Information elements have no value set:\n"
+            )
+            for tag in empty:
+                msg += f"\t{tag} {keyword_for_tag(tag)}\n"
+            raise ValueError(msg[:-1])  # Remove final newline
 
 class FileMetaDataset(Dataset):
     """Contains a collection (dictionary) of group 2 DICOM Data Elements.
