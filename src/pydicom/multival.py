@@ -40,7 +40,7 @@ class ConstrainedList(MutableSequence[T]):
     def extend(self, val: Iterable[T]) -> None:
         """Extend using an iterable containing the same types of item."""
         if not hasattr(val, "__iter__"):
-            raise TypeError(f"An iterable is required")
+            raise TypeError("An iterable is required")
 
         self._list.extend([self._validate(item) for item in val])
 
@@ -63,7 +63,7 @@ class ConstrainedList(MutableSequence[T]):
     def __iadd__(self: Self, other: Iterable[T]) -> Self:
         """Implement += [T, ...]."""
         if not hasattr(other, "__iter__"):
-            raise TypeError(f"An iterable is required")
+            raise TypeError("An iterable is required")
 
         self._list += [self._validate(item) for item in other]
         return self
