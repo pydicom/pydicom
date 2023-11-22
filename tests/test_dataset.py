@@ -1354,18 +1354,21 @@ class TestDataset:
         assert ds.data_element("BeamSequence") == next(elem_gen)
         assert ds.BeamSequence[0].data_element("PatientName") == next(elem_gen)
 
+    # FIXME: these tests need an overhaul
     def test_save_as(self):
         """Test Dataset.save_as"""
         fp = DicomBytesIO()
         ds = Dataset()
         ds.PatientName = "CITIZEN"
         # Raise AttributeError if is_implicit_VR or is_little_endian missing
-        with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False)
+        msg = (
 
-        ds.is_implicit_VR = True
+        )
         with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False)
+            ds.save_as(fp, write_like_original=False, implicit_VR=True)
+
+        with pytest.raises(AttributeError):
+            ds.save_as(fp, write_like_original=False, implicit_VR=True)
 
         ds.is_little_endian = True
         del ds.is_implicit_VR

@@ -23,7 +23,12 @@ from pydicom.tag import (
     SequenceDelimiterTag,
     tag_in_exception,
 )
-from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
+from pydicom.uid import (
+    DeflatedExplicitVRLittleEndian,
+    UID,
+    ImplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+)
 from pydicom.valuerep import (
     PersonName,
     IS,
@@ -528,9 +533,21 @@ def write_data_element(
     elem: DataElement | RawDataElement,
     encodings: str | list[str] | None = None,
 ) -> None:
-    """Write the data_element to file fp according to
-    dicom media storage rules.
+    """Encode `elem` and write it to `fp`.
+
+    Parameters
+    ----------
+    fp : pydicom.filebase.DicomIO
+        The file-like to write the encoded element to. The
+        ``DicomIO.is_little_endian`` and ``DicomIO.is_implicit_VR`` attributes
+        must be set beforehand.
+    elem : pydicom.dataelem.DataElement | pydicom.dataelem.RawDataElement
+        The element being encoded
+    encodings : str | list[str] | None
+        The character set to use to encode string values, default ``None``.
     """
+    print(elem)
+
     # Write element's tag
     fp.write_tag(elem.tag)
 
@@ -610,6 +627,7 @@ def write_data_element(
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
         vr = cast(str, vr)
+        print(vr, default_encoding)
         fp.write(bytes(vr, default_encoding))
 
         if vr in EXPLICIT_VR_LENGTH_32:
@@ -633,16 +651,78 @@ def write_data_element(
 
 
 def write_dataset(
-    fp: DicomIO, dataset: Dataset, parent_encoding: str | list[str] = default_encoding
+    fp: DicomIO,
+    dataset: Dataset,
+    implicit_VR: bool | None = None,
+    little_endian: bool | None = None,
+    parent_encoding: str | list[str] = default_encoding,
 ) -> int:
-    """Write a Dataset dictionary to the file. Return the total length written."""
-    _harmonize_properties(dataset, fp)
+    """Encode `dataset` and write the encoded data to `fp`.
 
-    if None in (dataset.is_little_endian, dataset.is_implicit_VR):
-        name = dataset.__class__.__name__
-        raise AttributeError(
-            f"'{name}.is_little_endian' and '{name}.is_implicit_VR' must "
-            f"be set appropriately before saving"
+    .. versionchanged:: 3.0
+
+        Added the `implicit_VR` and `little_endian` optional arguments, which
+        will be required starting in v4.0.
+
+    Parameters
+    ----------
+    fp : pydicom.filebase.DicomIO
+        The file-like to write the encoded dataset to.
+    dataset : pydicom.dataset.Dataset
+        The dataset to be encoded.
+    implicit_VR : bool, optional
+        If ``True`` use implicit VR encoding, otherwise use explicit VR.
+    little_endian : bool, optional
+        If ``True`` use little endian encoding, otherwise use big endian (not
+        recommended).
+    parent_encoding : str | List[str], optional
+        The character set to use for encoding strings, defaults to iso8859.
+
+    Returns
+    -------
+    int
+        The number of bytes written to `fp`.
+    """
+    # Remove warning in v4.0
+    if isinstance(implicit_VR, (str, list)):
+        parent_encoding, implicit_VR, little_endian = (
+            implicit_VR, little_endian, parent_encoding
+        )
+        warnings.warn(
+            UserWarning,
+            "The keyword argument order for 'write_dataset()' has changed, "
+            "please update your code accordingly"
+        )
+
+    arg_encoding = (little_endian, implicit_VR)
+    ds_encoding = (dataset.is_little_endian, dataset.is_implicit_VR)
+    fp_encoding = (fp.is_little_endian, fp.is_implicit_VR)
+
+    if None in arg_encoding and None in ds_encoding and None in fp_encoding:
+        raise AttributeError("'little_endian' and 'implicit_VR' are required")
+
+    if None not in arg_encoding:
+        fp.is_implicit_VR = implicit_VR
+        fp.is_little_endian = little_endian
+    elif None not in ds_encoding or None not in fp_encoding:
+        # Prefer encoding of destination over dataset
+        if None not in fp_encoding:
+            dataset._is_little_endian = fp.is_little_endian
+            dataset._is_implicit_VR = fp.is_implicit_VR
+        elif None not in ds_encoding:
+            fp.is_little_endian = dataset._is_little_endian
+            fp.is_implicit_VR = dataset._is_implicit_VR
+
+    name = dataset.__class__.__name__
+    if None in arg_encoding:
+        warnings.warn(
+            (
+                f"The use of '{name}.is_little_endian' and "
+                f"'{name}.is_implicit_VR' to set the encoding is deprecated "
+                "and will be removed in v4.0, please use the 'little_endian' "
+                "and 'implicit_VR' arguments instead"
+            ),
+            DeprecationWarning,
         )
 
     if not dataset.is_original_encoding:
@@ -653,34 +733,23 @@ def write_dataset(
     )
 
     fpStart = fp.tell()
-    # data_elements must be written in tag order
+
+    # Elements must be written in tag order
     tags = sorted(dataset.keys())
 
+    #for tag in (x for x in tags if x.group > 6 and x.element != 0):
     for tag in tags:
-        # do not write retired Group Length (see PS3.5, 7.2)
+        # Do not write retired Group Length (see PS3.5, 7.2)
         if tag.element == 0 and tag.group > 6:
             continue
 
         with tag_in_exception(tag):
+            # Use _dict.get(tag) directly to skip slice check
+            #   and conversion from RawDataElement to DataElement
+            # write_data_element(fp, dataset._dict.get(tag), dataset_encoding)
             write_data_element(fp, dataset.get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
-
-
-def _harmonize_properties(ds: Dataset, fp: DicomIO) -> None:
-    """Make sure the properties in the dataset and the file pointer are
-    consistent, so the user can set both with the same effect.
-    Properties set on the destination file object always have preference.
-    """
-    # ensure preference of fp over dataset
-    if hasattr(fp, "is_little_endian"):
-        ds.is_little_endian = fp.is_little_endian
-    if hasattr(fp, "is_implicit_VR"):
-        ds.is_implicit_VR = fp.is_implicit_VR
-
-    # write the properties back to have a consistent state
-    fp.is_implicit_VR = cast(bool, ds.is_implicit_VR)
-    fp.is_little_endian = cast(bool, ds.is_little_endian)
 
 
 def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str]) -> None:
@@ -722,7 +791,13 @@ def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str]) -> 
     length_location = fp.tell()  # save location for later.
     # will fill in real value later if not undefined length
     fp.write_UL(0xFFFFFFFF)
-    write_dataset(fp, dataset, parent_encoding=encodings)
+    write_dataset(
+        fp,
+        dataset,
+        implicit_VR=fp.is_implicit_VR,
+        little_endian=fp.is_little_endian,
+        parent_encoding=encodings,
+    )
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
@@ -830,9 +905,9 @@ def write_file_meta_info(
     # first write into a buffer to avoid seeking back, that can be
     # expansive and is not allowed if writing into a zip file
     buffer = DicomBytesIO()
-    buffer.is_little_endian = True
-    buffer.is_implicit_VR = False
-    write_dataset(buffer, file_meta)
+    # buffer.is_little_endian = True
+    # buffer.is_implicit_VR = False
+    write_dataset(buffer, file_meta, implicit_VR=False, little_endian=True)
 
     # If FileMetaInformationGroupLength is present it will be the first written
     #   element and we must update its value to the correct length.
@@ -850,42 +925,6 @@ def write_file_meta_info(
     fp.write(buffer.getvalue())
 
 
-def _write_dataset(fp: DicomIO, dataset: Dataset, write_like_original: bool) -> None:
-    """Write the Data Set to a file-like. Assumes the file meta information,
-    if any, has been written.
-    """
-
-    # if we want to write with the same endianness and VR handling as
-    # the read dataset we want to preserve raw data elements for
-    # performance reasons (which is done by get_item);
-    # otherwise we use the default converting item getter
-    if dataset.is_original_encoding:
-        get_item = Dataset.get_item
-    else:
-        get_item = Dataset.__getitem__  # type: ignore[assignment]
-
-    # WRITE DATASET
-    # The transfer syntax used to encode the dataset can't be changed
-    #   within the dataset.
-    # Write any Command Set elements now as elements must be in tag order
-    #   Mixing Command Set with other elements is non-conformant so we
-    #   require `write_like_original` to be True
-    command_set = get_item(dataset, slice(0x00000000, 0x00010000))
-    if command_set and write_like_original:
-        fp.is_implicit_VR = True
-        fp.is_little_endian = True
-        write_dataset(fp, command_set)
-
-    # Set file VR and endianness. MUST BE AFTER writing META INFO (which
-    #   requires Explicit VR Little Endian) and COMMAND SET (which requires
-    #   Implicit VR Little Endian)
-    fp.is_implicit_VR = cast(bool, dataset.is_implicit_VR)
-    fp.is_little_endian = cast(bool, dataset.is_little_endian)
-
-    # Write non-Command Set elements now
-    write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
-
-
 def _determine_encoding(
     ds: Dataset,
     transfer_syntax: UID | None,
@@ -897,11 +936,11 @@ def _determine_encoding(
     use_implicit = implicit_VR if implicit_VR is not None else ds._is_implicit_VR
     use_little = little_endian if little_endian is not None else ds._is_little_endian
 
-    if tsyntax is None:
+    if transfer_syntax is None:
         return [use_implicit, use_little]
 
     # Must check UID.is_private before checking UID.is_transfer_syntax
-    if tsyntax.is_private:
+    if transfer_syntax.is_private:
         # Private transfer syntax UID - fallback to either args or encoding
         #   of the original file (if any)
         if use_implicit is None:
@@ -918,45 +957,45 @@ def _determine_encoding(
 
         return [use_implicit, use_little]
 
-    if not tsyntax.is_transfer_syntax:
+    if not transfer_syntax.is_transfer_syntax:
         raise ValueError("The Transfer Syntax UID is not a valid transfer syntax")
 
     # Check that supplied args match transfer syntax
-    if implicit_VR is not None and implicit_VR != tsyntax.is_implicit_VR:
+    if implicit_VR is not None and implicit_VR != transfer_syntax.is_implicit_VR:
         raise ValueError(
             f"The 'implicit_VR' value is not consistent with the required "
-            f"VR encoding for '{tsyntax.name}'"
+            f"VR encoding for a '{transfer_syntax.name}' transfer syntax"
         )
 
-    if little_endian is not None and little_endian != tsyntax.is_little_endian:
+    if little_endian is not None and little_endian != transfer_syntax.is_little_endian:
         raise ValueError(
             f"The 'little_endian' value is not consistent with the required "
-            f"endianness for '{tsyntax.name}'"
+            f"endianness for a '{transfer_syntax.name}' transfer syntax"
         )
 
-    return [tsyntax.is_implicit_VR, tsyntax.is_little_endian]
+    return [transfer_syntax.is_implicit_VR, transfer_syntax.is_little_endian]
 
 
 def dcmwrite(
     filename: PathType | BinaryIO | DicomFileLike,
     dataset: Dataset,
     __write_like_original: bool = True,
-    implicit_vr: bool | None = None,
-    little_endian: bool = None,
-    enforce_conformance: bool = False,
-    force_encoding: bool = False,
     **kwargs,
 ) -> None:
     """Write `dataset` to the `filename` specified.
 
-    If `enforce_conformance` is ``True``, `dataset` will be stored in the
+    .. versionchanged:: 3.0
+
+        Added the `enforce_file_format` keyword argument.
+
+    If `enforce_file_format` is ``True``, `dataset` will be stored in the
     :dcm:`DICOM File Format <part10/chapter_7.html>`.  To do
     so requires that the ``Dataset.file_meta`` attribute
     exists and contains a :class:`Dataset` with the required (Type 1) *File
     Meta Information Group* elements. The encoded `dataset` will be
     placed into the file after the DICOM *File Meta Information*.
 
-    If `enforce_conformance` is ``False`` (default) then the :class:`Dataset`
+    If `enforce_file_format` is ``False`` (default) then the :class:`Dataset`
     will be written as is (after minimal validation checking) and may or may
     not contain all or parts of the *File Meta Information* (and hence may or
     may not be conformant with the DICOM File Format).
@@ -977,9 +1016,9 @@ def dcmwrite(
     ``dataset.preamble`` (see the table below).
 
     +------------------+------------------------------+
-    |                  | write_like_original          |
+    |                  | enforce_file_format          |
     +------------------+-------------+----------------+
-    | dataset.preamble | True        | False          |
+    | dataset.preamble | False       | True           |
     +==================+=============+================+
     | None             | no preamble | 128 0x00 bytes |
     +------------------+-------------+----------------+
@@ -993,7 +1032,7 @@ def dcmwrite(
 
     The preamble and prefix are followed by a set of DICOM elements from the
     (0002,eeee) group. Some of these elements are required (Type 1) while
-    others are optional (Type 3/1C). If `write_like_original` is ``True``
+    others are optional (Type 3/1C). If `enforce_file_format` is ``False``
     then the *File Meta Information Group* elements are all optional. See
     :func:`~pydicom.filewriter.write_file_meta_info` for more information on
     which elements are required.
@@ -1002,19 +1041,10 @@ def dcmwrite(
     own :class:`~pydicom.dataset.Dataset` in the ``dataset.file_meta``
     attribute.
 
-    If (0002,0010) *Transfer Syntax UID* is included then the user must ensure
-    its value is compatible with the values for the
-    ``dataset.is_little_endian`` and ``dataset.is_implicit_VR`` attributes.
-    For example, if ``is_little_endian`` and ``is_implicit_VR`` are both
-    ``True`` then the Transfer Syntax UID must be 1.2.840.10008.1.2 *Implicit
-    VR Little Endian*. See the DICOM Standard, Part 5,
-    :dcm:`Section 10<part05/chapter_10.html>` for more information on Transfer
-    Syntaxes.
-
     *Encoding*
 
     The preamble and prefix are encoding independent. The File Meta elements
-    are encoded as *Explicit VR Little Endian* as required by the DICOM
+    are always encoded as *Explicit VR Little Endian* as required by the DICOM
     Standard.
 
     **Dataset**
@@ -1025,16 +1055,17 @@ def dcmwrite(
 
     *Encoding*
 
-    The `dataset` is encoded as specified by:
+    .. versionchanged:: 3.0
 
-    * If ``Dataset.file_meta`` is present and has *Transfer Syntax UID*,
-      then the encoding for the set transfer syntax
-    * If `write_like_original` is ``False``:
-      * If ``Dataset.file_meta`` is absent or has no *Transfer Syntax UID* then
-      the `implicit_VR` and `little_endian` is p the ``dataset.is_little_endian``
-    and ``dataset.is_implicit_VR`` attributes. It's up to the user to ensure
-    these attributes are set correctly (as well as setting an appropriate
-    value for ``dataset.file_meta.TransferSyntaxUID`` if present).
+        Added the `implicit_VR` and `little_endian` arguments.
+
+    The `dataset` is encoded as specified by (in order of priority):
+
+    * If ``Dataset.file_meta`` exists and has a public *Transfer Syntax UID*,
+      then the encoding corresponding to the set transfer syntax.
+    * The `implicit_VR` and `little_endian` arguments.
+    * If `dataset` has been read from file then the encoding used by the
+      original file.
 
     Parameters
     ----------
@@ -1043,6 +1074,15 @@ def dcmwrite(
     dataset : pydicom.dataset.FileDataset
         The :class:`~pydicom.dataset.Dataset` holding the DICOM information;
         e.g. an object read with :func:`~pydicom.filereader.dcmread`.
+    write_like_original : bool, optional
+        If ``True`` (default), then write `dataset` as-is, otherwise enforce
+        the DICOM File Format.
+
+        .. versionchanged:: 3.0
+
+            `write_like_original` is deprecated and will be removed in v4.0,
+            please use `enforce_file_format` instead
+
     implicit_VR : bool, optional
         Encode `dataset` using implicit VR (if ``True``) or explicit VR
         (if ``False``). Required if `dataset` has no File Meta Information
@@ -1053,33 +1093,19 @@ def dcmwrite(
         strongly recommended that little endian encoding be used as big endian
         was retired from the DICOM Standard in 2006. Additionally, conversion of
         datasets from little endian to big endian is not supported. Required if
-        `dataset` has no File Meta Information elements, or if the File Meta is
-        missing a *Transfer Syntax UID* element.
-    enforce_conformance : bool, optional
+        a *Transfer Syntax UID* element is not available in the dataset's File
+        Meta.
     enforce_file_format: bool, optional
         If ``True`` then attempt to produce a file conformant with the DICOM
         File Format, or raise an exception if unable to do so. If ``False``
-        (default) then preserve the following information from
-        the original dataset (which may result in a non-conformant file):
+        (default) then preserve the following - which may result in a
+        non-conformant file:
 
-        - Dataset.preamble -- if the original dataset had no preamble then
-          none will be written.
-        - Dataset.file_meta -- if the original dataset was missing any required
+        - Dataset.preamble -- if the dataset has no preamble then none will be
+          written.
+        - Dataset.file_meta -- if the dataset is missing any required
           *File Meta Information Group* elements then they will not be added or
           written.
-          - If (0002,0000) *File Meta Information Group Length* is present in
-            the File Meta Information then it may have its value updated.
-
-        - is_undefined_length -- if elements in the original dataset used
-          delimiters then conserve them instead of converting to the more
-          sensible length characters FIXME
-        - is_undefined_length_sequence_item -- for datasets that belong to a
-          sequence, write the undefined length delimiters if that is
-          what the original had.
-    force_encoding : bool, optional
-        If ``True``, then force encoding to use the values specified by
-        `implicit_VR` and `little_endian`. This may produce a highly
-        non-conformant or invalid dataset and is not recommended.
 
     Raises
     ------
@@ -1100,8 +1126,27 @@ def dcmwrite(
         Write a DICOM file from a dataset that was read in with ``dcmread()``.
         ``save_as()`` wraps ``dcmwrite()``.
     """
-    if "write_like_original" in kwargs:
-        write_like_original = kwargs.get("write_like_original", None)
+    implicit_VR: bool | None = kwargs.get("implicit_VR", None)
+    little_endian: bool = kwargs.get("little_endian", True)
+    enforce_file_format: bool = kwargs.get("enforce_file_format", False)
+    # For advanced use only - use is not documented
+    force_encoding: bool = kwargs.get("force_encoding", False)
+    # Deprecated, remove in v4.0
+    write_like_original: bool | None = kwargs.get("write_like_original", None)
+
+    # Cover use of `write_like_original` as:
+    #   kwarg - dcmwrite(fp, ds, write_like_original=True)
+    #   positional arg - dcmwrite(fp, ds, False)
+    #   default - dcmwrite(fp, ds) covered by the default for enforce_file_format
+    if write_like_original is not None or __write_like_original is False:
+        warnings.warn(
+            (
+                "'write_like_original' is deprecated and will be removed in "
+                " v4.0, please use 'enforce_file_format' instead"
+            ),
+            DeprecationWarning,
+        )
+        enforce_file_format = not write_like_original
 
     cls_name = dataset.__class__.__name__
 
@@ -1112,12 +1157,11 @@ def dcmwrite(
             f"FileMetaDataset instance in the '{cls_name}.file_meta' attribute."
         )
 
-    if force_encoding and enforce_conformance:
+    if force_encoding and enforce_file_format:
         raise ValueError(
-            "'force_encoding' cannot be used with 'enforce_conformance'"
+            "'force_encoding' cannot be used with 'enforce_file_format'"
         )
 
-    preamble = getattr(dataset, "preamble", None)
     # Avoid making changes to the original File Meta Information
     file_meta = FileMetaDataset()
     if hasattr(dataset, "file_meta"):
@@ -1141,7 +1185,17 @@ def dcmwrite(
             "Implicit VR and big endian is not a valid encoding combination"
         )
 
-    if enforce_conformance:
+    preamble = getattr(dataset, "preamble", None)
+    if preamble and len(preamble) != 128:
+        raise ValueError(f"'{cls_name}.preamble' must be 128-bytes long.")
+
+    if enforce_file_format:
+        # Command set elements are not valid
+        if dataset.group_dataset(0x0000):
+            raise ValueError(
+                "Command Set elements are not allowed in DICOM File Format files"
+            )
+
         # A valid File Meta Information is required by the DICOM File Format
         if tsyntax is None:
             if encoding == [True, True]:
@@ -1149,7 +1203,7 @@ def dcmwrite(
             elif encoding == [False, False]:
                 file_meta.TransferSyntaxUID = ExplicitVRBigEndian
 
-            tsyntax = file_meta.TransferSyntaxUID
+            tsyntax: UID | None = file_meta.get("TransferSyntaxUID", None)
 
         if "SOPClassUID" in dataset:
             file_meta.MediaStorageSOPClassUID = dataset.SOPClassUID
@@ -1158,29 +1212,24 @@ def dcmwrite(
 
         validate_file_meta(file_meta, enforce_standard=True)
 
+        # `tsyntax` must exist after validate_file_meta()
         if not tsyntax.is_private:
             # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
             #   and native pixel data uses actual length
             if "PixelData" in dataset:
                 dataset["PixelData"].is_undefined_length = tsyntax.is_compressed
 
-        # A preamble is required if writing to the DICOM File Format
+        # A preamble is required by the DICOM File Format
         if not preamble:
             preamble = b"\x00" * 128
-
-    if preamble and len(preamble) != 128:
-        raise ValueError(
-            f"'{dataset.__class__.__name__}.preamble' must be 128-bytes long."
-        )
 
     # Check for decompression, give warnings if inconsistencies
     # If decompressed, then pixel_array is now used instead of PixelData
     if dataset.is_decompressed:
         if file_meta.TransferSyntaxUID.is_compressed:
             raise ValueError(
-                f"The Transfer Syntax UID element in "
-                f"'{dataset.__class__.__name__}.file_meta' is compressed "
-                f"but the pixel data has been decompressed"
+                f"The Transfer Syntax UID element in '{cls_name}.file_meta' "
+                "is compressed but the pixel data has been decompressed"
             )
 
         # Force PixelData to the decompressed version
@@ -1202,41 +1251,39 @@ def dcmwrite(
                 f"but got {type(filename).__name__}"
             )
 
-    fp.is_implicit_VR, fp.is_little_endian = encoding
-
     try:
-        # WRITE FILE META INFORMATION
         if preamble:
             # Write the 'DICM' prefix if and only if we write the preamble
             fp.write(preamble)
             fp.write(b"DICM")
 
-        if meta:  # May be an empty Dataset
-            # If we want to `write_like_original`, don't enforce_standard
+        if file_meta:  # May be an empty Dataset
             write_file_meta_info(
-                fp, meta, enforce_standard=enforce_conformance
+                fp, file_meta, enforce_standard=enforce_file_format
             )
 
         if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
-            # when writing, the entire dataset following
-            #     the file metadata is prepared the normal way,
-            #     then "deflate" compression applied.
+            # When writing, the entire dataset following the file meta data
+            #   is encoded normally, then "deflate" compression applied
             buffer = DicomBytesIO()
-            _write_dataset(buffer, dataset, write_like_original)
+            write_dataset(
+                buffer, dataset, implicit_VR=encoding[0], little_endian=encoding[1]
+            )
 
             # Compress the encoded data and write to file
             compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
-            deflated = compressor.compress(
-                buffer.parent.getvalue()  # type: ignore[union-attr]
-            )
-            deflated += compressor.flush()
+            deflated = [
+                compressor.compress(buffer.parent.getvalue()),  # type: ignore[union-attr]
+                compressor.flush(),
+            ]
+            fp.write(b"".join(deflated))
             if len(deflated) % 2:
-                deflated += b"\x00"
-
-            fp.write(deflated)
+                fp.write(b"\x00")
         else:
-            _write_dataset(fp, dataset, write_like_original)
+            write_dataset(
+                fp, dataset, implicit_VR=encoding[0], little_endian=encoding[1]
+            )
 
     finally:
         if not caller_owns_file:

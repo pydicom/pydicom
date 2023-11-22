@@ -60,6 +60,7 @@ from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
 from pydicom.datadict import (
+    dictionary_description,
     dictionary_VR,
     tag_for_keyword,
     keyword_for_tag,
@@ -380,16 +381,6 @@ class Dataset:
     indent_chars : str
         For string display, the characters used to indent nested Sequences.
         Default is ``"   "``.
-    is_little_endian : bool
-        Shall be set before writing with ``write_like_original=False``.
-        The :class:`Dataset` (excluding the pixel data) will be written using
-        the given endianness.
-    is_implicit_VR : bool
-        Shall be set before writing with ``write_like_original=False``.
-        The :class:`Dataset` will be written using the transfer syntax with
-        the given VR handling, e.g *Little Endian Implicit VR* if ``True``,
-        and *Little Endian Explicit VR* or *Big Endian Explicit VR* (depending
-        on ``Dataset.is_little_endian``) if ``False``.
     """
 
     indent_chars = "   "
@@ -419,8 +410,8 @@ class Dataset:
         # The dataset's original character set encoding
         self.read_encoding: None | str | MutableSequence[str] = None
 
-        self.is_little_endian: bool | None = None
-        self.is_implicit_VR: bool | None = None
+        self._is_little_endian: bool | None = None
+        self._is_implicit_VR: bool | None = None
 
         # True if the dataset is a sequence item with undefined length
         self.is_undefined_length_sequence_item = False
@@ -1238,12 +1229,38 @@ class Dataset:
         """
         tags = self._slice_dataset(slce.start, slce.stop, slce.step)
         ds = Dataset({tag: self.get_item(tag) for tag in tags})
-        ds.is_little_endian = self.is_little_endian
-        ds.is_implicit_VR = self.is_implicit_VR
+        ds._is_little_endian = self._is_little_endian
+        ds._is_implicit_VR = self._is_implicit_VR
         ds.set_original_encoding(
             self.read_implicit_vr, self.read_little_endian, self.read_encoding
         )
         return ds
+
+    @property
+    def is_implicit_VR(self) -> bool | None:
+        return self._is_implicit_VR
+
+    @is_implicit_VR.setter
+    def is_implicit_VR(self, value: bool | None) -> None:
+        warnings.warn(
+            f"'{self.__class__.__name__}.is_implicit_VR' is deprecated and will "
+            "be removed in v4.0",
+            DeprecationWarning,
+        )
+        self._is_implicit_VR = value
+
+    @property
+    def is_little_endian(self) -> bool | None:
+        return self._is_little_endian
+
+    @is_little_endian.setter
+    def is_little_endian(self, value: bool | None) -> None:
+        warnings.warn(
+            f"'{self.__class__.__name__}.is_little_endian' is deprecated and will "
+            "be removed in v4.0",
+            DeprecationWarning,
+        )
+        self._is_little_endian = value
 
     @property
     def is_original_encoding(self) -> bool:
@@ -1256,10 +1273,10 @@ class Dataset:
         (0008,0005) *Specific Character Set*.
         """
         return (
-            self.is_implicit_VR is not None
-            and self.is_little_endian is not None
-            and self.read_implicit_vr == self.is_implicit_VR
-            and self.read_little_endian == self.is_little_endian
+            self._is_implicit_VR is not None
+            and self._is_little_endian is not None
+            and self.read_implicit_vr == self._is_implicit_VR
+            and self.read_little_endian == self._is_little_endian
             and self.read_encoding == self._character_set
         )
 
@@ -1790,8 +1807,8 @@ class Dataset:
         self["PixelData"].is_undefined_length = True
 
         # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
-        self.is_implicit_VR = False
-        self.is_little_endian = True
+        self._is_implicit_VR = False
+        self._is_little_endian = True
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, "file_meta"):
@@ -1861,7 +1878,7 @@ class Dataset:
             and self.file_meta.TransferSyntaxUID.is_compressed
         ):
             # Check that current file as read does match expected
-            if not self.is_little_endian or self.is_implicit_VR:
+            if not self._is_little_endian or self._is_implicit_VR:
                 msg = (
                     "Current dataset does not match expected ExplicitVR "
                     "LittleEndian transfer syntax from a compressed "
@@ -2120,18 +2137,29 @@ class Dataset:
         self,
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
         write_like_original: bool = True,
+        implicit_VR: bool | None = None,
+        little_endian: bool | None = True,
+        enforce_file_format: bool = False,
     ) -> None:
         """Write the :class:`Dataset` to `filename`.
 
-        Wrapper for pydicom.filewriter.dcmwrite, passing this dataset to it.
-        See documentation for that function for details.
+        Wrapper for :func:`~pydicom.filewriter.dcmwrite`.
+
+        Parameters
+        ----------
 
         See Also
         --------
         pydicom.filewriter.dcmwrite
-            Write a DICOM file from a :class:`FileDataset` instance.
+            Encode a dataset and write it to file.
         """
-        pydicom.dcmwrite(filename, self, write_like_original)
+        pydicom.dcmwrite(
+            filename,
+            self,
+            enforce_file_format = not write_like_original,
+            implicit_VR=implicit_VR,
+            little_endian=little_endian,
+        )
 
     def ensure_file_meta(self) -> None:
         """Create an empty ``Dataset.file_meta`` if none exists.
@@ -2165,11 +2193,11 @@ class Dataset:
         """
         self.ensure_file_meta()
 
-        if self.is_little_endian and self.is_implicit_VR:
+        if self._is_little_endian and self._is_implicit_VR:
             self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        elif not self.is_little_endian and not self.is_implicit_VR:
+        elif not self._is_little_endian and not self._is_implicit_VR:
             self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-        elif not self.is_little_endian and self.is_implicit_VR:
+        elif not self._is_little_endian and self._is_implicit_VR:
             raise NotImplementedError(
                 "Implicit VR Big Endian is not a " "supported Transfer Syntax."
             )
@@ -2744,8 +2772,8 @@ class FileDataset(Dataset):
         self.file_meta: FileMetaDataset = (
             file_meta if file_meta is not None else FileMetaDataset()
         )
-        self.is_implicit_VR: bool = is_implicit_VR
-        self.is_little_endian: bool = is_little_endian
+        self._is_implicit_VR: bool = is_implicit_VR
+        self._is_little_endian: bool = is_little_endian
 
         filename: str | None = None
         filename_or_obj = path_from_pathlike(filename_or_obj)
@@ -2788,8 +2816,8 @@ class FileDataset(Dataset):
             self,
             self.preamble,
             self.file_meta,
-            self.is_implicit_VR,
-            self.is_little_endian,
+            self._is_implicit_VR,
+            self._is_little_endian,
         )
         filename = self.filename
         if filename is not None and not isinstance(filename, str):
@@ -2847,23 +2875,24 @@ def validate_file_meta(
     enforce_standard : bool, optional
         If ``False``, then only a check for invalid elements is performed.
         If ``True`` (default), the following elements will be added if not
-        already present:
+        already present and the Type 1 elements given a value if empty:
 
-        * (0002,0001) *File Meta Information Version*
-        * (0002,0012) *Implementation Class UID*
-        * (0002,0013) *Implementation Version Name*
+        * (0002,0001) *File Meta Information Version*, Type 1
+        * (0002,0012) *Implementation Class UID*, Type 1
+        * (0002,0013) *Implementation Version Name*, Type 3
 
-        and the following elements will be checked:
+        and the following elements will be checked to ensure they're present
+        and have a non-empty value:
 
-        * (0002,0002) *Media Storage SOP Class UID*
-        * (0002,0003) *Media Storage SOP Instance UID*
-        * (0002,0010) *Transfer Syntax UID*
+        * (0002,0002) *Media Storage SOP Class UID*, Type 1
+        * (0002,0003) *Media Storage SOP Instance UID*, Type 1
+        * (0002,0010) *Transfer Syntax UID*, Type 1
 
     Raises
     ------
     ValueError
-        If `enforce_standard` is ``True`` and any of the checked *File Meta
-        Information* elements are missing from `file_meta`.
+        If `enforce_standard` is ``True`` and any of the Type 1 *File Meta
+        Information* elements are missing from `file_meta` or have no value.
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
@@ -2871,48 +2900,39 @@ def validate_file_meta(
     for elem in file_meta.elements():
         if elem.tag.group != 0x0002:
             raise ValueError(
-                "Only File Meta Information Group (0002,eeee) "
-                "elements must be present in 'file_meta'."
+                "Only File Meta Information group (0002,eeee) elements may be "
+                "present in 'file_meta'."
             )
 
     if enforce_standard:
-        if "FileMetaInformationVersion" not in file_meta:
+        if (
+            "FileMetaInformationVersion" not in file_meta
+            or file_meta["FileMetaInformationVersion"].is_empty
+        ):
             file_meta.FileMetaInformationVersion = b"\x00\x01"
 
-        if "ImplementationClassUID" not in file_meta:
+        if (
+            "ImplementationClassUID" not in file_meta
+            or file_meta["ImplementationClassUID"].is_empty
+        ):
             file_meta.ImplementationClassUID = UID(PYDICOM_IMPLEMENTATION_UID)
 
         if "ImplementationVersionName" not in file_meta:
             file_meta.ImplementationVersionName = (
-                f"PYDICOM {'.'.join(str(x) for x in __version_info__)}"
+                f"PYDICOM {'.'.join(__version_info__)}"
             )
 
-        # Check that required File Meta Information elements are present
-        missing = []
-        empty = []
-        for element in [0x0002, 0x0003, 0x0010]:
-            tag = Tag(0x0002, element)
-            if tag not in file_meta:
-                missing.append(tag)
+        invalid = []
+        for tag in [0x00020002, 0x00020003, 0x00020010]:
+            if tag not in file_meta or file_meta[tag].is_empty:
+                invalid.append(f"{Tag(tag)} {dictionary_description(tag)}")
 
-            if not file_meta[tag].value:
-                empty.append(tag)
-
-        if missing:
-            msg = (
-                "Missing required File Meta Information elements from 'file_meta':\n"
+        if invalid:
+            raise AttributeError(
+                "Required File Meta Information elements are either missing "
+                f"or have an empty value: {', '.join(invalid)}"
             )
-            for tag in missing:
-                msg += f"\t{tag} {keyword_for_tag(tag)}\n"
-            raise ValueError(msg[:-1])  # Remove final newline
 
-        if empty:
-            msg = (
-                "The following File Meta Information elements have no value set:\n"
-            )
-            for tag in empty:
-                msg += f"\t{tag} {keyword_for_tag(tag)}\n"
-            raise ValueError(msg[:-1])  # Remove final newline
 
 class FileMetaDataset(Dataset):
     """Contains a collection (dictionary) of group 2 DICOM Data Elements.
