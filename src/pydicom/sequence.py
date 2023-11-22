@@ -51,21 +51,15 @@ class Sequence(MultiValue[Dataset]):
         if isinstance(iterable, Dataset):
             raise TypeError("The Sequence constructor requires an iterable")
 
-        # the parent dataset
-        self._parent_dataset: weakref.ReferenceType[Dataset] | None = None
-
         # validate_dataset is used as a pseudo type_constructor
         self._list: list[Dataset] = []
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
-        for ds in self:
-            ds.parent_seq = self  # type: ignore
         self.is_undefined_length: bool
 
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
         super().append(val)
-        val.parent_seq = self  # type: ignore
 
     def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
@@ -75,18 +69,6 @@ class Sequence(MultiValue[Dataset]):
             raise TypeError("An iterable of 'Dataset' is required")
 
         super().extend(val)
-        for ds in val:
-            ds.parent_seq = self  # type: ignore
-
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "Sequence":
-        cls = self.__class__
-        copied = cls.__new__(cls)
-        if memo is not None:
-            memo[id(self)] = copied
-        copied.__dict__.update(deepcopy(self.__dict__, memo))
-        for ds in copied:
-            ds.parent_seq = copied  # type:ignore
-        return copied
 
     def __iadd__(  # type: ignore[override]
         self, other: Iterable[Dataset]
@@ -95,36 +77,11 @@ class Sequence(MultiValue[Dataset]):
         if isinstance(other, Dataset):
             raise TypeError("An iterable of 'Dataset' is required")
 
-        result = super().__iadd__(other)
-        for ds in other:
-            ds.parent_seq = self  # type: ignore
-
-        return result
+        return super().__iadd__(other)
 
     def insert(self, position: int, val: Dataset) -> None:  # type: ignore[override]
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
         super().insert(position, val)
-        val.parent_seq = self  # type: ignore
-
-    @property
-    def parent_dataset(self) -> "weakref.ReferenceType[Dataset] | None":
-        """Return a weak reference to the parent
-        :class:`~pydicom.dataset.Dataset`.
-
-        .. versionadded:: 2.4
-
-            Returned value is a weak reference to the parent ``Dataset``.
-        """
-        return self._parent_dataset
-
-    @parent_dataset.setter
-    def parent_dataset(self, value: Dataset) -> None:
-        """Set the parent :class:`~pydicom.dataset.Dataset`
-
-        .. versionadded:: 2.4
-        """
-        if value != self._parent_dataset:
-            self._parent_dataset = weakref.ref(value)
 
     @overload  # type: ignore[override]
     def __setitem__(self, idx: int, val: Dataset) -> None:
@@ -143,12 +100,9 @@ class Sequence(MultiValue[Dataset]):
                 raise TypeError("Can only assign an iterable of 'Dataset'")
 
             super().__setitem__(idx, val)
-            for ds in val:
-                ds.parent_seq = self  # type: ignore
         else:
             val = cast(Dataset, val)
             super().__setitem__(idx, val)
-            val.parent_seq = self  # type: ignore
 
     def __str__(self) -> str:
         """String description of the Sequence."""
@@ -157,18 +111,3 @@ class Sequence(MultiValue[Dataset]):
     def __repr__(self) -> str:  # type: ignore[override]
         """String representation of the Sequence."""
         return f"<{self.__class__.__name__}, length {len(self)}>"
-
-    def __getstate__(self) -> dict[str, Any]:
-        if self.parent_dataset is not None:
-            s = self.__dict__.copy()
-            s["_parent_dataset"] = s["_parent_dataset"]()
-            return s
-        return self.__dict__
-
-    # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        if self.__dict__["_parent_dataset"] is not None:
-            self.__dict__["_parent_dataset"] = weakref.ref(
-                self.__dict__["_parent_dataset"]
-            )
