@@ -44,7 +44,7 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Darcy Mason
@@ -85,16 +85,13 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_read_rtplan.ipynb <plot_read_rtplan.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_read_rtplan.py <plot_read_rtplan.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_read_rtplan.ipynb <plot_read_rtplan.ipynb>`
 
 
 .. only:: html

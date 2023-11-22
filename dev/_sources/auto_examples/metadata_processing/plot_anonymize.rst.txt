@@ -34,7 +34,7 @@ Anonymize a single file
 
 .. GENERATED FROM PYTHON SOURCE LINES 16-30
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Darcy Mason
@@ -72,7 +72,7 @@ curves tags.
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-46
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -100,7 +100,7 @@ also some other tags such that patient ID, etc.
 
 .. GENERATED FROM PYTHON SOURCE LINES 49-54
 
-.. code-block:: default
+.. code-block:: Python
 
 
     ds.PatientID = "id"
@@ -120,7 +120,7 @@ pydicom allows to remove private tags using ``remove_private_tags`` method
 
 .. GENERATED FROM PYTHON SOURCE LINES 56-59
 
-.. code-block:: default
+.. code-block:: Python
 
 
     ds.remove_private_tags()
@@ -139,7 +139,7 @@ Data elements of type 3 (optional) can be easily deleted using ``del`` or
 
 .. GENERATED FROM PYTHON SOURCE LINES 62-69
 
-.. code-block:: default
+.. code-block:: Python
 
 
     if "OtherPatientIDs" in ds:
@@ -162,7 +162,7 @@ blank string.
 
 .. GENERATED FROM PYTHON SOURCE LINES 72-77
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tag = "PatientBirthDate"
@@ -182,7 +182,7 @@ Finally, this is possible to store the image
 
 .. GENERATED FROM PYTHON SOURCE LINES 79-85
 
-.. code-block:: default
+.. code-block:: Python
 
 
     for keyword in ["PatientID", "PatientBirthDate"]:
@@ -207,7 +207,7 @@ Finally, this is possible to store the image
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.008 seconds)
+   **Total running time of the script:** (0 minutes 0.007 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_anonymize.py:
@@ -216,16 +216,13 @@ Finally, this is possible to store the image
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_anonymize.ipynb <plot_anonymize.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_anonymize.py <plot_anonymize.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_anonymize.ipynb <plot_anonymize.ipynb>`
 
 
 .. only:: html

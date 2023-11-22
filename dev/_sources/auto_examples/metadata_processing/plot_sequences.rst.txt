@@ -44,7 +44,7 @@ This examples illustrates how to work with sequences.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from pydicom.sequence import Sequence
@@ -90,16 +90,13 @@ This examples illustrates how to work with sequences.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_sequences.ipynb <plot_sequences.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_sequences.py <plot_sequences.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_sequences.ipynb <plot_sequences.ipynb>`
 
 
 .. only:: html

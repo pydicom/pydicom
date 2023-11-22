@@ -135,7 +135,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -177,16 +177,13 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_downsize_image.ipynb <plot_downsize_image.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_downsize_image.py <plot_downsize_image.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_downsize_image.ipynb <plot_downsize_image.ipynb>`
 
 
 .. only:: html

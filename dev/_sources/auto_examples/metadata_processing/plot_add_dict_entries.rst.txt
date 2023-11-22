@@ -55,7 +55,7 @@ pydicom's private dictionary when loading an existing dataset.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
     # authors : Darcy Mason and pydicom contributors
     # license : MIT
@@ -136,16 +136,13 @@ pydicom's private dictionary when loading an existing dataset.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_add_dict_entries.ipynb <plot_add_dict_entries.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_add_dict_entries.py <plot_add_dict_entries.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_add_dict_entries.ipynb <plot_add_dict_entries.ipynb>`
 
 
 .. only:: html

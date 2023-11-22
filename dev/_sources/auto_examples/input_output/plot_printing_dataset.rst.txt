@@ -115,7 +115,7 @@ This example illustrates how to print the data set in your own format.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -167,16 +167,13 @@ This example illustrates how to print the data set in your own format.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_printing_dataset.ipynb <plot_printing_dataset.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_printing_dataset.py <plot_printing_dataset.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_printing_dataset.ipynb <plot_printing_dataset.ipynb>`
 
 
 .. only:: html

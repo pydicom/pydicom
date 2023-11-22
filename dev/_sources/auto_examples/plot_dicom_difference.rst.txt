@@ -712,7 +712,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -742,7 +742,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.095 seconds)
+   **Total running time of the script:** (0 minutes 0.096 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:
@@ -751,16 +751,13 @@ This examples illustrates how to find the differences between two DICOM files.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_dicom_difference.ipynb <plot_dicom_difference.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_dicom_difference.py <plot_dicom_difference.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_dicom_difference.ipynb <plot_dicom_difference.ipynb>`
 
 
 .. only:: html

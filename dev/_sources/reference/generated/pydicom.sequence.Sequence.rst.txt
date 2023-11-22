@@ -29,10 +29,4 @@
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~Sequence.parent_dataset
-   
    
