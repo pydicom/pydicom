@@ -6,6 +6,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
 import os
 from pathlib import Path
+import pickle
 from platform import python_implementation
 
 from struct import unpack
@@ -1137,6 +1138,170 @@ class TestCorrectAmbiguousVR:
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
         assert "SS" == ds[0x00283000][0][0x00283002].VR
+
+    def test_ambiguous_element_sequence_implicit_nearest(self):
+        """Test that the nearest dataset with pixel rep to the ambiguous
+        element is used for correction.
+        """
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
+        ds.is_implicit_VR = True
+        ds.ModalityLUTSequence[0].PixelRepresentation = 1
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        assert "SS" == ds[0x00283000][0][0x00283002].VR
+
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
+        ds.is_implicit_VR = True
+        ds.ModalityLUTSequence[0].PixelRepresentation = 0
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        assert "US" == ds[0x00283000][0][0x00283002].VR
+
+    def test_ambiguous_element_sequence_explicit_nearest(self):
+        """Test that the nearest dataset with pixel rep to the ambiguous
+        element is used for correction.
+        """
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
+        ds.is_implicit_VR = False
+        ds.ModalityLUTSequence[0].PixelRepresentation = 1
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        assert "SS" == ds[0x00283000][0][0x00283002].VR
+
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
+        ds.is_implicit_VR = False
+        ds.ModalityLUTSequence[0].PixelRepresentation = 0
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        assert "US" == ds[0x00283000][0][0x00283002].VR
+
+    def test_pickle_deepcopy_implicit(self):
+        """Test we can correct VR after pickling and deepcopy."""
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
+        ds.is_implicit_VR = True
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        ds.filename = None
+
+        ds2 = deepcopy(ds)
+
+        s = pickle.dumps({"ds": ds})
+        ds = pickle.loads(s)["ds"]
+
+        assert "US" == ds[0x00283000][0][0x00283002].VR
+        assert "US" == ds2[0x00283000][0][0x00283002].VR
+
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
+        ds.is_implicit_VR = True
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        ds.filename = None
+
+        ds2 = deepcopy(ds)
+
+        s = pickle.dumps({"ds": ds})
+        ds = pickle.loads(s)["ds"]
+
+        assert "SS" == ds[0x00283000][0][0x00283002].VR
+        assert "SS" == ds2[0x00283000][0][0x00283002].VR
+
+    def test_pickle_deepcopy_explicit(self):
+        """Test we can correct VR after pickling and deepcopy."""
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
+        ds.is_implicit_VR = False
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        ds.filename = None
+
+        ds2 = deepcopy(ds)
+
+        s = pickle.dumps({"ds": ds})
+        ds = pickle.loads(s)["ds"]
+
+        assert "US" == ds[0x00283000][0][0x00283002].VR
+        assert "US" == ds2[0x00283000][0][0x00283002].VR
+
+        ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
+        ds.is_implicit_VR = False
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        ds.filename = None
+
+        ds2 = deepcopy(ds)
+
+        s = pickle.dumps({"ds": ds})
+        ds = pickle.loads(s)["ds"]
+
+        assert "SS" == ds[0x00283000][0][0x00283002].VR
+        assert "SS" == ds2[0x00283000][0][0x00283002].VR
+
+    def test_parent_change_implicit(self):
+        """Test ambiguous VR correction when parent is changed."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BeamSequence = [Dataset()]
+        # Nesting Modality LUT Sequence to avoid raw -> elem conversion
+        seq = ds.BeamSequence[0]
+        seq.ModalityLUTSequence = [Dataset()]
+        seq.ModalityLUTSequence[0].LUTDescriptor = [0, 0, 16]
+        seq.ModalityLUTSequence[0].LUTExplanation = None
+        seq.ModalityLUTSequence[0].ModalityLUTType = "US"  # US = unspecified
+        seq.ModalityLUTSequence[0].LUTData = b"\x0000\x149a\x1f1c\xc2637"
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+
+        ds1 = dcmread(ct_name)
+        ds1.PixelRepresentation = 1
+        ds1.BeamSequence = ds.BeamSequence
+        assert ds1._pixel_rep == 1
+        assert ds1["BeamSequence"][0]._pixel_rep == 1
+        assert isinstance(ds1.BeamSequence[0]._dict[0x00283000], RawDataElement)
+
+        modality_seq = ds1.BeamSequence[0].ModalityLUTSequence
+        assert modality_seq[0]._pixel_rep == 1
+        assert "SS" == ds1.BeamSequence[0][0x00283000][0][0x00283002].VR
+
+    def test_pixel_repr_none_in_nearer_implicit(self):
+        """Test a pixel representation of None in a nearer dataset."""
+        ds = self.dataset_with_modality_lut_sequence(0)
+        ds.ModalityLUTSequence[0].PixelRepresentation = None
+        ds.is_implicit_VR = True
+
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+
+        item = ds.ModalityLUTSequence[0]
+        assert ds._pixel_rep == 0
+        assert item._pixel_rep == 0
+        assert "US" == item[0x00283002].VR
+
+    def test_pixel_repr_none_in_further_implicit(self):
+        """Test a pixel representation of None in a further dataset."""
+        ds = self.dataset_with_modality_lut_sequence(None)
+        ds.ModalityLUTSequence[0].PixelRepresentation = 0
+        ds.is_implicit_VR = True
+
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+
+        item = ds.ModalityLUTSequence[0]
+        assert not hasattr(ds, "_pixel_rep")
+        assert item._pixel_rep == 0
+        assert "US" == item[0x00283002].VR
 
 
 class TestCorrectAmbiguousVRElement:

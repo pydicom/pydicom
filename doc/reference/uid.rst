@@ -135,15 +135,18 @@ Storage SOP Class UIDs
    EncapsulatedPDFStorage
    EncapsulatedSTLStorage
    EnhancedCTImageStorage
+   EnhancedContinuousRTImageStorage
    EnhancedMRColorImageStorage
    EnhancedMRImageStorage
    EnhancedPETImageStorage
+   EnhancedRTImageStorage
    EnhancedSRStorage
    EnhancedUSVolumeStorage
    EnhancedXAImageStorage
    EnhancedXRFImageStorage
    EnhancedXRayRadiationDoseSRStorage
    ExtensibleSRStorage
+   General32bitECGWaveformStorage
    GeneralAudioWaveformStorage
    GeneralECGWaveformStorage
    GenericImplantTemplateStorage
@@ -157,6 +160,7 @@ Storage SOP Class UIDs
    IntraocularLensCalculationsStorage
    IntravascularOpticalCoherenceTomographyImageStorageForPresentation
    IntravascularOpticalCoherenceTomographyImageStorageForProcessing
+   InventoryStorage
    KeratometryMeasurementsStorage
    KeyObjectSelectionDocumentStorage
    LegacyConvertedEnhancedCTImageStorage
@@ -187,6 +191,7 @@ Storage SOP Class UIDs
    ParametricMapStorage
    PatientRadiationDoseSRStorage
    PerformedImagingAgentAdministrationSRStorage
+   PhotoacousticImageStorage
    PlannedImagingAgentAdministrationSRStorage
    PositronEmissionTomographyImageStorage
    ProcedureLogStorage
@@ -200,6 +205,7 @@ Storage SOP Class UIDs
    RTImageStorage
    RTIonBeamsTreatmentRecordStorage
    RTIonPlanStorage
+   RTPatientPositionAcquisitionInstructionStorage
    RTPhysicianIntentStorage
    RTPlanStorage
    RTRadiationRecordSetStorage
@@ -241,6 +247,7 @@ Storage SOP Class UIDs
    VLPhotographicImageStorage
    VLSlideCoordinatesMicroscopicImageStorage
    VLWholeSlideMicroscopyImageStorage
+   VariableModalityLUTSoftcopyPresentationStateStorage
    VideoEndoscopicImageStorage
    VideoMicroscopicImageStorage
    VideoPhotographicImageStorage

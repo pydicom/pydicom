@@ -76,7 +76,7 @@ def update_api_reference(path: Path) -> None:
 
 
 if __name__ == "__main__":
-    p = Path(__file__).parent.parent.parent / "pydicom" / "uid.py"
+    p = Path(__file__).parent.parent.parent / "src" / "pydicom" / "uid.py"
     p.resolve(strict=True)
     update_uids(p)
 

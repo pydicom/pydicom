@@ -41,6 +41,7 @@ if have_numpy:
     import numpy
 
 
+# Ambiguous VR Correction
 # (0018,9810) Zero Velocity Pixel Value
 # (0022,1452) Mapped Pixel Value
 # (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
@@ -53,7 +54,7 @@ if have_numpy:
 # (0028,3002) LUT Descriptor
 # (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
 # (0060,3004)/(0060,3006) Histogram First/Last Bin Value
-_us_ss_tags = {
+_AMBIGUOUS_US_SS_TAGS = {
     0x00189810,
     0x00221452,
     0x00280104,
@@ -80,18 +81,23 @@ _us_ss_tags = {
 # (5400,0112) Channel Maximum Value
 # (5400,100A) Waveform Padding Data
 # (5400,1010) Waveform Data
-_ob_ow_tags = {0x54000110, 0x54000112, 0x5400100A, 0x54001010}
+_AMBIGUOUS_OB_OW_TAGS = {0x54000110, 0x54000112, 0x5400100A, 0x54001010}
 
 # (60xx,3000) Overlay Data
-_overlay_data_tags = {x << 16 | 0x3000 for x in range(0x6000, 0x601F, 2)}
+_OVERLAY_DATA_TAGS = {x << 16 | 0x3000 for x in range(0x6000, 0x601F, 2)}
 
 
 def _correct_ambiguous_vr_element(
-    elem: DataElement, ds: Dataset, is_little_endian: bool
+    elem: DataElement,
+    ancestors: list[Dataset],
+    is_little_endian: bool,
 ) -> DataElement:
     """Implementation for `correct_ambiguous_vr_element`.
     See `correct_ambiguous_vr_element` for description.
     """
+    # The zeroth dataset is the nearest, the last is the root dataset
+    ds = ancestors[0]
+
     # 'OB or OW': 7fe0,0010 PixelData
     if elem.tag == 0x7FE00010:
         # Compressed Pixel Data
@@ -114,31 +120,44 @@ def _correct_ambiguous_vr_element(
             elem.VR = VR.OW if cast(int, ds.BitsAllocated) > 8 else VR.OB
 
     # 'US or SS' and dependent on PixelRepresentation
-    elif elem.tag in _us_ss_tags:
+    elif elem.tag in _AMBIGUOUS_US_SS_TAGS:
         # US if PixelRepresentation value is 0x0000, else SS
         #   For references, see the list at
         #   https://github.com/pydicom/pydicom/pull/298
         # PixelRepresentation is usually set in the root dataset
-        while (
-            "PixelRepresentation" not in ds
-            and ds.parent_seq is not None
-            and ds.parent_seq().parent_dataset is not None  # type: ignore[union-attr]
-            and ds.parent_seq().parent_dataset()  # type: ignore
-        ):
-            # Make weakrefs into strong refs (locally here) by calling () them
-            ds = ds.parent_seq().parent_dataset()  # type: ignore
-        # if no pixel data is present, none if these tags is used,
-        # so we can just ignore a missing PixelRepresentation in this case
-        if (
-            "PixelRepresentation" not in ds
-            and "PixelData" not in ds
-            or ds.PixelRepresentation == 0
-        ):
-            elem.VR = VR.US
-            byte_type = "H"
-        else:
-            elem.VR = VR.SS
-            byte_type = "h"
+
+        # If correcting during write, or after implicit read when the
+        #   element is on the same level as pixel representation
+        pixel_rep = next(
+            (
+                cast(int, x.PixelRepresentation)
+                for x in ancestors
+                if getattr(x, "PixelRepresentation", None) is not None
+            ),
+            None,
+        )
+
+        if pixel_rep is None:
+            # If correcting after implicit read when the element isn't
+            #   on the same level as pixel representation
+            pixel_rep = next(
+                (x._pixel_rep for x in ancestors if hasattr(x, "_pixel_rep")),
+                None,
+            )
+
+        if pixel_rep is None:
+            # If no pixel data is present, none if these tags is used,
+            # so we can just ignore a missing PixelRepresentation in this case
+            pixel_rep = 1
+            if (
+                "PixelRepresentation" not in ds
+                and "PixelData" not in ds
+                or ds.PixelRepresentation == 0
+            ):
+                pixel_rep = 0
+
+        elem.VR = VR.US if pixel_rep == 0 else VR.SS
+        byte_type = "H" if pixel_rep == 0 else "h"
 
         if elem.VM == 0:
             return elem
@@ -151,7 +170,7 @@ def _correct_ambiguous_vr_element(
             )
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
-    elif elem.tag in _ob_ow_tags:
+    elif elem.tag in _AMBIGUOUS_OB_OW_TAGS:
         # If WaveformBitsAllocated is > 8 then OW, otherwise may be
         #   OB or OW.
         #   See PS3.3 C.10.9.1.
@@ -181,7 +200,7 @@ def _correct_ambiguous_vr_element(
             elem.VR = VR.OW
 
     # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
-    elif elem.tag in _overlay_data_tags:
+    elif elem.tag in _OVERLAY_DATA_TAGS:
         # Implicit VR must be OW, explicit VR may be OB or OW
         #   as per PS3.5 Section 8.1.2 and Annex A
         elem.VR = VR.OW
@@ -190,7 +209,10 @@ def _correct_ambiguous_vr_element(
 
 
 def correct_ambiguous_vr_element(
-    elem: DataElement, ds: Dataset, is_little_endian: bool
+    elem: DataElement,
+    ds: Dataset,
+    is_little_endian: bool,
+    ancestors: list[Dataset] | None = None,
 ) -> DataElement:
     """Attempt to correct the ambiguous VR element `elem`.
 
@@ -201,6 +223,10 @@ def correct_ambiguous_vr_element(
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
     using the :func:`~pydicom.values.convert_numbers` function.
 
+    .. versionchanged:: 3.0
+
+        The `ancestors` keyword argument was added.
+
     Parameters
     ----------
     elem : dataelem.DataElement
@@ -209,12 +235,19 @@ def correct_ambiguous_vr_element(
         The dataset containing `elem`.
     is_little_endian : bool
         The byte ordering of the values in the dataset.
+    ancestors : list[pydicom.dataset.Dataset] | None
+        A list of the ancestor datasets to look through when trying to find
+        the relevant element value to use in VR correction. Should be ordered
+        from closest to furthest. If ``None`` then will build itself
+        automatically starting at `ds` (default).
 
     Returns
     -------
     dataelem.DataElement
         The corrected element
     """
+    ancestors = [ds] if ancestors is None else ancestors
+
     if elem.VR in AMBIGUOUS_VR:
         # convert raw data elements before handling them
         if isinstance(elem, RawDataElement):
@@ -222,16 +255,20 @@ def correct_ambiguous_vr_element(
             ds.__setitem__(elem.tag, elem)
 
         try:
-            _correct_ambiguous_vr_element(elem, ds, is_little_endian)
+            _correct_ambiguous_vr_element(elem, ancestors, is_little_endian)
         except AttributeError as e:
             raise AttributeError(
-                f"Failed to resolve ambiguous VR for tag {elem.tag}: " + str(e)
+                f"Failed to resolve ambiguous VR for tag {elem.tag}: {str(e)}"
             )
 
     return elem
 
 
-def correct_ambiguous_vr(ds: Dataset, is_little_endian: bool) -> Dataset:
+def correct_ambiguous_vr(
+    ds: Dataset,
+    is_little_endian: bool,
+    ancestors: list[Dataset] | None = None,
+) -> Dataset:
     """Iterate through `ds` correcting ambiguous VR elements (if possible).
 
     When it's not possible to correct the VR, the element will be returned
@@ -241,12 +278,21 @@ def correct_ambiguous_vr(ds: Dataset, is_little_endian: bool) -> Dataset:
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
     using the :func:`~pydicom.values.convert_numbers` function.
 
+    .. versionchanged:: 3.0
+
+        The `ancestors` keyword argument was added.
+
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
         The dataset containing ambiguous VR elements.
     is_little_endian : bool
         The byte ordering of the values in the dataset.
+    ancestors : list[pydicom.dataset.Dataset] | None
+        A list of the ancestor datasets to look through when trying to find
+        the relevant element value to use in VR correction. Should be ordered
+        from closest to furthest. If ``None`` then will build itself
+        automatically starting at `ds` (default).
 
     Returns
     -------
@@ -258,15 +304,22 @@ def correct_ambiguous_vr(ds: Dataset, is_little_endian: bool) -> Dataset:
     AttributeError
         If a tag is missing in `ds` that is required to resolve the ambiguity.
     """
+    # Construct the tree if `ds` is the root level dataset
+    # tree = Tree(ds) if tree is None else tree
+    ancestors = [ds] if ancestors is None else ancestors
+
     # Iterate through the elements
     for elem in ds:
         # raw data element sequences can be written as they are, because we
         # have ensured that the transfer syntax has not changed at this point
         if elem.VR == VR.SQ:
-            for item in cast(MutableSequence[Dataset], elem.value):
-                correct_ambiguous_vr(item, is_little_endian)
+            for item in cast(MutableSequence["Dataset"], elem.value):
+                ancestors.insert(0, item)
+                correct_ambiguous_vr(item, is_little_endian, ancestors)
         elif elem.VR in AMBIGUOUS_VR:
-            correct_ambiguous_vr_element(elem, ds, is_little_endian)
+            correct_ambiguous_vr_element(elem, ds, is_little_endian, ancestors)
+
+    del ancestors[0]
     return ds
 
 

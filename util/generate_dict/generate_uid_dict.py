@@ -23,10 +23,10 @@ import xml.etree.ElementTree as ET
 from pydicom import _version
 
 
-_PKG_DIRECTORY = Path(__file__).parent.parent.parent / "pydicom"
+_PKG_DIRECTORY = Path(__file__).parent.parent.parent / "src" / "pydicom"
 PYDICOM_DICT_FILENAME = _PKG_DIRECTORY / "_uid_dict.py"
 DICT_NAME = "UID_dictionary"
-BR = "{https://docbook.org/ns/docbook}"
+BR = "{http://docbook.org/ns/docbook}"
 
 
 def write_dict(fp, dict_name, attributes):
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     root = tree.getroot()
 
     # Check the version is up to date
-    dcm_version = root.find("{https://docbook.org/ns/docbook}subtitle")
+    dcm_version = root.find(f"{BR}subtitle")
     dcm_version = dcm_version.text.split()[2]
     lib_version = getattr(_version, "__dicom_version__", None)
     if lib_version != dcm_version:

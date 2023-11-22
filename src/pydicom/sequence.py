@@ -70,10 +70,9 @@ class Sequence(ConstrainedList[Dataset]):
             if isinstance(val, Dataset):
                 raise TypeError("Can only assign an iterable of 'Dataset'")
 
-        super().__setitem__(index, val)
-        # else:
-        #     # val = cast(Dataset, val)
-        #     super().__setitem__(index, val)
+            super().__setitem__(index, val)
+        else:
+            super().__setitem__(index, cast(Dataset, val))
 
     def __str__(self) -> str:
         """String description of the Sequence."""
@@ -86,7 +85,7 @@ class Sequence(ConstrainedList[Dataset]):
     @staticmethod
     def _validate(item: Any) -> Dataset:
         """Check that `item` is a :class:`~pydicom.dataset.Dataset` instance."""
-        if not isinstance(item, Dataset):
-            raise TypeError("Sequence contents must be 'Dataset' instances.")
+        if isinstance(item, Dataset):
+            return item
 
-        return item
+        raise TypeError("Sequence contents must be 'Dataset' instances.")
