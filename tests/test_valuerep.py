@@ -917,7 +917,8 @@ class TestIS:
         bin_elem = b"\x18\x00\x52\x11\x04\x00\x00\x0014.5"
         with BytesIO(bin_elem) as bio:
             ds = read_dataset(bio, True, True)
-        assert isinstance(ds.Exposure, ISfloat)
+        with pytest.warns(UserWarning, match="Invalid value for VR IS"):
+            assert isinstance(ds.Exposure, ISfloat)
         assert ds.Exposure == 14.5
 
         # Strict checking raises an error
@@ -929,7 +930,8 @@ class TestIS:
     def test_float_init(self):
         """New ISfloat created from another behaves correctly"""
         is1 = IS("14.5", validation_mode=config.IGNORE)
-        is2 = IS(is1)
+        with pytest.warns(UserWarning, match='Value "14.5" is not valid'):
+            is2 = IS(is1)
         assert is1 == is2
         assert is2.original_string == is1.original_string
 

@@ -2858,8 +2858,8 @@ class FileDataset(Dataset):
             self,
             self.preamble,
             self.file_meta,
-            self.is_implicit_VR,
-            self.is_little_endian,
+            self.is_implicit_VR,  # type: ignore[arg-type]
+            self.is_little_endian,  # type: ignore[arg-type]
         )
         filename = self.filename
         if filename is not None and not isinstance(filename, str):

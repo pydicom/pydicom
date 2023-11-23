@@ -71,6 +71,11 @@ Changes
 * :attr:`~pydicom.dataelem.DataElement.VM` always returns ``1`` for **SQ**
   elements (:issue:`1481`)
 * DICOM dictionary updated to 2023d
+* :attr:`~pydicom.dataset.Dataset.is_little_endian` and
+  :attr:`~pydicom.dataset.Dataset.is_little_endian` will be made read-only in v4.0
+* :attr:`~pydicom.dataset.Dataset.read_little_endian` and
+  :attr:`~pydicom.dataset.Dataset.read_implicit_vr` are deprecated and will be
+   removed in v4.0
 
 
 Enhancements

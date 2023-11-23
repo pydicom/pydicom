@@ -247,8 +247,8 @@ class TestWriteFile:
         fp = DicomBytesIO()
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         ds.add_new(0xFFFFFFFF, "LO", "123456")
         ds.save_as(fp, write_like_original=True)
 
@@ -327,8 +327,8 @@ class TestWriteFile:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = RLELossless
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
         bs = BytesIO()
 
         msg = (
@@ -930,7 +930,7 @@ class TestCorrectAmbiguousVR:
     def test_waveform_bits_allocated(self):
         """Test correcting elements which require WaveformBitsAllocated."""
         ref_ds = Dataset()
-        ref_ds.is_implicit_VR = False
+        ref_ds._is_implicit_VR = False
 
         # If WaveformBitsAllocated  > 8 then VR must be OW
         ref_ds.WaveformBitsAllocated = 16
@@ -950,11 +950,11 @@ class TestCorrectAmbiguousVR:
         assert "OB" == ds[0x54001010].VR
 
         # For implicit VR, VR is always OW
-        ref_ds.is_implicit_VR = True
+        ref_ds._is_implicit_VR = True
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         assert b"\x01\x02" == ds.WaveformData
         assert "OW" == ds[0x54001010].VR
-        ref_ds.is_implicit_VR = False
+        ref_ds._is_implicit_VR = False
 
         # If no WaveformBitsAllocated then AttributeError shall be raised
         ref_ds = Dataset()
@@ -1003,7 +1003,7 @@ class TestCorrectAmbiguousVR:
         """Test correcting OverlayData"""
         # VR must be 'OW'
         ref_ds = Dataset()
-        ref_ds.is_implicit_VR = True
+        ref_ds._is_implicit_VR = True
         ref_ds.add(DataElement(0x60003000, "OB or OW", b"\x00"))
         ref_ds.add(DataElement(0x601E3000, "OB or OW", b"\x00"))
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
@@ -1012,7 +1012,7 @@ class TestCorrectAmbiguousVR:
         assert "OB or OW" == ref_ds[0x60003000].VR
         assert "OB or OW" == ref_ds[0x601E3000].VR
 
-        ref_ds.is_implicit_VR = False
+        ref_ds._is_implicit_VR = False
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         assert "OW" == ds[0x60003000].VR
         assert "OB or OW" == ref_ds[0x60003000].VR
@@ -1037,8 +1037,8 @@ class TestCorrectAmbiguousVR:
     def test_write_new_ambiguous(self):
         """Regression test for #781"""
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         ds.SmallestImagePixelValue = 0
         assert ds[0x00280106].VR == "US or SS"
         ds.PixelRepresentation = 0
@@ -1063,7 +1063,7 @@ class TestCorrectAmbiguousVR:
         ds.ModalityLUTSequence[0].LUTExplanation = None
         ds.ModalityLUTSequence[0].ModalityLUTType = "US"  # US = unspecified
         ds.ModalityLUTSequence[0].LUTData = b"\x0000\x149a\x1f1c\xc2637"
-        ds.is_little_endian = True
+        ds._is_little_endian = True
         return ds
 
     def test_ambiguous_element_in_sequence_explicit_using_attribute(self):
@@ -1071,14 +1071,14 @@ class TestCorrectAmbiguousVR:
         as explicit transfer syntax works if accessing the tag via keyword."""
         # regression test for #804
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
         assert "US" == ds.ModalityLUTSequence[0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1089,14 +1089,14 @@ class TestCorrectAmbiguousVR:
         as explicit transfer syntax works if accessing the tag
         via the tag number."""
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
         assert "US" == ds[0x00283000][0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1108,14 +1108,14 @@ class TestCorrectAmbiguousVR:
         tag via keyword."""
         # regression test for #804
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
         assert "US" == ds.ModalityLUTSequence[0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1126,14 +1126,14 @@ class TestCorrectAmbiguousVR:
         from a file with implicit transfer syntax works if accessing the tag
         via the tag number."""
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
         assert "US" == ds[0x00283000][0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1144,7 +1144,7 @@ class TestCorrectAmbiguousVR:
         element is used for correction.
         """
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         ds.ModalityLUTSequence[0].PixelRepresentation = 1
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1152,7 +1152,7 @@ class TestCorrectAmbiguousVR:
         assert "SS" == ds[0x00283000][0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         ds.ModalityLUTSequence[0].PixelRepresentation = 0
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1164,7 +1164,7 @@ class TestCorrectAmbiguousVR:
         element is used for correction.
         """
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         ds.ModalityLUTSequence[0].PixelRepresentation = 1
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1172,7 +1172,7 @@ class TestCorrectAmbiguousVR:
         assert "SS" == ds[0x00283000][0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         ds.ModalityLUTSequence[0].PixelRepresentation = 0
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1182,7 +1182,7 @@ class TestCorrectAmbiguousVR:
     def test_pickle_deepcopy_implicit(self):
         """Test we can correct VR after pickling and deepcopy."""
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1197,7 +1197,7 @@ class TestCorrectAmbiguousVR:
         assert "US" == ds2[0x00283000][0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1214,7 +1214,7 @@ class TestCorrectAmbiguousVR:
     def test_pickle_deepcopy_explicit(self):
         """Test we can correct VR after pickling and deepcopy."""
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=0)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1229,7 +1229,7 @@ class TestCorrectAmbiguousVR:
         assert "US" == ds2[0x00283000][0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1255,8 +1255,8 @@ class TestCorrectAmbiguousVR:
         seq.ModalityLUTSequence[0].LUTExplanation = None
         seq.ModalityLUTSequence[0].ModalityLUTType = "US"  # US = unspecified
         seq.ModalityLUTSequence[0].LUTData = b"\x0000\x149a\x1f1c\xc2637"
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
 
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1277,7 +1277,7 @@ class TestCorrectAmbiguousVR:
         """Test a pixel representation of None in a nearer dataset."""
         ds = self.dataset_with_modality_lut_sequence(0)
         ds.ModalityLUTSequence[0].PixelRepresentation = None
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
 
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1292,7 +1292,7 @@ class TestCorrectAmbiguousVR:
         """Test a pixel representation of None in a further dataset."""
         ds = self.dataset_with_modality_lut_sequence(None)
         ds.ModalityLUTSequence[0].PixelRepresentation = 0
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
 
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
@@ -1401,16 +1401,22 @@ class TestWriteAmbiguousVR:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ref_ds)
-        file_ds.is_implicit_VR = False
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = False
+        file_ds._is_little_endian = True
         file_ds.save_as(fp, write_like_original=True)
         fp.seek(0)
 
         ds = read_dataset(fp, False, True, parent_encoding="latin1")
         assert 256 == ds.SmallestValidPixelValue
         assert "US" == ds[0x00280104].VR
-        assert not ds.read_implicit_vr
-        assert ds.read_little_endian
+        msg = "'Dataset.read_implicit_vr' will be removed in v4.0"
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert not ds.read_implicit_vr
+
+        msg = "'Dataset.read_little_endian' will be removed in v4.0"
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ds.read_little_endian
+
         assert ds.read_encoding == "latin1"
 
     def test_write_explicit_vr_big_endian(self):
@@ -1423,16 +1429,17 @@ class TestWriteAmbiguousVR:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ref_ds)
-        file_ds.is_implicit_VR = False
-        file_ds.is_little_endian = False
+        file_ds._is_implicit_VR = False
+        file_ds._is_little_endian = False
         file_ds.save_as(fp, write_like_original=True)
         fp.seek(0)
 
         ds = read_dataset(fp, False, False)
         assert 1 == ds.SmallestValidPixelValue
         assert "SS" == ds[0x00280104].VR
-        assert not ds.read_implicit_vr
-        assert not ds.read_little_endian
+        with pytest.warns(DeprecationWarning):
+            assert not ds.read_implicit_vr
+            assert not ds.read_little_endian
         assert ["UTF8"] == ds.read_encoding
 
 
@@ -1630,7 +1637,7 @@ class TestWriteToStandard:
         # make sure conversion from implicit to explicit VR works
         # without private tags
         ds = dcmread(mr_implicit_name)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.1"
         fp = DicomBytesIO()
         ds.save_as(fp, write_like_original=False)
@@ -1668,7 +1675,7 @@ class TestWriteToStandard:
         # make sure conversion from implicit to explicit VR works
         # if setting the property in the destination
         ds = dcmread(mr_implicit_name)
-        ds.is_implicit_VR = False
+        ds._is_implicit_VR = False
         ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.1"
         fp = DicomBytesIO()
         fp.is_implicit_VR = False
@@ -1685,7 +1692,7 @@ class TestWriteToStandard:
         # make sure conversion from explicit to implicit VR works
         # without private tags
         ds = dcmread(mr_name)
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         ds.file_meta.TransferSyntaxUID = uid.ImplicitVRLittleEndian
         fp = DicomBytesIO()
         ds.save_as(fp, write_like_original=False)
@@ -1700,7 +1707,7 @@ class TestWriteToStandard:
         # make sure conversion from big to little endian works
         # except for pixel data
         ds = dcmread(mr_bigendian_name)
-        ds.is_little_endian = True
+        ds._is_little_endian = True
         ds.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
         fp = DicomBytesIO()
         ds.save_as(fp, write_like_original=False)
@@ -1719,7 +1726,7 @@ class TestWriteToStandard:
         # make sure conversion from little to big endian works
         # except for pixel data
         ds = dcmread(mr_name)
-        ds.is_little_endian = False
+        ds._is_little_endian = False
         ds.file_meta.TransferSyntaxUID = uid.ExplicitVRBigEndian
         fp = DicomBytesIO()
         ds.save_as(fp, write_like_original=False)
@@ -1758,14 +1765,14 @@ class TestWriteToStandard:
         # Only done for ImplVR LE and ExplVR BE
         # Added
         ds = dcmread(rtplan_name)
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
         ds.save_as(DicomBytesIO(), write_like_original=False)
         assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
 
         # Updated
-        ds.is_implicit_VR = False
-        ds.is_little_endian = False
+        ds._is_implicit_VR = False
+        ds._is_little_endian = False
         ds.save_as(DicomBytesIO(), write_like_original=False)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
 
@@ -1775,16 +1782,16 @@ class TestWriteToStandard:
         """
         # convert a dataset with private tags to Implicit VR
         ds_orig = dcmread(ct_name)
-        ds_orig.is_implicit_VR = True
-        ds_orig.is_little_endian = True
+        ds_orig._is_implicit_VR = True
+        ds_orig._is_little_endian = True
         fp = DicomBytesIO()
         ds_orig.save_as(fp, write_like_original=False)
         fp.seek(0)
         ds_impl = dcmread(fp)
 
         # convert the dataset back to explicit VR - private tag VR now unknown
-        ds_impl.is_implicit_VR = False
-        ds_impl.is_little_endian = True
+        ds_impl._is_implicit_VR = False
+        ds_impl._is_little_endian = True
         ds_impl.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
         fp = DicomBytesIO()
         ds_impl.save_as(fp, write_like_original=False)
@@ -1800,8 +1807,8 @@ class TestWriteToStandard:
         """Test converting an RGB dataset from implicit to explicit VR
         and vice verse."""
         ds_orig = dcmread(sc_rgb_name)
-        ds_orig.is_implicit_VR = True
-        ds_orig.is_little_endian = True
+        ds_orig._is_implicit_VR = True
+        ds_orig._is_little_endian = True
         fp = DicomBytesIO()
         ds_orig.save_as(fp, write_like_original=False)
         fp.seek(0)
@@ -1810,8 +1817,8 @@ class TestWriteToStandard:
             assert elem_orig.value == elem_conv.value
         assert "OW" == ds_impl[0x7FE00010].VR
 
-        ds_impl.is_implicit_VR = False
-        ds_impl.is_little_endian = True
+        ds_impl._is_implicit_VR = False
+        ds_impl._is_little_endian = True
         ds_impl.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
         fp = DicomBytesIO()
         ds_impl.save_as(fp, write_like_original=False)
@@ -1825,9 +1832,13 @@ class TestWriteToStandard:
         """Test TransferSyntaxUID is not added if ExplVRLE."""
         ds = dcmread(rtplan_name)
         del ds.file_meta.TransferSyntaxUID
-        ds.is_implicit_VR = False
-        ds.is_little_endian = True
-        with pytest.raises(ValueError):
+        ds._is_implicit_VR = False
+        ds._is_little_endian = True
+        msg = (
+            r"Required File Meta Information elements are either missing or "
+            r"have an empty value: \(0002,0010\) Transfer Syntax UID"
+        )
+        with pytest.raises(AttributeError, match=msg):
             ds.save_as(DicomBytesIO(), write_like_original=False)
         assert "TransferSyntaxUID" not in ds.file_meta
 
@@ -1835,8 +1846,8 @@ class TestWriteToStandard:
         """Test TransferSyntaxUID is raises
         NotImplementedError if ImplVRBE."""
         ds = dcmread(rtplan_name)
-        ds.is_implicit_VR = True
-        ds.is_little_endian = False
+        ds._is_implicit_VR = True
+        ds._is_little_endian = False
         with pytest.raises(NotImplementedError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
 
@@ -1844,8 +1855,8 @@ class TestWriteToStandard:
         """Test MediaStorageSOPClassUID and InstanceUID are added."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         ds.SOPClassUID = CTImageStorage
         ds.SOPInstanceUID = "1.2.3"
         ds.save_as(fp, write_like_original=False)
@@ -1884,18 +1895,21 @@ class TestWriteToStandard:
         ds = dcmread(rtplan_name)
         del ds.SOPInstanceUID
         ds.file_meta = FileMetaDataset()
-        with pytest.raises(ValueError):
+
+        msg = r"Required File Meta Information elements are either missing or "
+        with pytest.raises(AttributeError, match=msg):
             ds.save_as(DicomBytesIO(), write_like_original=False)
+
         del ds.file_meta
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError, match=msg):
             ds.save_as(DicomBytesIO(), write_like_original=False)
 
     def test_add_file_meta(self):
         """Test that file_meta is added if it doesn't exist"""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         ds.SOPClassUID = CTImageStorage
         ds.SOPInstanceUID = "1.2.3"
         ds.save_as(fp, write_like_original=False)
@@ -1956,14 +1970,32 @@ class TestWriteFileMetaInfoToStandard:
         """Test that missing required elements raises ValueError."""
         fp = DicomBytesIO()
         meta = Dataset()
-        with pytest.raises(ValueError):
+        msg = (
+            r"Required File Meta Information elements are either missing or "
+            r"have an empty value: \(0002,0002\) Media Storage SOP Class UID, "
+            r"\(0002,0003\) Media Storage SOP Instance UID, \(0002,0010\) "
+            r"Transfer Syntax UID"
+        )
+        with pytest.raises(AttributeError, match=msg):
             write_file_meta_info(fp, meta)
+
+        msg = (
+            r"Required File Meta Information elements are either missing or "
+            r"have an empty value: \(0002,0003\) Media Storage SOP Instance "
+            r"UID, \(0002,0010\) Transfer Syntax UID"
+        )
         meta.MediaStorageSOPClassUID = "1.1"
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError, match=msg):
             write_file_meta_info(fp, meta)
+
+        msg = (
+            r"Required File Meta Information elements are either missing or "
+            r"have an empty value: \(0002,0010\) Transfer Syntax UID"
+        )
         meta.MediaStorageSOPInstanceUID = "1.2"
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError, match=msg):
             write_file_meta_info(fp, meta)
+
         meta.TransferSyntaxUID = "1.3"
         write_file_meta_info(fp, meta, enforce_standard=True)
 
@@ -2238,8 +2270,8 @@ class TestWriteNonStandard:
         preamble = ds.preamble[:]
         del ds.preamble
         del ds.file_meta
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         ds.CommandGroupLength = 8
         ds.MessageID = 1
         ds.MoveDestination = "SOME_SCP"
@@ -2596,7 +2628,8 @@ class TestWriteNumbers:
         """Test exceptions raise OSError"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        elem = DataElement(0x00100010, "US", b"\x00")
+        with pytest.warns(UserWarning, match="Invalid value length 1"):
+            elem = DataElement(0x00100010, "US", b"\x00")
         fmt = "H"
         with pytest.raises(OSError, match=r"for data_element:\n\(0010,0010\)"):
             write_numbers(fp, elem, fmt)
@@ -2628,8 +2661,8 @@ class TestWriteOtherVRs:
         fp.is_little_endian = True
         fp.is_implicit_VR = False
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.FloatPixelData = b"\x00\x01\x02\x03"
         ds.save_as(fp)
         assert fp.getvalue() == (

@@ -726,9 +726,9 @@ def _harmonize_properties(ds: Dataset, fp: DicomIO) -> None:
     """
     # ensure preference of fp over dataset
     if hasattr(fp, "is_little_endian"):
-        ds.is_little_endian = fp.is_little_endian
+        ds._is_little_endian = fp.is_little_endian
     if hasattr(fp, "is_implicit_VR"):
-        ds.is_implicit_VR = fp.is_implicit_VR
+        ds._is_implicit_VR = fp.is_implicit_VR
 
     # write the properties back to have a consistent state
     fp.is_implicit_VR = cast(bool, ds.is_implicit_VR)
@@ -1091,8 +1091,8 @@ def dcmwrite(
             )
 
         if not tsyntax.is_private:
-            dataset.is_little_endian = tsyntax.is_little_endian
-            dataset.is_implicit_VR = tsyntax.is_implicit_VR
+            dataset._is_little_endian = tsyntax.is_little_endian
+            dataset._is_implicit_VR = tsyntax.is_implicit_VR
 
     if tsyntax and not tsyntax.is_private:
         # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
