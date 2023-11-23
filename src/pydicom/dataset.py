@@ -6,7 +6,7 @@ adds extra functionality to Dataset when data is read from or written to file.
 
 Overview of DICOM object model
 ------------------------------
-Dataset (dict subclass)
+Dataset (MutableMapping[Tag, DataElement])
   Contains DataElement instances, each of which has a tag, VR, VM and value.
     The DataElement value can be:
         * A single value, such as a number, string, etc. (i.e. VM = 1)
@@ -2181,19 +2181,125 @@ class Dataset:
     def save_as(
         self,
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
-        write_like_original: bool = True,
+        __write_like_original: bool = True,
+        implicit_VR: bool | None = None,
+        little_endian: bool = True,
+        enforce_file_format: bool = False,
+        **kwargs,
     ) -> None:
-        """Write the :class:`Dataset` to `filename`.
+        """Encode the current :class:`Dataset` and write it to `filename`.
 
-        Wrapper for pydicom.filewriter.dcmwrite, passing this dataset to it.
-        See documentation for that function for details.
+        See the documentation for :func:`~pydicom.filewriter.dcmwrite` for
+        more detailed information.
+
+        .. warning::
+
+            Encoding a dataset with ``little_endian=False`` (i.e. as big
+            endian) is not recommended. Big endian encoding was retired from
+            the DICOM Standard in 2006.
+
+        .. warning::
+
+            This function cannot be used to convert a decoded dataset to an
+            encoding that uses a different endianness, such as from big to
+            little endian. :func:`~pydicom.filewriter.dcmwrite()` must be used
+            instead, however the process is not automatic. See the
+            documentation of :func:`~pydicom.filewriter.dcmwrite()` for
+            details.
+
+        .. versionchanged:: 3.0
+
+            Added `implicit_VR`, `little_endian` and `enforce_file_format`
+
+        .. deprecated:: 3.0
+
+            `write_like_original` is deprecated, please use
+            `enforce_file_format` instead
+
+        Parameters
+        ----------
+        filename : str | PathLike | BinaryIO
+            The path or file-like to write the encoded dataset to.
+        write_like_original : bool, optional
+            If ``False`` (default) then write the dataset as-is, otherwise
+            ensure that the dataset is written in the DICOM File Format or
+            raise an exception is that isn't possible.
+        implicit_VR : bool, optional
+            Required if the dataset has no valid public *Transfer Syntax UID*
+            set in the file meta. If ``True`` then encode the dataset using
+            implicit VR, otherwise use explicit VR.
+        little_endian, bool, optional
+            Required if the dataset has no valid public *Transfer Syntax UID*
+            set in the file meta. If ``True`` (default) then use little endian
+            byte order when encoding the dataset, otherwise use big endian.
+            Big endian encoding was retired from the DICOM Standard in 2006
+            and is not recommended.
+        enforce_file_format : bool, optional
+            If ``True`` then ensure the dataset is written in the DICOM File
+            Format or raise an exception if that isn't possible. If ``False``
+            (default) then write the dataset as-is, preserving the following -
+            which may result in a non-conformant file:
+
+            - Dataset.preamble: if the dataset has no preamble then none will
+              be written
+            - Dataset.file_meta: if the dataset is missing any required *File
+              Meta Information Group* elements then they will not be added or
+              written
 
         See Also
         --------
         pydicom.filewriter.dcmwrite
             Write a DICOM file from a :class:`FileDataset` instance.
         """
-        pydicom.dcmwrite(filename, self, write_like_original)
+        # TODO: v4.0
+        # Cover use of `write_like_original` as:
+        #   kwarg: save_as(filename, write_like_original=bool)
+        #   positional arg: save_as(filename, False)
+        #   default: save_as(filename) or save_as(filename, True) - handled
+        #       by the default of `enforce_file_format`
+        write_like_original = kwargs.get("write_like_original", None)
+        if write_like_original is not None or __write_like_original is False:
+            warnings.warn(
+                (
+                    "'write_like_original' is deprecated and will be removed "
+                    "in v4.0, please use 'enforce_file_format' instead"
+                ),
+                DeprecationWarning,
+            )
+            enforce_file_format = not write_like_original
+
+        # Make sure no extraneous kwargs
+        keys = list(kwargs.keys())
+        print(keys)
+        if keys and keys != ["write_like_original"]:
+            if "write_like_original" in keys:
+                keys.remove("write_like_original")
+            raise TypeError(f"Invalid keyword argument(s): '{', '.join(keys)}'")
+
+        # Disallow conversion between little and big endian encoding
+        if self.is_little_endian is not None:
+            file_meta = getattr(self, "file_meta", {})
+            syntax = file_meta.get("TransferSyntaxUID", None)
+
+            needs_convert = False
+            if syntax and not syntax.is_private:
+                needs_convert = self.is_little_endian != syntax.is_little_endian
+            else:
+                needs_convert = self.is_little_endian != little_endian
+
+            if needs_convert:
+                raise ValueError(
+                    "You must use dcmwrite() if you want to convert between "
+                    "little and big endian encoding"
+                )
+
+        pydicom.dcmwrite(
+            filename,
+            self,
+            implicit_VR=implicit_VR,
+            little_endian=little_endian,
+            enforce_file_format=enforce_file_format,
+        )
 
     def ensure_file_meta(self) -> None:
         """Create an empty ``Dataset.file_meta`` if none exists.

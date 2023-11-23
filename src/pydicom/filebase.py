@@ -38,6 +38,7 @@ class DicomIO:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # start with this by default
         self._implicit_VR = True
+        self._little_endian = None
         self.write: Callable[[bytes], int]
         self.parent_read: Reader
         self.seek: Seeker

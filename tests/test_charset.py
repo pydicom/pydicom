@@ -448,9 +448,7 @@ class TestCharset:
 
         # check that patient names are correctly written back
         fp = DicomBytesIO()
-        fp.is_implicit_VR = False
-        fp.is_little_endian = True
-        ds.save_as(fp, write_like_original=False)
+        ds.save_as(fp, enforce_file_format=True, implicit_VR=False)
         fp.seek(0)
         ds = dcmread(fp)
         assert patient_name == ds.PatientName
@@ -460,9 +458,7 @@ class TestCharset:
         if hasattr(ds.PatientName, "original_string"):
             ds.PatientName.original_string = None
             fp = DicomBytesIO()
-            fp.is_implicit_VR = False
-            fp.is_little_endian = True
-            ds.save_as(fp, write_like_original=False)
+            ds.save_as(fp, enforce_file_format=True)
             fp.seek(0)
             ds = dcmread(fp)
             assert patient_name == ds.PatientName
@@ -475,7 +471,7 @@ class TestCharset:
         from pydicom.filebase import DicomBytesIO
 
         fp = DicomBytesIO()
-        ds.save_as(fp, write_like_original=False)
+        ds.save_as(fp, enforce_file_format=True)
         fp.seek(0)
         ds_out = dcmread(fp)
         # we expect UTF-8 encoding here
@@ -507,9 +503,7 @@ class TestCharset:
             original_string = ds.PatientName.original_string
             ds.PatientName.original_string = None
             fp = DicomBytesIO()
-            fp.is_implicit_VR = False
-            fp.is_little_endian = True
-            ds.save_as(fp, write_like_original=False)
+            ds.save_as(fp, enforce_file_format=True, implicit_VR=False)
             fp.seek(0)
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string

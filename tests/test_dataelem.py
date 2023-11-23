@@ -449,7 +449,7 @@ class TestDataElement:
             assert 0 == elem.VM
             assert elem.value == value
             fp = DicomBytesIO()
-            filewriter.write_dataset(fp, ds)
+            filewriter.write_dataset(fp, ds, implicit_VR=True, little_endian=True)
             ds_read = dcmread(fp, force=True)
             assert empty_value == ds_read[tag_name].value
 
@@ -472,7 +472,6 @@ class TestDataElement:
         }
         config.use_none_as_empty_text_VR_value = use_none
         ds = Dataset()
-        ds._is_little_endian = True
         # set value to new element
         for tag_name in text_vrs.values():
             check_empty_text_element(None)
@@ -500,7 +499,7 @@ class TestDataElement:
             assert 0 == elem.VM
             assert elem.value == value
             fp = DicomBytesIO()
-            filewriter.write_dataset(fp, ds)
+            filewriter.write_dataset(fp, ds, implicit_VR=True, little_endian=True)
             ds_read = dcmread(fp, force=True)
             assert ds_read[tag_name].value is None
 
@@ -522,7 +521,6 @@ class TestDataElement:
             "UN": "SelectorUNValue",
         }
         ds = Dataset()
-        ds._is_little_endian = True
         # set value to new element
         for tag_name in non_text_vrs.values():
             check_empty_binary_element(None)
@@ -547,9 +545,7 @@ class TestDataElement:
         assert elem.value == []
 
         fp = DicomBytesIO()
-        fp.is_little_endian = True
-        fp.is_implicit_VR = True
-        filewriter.write_dataset(fp, ds)
+        filewriter.write_dataset(fp, ds, implicit_VR=True, little_endian=True)
         ds_read = dcmread(fp, force=True)
         elem = ds_read["AcquisitionContextSequence"]
         assert elem.value == []
