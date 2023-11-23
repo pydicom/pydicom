@@ -57,11 +57,7 @@ class Sequence(ConstrainedList[Dataset]):
         return super().__iadd__(other)
 
     def __setitem__(self, index: slice | int, val: Iterable[Dataset] | Dataset) -> None:
-        """Add item(s) to the Sequence at `index`.
-
-        Also sets the parent :class:`~pydicom.dataset.Dataset` to the new
-        :class:`Sequence` item(s)
-        """
+        """Add item(s) to the Sequence at `index`."""
         if isinstance(index, slice):
             if isinstance(val, Dataset):
                 raise TypeError("Can only assign an iterable of 'Dataset'")
