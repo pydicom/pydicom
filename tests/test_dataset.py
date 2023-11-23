@@ -1354,21 +1354,18 @@ class TestDataset:
         assert ds.data_element("BeamSequence") == next(elem_gen)
         assert ds.BeamSequence[0].data_element("PatientName") == next(elem_gen)
 
-    # FIXME: these tests need an overhaul
     def test_save_as(self):
         """Test Dataset.save_as"""
         fp = DicomBytesIO()
         ds = Dataset()
         ds.PatientName = "CITIZEN"
         # Raise AttributeError if is_implicit_VR or is_little_endian missing
-        msg = (
-
-        )
         with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False, implicit_VR=True)
+            ds.save_as(fp, write_like_original=False)
 
+        ds.is_implicit_VR = True
         with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False, implicit_VR=True)
+            ds.save_as(fp, write_like_original=False)
 
         ds.is_little_endian = True
         del ds.is_implicit_VR
@@ -1720,6 +1717,50 @@ class TestDataset:
         with pytest.raises(ValueError, match=msg):
             ds["invalid"] = ds["PatientName"]
 
+    def test_values(self):
+        """Test Dataset.values()."""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientID = "Bar"
+
+        values = list(ds.values())
+        assert values[0] == ds["PatientName"]
+        assert values[1] == ds["BeamSequence"]
+        assert len(values) == 2
+
+    def test_pixel_rep(self):
+        """Tests for Dataset._pixel_rep"""
+        ds = Dataset()
+        ds.PixelRepresentation = None
+        ds.BeamSequence = []
+
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        fp = io.BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        assert not hasattr(ds, "_pixel_rep")
+        assert ds.PixelRepresentation is None
+        assert ds.BeamSequence == []
+        # Attribute not set if Pixel Representation is None
+        assert not hasattr(ds, "_pixel_rep")
+
+        ds = dcmread(fp, force=True)
+        ds.PixelRepresentation = 0
+        assert ds.BeamSequence == []
+        assert ds._pixel_rep == 0
+
+        ds = dcmread(fp, force=True)
+        ds.PixelRepresentation = 1
+        assert ds.BeamSequence == []
+        assert ds._pixel_rep == 1
+
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds._set_pixel_representation(ds["PixelRepresentation"])
+        assert ds._pixel_rep == 0
+
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
@@ -1844,13 +1885,11 @@ class TestFileDataset:
 
     def test_pickle_data_elements(self):
         ds = pydicom.dcmread(self.test_file)
-        assert ds.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         for e in ds:
             # make sure all data elements have been loaded
             pass
         s = pickle.dumps({"ds": ds})
         ds1 = pickle.loads(s)["ds"]
-        assert ds1.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         assert ds == ds1
 
     def test_pickle_nested_sequence(self):
@@ -2015,17 +2054,12 @@ class TestFileDataset:
         """Regression test for #1816"""
         ds = Dataset()
         ds.BeamSequence = []
-        elem = ds["BeamSequence"]
-        assert elem.parent is ds
 
         ds2 = Dataset()
         ds2.update(ds)
-        elem = ds2["BeamSequence"]
-        assert elem.parent is ds2
 
         ds3 = copy.deepcopy(ds2)
-        elem = ds3["BeamSequence"]
-        assert elem.parent is ds3
+        assert ds3 == ds
 
 
 class TestDatasetOverlayArray:
@@ -2228,12 +2262,6 @@ class TestFileMeta:
         assert ds_copy.BeamSequence[1].Manufacturer == "Linac and Sons, co."
         if copy_method == copy.deepcopy:
             assert id(ds_copy.BeamSequence[0]) != id(ds.BeamSequence[0])
-
-            # dereference weakrefs and check are pointing to correct objects
-            assert ds.BeamSequence is ds.BeamSequence[0].parent_seq()
-            assert ds is ds.BeamSequence.parent_dataset()
-            assert ds_copy.BeamSequence is ds_copy.BeamSequence[0].parent_seq()
-            assert ds_copy is ds_copy.BeamSequence.parent_dataset()
         else:
             # shallow copy
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])

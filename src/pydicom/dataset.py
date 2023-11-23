@@ -404,9 +404,11 @@ class Dataset:
         # the following read_XXX attributes are used internally to store
         # the properties of the dataset after read from a file
         # set depending on the endianness of the read dataset
-        self.read_little_endian: bool | None = None
+        # TODO: v4.0
+        #   Remove read_little_endian and read_implicit_vr
+        self._read_little_endian: bool | None = None
         # set depending on the VR handling of the read dataset
-        self.read_implicit_vr: bool | None = None
+        self._read_implicit_vr: bool | None = None
         # The dataset's original character set encoding
         self.read_encoding: None | str | MutableSequence[str] = None
 
@@ -1232,7 +1234,7 @@ class Dataset:
         ds._is_little_endian = self._is_little_endian
         ds._is_implicit_VR = self._is_implicit_VR
         ds.set_original_encoding(
-            self.read_implicit_vr, self.read_little_endian, self.read_encoding
+            self._read_implicit_vr, self._read_little_endian, self.read_encoding
         )
         return ds
 
@@ -1242,9 +1244,24 @@ class Dataset:
 
     @is_implicit_VR.setter
     def is_implicit_VR(self, value: bool | None) -> None:
+        """Get/set the VR method used by the encoded dataset.
+
+        .. deprecated:: 3.0
+
+            ``is_implicit_VR`` will be made read-only in v4.0
+
+        Returns
+        -------
+        bool | None
+            If the dataset has been created from scratch then returns ``None``,
+            otherwise returns the VR encoding method used by the decoded
+            dataset.
+        """
         warnings.warn(
-            f"'{self.__class__.__name__}.is_implicit_VR' is deprecated and will "
-            "be removed in v4.0",
+            (
+                f"'{type(self).__name__}.is_implicit_VR' will be made "
+                "read-only in v4.0"
+            ),
             DeprecationWarning,
         )
         self._is_implicit_VR = value
@@ -1255,9 +1272,24 @@ class Dataset:
 
     @is_little_endian.setter
     def is_little_endian(self, value: bool | None) -> None:
+        """Get/set the endianness used by the encoded dataset.
+
+        .. deprecated:: 3.0
+
+            ``is_little_endian`` will be made read-only in v4.0
+
+        Returns
+        -------
+        bool | None
+            If the dataset has been created from scratch then returns ``None``,
+            otherwise returns the endianness of the encoding used by the
+            decoded dataset.
+        """
         warnings.warn(
-            f"'{self.__class__.__name__}.is_little_endian' is deprecated and will "
-            "be removed in v4.0",
+            (
+                f"'{type(self).__name__}.is_little_endian' will be made "
+                "read-only in v4.0"
+            ),
             DeprecationWarning,
         )
         self._is_little_endian = value
@@ -1272,11 +1304,13 @@ class Dataset:
         This includes properties related to endianness, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
+        # TODO: v4.0
+        #   Remove check on read_implicit_vr and read_little_endian
         return (
             self._is_implicit_VR is not None
             and self._is_little_endian is not None
-            and self.read_implicit_vr == self._is_implicit_VR
-            and self.read_little_endian == self._is_little_endian
+            and self._read_implicit_vr == self._is_implicit_VR
+            and self._read_little_endian == self._is_little_endian
             and self.read_encoding == self._character_set
         )
 
@@ -1293,8 +1327,11 @@ class Dataset:
         Can be used for a :class:`Dataset` with raw data elements to enable
         optimized writing (e.g. without decoding the data elements).
         """
-        self.read_implicit_vr = is_implicit_vr
-        self.read_little_endian = is_little_endian
+        # TODO: v4.0
+        #   read_implicit_vr and read_little_endian to be removed as
+        #   is_implicit_VR and is_little_endian will be read-only
+        self._read_implicit_vr = is_implicit_vr
+        self._read_little_endian = is_little_endian
         self.read_encoding = character_encoding
 
     def group_dataset(self, group: int) -> "Dataset":
@@ -2122,6 +2159,36 @@ class Dataset:
                     strings.append(indent_str + repr(elem))
         return "\n".join(strings)
 
+    @property
+    def read_implicit_vr(self) -> bool | None:
+        """Get the VR method used by the encoded dataset.
+
+        .. deprecated:: 3.0
+
+            ``read_implicit_vr`` will be removed in v4.0, at which point you
+            should switch to the ``is_implicit_VR`` property instead.
+        """
+        warnings.warn(
+            f"'{type(self).__name__}.read_implicit_vr' will be removed in v4.0",
+            DeprecationWarning,
+        )
+        return self._read_implicit_vr
+
+    @property
+    def read_little_endian(self) -> bool | None:
+        """Get the endianness used by the encoded dataset.
+
+        .. deprecated:: 3.0
+
+            ``read_little_endian`` will be removed in v4.0, at which point you
+            should switch to the ``is_little_endian`` property instead.
+        """
+        warnings.warn(
+            f"'{type(self).__name__}.read_little_endian' will be removed in v4.0",
+            DeprecationWarning,
+        )
+        return self._read_little_endian
+
     def remove_private_tags(self) -> None:
         """Remove all private elements from the :class:`Dataset`."""
 
@@ -2156,7 +2223,7 @@ class Dataset:
         pydicom.dcmwrite(
             filename,
             self,
-            enforce_file_format = not write_like_original,
+            enforce_file_format=not write_like_original,
             implicit_VR=implicit_VR,
             little_endian=little_endian,
         )
@@ -2167,9 +2234,8 @@ class Dataset:
         .. versionadded:: 1.2
         """
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
-        if (
-            not hasattr(self, "file_meta")
-            or not isinstance(self.file_meta, FileMetaDataset)
+        if not hasattr(self, "file_meta") or not isinstance(
+            self.file_meta, FileMetaDataset
         ):
             self.file_meta = FileMetaDataset()
 
