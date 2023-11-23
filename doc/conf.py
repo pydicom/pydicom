@@ -28,7 +28,7 @@ import pydicom
 
 # Try to override the matplotlib configuration as early as possible
 try:
-    import gen_rst
+    import gen_rst  # noqa
 except ImportError:
     pass
 # -- General configuration ------------------------------------------------
@@ -39,7 +39,7 @@ except ImportError:
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.insert(0, os.path.abspath("../build_tools/sphinx"))  # noqa
-from github_link import make_linkcode_resolve
+from github_link import make_linkcode_resolve  # noqa
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
