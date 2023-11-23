@@ -8,7 +8,6 @@ A DataElement has a tag,
 """
 
 import base64
-import copy
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence

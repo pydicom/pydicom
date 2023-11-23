@@ -18,8 +18,6 @@ from pydicom import dcmread
 from pydicom.data.data_manager import get_charset_files, get_testdata_file
 from pydicom.dataset import Dataset
 
-from pathlib import Path
-
 
 subparsers: argparse._SubParsersAction | None = None
 

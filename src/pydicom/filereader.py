@@ -6,7 +6,6 @@
 from io import BytesIO
 import os
 from struct import Struct, unpack
-import sys
 from typing import BinaryIO, Any, cast
 from collections.abc import Callable, MutableSequence, Iterator
 import warnings

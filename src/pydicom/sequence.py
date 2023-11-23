@@ -3,13 +3,9 @@
 
 Sequence is a list of pydicom Dataset objects.
 """
-from copy import deepcopy
-from typing import cast, overload, Any
+from typing import cast, overload
 from collections.abc import Iterable, MutableSequence
-import weakref
-import warnings
 
-from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
 

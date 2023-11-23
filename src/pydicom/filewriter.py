@@ -2,7 +2,6 @@
 """Functions related to writing DICOM data."""
 
 from struct import pack
-import sys
 from typing import BinaryIO, Any, cast
 from collections.abc import Sequence, MutableSequence, Iterable
 import warnings

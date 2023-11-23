@@ -5,9 +5,8 @@ import datetime
 from decimal import Decimal
 from enum import Enum, unique
 import re
-import sys
 from math import floor, isfinite, log10
-from typing import TypeVar, Optional, Union, Any, cast
+from typing import TypeVar, Optional, Any, cast
 from collections.abc import Callable, MutableSequence, Sequence, Iterator
 import warnings
 

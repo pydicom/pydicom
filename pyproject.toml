@@ -102,14 +102,6 @@ select = [
     "W",
 ]
 ignore = [
-    "E402",
-    "F401",
-    "F403",
-    "F405",
-    "F541",
-    "F601",
-    "F811",
-    "F841",
     "PLR5501",
     "PLC1901",
     "PLR2004",
@@ -131,6 +123,7 @@ max-statements = 106
 [tool.ruff.per-file-ignores]
 "*/__init__.py" = ["F401"]
 "src/pydicom/config.py" = ["PLW0602"]
+"src/pydicom/sr/_concepts_dict.py" = ["F601"]
 
 [tool.mypy]
 python_version = "3.10"

@@ -3,7 +3,7 @@
 
 from importlib import import_module
 import sys
-from typing import Union, cast, TYPE_CHECKING, Any
+from typing import cast, TYPE_CHECKING, Any
 from collections.abc import Callable, Iterator, Iterable
 
 from pydicom.pixel_data_handlers.util import get_nr_frames
@@ -770,7 +770,7 @@ class Encoder:
                 assert kwargs["pixel_representation"] in px_repr
                 assert kwargs["bits_allocated"] in bits_a
                 assert kwargs["bits_stored"] in bits_s
-            except AssertionError as exc:
+            except AssertionError:
                 continue
 
             return

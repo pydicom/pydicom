@@ -28,7 +28,7 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING, cast, Any, Optional
+from typing import TYPE_CHECKING, cast, Any
 import warnings
 
 try:
