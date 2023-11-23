@@ -588,6 +588,8 @@ def write_data_element(
 ) -> None:
     """Write the data_element to file fp according to
     dicom media storage rules.
+
+    Note: this can only handle RawDataElement if writing implicit VR
     """
     # Write element's tag
     fp.write_tag(elem.tag)
@@ -605,7 +607,7 @@ def write_data_element(
             f"writing, or use an implicit VR transfer syntax"
         )
         raise ValueError(msg)
-    print(type(elem))
+
     if elem.is_raw:
         elem = cast(RawDataElement, elem)
         # raw data element values can be written as they are
@@ -666,14 +668,6 @@ def write_data_element(
         vr = VR.UN
 
     # write the VR for explicit transfer syntax
-    print(
-        "write_data_element()",
-        fp.is_implicit_VR,
-        fp.is_little_endian,
-        elem.tag,
-        vr,
-        default_encoding,
-    )
     if not fp.is_implicit_VR:
         vr = cast(str, vr)
         fp.write(bytes(vr, default_encoding))
@@ -774,18 +768,22 @@ def write_dataset(
         fp.is_little_endian = dataset.is_little_endian
 
     cls_name = type(dataset).__name__
+
     if None in arg_encoding:
+        print("None in arg_encoding!")
         warnings.warn(
             (
-                f"The use of '{cls_name}.is_little_endian' and "
-                f"'{cls_name}.is_implicit_VR' to set the encoding is deprecated "
-                "and will be removed in v4.0, please use the 'little_endian' "
-                "and 'implicit_VR' arguments instead"
+                f"The use of '{cls_name}.is_implicit_VR' and "
+                f"'{cls_name}.is_little_endian' with write_dataset() to set "
+                "the encoding is deprecated and will be removed in v4.0, "
+                "please use the 'implicit_VR' and 'little_endian' arguments "
+                "instead"
             ),
             DeprecationWarning,
         )
 
     if not dataset.is_original_encoding:
+        # FIXME: is this correct use of fp.is_little_endian?
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = cast(
@@ -807,22 +805,6 @@ def write_dataset(
             write_data_element(fp, dataset.get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
-
-
-def _harmonize_properties(ds: Dataset, fp: DicomIO) -> None:
-    """Make sure the properties in the dataset and the file pointer are
-    consistent, so the user can set both with the same effect.
-    Properties set on the destination file object always have preference.
-    """
-    # ensure preference of fp over dataset
-    if hasattr(fp, "is_little_endian"):
-        ds._is_little_endian = fp.is_little_endian
-    if hasattr(fp, "is_implicit_VR"):
-        ds._is_implicit_VR = fp.is_implicit_VR
-
-    # write the properties back to have a consistent state
-    fp.is_implicit_VR = cast(bool, ds.is_implicit_VR)
-    fp.is_little_endian = cast(bool, ds.is_little_endian)
 
 
 def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str]) -> None:
@@ -864,7 +846,13 @@ def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str]) -> 
     length_location = fp.tell()  # save location for later.
     # will fill in real value later if not undefined length
     fp.write_UL(0xFFFFFFFF)
-    write_dataset(fp, dataset, parent_encoding=encodings)
+    write_dataset(
+        fp,
+        dataset,
+        implicit_VR=fp.is_implicit_VR,
+        little_endian=fp.is_little_endian,  # :( ugly
+        parent_encoding=encodings,
+    )
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
@@ -990,42 +978,6 @@ def write_file_meta_info(
         write_data_element(buffer, file_meta[0x00020000])
 
     fp.write(buffer.getvalue())
-
-
-def _write_dataset(fp: DicomIO, dataset: Dataset, write_like_original: bool) -> None:
-    """Write the Data Set to a file-like. Assumes the file meta information,
-    if any, has been written.
-    """
-
-    # if we want to write with the same endianness and VR handling as
-    # the read dataset we want to preserve raw data elements for
-    # performance reasons (which is done by get_item);
-    # otherwise we use the default converting item getter
-    if dataset.is_original_encoding:
-        get_item = Dataset.get_item
-    else:
-        get_item = Dataset.__getitem__  # type: ignore[assignment]
-
-    # WRITE DATASET
-    # The transfer syntax used to encode the dataset can't be changed
-    #   within the dataset.
-    # Write any Command Set elements now as elements must be in tag order
-    #   Mixing Command Set with other elements is non-conformant so we
-    #   require `write_like_original` to be True
-    command_set = get_item(dataset, slice(0x00000000, 0x00010000))
-    if command_set and write_like_original:
-        fp.is_implicit_VR = True
-        fp.is_little_endian = True
-        write_dataset(fp, command_set)
-
-    # Set file VR and endianness. MUST BE AFTER writing META INFO (which
-    #   requires Explicit VR Little Endian) and COMMAND SET (which requires
-    #   Implicit VR Little Endian)
-    fp.is_implicit_VR = cast(bool, dataset.is_implicit_VR)
-    fp.is_little_endian = cast(bool, dataset.is_little_endian)
-
-    # Write non-Command Set elements now
-    write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
 
 
 def _determine_encoding(

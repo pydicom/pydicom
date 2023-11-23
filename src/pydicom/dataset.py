@@ -1279,11 +1279,26 @@ class Dataset:
 
         .. versionadded:: 1.1
 
+
         This includes properties related to endianness, VR handling and the
         (0008,0005) *Specific Character Set*.
+
+        .. versionchanged:: 3.0
+
+            Also takes into account the set *Transfer Syntax UID*.
         """
         # TODO: v4.0
+        #   Switch check to use is_implicit_VR and is_little_endian
         #   Remove check on read_implicit_vr and read_little_endian
+        file_meta = getattr(self, "file_meta", {})
+        syntax = file_meta.get("TransferSyntaxUID", None)
+        if syntax and not syntax.is_private and syntax.is_transfer_syntax:
+            if self._read_implicit_vr != syntax.is_implicit_VR:
+                return False
+
+            if self._read_little_endian != syntax.is_little_endian:
+                return False
+
         return (
             self.is_implicit_VR is not None
             and self.is_little_endian is not None
