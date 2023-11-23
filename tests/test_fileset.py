@@ -181,6 +181,7 @@ def private(dicomdir):
 
     len_top = len(write_record(top))  # 112
     len_middle = len(write_record(middle))  # 112
+    len(write_record(bottom))  # 112
     len_last = len(write_record(ds.DirectoryRecordSequence[-1]))  # 248
 
     records = {}
@@ -714,8 +715,9 @@ class TestRecordNode:
     def test_encoding(self, private, tdir):
         """Test group element not added when encoding."""
         fs = FileSet(private)
-        fs._instances[0].node._record.add_new(0x00080000, "UL", 128)
-        fs._instances[0].node._record.PatientSex = "F"
+        node = fs._instances[0].node
+        node._record.add_new(0x00080000, "UL", 128)
+        node._record.PatientSex = "F"
         fs, ds, paths = copy_fs(fs, tdir.name)
         item = ds.DirectoryRecordSequence[3]
         assert 0x00080000 not in item
