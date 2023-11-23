@@ -1231,8 +1231,8 @@ class Dataset:
         """
         tags = self._slice_dataset(slce.start, slce.stop, slce.step)
         ds = Dataset({tag: self.get_item(tag) for tag in tags})
-        ds._is_little_endian = self._is_little_endian
-        ds._is_implicit_VR = self._is_implicit_VR
+        ds._is_little_endian = self.is_little_endian
+        ds._is_implicit_VR = self.is_implicit_VR
         ds.set_original_encoding(
             self._read_implicit_vr, self._read_little_endian, self.read_encoding
         )
@@ -1307,10 +1307,10 @@ class Dataset:
         # TODO: v4.0
         #   Remove check on read_implicit_vr and read_little_endian
         return (
-            self._is_implicit_VR is not None
-            and self._is_little_endian is not None
-            and self._read_implicit_vr == self._is_implicit_VR
-            and self._read_little_endian == self._is_little_endian
+            self.is_implicit_VR is not None
+            and self.is_little_endian is not None
+            and self._read_implicit_vr == self.is_implicit_VR
+            and self._read_little_endian == self.is_little_endian
             and self.read_encoding == self._character_set
         )
 
@@ -1915,7 +1915,7 @@ class Dataset:
             and self.file_meta.TransferSyntaxUID.is_compressed
         ):
             # Check that current file as read does match expected
-            if not self._is_little_endian or self._is_implicit_VR:
+            if not self.is_little_endian or self.is_implicit_VR:
                 msg = (
                     "Current dataset does not match expected ExplicitVR "
                     "LittleEndian transfer syntax from a compressed "
@@ -2204,29 +2204,18 @@ class Dataset:
         self,
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
         write_like_original: bool = True,
-        implicit_VR: bool | None = None,
-        little_endian: bool | None = True,
-        enforce_file_format: bool = False,
     ) -> None:
         """Write the :class:`Dataset` to `filename`.
 
-        Wrapper for :func:`~pydicom.filewriter.dcmwrite`.
-
-        Parameters
-        ----------
+        Wrapper for pydicom.filewriter.dcmwrite, passing this dataset to it.
+        See documentation for that function for details.
 
         See Also
         --------
         pydicom.filewriter.dcmwrite
-            Encode a dataset and write it to file.
+            Write a DICOM file from a :class:`Fileataset` instance.
         """
-        pydicom.dcmwrite(
-            filename,
-            self,
-            enforce_file_format=not write_like_original,
-            implicit_VR=implicit_VR,
-            little_endian=little_endian,
-        )
+        pydicom.dcmwrite(filename, self, write_like_original)
 
     def ensure_file_meta(self) -> None:
         """Create an empty ``Dataset.file_meta`` if none exists.
@@ -2234,9 +2223,7 @@ class Dataset:
         .. versionadded:: 1.2
         """
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
-        if not hasattr(self, "file_meta") or not isinstance(
-            self.file_meta, FileMetaDataset
-        ):
+        if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
 
     def fix_meta_info(self, enforce_standard: bool = True) -> None:
@@ -2259,11 +2246,11 @@ class Dataset:
         """
         self.ensure_file_meta()
 
-        if self._is_little_endian and self._is_implicit_VR:
+        if self.is_little_endian and self.is_implicit_VR:
             self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        elif not self._is_little_endian and not self._is_implicit_VR:
+        elif not self.is_little_endian and not self.is_implicit_VR:
             self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-        elif not self._is_little_endian and self._is_implicit_VR:
+        elif not self.is_little_endian and self.is_implicit_VR:
             raise NotImplementedError(
                 "Implicit VR Big Endian is not a " "supported Transfer Syntax."
             )
@@ -2882,8 +2869,8 @@ class FileDataset(Dataset):
             self,
             self.preamble,
             self.file_meta,
-            self._is_implicit_VR,
-            self._is_little_endian,
+            self.is_implicit_VR,
+            self.is_little_endian,
         )
         filename = self.filename
         if filename is not None and not isinstance(filename, str):
