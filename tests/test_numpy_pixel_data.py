@@ -26,7 +26,6 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
-from copy import deepcopy
 
 import pytest
 

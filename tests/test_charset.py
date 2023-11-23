@@ -4,7 +4,7 @@
 import pytest
 
 import pydicom.charset
-from pydicom import dcmread, config
+from pydicom import dcmread
 from pydicom.data import get_charset_files, get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO

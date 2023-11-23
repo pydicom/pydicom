@@ -33,7 +33,7 @@ if EXT_PYDICOM:
             pass
         os.remove(DATA_SRC / "test")
         IS_WRITEABLE = True
-    except Exception as exc:
+    except Exception:
         IS_WRITEABLE = False
 
 
@@ -125,7 +125,7 @@ class TestGetData:
         msg = (
             "'get_testdata_file' does not support absolute paths, "
             "as it only works with internal pydicom test data - "
-            rf"did you mean 'dcmread\(\"/foo/bar.dcm\"\)'?"
+            r"did you mean 'dcmread\(\"/foo/bar.dcm\"\)'?"
         )
         with pytest.raises(ValueError, match=msg):
             get_testdata_file("/foo/bar.dcm")

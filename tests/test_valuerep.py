@@ -8,8 +8,6 @@ from itertools import chain
 from io import BytesIO
 import pickle
 import math
-import sys
-from typing import Union
 
 import pytest
 

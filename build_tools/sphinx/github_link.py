@@ -47,7 +47,7 @@ def _linkcode_resolve(domain, info, package, url_fmt, revision):
 
     try:
         obj = attrgetter(info["fullname"])(module)
-    except AttributeError as exc:
+    except AttributeError:
         # For some reason DataElement.is_undefined_length causes an exception
         pass
 

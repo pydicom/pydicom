@@ -5,8 +5,6 @@ import copy
 import io
 import math
 import pickle
-import sys
-import weakref
 from platform import python_implementation
 
 import pytest
@@ -38,8 +36,6 @@ from pydicom.uid import (
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID,
-    ExplicitVRLittleEndian,
-    MediaStorageDirectoryStorage,
 )
 from pydicom.valuerep import DS, VR
 

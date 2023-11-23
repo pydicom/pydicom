@@ -25,8 +25,6 @@ There are the following possibilities:
 * OverlayColumns
 """
 
-from importlib import reload
-import typing
 
 import pytest
 

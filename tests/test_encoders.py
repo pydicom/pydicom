@@ -32,7 +32,6 @@ from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
     UID,
     RLELossless,
-    ExplicitVRLittleEndian,
     JPEG2000MC,
     JPEG2000Lossless,
 )
@@ -278,7 +277,7 @@ class TestEncoder_Encode:
         enc = RLELosslessEncoder
         msg = (
             r"'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
-            rf"not 'str'"
+            r"not 'str'"
         )
         with pytest.raises(TypeError, match=msg):
             enc.encode("abc")
@@ -288,7 +287,7 @@ class TestEncoder_Encode:
         enc = RLELosslessEncoder
         msg = (
             r"'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
-            rf"not 'str'"
+            r"not 'str'"
         )
         with pytest.raises(TypeError, match=msg):
             next(enc.iter_encode("abc"))

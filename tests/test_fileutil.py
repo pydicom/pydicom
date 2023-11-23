@@ -3,7 +3,6 @@
 from io import BytesIO
 from pathlib import Path
 
-import pytest
 
 from pydicom.fileutil import path_from_pathlike
 

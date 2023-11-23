@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from pydicom import config, dcmread
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filebase import DicomBytesIO
@@ -23,7 +23,7 @@ from pydicom.fileset import (
     _PREFIXES,
 )
 from pydicom.filewriter import write_dataset
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag
 from pydicom.uid import (
     ExplicitVRLittleEndian,
     generate_uid,
@@ -1118,7 +1118,7 @@ class TestFileSet:
 
         s = str(fs)
         assert "DICOM File-set" in s
-        assert f"Root directory: (no value available)" not in s
+        assert "Root directory: (no value available)" not in s
         assert "File-set ID: (no value available)" in s
         assert f"File-set UID: {fs.UID}" in s
         assert "Managed instances" not in s
