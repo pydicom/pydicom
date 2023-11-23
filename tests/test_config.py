@@ -35,7 +35,7 @@ class TestDebug:
         assert isinstance(self.logger.handlers[0], logging.NullHandler)
 
         with caplog.at_level(logging.DEBUG, logger="pydicom"):
-            ds = dcmread(DS_PATH)
+            dcmread(DS_PATH)
 
             assert "Call to dcmread()" not in caplog.text
             assert "Reading File Meta Information preamble..." in caplog.text
@@ -49,7 +49,7 @@ class TestDebug:
         assert isinstance(self.logger.handlers[0], logging.NullHandler)
 
         with caplog.at_level(logging.DEBUG, logger="pydicom"):
-            ds = dcmread(DS_PATH)
+            dcmread(DS_PATH)
 
             assert "Call to dcmread()" in caplog.text
             assert "Reading File Meta Information preamble..." in caplog.text
@@ -68,7 +68,7 @@ class TestDebug:
         assert isinstance(self.logger.handlers[0], logging.NullHandler)
 
         with caplog.at_level(logging.DEBUG, logger="pydicom"):
-            ds = dcmread(DS_PATH)
+            dcmread(DS_PATH)
 
             assert "Call to dcmread()" not in caplog.text
             assert "Reading File Meta Information preamble..." in caplog.text
@@ -83,7 +83,7 @@ class TestDebug:
         assert isinstance(self.logger.handlers[1], logging.StreamHandler)
 
         with caplog.at_level(logging.DEBUG, logger="pydicom"):
-            ds = dcmread(DS_PATH)
+            dcmread(DS_PATH)
 
             assert "Call to dcmread()" in caplog.text
             assert "Reading File Meta Information preamble..." in caplog.text
@@ -103,7 +103,7 @@ class TestDebug:
         assert isinstance(self.logger.handlers[1], logging.StreamHandler)
 
         with caplog.at_level(logging.DEBUG, logger="pydicom"):
-            ds = dcmread(DS_PATH)
+            dcmread(DS_PATH)
 
             assert "Call to dcmread()" not in caplog.text
             assert "Reading File Meta Information preamble..." in caplog.text

@@ -165,7 +165,6 @@ class TestRLELossless:
     def test_cycle_u32_3s_1f_raises(self):
         """Test that 32-bit, 3 sample/px data raises exception."""
         ds = dcmread(EXPL_32_3_1F)
-        ref = ds.pixel_array
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
 

@@ -181,7 +181,6 @@ def private(dicomdir):
 
     len_top = len(write_record(top))  # 112
     len_middle = len(write_record(middle))  # 112
-    len_bottom = len(write_record(bottom))  # 238
     len_last = len(write_record(ds.DirectoryRecordSequence[-1]))  # 248
 
     records = {}
@@ -715,7 +714,6 @@ class TestRecordNode:
     def test_encoding(self, private, tdir):
         """Test group element not added when encoding."""
         fs = FileSet(private)
-        node = fs._instances[0].node
         fs._instances[0].node._record.add_new(0x00080000, "UL", 128)
         fs._instances[0].node._record.PatientSex = "F"
         fs, ds, paths = copy_fs(fs, tdir.name)
@@ -1901,7 +1899,7 @@ class TestFileSet_Load:
             r"not a 'Media Storage Directory' instance"
         )
         with pytest.raises(ValueError, match=msg):
-            fs = FileSet(dicomdir)
+            FileSet(dicomdir)
 
     def test_bad_filename_raises(self, dicomdir):
         """Test loading with a bad path."""
@@ -2459,7 +2457,6 @@ class TestFileSet_Modify:
     def test_write_undefined_length(self, dicomdir_copy):
         """Test writing with undefined length items"""
         t, ds = dicomdir_copy
-        elem = ds["DirectoryRecordSequence"]
         ds["DirectoryRecordSequence"].is_undefined_length = True
         for item in ds.DirectoryRecordSequence:
             item.is_undefined_length_sequence_item = True

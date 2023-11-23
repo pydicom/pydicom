@@ -36,8 +36,8 @@ def test_waveform_array_raises():
 def test_simple():
     """Simple functionality test."""
     ds = dcmread(ECG)
-    arr = ds.waveform_array(index=0)
-    arr = ds.waveform_array(index=1)
+    ds.waveform_array(index=0)
+    ds.waveform_array(index=1)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")

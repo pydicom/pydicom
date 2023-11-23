@@ -302,7 +302,7 @@ class TestDataset:
 
     def test_setdefault_unknown_tag_strict(self, raise_on_writing_invalid_value):
         with pytest.raises(KeyError, match=r"\(8888,0004\)"):
-            elem = self.ds.setdefault(0x88880004, "foo")
+            self.ds.setdefault(0x88880004, "foo")
 
     def test_setdefault_tuple(self):
         elem = self.ds.setdefault((0x300A, 0x00B2), "foo")
@@ -322,7 +322,7 @@ class TestDataset:
 
     def test_setdefault_unknown_tuple_strict(self, raise_on_writing_invalid_value):
         with pytest.raises(KeyError, match=r"\(8888,0004\)"):
-            elem = self.ds.setdefault((0x8888, 0x0004), "foo")
+            self.ds.setdefault((0x8888, 0x0004), "foo")
 
     def test_setdefault_use_value(self, dont_raise_on_writing_invalid_value):
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
@@ -1137,7 +1137,7 @@ class TestDataset:
         ds.private_block(0x13, "GEMS_PATI_01", create=True)
         assert ["GEMS_PATI_01"] == ds.private_creators(0x13)
 
-    def test_add_known_private_tag(self):
+    def test_add_known_private_tag2(self):
         # regression test for #1082
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         assert "[Patient Status]" == ds[0x11, 0x1010].name

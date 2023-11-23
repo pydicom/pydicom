@@ -110,6 +110,7 @@ ignore = [
 ]
 line-length = 214
 target-version = "py310"
+include = ["src/*.py", "tests/*.py"]
 
 [tool.ruff.mccabe]
 max-complexity = 32
@@ -124,6 +125,7 @@ max-statements = 106
 "*/__init__.py" = ["F401"]
 "src/pydicom/config.py" = ["PLW0602"]
 "src/pydicom/sr/_concepts_dict.py" = ["F601"]
+"tests/*.py" = ["F401"]
 
 [tool.mypy]
 python_version = "3.10"

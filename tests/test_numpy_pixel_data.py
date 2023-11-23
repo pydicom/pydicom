@@ -578,7 +578,6 @@ class TestNumpy_NumpyHandler:
         ds = dcmread(EXPL_8_3_1F_ODD)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
 
             assert ds.pixel_array[0].tolist() == [
                 [166, 141, 52],
@@ -761,7 +760,7 @@ class TestNumpy_NumpyHandler:
         ds = dcmread(None)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
+            ds.pixel_array
 
     @pytest.mark.skip(reason="No suitable dataset available")
     def test_little_1bit_3sample_10frame(self):
@@ -770,7 +769,7 @@ class TestNumpy_NumpyHandler:
         ds = dcmread(None)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
+            ds.pixel_array
 
     def test_little_16bit_1sample_1frame(self):
         """Test pixel_array for little 16-bit, 1 sample/pixel, 1 frame."""

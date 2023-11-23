@@ -1472,7 +1472,6 @@ class TestNumpy_PaletteColor:
         assert 16 == ds.BitsStored
         assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
         arr = ds.pixel_array
-        orig = arr.copy()
         rgb = apply_color_lut(arr, ds)
         assert (480, 640, 3) == rgb.shape
         assert [10280, 11565, 16705] == list(rgb[0, 0, :])

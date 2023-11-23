@@ -905,7 +905,7 @@ class TestReader:
         bs = DicomBytesIO()
         ds.save_as(bs)
 
-        out = dcmread(bs, force=True)
+        dcmread(bs, force=True)
         assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
 
 

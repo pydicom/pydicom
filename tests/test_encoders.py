@@ -930,7 +930,7 @@ class TestEncoder_Process:
         ds = get_testdata_file("CT_small.dcm", read=True)
         enc = RLELosslessEncoder
         kwargs = enc.kwargs_from_ds(ds)
-        out = enc._process(ds.PixelData, plugin="pydicom", **kwargs)
+        enc._process(ds.PixelData, plugin="pydicom", **kwargs)
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
     def test_specify_invalid_plugin_raises(self):
@@ -1059,7 +1059,6 @@ class TestDatasetCompress:
     def test_round_trip(self):
         """Test an encoding round-trip"""
         ds = get_testdata_file("MR_small_RLE.dcm", read=True)
-        original = ds.PixelData
         arr = ds.pixel_array
         del ds.PixelData
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
