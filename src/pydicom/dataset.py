@@ -2213,7 +2213,7 @@ class Dataset:
         See Also
         --------
         pydicom.filewriter.dcmwrite
-            Write a DICOM file from a :class:`Fileataset` instance.
+            Write a DICOM file from a :class:`FileDataset` instance.
         """
         pydicom.dcmwrite(filename, self, write_like_original)
 
