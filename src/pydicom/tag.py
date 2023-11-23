@@ -260,3 +260,8 @@ ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D))
 
 # end of Sequence of undefined length
 SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))
+
+# (0028,0103) *Pixel Representation*
+TAG_PIXREP = BaseTag(0x00280103)
+# (0008,0005) *Specific Character Set*
+TAG_CHARSET = BaseTag(0x00080005)
