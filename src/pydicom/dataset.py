@@ -2307,9 +2307,10 @@ class Dataset:
 
             if needs_convert:
                 raise ValueError(
-                    "Please see the documentation for filewriter.dcmwrite() "
-                    "if you want to convert between little and big endian "
-                    "encoding"
+                    f"'{type(self).__name__}.save_as()' cannot be used to "
+                    "convert between little and big endian encoding. Please "
+                    "read the documentation for filewriter.dcmwrite() "
+                    "if this is what you really want to do"
                 )
 
         pydicom.dcmwrite(

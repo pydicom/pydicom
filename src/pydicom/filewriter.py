@@ -736,7 +736,8 @@ def write_dataset(
         fp.is_implicit_VR = dataset.is_implicit_VR
         fp.is_little_endian = dataset.is_little_endian
 
-    if not dataset.is_original_encoding:
+    # Need to check if the encoding of fp is different from dataset
+    if fp_encoding != ds_encoding or dataset.read_encoding != dataset._character_set:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = cast(
@@ -752,7 +753,7 @@ def write_dataset(
             continue
 
         with tag_in_exception(tag):
-            write_data_element(fp, dataset.get(tag), dataset_encoding)
+            write_data_element(fp, dataset.get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
 
@@ -933,7 +934,7 @@ def _determine_encoding(
 ) -> tuple[bool, bool]:
     """Return the encoding to use for `ds`.
 
-    If `force_encoding` isn't used, the priority is:
+    If `force_encoding` isn't used the priority is:
 
     1. The encoding corresponding to `transfer_syntax`
     2. The encoding set by `implicit_VR` and `little_endian`
@@ -976,8 +977,11 @@ def _determine_encoding(
 
         return [implicit_VR, little_endian]
 
-    use_implicit = implicit_VR if implicit_VR is not None else ds._is_implicit_VR
-    use_little = little_endian if little_endian is not None else ds._is_little_endian
+    use_implicit = implicit_VR
+    use_little = little_endian
+    if None in (implicit_VR, little_endian):
+        use_implicit = ds.is_implicit_VR
+        use_little = ds.is_little_endian
 
     if transfer_syntax is None:
         if None not in (use_implicit, use_little):
@@ -988,7 +992,6 @@ def _determine_encoding(
             "please set the file meta's Transfer Syntax UID or use the "
             "'implicit_VR' and 'little_endian' arguments"
         )
-
 
     # Must check UID.is_private before checking UID.is_transfer_syntax
     if transfer_syntax.is_private:
@@ -1003,7 +1006,10 @@ def _determine_encoding(
         return [use_implicit, use_little]
 
     if not transfer_syntax.is_transfer_syntax:
-        raise ValueError("The Transfer Syntax UID is not a valid transfer syntax")
+        raise ValueError(
+            f"The Transfer Syntax UID '{transfer_syntax.name}' is not a valid "
+            "transfer syntax"
+        )
 
     # Check that supplied args match transfer syntax
     if implicit_VR is not None and implicit_VR != transfer_syntax.is_implicit_VR:
@@ -1031,7 +1037,8 @@ def dcmwrite(
     force_encoding: bool = False,
     **kwargs,
 ) -> None:
-    """Write `dataset` to the `filename` specified.
+    """Write `dataset` to `filename`, which can be a path, a file-like or a
+    buffer.
 
     .. versionchanged:: 3.0
 
@@ -1245,7 +1252,7 @@ def dcmwrite(
         # Command Set elements are not allowed
         if dataset.group_dataset(0x0000):
             raise ValueError(
-                "Command Set elements are not allowed when writing using the "
+                "Command Set elements are not allowed when using the "
                 "DICOM File Format"
             )
 
@@ -1323,9 +1330,7 @@ def dcmwrite(
             fp.write(b"DICM")
 
         if file_meta:  # May be empty
-            write_file_meta_info(
-                fp, file_meta, enforce_standard=enforce_file_format
-            )
+            write_file_meta_info(fp, file_meta, enforce_standard=enforce_file_format)
 
         if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
@@ -1337,10 +1342,12 @@ def dcmwrite(
 
             # Compress the encoded data and write to file
             compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
-            deflated = b"".join((
-                compressor.compress(buffer.parent.getvalue()),
-                compressor.flush(),
-            ))
+            deflated = b"".join(
+                (
+                    compressor.compress(buffer.parent.getvalue()),
+                    compressor.flush(),
+                )
+            )
             fp.write(deflated)
             if len(deflated) % 2:
                 fp.write(b"\x00")

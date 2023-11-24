@@ -1840,6 +1840,25 @@ class TestDatasetSaveAs:
         ds.save_as(fp, implicit_VR=False)
         assert elem.is_undefined_length
 
+    def test_convert_big_little_endian_raises(self):
+        """Test conversion between big <-> little endian raises exception"""
+        msg = (
+            r"'Dataset.save_as\(\)' cannot be used to "
+            r"convert between little and big endian encoding. Please "
+            r"read the documentation for filewriter.dcmwrite\(\) "
+            r"if this is what you really want to do"
+        )
+        ds = Dataset()
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO(), implicit_VR=True, little_endian=False)
+
+        ds._is_little_endian = False
+        ds._is_implicit_VR = True
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO(), implicit_VR=True, little_endian=True)
+
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
