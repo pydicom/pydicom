@@ -76,6 +76,8 @@ Changes
 * :attr:`~pydicom.dataset.Dataset.read_little_endian` and
   :attr:`~pydicom.dataset.Dataset.read_implicit_vr` are deprecated and will be
    removed in v4.0
+* :class:`~pydicom.sequence.Sequence` is no longer a subclass of
+  :class:`~pydicom.multivalue.MultiValue`
 
 
 Enhancements
