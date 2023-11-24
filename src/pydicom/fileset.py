@@ -1066,7 +1066,7 @@ class FileSet:
         self._stage["+"][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
         instance._apply_stage("+")
-        ds.save_as(instance.path, write_like_original=False)
+        ds.save_as(instance.path, enforce_file_format=True)
 
         return cast(FileInstance, instance)
 
@@ -1193,7 +1193,7 @@ class FileSet:
         self._stage["+"][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
         instance._apply_stage("+")
-        ds.save_as(instance.path, write_like_original=False)
+        ds.save_as(instance.path, enforce_file_format=True)
 
         return cast(FileInstance, instance)
 

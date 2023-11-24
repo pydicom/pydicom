@@ -2236,37 +2236,39 @@ class Dataset:
         filename : str | PathLike | BinaryIO
             The path or file-like to write the encoded dataset to.
         write_like_original : bool, optional
-            If ``False`` (default) then write the dataset as-is, otherwise
+            If ``True`` (default) then write the dataset as-is, otherwise
             ensure that the dataset is written in the DICOM File Format or
-            raise an exception is that isn't possible.
+            raise an exception is that isn't possible. This parameter is
+            deprecated, please use `enforce_file_format` instead.
         implicit_VR : bool, optional
             Required if the dataset has no valid public *Transfer Syntax UID*
-            set in the file meta. If ``True`` then encode the dataset using
-            implicit VR, otherwise use explicit VR.
+            set in the file meta and
+            :attr:`~pydicom.dataset.Dataset.is_implicit_VR` is ``None``. If
+            ``True`` then encode using implicit VR, otherwise use explicit VR.
         little_endian, bool, optional
             Required if the dataset has no valid public *Transfer Syntax UID*
-            set in the file meta. If ``True`` (default) then use little endian
-            byte order when encoding the dataset, otherwise use big endian.
-            Big endian encoding was retired from the DICOM Standard in 2006
-            and is not recommended.
+            set in the file meta and
+            :attr:`~pydicom.dataset.Dataset.is_little_endian` is ``None``. If
+            ``True`` (default) then use little endian byte order when encoding,
+            otherwise use big endian (not recommended).
         enforce_file_format : bool, optional
             If ``True`` then ensure the dataset is written in the DICOM File
             Format or raise an exception if that isn't possible. If ``False``
             (default) then write the dataset as-is, preserving the following -
             which may result in a non-conformant file:
 
-            - Dataset.preamble: if the dataset has no preamble then none will
-              be written
-            - Dataset.file_meta: if the dataset is missing any required *File
-              Meta Information Group* elements then they will not be added or
-              written
+            - ``Dataset.preamble``: if the dataset has no preamble then none
+              will be written
+            ``- Dataset.file_meta``: if the dataset is missing any required
+              *File Meta Information Group* elements then they will not be
+              added or written
 
         See Also
         --------
         pydicom.filewriter.dcmwrite
-            Write a DICOM file from a :class:`FileDataset` instance.
+            Encode a :class:`Dataset` and write it to a file or buffer.
         """
-        # TODO: v4.0
+        # TODO: Remove in v4.0
         # Cover use of `write_like_original` as:
         #   kwarg: save_as(filename, write_like_original=bool)
         #   positional arg: save_as(filename, False)
@@ -2276,20 +2278,21 @@ class Dataset:
         if write_like_original is not None or __write_like_original is False:
             warnings.warn(
                 (
-                    "'write_like_original' is deprecated and will be removed "
-                    "in v4.0, please use 'enforce_file_format' instead"
+                    "'write_like_original' is deprecated and will be removed in "
+                    "v4.0, please use 'enforce_file_format="
+                    f"{not write_like_original}' instead"
                 ),
                 DeprecationWarning,
             )
             enforce_file_format = not write_like_original
 
-        # Make sure no extraneous kwargs
-        keys = list(kwargs.keys())
-        print(keys)
-        if keys and keys != ["write_like_original"]:
-            if "write_like_original" in keys:
-                keys.remove("write_like_original")
-            raise TypeError(f"Invalid keyword argument(s): '{', '.join(keys)}'")
+        # Make sure kwargs only contains `write_like_original`
+        keys = [x for x in kwargs.keys() if x != "write_like_original"]
+        if keys:
+            raise TypeError(
+                f"Invalid keyword argument(s) for {type(self).__name__}.save_as(): "
+                f"{', '.join(keys)}"
+            )
 
         # Disallow conversion between little and big endian encoding
         if self.is_little_endian is not None:
@@ -2297,15 +2300,16 @@ class Dataset:
             syntax = file_meta.get("TransferSyntaxUID", None)
 
             needs_convert = False
-            if syntax and not syntax.is_private:
+            if syntax and not syntax.is_private and syntax.is_transfer_syntax:
                 needs_convert = self.is_little_endian != syntax.is_little_endian
             else:
                 needs_convert = self.is_little_endian != little_endian
 
             if needs_convert:
                 raise ValueError(
-                    "You must use dcmwrite() if you want to convert between "
-                    "little and big endian encoding"
+                    "Please see the documentation for filewriter.dcmwrite() "
+                    "if you want to convert between little and big endian "
+                    "encoding"
                 )
 
         pydicom.dcmwrite(
@@ -2351,7 +2355,7 @@ class Dataset:
             self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
         elif not self.is_little_endian and self.is_implicit_VR:
             raise NotImplementedError(
-                "Implicit VR Big Endian is not a " "supported Transfer Syntax."
+                "Implicit VR Big Endian is not a supported Transfer Syntax"
             )
 
         if "SOPClassUID" in self:
@@ -3086,7 +3090,7 @@ def validate_file_meta(
             )
 
         invalid = []
-        for tag in [0x00020002, 0x00020003, 0x00020010]:
+        for tag in (0x00020002, 0x00020003, 0x00020010):
             if tag not in file_meta or file_meta[tag].is_empty:
                 invalid.append(f"{Tag(tag)} {dictionary_description(tag)}")
 

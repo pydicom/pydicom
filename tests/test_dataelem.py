@@ -449,7 +449,9 @@ class TestDataElement:
             assert 0 == elem.VM
             assert elem.value == value
             fp = DicomBytesIO()
-            filewriter.write_dataset(fp, ds, implicit_VR=True, little_endian=True)
+            fp.is_implicit_VR = True
+            fp.is_little_endian = True
+            filewriter.write_dataset(fp, ds)
             ds_read = dcmread(fp, force=True)
             assert empty_value == ds_read[tag_name].value
 
@@ -499,7 +501,9 @@ class TestDataElement:
             assert 0 == elem.VM
             assert elem.value == value
             fp = DicomBytesIO()
-            filewriter.write_dataset(fp, ds, implicit_VR=True, little_endian=True)
+            fp.is_implicit_VR = True
+            fp.is_little_endian = True
+            filewriter.write_dataset(fp, ds)
             ds_read = dcmread(fp, force=True)
             assert ds_read[tag_name].value is None
 
@@ -545,7 +549,9 @@ class TestDataElement:
         assert elem.value == []
 
         fp = DicomBytesIO()
-        filewriter.write_dataset(fp, ds, implicit_VR=True, little_endian=True)
+        fp.is_implicit_VR = True
+        fp.is_little_endian = True
+        filewriter.write_dataset(fp, ds)
         ds_read = dcmread(fp, force=True)
         elem = ds_read["AcquisitionContextSequence"]
         assert elem.value == []

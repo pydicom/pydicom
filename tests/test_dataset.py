@@ -1588,17 +1588,16 @@ class TestDatasetSaveAs:
         ds.PatientName = "CITIZEN"
 
         # Requires implicit_VR
-        msg = "'implicit_VR' and 'little_endian' are required"
-        with pytest.raises(AttributeError, match=msg):
+        msg = (
+            "Unable to determine the encoding to use for writing the dataset, "
+            "please set the file meta's Transfer Syntax UID or use the "
+            "'implicit_VR' and 'little_endian' arguments"
+        )
+        with pytest.raises(ValueError, match=msg):
             ds.save_as(DicomBytesIO())
 
         # OK
         ds.save_as(DicomBytesIO(), implicit_VR=True)
-
-        # Also OK
-        ds._is_implicit_VR = True
-        ds._is_little_endian = True
-        ds.save_as(DicomBytesIO())
 
     def test_mismatch(self):
         """Test mismatch between transfer syntax and args."""
@@ -1634,7 +1633,6 @@ class TestDatasetSaveAs:
         # Explicit -> implicit
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         fp = DicomBytesIO()
-        # with pytest.warns(DeprecationWarning, match=msg):
         ds.save_as(fp)
         fp.seek(0)
         ds = dcmread(fp)
@@ -1645,12 +1643,11 @@ class TestDatasetSaveAs:
         fp = DicomBytesIO()
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds._is_implicit_VR = True
-        # with pytest.warns(DeprecationWarning, match=msg):
         ds.save_as(fp)
         fp.seek(0)
-        # ds = dcmread(fp)
-        # assert not ds.is_implicit_VR
-        # assert ds.is_little_endian
+        ds = dcmread(fp)
+        assert not ds.is_implicit_VR
+        assert ds.is_little_endian
 
     def test_priority_args(self):
         """Test prefer args over dataset attributes."""
@@ -1677,25 +1674,33 @@ class TestDatasetSaveAs:
         assert ds.is_little_endian
 
     def test_write_like_original(self):
-        pass
-        # Warns on write_like_original
+        ds = Dataset()
+        ds.SOPClassUID = "1.2.3"
+        ds.SOPInstanceUID = "1.2.3.4"
+        msg = (
+            "'write_like_original' is deprecated and will be removed in v4.0, "
+            "please use 'enforce_file_format="
+        )
 
-        # Unless transfer syntax is set
+        # Test kwarg - not enforce_file_format
+        with pytest.warns(DeprecationWarning, match=msg):
+            ds.save_as(DicomBytesIO(), write_like_original=True, implicit_VR=True)
+
+        # Test default - not enforce_file_format
+        ds.save_as(DicomBytesIO(), implicit_VR=True)
+
+        # Test positional arg - not enforce_file_format
+        ds.save_as(DicomBytesIO(), True, implicit_VR=True)
+
+        # Test positional arg - enforce_file_format
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID
-        ds._is_implicit_VR
-        with pytest.raises(AttributeError, match=msg):
-            ds.save_as(self.fp, implicit_VR=True, enforce_file_format=True)
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        with pytest.warns(DeprecationWarning, match=msg):
+            ds.save_as(DicomBytesIO(), False, implicit_VR=True)
 
-        with pytest.raises(AttributeError, match=msg):
-            ds.save_as(self.fp, little_endian=True, enforce_file_format=True)
-
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.MediaStorageSOPClassUID = "1.1"
-        ds.file_meta.MediaStorageSOPInstanceUID = "1.2"
-        ds.file_meta.TransferSyntaxUID = "1.3"
-        ds.file_meta.ImplementationClassUID = "1.4"
-        ds.save_as(self.fp, enforce_file_format=True, implicit_VR=True)
+        # Test kwarg - enforce_file_format
+        with pytest.warns(DeprecationWarning, match=msg):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
 
     def test_save_as_compressed_no_encaps(self):
         """Test saving a compressed dataset with no encapsulation."""
@@ -1710,7 +1715,7 @@ class TestDatasetSaveAs:
             r"that it's compressed, but the data isn't encapsulated"
         )
         with pytest.raises(ValueError, match=msg):
-            ds.save_as(fp, implicit_VR=False)
+            ds.save_as(fp)
 
     def test_save_as_compressed_encaps(self):
         """Test saving a compressed dataset with encapsulation."""
@@ -1720,7 +1725,7 @@ class TestDatasetSaveAs:
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
         ds["PixelData"].VR = "OB"
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp)
 
     def test_save_as_no_pixel_data(self):
         """Test saving with no Pixel Data."""
@@ -1728,7 +1733,7 @@ class TestDatasetSaveAs:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp)
 
     def test_save_as_no_file_meta(self):
         """Test saving with no Transfer Syntax or file_meta."""
@@ -1746,30 +1751,33 @@ class TestDatasetSaveAs:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = "1.2.3.4.5.6"
+
+        msg = (
+            "Unable to determine the encoding to use for writing the "
+            "dataset, please use the 'implicit_VR' and 'little_endian' "
+            "arguments"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
         ds.save_as(fp, implicit_VR=False)
 
     def test_save_as_set_little_implicit_with_tsyntax(self):
         """Test setting is_implicit_VR and is_little_endian from tsyntax"""
-        fp = DicomBytesIO()
         ds = Dataset()
         ds.PatientName = "CITIZEN"
-        # Raise if is_implicit_VR or is_little_endian missing with no tsyntax
         msg = (
-            r"'Dataset.is_little_endian' and 'Dataset.is_implicit_VR' must be "
-            r"set appropriately before saving"
+            "Unable to determine the encoding to use for writing the dataset, "
+            "please set the file meta's Transfer Syntax UID or use the "
+            "'implicit_VR' and 'little_endian' arguments"
         )
-        with pytest.raises(AttributeError, match=msg):
-            ds.save_as(fp)
-
-        # Test private transfer syntax raises
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = "1.2"
-        with pytest.raises(AttributeError, match=msg):
-            ds.save_as(fp)
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
 
         # Test public transfer syntax OK
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.1"
-        ds.save_as(fp)
+        ds.save_as(DicomBytesIO())
 
     def test_save_as_undefined(self):
         """Test setting is_undefined_length correctly."""
@@ -1809,11 +1817,11 @@ class TestDatasetSaveAs:
         elem.VR = "OB"
         # Unchanged - False
         assert not elem.is_undefined_length
-        ds.save_as(fp)
+        ds.save_as(fp, implicit_VR=True)
         assert not elem.is_undefined_length
         # Unchanged - True
         elem.is_undefined_length = True
-        ds.save_as(fp)
+        ds.save_as(fp, implicit_VR=True)
         assert elem.is_undefined_length
 
     def test_save_as_undefined_no_tsyntax(self):

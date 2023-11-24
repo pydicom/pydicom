@@ -1739,7 +1739,8 @@ class TestFileSet:
         ds.InstanceNumber = "1"
         ds.StudyInstanceUID = instance.StudyInstanceUID
         ds.SeriesInstanceUID = instance.SeriesInstanceUID
-        fs.add(ds)
+        with pytest.warns(UserWarning, match="Invalid value for VR UI"):
+            fs.add(ds)
 
         ds = dcmread(get_testdata_file("rtplan.dcm"))
         ds.PatientID = "12345678"
