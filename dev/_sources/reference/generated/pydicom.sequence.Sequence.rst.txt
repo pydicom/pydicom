@@ -23,7 +23,6 @@
       ~Sequence.pop
       ~Sequence.remove
       ~Sequence.reverse
-      ~Sequence.sort
    
    
 
