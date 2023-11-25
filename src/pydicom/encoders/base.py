@@ -685,7 +685,7 @@ class Encoder:
         all_plugins = list(self._unavailable.keys()) + list(self._available.keys())
         if plugin and plugin not in all_plugins:
             raise ValueError(
-                f"No plugin named '{plugin}' has been added to the " f"'{self.name}'"
+                f"No plugin named '{plugin}' has been added to the '{self.name}'"
             )
 
         if plugin and plugin in self._unavailable:

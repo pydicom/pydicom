@@ -126,7 +126,7 @@ def convert_ATvalue(
     # length > 4
     if length % 4 != 0:
         logger.warning(
-            "Expected length to be multiple of 4 for VR 'AT', " f"got length {length}"
+            f"Expected length to be multiple of 4 for VR 'AT', got length {length}"
         )
         length -= length % 4
     return MultiValue(
@@ -529,9 +529,7 @@ def convert_text(
     as_strings = [handle_value(value) for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
-    return MultiValue(
-        str, as_strings, validation_mode=config.settings.reading_validation_mode
-    )
+    return MultiValue(str, as_strings)
 
 
 def convert_single_string(

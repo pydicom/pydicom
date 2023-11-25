@@ -1125,7 +1125,7 @@ def read_deferred_data_element(
         fp.close()
     if elem.VR != raw_data_elem.VR:
         raise ValueError(
-            f"Deferred read VR {elem.VR} does not match original " f"{raw_data_elem.VR}"
+            f"Deferred read VR {elem.VR} does not match original {raw_data_elem.VR}"
         )
 
     if elem.tag != raw_data_elem.tag:

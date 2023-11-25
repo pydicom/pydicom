@@ -946,7 +946,7 @@ def format_number_as_ds(val: float | Decimal) -> str:
         raise TypeError("'val' must be of type float or decimal.Decimal")
     if not isfinite(val):
         raise ValueError(
-            "Cannot encode non-finite floats as DICOM decimal strings. " f"Got '{val}'"
+            f"Cannot encode non-finite floats as DICOM decimal strings. Got '{val}'"
         )
 
     valstr = str(val)
@@ -1302,7 +1302,10 @@ class ISfloat(float):
         cls: type["ISfloat"],
         val: str | float | Decimal,
         validation_mode: int | None = None,
-    ) -> float:
+    ) -> float | str:
+        if isinstance(val, str) and val.strip() == "":
+            return ""
+
         return super().__new__(cls, val)
 
     def __init__(
@@ -1359,6 +1362,7 @@ class IS(int):
             newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
+        print(newval, newval < 2**31, validation_mode == config.RAISE)
         if not -(2**31) <= newval < 2**31 and validation_mode == config.RAISE:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
@@ -1408,7 +1412,6 @@ _T = TypeVar("_T")
 def MultiString(
     val: str,
     valtype: Callable[[str], _T] | None = None,
-    validation_mode: int | None = None,
 ) -> _T | MutableSequence[_T]:
     """Split a string by delimiters if there are any
 
@@ -1419,29 +1422,20 @@ def MultiString(
     valtype : type or callable, optional
         Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
         overwrite to a specific type.
-    validation_mode : int
-        Defines if values are validated and how validation errors are
-        handled.
 
     Returns
     -------
-    valtype or MultiValue of valtype
-        The split value as `valtype` or a :class:`list` of `valtype`.
+    valtype or MultiValue[valtype]
+        The split value as `valtype` or a :class:`~pydicom.multival.MultiValue`
+        of `valtype`.
     """
     if valtype is None:
         valtype = cast(Callable[[str], _T], str)
 
-    # Remove trailing blank used to pad to even length
-    # 2005.05.25: also check for trailing 0, error made
-    # in PET files we are converting
-    while val and val.endswith((" ", "\x00")):
-        val = val[:-1]
+    # Remove trailing padding and null bytes
+    items = val.rstrip(" \x00").split("\\")
 
-    splitup: list[str] = val.split("\\")
-    if len(splitup) == 1:
-        return valtype(splitup[0])
-
-    return MultiValue(valtype, splitup, validation_mode)
+    return valtype(items[0]) if len(items) == 1 else MultiValue(valtype, items)
 
 
 def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] | None:
