@@ -538,7 +538,6 @@ class DataElement:
             val = val.decode()
 
         if self.VR == VR_.IS:
-            print(val, self.validation_mode)
             return pydicom.valuerep.IS(val, self.validation_mode)
 
         if self.VR == VR_.DA and config.datetime_conversion:

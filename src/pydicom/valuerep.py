@@ -1362,7 +1362,6 @@ class IS(int):
             newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        print(newval, newval < 2**31, validation_mode == config.RAISE)
         if not -(2**31) <= newval < 2**31 and validation_mode == config.RAISE:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
