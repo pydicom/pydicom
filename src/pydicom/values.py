@@ -6,8 +6,8 @@
 import re
 from io import BytesIO
 from struct import unpack, calcsize
-from typing import Union, cast, Any
-from collections.abc import MutableSequence
+from typing import Union, cast, Any, TypeVar
+from collections.abc import MutableSequence, Callable
 
 # don't import datetime_conversion directly
 from pydicom import config
@@ -22,7 +22,6 @@ from pydicom.tag import Tag, TupleTag, BaseTag
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    MultiString,
     DA,
     DT,
     TM,
@@ -38,6 +37,37 @@ if have_numpy:
 
 
 from pydicom.valuerep import PersonName
+
+
+_T = TypeVar("_T")
+
+
+def MultiString(
+    val: str, valtype: Callable[[str], _T] | None = None
+) -> _T | MutableSequence[_T]:
+    """Split a string by delimiters if there are any
+
+    Parameters
+    ----------
+    val : str
+        The string to split up.
+    valtype : type or callable, optional
+        Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
+        overwrite to a specific type.
+
+    Returns
+    -------
+    valtype or MultiValue[valtype]
+        The split value as `valtype` or a :class:`~pydicom.multival.MultiValue`
+        of `valtype`.
+    """
+    if valtype is None:
+        valtype = cast(Callable[[str], _T], str)
+
+    # Remove trailing padding and null bytes
+    items = val.rstrip(" \x00").split("\\")
+
+    return valtype(items[0]) if len(items) == 1 else MultiValue(valtype, items)
 
 
 def convert_tag(byte_string: bytes, is_little_endian: bool, offset: int = 0) -> BaseTag:

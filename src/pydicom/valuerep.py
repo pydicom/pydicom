@@ -6,13 +6,12 @@ from decimal import Decimal
 from enum import Enum, unique
 import re
 from math import floor, isfinite, log10
-from typing import TypeVar, Optional, Any, cast
-from collections.abc import Callable, MutableSequence, Sequence, Iterator
+from typing import Optional, Any, cast
+from collections.abc import Callable, Sequence, Iterator
 import warnings
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.multival import MultiValue
 
 
 # can't import from charset or get circular import
@@ -1035,6 +1034,8 @@ class DSfloat(float):
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
 
+        self.original_string: str
+
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
         has_attribute = hasattr(val, "original_string")
@@ -1167,6 +1168,8 @@ class DSdecimal(Decimal):
         """
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
+
+        self.original_string: str
 
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
@@ -1403,38 +1406,6 @@ class IS(int):
 
     def __repr__(self) -> str:
         return f"'{super().__repr__()}'"
-
-
-_T = TypeVar("_T")
-
-
-def MultiString(
-    val: str,
-    valtype: Callable[[str], _T] | None = None,
-) -> _T | MutableSequence[_T]:
-    """Split a string by delimiters if there are any
-
-    Parameters
-    ----------
-    val : str
-        The string to split up.
-    valtype : type or callable, optional
-        Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
-        overwrite to a specific type.
-
-    Returns
-    -------
-    valtype or MultiValue[valtype]
-        The split value as `valtype` or a :class:`~pydicom.multival.MultiValue`
-        of `valtype`.
-    """
-    if valtype is None:
-        valtype = cast(Callable[[str], _T], str)
-
-    # Remove trailing padding and null bytes
-    items = val.rstrip(" \x00").split("\\")
-
-    return valtype(items[0]) if len(items) == 1 else MultiValue(valtype, items)
 
 
 def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] | None:

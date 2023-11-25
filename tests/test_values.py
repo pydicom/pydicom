@@ -5,6 +5,7 @@ import logging
 import pytest
 
 from pydicom.tag import Tag
+from pydicom.uid import UID
 from pydicom.values import (
     convert_value,
     converters,
@@ -15,6 +16,7 @@ from pydicom.values import (
     convert_single_string,
     convert_AE_string,
     convert_PN,
+    MultiString,
 )
 from pydicom.valuerep import VR
 
@@ -280,3 +282,23 @@ class TestConvertPN:
 def test_all_converters():
     """Test that the VR decoder functions are complete"""
     assert set(VR) == set(converters)
+
+
+def test_multistring():
+    """Tests for MultiString"""
+    # Test stripping trailing nulls and spaces
+    value = MultiString("abjoaisj\\afsdfa\\aasdf \x00  \x00\x00   ")
+    assert value == ["abjoaisj", "afsdfa", "aasdf"]
+    value = MultiString("abjoaisj\\afsdfa\\\x00 \x00  \x00\x00   ")
+    assert value == ["abjoaisj", "afsdfa", ""]
+    value = MultiString("  \x00abjoaisj \\ afsdfa\\\x00 \x00  \x00\x00   ")
+    assert value == ["  \x00abjoaisj ", " afsdfa", ""]
+    # Test default constructor
+    assert isinstance(value[0], str)
+    # Test supplied constructor
+    value = MultiString("1.2.3.4\\5.6.7.8", UID)
+    assert value == ["1.2.3.4", "5.6.7.8"]
+    assert all(isinstance(x, UID) for x in value)
+    # Test single item
+    value = MultiString("aasdf \x00  \x00\x00   ")
+    assert value == "aasdf"
