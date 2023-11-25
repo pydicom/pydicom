@@ -71,6 +71,8 @@ Changes
 * :attr:`~pydicom.dataelem.DataElement.VM` always returns ``1`` for **SQ**
   elements (:issue:`1481`)
 * DICOM dictionary updated to 2023d
+* :class:`~pydicom.sequence.Sequence` is no longer a subclass of
+  :class:`~pydicom.multivalue.MultiValue`
 
 
 Enhancements
