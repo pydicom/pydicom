@@ -181,7 +181,7 @@ def private(dicomdir):
 
     len_top = len(write_record(top))  # 112
     len_middle = len(write_record(middle))  # 112
-    len(write_record(bottom))  # 112
+    len(write_record(bottom))  # 238
     len_last = len(write_record(ds.DirectoryRecordSequence[-1]))  # 248
 
     records = {}
