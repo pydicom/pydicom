@@ -99,7 +99,7 @@ class _CID_Dict:
                 # See CID 12300 for example
                 codes = ", ".join([f"'{v[0]}'" for v in _matches])
                 raise AttributeError(
-                    f"'{name}' has multiple code matches in CID {self.cid}: " f"{codes}"
+                    f"'{name}' has multiple code matches in CID {self.cid}: {codes}"
                 )
 
             code, val = _matches[0]

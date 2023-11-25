@@ -72,7 +72,12 @@ Changes
   elements (:issue:`1481`)
 * DICOM dictionary updated to 2023d
 * :class:`~pydicom.sequence.Sequence` is no longer a subclass of
-  :class:`~pydicom.multivalue.MultiValue`
+  :class:`~pydicom.multivalue.MultiValue` (:issue:`1395`)
+* :class:`~pydicom.multivalue.MultiValue` no longer accepts a ``validation_mode``
+  optional argument
+* ``valuerep.MultiString`` has been moved and renamed to
+  :func:`values.multi_string <pydicom.values.multi_string` and no longer accepts
+  a ``validation_mode`` optional argument
 
 
 Enhancements

@@ -6,13 +6,12 @@ from decimal import Decimal
 from enum import Enum, unique
 import re
 from math import floor, isfinite, log10
-from typing import TypeVar, Optional, Any, cast
-from collections.abc import Callable, MutableSequence, Sequence, Iterator
+from typing import Optional, Any, cast
+from collections.abc import Callable, Sequence, Iterator
 import warnings
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.multival import MultiValue
 
 
 # can't import from charset or get circular import
@@ -946,7 +945,7 @@ def format_number_as_ds(val: float | Decimal) -> str:
         raise TypeError("'val' must be of type float or decimal.Decimal")
     if not isfinite(val):
         raise ValueError(
-            "Cannot encode non-finite floats as DICOM decimal strings. " f"Got '{val}'"
+            f"Cannot encode non-finite floats as DICOM decimal strings. Got '{val}'"
         )
 
     valstr = str(val)
@@ -1034,6 +1033,8 @@ class DSfloat(float):
         """
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
+
+        self.original_string: str
 
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
@@ -1167,6 +1168,8 @@ class DSdecimal(Decimal):
         """
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
+
+        self.original_string: str
 
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
@@ -1302,7 +1305,10 @@ class ISfloat(float):
         cls: type["ISfloat"],
         val: str | float | Decimal,
         validation_mode: int | None = None,
-    ) -> float:
+    ) -> float | str:
+        if isinstance(val, str) and val.strip() == "":
+            return ""
+
         return super().__new__(cls, val)
 
     def __init__(
@@ -1400,48 +1406,6 @@ class IS(int):
 
     def __repr__(self) -> str:
         return f"'{super().__repr__()}'"
-
-
-_T = TypeVar("_T")
-
-
-def MultiString(
-    val: str,
-    valtype: Callable[[str], _T] | None = None,
-    validation_mode: int | None = None,
-) -> _T | MutableSequence[_T]:
-    """Split a string by delimiters if there are any
-
-    Parameters
-    ----------
-    val : str
-        The string to split up.
-    valtype : type or callable, optional
-        Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
-        overwrite to a specific type.
-    validation_mode : int
-        Defines if values are validated and how validation errors are
-        handled.
-
-    Returns
-    -------
-    valtype or MultiValue of valtype
-        The split value as `valtype` or a :class:`list` of `valtype`.
-    """
-    if valtype is None:
-        valtype = cast(Callable[[str], _T], str)
-
-    # Remove trailing blank used to pad to even length
-    # 2005.05.25: also check for trailing 0, error made
-    # in PET files we are converting
-    while val and val.endswith((" ", "\x00")):
-        val = val[:-1]
-
-    splitup: list[str] = val.split("\\")
-    if len(splitup) == 1:
-        return valtype(splitup[0])
-
-    return MultiValue(valtype, splitup, validation_mode)
 
 
 def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] | None:

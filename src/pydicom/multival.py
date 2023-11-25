@@ -6,8 +6,6 @@ or any list of items that must all be the same type.
 from typing import overload, Any, cast, TypeVar
 from collections.abc import Iterable, Callable, MutableSequence, Iterator
 
-from pydicom import config
-
 
 T = TypeVar("T")
 Self = TypeVar("Self", bound="ConstrainedList")
@@ -126,7 +124,6 @@ class MultiValue(ConstrainedList):
         self,
         type_constructor: Callable[[Any], T],
         iterable: Iterable[Any],
-        validation_mode: int | None = None,
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
         item in the :class:`MultiValue` has the same type.
@@ -145,24 +142,10 @@ class MultiValue(ConstrainedList):
             the :class:`MultiValue`.
         """
         self._constructor = type_constructor
-        self._valmode = config.settings.reading_validation_mode
-        if validation_mode is not None:
-            self._valmode = validation_mode
 
         super().__init__(iterable)
 
-    def _validate(self, item: Any) -> T:  # type: ignore[type-var]
-        from pydicom.valuerep import DSfloat, DSdecimal, IS
-
-        if self._constructor in (DSfloat, DSdecimal, IS):
-            if item == "":
-                return cast(T, item)
-
-            return self._constructor(  # type: ignore[call-arg]
-                item,
-                validation_mode=self._valmode,
-            )
-
+    def _validate(self, item: Any | T) -> T:
         return self._constructor(item)
 
     def sort(self, *args: Any, **kwargs: Any) -> None:

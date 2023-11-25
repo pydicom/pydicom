@@ -174,7 +174,7 @@ def fetch_data_files() -> None:
 
     if error:
         raise RuntimeError(
-            "An error occurred downloading the following files: " f"{', '.join(error)}"
+            f"An error occurred downloading the following files: {', '.join(error)}"
         )
 
 

@@ -1579,7 +1579,7 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
+                pkg_msg.append(f"{hh.HANDLER_NAME} (req. {', '.join(names)})")
 
             raise RuntimeError(msg + ", ".join(pkg_msg))
 
@@ -1889,7 +1889,7 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
+                pkg_msg.append(f"{hh.HANDLER_NAME} (req. {', '.join(names)})")
 
             raise RuntimeError(msg + ", ".join(pkg_msg))
 
@@ -2274,7 +2274,7 @@ class Dataset:
 
         if key != elem_tag:
             raise ValueError(
-                f"The key '{key}' doesn't match the 'DataElement' tag " f"'{elem_tag}'"
+                f"The key '{key}' doesn't match the 'DataElement' tag '{elem_tag}'"
             )
 
         if elem_tag.is_private:
