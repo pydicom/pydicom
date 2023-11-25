@@ -42,7 +42,7 @@ from pydicom.valuerep import PersonName
 _T = TypeVar("_T")
 
 
-def MultiString(
+def multi_string(
     val: str, valtype: Callable[[str], _T] | None = None
 ) -> _T | MutableSequence[_T]:
     """Split a string by delimiters if there are any
@@ -272,7 +272,7 @@ def convert_DS_string(
 
         return value
 
-    return MultiString(num_string.strip(), valtype=pydicom.valuerep.DSclass)
+    return multi_string(num_string.strip(), valtype=pydicom.valuerep.DSclass)
 
 
 def _DT_from_str(value: str) -> DT:
@@ -372,7 +372,7 @@ def convert_IS_string(
 
         return cast("numpy.ndarray", value)
 
-    return MultiString(num_string, valtype=pydicom.valuerep.IS)
+    return multi_string(num_string, valtype=pydicom.valuerep.IS)
 
 
 def convert_numbers(
@@ -523,7 +523,7 @@ def convert_string(
     str or MultiValue of str
         The decoded value(s).
     """
-    return MultiString(byte_string.decode(default_encoding))
+    return multi_string(byte_string.decode(default_encoding))
 
 
 def convert_text(
@@ -690,7 +690,7 @@ def convert_UI(
     """
     # Convert to str and remove any trailing nulls or spaces
     value = byte_string.decode(default_encoding)
-    return MultiString(value.rstrip("\0 "), pydicom.uid.UID)
+    return multi_string(value.rstrip("\0 "), pydicom.uid.UID)
 
 
 def convert_UN(

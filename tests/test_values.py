@@ -16,7 +16,7 @@ from pydicom.values import (
     convert_single_string,
     convert_AE_string,
     convert_PN,
-    MultiString,
+    multi_string,
 )
 from pydicom.valuerep import VR
 
@@ -285,20 +285,20 @@ def test_all_converters():
 
 
 def test_multistring():
-    """Tests for MultiString"""
+    """Tests for multi_string"""
     # Test stripping trailing nulls and spaces
-    value = MultiString("abjoaisj\\afsdfa\\aasdf \x00  \x00\x00   ")
+    value = multi_string("abjoaisj\\afsdfa\\aasdf \x00  \x00\x00   ")
     assert value == ["abjoaisj", "afsdfa", "aasdf"]
-    value = MultiString("abjoaisj\\afsdfa\\\x00 \x00  \x00\x00   ")
+    value = multi_string("abjoaisj\\afsdfa\\\x00 \x00  \x00\x00   ")
     assert value == ["abjoaisj", "afsdfa", ""]
-    value = MultiString("  \x00abjoaisj \\ afsdfa\\\x00 \x00  \x00\x00   ")
+    value = multi_string("  \x00abjoaisj \\ afsdfa\\\x00 \x00  \x00\x00   ")
     assert value == ["  \x00abjoaisj ", " afsdfa", ""]
     # Test default constructor
     assert isinstance(value[0], str)
     # Test supplied constructor
-    value = MultiString("1.2.3.4\\5.6.7.8", UID)
+    value = multi_string("1.2.3.4\\5.6.7.8", UID)
     assert value == ["1.2.3.4", "5.6.7.8"]
     assert all(isinstance(x, UID) for x in value)
     # Test single item
-    value = MultiString("aasdf \x00  \x00\x00   ")
+    value = multi_string("aasdf \x00  \x00\x00   ")
     assert value == "aasdf"
