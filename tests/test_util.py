@@ -2,7 +2,8 @@
 """Test suite for util functions"""
 import copy
 from contextlib import contextmanager
-from pathlib import Path
+from io import BytesIO
+import os
 
 import pytest
 
@@ -28,7 +29,13 @@ from pydicom.util.codify import (
     code_dataset,
     main as codify_main,
 )
-from pydicom.util.dump import *
+from pydicom.util.dump import (
+    print_character,
+    filedump,
+    datadump,
+    hexdump,
+    pretty_print,
+)
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.util.leanread import dicomfile
 

@@ -25,8 +25,6 @@ There are the following possibilities:
 * OverlayColumns
 """
 
-from importlib import reload
-import typing
 
 import pytest
 
@@ -171,7 +169,7 @@ class TestNumpy_NumpyHandler:
     def test_little_1bit_1sample_3frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
         ds = dcmread(EXPL_1_1_3F)
-        arr = ds.overlay_array(0x6000)
+        ds.overlay_array(0x6000)
 
     def test_read_only(self):
         """Test for #717, returned array read-only."""

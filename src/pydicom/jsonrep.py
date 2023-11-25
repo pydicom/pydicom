@@ -3,7 +3,7 @@
 
 import base64
 from inspect import signature
-from typing import Optional, TypeAlias, Union, Any, cast, TYPE_CHECKING
+from typing import TypeAlias, Any, cast, TYPE_CHECKING
 from collections.abc import Callable
 import warnings
 

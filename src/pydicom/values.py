@@ -33,12 +33,9 @@ from pydicom.valuerep import (
     validate_value,
 )
 
-try:
+if have_numpy:
     import numpy
 
-    have_numpy = True
-except ImportError:
-    have_numpy = False
 
 from pydicom.valuerep import PersonName
 

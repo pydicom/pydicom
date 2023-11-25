@@ -52,7 +52,7 @@ class TestFilespec:
         with pytest.raises(
             ArgumentTypeError, match=r".*pydicom::rtplan\.dcm.*is available.*"
         ):
-            filespec_parser(f"rtplan.dcm")
+            filespec_parser("rtplan.dcm")
 
     def test_colons(self):
         """CLI filespec with a colon in filename works correctly"""
@@ -136,7 +136,7 @@ class TestCLIcall:
 
     def test_codify_UTF8(self, capsys):
         """CLI `codify` command creates code with utf-8 characters"""
-        main(f"codify pydicom::chrFren.dcm".split())
+        main("codify pydicom::chrFren.dcm".split())
         out, _ = capsys.readouterr()
         assert out.startswith("# -*- coding: utf-8 -*-")
         assert "Buc^Jérôme" in out

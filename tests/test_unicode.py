@@ -3,7 +3,6 @@
 
 import sys
 
-import pytest
 
 from pydicom import dcmread
 

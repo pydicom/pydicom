@@ -9,18 +9,14 @@ import pytest
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
-
-jpeg_ls_missing_message = "jpeg_ls is not available " "in this test environment"
-jpeg_ls_present_message = "jpeg_ls is being tested"
-
 from pydicom.pixel_data_handlers import numpy_handler
-
-have_numpy_handler = numpy_handler.is_available()
-
 from pydicom.pixel_data_handlers import jpeg_ls_handler
 
-have_jpeg_ls_handler = jpeg_ls_handler.is_available()
+jpeg_ls_missing_message = "jpeg_ls is not available in this test environment"
+jpeg_ls_present_message = "jpeg_ls is being tested"
 
+have_numpy_handler = numpy_handler.is_available()
+have_jpeg_ls_handler = jpeg_ls_handler.is_available()
 test_jpeg_ls_decoder = have_numpy_handler and have_jpeg_ls_handler
 
 empty_number_tags_name = get_testdata_file("reportsi_with_empty_number_tags.dcm")

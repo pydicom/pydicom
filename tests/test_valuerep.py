@@ -8,8 +8,6 @@ from itertools import chain
 from io import BytesIO
 import pickle
 import math
-import sys
-from typing import Union
 
 import pytest
 
@@ -762,7 +760,7 @@ class TestDSdecimal:
             "characters long. Use a smaller string, *"
         )
         with pytest.warns(UserWarning, match=msg):
-            x = DSdecimal(Decimal(math.pi), auto_format=False)
+            DSdecimal(Decimal(math.pi), auto_format=False)
 
     def test_string_too_long_raises(self, enforce_valid_values):
         msg = (
@@ -770,7 +768,7 @@ class TestDSdecimal:
             "characters long. Use a smaller string, *"
         )
         with pytest.raises(OverflowError, match=msg):
-            x = DSdecimal(Decimal(math.pi), auto_format=False)
+            DSdecimal(Decimal(math.pi), auto_format=False)
 
     def test_auto_format(self, enforce_valid_both_fixture):
         """Test truncating decimal"""

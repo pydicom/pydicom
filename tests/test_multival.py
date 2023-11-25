@@ -180,4 +180,4 @@ def test_constrained_list_raises():
 
     msg = r"'Foo._validate\(\)' must be implemented"
     with pytest.raises(NotImplementedError, match=msg):
-        foo = Foo([1, 2, 3, 4])
+        Foo([1, 2, 3, 4])

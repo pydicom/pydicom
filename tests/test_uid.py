@@ -1,8 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for uid.py"""
 
-from importlib import import_module
-import sys
 import uuid
 
 import pytest
