@@ -21,7 +21,6 @@ import os
 import os.path
 import re
 import warnings
-import weakref
 from bisect import bisect_left
 from collections.abc import (
     ValuesView,
@@ -44,7 +43,6 @@ from typing import (
     BinaryIO,
     TypeVar,
     overload,
-    TYPE_CHECKING,
 )
 
 from pydicom.filebase import DicomFileLike
@@ -87,10 +85,6 @@ from pydicom.uid import (
 )
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
-
-
-if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.sequence import Sequence
 
 
 class PrivateBlock:
@@ -1288,7 +1282,7 @@ class Dataset:
             (
                 f"'{name}.is_implicit_VR' will be removed in v4.0, set the "
                 "Transfer Syntax UID or use the 'implicit_vr' argument with "
-                f"to {name}.save_as() or dcmwrite() instead"
+                f"{name}.save_as() or dcmwrite() instead"
             ),
             DeprecationWarning,
         )
@@ -1321,7 +1315,7 @@ class Dataset:
             (
                 f"'{name}.is_little_endian' will be removed in v4.0, set the "
                 "Transfer Syntax UID or use the 'little_endian' argument with "
-                f"to {name}.save_as() or dcmwrite() instead"
+                f"{name}.save_as() or dcmwrite() instead"
             ),
             DeprecationWarning,
         )

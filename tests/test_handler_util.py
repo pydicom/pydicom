@@ -181,14 +181,14 @@ class TestNumpy_PixelDtype:
 
         # < is little, = is native, > is big
         if byteorder == "little":
-            self.ds.is_little_endian = True
+            self.ds._is_little_endian = True
             assert pixel_dtype(self.ds).byteorder in ["<", "="]
-            self.ds.is_little_endian = False
+            self.ds._is_little_endian = False
             assert pixel_dtype(self.ds).byteorder == ">"
         elif byteorder == "big":
-            self.ds.is_little_endian = True
+            self.ds._is_little_endian = True
             assert pixel_dtype(self.ds).byteorder == "<"
-            self.ds.is_little_endian = False
+            self.ds._is_little_endian = False
             assert pixel_dtype(self.ds).byteorder in [">", "="]
 
 
@@ -2447,8 +2447,8 @@ class TestNumpy_ApplyVOI:
     def test_voi_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_explicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.PixelRepresentation = 0
         ds.BitsStored = 16
         ds.VOILUTSequence = [Dataset()]
