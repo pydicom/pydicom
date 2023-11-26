@@ -912,7 +912,8 @@ class Dataset:
         -------
         str | MutableSequence[str] | None
             The original character set encoding of the dataset as given by
-            the (0008,0005) *Specific Character Set*, or ``iso8859`` (ASCII)
+            the (0008,0005) *Specific Character Set*, or `iso8859
+            <https://docs.python.org/3/library/codecs.html#standard-encodings>`_
             if the dataset has been created from scratch.
         """
         return self._read_charset
@@ -928,7 +929,7 @@ class Dataset:
             DeprecationWarning,
         )
 
-        return self._read_charset
+        return self.original_character_set
 
     @read_encoding.setter
     def read_encoding(self, value: str | MutableSequence[str]) -> None:
@@ -1350,7 +1351,7 @@ class Dataset:
         -------
         tuple[bool, bool] | tuple[None, None]
             For a dataset decoded from a file or buffer this is whether
-            the encoded used implicit/explicit VR and little/big endian
+            the encoding used implicit/explicit VR and little/big endian
             as ``(encoded as implicit VR, encoded as little endian)``. Returns
             ``(None, None)`` for a dataset created from scratch.
         """
