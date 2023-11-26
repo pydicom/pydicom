@@ -121,7 +121,7 @@ class TestCharset:
     def test_invalid_character_set(self, allow_reading_invalid_values):
         """charset: replace invalid encoding with default encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
-        ds.read_encoding = None
+        ds._read_charset = None
         ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.warns(
             UserWarning,
@@ -135,7 +135,7 @@ class TestCharset:
     def test_invalid_character_set_enforce_valid(self, enforce_valid_values):
         """charset: raise on invalid encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
-        ds.read_encoding = None
+        ds._read_charset = None
         ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.raises(LookupError, match="Unknown encoding 'UNSUPPORTED'"):
             ds.decode()

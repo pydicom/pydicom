@@ -1417,7 +1417,12 @@ class TestWriteAmbiguousVR:
         with pytest.warns(DeprecationWarning, match=msg):
             assert ds.read_little_endian
 
-        assert ds.read_encoding == "latin1"
+        msg = (
+            "'Dataset.read_encoding' will be removed in v4.0, use "
+            "'Dataset.original_character_set' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ds.read_encoding == "latin1"
 
     def test_write_explicit_vr_big_endian(self):
         """Test writing explicit big data for ambiguous elements."""
@@ -1440,7 +1445,13 @@ class TestWriteAmbiguousVR:
         with pytest.warns(DeprecationWarning):
             assert not ds.read_implicit_vr
             assert not ds.read_little_endian
-        assert ["UTF8"] == ds.read_encoding
+
+        msg = (
+            "'Dataset.read_encoding' will be removed in v4.0, use "
+            "'Dataset.original_character_set' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ["UTF8"] == ds.read_encoding
 
 
 class TestScratchWrite:

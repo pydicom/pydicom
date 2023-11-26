@@ -2253,7 +2253,7 @@ class TestFileMeta:
         ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
         ds._is_implicit_VR = True
         ds._is_little_endian = True
-        ds.read_encoding = "utf-8"
+        ds._read_charset = "utf-8"
         ds_copy = copy_method(ds)
         assert isinstance(ds_copy, Dataset)
         assert len(ds_copy) == 2
@@ -2267,7 +2267,7 @@ class TestFileMeta:
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
         assert ds_copy.is_implicit_VR
         assert ds_copy.is_little_endian
-        assert ds_copy.read_encoding == "utf-8"
+        assert ds_copy.original_character_set == "utf-8"
 
 
 @pytest.fixture
@@ -2381,6 +2381,7 @@ def test_setattr_warns(setattr_warn):
     deprecations = (
         "is_implicit_VR",
         "is_little_endian",
+        "read_encoding",
     )
 
     for s in CAMEL_CASE[0]:
@@ -2411,6 +2412,7 @@ def test_setattr_raises(setattr_raise):
     deprecations = (
         "is_implicit_VR",
         "is_little_endian",
+        "read_encoding",
     )
 
     for s in CAMEL_CASE[0]:
@@ -2441,6 +2443,7 @@ def test_setattr_ignore(setattr_ignore):
     deprecations = (
         "is_implicit_VR",
         "is_little_endian",
+        "read_encoding",
     )
 
     for s in CAMEL_CASE[0]:
