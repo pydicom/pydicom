@@ -1266,8 +1266,11 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     if not HAVE_NP:
         raise ImportError("Numpy is required to determine the dtype.")
 
-    if ds.is_little_endian is None:
-        ds._is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
+    # Prefer Transfer Syntax UID, fall back to the original encoding
+    try:
+        is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
+    except AttributeError:
+        is_little_endian = ds.original_encoding[1]
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1
@@ -1314,7 +1317,7 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         )
 
     # Correct for endianness of the system vs endianness of the dataset
-    if ds.is_little_endian != (byteorder == "little"):
+    if is_little_endian != (byteorder == "little"):
         # 'S' swap from current to opposite
         dtype = dtype.newbyteorder("S")
 

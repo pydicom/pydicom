@@ -181,14 +181,14 @@ class TestNumpy_PixelDtype:
 
         # < is little, = is native, > is big
         if byteorder == "little":
-            self.ds.is_little_endian = True
+            self.ds._read_little = True
             assert pixel_dtype(self.ds).byteorder in ["<", "="]
-            self.ds.is_little_endian = False
+            self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder == ">"
         elif byteorder == "big":
-            self.ds.is_little_endian = True
+            self.ds._read_little = True
             assert pixel_dtype(self.ds).byteorder == "<"
-            self.ds.is_little_endian = False
+            self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder in [">", "="]
 
 
@@ -1273,7 +1273,7 @@ class TestNumpy_ModalityLUT:
     def test_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = dcmread(MOD_16_SEQ)
-        assert ds.is_little_endian is True
+        assert ds.original_encoding == (True, True)
         seq = ds.ModalityLUTSequence[0]
         assert [4096, -2048, 16] == seq.LUTDescriptor
         seq["LUTData"].VR = "OW"
@@ -2447,8 +2447,8 @@ class TestNumpy_ApplyVOI:
     def test_voi_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_explicit_VR = True
+        ds._read_little = True
+        ds._read_implicit = False
         ds.PixelRepresentation = 0
         ds.BitsStored = 16
         ds.VOILUTSequence = [Dataset()]

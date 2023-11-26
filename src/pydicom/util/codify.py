@@ -414,6 +414,9 @@ def code_file_from_dataset(
     if hasattr(ds, "file_meta"):
         lines.append("ds.file_meta = file_meta")
 
+    implicit_vr, little_endian = ds.original_encoding
+    lines.append(f"ds.set_original_encoding({implicit_vr}, {little_endian})")
+
     # Return the complete code string
     return line_term.join(lines)
 

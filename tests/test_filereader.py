@@ -811,7 +811,12 @@ class TestReader:
         """Test that an empty Specific Character Set is handled correctly.
         Regression test for #1038"""
         ds = dcmread(get_testdata_file("empty_charset_LEI.dcm"))
-        assert ds.read_encoding == ["iso8859"]
+        msg = (
+            "'FileDataset.read_encoding' will be removed in v4.0, use "
+            "'FileDataset.original_character_set' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ds.read_encoding == ["iso8859"]
 
     def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.

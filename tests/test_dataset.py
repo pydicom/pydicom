@@ -79,7 +79,7 @@ class TestDataset:
         sub_ds.BeamNumber = "1"
         dataset.BeamSequence = Sequence([sub_ds])
         fp = DicomBytesIO()
-        pydicom.dcmwrite(fp, dataset, implicit_VR=True)
+        pydicom.dcmwrite(fp, dataset, implicit_vr=True)
 
         def _reset():
             fp.seek(0)
@@ -1557,7 +1557,7 @@ class TestDataset:
         ds.BeamSequence = []
 
         fp = io.BytesIO()
-        ds.save_as(fp, implicit_VR=True)
+        ds.save_as(fp, implicit_vr=True)
         ds = dcmread(fp, force=True)
         assert not hasattr(ds, "_pixel_rep")
         assert ds.PixelRepresentation is None
@@ -1597,7 +1597,7 @@ class TestDatasetSaveAs:
             ds.save_as(DicomBytesIO())
 
         # OK
-        ds.save_as(DicomBytesIO(), implicit_VR=True)
+        ds.save_as(DicomBytesIO(), implicit_vr=True)
 
     def test_mismatch(self):
         """Test mismatch between transfer syntax and args."""
@@ -1610,14 +1610,14 @@ class TestDatasetSaveAs:
             "VR encoding for a 'Implicit VR Little Endian' transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
-            ds.save_as(DicomBytesIO(), implicit_VR=False, little_endian=False)
+            ds.save_as(DicomBytesIO(), implicit_vr=False, little_endian=False)
 
         msg = (
             "The 'little_endian' value is not consistent with the required "
             "endianness for a 'Implicit VR Little Endian' transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
-            ds.save_as(DicomBytesIO(), implicit_VR=True, little_endian=False)
+            ds.save_as(DicomBytesIO(), implicit_vr=True, little_endian=False)
 
     def test_priority_syntax(self):
         """Test prefer transfer syntax over dataset attributes."""
@@ -1657,7 +1657,7 @@ class TestDatasetSaveAs:
 
         # Explicit -> implicit
         fp = DicomBytesIO()
-        ds.save_as(fp, implicit_VR=True)
+        ds.save_as(fp, implicit_vr=True)
         fp.seek(0)
         ds = dcmread(fp)
         assert ds.is_implicit_VR
@@ -1667,7 +1667,7 @@ class TestDatasetSaveAs:
         fp = DicomBytesIO()
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds._is_implicit_VR = True
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp, implicit_vr=False)
         fp.seek(0)
         ds = dcmread(fp)
         assert not ds.is_implicit_VR
@@ -1684,19 +1684,19 @@ class TestDatasetSaveAs:
 
         # Test kwarg - not enforce_file_format
         with pytest.warns(DeprecationWarning, match=msg):
-            ds.save_as(DicomBytesIO(), write_like_original=True, implicit_VR=True)
+            ds.save_as(DicomBytesIO(), write_like_original=True, implicit_vr=True)
 
         # Test default - not enforce_file_format
-        ds.save_as(DicomBytesIO(), implicit_VR=True)
+        ds.save_as(DicomBytesIO(), implicit_vr=True)
 
         # Test positional arg - not enforce_file_format
-        ds.save_as(DicomBytesIO(), True, implicit_VR=True)
+        ds.save_as(DicomBytesIO(), True, implicit_vr=True)
 
         # Test positional arg - enforce_file_format
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         with pytest.warns(DeprecationWarning, match=msg):
-            ds.save_as(DicomBytesIO(), False, implicit_VR=True)
+            ds.save_as(DicomBytesIO(), False, implicit_vr=True)
 
         # Test kwarg - enforce_file_format
         with pytest.warns(DeprecationWarning, match=msg):
@@ -1740,10 +1740,10 @@ class TestDatasetSaveAs:
         fp = DicomBytesIO()
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp, implicit_vr=False)
 
         del ds.file_meta
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp, implicit_vr=False)
 
     def test_save_as_private_transfer_syntax(self):
         """Test saving with a private transfer syntax."""
@@ -1760,7 +1760,7 @@ class TestDatasetSaveAs:
         with pytest.raises(ValueError, match=msg):
             ds.save_as(fp)
 
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp, implicit_vr=False)
 
     def test_save_as_set_little_implicit_with_tsyntax(self):
         """Test setting is_implicit_VR and is_little_endian from tsyntax"""
@@ -1817,11 +1817,11 @@ class TestDatasetSaveAs:
         elem.VR = "OB"
         # Unchanged - False
         assert not elem.is_undefined_length
-        ds.save_as(fp, implicit_VR=True)
+        ds.save_as(fp, implicit_vr=True)
         assert not elem.is_undefined_length
         # Unchanged - True
         elem.is_undefined_length = True
-        ds.save_as(fp, implicit_VR=True)
+        ds.save_as(fp, implicit_vr=True)
         assert elem.is_undefined_length
 
     def test_save_as_undefined_no_tsyntax(self):
@@ -1833,11 +1833,11 @@ class TestDatasetSaveAs:
         elem.VR = "OB"
         # Unchanged - False
         assert not elem.is_undefined_length
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp, implicit_vr=False)
         assert not elem.is_undefined_length
         # Unchanged - True
         elem.is_undefined_length = True
-        ds.save_as(fp, implicit_VR=False)
+        ds.save_as(fp, implicit_vr=False)
         assert elem.is_undefined_length
 
     def test_convert_big_little_endian_raises(self):
@@ -1852,12 +1852,12 @@ class TestDatasetSaveAs:
         ds._is_little_endian = True
         ds._is_implicit_VR = True
         with pytest.raises(ValueError, match=msg):
-            ds.save_as(DicomBytesIO(), implicit_VR=True, little_endian=False)
+            ds.save_as(DicomBytesIO(), implicit_vr=True, little_endian=False)
 
         ds._is_little_endian = False
         ds._is_implicit_VR = True
         with pytest.raises(ValueError, match=msg):
-            ds.save_as(DicomBytesIO(), implicit_VR=True, little_endian=True)
+            ds.save_as(DicomBytesIO(), implicit_vr=True, little_endian=True)
 
 
 class TestDatasetElements:

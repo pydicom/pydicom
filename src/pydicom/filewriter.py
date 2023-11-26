@@ -704,9 +704,9 @@ def write_dataset(
     The `dataset` is encoded as specified by (in order of priority):
 
     * ``fp.is_implicit_VR`` and ``fp.is_little_endian``.
-    * If `dataset` has been decoded from a file or buffer then the original
-      encoding as found in ``dataset.is_implicit_VR`` and
-      ``dataset.is_little_endian``.
+    * ``dataset.is_implicit_VR`` and ``dataset.is_little_endian``
+    * If `dataset` has been decoded from a file or buffer then
+      :attr:`~pydicom.dataset.Dataset.original_encoding`.
 
     Parameters
     ----------
@@ -725,22 +725,32 @@ def write_dataset(
     # In order of encoding priority
     fp_encoding = (fp.is_implicit_VR, fp.is_little_endian)
     ds_encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
+    or_encoding = dataset.original_encoding
+
+    if None in fp_encoding and None in ds_encoding and None in or_encoding:
+        # TODO: Update in v4.0
+        raise AttributeError(
+            "Valid 'implicit_VR' and 'little_endian' attributes are required "
+            "'fp' or 'dataset'"
+        )
 
     if None in fp_encoding:
-        if None in ds_encoding:
-            raise AttributeError(
-                "Valid 'implicit_VR' and 'little_endian' attributes are "
-                "required for 'fp' or 'dataset'"
-            )
+        if None not in ds_encoding:
+            fp.is_implicit_VR, fp.is_little_endian = ds_encoding
+        elif None not in or_encoding:
+            fp.is_implicit_VR, fp.is_little_endian = or_encoding
 
-        fp.is_implicit_VR = dataset.is_implicit_VR
-        fp.is_little_endian = dataset.is_little_endian
-
-    # Need to check if the encoding of fp is different from dataset
-    if fp_encoding != ds_encoding or dataset.read_encoding != dataset._character_set:
+    # This function is doing some heavy lifting:
+    #   If implicit -> explicit, runs ambiguous VR correction
+    #   If implicit -> explicit, RawDataElements -> DataElement (VR lookup)
+    #   If charset changed, RawDataElements -> DataElement
+    if (
+        fp_encoding != or_encoding
+        or dataset.original_character_set != dataset._character_set
+    ):
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
-    dataset_encoding = cast(
+    ds_charset = cast(
         None | str | list[str], dataset.get("SpecificCharacterSet", parent_encoding)
     )
 
@@ -753,7 +763,7 @@ def write_dataset(
             continue
 
         with tag_in_exception(tag):
-            write_data_element(fp, dataset.get_item(tag), dataset_encoding)
+            write_data_element(fp, dataset.get_item(tag), ds_charset)
 
     return fp.tell() - fpStart
 
@@ -927,8 +937,8 @@ def write_file_meta_info(
 
 def _determine_encoding(
     ds: Dataset,
-    transfer_syntax: UID | None,
-    implicit_VR: bool | None,
+    tsyntax: UID | None,
+    implicit_vr: bool | None,
     little_endian: bool | None,
     force_encoding: bool,
 ) -> tuple[bool, bool]:
@@ -936,9 +946,10 @@ def _determine_encoding(
 
     If `force_encoding` isn't used the priority is:
 
-    1. The encoding corresponding to `transfer_syntax`
-    2. The encoding set by `implicit_VR` and `little_endian`
-    3. The encoding of `ds`
+    1. The encoding corresponding to `tsyntax`
+    2. The encoding set by `implicit_vr` and `little_endian`
+    3. `Dataset.is_implicit_VR` and `Dataset.is_little_endian`
+    4. `Dataset.original_encoding`
 
     If none of those are valid, raise an exception.
 
@@ -946,14 +957,15 @@ def _determine_encoding(
     ----------
     ds : pydicom.dataset.Dataset
         The dataset that is to be encoded.
-    transfer_syntax : pydicom.uid.UID | None
-        The dataset's transfer syntax (if any).
-    implicit_VR : bool | None
+    tsyntax : pydicom.uid.UID | None
+        The dataset's public or private transfer syntax (if any). Private
+        transfer syntaxes require `implicit_vr` and `little_endian` be used.
+    implicit_vr : bool | None
         The VR encoding method (if supplied)
     little_endian : bool | None
         The encoding endianness (if supplied).
     force_encoding : bool
-        If ``True`` then force the encoding to use `implicit_VR` and
+        If ``True`` then force the encoding to use `implicit_vr` and
         `little_endian`. Default ``False``.
 
     Returns
@@ -966,72 +978,73 @@ def _determine_encoding(
     ValueError
         If unable to determine the encoding to use, if `transfer_syntax` is
         not a transfer syntax, or if there's an inconsistency between
-        `transfer_syntax` and `implicit_VR` or `little_endian`.
+        `transfer_syntax` and `implicit_vr` or `little_endian`.
     """
+    arg_encoding = (implicit_vr, little_endian)
+    ds_encoding = (ds.is_implicit_VR, ds.is_little_endian)
+
     if force_encoding:
-        if None in (implicit_VR, little_endian):
+        if None in arg_encoding:
             raise ValueError(
-                "Both 'implicit_VR' and 'little_endian' are required if "
+                "Both 'implicit_vr' and 'little_endian' are required if "
                 "'force_encoding' is used"
             )
 
-        return [implicit_VR, little_endian]
+        return list(arg_encoding)
 
-    use_implicit = implicit_VR
-    use_little = little_endian
-    if None in (implicit_VR, little_endian):
-        use_implicit = ds.is_implicit_VR
-        use_little = ds.is_little_endian
+    use_implicit, use_little = arg_encoding
+    if None in arg_encoding:
+        use_implicit, use_little = ds_encoding
+    elif None in ds_encoding:
+        use_implicit, use_little = ds.original_encoding
 
-    if transfer_syntax is None:
+    if tsyntax is None:
         if None not in (use_implicit, use_little):
             return [use_implicit, use_little]
 
         raise ValueError(
             "Unable to determine the encoding to use for writing the dataset, "
             "please set the file meta's Transfer Syntax UID or use the "
-            "'implicit_VR' and 'little_endian' arguments"
+            "'implicit_vr' and 'little_endian' arguments"
         )
 
     # Must check UID.is_private before checking UID.is_transfer_syntax
-    if transfer_syntax.is_private:
-        # Fallback to either args or encoding of the original file (if any)
-        if use_implicit is None or use_little is None:
+    if tsyntax.is_private:
+        if None in (use_implicit, use_little):
             raise ValueError(
-                "Unable to determine the encoding to use for writing the "
-                "dataset, please use the 'implicit_VR' and 'little_endian' "
-                "arguments"
+                "The 'implicit_vr' and 'little_endian' arguments are required "
+                "when using a private transfer syntax"
             )
 
         return [use_implicit, use_little]
 
-    if not transfer_syntax.is_transfer_syntax:
+    if not tsyntax.is_transfer_syntax:
         raise ValueError(
-            f"The Transfer Syntax UID '{transfer_syntax.name}' is not a valid "
+            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid "
             "transfer syntax"
         )
 
-    # Check that supplied args match transfer syntax
-    if implicit_VR is not None and implicit_VR != transfer_syntax.is_implicit_VR:
+    # Check that supplied args match transfer syntax - or not bother?
+    if implicit_vr is not None and implicit_vr != tsyntax.is_implicit_VR:
         raise ValueError(
-            f"The 'implicit_VR' value is not consistent with the required "
-            f"VR encoding for a '{transfer_syntax.name}' transfer syntax"
+            f"The 'implicit_vr' value is not consistent with the required "
+            f"VR encoding for a '{tsyntax.name}' transfer syntax"
         )
 
-    if little_endian is not None and little_endian != transfer_syntax.is_little_endian:
+    if little_endian is not None and little_endian != tsyntax.is_little_endian:
         raise ValueError(
             f"The 'little_endian' value is not consistent with the required "
-            f"endianness for a '{transfer_syntax.name}' transfer syntax"
+            f"endianness for a '{tsyntax.name}' transfer syntax"
         )
 
-    return [transfer_syntax.is_implicit_VR, transfer_syntax.is_little_endian]
+    return [tsyntax.is_implicit_VR, tsyntax.is_little_endian]
 
 
 def dcmwrite(
     filename: PathType | BinaryIO | DicomFileLike,
     dataset: Dataset,
     __write_like_original: bool = True,
-    implicit_VR: bool | None = None,
+    implicit_vr: bool | None = None,
     little_endian: bool = True,
     enforce_file_format: bool = False,
     force_encoding: bool = False,
@@ -1114,15 +1127,15 @@ def dcmwrite(
 
     .. versionchanged:: 3.0
 
-        Added the `implicit_VR` and `little_endian` arguments.
+        Added the `implicit_vr` and `little_endian` arguments.
 
     The `dataset` is encoded as specified by (in order of priority):
 
     * The encoding corresponding to the set *Transfer Syntax UID*
       ``dataset.file_meta``.
-    * The `implicit_VR` and `little_endian` arguments.
-    * The encoding used by `dataset` if it was originally decoded from a
-      file or buffer.
+    * The `implicit_vr` and `little_endian` arguments.
+    * `Dataset.is_implicit_VR` and `Dataset.is_little_endian`
+    * :attr:`~pydicom.dataset.Dataset.original_encoding`
 
     .. warning::
 
@@ -1144,16 +1157,14 @@ def dcmwrite(
         ensure that `dataset` is written in the DICOM File Format or
         raise an exception is that isn't possible. This parameter is
         deprecated, please use `enforce_file_format` instead.
-    implicit_VR : bool, optional
+    implicit_vr : bool, optional
         Required if `dataset` has no valid public *Transfer Syntax UID*
-        set in the file meta and
-        :attr:`~pydicom.dataset.Dataset.is_implicit_VR` is ``None``. If
+        set in the file meta and `dataset` has been created from scratch. If
         ``True`` then encode `dataset` using implicit VR, otherwise use
         explicit VR.
     little_endian, bool, optional
         Required if `dataset` has no valid public *Transfer Syntax UID*
-        set in the file meta and
-        :attr:`~pydicom.dataset.Dataset.is_little_endian` is ``None``. If
+        set in the file meta and `dataset` has been created from scratch. If
         ``True`` (default) then use little endian byte order when encoding
         `dataset`, otherwise use big endian.
     enforce_file_format : bool, optional
@@ -1167,7 +1178,7 @@ def dcmwrite(
         - ``dataset.file_meta``: if `dataset` is missing any required *File
           Meta Information Group* elements then they will not be written.
     force_encoding : bool, optional
-        If ``True`` then force the encoding to follow `implicit_VR` and
+        If ``True`` then force the encoding to follow `implicit_vr` and
         `little_endian`. Cannot be used with `enforce_file_format`. Default
         ``False``.
 
@@ -1234,7 +1245,7 @@ def dcmwrite(
     encoding = _determine_encoding(
         dataset,
         tsyntax,
-        implicit_VR,
+        implicit_vr,
         little_endian,
         force_encoding,
     )
