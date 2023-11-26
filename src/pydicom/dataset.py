@@ -21,7 +21,6 @@ import os
 import os.path
 import re
 import warnings
-import weakref
 from bisect import bisect_left
 from collections.abc import (
     ValuesView,
@@ -90,7 +89,7 @@ from pydicom.waveforms import numpy_handler as wave_handler
 
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.sequence import Sequence
+    pass
 
 
 class PrivateBlock:
