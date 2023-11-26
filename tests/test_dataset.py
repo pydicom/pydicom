@@ -1772,7 +1772,7 @@ class TestDatasetElements:
 
     def test_sequence_assignment(self):
         """Assignment to SQ works only if valid Sequence assigned."""
-        msg = r"Sequence contents must be Dataset instances"
+        msg = r"Sequence contents must be 'Dataset' instances"
         with pytest.raises(TypeError, match=msg):
             self.ds.ConceptCodeSequence = [1, 2, 3]
 
