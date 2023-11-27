@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.299** total execution time for 5 files **from auto_examples/input_output**:
+**00:00.301** total execution time for 5 files **from auto_examples/input_output**:
 
 .. container::
 
@@ -36,12 +36,12 @@ Computation times
      - 00:00.199
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``plot_read_dicom.py``)
-     - 00:00.088
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``plot_write_dicom.py``)
-     - 00:00.005
+     - 00:00.086
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py` (``plot_printing_dataset.py``)
+     - 00:00.008
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``plot_write_dicom.py``)
      - 00:00.005
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``plot_read_rtplan.py``)
