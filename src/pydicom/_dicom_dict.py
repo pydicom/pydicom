@@ -2339,7 +2339,7 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x0034000B: ('SQ', '1', "Camera Position Group Sequence", '', 'CameraPositionGroupSequence'),  # noqa
     0x0034000C: ('CS', '1', "Includes Information", '', 'IncludesInformation'),  # noqa
     0x0034000D: ('SQ', '1', "Time of Frame Group Sequence", '', 'TimeOfFrameGroupSequence'),  # noqa
-    0x00380004: ('SQ', '1', "Referenced Patient Alias Sequence", '', 'ReferencedPatientAliasSequence'),  # noqa
+    0x00380004: ('SQ', '1', "Referenced Patient Alias Sequence", 'Retired', 'ReferencedPatientAliasSequence'),  # noqa
     0x00380008: ('CS', '1', "Visit Status ID", '', 'VisitStatusID'),  # noqa
     0x00380010: ('LO', '1', "Admission ID", '', 'AdmissionID'),  # noqa
     0x00380011: ('LO', '1', "Issuer of Admission ID", 'Retired', 'IssuerOfAdmissionID'),  # noqa
@@ -2902,6 +2902,10 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x00480111: ('DS', '1', "Condenser Lens Power", '', 'CondenserLensPower'),  # noqa
     0x00480112: ('DS', '1', "Objective Lens Power", '', 'ObjectiveLensPower'),  # noqa
     0x00480113: ('DS', '1', "Objective Lens Numerical Aperture", '', 'ObjectiveLensNumericalAperture'),  # noqa
+    0x00480114: ('CS', '1', "Confocal Mode", '', 'ConfocalMode'),  # noqa
+    0x00480115: ('CS', '1', "Tissue Location", '', 'TissueLocation'),  # noqa
+    0x00480116: ('SQ', '1', "Confocal Microscopy Image Frame Type Sequence", '', 'ConfocalMicroscopyImageFrameTypeSequence'),  # noqa
+    0x00480117: ('FD', '1', "Image Acquisition Depth", '', 'ImageAcquisitionDepth'),  # noqa
     0x00480120: ('SQ', '1', "Palette Color Lookup Table Sequence", '', 'PaletteColorLookupTableSequence'),  # noqa
     0x00480200: ('SQ', '1', "Referenced Image Navigation Sequence", 'Retired', 'ReferencedImageNavigationSequence'),  # noqa
     0x00480201: ('US', '2', "Top Left Hand Corner of Localizer Area", 'Retired', 'TopLeftHandCornerOfLocalizerArea'),  # noqa
@@ -4652,6 +4656,7 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x300A0688: ('FD', '1', "RT Beam Modifier Definition Distance", '', 'RTBeamModifierDefinitionDistance'),  # noqa
     0x300A0689: ('SQ', '1', "Beam Area Limit Sequence", '', 'BeamAreaLimitSequence'),  # noqa
     0x300A068A: ('SQ', '1', "Referenced RT Prescription Sequence", '', 'ReferencedRTPrescriptionSequence'),  # noqa
+    0x300A068B: ('CS', '1', "Dose Value Interpretation", '', 'DoseValueInterpretation'),  # noqa
     0x300A0700: ('UI', '1', "Treatment Session UID", '', 'TreatmentSessionUID'),  # noqa
     0x300A0701: ('CS', '1', "RT Radiation Usage", '', 'RTRadiationUsage'),  # noqa
     0x300A0702: ('SQ', '1', "Referenced RT Radiation Set Sequence", '', 'ReferencedRTRadiationSetSequence'),  # noqa
@@ -4770,6 +4775,7 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x300C0126: ('CS', '1', "Beam Hold Transition", '', 'BeamHoldTransition'),  # noqa
     0x300C0127: ('DT', '1', "Beam Hold Transition DateTime", '', 'BeamHoldTransitionDateTime'),  # noqa
     0x300C0128: ('SQ', '1', "Beam Hold Originating Device Sequence", '', 'BeamHoldOriginatingDeviceSequence'),  # noqa
+    0x300C0129: ('CS', '1', "Beam Hold Transition Trigger Source", '', 'BeamHoldTransitionTriggerSource'),  # noqa
     0x300E0002: ('CS', '1', "Approval Status", '', 'ApprovalStatus'),  # noqa
     0x300E0004: ('DA', '1', "Review Date", '', 'ReviewDate'),  # noqa
     0x300E0005: ('TM', '1', "Review Time", '', 'ReviewTime'),  # noqa
@@ -5040,7 +5046,7 @@ DicomDictionary: dict[int, tuple[str, str, str, str, str]] = {
     0x4010107E: ('DS', '6', "PRCS to RCS Orientation", '', 'PRCSToRCSOrientation'),  # noqa
     0x4FFE0001: ('SQ', '1', "MAC Parameters Sequence", '', 'MACParametersSequence'),  # noqa
     0x52009229: ('SQ', '1', "Shared Functional Groups Sequence", '', 'SharedFunctionalGroupsSequence'),  # noqa
-    0x52009230: ('SQ', '1', "Per-frame Functional Groups Sequence", '', 'PerFrameFunctionalGroupsSequence'),  # noqa
+    0x52009230: ('SQ', '1', "Per-Frame Functional Groups Sequence", '', 'PerFrameFunctionalGroupsSequence'),  # noqa
     0x54000100: ('SQ', '1', "Waveform Sequence", '', 'WaveformSequence'),  # noqa
     0x54000110: ('OB or OW', '1', "Channel Minimum Value", '', 'ChannelMinimumValue'),  # noqa
     0x54000112: ('OB or OW', '1', "Channel Maximum Value", '', 'ChannelMaximumValue'),  # noqa

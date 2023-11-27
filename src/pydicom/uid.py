@@ -279,6 +279,16 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.107"""
     HEVCM10P51 = UID("1.2.840.10008.1.2.4.108")
     """1.2.840.10008.1.2.4.108"""
+    HTJ2KLossless = UID("1.2.840.10008.1.2.4.201")
+    """1.2.840.10008.1.2.4.201"""
+    HTJ2KLosslessRPCL = UID("1.2.840.10008.1.2.4.202")
+    """1.2.840.10008.1.2.4.202"""
+    HTJ2K = UID("1.2.840.10008.1.2.4.203")
+    """1.2.840.10008.1.2.4.203"""
+    JPIPHTJ2KReferenced = UID("1.2.840.10008.1.2.4.204")
+    """1.2.840.10008.1.2.4.204"""
+    JPIPHTJ2KReferencedDeflate = UID("1.2.840.10008.1.2.4.205")
+    """1.2.840.10008.1.2.4.205"""
     RLELossless = UID("1.2.840.10008.1.2.5")
     """1.2.840.10008.1.2.5"""
     SMPTEST211020UncompressedProgressiveActiveVideo = UID("1.2.840.10008.1.2.7.1")
@@ -319,6 +329,11 @@ AllTransferSyntaxes = [
     MPEG4HP42STEREOF,
     HEVCMP51,
     HEVCM10P51,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    HTJ2K,
+    JPIPHTJ2KReferenced,
+    JPIPHTJ2KReferencedDeflate,
     RLELossless,
     SMPTEST211020UncompressedProgressiveActiveVideo,
     SMPTEST211020UncompressedInterlacedActiveVideo,
@@ -775,6 +790,12 @@ VLWholeSlideMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.6")  # no
 """1.2.840.10008.5.1.4.1.1.77.1.6"""
 DermoscopicPhotographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.7"""
+ConfocalMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.8")  # noqa
+"""1.2.840.10008.5.1.4.1.1.77.1.8"""
+ConfocalMicroscopyTiledPyramidalImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.9"
+)  # noqa
+"""1.2.840.10008.5.1.4.1.1.77.1.9"""
 LensometryMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.1"""
 AutorefractionMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.2")  # noqa
