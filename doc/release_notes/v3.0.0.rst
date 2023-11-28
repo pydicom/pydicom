@@ -102,6 +102,11 @@ Enhancements
     * :attr:`~pydicom.uid.MPEG4HP422DF`
     * :attr:`~pydicom.uid.MPEG4HP423DF`
     * :attr:`~pydicom.uid.MPEG4HP42STEREOF`
+    * :attr:`~pydicom.uid.HTJ2KLossless`
+    * :attr:`~pydicom.uid.HTJ2KLosslessRPCL`
+    * :attr:`~pydicom.uid.HTJ2K`
+    * :attr:`~pydicom.uid.JPIPHTJ2KReferenced`
+    * :attr:`~pydicom.uid.JPIPHTJ2KReferencedDeflate`
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo`
     * :attr:`~pydicom.uid.SMPTEST211030PCMDigitalAudio`

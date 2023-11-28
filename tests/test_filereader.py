@@ -14,7 +14,7 @@ import tempfile
 import pytest
 
 import pydicom.config
-from pydicom import config
+from pydicom import config, dicomio
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
@@ -95,6 +95,11 @@ emri_jpeg_2k_lossless_too_short = get_testdata_file(
 color_3d_jpeg_baseline = get_testdata_file("color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
+
+
+def test_dicomio():
+    assert dicomio.dcmread is pydicom.dcmread
+    assert dicomio.dcmwrite is pydicom.dcmwrite
 
 
 class TestReader:
@@ -315,7 +320,9 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.save_as(fp, implicit_VR=True)
+        file_ds._is_implicit_VR = True
+        file_ds._is_little_endian = True
+        file_ds.save_as(fp, write_like_original=True)
 
         test_ds = dcmread(fp, force=True, stop_before_pixels=True)
         ds_tags = sorted(ds.keys())
@@ -900,7 +907,7 @@ class TestReader:
         bs = DicomBytesIO()
         ds.save_as(bs, implicit_VR=True)
 
-        out = dcmread(bs, force=True)
+        dcmread(bs, force=True)
         assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
 
 

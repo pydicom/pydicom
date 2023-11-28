@@ -10,7 +10,7 @@ This example shows how to read and interact with a DICOM File-set.
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from pydicom import dcmread, examples
+from pydicom import examples
 from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
 from pydicom.uid import generate_uid

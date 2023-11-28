@@ -108,6 +108,8 @@ Storage SOP Class UIDs
    Comprehensive3DSRStorage
    ComprehensiveSRStorage
    ComputedRadiographyImageStorage
+   ConfocalMicroscopyImageStorage
+   ConfocalMicroscopyTiledPyramidalImageStorage
    ContentAssessmentResultsStorage
    CornealTopographyMapStorage
    DICOS2DAITStorage

@@ -13,7 +13,6 @@ from pydicom.pixel_data_handlers.util import (
     get_expected_length,
 )
 from pydicom.uid import (
-    ImplicitVRLittleEndian,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,

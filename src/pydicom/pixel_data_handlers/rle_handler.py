@@ -36,13 +36,12 @@ in the table below.
 """
 
 from struct import unpack
-import sys
 from typing import TYPE_CHECKING, cast
 import warnings
 
 try:
     import numpy as np
-    import numpy
+    import numpy  # noqa: F401
 
     HAVE_RLE = True
 except ImportError:
@@ -50,7 +49,7 @@ except ImportError:
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
-from pydicom.encoders.native import _encode_frame
+from pydicom.encoders.native import _encode_frame  # noqa: F401
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover

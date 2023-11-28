@@ -4,7 +4,6 @@ from unittest import mock
 
 import pytest
 
-from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement

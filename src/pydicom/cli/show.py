@@ -105,16 +105,14 @@ def quiet_rtplan(ds: Dataset) -> str | None:
                 gantry = cp.get("GantryAngle")
                 bld = cp.get("BeamLimitingDeviceAngle")
                 couch = cp.get("PatientSupportAngle")
-                line += (
-                    f" energy {energy} gantry {gantry}, coll {bld}, " f"couch {couch}"
-                )
+                line += f" energy {energy} gantry {gantry}, coll {bld}, couch {couch}"
 
         wedges = beam.get("NumberOfWedges")
         comps = beam.get("NumberOfCompensators")
         boli = beam.get("NumberOfBoli")
         blocks = beam.get("NumberOfBlocks")
 
-        line += f" ({wedges} wedges, {comps} comps, {boli} boli," f" {blocks} blocks)"
+        line += f" ({wedges} wedges, {comps} comps, {boli} boli, {blocks} blocks)"
 
         lines.append(line)
 

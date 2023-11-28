@@ -1031,7 +1031,7 @@ class Dataset:
                 )
 
             if tag != BaseTag(0x00080005):
-                character_set = self.original_encoding or self._character_set
+                character_set = self.original_character_set or self._character_set
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
@@ -1365,7 +1365,7 @@ class Dataset:
         self,
         is_implicit_vr: bool | None,
         is_little_endian: bool | None,
-        character_encoding: str | MutableSequence[str] | None = None,
+        character_encoding: str | MutableSequence[str],
     ) -> None:
         """Set the values for the original transfer syntax and encoding.
 
@@ -1376,8 +1376,7 @@ class Dataset:
         """
         self._read_implicit = is_implicit_vr
         self._read_little = is_little_endian
-        if character_encoding is not None:
-            self._read_charset = character_encoding
+        self._read_charset = character_encoding
 
     def group_dataset(self, group: int) -> "Dataset":
         """Return a :class:`Dataset` containing only elements of a certain
@@ -1700,7 +1699,7 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
+                pkg_msg.append(f"{hh.HANDLER_NAME} (req. {', '.join(names)})")
 
             raise RuntimeError(msg + ", ".join(pkg_msg))
 
@@ -1888,7 +1887,7 @@ class Dataset:
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self["PixelData"].is_undefined_length = True
 
-        # TODO: Remove in v4.0
+        # TODO: Remove in stage 2
         # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
         self._is_implicit_VR = False
         self._is_little_endian = True
@@ -2011,7 +2010,7 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
+                pkg_msg.append(f"{hh.HANDLER_NAME} (req. {', '.join(names)})")
 
             raise RuntimeError(msg + ", ".join(pkg_msg))
 
@@ -2207,12 +2206,12 @@ class Dataset:
 
     @property
     def read_implicit_vr(self) -> bool | None:
-        """Get the VR method used by the encoded dataset.
+        """Get the VR method used by the original encoding of the dataset.
 
         .. deprecated:: 3.0
 
-            ``read_implicit_vr`` will be removed in v4.0, at which point you
-            should switch to the ``is_implicit_VR`` property instead.
+            ``read_implicit_vr`` will be removed in v4.0, , use
+            :attr:`~pydicom.dataset.Dataset.original_encoding` instead.
 
         Returns
         -------
@@ -2234,6 +2233,7 @@ class Dataset:
     @property
     def read_little_endian(self) -> bool | None:
         """Get the endianness used by the original encoding of the dataset.
+
         .. deprecated:: 3.0
 
             ``read_little_endian`` will be removed in v4.0, use
@@ -2558,7 +2558,7 @@ class Dataset:
 
         if key != elem_tag:
             raise ValueError(
-                f"The key '{key}' doesn't match the 'DataElement' tag " f"'{elem_tag}'"
+                f"The key '{key}' doesn't match the 'DataElement' tag '{elem_tag}'"
             )
 
         if elem_tag.is_private:
@@ -3169,7 +3169,7 @@ def validate_file_meta(
             )
 
         invalid = []
-        for tag in (0x00020002, 0x00020003, 0x00020010):
+        for tag in [0x00020002, 0x00020003, 0x00020010]:
             if tag not in file_meta or file_meta[tag].is_empty:
                 invalid.append(f"{Tag(tag)} {dictionary_description(tag)}")
 

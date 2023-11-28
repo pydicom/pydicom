@@ -89,7 +89,6 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     rows = kwargs["rows"]
     columns = kwargs["columns"]
     samples_per_pixel = kwargs["samples_per_pixel"]
-    number_of_frames = kwargs["number_of_frames"]
     pixel_representation = kwargs["pixel_representation"]
     bits_allocated = kwargs["bits_allocated"]
     bits_stored = kwargs["bits_stored"]

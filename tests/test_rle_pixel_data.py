@@ -908,7 +908,7 @@ class TestNumpy_RLEDecodeFrame:
             r"vs. 4096 bytes expected"
         )
         with pytest.warns(UserWarning, match=msg):
-            frame = _rle_decode_frame(
+            _rle_decode_frame(
                 pixel_data + b"\x00\x01", 4096, 1, ds.SamplesPerPixel, ds.BitsAllocated
             )
 

@@ -4,7 +4,6 @@
 from collections.abc import Sequence, MutableSequence, Iterable
 from copy import deepcopy
 from struct import pack
-import sys
 from typing import BinaryIO, Any, cast
 import warnings
 import zlib

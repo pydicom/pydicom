@@ -49,7 +49,7 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import warnings
 
 from pydicom.data.download import (
@@ -174,7 +174,7 @@ def fetch_data_files() -> None:
 
     if error:
         raise RuntimeError(
-            "An error occurred downloading the following files: " f"{', '.join(error)}"
+            f"An error occurred downloading the following files: {', '.join(error)}"
         )
 
 
@@ -406,8 +406,8 @@ def get_testdata_files(pattern: str = "**/*") -> list[str]:
     """
     if os.path.isabs(pattern):
         raise ValueError(
-            f"'get_testdata_files' does not support absolute paths, as it only works"
-            f" with internal pydicom test data."
+            "'get_testdata_files' does not support absolute paths, as it only works"
+            " with internal pydicom test data."
         )
     data_path = Path(DATA_ROOT) / "test_files"
 

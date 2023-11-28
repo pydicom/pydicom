@@ -2,7 +2,6 @@
 """Unit tests for the pydicom.sequence module."""
 
 import copy
-import weakref
 
 import pytest
 

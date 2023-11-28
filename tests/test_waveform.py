@@ -1,11 +1,8 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 
-from importlib import reload
-import typing
 
 import pytest
 
-import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
 
@@ -39,8 +36,8 @@ def test_waveform_array_raises():
 def test_simple():
     """Simple functionality test."""
     ds = dcmread(ECG)
-    arr = ds.waveform_array(index=0)
-    arr = ds.waveform_array(index=1)
+    ds.waveform_array(index=0)
+    ds.waveform_array(index=1)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -62,9 +59,9 @@ class TestHandlerGenerateMultiplex:
         item = ds.WaveformSequence[0]
         del item.NumberOfWaveformSamples
         msg = (
-            f"Unable to convert the waveform multiplex group with index "
-            f"0 as the following required elements are missing from "
-            f"the sequence item: NumberOfWaveformSamples"
+            "Unable to convert the waveform multiplex group with index "
+            "0 as the following required elements are missing from "
+            "the sequence item: NumberOfWaveformSamples"
         )
         gen = generate_multiplex(ds)
         with pytest.raises(AttributeError, match=msg):
@@ -111,9 +108,9 @@ class TestHandlerMultiplexArray:
         item = ds.WaveformSequence[0]
         del item.NumberOfWaveformSamples
         msg = (
-            f"Unable to convert the waveform multiplex group with index "
-            f"0 as the following required elements are missing from "
-            f"the sequence item: NumberOfWaveformSamples"
+            "Unable to convert the waveform multiplex group with index "
+            "0 as the following required elements are missing from "
+            "the sequence item: NumberOfWaveformSamples"
         )
         with pytest.raises(AttributeError, match=msg):
             multiplex_array(ds, 0)

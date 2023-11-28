@@ -1284,7 +1284,7 @@ class TestEncapsulate:
         frame_a.length = 2**32 - 1 - 8  # 8 for first BOT item tag/length
         frame_b = FakeBytes()
         frame_b.length = 10
-        data = encapsulate([frame_a, frame_b], has_bot=True)
+        encapsulate([frame_a, frame_b], has_bot=True)
 
         frame_a.length = 2**32 - 1 - 7
         msg = (

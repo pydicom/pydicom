@@ -8,7 +8,6 @@ A DataElement has a tag,
 """
 
 import base64
-import copy
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
@@ -293,7 +292,7 @@ class DataElement:
             return cls(tag=tag, value=elem_value, VR=vr)
         except Exception as exc:
             raise ValueError(
-                f"Data element '{tag}' could not be loaded from JSON: " f"{elem_value}"
+                f"Data element '{tag}' could not be loaded from JSON: {elem_value}"
             ) from exc
 
     def to_json_dict(
@@ -523,13 +522,13 @@ class DataElement:
             return Sequence(val)
 
         # if the value is a list, convert each element
-        try:
-            val.append
-        except AttributeError:  # not a list
+        if not hasattr(val, "append"):
             return self._convert(val)
+
         if len(val) == 1:
             return self._convert(val[0])
-        return MultiValue(self._convert, val, validation_mode=self.validation_mode)
+
+        return MultiValue(self._convert, val)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""

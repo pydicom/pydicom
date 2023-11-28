@@ -49,6 +49,11 @@ UID_dictionary = {
     '1.2.840.10008.1.2.4.106.1': ('Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2', 'Transfer Syntax', '', '', 'MPEG4HP42STEREOF'),  # noqa
     '1.2.840.10008.1.2.4.107': ('HEVC/H.265 Main Profile / Level 5.1', 'Transfer Syntax', '', '', 'HEVCMP51'),  # noqa
     '1.2.840.10008.1.2.4.108': ('HEVC/H.265 Main 10 Profile / Level 5.1', 'Transfer Syntax', '', '', 'HEVCM10P51'),  # noqa
+    '1.2.840.10008.1.2.4.201': ('High-Throughput JPEG 2000 Image Compression (Lossless Only)', 'Transfer Syntax', '', '', 'HTJ2KLossless'),  # noqa
+    '1.2.840.10008.1.2.4.202': ('High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)', 'Transfer Syntax', '', '', 'HTJ2KLosslessRPCL'),  # noqa
+    '1.2.840.10008.1.2.4.203': ('High-Throughput JPEG 2000 Image Compression', 'Transfer Syntax', '', '', 'HTJ2K'),  # noqa
+    '1.2.840.10008.1.2.4.204': ('JPIP HTJ2K Referenced', 'Transfer Syntax', '', '', 'JPIPHTJ2KReferenced'),  # noqa
+    '1.2.840.10008.1.2.4.205': ('JPIP HTJ2K Referenced Deflate', 'Transfer Syntax', '', '', 'JPIPHTJ2KReferencedDeflate'),  # noqa
     '1.2.840.10008.1.2.5': ('RLE Lossless', 'Transfer Syntax', '', '', 'RLELossless'),  # noqa
     '1.2.840.10008.1.2.6.1': ('RFC 2557 MIME encapsulation', 'Transfer Syntax', '', 'Retired', 'RFC2557MIMEEncapsulation'),  # noqa
     '1.2.840.10008.1.2.6.2': ('XML Encoding', 'Transfer Syntax', '', 'Retired', 'XMLEncoding'),  # noqa
@@ -238,6 +243,8 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.77.1.5.8': ('Ophthalmic Optical Coherence Tomography B-scan Volume Analysis Storage', 'SOP Class', '', '', 'OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.77.1.6': ('VL Whole Slide Microscopy Image Storage', 'SOP Class', '', '', 'VLWholeSlideMicroscopyImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.77.1.7': ('Dermoscopic Photography Image Storage', 'SOP Class', '', '', 'DermoscopicPhotographyImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.77.1.8': ('Confocal Microscopy Image Storage', 'SOP Class', '', '', 'ConfocalMicroscopyImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.77.1.9': ('Confocal Microscopy Tiled Pyramidal Image Storage', 'SOP Class', '', '', 'ConfocalMicroscopyTiledPyramidalImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.1': ('Lensometry Measurements Storage', 'SOP Class', '', '', 'LensometryMeasurementsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.2': ('Autorefraction Measurements Storage', 'SOP Class', '', '', 'AutorefractionMeasurementsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.3': ('Keratometry Measurements Storage', 'SOP Class', '', '', 'KeratometryMeasurementsStorage'),  # noqa

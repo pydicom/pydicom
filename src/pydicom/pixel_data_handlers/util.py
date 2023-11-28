@@ -3,7 +3,7 @@
 
 from struct import unpack, unpack_from
 from sys import byteorder
-from typing import Optional, Union, TYPE_CHECKING, cast
+from typing import Optional, TYPE_CHECKING, cast
 from collections.abc import Iterable, ByteString
 import warnings
 

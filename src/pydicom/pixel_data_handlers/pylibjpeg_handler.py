@@ -63,7 +63,7 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    import pylibjpeg
+    import pylibjpeg  # noqa: F401
 
     HAVE_PYLIBJPEG = True
 except ImportError:
@@ -77,21 +77,21 @@ if HAVE_PYLIBJPEG:
         from pylibjpeg.pydicom.utils import get_pixel_data_decoders
 
 try:
-    import openjpeg
+    import openjpeg  # noqa: F401
 
     HAVE_OPENJPEG = True
 except ImportError:
     HAVE_OPENJPEG = False
 
 try:
-    import libjpeg
+    import libjpeg  # noqa: F401
 
     HAVE_LIBJPEG = True
 except ImportError:
     HAVE_LIBJPEG = False
 
 try:
-    import rle
+    import rle  # noqa: F401
 
     HAVE_RLE = True
 except ImportError:

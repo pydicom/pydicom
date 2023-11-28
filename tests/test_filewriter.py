@@ -7,7 +7,6 @@ from io import BytesIO
 import os
 from pathlib import Path
 import pickle
-from platform import python_implementation
 
 from struct import unpack
 from tempfile import TemporaryFile

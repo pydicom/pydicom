@@ -1,8 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Tests for the 'pydicom' encoder plugin."""
 
-from struct import pack, unpack
-import sys
 
 import pytest
 
@@ -24,7 +22,6 @@ from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_segment,
 )
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
-from pydicom.uid import RLELossless
 
 
 # EXPL: Explicit VR Little Endian
