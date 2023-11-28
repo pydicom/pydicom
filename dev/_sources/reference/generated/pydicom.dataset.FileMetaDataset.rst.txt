@@ -67,7 +67,14 @@
       ~FileMetaDataset.default_element_format
       ~FileMetaDataset.default_sequence_element_format
       ~FileMetaDataset.indent_chars
+      ~FileMetaDataset.is_implicit_VR
+      ~FileMetaDataset.is_little_endian
       ~FileMetaDataset.is_original_encoding
+      ~FileMetaDataset.original_character_set
+      ~FileMetaDataset.original_encoding
       ~FileMetaDataset.pixel_array
+      ~FileMetaDataset.read_encoding
+      ~FileMetaDataset.read_implicit_vr
+      ~FileMetaDataset.read_little_endian
    
    
