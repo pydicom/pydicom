@@ -1007,7 +1007,7 @@ class TestDatasetCompress:
         ds = get_testdata_file("CT_small.dcm", read=True)
         assert hasattr(ds, "file_meta")
         arr = ds.pixel_array
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         assert ds.is_little_endian
         del ds.PixelData
         del ds.file_meta

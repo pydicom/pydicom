@@ -413,8 +413,8 @@ def code_file_from_dataset(
     # Add the file meta to the dataset, and set transfer syntax
     if hasattr(ds, "file_meta"):
         lines.append("ds.file_meta = file_meta")
-    lines.append("ds.is_implicit_VR = " + str(ds.is_implicit_VR))
-    lines.append("ds.is_little_endian = " + str(ds.is_little_endian))
+    lines.append("ds._is_implicit_VR = " + str(ds.is_implicit_VR))
+    lines.append("ds._is_little_endian = " + str(ds.is_little_endian))
 
     # Return the complete code string
     return line_term.join(lines)

@@ -75,8 +75,8 @@ class TestDataset:
         sub_ds.BeamNumber = "1"
         dataset.BeamSequence = Sequence([sub_ds])
         fp = DicomBytesIO()
-        dataset.is_little_endian = True
-        dataset.is_implicit_VR = True
+        dataset._is_little_endian = True
+        dataset._is_implicit_VR = True
         pydicom.dcmwrite(fp, dataset)
 
         def _reset():
@@ -1293,8 +1293,8 @@ class TestDataset:
         ds.set_original_encoding(True, True, ["latin_1"])
         assert not ds.is_original_encoding
 
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         assert ds.is_original_encoding
         # changed character set
         ds.SpecificCharacterSet = "ISO_IR 192"
@@ -1302,10 +1302,10 @@ class TestDataset:
         # back to original character set
         ds.SpecificCharacterSet = "ISO_IR 100"
         assert ds.is_original_encoding
-        ds.is_little_endian = False
+        ds._is_little_endian = False
         assert not ds.is_original_encoding
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         assert not ds.is_original_encoding
 
     def test_remove_private_tags(self):
@@ -1359,16 +1359,16 @@ class TestDataset:
         with pytest.raises(AttributeError):
             ds.save_as(fp, write_like_original=False)
 
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         with pytest.raises(AttributeError):
             ds.save_as(fp, write_like_original=False)
 
-        ds.is_little_endian = True
-        del ds.is_implicit_VR
+        ds._is_little_endian = True
+        del ds._is_implicit_VR
         with pytest.raises(AttributeError):
             ds.save_as(fp, write_like_original=False)
 
-        ds.is_implicit_VR = True
+        ds._is_implicit_VR = True
         ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = "1.1"
         ds.file_meta.MediaStorageSOPInstanceUID = "1.2"
@@ -1380,8 +1380,8 @@ class TestDataset:
         """Test saving a compressed dataset with no encapsulation."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = b"\x00\x01\x02\x03\x04\x05\x06"
@@ -1397,8 +1397,8 @@ class TestDataset:
         """Test saving a compressed dataset with encapsulation."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
@@ -1409,8 +1409,8 @@ class TestDataset:
         """Test saving with no Pixel Data."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.save_as(fp)
@@ -1419,8 +1419,8 @@ class TestDataset:
         """Test saving with no Transfer Syntax or file_meta."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.save_as(fp)
 
@@ -1431,8 +1431,8 @@ class TestDataset:
         """Test saving with a private transfer syntax."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = "1.2.3.4.5.6"
         ds.save_as(fp)
@@ -1464,8 +1464,8 @@ class TestDataset:
         """Test setting is_undefined_length correctly."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
@@ -1493,8 +1493,8 @@ class TestDataset:
         """Test is_undefined_length unchanged with private tsyntax."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = "1.2.3.4.5"
         ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
@@ -1513,8 +1513,8 @@ class TestDataset:
         """Test is_undefined_length unchanged with no tsyntax."""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
         elem = ds["PixelData"]
         elem.VR = "OB"
@@ -1731,8 +1731,8 @@ class TestDataset:
         ds.PixelRepresentation = None
         ds.BeamSequence = []
 
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
         fp = io.BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
@@ -1791,28 +1791,28 @@ class TestDatasetElements:
         assert not self.ds.file_meta
 
     def test_fix_meta_info(self):
-        self.ds.is_little_endian = True
-        self.ds.is_implicit_VR = True
+        self.ds._is_little_endian = True
+        self.ds._is_implicit_VR = True
         self.ds.fix_meta_info(enforce_standard=False)
         assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
 
-        self.ds.is_implicit_VR = False
+        self.ds._is_implicit_VR = False
         self.ds.fix_meta_info(enforce_standard=False)
         # transfer syntax does not change because of ambiguity
         assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
 
-        self.ds.is_little_endian = False
-        self.ds.is_implicit_VR = True
+        self.ds._is_little_endian = False
+        self.ds._is_implicit_VR = True
         with pytest.raises(NotImplementedError):
             self.ds.fix_meta_info()
 
-        self.ds.is_implicit_VR = False
+        self.ds._is_implicit_VR = False
         self.ds.fix_meta_info(enforce_standard=False)
         assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
 
         assert "MediaStorageSOPClassUID" not in self.ds.file_meta
         assert "MediaStorageSOPInstanceUID" not in self.ds.file_meta
-        with pytest.raises(ValueError, match="Missing required File Meta .*"):
+        with pytest.raises(AttributeError, match="Required File Meta .*"):
             self.ds.fix_meta_info(enforce_standard=True)
 
         self.ds.SOPClassUID = "1.2.3"
@@ -1832,7 +1832,7 @@ class TestDatasetElements:
     def test_validate_and_correct_file_meta(self):
         file_meta = FileMetaDataset()
         validate_file_meta(file_meta, enforce_standard=False)
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError):
             validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta = Dataset()  # not FileMetaDataset for bkwds-compat checks
@@ -1840,8 +1840,8 @@ class TestDatasetElements:
         for enforce_standard in (True, False):
             with pytest.raises(
                 ValueError,
-                match=r"Only File Meta Information Group "
-                r"\(0002,eeee\) elements must be present .*",
+                match=r"Only File Meta Information group "
+                r"\(0002,eeee\) elements may be present .*",
             ):
                 validate_file_meta(file_meta, enforce_standard=enforce_standard)
 
@@ -1849,7 +1849,7 @@ class TestDatasetElements:
         file_meta.MediaStorageSOPClassUID = "1.2.3"
         file_meta.MediaStorageSOPInstanceUID = "1.2.4"
         # still missing TransferSyntaxUID
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError):
             validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
@@ -1915,15 +1915,15 @@ class TestFileDataset:
         e = dcmread(self.test_file)
         assert d == e
 
-        e.is_implicit_VR = not e.is_implicit_VR
+        e._is_implicit_VR = not e.is_implicit_VR
         assert d == e
 
-        e.is_implicit_VR = not e.is_implicit_VR
+        e._is_implicit_VR = not e.is_implicit_VR
         assert d == e
-        e.is_little_endian = not e.is_little_endian
+        e._is_little_endian = not e.is_little_endian
         assert d == e
 
-        e.is_little_endian = not e.is_little_endian
+        e._is_little_endian = not e.is_little_endian
         assert d == e
         e.filename = "test_filename.dcm"
         assert d == e
@@ -2019,8 +2019,8 @@ class TestFileDataset:
         ds2 = copy.deepcopy(ds)
         assert ds == ds2
         ds.filename = "foo.dcm"
-        ds.is_implicit_VR = not ds.is_implicit_VR
-        ds.is_little_endian = not ds.is_little_endian
+        ds._is_implicit_VR = not ds._is_implicit_VR
+        ds._is_little_endian = not ds._is_little_endian
         ds.file_meta = None
         ds.preamble = None
         assert ds == ds2
@@ -2247,9 +2247,9 @@ class TestFileMeta:
         ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
         ds.BeamSequence[0].Manufacturer = "Linac, co."
         ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
-        ds.read_encoding = "utf-8"
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._read_charset = "utf-8"
         ds_copy = copy_method(ds)
         assert isinstance(ds_copy, Dataset)
         assert len(ds_copy) == 2
@@ -2263,7 +2263,7 @@ class TestFileMeta:
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
         assert ds_copy.is_implicit_VR
         assert ds_copy.is_little_endian
-        assert ds_copy.read_encoding == "utf-8"
+        assert ds_copy.original_character_set == "utf-8"
 
 
 @pytest.fixture
@@ -2324,8 +2324,6 @@ CAMEL_CASE = (
         "_parent_encoding",
         "_dict",
         "is_decompressed",
-        "read_little_endian",
-        "read_implicit_vr",
         "read_encoding",
         "_private_blocks",
         "default_element_format",
@@ -2376,10 +2374,21 @@ def test_setattr_warns(setattr_warn):
     with assert_no_warning():
         ds = Dataset()
 
+    deprecations = (
+        "is_implicit_VR",
+        "is_little_endian",
+        "read_encoding",
+    )
+
     for s in CAMEL_CASE[0]:
-        with assert_no_warning():
-            val = getattr(ds, s, None)
-            setattr(ds, s, val)
+        if s in deprecations:
+            with pytest.warns(DeprecationWarning):
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
+        else:
+            with assert_no_warning():
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
 
     for s in CAMEL_CASE[1]:
         msg = (
@@ -2396,10 +2405,21 @@ def test_setattr_raises(setattr_raise):
     with assert_no_warning():
         ds = Dataset()
 
+    deprecations = (
+        "is_implicit_VR",
+        "is_little_endian",
+        "read_encoding",
+    )
+
     for s in CAMEL_CASE[0]:
-        with assert_no_warning():
-            val = getattr(ds, s, None)
-            setattr(ds, s, val)
+        if s in deprecations:
+            with pytest.warns(DeprecationWarning):
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
+        else:
+            with assert_no_warning():
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
 
     for s in CAMEL_CASE[1]:
         msg = (
@@ -2416,10 +2436,21 @@ def test_setattr_ignore(setattr_ignore):
     with assert_no_warning():
         ds = Dataset()
 
+    deprecations = (
+        "is_implicit_VR",
+        "is_little_endian",
+        "read_encoding",
+    )
+
     for s in CAMEL_CASE[0]:
-        with assert_no_warning():
-            val = getattr(ds, s, None)
-            setattr(ds, s, val)
+        if s in deprecations:
+            with pytest.warns(DeprecationWarning):
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
+        else:
+            with assert_no_warning():
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
 
     ds = Dataset()
     for s in CAMEL_CASE[1]:

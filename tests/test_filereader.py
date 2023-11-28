@@ -320,8 +320,8 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = True
+        file_ds._is_little_endian = True
         file_ds.save_as(fp, write_like_original=True)
 
         test_ds = dcmread(fp, force=True, stop_before_pixels=True)
@@ -514,8 +514,8 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = True
+        file_ds._is_little_endian = True
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
@@ -531,8 +531,8 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = False
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = False
+        file_ds._is_little_endian = True
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
@@ -545,8 +545,8 @@ class TestReader:
         ds = dcmread(jpeg_lossless_name)
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = True
+        file_ds._is_little_endian = True
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
@@ -824,7 +824,12 @@ class TestReader:
         """Test that an empty Specific Character Set is handled correctly.
         Regression test for #1038"""
         ds = dcmread(get_testdata_file("empty_charset_LEI.dcm"))
-        assert ds.read_encoding == ["iso8859"]
+        msg = (
+            "'FileDataset.read_encoding' will be removed in v4.0, use "
+            "'FileDataset.original_character_set' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ds.read_encoding == ["iso8859"]
 
     def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.
@@ -902,8 +907,8 @@ class TestReader:
         """Test correct type for an empty PN element."""
         # Test for 1338
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         ds.PatientName = ""
         assert isinstance(ds.PatientName, pydicom.valuerep.PersonName)
 
@@ -975,8 +980,8 @@ class TestIncorrectVR:
         ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = "1.1.1"
         ds.file_meta.MediaStorageSOPInstanceUID = "2.2.2"
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
         ds.SOPClassUID = "9.9.9"  # First item group 8 in top-level dataset
         seq = Sequence()
         seq_ds = Dataset()
@@ -1126,14 +1131,14 @@ class TestReadDataElement:
 
         self.fp = BytesIO()  # Implicit little
         file_ds = FileDataset(self.fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = True
+        file_ds._is_little_endian = True
         file_ds.save_as(self.fp, write_like_original=True)
 
         self.fp_ex = BytesIO()  # Explicit little
         file_ds = FileDataset(self.fp_ex, ds)
-        file_ds.is_implicit_VR = False
-        file_ds.is_little_endian = True
+        file_ds._is_implicit_VR = False
+        file_ds._is_little_endian = True
         file_ds.save_as(self.fp_ex, write_like_original=True)
 
     def test_read_OD_implicit_little(self):

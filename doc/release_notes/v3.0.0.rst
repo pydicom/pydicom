@@ -80,6 +80,17 @@ Changes
   a ``validation_mode`` optional argument
 
 
+Deprecations
+------------
+* :attr:`~pydicom.dataset.Dataset.is_little_endian` and
+  :attr:`~pydicom.dataset.Dataset.is_implicit_VR` will be removed in v4.0
+* :attr:`~pydicom.dataset.Dataset.read_little_endian` and
+  :attr:`~pydicom.dataset.Dataset.read_implicit_vr` will be removed in v4.0,
+  use :attr:`~pydicom.dataset.Dataset.original_encoding` instead
+* :attr:`~pydicom.dataset.Dataset.read_encoding` will be removed in v4.0,
+  use :attr:`~pydicom.dataset.Dataset.original_character_set` instead
+
+
 Enhancements
 ------------
 * Added details of missing required tag information when adding a dataset to a
