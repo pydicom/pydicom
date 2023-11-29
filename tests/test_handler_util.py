@@ -197,6 +197,16 @@ class TestNumpy_PixelDtype:
             self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder in [">", "="]
 
+    def test_no_endianness_raises(self):
+        ds = Dataset()
+        ds.BitsAllocated = 8
+        ds.PixelRepresentation = 1
+        msg = (
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in the file meta"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            pixel_dtype(ds)
 
 if HAVE_NP:
     RESHAPE_ARRAYS = {
@@ -2465,6 +2475,43 @@ class TestNumpy_ApplyVOI:
         out = apply_voi(arr, ds)
         assert "uint16" == out.dtype
         assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_file_meta(self):
+        """Test using file meta to determine endianness"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        item.LUTData = pack("<4H", *item.LUTData)
+        item["LUTData"].VR = "OW"
+        arr = np.asarray([0, 1, 2, 3, 255], dtype="uint16")
+        out = apply_voi(arr, ds)
+        assert "uint16" == out.dtype
+        assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_no_endianness_raises(self):
+        """Test unable to determine endianness"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        item.LUTData = pack("<4H", *item.LUTData)
+        item["LUTData"].VR = "OW"
+        arr = np.asarray([0, 1, 2, 3, 255], dtype="uint16")
+        msg = (
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in the file meta"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            apply_voi(arr, ds)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")

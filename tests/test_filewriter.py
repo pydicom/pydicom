@@ -1962,7 +1962,6 @@ class TestDCMWrite_EnforceFileFormat:
             dcmwrite(fp, ds, implicit_vr=True, enforce_file_format=True)
 
 
-# TODO: add original encoding fallback
 class TestDetermineEncoding:
     """Tests for _determine_encoding()."""
 
@@ -2086,15 +2085,42 @@ class TestWriteDataset:
 
     def test_encoding_buffer(self):
         """Test buffer.is_implicit_VR, buffer.is_little_endian used."""
-        pass
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        ds._read_little = False
+        ds._read_implicit = False
+        ds._is_little_endian = False
+        ds._is_implicit_VR = False
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = True
+        fp.is_little_endian = True
+        # Should use fp's encoding - implicit little
+        write_dataset(fp, ds)
+        assert fp.getvalue()[:8] == b"\x10\x00\x10\x00\x04\x00\x00\x00"
 
     def test_encoding_ds_attr(self):
         """Tests ds.is_implicit_VR, ds.is_little_endian used."""
-        pass
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        ds._read_little = False
+        ds._read_implicit = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
+        fp = DicomBytesIO()
+        # Should use ds's encoding - implicit little
+        write_dataset(fp, ds)
+        assert fp.getvalue()[:8] == b"\x10\x00\x10\x00\x04\x00\x00\x00"
 
     def test_encoding_ds_original(self):
         """Test original ds encoding used."""
-        pass
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        ds._read_little = True
+        ds._read_implicit = True
+        fp = DicomBytesIO()
+        # Should use ds's original encoding - implicit little
+        write_dataset(fp, ds)
+        assert fp.getvalue()[:8] == b"\x10\x00\x10\x00\x04\x00\x00\x00"
 
     def test_encoding_raises(self):
         """Test raises exception if no encoding set"""
@@ -2121,6 +2147,17 @@ class TestWriteDataset:
         ds_read = read_dataset(fp, is_implicit_VR=False, is_little_endian=True)
         for elem_orig, elem_read in zip(ds_read, ds):
             assert elem_orig == elem_read
+
+    def test_no_source_raises(self):
+        """Test trying to write without an encoding source raises."""
+        ds = Dataset()
+        fp = DicomBytesIO()
+        msg = (
+            "'fp.is_implicit_VR' and 'fp.is_little_endian' attributes are "
+            "required"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            write_dataset(fp, ds)
 
 
 class TestWriteFileMetaInfoToStandard:

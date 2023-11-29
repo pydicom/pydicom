@@ -412,7 +412,7 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
 
     if not np.issubdtype(arr.dtype, np.integer):
         warnings.warn(
-            "Applying a VOI LUT on a float input array may give " "incorrect results"
+            "Applying a VOI LUT on a float input array may give incorrect results"
         )
 
     # VOI LUT Sequence contains one or more items
@@ -441,7 +441,10 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
             is_little_endian = ds.original_encoding[1]
 
         if is_little_endian is None:
-            raise ValueError("Unable to determine the endianness of the dataset")
+            raise AttributeError(
+                "Unable to determine the endianness of the dataset, please set "
+                "an appropriate Transfer Syntax UID in the file meta"
+            )
 
         unpack_fmt = f"{'><'[is_little_endian]}{nr_entries}H"
         unc_data = unpack_from(unpack_fmt, cast(bytes, item.LUTData))
@@ -1280,7 +1283,10 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         is_little_endian = ds.original_encoding[1]
 
     if is_little_endian is None:
-        raise ValueError("Unable to determine the endianness of the dataset")
+        raise AttributeError(
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in the file meta"
+        )
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1
