@@ -208,6 +208,7 @@ class TestNumpy_PixelDtype:
         with pytest.raises(AttributeError, match=msg):
             pixel_dtype(ds)
 
+
 if HAVE_NP:
     RESHAPE_ARRAYS = {
         "reference": np.asarray(

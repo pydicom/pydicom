@@ -2152,10 +2152,7 @@ class TestWriteDataset:
         """Test trying to write without an encoding source raises."""
         ds = Dataset()
         fp = DicomBytesIO()
-        msg = (
-            "'fp.is_implicit_VR' and 'fp.is_little_endian' attributes are "
-            "required"
-        )
+        msg = "'fp.is_implicit_VR' and 'fp.is_little_endian' attributes are " "required"
         with pytest.raises(AttributeError, match=msg):
             write_dataset(fp, ds)
 
