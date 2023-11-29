@@ -43,7 +43,7 @@ ds.file_meta = file_meta
 
 path = Path(tempfile.NamedTemporaryFile(suffix=".dcm").name)
 print(f"Writing dataset to: {path}")
-ds.save_as(path)
+ds.save_as(path, enforce_file_format=True)
 
 # reopen the data just for checking
 print(f"Load dataset from: {path} ...")

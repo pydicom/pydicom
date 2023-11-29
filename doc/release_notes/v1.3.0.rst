@@ -9,7 +9,7 @@ Documentation
   and coronal (:pr:`789`)
 
 Changes
-.......
+------------
 * Removed deprecated uid variables, config.image_handlers and DeferredDataElement (:pr:`760`)
 * ``dataelem.isMultiValue`` is deprecated and will be removed in v1.4.
   Use ``dataelem.DataElement.VM`` instead.
