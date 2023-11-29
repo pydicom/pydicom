@@ -1455,6 +1455,7 @@ class TestScratchWrite:
 
 class TestDCMWrite:
     """Tests for dcmwrite()"""
+
     def test_implicit_big_raises(self):
         """Test implicit VR big endian encoding raises exception."""
         msg = "Implicit VR and big endian is not a valid encoding combination"
@@ -1787,6 +1788,7 @@ class TestDCMWrite:
 
 class TestDCMWrite_EnforceFileFormat:
     """Tests for dcmwrite(enforce_file_format=True)"""
+
     def test_force_encoding_raises(self):
         """Test that force_encoding raises."""
         msg = "'force_encoding' cannot be used with 'enforce_file_format'"
@@ -1896,7 +1898,9 @@ class TestDCMWrite_EnforceFileFormat:
         assert out.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
 
         fp = DicomBytesIO()
-        dcmwrite(fp, ds, implicit_vr=False, little_endian=False, enforce_file_format=True)
+        dcmwrite(
+            fp, ds, implicit_vr=False, little_endian=False, enforce_file_format=True
+        )
         fp.seek(0)
         out = dcmread(fp)
         assert out.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
@@ -1906,7 +1910,9 @@ class TestDCMWrite_EnforceFileFormat:
             r"or have an empty value: \(0002,0010\) Transfer Syntax UID"
         )
         with pytest.raises(AttributeError, match=msg):
-            dcmwrite(fp, ds, implicit_vr=False, little_endian=True, enforce_file_format=True)
+            dcmwrite(
+                fp, ds, implicit_vr=False, little_endian=True, enforce_file_format=True
+            )
 
     def test_file_meta_sop_class_sop_instance(self):
         """Test a file meta with no Media Storage SOP Class/Instance UID."""
@@ -1937,7 +1943,9 @@ class TestDCMWrite_EnforceFileFormat:
         ds.file_meta.MediaStorageSOPClassUID = "1.2"
         ds.file_meta.MediaStorageSOPInstanceUID = "1.2.3"
         fp = DicomBytesIO()
-        dcmwrite(fp, ds, implicit_vr=False, little_endian=False, enforce_file_format=True)
+        dcmwrite(
+            fp, ds, implicit_vr=False, little_endian=False, enforce_file_format=True
+        )
         fp.seek(0)
         out = dcmread(fp)
         assert out.file_meta.MediaStorageSOPClassUID == "1.2"
@@ -1957,6 +1965,7 @@ class TestDCMWrite_EnforceFileFormat:
 # TODO: add original encoding fallback
 class TestDetermineEncoding:
     """Tests for _determine_encoding()."""
+
     def test_force_encoding_raises(self):
         """Test exception raised if force_encoding used without args."""
         ds = Dataset()
@@ -2981,10 +2990,7 @@ def use_future():
 class TestFuture:
     def test_dcmwrite_write_like_original_raises(self, use_future):
         ds = Dataset()
-        msg = (
-            r"Invalid keyword argument for dcmwrite\(\): "
-            r"'write_like_original'"
-        )
+        msg = r"Invalid keyword argument for dcmwrite\(\): " r"'write_like_original'"
         with pytest.raises(TypeError):
             dcmwrite(None, ds, write_like_original=True)
 

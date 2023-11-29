@@ -35,7 +35,7 @@ Changes
   datasets. If this is something you need use ``dcmwrite()`` instead.
 *  ``implicit_vr``, ``little_endian`` and ``force_encoding`` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`
-* The priorty used when encoding datasets with ``Dataset.save_as()`` or
+* The priority used when encoding datasets with ``Dataset.save_as()`` or
   ``dcmwrite()`` has been changed to:
 
   1. the set *Transfer Syntax UID*
