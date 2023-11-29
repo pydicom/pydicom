@@ -2,7 +2,7 @@ Version 0.9.8
 =============
 
 Changelog
-------------
+---------
 
 pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
 compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
@@ -10,7 +10,7 @@ VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
 available, but is off by default.
 
 Major changes
---------------
+.............
 
 * Requires Python 2.6 or later, in preparation for Python 3 compatibility
 * experimental Python 3 compatibility (unofficial at this point) -- uncomment
@@ -24,7 +24,7 @@ Major changes
   constructs: decorators, generators, etc
 
 Bug fixes
-------------
+.........
 
 * Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
   774b7a55db33)
@@ -33,14 +33,14 @@ Bug fixes
 
 
 Enhancements
-------------
+............
 
 * UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
   3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)
 * new PersonName3 class for Python 3: (revision 9b92b336e7d4)
 
 Contrib file changes
---------------------
+....................
 
 * Fix for pydicom_series for DS decimal (revision e830f30b6781)
 * new dcm_qt_tree.py module - tree display of DICOM files using PySide and

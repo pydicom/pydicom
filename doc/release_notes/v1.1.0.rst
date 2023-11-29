@@ -1,8 +1,11 @@
 Version 1.1.0
 =================================
 
+Changelog
+---------
+
 Enhancements
-------------
+............
 
 * ``UID.__str__`` no longer returns the UID name (when known). The UID name is
   still available using the ``UID.name`` property.
@@ -17,7 +20,7 @@ Enhancements
 * added full API documentation to pydicom documentation (:issue:`649`)
 
 Fixes
-------------
+.....
 
 * ``UID`` should behave as expected for a python ``str`` subclass
   (:issue:`256`)
@@ -35,7 +38,7 @@ Fixes
 * fixed error handling for values too large to fit in VR IS (:issue:`640`)
 
 Other
-------------
+-----
 
 * A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
   comparing ``UID == [UID name]`` and ``UID != [UID name]``. Starting in v1.2,

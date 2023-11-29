@@ -5,7 +5,7 @@ Changelog
 ---------
 
 Major changes
-------------------------
+.............
 
 * Renamed Attribute class and related modules to !DataElement. Old code will
   continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
@@ -16,7 +16,7 @@ Major changes
   (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)
 
 Other Enhancements
-------------------------
+..................
 
 * Added support for auto-completion of dataset elements in ipython; also all
   environments using Python 2.6 (r69, r70)
@@ -32,7 +32,7 @@ Other Enhancements
   function
 
 Bug Fixes
-------------
+.........
 
 * Fixed issue27, sequence with a single empty item read incorrectly
 * Fixed bug that read_OW did not handle !UndefinedLength (r50)
@@ -42,7 +42,7 @@ Bug Fixes
 * Fixed issue18, util directory not installed (r45)
 
 Other
-------------
+.....
 
 * Added example file myprint.py -- shows how to custom format DICOM file
   information (r67)

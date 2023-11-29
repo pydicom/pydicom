@@ -1,7 +1,7 @@
 Version 2.0.0
 =================================
 
-Changes
+Changelog
 ---------
 * Dropped support for Python 2 (only Python 3.5+ supported)
 
@@ -25,7 +25,7 @@ Changes
   Use ``dataelem.DataElement.VM`` instead.
 
 Enhancements
-------------
+............
 * Allow PathLike objects for filename argument in `dcmread`, `dcmwrite` and
   `Dataset.save_as` (:issue:`1047`)
 * Deflate post-file meta information data when writing a dataset with the
@@ -38,7 +38,7 @@ Enhancements
   behavior
 
 Fixes
-------------
+.....
 * Fixed reading of datasets with an empty `Specific Character Set` tag
   (regression, :issue:`1038`)
 * Fixed failure to parse dataset with an empty *LUT Descriptor* or
