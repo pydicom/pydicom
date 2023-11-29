@@ -435,8 +435,9 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     # Ambiguous VR, US or OW
     unc_data: Iterable[int]
     if item["LUTData"].VR == VR.OW:
-        is_little_endian = ds.file_meta._tsyntax_encoding[1]
-        if is_little_endian is None:
+        if hasattr(ds, "file_meta"):
+            is_little_endian = ds.file_meta._tsyntax_encoding[1]
+        else:
             is_little_endian = ds.original_encoding[1]
 
         if is_little_endian is None:
@@ -1273,8 +1274,9 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         raise ImportError("Numpy is required to determine the dtype.")
 
     # Prefer Transfer Syntax UID, fall back to the original encoding
-    is_little_endian = ds.file_meta._tsyntax_encoding[1]
-    if is_little_endian is None:
+    if hasattr(ds, "file_meta"):
+        is_little_endian = ds.file_meta._tsyntax_encoding[1]
+    else:
         is_little_endian = ds.original_encoding[1]
 
     if is_little_endian is None:

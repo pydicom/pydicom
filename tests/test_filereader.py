@@ -320,9 +320,7 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds._is_implicit_VR = True
-        file_ds._is_little_endian = True
-        file_ds.save_as(fp, write_like_original=True)
+        file_ds.save_as(fp, implicit_vr=True)
 
         test_ds = dcmread(fp, force=True, stop_before_pixels=True)
         ds_tags = sorted(ds.keys())

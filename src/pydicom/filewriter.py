@@ -689,6 +689,9 @@ def write_data_element(
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
 
 
+EncodingType = tuple[bool | None, bool | None]
+
+
 def write_dataset(
     fp: DicomIO, dataset: Dataset, parent_encoding: str | list[str] = default_encoding
 ) -> int:
@@ -719,8 +722,9 @@ def write_dataset(
     """
     # TODO: Update in v4.0
     # In order of encoding priority
-    fp_encoding = (fp.is_implicit_VR, fp.is_little_endian)
-    ds_encoding: tuple[bool | None, bool | None] = (None, None)
+
+    fp_encoding: EncodingType = (fp.is_implicit_VR, fp.is_little_endian)
+    ds_encoding: EncodingType = (None, None)
     if not config._use_future:
         ds_encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
     or_encoding = dataset.original_encoding
@@ -732,13 +736,11 @@ def write_dataset(
 
     if None in fp_encoding:
         if None not in ds_encoding:
-            fp.is_implicit_VR, fp.is_little_endian = cast(
-                tuple[bool, bool], ds_encoding
-            )
+            fp_encoding = ds_encoding
         elif None not in or_encoding:
-            fp.is_implicit_VR, fp.is_little_endian = cast(
-                tuple[bool, bool], or_encoding
-            )
+            fp_encoding = or_encoding
+
+    fp.is_implicit_VR, fp.is_little_endian = cast(tuple[bool, bool], fp_encoding)
 
     # This function is doing some heavy lifting:
     #   If implicit -> explicit, runs ambiguous VR correction

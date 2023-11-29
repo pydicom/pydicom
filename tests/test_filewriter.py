@@ -1595,13 +1595,13 @@ class TestDCMWrite:
         """Test simple conversion from big to little endian."""
         # Note that O* and UN elements are not converted
         ds = dcmread(mr_bigendian_name)
-        assert not ds.is_little_endian
+        assert not ds.original_encoding[1]
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         fp = DicomBytesIO()
         dcmwrite(fp, ds)
         fp.seek(0)
         ds_out = dcmread(fp)
-        assert ds_out.is_little_endian
+        assert ds_out.original_encoding[1]
 
         # pixel data is not converted automatically
         ds_explicit = dcmread(mr_name)
@@ -1614,13 +1614,13 @@ class TestDCMWrite:
         """Test simple conversion from little to big endian."""
         # Note that O* and UN elements are not converted
         ds = dcmread(mr_name)
-        assert ds.is_little_endian
+        assert ds.original_encoding[1]
         ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
         fp = DicomBytesIO()
         dcmwrite(fp, ds, little_endian=False)
         fp.seek(0)
         ds_out = dcmread(fp)
-        assert not ds_out.is_little_endian
+        assert not ds_out.original_encoding[1]
 
         # pixel data is not converted automatically
         ds_explicit = dcmread(mr_bigendian_name)
@@ -2991,7 +2991,7 @@ class TestFuture:
     def test_dcmwrite_write_like_original_raises(self, use_future):
         ds = Dataset()
         msg = r"Invalid keyword argument for dcmwrite\(\): " r"'write_like_original'"
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError, match=msg):
             dcmwrite(None, ds, write_like_original=True)
 
         with pytest.raises(TypeError):

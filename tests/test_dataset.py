@@ -37,6 +37,7 @@ from pydicom.uid import (
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID,
+    CTImageStorage,
 )
 from pydicom.valuerep import DS, VR
 
@@ -1307,6 +1308,9 @@ class TestDataset:
         ds._is_implicit_VR = False
         assert not ds.is_original_encoding
 
+        ds.set_original_encoding(True, True, None)
+        assert ds.original_character_set == ["latin_1"]
+
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""
         ds = Dataset()
@@ -1579,6 +1583,19 @@ class TestDataset:
 
 
 class TestDatasetSaveAs:
+    def test_extra_kwargs_raises(self):
+        """Test unknown kwargs raise exception."""
+        ds = Dataset()
+        msg = r"Invalid keyword argument\(s\) for Dataset.save_as\(\): is_implicit_VR"
+        with pytest.warns(DeprecationWarning):
+            with pytest.raises(TypeError, match=msg):
+                ds.save_as(
+                    DicomBytesIO(),
+                    implicit_vr=False,
+                    write_like_original=True,
+                    is_implicit_VR=False,
+                )
+
     def test_no_transfer_syntax(self):
         """Test basic use of Dataset.save_as()"""
         ds = Dataset()
@@ -1595,6 +1612,15 @@ class TestDatasetSaveAs:
 
         # OK
         ds.save_as(DicomBytesIO(), implicit_vr=True)
+
+    def test_little_endian_default(self):
+        """Test that the default uses little endian."""
+        ds = Dataset()
+        ds.PatientName = "CITIZEN"
+        bs = io.BytesIO()
+        ds.save_as(bs, implicit_vr=True, little_endian=None)
+        assert ds["PatientName"].tag.group == 0x0010
+        assert bs.getvalue()[:4] == b"\x10\x00\x10\x00"
 
     def test_mismatch(self):
         """Test mismatch between transfer syntax and args."""
@@ -1619,13 +1645,8 @@ class TestDatasetSaveAs:
     def test_priority_syntax(self):
         """Test prefer transfer syntax over dataset attributes."""
         ds = get_testdata_file("CT_small.dcm", read=True)
-        assert not ds.is_implicit_VR
-        msg = (
-            r"The use of 'Dataset.is_implicit_VR' and 'Dataset.is_little_endian' "
-            r"with write_dataset\(\) to set the encoding is deprecated and "
-            r"will be removed in v4.0, please use the 'implicit_vr' and "
-            r"'little_endian' arguments instead"
-        )
+        assert not ds.original_encoding[0]
+        assert not ds._is_implicit_VR
 
         # Explicit -> implicit
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
@@ -1633,8 +1654,8 @@ class TestDatasetSaveAs:
         ds.save_as(fp)
         fp.seek(0)
         ds = dcmread(fp)
-        assert ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding[0]
+        assert ds._is_implicit_VR
 
         # Implicit -> explicit
         fp = DicomBytesIO()
@@ -1643,32 +1664,94 @@ class TestDatasetSaveAs:
         ds.save_as(fp)
         fp.seek(0)
         ds = dcmread(fp)
-        assert not ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert not ds.original_encoding[0]
+
+        ds = Dataset()
+        ds.preamble = b"\x00" * 128
+        ds.PatientName = "Foo"
+        ds._is_little_endian = True
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+
+        # Big endian
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert not ds.original_encoding[1]
+
+        # Little endian
+        ds._read_little = None
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding[1]
 
     def test_priority_args(self):
         """Test prefer args over dataset attributes."""
         ds = get_testdata_file("CT_small.dcm", read=True)
         del ds.file_meta
-        assert not ds.is_implicit_VR
+        assert not ds.original_encoding[0]
+        assert not ds._is_implicit_VR
 
         # Explicit -> implicit
         fp = DicomBytesIO()
         ds.save_as(fp, implicit_vr=True)
         fp.seek(0)
         ds = dcmread(fp)
-        assert ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding == (True, True)
+        assert ds._is_implicit_VR
 
         # Implicit -> explicit
         fp = DicomBytesIO()
-        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-        ds._is_implicit_VR = True
         ds.save_as(fp, implicit_vr=False)
         fp.seek(0)
         ds = dcmread(fp)
-        assert not ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding == (False, True)
+
+        ds = Dataset()
+        ds.preamble = b"\x00" * 128
+        ds.PatientName = "Foo"
+        ds._is_little_endian = True
+
+        # Big endian
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=False, little_endian=False)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert not ds.original_encoding[1]
+
+        # Little endian
+        ds._read_little = None
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=False, little_endian=True)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding[1]
+
+    def test_priority_attr(self):
+        """Test priority of dataset attrs over original."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        del ds.file_meta
+        assert not ds.original_encoding[0]
+
+        # Explicit -> implicit
+        fp = DicomBytesIO()
+        ds._is_implicit_VR = True
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding == (True, True)
+
+        # Implicit -> explicit
+        fp = DicomBytesIO()
+        ds._is_implicit_VR = False
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding == (False, True)
 
     def test_write_like_original(self):
         ds = Dataset()
@@ -1910,45 +1993,6 @@ class TestDatasetElements:
         self.ds.ensure_file_meta()
         assert hasattr(self.ds, "file_meta")
         assert not self.ds.file_meta
-
-    def test_fix_meta_info(self):
-        self.ds._is_little_endian = True
-        self.ds._is_implicit_VR = True
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
-
-        self.ds._is_implicit_VR = False
-        self.ds.fix_meta_info(enforce_standard=False)
-        # transfer syntax does not change because of ambiguity
-        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
-
-        self.ds._is_little_endian = False
-        self.ds._is_implicit_VR = True
-        with pytest.raises(NotImplementedError):
-            self.ds.fix_meta_info()
-
-        self.ds._is_implicit_VR = False
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
-
-        assert "MediaStorageSOPClassUID" not in self.ds.file_meta
-        assert "MediaStorageSOPInstanceUID" not in self.ds.file_meta
-        with pytest.raises(AttributeError, match="Required File Meta .*"):
-            self.ds.fix_meta_info(enforce_standard=True)
-
-        self.ds.SOPClassUID = "1.2.3"
-        self.ds.SOPInstanceUID = "4.5.6"
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert "1.2.3" == self.ds.file_meta.MediaStorageSOPClassUID
-        assert "4.5.6" == self.ds.file_meta.MediaStorageSOPInstanceUID
-        self.ds.fix_meta_info(enforce_standard=True)
-
-        self.ds.file_meta = FileMetaDataset()
-        with pytest.raises(
-            ValueError,
-            match=r"Only group 2 data elements are allowed in a FileMetaDataset",
-        ):
-            self.ds.file_meta.PatientID = "PatientID"
 
     def test_validate_and_correct_file_meta(self):
         file_meta = FileMetaDataset()
@@ -2386,6 +2430,16 @@ class TestFileMeta:
         assert ds_copy.is_little_endian
         assert ds_copy.original_character_set == "utf-8"
 
+    def test_tsyntax_encoding(self):
+        file_meta = FileMetaDataset()
+        assert file_meta._tsyntax_encoding == (None, None)
+        file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        assert file_meta._tsyntax_encoding == (True, True)
+        file_meta.TransferSyntaxUID = "1.2.3.4"
+        assert file_meta._tsyntax_encoding == (None, None)
+        file_meta.TransferSyntaxUID = CTImageStorage
+        assert file_meta._tsyntax_encoding == (None, None)
+
 
 @pytest.fixture
 def contains_raise():
@@ -2594,7 +2648,7 @@ class TestFuture:
             r"Invalid keyword argument for Dataset.save_as\(\): "
             r"'write_like_original'"
         )
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError, match=msg):
             ds.save_as(None, write_like_original=True)
 
         with pytest.raises(TypeError):
@@ -2615,6 +2669,8 @@ class TestFuture:
 
     def test_is_little_endian_raises(self, use_future):
         ds = Dataset()
+        assert not hasattr(ds, "_is_little_endian")
+
         msg = "'Dataset' object has no attribute 'is_little_endian'"
         with pytest.raises(AttributeError, match=msg):
             ds.is_little_endian = True
@@ -2625,6 +2681,8 @@ class TestFuture:
 
     def test_is_implicit_VR_raises(self, use_future):
         ds = Dataset()
+        assert not hasattr(ds, "_is_implicit_VR")
+
         msg = "'Dataset' object has no attribute 'is_implicit_VR'"
         with pytest.raises(AttributeError, match=msg):
             ds.is_implicit_VR = True
@@ -2661,9 +2719,7 @@ class TestFuture:
         ds = Dataset()
         ds._is_little_endian = True
         ds._is_implicit_VR = True
-        ds.PatientID = "12345"  # 0010,0010
 
-        # Slice starting from and including (0008,0001)
         ds = ds[0x00080001:]
         assert not hasattr(ds, "_is_little_endian")
         assert not hasattr(ds, "_is_implicit_VR")

@@ -6,7 +6,7 @@ adds extra functionality to Dataset when data is read from or written to file.
 
 Overview of DICOM object model
 ------------------------------
-Dataset (dict-like)
+Dataset (dict subclass)
   Contains DataElement instances, each of which has a tag, VR, VM and value.
     The DataElement value can be:
         * A single value, such as a number, string, etc. (i.e. VM = 1)
@@ -77,8 +77,6 @@ from pydicom.pixel_data_handlers.util import (
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
 from pydicom.uid import (
     ExplicitVRLittleEndian,
-    ImplicitVRLittleEndian,
-    ExplicitVRBigEndian,
     RLELossless,
     PYDICOM_IMPLEMENTATION_UID,
     UID,
@@ -1929,12 +1927,6 @@ class Dataset:
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self["PixelData"].is_undefined_length = True
 
-        # TODO: Remove in stage 2
-        # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
-        if not config._use_future:
-            self._is_implicit_VR = False
-            self._is_little_endian = True
-
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
@@ -2474,46 +2466,6 @@ class Dataset:
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
-
-    # TODO: rationalise
-    def fix_meta_info(self, enforce_standard: bool = True) -> None:
-        """Ensure the file meta info exists and has the correct values
-        for transfer syntax and media storage UIDs.
-
-        .. versionadded:: 1.2
-
-        .. warning::
-
-            The transfer syntax for ``is_implicit_VR = False`` and
-            ``is_little_endian = True`` is ambiguous and will therefore not
-            be set.
-
-        Parameters
-        ----------
-        enforce_standard : bool, optional
-            If ``True``, a check for incorrect and missing elements is
-            performed (see :func:`~validate_file_meta`).
-        """
-        self.ensure_file_meta()
-
-        if config._use_future:
-            pass
-        else:
-            if self.is_little_endian and self.is_implicit_VR:
-                self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-            elif not self.is_little_endian and not self.is_implicit_VR:
-                self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-            elif not self.is_little_endian and self.is_implicit_VR:
-                raise NotImplementedError(
-                    "Implicit VR Big Endian is not a supported Transfer Syntax"
-                )
-
-        if "SOPClassUID" in self:
-            self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
-        if "SOPInstanceUID" in self:
-            self.file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
-        if enforce_standard:
-            validate_file_meta(self.file_meta, enforce_standard=True)
 
     def __setattr__(self, name: str, value: Any) -> None:
         """Intercept any attempts to set a value for an instance attribute.
@@ -3358,8 +3310,16 @@ class FileMetaDataset(Dataset):
 
     @property
     def _tsyntax_encoding(self) -> tuple[bool, bool] | tuple[None, None]:
+        """Return the transfer syntax encoding method (if any)
+
+        Returns
+        -------
+        tuple[bool, bool] | tuple[None, None]
+            If the file meta has a valid public Transfer Syntax UID then
+            returns (is implicit, is little), otherwise returns (None, None).
+        """
         tsyntax = self.get("TransferSyntaxUID", None)
-        if tsyntax is None or tsyntax.is_private or not tsyntax.is_transfer_syntax:
+        if not tsyntax or tsyntax.is_private or not tsyntax.is_transfer_syntax:
             return (None, None)
 
         return (tsyntax.is_implicit_VR, tsyntax.is_little_endian)
