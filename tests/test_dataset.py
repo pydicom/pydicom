@@ -1284,7 +1284,7 @@ class TestDataset:
         )
 
     def test_is_original_encoding(self):
-        """Test Dataset.write_like_original"""
+        """Test Dataset.is_original_encoding"""
         ds = Dataset()
         assert not ds.is_original_encoding
 
@@ -2080,15 +2080,15 @@ class TestFileDataset:
         e = dcmread(self.test_file)
         assert d == e
 
-        e._is_implicit_VR = not e.is_implicit_VR
+        e._read_implicit = not e._read_implicit
         assert d == e
 
-        e._is_implicit_VR = not e.is_implicit_VR
+        e._read_implicit = not e._read_implicit
         assert d == e
-        e._is_little_endian = not e.is_little_endian
+        e._read_little = not e._read_little
         assert d == e
 
-        e._is_little_endian = not e.is_little_endian
+        e._read_little = not e._read_little
         assert d == e
         e.filename = "test_filename.dcm"
         assert d == e
@@ -2184,8 +2184,8 @@ class TestFileDataset:
         ds2 = copy.deepcopy(ds)
         assert ds == ds2
         ds.filename = "foo.dcm"
-        ds._is_implicit_VR = not ds._is_implicit_VR
-        ds._is_little_endian = not ds._is_little_endian
+        ds._read_implicit = not ds._read_implicit
+        ds._read_little = not ds._read_little
         ds.file_meta = None
         ds.preamble = None
         assert ds == ds2
@@ -2412,9 +2412,7 @@ class TestFileMeta:
         ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
         ds.BeamSequence[0].Manufacturer = "Linac, co."
         ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
-        ds._is_implicit_VR = True
-        ds._is_little_endian = True
-        ds._read_charset = "utf-8"
+        ds.set_original_encoding(True, True, "utf-8")
         ds_copy = copy_method(ds)
         assert isinstance(ds_copy, Dataset)
         assert len(ds_copy) == 2
@@ -2426,8 +2424,7 @@ class TestFileMeta:
         else:
             # shallow copy
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
-        assert ds_copy.is_implicit_VR
-        assert ds_copy.is_little_endian
+        assert ds_copy.original_encoding == (True, True)
         assert ds_copy.original_character_set == "utf-8"
 
     def test_tsyntax_encoding(self):
@@ -2666,6 +2663,16 @@ class TestFuture:
         ds._read_little = True
         ds._is_little_endian = False
         ds.save_as(DicomBytesIO())
+
+    def test_is_original_encoding(self, use_future):
+        ds = Dataset()
+        ds._read_charset = ["latin_1"]
+        ds.SpecificCharacterSet = "ISO_IR 100"
+        assert ds.is_original_encoding
+        ds.SpecificCharacterSet = "ISO_IR 192"
+        assert not ds.is_original_encoding
+        ds.SpecificCharacterSet = "ISO_IR 100"
+        assert ds.is_original_encoding
 
     def test_is_little_endian_raises(self, use_future):
         ds = Dataset()

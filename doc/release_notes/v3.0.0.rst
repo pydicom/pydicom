@@ -33,7 +33,7 @@ Changes
   :meth:`~pydicom.dataset.Dataset.save_as`. In addition, this method will now
   raise an exception if the user tries to convert between little and big endian
   datasets. If this is something you need use ``dcmwrite()`` instead.
-*  ``implicit_vr``, ``little_endian`` and ``force_encoding`` optional arguments
+* ``implicit_vr``, ``little_endian`` and ``force_encoding`` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`
 * The priority used when encoding datasets with :meth:`~pydicom.dataset.Dataset.save_as`
   or :func:`~pydicom.filewriter.dcmwrite` has been changed to:

@@ -1254,11 +1254,11 @@ class Dataset:
         """
         tags = self._slice_dataset(slce.start, slce.stop, slce.step)
         ds = Dataset({tag: self.get_item(tag) for tag in tags})
+        is_implicit, is_little = self.original_encoding
+        ds.set_original_encoding(is_implicit, is_little, self.original_character_set)
         if not config._use_future:
             ds._is_little_endian = self.is_little_endian
             ds._is_implicit_VR = self.is_implicit_VR
-        ds._read_implicit, ds._read_little = self.original_encoding
-        ds._read_charset = self.original_character_set
 
         return ds
 
@@ -1344,6 +1344,7 @@ class Dataset:
         )
         self._is_little_endian = value
 
+    # FIXME
     @property
     def is_original_encoding(self) -> bool:
         """Return ``True`` if the encoding to be used for writing is set and
@@ -1354,9 +1355,9 @@ class Dataset:
         This includes properties related to endianness, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
-        # TODO: v4.0
-        #   Replace check on read_implicit_vr and read_little_endian
-        #   with check on transfer syntax
+        if config._use_future:
+            return self.original_character_set == self._character_set
+
         current_encoding = (self.is_implicit_VR, self.is_little_endian)
         return (
             None not in current_encoding
@@ -1377,7 +1378,6 @@ class Dataset:
             as ``(encoded as implicit VR, encoded as little endian)``. Returns
             ``(None, None)`` for a dataset created from scratch.
         """
-
         return cast(
             tuple[bool, bool] | tuple[None, None],
             (self._read_implicit, self._read_little),
@@ -2266,7 +2266,7 @@ class Dataset:
             ),
             DeprecationWarning,
         )
-        return self.original_encoding[0]
+        return self._read_implicit
 
     @property
     def read_little_endian(self) -> bool | None:
@@ -2298,7 +2298,7 @@ class Dataset:
             ),
             DeprecationWarning,
         )
-        return self.original_encoding[1]
+        return self._read_little
 
     def remove_private_tags(self) -> None:
         """Remove all private elements from the :class:`Dataset`."""

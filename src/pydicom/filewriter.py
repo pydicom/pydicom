@@ -110,7 +110,7 @@ def _correct_ambiguous_vr_element(
         #   If encapsulated, VR is OB and length is undefined
         if elem.is_undefined_length:
             elem.VR = VR.OB
-        elif ds.is_implicit_VR:
+        elif ds.original_encoding[0]:
             # Non-compressed Pixel Data - Implicit Little Endian
             # PS3.5 Annex A1: VR is always OW
             elem.VR = VR.OW
@@ -179,7 +179,7 @@ def _correct_ambiguous_vr_element(
         # If WaveformBitsAllocated is > 8 then OW, otherwise may be
         #   OB or OW.
         #   See PS3.3 C.10.9.1.
-        if ds.is_implicit_VR:
+        if ds.original_encoding[0]:
             elem.VR = VR.OW
         else:
             elem.VR = VR.OW if cast(int, ds.WaveformBitsAllocated) > 8 else VR.OB
@@ -1001,17 +1001,17 @@ def _determine_encoding(
     if implicit_vr is not None and little_endian is None:
         arg_encoding = (implicit_vr, True)
 
-    ds_encoding: tuple[bool | None, bool | None] = (None, None)
+    ds_encoding: EncodingType = (None, None)
     if not config._use_future:
         ds_encoding = (ds.is_implicit_VR, ds.is_little_endian)
 
-    fallback_encoding: tuple[bool | None, bool | None] = (None, None)
+    fallback_encoding: EncodingType = (None, None)
     if None not in arg_encoding:
-        fallback_encoding = cast(tuple[bool, bool], arg_encoding)
+        fallback_encoding = arg_encoding
     elif None not in ds_encoding:
-        fallback_encoding = cast(tuple[bool, bool], ds_encoding)
+        fallback_encoding = ds_encoding
     elif None not in ds.original_encoding:
-        fallback_encoding = cast(tuple[bool, bool], ds.original_encoding)
+        fallback_encoding = ds.original_encoding
 
     if tsyntax is None:
         if None not in fallback_encoding:

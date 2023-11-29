@@ -911,7 +911,7 @@ class TestCorrectAmbiguousVR:
     def test_waveform_bits_allocated(self):
         """Test correcting elements which require WaveformBitsAllocated."""
         ref_ds = Dataset()
-        ref_ds._is_implicit_VR = False
+        ref_ds.set_original_encoding(False, True)
 
         # If WaveformBitsAllocated  > 8 then VR must be OW
         ref_ds.WaveformBitsAllocated = 16
@@ -931,11 +931,11 @@ class TestCorrectAmbiguousVR:
         assert "OB" == ds[0x54001010].VR
 
         # For implicit VR, VR is always OW
-        ref_ds._is_implicit_VR = True
+        ref_ds.set_original_encoding(True, True)
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         assert b"\x01\x02" == ds.WaveformData
         assert "OW" == ds[0x54001010].VR
-        ref_ds._is_implicit_VR = False
+        ref_ds.set_original_encoding(False, True)
 
         # If no WaveformBitsAllocated then AttributeError shall be raised
         ref_ds = Dataset()
@@ -984,7 +984,7 @@ class TestCorrectAmbiguousVR:
         """Test correcting OverlayData"""
         # VR must be 'OW'
         ref_ds = Dataset()
-        ref_ds._is_implicit_VR = True
+        ref_ds.set_original_encoding(True, True)
         ref_ds.add(DataElement(0x60003000, "OB or OW", b"\x00"))
         ref_ds.add(DataElement(0x601E3000, "OB or OW", b"\x00"))
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
@@ -993,7 +993,7 @@ class TestCorrectAmbiguousVR:
         assert "OB or OW" == ref_ds[0x60003000].VR
         assert "OB or OW" == ref_ds[0x601E3000].VR
 
-        ref_ds._is_implicit_VR = False
+        ref_ds.set_original_encoding(False, True)
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         assert "OW" == ds[0x60003000].VR
         assert "OB or OW" == ref_ds[0x60003000].VR
@@ -2016,6 +2016,14 @@ class TestDetermineEncoding:
         result = _determine_encoding(ds, None, None, False, False)
         assert result == (False, True)
 
+    def test_original(self):
+        """Test fallback to original when tsyntax, args and ds attr not available."""
+        ds = Dataset()
+        ds._read_implicit = False
+        ds._read_little = True
+        result = _determine_encoding(ds, None, None, False, False)
+        assert result == (False, True)
+
     def test_none_raises(self):
         """Test exception raised if unable to determine encoding."""
         msg = (
@@ -2074,7 +2082,22 @@ class TestDetermineEncoding:
 
 
 class TestWriteDataset:
-    """Unit tests for writing datasets to the DICOM standard"""
+    """Tests for write_dataset()"""
+
+    def test_encoding_buffer(self):
+        """Test buffer.is_implicit_VR, buffer.is_little_endian used."""
+        pass
+
+    def test_encoding_ds_attr(self):
+        """Tests ds.is_implicit_VR, ds.is_little_endian used."""
+        pass
+
+    def test_encoding_ds_original(self):
+        """Test original ds encoding used."""
+        pass
+
+    def test_encoding_raises(self):
+        """Test raises exception if no encoding set"""
 
     def test_write_dataset(self):
         # make sure writing and reading back a dataset works correctly

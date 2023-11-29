@@ -9,7 +9,7 @@ compatibility. ** It is the last version which will run with Python < 2.6 **
 (it will run with Python 2.4 to Python 2.7)
 
 Major changes
-.............
+-------------
 
 * Added DICOM 2011 keywords. Old "named tags" still work, but will be
   deprecated in future versions. Most names are identical, but some have changed.
@@ -33,7 +33,7 @@ part of the standard, and promote consistency across programming languages and
 libraries.
 
 Bug fixes
-.........
+------------
 
 * New way to read file meta information, not using the group length, instead
   reading until end of group 2 data elements. If group length dose not match,
@@ -45,7 +45,7 @@ Bug fixes
 * Japanese and Korean encoding fixes (issue 110)
 
 Other Enhancements
-..................
+------------------
 
 * New Sequence class which verifies items are Datasets (issue 52)
 * Assignment to SQ data element checks value is a Sequence or can be converted

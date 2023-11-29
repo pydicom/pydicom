@@ -1,11 +1,8 @@
 Version 1.2.0
 =================================
 
-Changelog
----------
-
 Changes
-.......
+------------
 
 * PIL removed as a fallback if Pillow is not available in the pillow pixel data
   handler (:issue:`722`)
@@ -29,7 +26,7 @@ Changes
 
 
 Enhancements
-............
+------------
 
 * Updated DICOM dictionary for 2018c edition (:issue:`677`)
 * Added possibility to set byte strings as value for VRs that use only the
@@ -54,7 +51,7 @@ Enhancements
 
 
 Fixes
-.....
+------------
 
 * Removed unused ``original_string`` attribute from the ``DataElement`` class
   (:pr:`660`)
