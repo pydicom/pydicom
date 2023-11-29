@@ -24,6 +24,7 @@ except ImportError:
     HAVE_GDCM = False
 
 
+from pydicom import config
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.encoders import RLELosslessEncoder
@@ -1086,3 +1087,18 @@ class TestDatasetCompress:
         ds.compress(RLELossless, encoding_plugin="pydicom", samples_per_pixel=3)
         ds.SamplesPerPixel = 3
         assert np.array_equal(ref, ds.pixel_array)
+
+
+@pytest.fixture
+def use_future():
+    config._use_future = True
+    yield
+    config._use_future = False
+
+
+class TestFuture:
+    def test_compress(self, use_future):
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds.compress(RLELossless, encoding_plugin="pydicom")
+        assert not hasattr(ds, "_is_little_endian")
+        assert not hasattr(ds, "_is_implicit_VR")

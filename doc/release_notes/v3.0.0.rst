@@ -36,9 +36,14 @@ Changes
 *  ``implicit_vr``, ``little_endian`` and ``force_encoding`` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`
 * The priorty used when encoding datasets with ``Dataset.save_as()`` or
-  ``dcmwrite()`` has been changed to: 1) the set *Transfer Syntax UID*, 2) the
-  `implicit_vr` and `little_endian` arguments, 3) the original encoding of the
-  dataset
+  ``dcmwrite()`` has been changed to:
+
+  1. the set *Transfer Syntax UID*
+  2. the `implicit_vr` and `little_endian` arguments
+  3. :attr:`~pydicom.dataset.Dataset.is_implicit_VR` and
+     :attr:`~pydicom.dataset.Dataset.is_little_endian`
+  4. :attr:`~pydicom.dataset.Dataset.original_encoding`
+
 
 Removals
 ~~~~~~~~
@@ -128,8 +133,8 @@ Fixes
   :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
 * Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
-* Fixed incorrectly encoding a dataset when converting from explicit to implicit VR
-  when only the *Transfer Syntax UID* was changed (:issue:`1943`)
+* Fixed incorrectly encoding a dataset when converting between explicit and
+  implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
 
 
 Deprecations

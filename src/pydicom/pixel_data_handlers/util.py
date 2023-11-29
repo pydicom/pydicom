@@ -435,8 +435,14 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     # Ambiguous VR, US or OW
     unc_data: Iterable[int]
     if item["LUTData"].VR == VR.OW:
-        endianness = "<" if ds.is_little_endian else ">"
-        unpack_fmt = f"{endianness}{nr_entries}H"
+        is_little_endian = ds.file_meta._tsyntax_encoding[1]
+        if is_little_endian is None:
+            is_little_endian = ds.original_encoding[1]
+
+        if is_little_endian is None:
+            raise ValueError("Unable to determine the endianness of the dataset")
+
+        unpack_fmt = f"{'><'[is_little_endian]}{nr_entries}H"
         unc_data = unpack_from(unpack_fmt, cast(bytes, item.LUTData))
     else:
         unc_data = cast(list[int], item.LUTData)
@@ -1267,10 +1273,12 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         raise ImportError("Numpy is required to determine the dtype.")
 
     # Prefer Transfer Syntax UID, fall back to the original encoding
-    try:
-        is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
-    except AttributeError:
+    is_little_endian = ds.file_meta._tsyntax_encoding[1]
+    if is_little_endian is None:
         is_little_endian = ds.original_encoding[1]
+
+    if is_little_endian is None:
+        raise ValueError("Unable to determine the endianness of the dataset")
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1

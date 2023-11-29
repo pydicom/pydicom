@@ -6,7 +6,7 @@ adds extra functionality to Dataset when data is read from or written to file.
 
 Overview of DICOM object model
 ------------------------------
-Dataset (MutableMapping[Tag, DataElement])
+Dataset (dict-like)
   Contains DataElement instances, each of which has a tag, VR, VM and value.
     The DataElement value can be:
         * A single value, such as a number, string, etc. (i.e. VM = 1)
@@ -406,8 +406,9 @@ class Dataset:
 
         # TODO: v4.0
         #   Remove is_little_endian and is_implicit_VR
-        self._is_little_endian: bool | None = None
-        self._is_implicit_VR: bool | None = None
+        if not config._use_future:
+            self._is_little_endian: bool | None = None
+            self._is_implicit_VR: bool | None = None
 
         # True if the dataset is a sequence item with undefined length
         self.is_undefined_length_sequence_item = False
@@ -921,6 +922,9 @@ class Dataset:
     @property
     def read_encoding(self) -> str | MutableSequence[str]:
         name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'read_encoding'")
+
         warnings.warn(
             (
                 f"'{name}.read_encoding' will be removed in v4.0, use "
@@ -942,6 +946,9 @@ class Dataset:
 
         """
         name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'read_encoding'")
+
         warnings.warn(
             (
                 f"'{name}.read_encoding' will be removed in v4.0, use "
@@ -1249,8 +1256,9 @@ class Dataset:
         """
         tags = self._slice_dataset(slce.start, slce.stop, slce.step)
         ds = Dataset({tag: self.get_item(tag) for tag in tags})
-        ds._is_little_endian = self.is_little_endian
-        ds._is_implicit_VR = self.is_implicit_VR
+        if not config._use_future:
+            ds._is_little_endian = self.is_little_endian
+            ds._is_implicit_VR = self.is_implicit_VR
         ds._read_implicit, ds._read_little = self.original_encoding
         ds._read_charset = self.original_character_set
 
@@ -1258,6 +1266,11 @@ class Dataset:
 
     @property
     def is_implicit_VR(self) -> bool | None:
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'is_implicit_VR'"
+            )
+
         return self._is_implicit_VR
 
     @is_implicit_VR.setter
@@ -1279,6 +1292,9 @@ class Dataset:
             dataset.
         """
         name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'is_implicit_VR'")
+
         warnings.warn(
             (
                 f"'{name}.is_implicit_VR' will be removed in v4.0, set the "
@@ -1291,6 +1307,11 @@ class Dataset:
 
     @property
     def is_little_endian(self) -> bool | None:
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'is_little_endian'"
+            )
+
         return self._is_little_endian
 
     @is_little_endian.setter
@@ -1312,6 +1333,9 @@ class Dataset:
             decoded dataset.
         """
         name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'is_little_endian'")
+
         warnings.warn(
             (
                 f"'{name}.is_little_endian' will be removed in v4.0, set the "
@@ -1365,18 +1389,36 @@ class Dataset:
         self,
         is_implicit_vr: bool | None,
         is_little_endian: bool | None,
-        character_encoding: str | MutableSequence[str],
+        character_encoding: str | MutableSequence[str] | None = None,
     ) -> None:
-        """Set the values for the original transfer syntax and encoding.
+        """Set the values for the original dataset encoding.
 
         .. versionadded:: 1.2
 
         Can be used for a :class:`Dataset` with raw data elements to enable
         optimized writing (e.g. without decoding the data elements).
+
+        .. versionchanged:: 3.0
+
+            `character_encoding` is now optional
+
+        Parameters
+        ----------
+        is_implicit_vr : bool | None
+            The the original VR encoding of the dataset, ``True`` for implicit
+            VR, ``False`` for explicit VR or ``None`` to reset.
+        is_little_endian : bool | None
+            Set the original endianness of the dataset, ``True`` for little
+            endian, ``False`` for big or ``None`` to reset.
+        character_encoding : str | MutableSequence[str], optional
+            Set the original character set encoding of the dataset. If ``None``
+            then no changes will be made to the original character set
+            encoding.
         """
         self._read_implicit = is_implicit_vr
         self._read_little = is_little_endian
-        self._read_charset = character_encoding
+        if character_encoding is not None:
+            self._read_charset = character_encoding
 
     def group_dataset(self, group: int) -> "Dataset":
         """Return a :class:`Dataset` containing only elements of a certain
@@ -1889,8 +1931,9 @@ class Dataset:
 
         # TODO: Remove in stage 2
         # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
-        self._is_implicit_VR = False
-        self._is_little_endian = True
+        if not config._use_future:
+            self._is_implicit_VR = False
+            self._is_little_endian = True
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, "file_meta"):
@@ -2221,6 +2264,9 @@ class Dataset:
             or buffer and used implicit VR, ``False`` if it used explicit VR.
         """
         name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'read_implicit_vr'")
+
         warnings.warn(
             (
                 f"'{name}.read_implicit_vr' will be removed in v4.0, use "
@@ -2228,7 +2274,7 @@ class Dataset:
             ),
             DeprecationWarning,
         )
-        return self._read_implicit
+        return self.original_encoding[0]
 
     @property
     def read_little_endian(self) -> bool | None:
@@ -2248,6 +2294,11 @@ class Dataset:
             endian.
         """
         name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(
+                f"'{name}' object has no attribute 'read_little_endian'"
+            )
+
         warnings.warn(
             (
                 f"'{name}.read_little_endian' will be removed in v4.0, use "
@@ -2255,7 +2306,7 @@ class Dataset:
             ),
             DeprecationWarning,
         )
-        return self._read_little
+        return self.original_encoding[1]
 
     def remove_private_tags(self) -> None:
         """Remove all private elements from the :class:`Dataset`."""
@@ -2273,9 +2324,9 @@ class Dataset:
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
         __write_like_original: bool = True,
         implicit_vr: bool | None = None,
-        little_endian: bool = True,
+        little_endian: bool | None = None,
         enforce_file_format: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
 
@@ -2303,13 +2354,13 @@ class Dataset:
 
         .. deprecated:: 3.0
 
-            `write_like_original` is deprecated, please use
+            `write_like_original` will be removed in v4.0, please use
             `enforce_file_format` instead
 
         Parameters
         ----------
         filename : str | PathLike | BinaryIO
-            The path or file-like to write the encoded dataset to.
+            The path, file-like or buffer to write the encoded dataset to.
         write_like_original : bool, optional
             If ``True`` (default) then write the dataset as-is, otherwise
             ensure that the dataset is written in the DICOM File Format or
@@ -2318,12 +2369,14 @@ class Dataset:
         implicit_vr : bool, optional
             Required if the dataset has no valid public *Transfer Syntax UID*
             set in the file meta and
-            :attr:`~pydicom.dataset.Dataset.is_implicit_VR` is ``None``. If
+            :attr:`~pydicom.dataset.Dataset.is_implicit_VR` or
+            :attr:``~pydicom.dataset.Dataset.original_encoding` are ``None``. If
             ``True`` then encode using implicit VR, otherwise use explicit VR.
         little_endian, bool, optional
             Required if the dataset has no valid public *Transfer Syntax UID*
             set in the file meta and
-            :attr:`~pydicom.dataset.Dataset.is_little_endian` is ``None``. If
+            :attr:`~pydicom.dataset.Dataset.is_little_endian` or
+            :attr:`~pydicom.dataset.Dataset.original_encoding` are ``None``. If
             ``True`` (default) then use little endian byte order when encoding,
             otherwise use big endian (not recommended).
         enforce_file_format : bool, optional
@@ -2343,6 +2396,8 @@ class Dataset:
         pydicom.filewriter.dcmwrite
             Encode a :class:`Dataset` and write it to a file or buffer.
         """
+        class_name = type(self).__name__
+
         # TODO: Remove in v4.0
         # Cover use of `write_like_original` as:
         #   kwarg: save_as(filename, write_like_original=bool)
@@ -2351,6 +2406,12 @@ class Dataset:
         #       by the default of `enforce_file_format`
         write_like_original = kwargs.get("write_like_original", None)
         if write_like_original is not None or __write_like_original is False:
+            if config._use_future:
+                raise TypeError(
+                    f"Invalid keyword argument for {class_name}.save_as(): "
+                    "'write_like_original'"
+                )
+
             warnings.warn(
                 (
                     "'write_like_original' is deprecated and will be removed in "
@@ -2365,32 +2426,42 @@ class Dataset:
         keys = [x for x in kwargs.keys() if x != "write_like_original"]
         if keys:
             raise TypeError(
-                f"Invalid keyword argument(s) for {type(self).__name__}.save_as(): "
+                f"Invalid keyword argument(s) for {class_name}.save_as(): "
                 f"{', '.join(keys)}"
             )
 
+        # The default for little_endian is `None` so we can prevent conversion
+        #   between little and big endian, but we actually default it to `True`
+        #   when `implicit_vr` is used
+        if implicit_vr is not None and little_endian is None:
+            little_endian = True
+
         # Disallow conversion between little and big endian encoding
-        if self.is_little_endian is not None:
+        if self.original_encoding[1] is not None:
             file_meta = getattr(self, "file_meta", {})
             syntax = file_meta.get("TransferSyntaxUID", None)
 
+            use_little: bool | None = None
             try:
-                needs_convert = self.original_encoding[1] != syntax.is_little_endian
+                use_little = syntax.is_little_endian
             except (AttributeError, ValueError):
-                needs_convert = self.original_encoding[1] != little_endian
+                if little_endian is not None:
+                    use_little = little_endian
+                elif not config._use_future:
+                    use_little = self.is_little_endian
 
-            if needs_convert:
+            if use_little is not None and self.original_encoding[1] != use_little:
                 raise ValueError(
-                    f"'{type(self).__name__}.save_as()' cannot be used to "
-                    "convert between little and big endian encoding. Please "
-                    "read the documentation for filewriter.dcmwrite() "
-                    "if this is what you really want to do"
+                    f"'{class_name}.save_as()' cannot be used to convert "
+                    "between little and big endian encoding. Please read the "
+                    "documentation for filewriter.dcmwrite() if this is what "
+                    "you really want to do"
                 )
 
         pydicom.dcmwrite(
             filename,
             self,
-            implicit_VR=implicit_VR,
+            implicit_vr=implicit_vr,
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
         )
@@ -2404,6 +2475,7 @@ class Dataset:
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
 
+    # TODO: rationalise
     def fix_meta_info(self, enforce_standard: bool = True) -> None:
         """Ensure the file meta info exists and has the correct values
         for transfer syntax and media storage UIDs.
@@ -2424,14 +2496,17 @@ class Dataset:
         """
         self.ensure_file_meta()
 
-        if self.is_little_endian and self.is_implicit_VR:
-            self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        elif not self.is_little_endian and not self.is_implicit_VR:
-            self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-        elif not self.is_little_endian and self.is_implicit_VR:
-            raise NotImplementedError(
-                "Implicit VR Big Endian is not a supported Transfer Syntax"
-            )
+        if config._use_future:
+            pass
+        else:
+            if self.is_little_endian and self.is_implicit_VR:
+                self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+            elif not self.is_little_endian and not self.is_implicit_VR:
+                self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+            elif not self.is_little_endian and self.is_implicit_VR:
+                raise NotImplementedError(
+                    "Implicit VR Big Endian is not a supported Transfer Syntax"
+                )
 
         if "SOPClassUID" in self:
             self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
@@ -3015,8 +3090,9 @@ class FileDataset(Dataset):
             file_meta if file_meta is not None else FileMetaDataset()
         )
         # TODO: Remove in v4.0
-        self._is_implicit_VR: bool = is_implicit_VR
-        self._is_little_endian: bool = is_little_endian
+        if not config._use_future:
+            self._is_implicit_VR: bool = is_implicit_VR
+            self._is_little_endian: bool = is_little_endian
 
         self._read_implicit: bool = is_implicit_VR
         self._read_little: bool = is_little_endian
@@ -3279,6 +3355,14 @@ class FileMetaDataset(Dataset):
             )
 
         super().__setitem__(key, value)
+
+    @property
+    def _tsyntax_encoding(self) -> tuple[bool, bool] | tuple[None, None]:
+        tsyntax = self.get("TransferSyntaxUID", None)
+        if tsyntax is None or tsyntax.is_private or not tsyntax.is_transfer_syntax:
+            return (None, None)
+
+        return (tsyntax.is_implicit_VR, tsyntax.is_little_endian)
 
 
 _RE_CAMEL_CASE = re.compile(

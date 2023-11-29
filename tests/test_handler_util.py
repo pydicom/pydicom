@@ -39,6 +39,7 @@ from pydicom.pixel_data_handlers.util import (
 )
 from pydicom.uid import (
     ExplicitVRLittleEndian,
+    ExplicitVRBigEndian,
     ImplicitVRLittleEndian,
     UncompressedTransferSyntaxes,
 )
@@ -179,15 +180,20 @@ class TestNumpy_PixelDtype:
         self.ds.BitsAllocated = 16
         self.ds.PixelRepresentation = 0
 
+        # explicit little
+        meta = self.ds.file_meta
+
         # < is little, = is native, > is big
         if byteorder == "little":
             self.ds._read_little = True
             assert pixel_dtype(self.ds).byteorder in ["<", "="]
+            meta.TransferSyntaxUID = ExplicitVRBigEndian
             self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder == ">"
         elif byteorder == "big":
             self.ds._read_little = True
             assert pixel_dtype(self.ds).byteorder == "<"
+            meta.TransferSyntaxUID = ExplicitVRBigEndian
             self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder in [">", "="]
 
@@ -1273,7 +1279,7 @@ class TestNumpy_ModalityLUT:
     def test_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = dcmread(MOD_16_SEQ)
-        assert ds.original_encoding == (True, True)
+        assert ds.original_encoding == (False, True)
         seq = ds.ModalityLUTSequence[0]
         assert [4096, -2048, 16] == seq.LUTDescriptor
         seq["LUTData"].VR = "OW"
@@ -2446,8 +2452,7 @@ class TestNumpy_ApplyVOI:
     def test_voi_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = Dataset()
-        ds._read_little = True
-        ds._read_implicit = False
+        ds.set_original_encoding(False, True)
         ds.PixelRepresentation = 0
         ds.BitsStored = 16
         ds.VOILUTSequence = [Dataset()]

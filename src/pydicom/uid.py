@@ -30,8 +30,6 @@ class UID(str):
     True
     >>> uid.name
     'JPEG Baseline (Process 1)'
-    >>> uid.keyword
-    JPEGBaseline8Bit
     """
 
     def __new__(

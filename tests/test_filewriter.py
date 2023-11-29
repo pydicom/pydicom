@@ -1373,7 +1373,9 @@ class TestWriteAmbiguousVR:
         with pytest.warns(DeprecationWarning, match=msg):
             assert ds.read_little_endian
 
-        assert ds.read_encoding == "latin1"
+        msg = "'Dataset.read_encoding' will be removed in v4.0"
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ds.read_encoding == "latin1"
 
     def test_write_explicit_vr_big_endian(self):
         """Test writing explicit big data for ambiguous elements."""
@@ -1393,7 +1395,10 @@ class TestWriteAmbiguousVR:
         with pytest.warns(DeprecationWarning):
             assert not ds.read_implicit_vr
             assert not ds.read_little_endian
-        assert ["UTF8"] == ds.read_encoding
+
+        msg = "'Dataset.read_encoding' will be removed in v4.0"
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ["UTF8"] == ds.read_encoding
 
 
 class TestScratchWrite:
@@ -1508,11 +1513,27 @@ class TestDCMWrite:
                 dcmwrite(
                     DicomBytesIO(),
                     Dataset(),
-                    implicit_VR=False,
+                    implicit_vr=False,
                     write_like_original=True,
                     __write_like_original=False,
                     is_implicit_VR=False,
                 )
+
+    def test_command_set_raises(self):
+        """Test exception if command set elements present."""
+        ds = Dataset()
+        ds.MessageID = 1
+        msg = (
+            r"Command Set elements \(0000,eeee\) are not allowed when using "
+            r"dcmwrite\(\), use write_dataset\(\) instead"
+        )
+        with pytest.raises(ValueError, match=msg):
+            dcmwrite(
+                DicomBytesIO(),
+                ds,
+                implicit_vr=True,
+                enforce_file_format=True,
+            )
 
     def test_file_meta_raises(self):
         """Test file meta elements in dataset raises exception."""
@@ -1777,22 +1798,6 @@ class TestDCMWrite_EnforceFileFormat:
                 enforce_file_format=True,
             )
 
-    def test_command_set_raises(self):
-        """Test exception if command set elements present."""
-        ds = Dataset()
-        ds.MessageID = 1
-        msg = (
-            "Command Set elements are not allowed when using the DICOM "
-            "File Format"
-        )
-        with pytest.raises(ValueError, match=msg):
-            dcmwrite(
-                DicomBytesIO(),
-                ds,
-                implicit_VR=True,
-                enforce_file_format=True,
-            )
-
     def test_preamble_default(self):
         """Test that the default preamble is written correctly when present."""
         fp = DicomBytesIO()
@@ -1959,7 +1964,7 @@ class TestDetermineEncoding:
         ds._read_little = True
         tsyntax = ImplicitVRLittleEndian
         msg = (
-            "Both 'implicit_vr' and 'little_endian' are required if "
+            "'implicit_vr' and 'little_endian' are required if "
             "'force_encoding' is used"
         )
         with pytest.raises(ValueError, match=msg):
@@ -1975,7 +1980,7 @@ class TestDetermineEncoding:
         ds._is_little_endian = True
         tsyntax = ImplicitVRLittleEndian
         result = _determine_encoding(ds, tsyntax, False, False, True)
-        assert result == [False, False]
+        assert result == (False, False)
 
     def test_transfer_syntax(self):
         """Test when transfer syntax is available."""
@@ -1984,7 +1989,7 @@ class TestDetermineEncoding:
         ds._is_little_endian = True
         tsyntax = ImplicitVRLittleEndian
         result = _determine_encoding(ds, tsyntax, True, None, False)
-        assert result == [True, True]
+        assert result == (True, True)
 
     def test_args(self):
         """Test fallback to args when transfer syntax not available."""
@@ -1992,7 +1997,7 @@ class TestDetermineEncoding:
         ds._is_implicit_VR = False
         ds._is_little_endian = True
         result = _determine_encoding(ds, None, True, False, False)
-        assert result == [True, False]
+        assert result == (True, False)
 
     def test_dataset(self):
         """Test fallback to dataset when transfer syntax and args not available."""
@@ -2000,7 +2005,7 @@ class TestDetermineEncoding:
         ds._is_implicit_VR = False
         ds._is_little_endian = True
         result = _determine_encoding(ds, None, None, False, False)
-        assert result == [False, True]
+        assert result == (False, True)
 
     def test_none_raises(self):
         """Test exception raised if unable to determine encoding."""
@@ -2016,8 +2021,8 @@ class TestDetermineEncoding:
         """Test private syntax raises if no args."""
         syntax = UID("1.2.3")
         msg = (
-            "Private transfer syntaxes require both the 'implicit_vr' and "
-            "'little_endian' arguments"
+            "The 'implicit_vr' and 'little_endian' arguments are required "
+            "when using a private transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(Dataset(), syntax, None, None, False)
@@ -2026,7 +2031,7 @@ class TestDetermineEncoding:
         """Test private syntax raises if no args."""
         syntax = UID("1.2.3")
         result = _determine_encoding(Dataset(), syntax, True, True, False)
-        assert result == [True, True]
+        assert result == (True, True)
 
     def test_invalid_transfer_syntax_raises(self):
         """Test public non-transfer syntax raises."""
@@ -2046,14 +2051,14 @@ class TestDetermineEncoding:
         tsyntax = ImplicitVRLittleEndian
         msg = (
             "The 'little_endian' value is not consistent with the required "
-            "endianness for a 'Implicit VR Little Endian' transfer syntax"
+            "endianness for the 'Implicit VR Little Endian' transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(ds, tsyntax, True, False, False)
 
         msg = (
             "The 'implicit_vr' value is not consistent with the required "
-            "VR encoding for a 'Implicit VR Little Endian' transfer syntax"
+            "VR encoding for the 'Implicit VR Little Endian' transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(ds, tsyntax, False, True, False)
@@ -2964,3 +2969,24 @@ class TestWriteUndefinedLengthPixelData:
 def test_all_writers():
     """Test that the VR writer functions are complete"""
     assert set(VR) == set(writers)
+
+
+@pytest.fixture
+def use_future():
+    config._use_future = True
+    yield
+    config._use_future = False
+
+
+class TestFuture:
+    def test_dcmwrite_write_like_original_raises(self, use_future):
+        ds = Dataset()
+        msg = (
+            r"Invalid keyword argument for dcmwrite\(\): "
+            r"'write_like_original'"
+        )
+        with pytest.raises(TypeError):
+            dcmwrite(None, ds, write_like_original=True)
+
+        with pytest.raises(TypeError):
+            dcmwrite(None, ds, False)

@@ -514,7 +514,7 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.save_as(fp, implicit_VR=True)
+        file_ds.save_as(fp, implicit_vr=True)
 
         ds = dcmread(fp, force=True)
         assert "US" == ds[0x00280108].VR
@@ -529,7 +529,7 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.save_as(fp, implicit_VR=False)
+        file_ds.save_as(fp, implicit_vr=False)
 
         ds = dcmread(fp, force=True)
         assert "US" == ds[0x00280108].VR
@@ -905,7 +905,7 @@ class TestReader:
         assert isinstance(ds.PatientName, pydicom.valuerep.PersonName)
 
         bs = DicomBytesIO()
-        ds.save_as(bs, implicit_VR=True)
+        ds.save_as(bs, implicit_vr=True)
 
         dcmread(bs, force=True)
         assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
@@ -1122,11 +1122,11 @@ class TestReadDataElement:
 
         self.fp = BytesIO()  # Implicit little
         file_ds = FileDataset(self.fp, ds)
-        file_ds.save_as(self.fp, implicit_VR=True)
+        file_ds.save_as(self.fp, implicit_vr=True)
 
         self.fp_ex = BytesIO()  # Explicit little
         file_ds = FileDataset(self.fp_ex, ds)
-        file_ds.save_as(self.fp_ex, implicit_VR=False)
+        file_ds.save_as(self.fp_ex, implicit_vr=False)
 
     def test_read_OD_implicit_little(self):
         """Check creation of OD DataElement from byte data works correctly."""

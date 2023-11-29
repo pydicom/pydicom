@@ -448,7 +448,7 @@ class TestCharset:
 
         # check that patient names are correctly written back
         fp = DicomBytesIO()
-        ds.save_as(fp, enforce_file_format=True, implicit_VR=False)
+        ds.save_as(fp, enforce_file_format=True, implicit_vr=False)
         fp.seek(0)
         ds = dcmread(fp)
         assert patient_name == ds.PatientName
@@ -503,7 +503,7 @@ class TestCharset:
             original_string = ds.PatientName.original_string
             ds.PatientName.original_string = None
             fp = DicomBytesIO()
-            ds.save_as(fp, enforce_file_format=True, implicit_VR=False)
+            ds.save_as(fp, enforce_file_format=True, implicit_vr=False)
             fp.seek(0)
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string
