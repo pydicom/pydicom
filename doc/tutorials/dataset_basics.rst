@@ -557,7 +557,7 @@ required). If it's unable to do so then an exception will be raised:
 .. code-block:: pycon
 
     >>> del ds.file_meta
-    >>> ds.save_as('out.dcm',enforce_file_format=True)
+    >>> ds.save_as('out.dcm', enforce_file_format=True)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
       File ".../pydicom/dataset.py", line 2452, in save_as
@@ -581,7 +581,7 @@ we need to add it back::
 And now we can add our *Transfer Syntax UID* element and save to file::
 
     >>> ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
-    >>> ds.save_as('out.dcm',enforce_file_format=True)
+    >>> ds.save_as('out.dcm', enforce_file_format=True)
 
 And we're done.
 

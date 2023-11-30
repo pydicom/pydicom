@@ -168,14 +168,25 @@ def apply_color_lut(
             bytes | None, getattr(ds, "SegmentedAlphaPaletteColorLookupTableData", None)
         )
 
-        endianness = "<" if ds.is_little_endian else ">"
+        if hasattr(ds, "file_meta"):
+            is_little_endian = ds.file_meta._tsyntax_encoding[1]
+        else:
+            is_little_endian = ds.original_encoding[1]
+
+        if is_little_endian is None:
+            raise AttributeError(
+                "Unable to determine the endianness of the dataset, please set "
+                "an appropriate Transfer Syntax UID in the file meta"
+            )
+
+        endianness = "><"[is_little_endian]
         byte_depth = nominal_depth // 8
         fmt = "B" if byte_depth == 1 else "H"
         actual_depth = nominal_depth
 
         for seg in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
             len_seg = len(seg) // byte_depth
-            s_fmt = endianness + str(len_seg) + fmt
+            s_fmt = f"{endianness}{len_seg}{fmt}"
             lut_ints = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
             luts.append(np.asarray(lut_ints, dtype=dtype))
     else:
@@ -259,7 +270,18 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
         if item["LUTData"].VR == VR.OW:
-            endianness = "<" if ds.is_little_endian else ">"
+            if hasattr(ds, "file_meta"):
+                is_little_endian = ds.file_meta._tsyntax_encoding[1]
+            else:
+                is_little_endian = ds.original_encoding[1]
+
+            if is_little_endian is None:
+                raise AttributeError(
+                    "Unable to determine the endianness of the dataset, please set "
+                    "an appropriate Transfer Syntax UID in the file meta"
+                )
+
+            endianness = "><"[is_little_endian]
             unpack_fmt = f"{endianness}{nr_entries}H"
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
