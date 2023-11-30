@@ -919,6 +919,14 @@ class Dataset:
 
     @property
     def read_encoding(self) -> str | MutableSequence[str]:
+        """Return the original character set encoding for a decoded dataset.
+
+        .. deprecated:: 3.0
+
+            ``read_encoding`` will be removed in v4.0, use
+            :attr:`~pydicom.dataset.Dataset.original_character_set` instead.
+
+        """
         name = type(self).__name__
         if config._use_future:
             raise AttributeError(f"'{name}' object has no attribute 'read_encoding'")
@@ -935,14 +943,6 @@ class Dataset:
 
     @read_encoding.setter
     def read_encoding(self, value: str | MutableSequence[str]) -> None:
-        """Return the original character set encoding for a decoded dataset.
-
-        .. deprecated:: 3.0
-
-            ``read_encoding`` will be removed in v4.0, use
-            :attr:`~pydicom.dataset.Dataset.original_character_set` instead.
-
-        """
         name = type(self).__name__
         if config._use_future:
             raise AttributeError(f"'{name}' object has no attribute 'read_encoding'")
@@ -1264,15 +1264,6 @@ class Dataset:
 
     @property
     def is_implicit_VR(self) -> bool | None:
-        if config._use_future:
-            raise AttributeError(
-                f"'{type(self).__name__}' object has no attribute 'is_implicit_VR'"
-            )
-
-        return self._is_implicit_VR
-
-    @is_implicit_VR.setter
-    def is_implicit_VR(self, value: bool | None) -> None:
         """Get/set the VR method used when encoding the dataset.
 
         .. deprecated:: 3.0
@@ -1289,6 +1280,15 @@ class Dataset:
             otherwise returns the VR encoding method used by the decoded
             dataset.
         """
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'is_implicit_VR'"
+            )
+
+        return self._is_implicit_VR
+
+    @is_implicit_VR.setter
+    def is_implicit_VR(self, value: bool | None) -> None:
         name = type(self).__name__
         if config._use_future:
             raise AttributeError(f"'{name}' object has no attribute 'is_implicit_VR'")
@@ -1305,15 +1305,6 @@ class Dataset:
 
     @property
     def is_little_endian(self) -> bool | None:
-        if config._use_future:
-            raise AttributeError(
-                f"'{type(self).__name__}' object has no attribute 'is_little_endian'"
-            )
-
-        return self._is_little_endian
-
-    @is_little_endian.setter
-    def is_little_endian(self, value: bool | None) -> None:
         """Get/set the endianness used when encoding the dataset.
 
         .. deprecated:: 3.0
@@ -1330,6 +1321,15 @@ class Dataset:
             otherwise returns the endianness of the encoding used by the
             decoded dataset.
         """
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'is_little_endian'"
+            )
+
+        return self._is_little_endian
+
+    @is_little_endian.setter
+    def is_little_endian(self, value: bool | None) -> None:
         name = type(self).__name__
         if config._use_future:
             raise AttributeError(f"'{name}' object has no attribute 'is_little_endian'")
@@ -2361,9 +2361,9 @@ class Dataset:
             Required if the dataset has no valid public *Transfer Syntax UID*
             set in the file meta and
             :attr:`~pydicom.dataset.Dataset.is_implicit_VR` or
-            :attr:``~pydicom.dataset.Dataset.original_encoding` are ``None``. If
+            :attr:`~pydicom.dataset.Dataset.original_encoding` are ``None``. If
             ``True`` then encode using implicit VR, otherwise use explicit VR.
-        little_endian, bool, optional
+        little_endian : bool, optional
             Required if the dataset has no valid public *Transfer Syntax UID*
             set in the file meta and
             :attr:`~pydicom.dataset.Dataset.is_little_endian` or
@@ -2378,7 +2378,7 @@ class Dataset:
 
             - ``Dataset.preamble``: if the dataset has no preamble then none
               will be written
-            ``- Dataset.file_meta``: if the dataset is missing any required
+            - ``Dataset.file_meta``: if the dataset is missing any required
               *File Meta Information Group* elements then they will not be
               added or written
 

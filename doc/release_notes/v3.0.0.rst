@@ -17,7 +17,8 @@ Changes
   for 32-bit systems (:issue:`1743`)
 * The characters used by :func:`~pydicom.fileset.generate_filename` when
   `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
-* :func:`~pydicom.data_manager.get_testdata_file` and :func:`~pydicom.data_manager.get_testdata_files`
+* :func:`~pydicom.data.data_manager.get_testdata_file` and
+  :func:`~pydicom.data.data_manager.get_testdata_files`
   now raise ``ValueError`` if called with an absolute path or pattern
 * :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
   generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
@@ -28,21 +29,22 @@ Changes
 * DICOM dictionary updated to 2023d
 * :func:`~pydicom.dataset.validate_file_meta` now checks to ensure required
   Type 1 elements aren't empty
-* ``implicit_vr`` and ``little_endian`` optional arguments added to
+* `implicit_vr` and `little_endian` optional arguments added to
   :meth:`~pydicom.dataset.Dataset.save_as`. In addition, this method will now
   raise an exception if the user tries to convert between little and big endian
-  datasets. If this is something you need, use ``dcmwrite()`` instead.
-* ``implicit_vr``, ``little_endian`` and ``force_encoding`` optional arguments
+  datasets. If this is something you need, use :func:`~pydicom.filewriter.dcmwrite` instead.
+* `implicit_vr`, `little_endian` and `force_encoding` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`
-* The priority used when encoding datasets with :meth:`~pydicom.dataset.Dataset.save_as`
-  or :func:`~pydicom.filewriter.dcmwrite` has been changed to:
+* The priority used to decide which encoding to use with
+  :meth:`~pydicom.dataset.Dataset.save_as` and
+  :func:`~pydicom.filewriter.dcmwrite` has been changed to:
 
-  1. the set *Transfer Syntax UID*
-  2. the `implicit_vr` and `little_endian` arguments
-  3. :attr:`~pydicom.dataset.Dataset.is_implicit_VR` and
-     :attr:`~pydicom.dataset.Dataset.is_little_endian`
-  4. :attr:`~pydicom.dataset.Dataset.original_encoding`
-* Datasets containing *Command Set* elements can no longer be written using
+  1. The set *Transfer Syntax UID*
+  2. The `implicit_vr` and `little_endian` arguments
+  3. :attr:`Dataset.is_implicit_VR<pydicom.dataset.Dataset.is_implicit_VR>` and
+     :attr:`Dataset.is_little_endian<pydicom.dataset.Dataset.is_little_endian>`
+  4. :attr:`Dataset.original_encoding<pydicom.dataset.Dataset.original_encoding>`
+* Datasets containing *Command Set* (0000,eeee) elements can no longer be written using
   :meth:`~pydicom.dataset.Dataset.save_as` or :func:`~pydicom.filewriter.dcmwrite`,
   use :func:`~pydicom.filewriter.write_dataset` instead.
 * The :attr:`~pydicom.dataset.FileDataset.file_meta` elements are no longer
@@ -50,7 +52,7 @@ Changes
 
 Removals
 ~~~~~~~~
-* `compat` module removed
+* ``compat`` module removed
 * The ``dicomdir`` module and ``DicomDir`` class have been removed and reading a
   DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
   For handling DICOM File-sets and DICOMDIR datasets use the
@@ -87,7 +89,7 @@ Removals
   removed, use :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
 * Removed the ``_storage_sopclass_uids`` module, import UIDs from the
-  :mod:`~pynetdicom.uid` module instead
+  :mod:`~pydicom.uid` module instead
 
 * The following properties have been removed:
 
@@ -161,5 +163,5 @@ Deprecations
 Pydicom Internals
 -----------------
 * Repository folder structure refactored
-* Renamed top level "source" folder to "util"
+* Renamed top level ``source`` folder to ``util``
 * New CI tools - `dependabot`, and `pre-commit` using black and ruff

@@ -1146,7 +1146,7 @@ def dcmwrite(
     The `dataset` is encoded as specified by (in order of priority):
 
     * The encoding corresponding to the set *Transfer Syntax UID* in
-      ``dataset.file_meta``.
+      :attr:`~pydicom.dataset.FileDataset.file_meta`.
     * The `implicit_vr` and `little_endian` arguments
     * :attr:`~pydicom.dataset.Dataset.is_implicit_VR` and
       :attr:`~pydicom.dataset.Dataset.is_little_endian`
@@ -1176,7 +1176,7 @@ def dcmwrite(
         set in the file meta and `dataset` has been created from scratch. If
         ``True`` then encode `dataset` using implicit VR, otherwise use
         explicit VR.
-    little_endian, bool, optional
+    little_endian : bool, optional
         Required if `dataset` has no valid public *Transfer Syntax UID*
         set in the file meta and `dataset` has been created from scratch. If
         ``True`` (default) then use little endian byte order when encoding
@@ -1200,10 +1200,10 @@ def dcmwrite(
     ------
     ValueError
 
-        * If group ``0x0000`` *Command Set* elements are present in `dataset`
-        * If group ``0x0002`` *File Meta Information Group* elements are present
-          in `dataset`
-        * If ``dataset.preamble`` exists but is not 128 bytes long
+      * If group ``0x0000`` *Command Set* elements are present in `dataset`.
+      * If group ``0x0002`` *File Meta Information Group* elements are present
+        in `dataset`.
+      * If ``dataset.preamble`` exists but is not 128 bytes long.
 
     See Also
     --------
