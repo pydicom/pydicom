@@ -4,7 +4,6 @@ Version 3.0.0
 Changes
 -------
 * Removed support for Python <= 3.9
-* `compat` module removed
 * All tag formats changed to upper case, no space e.g. "(7FE0,0010)" rather than "(7fe0, 0010)"
 * Values with VR AE with an incorrect value length are now handled
   gracefully (extra bytes are ignored with a warning)
@@ -32,7 +31,7 @@ Changes
 * ``implicit_vr`` and ``little_endian`` optional arguments added to
   :meth:`~pydicom.dataset.Dataset.save_as`. In addition, this method will now
   raise an exception if the user tries to convert between little and big endian
-  datasets. If this is something you need use ``dcmwrite()`` instead.
+  datasets. If this is something you need, use ``dcmwrite()`` instead.
 * ``implicit_vr``, ``little_endian`` and ``force_encoding`` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`
 * The priority used when encoding datasets with :meth:`~pydicom.dataset.Dataset.save_as`
@@ -43,10 +42,15 @@ Changes
   3. :attr:`~pydicom.dataset.Dataset.is_implicit_VR` and
      :attr:`~pydicom.dataset.Dataset.is_little_endian`
   4. :attr:`~pydicom.dataset.Dataset.original_encoding`
-
+* Datasets containing *Command Set* elements can no longer be written using
+  :meth:`~pydicom.dataset.Dataset.save_as` or :func:`~pydicom.filewriter.dcmwrite`,
+  use :func:`~pydicom.filewriter.write_dataset` instead.
+* The :attr:`~pydicom.dataset.FileDataset.file_meta` elements are no longer
+  modified when writing
 
 Removals
 ~~~~~~~~
+* `compat` module removed
 * The ``dicomdir`` module and ``DicomDir`` class have been removed and reading a
   DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
   For handling DICOM File-sets and DICOMDIR datasets use the
@@ -92,6 +96,8 @@ Removals
     * ``DataElement.parent``
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
+* Removed ``Dataset.fix_meta_info()``, encoding state now follows the transfer syntax
+  instead of the other way around
 
 
 Enhancements
@@ -133,8 +139,8 @@ Fixes
   :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
 * Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
-* Fixed incorrectly encoding a dataset when converting between explicit and
-  implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
+* Fixed using the incorrect encoding when writing datasets converted between
+  explicit and implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
 
 
 Deprecations

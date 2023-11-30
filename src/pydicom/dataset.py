@@ -1344,7 +1344,6 @@ class Dataset:
         )
         self._is_little_endian = value
 
-    # FIXME
     @property
     def is_original_encoding(self) -> bool:
         """Return ``True`` if the encoding to be used for writing is set and

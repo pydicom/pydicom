@@ -22,6 +22,7 @@ There are the following possibilities:
 * NumberOfFrames (1, 2, ...)
 """
 
+from io import BytesIO
 from struct import pack, unpack
 
 import pytest
@@ -30,7 +31,7 @@ from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
-from pydicom.uid import RLELossless, AllTransferSyntaxes
+from pydicom.uid import RLELossless, AllTransferSyntaxes, ExplicitVRLittleEndian
 
 try:
     import numpy as np
@@ -717,6 +718,30 @@ class TestNumpy_RLEHandler:
 
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+
+    def test_writing_decompressed(self):
+        """Test writing a decompressed dataset."""
+        ds = dcmread(RLE_8_1_1F)
+        ds.decompress()
+        ds.file_meta.TransferSyntaxUID = RLELossless
+
+        msg = (
+            "The dataset's Transfer Syntax UID 'RLE Lossless' is for "
+            "compressed pixel data, but the dataset's pixel data has been "
+            "decompressed. Either re-compress the pixel data or switch to "
+            "an uncompressed transfer syntax such as 'Explicit VR Little "
+            "Endian'."
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(BytesIO())
+
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        b = BytesIO()
+        ds.save_as(b)
+        b.seek(0)
+        arr = _get_pixel_array(b)
+        ref = _get_pixel_array(EXPL_8_1_1F)
+        assert np.array_equal(arr, ref)
 
 
 # Tests for rle_handler module with Numpy available

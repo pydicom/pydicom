@@ -545,10 +545,10 @@ By default, :meth:`~pydicom.dataset.Dataset.save_as` will write the dataset
 as-is. This means that even if your dataset is not conformant to the
 :dcm:`DICOM File Format<part10/chapter_7.html>` it will
 still be written exactly as given. To be certain you're writing the
-dataset in the DICOM File Format you can use the `write_like_original` keyword
+dataset in the DICOM File Format you can use the `enforce_file_format` keyword
 parameter::
 
-    >>> ds.save_as('out.dcm', write_like_original=False)
+    >>> ds.save_as('out.dcm', enforce_file_format=True)
 
 This will attempt to automatically add in any missing required group
 ``0x0002`` File Meta Information elements and set a blank 128 byte preamble (if
@@ -557,19 +557,17 @@ required). If it's unable to do so then an exception will be raised:
 .. code-block:: pycon
 
     >>> del ds.file_meta
-    >>> ds.save_as('out.dcm', write_like_original=False)
+    >>> ds.save_as('out.dcm',enforce_file_format=True)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-      File ".../pydicom/dataset.py", line 1794, in save_as
-        pydicom.dcmwrite(filename, self, write_like_original)
-      File ".../pydicom/filewriter.py", line 925, in dcmwrite
-        enforce_standard=not write_like_original)
-      File ".../pydicom/filewriter.py", line 712, in write_file_meta_info
-        validate_file_meta(file_meta, enforce_standard)
-      File ".../pydicom/dataset.py", line 2372, in validate_file_meta
-        raise ValueError(msg[:-1])  # Remove final newline
-      ValueError: Missing required File Meta Information elements from 'file_meta':
-	      (0002, 0010) TransferSyntaxUID
+      File ".../pydicom/dataset.py", line 2452, in save_as
+        pydicom.dcmwrite(
+      File ".../pydicom/filewriter.py", line 1311, in dcmwrite
+        validate_file_meta(file_meta, enforce_standard=True)
+      File ".../pydicom/dataset.py", line 3204, in validate_file_meta
+        raise AttributeError(
+    AttributeError: Required File Meta Information elements are either missing
+    or have an empty value: (0002,0010) Transfer Syntax UID
 
 The exception message contains the required element(s) that need to be added,
 usually this will only be the *Transfer Syntax UID*. It's an important element,
@@ -583,7 +581,7 @@ we need to add it back::
 And now we can add our *Transfer Syntax UID* element and save to file::
 
     >>> ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
-    >>> ds.save_as('out.dcm', write_like_original=False)
+    >>> ds.save_as('out.dcm',enforce_file_format=True)
 
 And we're done.
 
