@@ -1243,19 +1243,19 @@ def dcmwrite(
 
     cls_name = dataset.__class__.__name__
 
-    # Command Set elements are not allowed
-    if dataset.group_dataset(0x0000):
-        raise ValueError(
-            "Command Set elements (0000,eeee) are not allowed when using "
-            "dcmwrite(), use write_dataset() instead"
-        )
-
-    # Group 0x0002 elements may only be in the file meta information
-    if dataset.group_dataset(0x0002) != Dataset():
-        raise ValueError(
-            "File Meta Information Group elements (0002,eeee) must be in a "
-            f"FileMetaDataset instance in the '{cls_name}.file_meta' attribute"
-        )
+    # Check for disallowed tags
+    bad_tags = [x >> 16 for x in dataset._dict if x >> 16 in (0, 2)]
+    if bad_tags:
+        if 0 in bad_tags:
+            raise ValueError(
+                "Command Set elements (0000,eeee) are not allowed when using "
+                "dcmwrite(), use write_dataset() instead"
+            )
+        else:
+            raise ValueError(
+                "File Meta Information Group elements (0002,eeee) must be in a "
+                f"FileMetaDataset instance in the '{cls_name}.file_meta' attribute"
+            )
 
     if force_encoding and enforce_file_format:
         raise ValueError("'force_encoding' cannot be used with 'enforce_file_format'")
