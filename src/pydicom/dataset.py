@@ -909,7 +909,7 @@ class Dataset:
 
         Returns
         -------
-        str | MutableSequence[str] | None
+        str | MutableSequence[str]
             The original character set encoding of the dataset as given by
             the (0008,0005) *Specific Character Set*, or `iso8859
             <https://docs.python.org/3/library/codecs.html#standard-encodings>`_

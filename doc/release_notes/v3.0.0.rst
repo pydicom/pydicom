@@ -17,8 +17,8 @@ Changes
   for 32-bit systems (:issue:`1743`)
 * The characters used by :func:`~pydicom.fileset.generate_filename` when
   `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
-* :func:`~pydicom.data.data_manager.get_testdata_file` and
-  :func:`~pydicom.data.data_manager.get_testdata_files`
+* :func:`~pydicom.data.get_testdata_file` and
+  :func:`~pydicom.data.get_testdata_files`
   now raise ``ValueError`` if called with an absolute path or pattern
 * :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
   generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
