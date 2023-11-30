@@ -14,7 +14,7 @@ import zlib
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
-from pydicom.datadict import dictionary_VR
+from pydicom.datadict import dictionary_VR, _fast_vr
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
@@ -108,33 +108,29 @@ def data_element_generator(
     #    data element
     from pydicom.values import convert_string
 
-    if is_little_endian:
-        endian_chr = "<"
-    else:
-        endian_chr = ">"
+    endian_chr = "><"[is_little_endian]
 
     # assign implicit VR struct to variable as use later if VR assumed missing
-    implicit_VR_struct = Struct(endian_chr + "HHL")
+    implicit_VR_unpack = Struct(f"{endian_chr}HHL").unpack
     if is_implicit_VR:
-        element_struct = implicit_VR_struct
+        element_struct_unpack = implicit_VR_unpack
     else:  # Explicit VR
         # tag, VR, 2-byte length (or 0 if special VRs)
-        element_struct = Struct(endian_chr + "HH2sH")
-        extra_length_struct = Struct(endian_chr + "L")  # for special VRs
-        extra_length_unpack = extra_length_struct.unpack  # for lookup speed
+        element_struct_unpack = Struct(f"{endian_chr}HH2sH").unpack
+        extra_length_unpack = Struct(f"{endian_chr}L").unpack  # for lookup speed
 
     # Make local variables so have faster lookup
     fp_read = fp.read
     fp_tell = fp.tell
     logger_debug = logger.debug
     debugging = config.debugging
-    element_struct_unpack = element_struct.unpack
     defer_size = size_in_bytes(defer_size)
 
-    tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
+    # tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
+    tag_set = {tag for tag in specific_tags} if specific_tags else set()
     has_tag_set = bool(tag_set)
     if has_tag_set:
-        tag_set.add(Tag(0x00080005))  # Specific Character Set
+        tag_set.add(0x00080005)  # Specific Character Set
 
     while True:
         # VR: str | None
@@ -142,9 +138,6 @@ def data_element_generator(
         bytes_read = fp_read(8)
         if len(bytes_read) < 8:
             return  # at end of file
-
-        if debugging:
-            debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
 
         if is_implicit_VR:
             # must reset VR each time; could have set last iteration (e.g. SQ)
@@ -158,36 +151,20 @@ def data_element_generator(
             if not (b"AA" <= vr <= b"ZZ") and config.assume_implicit_vr_switch:
                 # invalid VR, must be 2 cap chrs, assume implicit and continue
                 vr = None
-                group, elem, length = implicit_VR_struct.unpack(bytes_read)
+                group, elem, length = implicit_VR_unpack(bytes_read)
             else:
                 vr = vr.decode(default_encoding)
                 if vr in EXPLICIT_VR_LENGTH_32:
                     bytes_read = fp_read(4)
                     length = extra_length_unpack(bytes_read)[0]
-                    if debugging:
-                        debug_msg += " " + bytes2hex(bytes_read)
-
-        if debugging:
-            debug_msg = f"{debug_msg:<47s}  ({group:04X},{elem:04X})"
-            if not is_implicit_VR:
-                debug_msg += f" {vr} "
-            if length != 0xFFFFFFFF:
-                debug_msg += f"Length: {length}"
-            else:
-                debug_msg += "Length: Undefined length (FFFFFFFF)"
-            logger_debug(debug_msg)
 
         # Positioned to read the value, but may not want to -- check stop_when
         value_tell = fp_tell()
-        tag = TupleTag((group, elem))
+        # tag = TupleTag((group, elem))
+        tag = group << 16 | elem
         if stop_when is not None:
             # XXX VR may be None here!! Should stop_when just take tag?
             if stop_when(tag, vr, length):
-                if debugging:
-                    logger_debug(
-                        "Reading ended by stop_when callback. "
-                        "Rewinding to start of data element."
-                    )
                 rewind_length = 8
                 if not is_implicit_VR and vr in EXPLICIT_VR_LENGTH_32:
                     rewind_length += 4
@@ -207,7 +184,7 @@ def data_element_generator(
             if (
                 defer_size is not None
                 and length > defer_size
-                and tag != BaseTag(0x00080005)
+                and tag != 0x00080005  # charset
             ):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
@@ -236,7 +213,7 @@ def data_element_generator(
                     )
 
             # If the tag is (0008,0005) Specific Character Set, then store it
-            if tag == BaseTag(0x00080005):
+            if tag == 0x00080005:
                 # *Specific Character String* is b'' for empty value
                 encoding = convert_string(cast(bytes, value) or b"", is_little_endian)
                 # Store the encoding value in the generator
@@ -244,7 +221,7 @@ def data_element_generator(
                 encoding = convert_encodings(encoding)
 
             yield RawDataElement(
-                tag, vr, length, value, value_tell, is_implicit_VR, is_little_endian
+                BaseTag(tag), vr, length, value, value_tell, is_implicit_VR, is_little_endian
             )
 
         # Second case: undefined length - must seek to delimiter,
@@ -262,7 +239,7 @@ def data_element_generator(
             #   identified as a Sequence
             if vr is None or vr == VR_.UN and config.replace_un_with_known_vr:
                 try:
-                    vr = dictionary_VR(tag)
+                    vr = _fast_vr(tag)
                 except KeyError:
                     # Look ahead to see if it consists of items
                     # and is thus a SQ
@@ -284,7 +261,7 @@ def data_element_generator(
                 if has_tag_set and tag not in tag_set:
                     continue
 
-                yield DataElement(tag, vr, seq, value_tell, is_undefined_length=True)
+                yield DataElement(BaseTag(tag), vr, seq, value_tell, is_undefined_length=True)
             else:
                 delimiter = SequenceDelimiterTag
                 if debugging:
@@ -298,7 +275,7 @@ def data_element_generator(
                     continue
 
                 yield RawDataElement(
-                    tag, vr, length, value, value_tell, is_implicit_VR, is_little_endian
+                    BaseTag(tag), vr, length, value, value_tell, is_implicit_VR, is_little_endian
                 )
 
 
@@ -602,7 +579,8 @@ def _read_command_set_elements(fp: BinaryIO) -> Dataset:
 
     def _not_group_0000(tag: BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0000, False otherwise."""
-        return tag.group != 0
+        return tag >> 16 != 0
+        # return tag.group != 0
 
     return read_dataset(
         fp, is_implicit_VR=True, is_little_endian=True, stop_when=_not_group_0000
@@ -632,7 +610,8 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
 
     def _not_group_0002(tag: BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0002, False otherwise."""
-        return tag.group != 2
+        return tag >> 16 != 2
+        # return tag.group != 2
 
     start_file_meta = fp.tell()
     file_meta = FileMetaDataset(
