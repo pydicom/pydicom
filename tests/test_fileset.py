@@ -1727,7 +1727,13 @@ class TestFileSet:
         """Test str(FileSet) with empty + additions."""
         fs = FileSet()
         fs.add(ct)
-        fs.add(get_testdata_file("MR_small.dcm"))
+        mr = get_testdata_file("MR_small.dcm", read=True)
+        # mr.SeriesDescription = "TEST_DESC"
+        fs.add(mr)
+        # Hack to add description because pydicom.fileset._define_series doesn't copy
+        # optional attribute "Series Description".
+        _mr_series_record = fs._tree.children[-1].children[-1].children[-1]._record
+        _mr_series_record.SeriesDescription = "TEST_DESC"
 
         for p in list(Path(TINY_ALPHA_FILESET).parent.glob("**/*"))[::2]:
             if p.is_file() and p.name not in ["DICOMDIR", "README"]:
@@ -1771,7 +1777,7 @@ class TestFileSet:
             "    PATIENT: PatientID='4MR1', "
             "PatientName='CompressedSamples^MR1'\n"
             "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
             "          IMAGE: 1 SOP Instance (1 addition)\n"
             "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
             "      STUDY: StudyDate=20200913, StudyTime=161900, "
@@ -1803,7 +1809,7 @@ class TestFileSet:
             "    PATIENT: PatientID='4MR1', "
             "PatientName='CompressedSamples^MR1'\n"
             "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
             "          IMAGE: 1 SOP Instance\n"
             "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
             "      STUDY: StudyDate=20200913, StudyTime=161900, "
@@ -1842,7 +1848,7 @@ class TestFileSet:
             "    PATIENT: PatientID='4MR1', "
             "PatientName='CompressedSamples^MR1'\n"
             "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
             "          IMAGE: 0 SOP Instances (1 initial, 1 removal)\n"
             "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
             "      STUDY: StudyDate=20200913, StudyTime=161900, "
