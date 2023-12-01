@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``plot_anonymize.py``)
-     - 00:00.007
+     - 00:00.008
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``plot_add_dict_entries.py``)
      - 00:00.003
