@@ -139,6 +139,9 @@ def data_element_generator(
         if len(bytes_read) < 8:
             return  # at end of file
 
+        if debugging:
+            debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
+
         if is_implicit_VR:
             # must reset VR each time; could have set last iteration (e.g. SQ)
             vr = None
@@ -157,6 +160,18 @@ def data_element_generator(
                 if vr in EXPLICIT_VR_LENGTH_32:
                     bytes_read = fp_read(4)
                     length = extra_length_unpack(bytes_read)[0]
+                    if debugging:
+                        debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
+
+        if debugging:
+            debug_msg = f"{debug_msg:<47s}  ({tag >> 16:04X},{tag & 0xFFFF:04X})"
+            if not is_implicit_VR:
+                debug_msg += f" {vr} "
+            if length != 0xFFFFFFFF:
+                debug_msg += f"Length: {length}"
+            else:
+                debug_msg += "Length: Undefined length (FFFFFFFF)"
+            logger_debug(debug_msg)
 
         # Positioned to read the value, but may not want to -- check stop_when
         value_tell = fp_tell()
@@ -165,6 +180,11 @@ def data_element_generator(
         if stop_when is not None:
             # XXX VR may be None here!! Should stop_when just take tag?
             if stop_when(tag, vr, length):
+                if debugging:
+                    logger_debug(
+                        "Reading ended by stop_when callback. "
+                        "Rewinding to start of data element."
+                    )
                 rewind_length = 8
                 if not is_implicit_VR and vr in EXPLICIT_VR_LENGTH_32:
                     rewind_length += 4
@@ -188,9 +208,10 @@ def data_element_generator(
             ):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
-                logger_debug(
-                    "Defer size exceeded. " "Skipping forward to next data element."
-                )
+                if debugging:
+                    logger_debug(
+                        "Defer size exceeded. Skipping forward to next data element."
+                    )
                 fp.seek(fp_tell() + length)
             else:
                 value = (
@@ -252,7 +273,7 @@ def data_element_generator(
             if vr == VR_.SQ:
                 if debugging:
                     logger_debug(
-                        f"{fp_tell():08X}: Reading/parsing undefined length " "sequence"
+                        f"{fp_tell():08X}: Reading/parsing undefined length sequence"
                     )
 
                 seq = read_sequence(
@@ -1082,7 +1103,7 @@ def read_deferred_data_element(
             statinfo = os.stat(filename_or_obj)
             if statinfo.st_mtime != timestamp:
                 warnings.warn(
-                    "Deferred read warning -- file modification time has " "changed"
+                    "Deferred read warning -- file modification time has changed"
                 )
 
     # Open the file, position to the right place
