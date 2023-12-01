@@ -14,7 +14,7 @@ import zlib
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
-from pydicom.datadict import dictionary_VR, _fast_vr
+from pydicom.datadict import _fast_vr
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
@@ -35,7 +35,6 @@ from pydicom.sequence import Sequence
 from pydicom.tag import (
     ItemTag,
     SequenceDelimiterTag,
-    TupleTag,
     Tag,
     BaseTag,
     TagListType,
@@ -296,13 +295,13 @@ def data_element_generator(
                     f"{fp_tell():08X}: Reading/parsing undefined length sequence"
                 )
 
-            seq = read_sequence(
-                fp, is_implicit_VR, is_little_endian, length, encoding
-            )
+            seq = read_sequence(fp, is_implicit_VR, is_little_endian, length, encoding)
             if has_tag_set and tag not in tag_set:
                 continue
 
-            yield DataElement(BaseTag(tag), vr, seq, value_tell, is_undefined_length=True)
+            yield DataElement(
+                BaseTag(tag), vr, seq, value_tell, is_undefined_length=True
+            )
         else:
             # VR is not SQ
             if debugging:
@@ -465,13 +464,12 @@ def read_dataset(
         parent_encoding,
         specific_tags,
     )
-    import itertools
 
     try:
         if bytelength is None:
             raw_data_elements = {e.tag: e for e in de_gen}
         else:
-            while (fp_tell() - fp_start < bytelength):
+            while fp_tell() - fp_start < bytelength:
                 raw_data_element = next(de_gen)
                 raw_data_elements[raw_data_element.tag] = raw_data_element
     except StopIteration:
