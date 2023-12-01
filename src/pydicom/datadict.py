@@ -283,18 +283,6 @@ def get_entry(tag: TagType) -> tuple[str, str, str, str, str]:
         raise KeyError(f"Tag {tag} not found in DICOM dictionary")
 
 
-def _fast_vr(tag: int) -> str:
-    try:
-        return DicomDictionary[tag][0]
-    except KeyError:
-        if not tag >> 16 % 2 == 1:
-            mask_x = mask_match(tag)
-            if mask_x:
-                return RepeatersDictionary[mask_x][0]
-
-        raise KeyError(f"Tag {tag} not found in DICOM dictionary")
-
-
 def dictionary_is_retired(tag: TagType) -> bool:
     """Return ``True`` if the element corresponding to `tag` is retired.
 
@@ -342,6 +330,22 @@ def dictionary_VR(tag: TagType) -> str:
         If the tag is not present in the DICOM data dictionary.
     """
     return get_entry(tag)[0]
+
+
+def _dictionary_vr_fast(tag: int) -> str:
+    """Return the VR corresponding to `tag`"""
+    # Faster implementation of `dictionary_VR`
+    try:
+        return DicomDictionary[tag][0]
+    except KeyError:
+        if not tag >> 16 % 2 == 1:
+            mask_x = mask_match(tag)
+            if mask_x:
+                return RepeatersDictionary[mask_x][0]
+
+        raise KeyError(
+            f"Tag ({tag >> 16:04X},{tag & 0xFFFF:04X}) not found in DICOM dictionary"
+        )
 
 
 def dictionary_VM(tag: TagType) -> str:
