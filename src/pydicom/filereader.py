@@ -45,11 +45,14 @@ from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR as VR_
 
 
+ENCODED_VR = {vr.encode(default_encoding) for vr in VR_}
+
+
 def data_element_generator(
     fp: BinaryIO,
     is_implicit_VR: bool,
     is_little_endian: bool,
-    stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
+    stop_when: Callable[[int | BaseTag, str | None, int], bool] | None = None,
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag] | None = None,
@@ -121,6 +124,7 @@ def data_element_generator(
 
     # Make local variables so have faster lookup
     fp_read = fp.read
+    fp_seek = fp.seek
     fp_tell = fp.tell
     logger_debug = logger.debug
     debugging = config.debugging
@@ -135,8 +139,8 @@ def data_element_generator(
     while True:
         # VR: str | None
         # Read tag, VR, length, get ready to read value
-        bytes_read = fp_read(8)
-        if len(bytes_read) < 8:
+        # bytes_read =
+        if len(bytes_read := fp_read(8)) < 8:
             return  # at end of file
 
         if debugging:
@@ -151,11 +155,16 @@ def data_element_generator(
             # defend against switching to implicit VR, some writer do in SQ's
             # issue 1067, issue 1035
 
-            if not (b"AA" <= vr <= b"ZZ") and config.assume_implicit_vr_switch:
+            if vr in ENCODED_VR:  # try most likely solution first
+                vr = vr.decode(default_encoding)
+                if vr in EXPLICIT_VR_LENGTH_32:
+                    length = extra_length_unpack(fp_read(4))[0]
+            elif not (b"AA" <= vr <= b"ZZ") and config.assume_implicit_vr_switch:
                 # invalid VR, must be 2 cap chrs, assume implicit and continue
                 vr = None
                 group, elem, length = implicit_VR_unpack(bytes_read)
             else:
+                # Possibly an unknown VR, mostly likely implicit
                 vr = vr.decode(default_encoding)
                 if vr in EXPLICIT_VR_LENGTH_32:
                     bytes_read = fp_read(4)
@@ -164,7 +173,7 @@ def data_element_generator(
                         debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
 
         if debugging:
-            debug_msg = f"{debug_msg:<47s}  ({tag >> 16:04X},{tag & 0xFFFF:04X})"
+            debug_msg = f"{debug_msg:<47s}  ({group:04X},{elem:04X})"
             if not is_implicit_VR:
                 debug_msg += f" {vr} "
             if length != 0xFFFFFFFF:
@@ -175,11 +184,15 @@ def data_element_generator(
 
         # Positioned to read the value, but may not want to -- check stop_when
         value_tell = fp_tell()
-        # tag = TupleTag((group, elem))
         tag = group << 16 | elem
+        if tag == 0xFFFEE00D:  # item delimitation item, length 0
+            # if we hit this then we're at the end of an undefined length
+            #   dataset within a sequence
+            return
+
         if stop_when is not None:
             # XXX VR may be None here!! Should stop_when just take tag?
-            if stop_when(tag, vr, length):
+            if stop_when(BaseTag(tag), vr, length):
                 if debugging:
                     logger_debug(
                         "Reading ended by stop_when callback. "
@@ -188,7 +201,7 @@ def data_element_generator(
                 rewind_length = 8
                 if not is_implicit_VR and vr in EXPLICIT_VR_LENGTH_32:
                     rewind_length += 4
-                fp.seek(value_tell - rewind_length)
+                fp_seek(value_tell - rewind_length)
                 return
 
         # Reading the value
@@ -198,7 +211,7 @@ def data_element_generator(
             # needed immediately to get the character encoding for other tags
             if has_tag_set and tag not in tag_set:
                 # skip the tag if not in specific tags
-                fp.seek(fp_tell() + length)
+                fp_seek(fp_tell() + length)
                 continue
 
             if (
@@ -212,7 +225,7 @@ def data_element_generator(
                     logger_debug(
                         "Defer size exceeded. Skipping forward to next data element."
                     )
-                fp.seek(fp_tell() + length)
+                fp_seek(fp_tell() + length)
             else:
                 value = (
                     fp_read(length)
@@ -242,69 +255,83 @@ def data_element_generator(
                 encoding = convert_encodings(encoding)
 
             yield RawDataElement(
-                BaseTag(tag), vr, length, value, value_tell, is_implicit_VR, is_little_endian
+                BaseTag(tag),
+                vr,
+                length,
+                value,
+                value_tell,
+                is_implicit_VR,
+                is_little_endian,
             )
+            continue
 
         # Second case: undefined length - must seek to delimiter,
         # unless is SQ type, in which case is easier to parse it, because
         # undefined length SQs and items of undefined lengths can be nested
         # and it would be error-prone to read to the correct outer delimiter
+
+        # VR UN with undefined length shall be handled as SQ
+        # see PS 3.5, section 6.2.2
+        if vr == VR_.UN and config.settings.infer_sq_for_un_vr:
+            vr = VR_.SQ
+        # Try to look up type to see if is a SQ
+        # if private tag, won't be able to look it up in dictionary,
+        #   in which case just ignore it and read the bytes unless it is
+        #   identified as a Sequence
+        if vr is None or vr == VR_.UN and config.replace_un_with_known_vr:
+            try:
+                vr = _fast_vr(tag)
+            except KeyError:
+                # Look ahead to see if it consists of items
+                # and is thus a SQ
+                next_tag = _unpack_tag(fp_read(4), endian_chr)
+                # Rewind the file
+                fp_seek(fp_tell() - 4)
+                if next_tag == ItemTag:
+                    vr = VR_.SQ
+
+        if vr == VR_.SQ:
+            if debugging:
+                logger_debug(
+                    f"{fp_tell():08X}: Reading/parsing undefined length sequence"
+                )
+
+            seq = read_sequence(
+                fp, is_implicit_VR, is_little_endian, length, encoding
+            )
+            if has_tag_set and tag not in tag_set:
+                continue
+
+            yield DataElement(BaseTag(tag), vr, seq, value_tell, is_undefined_length=True)
         else:
-            # VR UN with undefined length shall be handled as SQ
-            # see PS 3.5, section 6.2.2
-            if vr == VR_.UN and config.settings.infer_sq_for_un_vr:
-                vr = VR_.SQ
-            # Try to look up type to see if is a SQ
-            # if private tag, won't be able to look it up in dictionary,
-            #   in which case just ignore it and read the bytes unless it is
-            #   identified as a Sequence
-            if vr is None or vr == VR_.UN and config.replace_un_with_known_vr:
-                try:
-                    vr = _fast_vr(tag)
-                except KeyError:
-                    # Look ahead to see if it consists of items
-                    # and is thus a SQ
-                    next_tag = _unpack_tag(fp_read(4), endian_chr)
-                    # Rewind the file
-                    fp.seek(fp_tell() - 4)
-                    if next_tag == ItemTag:
-                        vr = VR_.SQ
+            # VR is not SQ
+            if debugging:
+                logger_debug("Reading undefined length data element")
 
-            if vr == VR_.SQ:
-                if debugging:
-                    logger_debug(
-                        f"{fp_tell():08X}: Reading/parsing undefined length sequence"
-                    )
+            value = read_undefined_length_value(
+                fp, is_little_endian, SequenceDelimiterTag, defer_size
+            )
 
-                seq = read_sequence(
-                    fp, is_implicit_VR, is_little_endian, length, encoding
-                )
-                if has_tag_set and tag not in tag_set:
-                    continue
+            # tags with undefined length are skipped after read
+            if has_tag_set and tag not in tag_set:
+                continue
 
-                yield DataElement(BaseTag(tag), vr, seq, value_tell, is_undefined_length=True)
-            else:
-                delimiter = SequenceDelimiterTag
-                if debugging:
-                    logger_debug("Reading undefined length data element")
-                value = read_undefined_length_value(
-                    fp, is_little_endian, delimiter, defer_size
-                )
-
-                # tags with undefined length are skipped after read
-                if has_tag_set and tag not in tag_set:
-                    continue
-
-                yield RawDataElement(
-                    BaseTag(tag), vr, length, value, value_tell, is_implicit_VR, is_little_endian
-                )
+            yield RawDataElement(
+                BaseTag(tag),
+                vr,
+                length,
+                value,
+                value_tell,
+                is_implicit_VR,
+                is_little_endian,
+            )
 
 
 def _is_implicit_vr(
     fp: BinaryIO,
     implicit_vr_is_assumed: bool,
     is_little_endian: bool,
-    stop_when: Callable[[BaseTag, str | None, int], bool] | None,
+    stop_when: Callable[[int | BaseTag, str | None, int], bool] | None,
     is_sequence: bool,
 ) -> bool:
     """Check if the real VR is explicit or implicit.
@@ -376,7 +403,7 @@ def read_dataset(
     is_implicit_VR: bool,
     is_little_endian: bool,
     bytelength: int | None = None,
-    stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
+    stop_when: Callable[[int | BaseTag, str | None, int], bool] | None = None,
     defer_size: str | int | float | None = None,
     parent_encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag] | None = None,
@@ -394,7 +421,7 @@ def read_dataset(
     is_little_endian : bool
         ``True`` if file has little endian transfer syntax.
     bytelength : int, None, optional
-        ``None`` to read until end of file or ItemDeliterTag, else a fixed
+        ``None`` to read until end of file or ItemDelimiterTag, else a fixed
         number of bytes to read
     stop_when : None, optional
         Optional call_back function which can terminate reading. See help for
@@ -423,6 +450,7 @@ def read_dataset(
         :class:`~pydicom.dataelem.DataElement` instances.
     """
     raw_data_elements: dict[BaseTag, RawDataElement | DataElement] = {}
+    fp_tell = fp.tell
     fp_start = fp.tell()
     is_implicit_VR = _is_implicit_vr(
         fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=not at_top_level
@@ -437,36 +465,36 @@ def read_dataset(
         parent_encoding,
         specific_tags,
     )
+    import itertools
+
     try:
-        while (bytelength is None) or (fp.tell() - fp_start < bytelength):
-            raw_data_element = next(de_gen)
-            # Read data elements. Stop on some errors, but return what was read
-            tag = raw_data_element.tag
-            # Check for ItemDelimiterTag --dataset is an item in a sequence
-            if tag == BaseTag(0xFFFEE00D):
-                break
-            raw_data_elements[tag] = raw_data_element
+        if bytelength is None:
+            raw_data_elements = {e.tag: e for e in de_gen}
+        else:
+            while (fp_tell() - fp_start < bytelength):
+                raw_data_element = next(de_gen)
+                raw_data_elements[raw_data_element.tag] = raw_data_element
     except StopIteration:
         pass
     except EOFError as details:
         if config.settings.reading_validation_mode == config.RAISE:
             raise
-        msg = str(details) + " in file " + getattr(fp, "name", "<no filename>")
-        warnings.warn(msg, UserWarning)
+        warnings.warn(
+            f"{details} in file {getattr(fp, 'name', '<no filename>')}",
+            UserWarning,
+        )
     except NotImplementedError as details:
         logger.error(details)
 
     ds = Dataset(raw_data_elements)
 
-    encoding: str | MutableSequence[str]
+    encoding: str | MutableSequence[str] = parent_encoding
     if 0x00080005 in raw_data_elements:
-        elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
+        elem = cast(RawDataElement, raw_data_elements[0x00080005])
         char_set = cast(
             str | MutableSequence[str] | None, DataElement_from_raw(elem).value
         )
         encoding = convert_encodings(char_set)  # -> List[str]
-    else:
-        encoding = parent_encoding  # -> str | MutableSequence[str]
 
     ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
     return ds
@@ -493,7 +521,7 @@ def read_sequence(
         fp_tell = fp.tell  # for speed in loop
         fpStart = fp_tell()
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
-            file_tell = fp.tell()
+            file_tell = fp_tell()
             dataset = read_sequence_item(
                 fp, is_implicit_VR, is_little_endian, encoding, offset
             )
@@ -519,10 +547,8 @@ def read_sequence_item(
     a :class:`~pydicom.dataset.Dataset`.
     """
     seq_item_tell = fp.tell() + offset
-    if is_little_endian:
-        tag_length_format = "<HHL"
-    else:
-        tag_length_format = ">HHL"
+    tag_length_format = "<HHL" if is_little_endian else ">HHL"
+
     try:
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
@@ -531,24 +557,26 @@ def read_sequence_item(
 
     tag = (group, element)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
-        logger.debug(f"{fp.tell() - 8 + offset:08x}: End of Sequence")
-        if length != 0:
-            logger.warning(
-                f"Expected 0x00000000 after delimiter, found 0x{length:X}, "
-                f"at position 0x{fp.tell() - 4 + offset:X}"
-            )
+        if config.debugging:
+            logger.debug(f"{fp.tell() - 8 + offset:08x}: End of Sequence")
+            if length != 0:
+                logger.warning(
+                    f"Expected 0x00000000 after delimiter, found 0x{length:X}, "
+                    f"at position 0x{fp.tell() - 4 + offset:X}"
+                )
         return None
 
-    if tag != ItemTag:
-        logger.warning(
-            f"Expected sequence item with tag {ItemTag} at file position "
-            f"0x{fp.tell() - 4 + offset:X}"
-        )
-    else:
-        logger.debug(
-            f"{fp.tell() - 4 + offset:08x}: {bytes2hex(bytes_read)}  "
-            "Found Item tag (start of item)"
-        )
+    if config.debugging:
+        if tag != ItemTag:
+            logger.warning(
+                f"Expected sequence item with tag {ItemTag} at file position "
+                f"0x{fp.tell() - 4 + offset:X}"
+            )
+        else:
+            logger.debug(
+                f"{fp.tell() - 4 + offset:08x}: {bytes2hex(bytes_read)}  "
+                "Found Item tag (start of item)"
+            )
 
     if length == 0xFFFFFFFF:
         ds = read_dataset(
@@ -571,7 +599,8 @@ def read_sequence_item(
         )
         ds.is_undefined_length_sequence_item = False
 
-        logger.debug(f"{fp.tell() + offset:08X}: Finished sequence item")
+        if config.debugging:
+            logger.debug(f"{fp.tell() + offset:08X}: Finished sequence item")
 
     ds.seq_item_tell = seq_item_tell
     return ds
@@ -598,10 +627,9 @@ def _read_command_set_elements(fp: BinaryIO) -> Dataset:
         command set elements are present.
     """
 
-    def _not_group_0000(tag: BaseTag, vr: str | None, length: int) -> bool:
+    def _not_group_0000(tag: int | BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0000, False otherwise."""
         return tag >> 16 != 0
-        # return tag.group != 0
 
     return read_dataset(
         fp, is_implicit_VR=True, is_little_endian=True, stop_when=_not_group_0000
@@ -629,10 +657,9 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
         File Meta are present.
     """
 
-    def _not_group_0002(tag: BaseTag, vr: str | None, length: int) -> bool:
+    def _not_group_0002(tag: int | BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return tag >> 16 != 2
-        # return tag.group != 2
 
     start_file_meta = fp.tell()
     file_meta = FileMetaDataset(
@@ -751,13 +778,13 @@ def read_preamble(fp: BinaryIO, force: bool) -> bytes | None:
     return preamble
 
 
-def _at_pixel_data(tag: BaseTag, vr: str | None, length: int) -> bool:
+def _at_pixel_data(tag: int | BaseTag, vr: str | None, length: int) -> bool:
     return tag in {0x7FE00010, 0x7FE00009, 0x7FE00008}
 
 
 def read_partial(
     fileobj: BinaryIO,
-    stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
+    stop_when: Callable[[int | BaseTag, str | None, int], bool] | None = None,
     defer_size: int | str | float | None = None,
     force: bool = False,
     specific_tags: list[BaseTag] | None = None,
@@ -884,7 +911,9 @@ def read_partial(
         # warning already logged in read_dataset
 
     # Add the command set elements to the dataset (if any)
-    dataset.update(command_set)
+    if command_set:
+        dataset.update(command_set)
+
     ds = FileDataset(
         fileobj,
         dataset,
@@ -1086,7 +1115,8 @@ def read_deferred_data_element(
     ValueError
         If the VR or tag of `raw_data_elem` does not match the read value.
     """
-    logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
+    if config.debugging:
+        logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
     # If it wasn't read from a file, then return an error
     if filename_or_obj is None:
         raise OSError("Deferred read -- original filename not stored. Cannot re-open")
