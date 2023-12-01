@@ -35,6 +35,8 @@ if "%1" == "clean" (
 
 if "%1" == "html" (
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
+  REM TODO remove when sphinx_rtd_theme fixes upstream
+  python fix_search.py
 	echo.
 	echo.Build finished. The HTML pages are in %BUILDDIR%/html.
 	goto end
