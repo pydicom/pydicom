@@ -1,6 +1,6 @@
 """
 A temporary fix for https://github.com/pydicom/pydicom/issues/1965
-while waiting for upstream sphinx_rtd_theme to fix/remove their 
+while waiting for upstream sphinx_rtd_theme to fix/remove their
 dependency on jQuery.
 """
 from pathlib import Path
@@ -10,7 +10,7 @@ import re
 search_html = Path("./_build/html/search.html")
 assert search_html.exists()
 
-with open(search_html, "r") as fp:
+with open(search_html) as fp:
     html = fp.read()
 
 pat = r"(<script>\s+jQuery.+searchindex\.js.+\s+<\/script>)"
