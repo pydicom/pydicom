@@ -129,9 +129,7 @@ def data_element_generator(
     debugging = config.debugging
     defer_size = size_in_bytes(defer_size)
 
-    tag_set: set[int | BaseTag] = (
-        {tag for tag in specific_tags} if specific_tags else set()
-    )
+    tag_set: set[int] = {tag for tag in specific_tags} if specific_tags else set()
     has_tag_set = bool(tag_set)
     if has_tag_set:
         tag_set.add(0x00080005)  # Specific Character Set
@@ -639,7 +637,7 @@ def _read_command_set_elements(fp: BinaryIO) -> Dataset:
         command set elements are present.
     """
 
-    def _not_group_0000(tag: int | BaseTag, vr: str | None, length: int) -> bool:
+    def _not_group_0000(tag: BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0000, False otherwise."""
         return tag >> 16 != 0
 
@@ -669,7 +667,7 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
         File Meta are present.
     """
 
-    def _not_group_0002(tag: int | BaseTag, vr: str | None, length: int) -> bool:
+    def _not_group_0002(tag: BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return tag >> 16 != 2
 
@@ -790,7 +788,7 @@ def read_preamble(fp: BinaryIO, force: bool) -> bytes | None:
     return preamble
 
 
-def _at_pixel_data(tag: int | BaseTag, vr: str | None, length: int) -> bool:
+def _at_pixel_data(tag: BaseTag, vr: str | None, length: int) -> bool:
     return tag in {0x7FE00010, 0x7FE00009, 0x7FE00008}
 
 
