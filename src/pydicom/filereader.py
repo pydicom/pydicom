@@ -163,6 +163,11 @@ def data_element_generator(
                         debug_msg += " " + bytes2hex(bytes_read)
             elif not (b"AA" <= vr <= b"ZZ") and config.assume_implicit_vr_switch:
                 # invalid VR, must be 2 cap chrs, assume implicit and continue
+                if debugging:
+                    logger.warning(
+                        f"Unknown VR '0x{vr[0]:02x}{vr[1]:02x}' assuming "
+                        "implicit VR encoding"
+                    )
                 vr = None
                 group, elem, length = implicit_VR_unpack(bytes_read)
             else:
@@ -170,6 +175,11 @@ def data_element_generator(
                 # Note that we treat an unimplemented VR as having a 2-byte
                 #   length, but that may not be correct
                 vr = vr.decode(default_encoding)
+                if debugging:
+                    logger.warning(
+                        f"Unknown VR '{vr}' assuming explicit VR encoding with "
+                        "2-byte length"
+                    )
 
         if debugging:
             debug_msg = f"{debug_msg:<47s}  ({group:04X},{elem:04X})"
