@@ -1071,9 +1071,10 @@ class TestIncorrectVR:
 
 @pytest.fixture
 def enable_debugging():
+    original_debug = config.debugging
     config.debugging = True
     yield
-    config.debugging = False
+    config.debugging = original_debug
 
 
 @pytest.fixture
