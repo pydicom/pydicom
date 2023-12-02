@@ -113,7 +113,7 @@ target-version = "py310"
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
 
 [tool.ruff.mccabe]
-max-complexity = 32
+max-complexity = 34
 
 [tool.ruff.pylint]
 max-args = 17

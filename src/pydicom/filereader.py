@@ -166,13 +166,10 @@ def data_element_generator(
                 vr = None
                 group, elem, length = implicit_VR_unpack(bytes_read)
             else:
-                # Possibly an unknown VR, mostly likely implicit
+                # Either an unimplemented VR or implicit VR encoding
+                # Note that we treat an unimplemented VR as having a 2-byte
+                #   length, but that may not be correct
                 vr = vr.decode(default_encoding)
-                if vr in EXPLICIT_VR_LENGTH_32:
-                    bytes_read = fp_read(4)
-                    length = extra_length_unpack(bytes_read)[0]
-                    if debugging:
-                        debug_msg += " " + bytes2hex(bytes_read)
 
         if debugging:
             debug_msg = f"{debug_msg:<47s}  ({group:04X},{elem:04X})"
@@ -571,6 +568,8 @@ def read_sequence_item(
 
     if config.debugging:
         if tag != ItemTag:
+            # Flag the incorrect item encoding, will usually raise an
+            #   exception afterwards due to the misaligned format
             logger.warning(
                 f"Expected sequence item with tag {ItemTag} at file position "
                 f"0x{fp.tell() - 4 + offset:X}"

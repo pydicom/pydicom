@@ -343,9 +343,7 @@ def _dictionary_vr_fast(tag: int) -> str:
             if mask_x:
                 return RepeatersDictionary[mask_x][0]
 
-        raise KeyError(
-            f"Tag ({tag >> 16:04X},{tag & 0xFFFF:04X}) not found in DICOM dictionary"
-        )
+        raise KeyError(f"Tag {Tag(tag)} not found in DICOM dictionary")
 
 
 def dictionary_VM(tag: TagType) -> str:
