@@ -954,7 +954,7 @@ class TestReader:
         assert "Finished sequence item" in caplog.text
 
     def test_sequence_delimiter_with_length(self, enable_debugging, caplog):
-        with caplog.at_level(logging.EBUG, logger="pydicom"):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
             read_dataset(
                 BytesIO(
                     b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
