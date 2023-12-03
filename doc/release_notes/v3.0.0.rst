@@ -78,6 +78,8 @@ Changes
 * ``valuerep.MultiString`` has been moved and renamed to
   :func:`values.multi_string <pydicom.values.multi_string` and no longer accepts
   a ``validation_mode`` optional argument
+* :class:`~pydicom.dataelem.0RawDataElement` is now a :class:`dataclasses.dataclass`
+  instead of a :class:`typing.NamedTuple`
 
 
 Deprecations

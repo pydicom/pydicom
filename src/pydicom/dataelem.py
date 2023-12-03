@@ -8,8 +8,9 @@ A DataElement has a tag,
 """
 
 import base64
+from dataclasses import dataclass
 import json
-from typing import Optional, Any, TYPE_CHECKING, NamedTuple
+from typing import Optional, Any, TYPE_CHECKING
 from collections.abc import Callable, MutableSequence
 import warnings
 
@@ -718,8 +719,9 @@ class DataElement:
         return repr(self.value) if self.VR == VR_.SQ else str(self)
 
 
-class RawDataElement(NamedTuple):
-    """Container for the data from a raw (mostly) undecoded element."""
+@dataclass
+class RawDataElement:
+    """Dataclass for the data from a raw (mostly) undecoded element."""
 
     tag: BaseTag
     VR: str | None

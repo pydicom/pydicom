@@ -1047,7 +1047,7 @@ class Dataset:
             if self[tag].VR in AMBIGUOUS_VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
 
-                self[tag] = correct_ambiguous_vr_element(self[tag], self, elem[6])
+                self[tag] = correct_ambiguous_vr_element(self[tag], self, elem.is_little_endian)
 
         return cast(DataElement, self._dict.get(tag))
 

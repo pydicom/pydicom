@@ -45,9 +45,9 @@ def fix_separator_callback(
                 )
             else:
                 new_value = raw_elem.value.replace(kwargs["invalid_separator"], b"\\")
-        return_val = raw_elem._replace(value=new_value)
+        raw_elem.value = new_value
 
-    return return_val
+    return raw_elem
 
 
 def fix_separator(
@@ -98,7 +98,7 @@ def fix_mismatch_callback(
             except ValueError:
                 pass
             else:
-                raw_elem = raw_elem._replace(VR=vr)
+                raw_elem.VR = vr
     return raw_elem
 
 
