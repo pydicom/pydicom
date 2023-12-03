@@ -42,7 +42,7 @@ location, building a 3D image and reslicing it in different planes.
 
 .. GENERATED FROM PYTHON SOURCE LINES 24-85
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import pydicom
@@ -107,27 +107,19 @@ location, building a 3D image and reslicing it in different planes.
     plt.show()
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** ( 0 minutes  0.000 seconds)
-
-
 .. _sphx_glr_download_auto_examples_image_processing_reslice.py:
 
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: reslice.ipynb <reslice.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: reslice.py <reslice.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: reslice.ipynb <reslice.ipynb>`
 
 
 .. only:: html

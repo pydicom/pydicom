@@ -26,7 +26,7 @@ Very simple app to display unicode person names.
 
 .. GENERATED FROM PYTHON SOURCE LINES 9-44
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -65,27 +65,19 @@ Very simple app to display unicode person names.
     root.mainloop()
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** ( 0 minutes  0.000 seconds)
-
-
 .. _sphx_glr_download_auto_examples_show_charset_name.py:
 
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: show_charset_name.ipynb <show_charset_name.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: show_charset_name.py <show_charset_name.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: show_charset_name.ipynb <show_charset_name.ipynb>`
 
 
 .. only:: html

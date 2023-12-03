@@ -29,7 +29,7 @@ optionally remove curves and private tags, and write the results in a new file.
 
 .. GENERATED FROM PYTHON SOURCE LINES 12-24
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -57,7 +57,7 @@ Anonymize a single file
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-36
 
-.. code-block:: default
+.. code-block:: Python
 
 
     filename = get_testdata_file('MR_small.dcm')
@@ -90,7 +90,7 @@ curves tags.
 
 .. GENERATED FROM PYTHON SOURCE LINES 40-52
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -118,7 +118,7 @@ also some other tags such that patient ID, etc.
 
 .. GENERATED FROM PYTHON SOURCE LINES 55-60
 
-.. code-block:: default
+.. code-block:: Python
 
 
     dataset.PatientID = "id"
@@ -138,7 +138,7 @@ pydicom allows to remove private tags using ``remove_private_tags`` method
 
 .. GENERATED FROM PYTHON SOURCE LINES 62-65
 
-.. code-block:: default
+.. code-block:: Python
 
 
     dataset.remove_private_tags()
@@ -157,7 +157,7 @@ Data elements of type 3 (optional) can be easily deleted using ``del`` or
 
 .. GENERATED FROM PYTHON SOURCE LINES 68-75
 
-.. code-block:: default
+.. code-block:: Python
 
 
     if 'OtherPatientIDs' in dataset:
@@ -180,7 +180,7 @@ blank string.
 
 .. GENERATED FROM PYTHON SOURCE LINES 78-83
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tag = 'PatientBirthDate'
@@ -200,7 +200,7 @@ Finally, this is possible to store the image
 
 .. GENERATED FROM PYTHON SOURCE LINES 85-93
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data_elements = ['PatientID',
@@ -227,7 +227,7 @@ Finally, this is possible to store the image
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.009 seconds)
+   **Total running time of the script:** (0 minutes 0.009 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_anonymize.py:
@@ -236,16 +236,13 @@ Finally, this is possible to store the image
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_anonymize.ipynb <plot_anonymize.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_anonymize.py <plot_anonymize.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_anonymize.ipynb <plot_anonymize.ipynb>`
 
 
 .. only:: html

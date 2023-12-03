@@ -102,7 +102,7 @@ This example shows how to read a DICOM :File-set's DICOMDIR dataset.
 
 |
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import os
@@ -174,7 +174,7 @@ This example shows how to read a DICOM :File-set's DICOMDIR dataset.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.015 seconds)
+   **Total running time of the script:** (0 minutes 0.014 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py:
@@ -183,16 +183,13 @@ This example shows how to read a DICOM :File-set's DICOMDIR dataset.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_read_dicom_directory.ipynb <plot_read_dicom_directory.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_read_dicom_directory.py <plot_read_dicom_directory.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_read_dicom_directory.ipynb <plot_read_dicom_directory.ipynb>`
 
 
 .. only:: html

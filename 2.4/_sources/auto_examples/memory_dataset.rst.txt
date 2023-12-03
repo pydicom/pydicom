@@ -28,7 +28,7 @@ datasets saved as blobs in a database.
 
 .. GENERATED FROM PYTHON SOURCE LINES 12-85
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -105,27 +105,19 @@ datasets saved as blobs in a database.
         dcmwrite(file_path + '_new', read_dataset)
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** ( 0 minutes  0.000 seconds)
-
-
 .. _sphx_glr_download_auto_examples_memory_dataset.py:
 
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: memory_dataset.ipynb <memory_dataset.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: memory_dataset.py <memory_dataset.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: memory_dataset.ipynb <memory_dataset.ipynb>`
 
 
 .. only:: html
