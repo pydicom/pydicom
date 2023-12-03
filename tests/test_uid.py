@@ -353,8 +353,7 @@ class TestUIDPrivate:
 
     def test_is_transfer_syntax(self):
         """Test that UID.is_transfer_syntax works with private UIDs."""
-        with pytest.raises(ValueError):
-            self.uid.is_transfer_syntax
+        assert not self.uid.is_transfer_syntax
 
     def test_is_compressed(self):
         """Test that UID.is_compressed works with private UIDs."""
@@ -393,3 +392,20 @@ class TestUIDPrivate:
     def test_keyword(self):
         """Test the keyword property."""
         assert "" == self.uid.keyword
+
+
+class TestUIDPrivateTransferSyntax:
+    """Test private transfer syntax UIDs."""
+
+    def setup_method(self):
+        """Set default UID"""
+        self.uid = UID("9.9.999.90009.1.2")
+
+    def test_setting(self):
+        self.uid.set_private_encoding(True, True)
+        assert self.uid.is_transfer_syntax
+        assert self.uid.is_implicit_VR
+        assert self.uid.is_little_endian
+        self.uid.set_private_encoding(False, False)
+        assert not self.uid.is_implicit_VR
+        assert not self.uid.is_little_endian
