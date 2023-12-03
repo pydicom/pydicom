@@ -1333,5 +1333,5 @@ class TestEncapsulateExtended:
         """Test encapsulating odd-length frames"""
         frames = [b"\x00", b"\x01", b"\x02"]
         eot_encapsulated, eot, eot_lengths = encapsulate_extended(frames)
-        assert unpack(f'<{len(frames)}Q', eot) == (0, 10, 20)
-        assert unpack(f'<{len(frames)}Q', eot_lengths) == (2, 2, 2)
+        assert unpack(f"<{len(frames)}Q", eot) == (0, 10, 20)
+        assert unpack(f"<{len(frames)}Q", eot_lengths) == (2, 2, 2)
