@@ -52,6 +52,7 @@
       ~UID.rpartition
       ~UID.rsplit
       ~UID.rstrip
+      ~UID.set_private_encoding
       ~UID.split
       ~UID.splitlines
       ~UID.startswith
