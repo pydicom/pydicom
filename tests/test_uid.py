@@ -393,14 +393,6 @@ class TestUIDPrivate:
         """Test the keyword property."""
         assert "" == self.uid.keyword
 
-
-class TestUIDPrivateTransferSyntax:
-    """Test private transfer syntax UIDs."""
-
-    def setup_method(self):
-        """Set default UID"""
-        self.uid = UID("9.9.999.90009.1.2")
-
     def test_setting(self):
         self.uid.set_private_encoding(True, True)
         assert self.uid.is_transfer_syntax
