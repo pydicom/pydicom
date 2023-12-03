@@ -792,6 +792,8 @@ def encapsulate_extended(frames: list[bytes]) -> tuple[bytes, bytes, bytes]:
     """
     nr_frames = len(frames)
     frame_lengths = [len(frame) for frame in frames]
+    # Odd-length frames get padded to even length by `encapsulate()`
+    frame_lengths = [ii + 1 if ii % 2 else ii for ii in frame_lengths]
     frame_offsets = [0]
     for ii, length in enumerate(frame_lengths[:-1]):
         # Extra 8 bytes for the Item tag and length
