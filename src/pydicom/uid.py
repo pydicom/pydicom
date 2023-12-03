@@ -229,10 +229,10 @@ class UID(str):
 
         Parameters
         ----------
-        implicit : bool
+        implicit_vr : bool
             ``True`` if the corresponding dataset encoding uses implicit VR,
             ``False`` otherwise.
-        implicit : bool
+        little_endian : bool
             ``True`` if the corresponding dataset encoding uses little endian
             byte order, ``False`` otherwise.
         """
