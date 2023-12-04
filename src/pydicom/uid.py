@@ -15,22 +15,41 @@ from pydicom.valuerep import STR_VR_REGEXES, validate_value
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
+    **Private Transfer Syntaxes**
+
+    If creating a private transfer syntax UID, then you must also use
+    :meth:`~pydicom.UID.set_private_encoding` to set the corresponding
+    dataset encoding.
+
     Examples
     --------
 
-    >>> from pydicom.uid import UID
-    >>> uid = UID('1.2.840.10008.1.2.4.50')
-    >>> uid
-    '1.2.840.10008.1.2.4.50'
-    >>> uid.is_implicit_VR
-    False
-    >>> uid.is_little_endian
-    True
-    >>> uid.is_transfer_syntax
-    True
-    >>> uid.name
-    'JPEG Baseline (Process 1)'
+    General usage::
+
+      >>> from pydicom.uid import UID
+      >>> uid = UID('1.2.840.10008.1.2.4.50')
+      >>> uid
+      '1.2.840.10008.1.2.4.50'
+      >>> uid.is_implicit_VR
+      False
+      >>> uid.is_little_endian
+      True
+      >>> uid.is_transfer_syntax
+      True
+      >>> uid.name
+      'JPEG Baseline (Process 1)'
+      >>> uid.keyword
+      JPEGBaseline8Bit
+
+    Setting the encoding to explicit VR little endian for a private transfer
+    syntax::
+
+      >>> uid = UID("1.2.3.4")
+      >>> uid.set_private_encoding(False, True)
+
     """
+
+    _PRIVATE_TS_ENCODING: tuple[bool, bool]
 
     def __new__(
         cls: type["UID"], val: str, validation_mode: int | None = None
@@ -62,15 +81,18 @@ class UID(str):
     def is_implicit_VR(self) -> bool:
         """Return ``True`` if an implicit VR transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Implicit VR Little Endian
-            if self == "1.2.840.10008.1.2":
-                return True
+            if not self.is_private:
+                # Implicit VR Little Endian
+                if self == "1.2.840.10008.1.2":
+                    return True
 
-            # Explicit VR Little Endian
-            # Explicit VR Big Endian
-            # Deflated Explicit VR Little Endian
-            # All encapsulated transfer syntaxes
-            return False
+                # Explicit VR Little Endian
+                # Explicit VR Big Endian
+                # Deflated Explicit VR Little Endian
+                # All encapsulated transfer syntaxes
+                return False
+
+            return self._PRIVATE_TS_ENCODING[0]
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -78,15 +100,18 @@ class UID(str):
     def is_little_endian(self) -> bool:
         """Return ``True`` if a little endian transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Explicit VR Big Endian
-            if self == "1.2.840.10008.1.2.2":
-                return False
+            if not self.is_private:
+                # Explicit VR Big Endian
+                if self == "1.2.840.10008.1.2.2":
+                    return False
 
-            # Explicit VR Little Endian
-            # Implicit VR Little Endian
-            # Deflated Explicit VR Little Endian
-            # All encapsulated transfer syntaxes
-            return True
+                # Explicit VR Little Endian
+                # Implicit VR Little Endian
+                # Deflated Explicit VR Little Endian
+                # All encapsulated transfer syntaxes
+                return True
+
+            return self._PRIVATE_TS_ENCODING[1]
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -96,7 +121,7 @@ class UID(str):
         if not self.is_private:
             return self.type == "Transfer Syntax"
 
-        raise ValueError("Can't determine UID type for private UIDs.")
+        return hasattr(self, "_PRIVATE_TS_ENCODING")
 
     @property
     def is_deflated(self) -> bool:
@@ -197,6 +222,21 @@ class UID(str):
             return True
 
         return False
+
+    def set_private_encoding(self, implicit_vr: bool, little_endian: bool) -> None:
+        """Set the corresponding dataset encoding for a privately defined transfer
+        syntax.
+
+        Parameters
+        ----------
+        implicit_vr : bool
+            ``True`` if the corresponding dataset encoding uses implicit VR,
+            ``False`` otherwise.
+        little_endian : bool
+            ``True`` if the corresponding dataset encoding uses little endian
+            byte order, ``False`` otherwise.
+        """
+        self._PRIVATE_TS_ENCODING = (implicit_vr, little_endian)
 
 
 # Many thanks to the Medical Connections for offering free
