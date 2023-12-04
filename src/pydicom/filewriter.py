@@ -1023,8 +1023,7 @@ def _determine_encoding(
             "'implicit_vr' and 'little_endian' arguments"
         )
 
-    # Must check UID.is_private before checking UID.is_transfer_syntax
-    if tsyntax.is_private:
+    if tsyntax.is_private and not tsyntax.is_transfer_syntax:
         if None in fallback_encoding:
             raise ValueError(
                 "The 'implicit_vr' and 'little_endian' arguments are required "
