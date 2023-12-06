@@ -4,7 +4,11 @@
 import os
 import sys
 
-import numpy as np
+try:
+    import numpy as np
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
 
 import pytest
 
@@ -183,6 +187,7 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls:
         b = self.emri_small.pixel_array
         assert b.mean() == a.mean()
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_frame_multiple_fragments(self):
         """Test a frame split across multiple fragments."""
         ds = dcmread(jpeg_ls_lossless_name)
