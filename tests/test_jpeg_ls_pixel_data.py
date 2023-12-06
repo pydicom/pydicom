@@ -4,11 +4,14 @@
 import os
 import sys
 
+import numpy as np
+
 import pytest
 
 import pydicom
-from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
+from pydicom.encaps import encapsulate, generate_pixel_data_frame
+from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers import numpy_handler
 from pydicom.pixel_data_handlers import jpeg_ls_handler
 
@@ -179,6 +182,15 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls:
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
         assert b.mean() == a.mean()
+
+    def test_frame_multiple_fragments(self):
+        """Test a frame split across multiple fragments."""
+        ds = dcmread(jpeg_ls_lossless_name)
+        ref = ds.pixel_array
+        frame = next(generate_pixel_data_frame(ds.PixelData, 1))
+        ds.PixelData = encapsulate([frame, frame], fragments_per_frame=4)
+        ds.NumberOfFrames = 2
+        assert np.array_equal(ds.pixel_array[0], ref)
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)

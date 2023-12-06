@@ -134,6 +134,8 @@ Fixes
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
 * Fixed :func:`~pydicom.encaps.encapsulate_extended` not returning the correct
   values for odd-length frames (:issue:`1968`)
+* Fixed the ``jpeg_ls``, ``pillow`` and ``rle`` pixel data handlers not working
+  correctly when a frame is spread across multiple fragments (:issue:`1774`)
 
 Pydicom Internals
 -----------------

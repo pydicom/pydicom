@@ -30,7 +30,7 @@ except ImportError:
     HAVE_JPEG2K = False
 
 from pydicom import config
-from pydicom.encaps import defragment_data, decode_data_sequence
+from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import (
     pixel_dtype,
     get_j2k_parameters,
@@ -180,8 +180,8 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     if transfer_syntax == JPEGExtended12Bit and ds.BitsAllocated != 8:
         raise NotImplementedError(
-            f"{JPEGExtended12Bit} - {JPEGExtended12Bit.name} only supported "
-            "by Pillow if Bits Allocated = 8"
+            f"{JPEGExtended12Bit} - {JPEGExtended12Bit.name} is only supported "
+            "by Pillow if (0028,0100) Bits Allocated = 8"
         )
 
     photometric_interpretation = cast(str, ds.PhotometricInterpretation)
@@ -189,38 +189,22 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     columns = cast(int, ds.Columns)
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
-    nr_frames = get_nr_frames(ds)
+    nr_frames = get_nr_frames(ds, warn=False)
 
     pixel_bytes = bytearray()
-    if nr_frames > 1:
-        j2k_precision, j2k_sign = None, None
-        # multiple compressed frames
-        for frame in decode_data_sequence(ds.PixelData):
-            im = _decompress_single_frame(
-                frame, transfer_syntax, photometric_interpretation
-            )
-            if "YBR" in photometric_interpretation:
-                im.draft("YCbCr", (rows, columns))
-            pixel_bytes.extend(im.tobytes())
-
-            if not j2k_precision:
-                params = get_j2k_parameters(frame)
-                j2k_precision = cast(int, params.setdefault("precision", bits_stored))
-                j2k_sign = params.setdefault("is_signed", None)
-
-    else:
-        # single compressed frame
-        pixel_data = defragment_data(ds.PixelData)
+    j2k_precision, j2k_sign = None, None
+    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
         im = _decompress_single_frame(
-            pixel_data, transfer_syntax, photometric_interpretation
+            frame, transfer_syntax, photometric_interpretation
         )
         if "YBR" in photometric_interpretation:
             im.draft("YCbCr", (rows, columns))
         pixel_bytes.extend(im.tobytes())
 
-        params = get_j2k_parameters(pixel_data)
-        j2k_precision = cast(int, params.setdefault("precision", bits_stored))
-        j2k_sign = params.setdefault("is_signed", None)
+        if not j2k_precision:
+            params = get_j2k_parameters(frame)
+            j2k_precision = cast(int, params.setdefault("precision", bits_stored))
+            j2k_sign = params.setdefault("is_signed", None)
 
     logger.debug(f"Successfully read {len(pixel_bytes)} pixel bytes")
 

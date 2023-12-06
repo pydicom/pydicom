@@ -47,7 +47,7 @@ try:
 except ImportError:
     HAVE_RLE = False
 
-from pydicom.encaps import decode_data_sequence, defragment_data
+from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
 from pydicom.encoders.native import _encode_frame  # noqa: F401
 import pydicom.uid
@@ -154,28 +154,17 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = ">") -> "np.ndarray":
 
     nr_bits = cast(int, ds.BitsAllocated)
     nr_samples = cast(int, ds.SamplesPerPixel)
-    nr_frames = get_nr_frames(ds)
+    nr_frames = get_nr_frames(ds, warn=False)
     rows = cast(int, ds.Rows)
     cols = cast(int, ds.Columns)
 
     # Decompress each frame of the pixel data
     pixel_data = bytearray()
-    if nr_frames > 1:
-        for rle_frame in decode_data_sequence(ds.PixelData):
-            frame = _rle_decode_frame(
-                rle_frame, rows, cols, nr_samples, nr_bits, rle_segment_order
-            )
-            pixel_data.extend(frame)
-    else:
-        frame = _rle_decode_frame(
-            defragment_data(ds.PixelData),
-            rows,
-            cols,
-            nr_samples,
-            nr_bits,
-            rle_segment_order,
+    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
+        im = _rle_decode_frame(
+            frame, rows, cols, nr_samples, nr_bits, rle_segment_order
         )
-        pixel_data.extend(frame)
+        pixel_data.extend(im)
 
     arr = np.frombuffer(pixel_data, pixel_dtype(ds))
 

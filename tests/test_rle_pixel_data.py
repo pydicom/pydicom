@@ -29,7 +29,7 @@ import pytest
 from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data
+from pydicom.encaps import defragment_data, generate_pixel_data_frame, encapsulate
 from pydicom.uid import RLELossless, AllTransferSyntaxes
 
 try:
@@ -717,6 +717,15 @@ class TestNumpy_RLEHandler:
 
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+
+    def test_frame_multiple_fragments(self):
+        """Test a frame split across multiple fragments."""
+        ds = dcmread(RLE_8_1_2F)
+        ref = ds.pixel_array
+
+        frames = [f for f in generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)]
+        ds.PixelData = encapsulate(frames, fragments_per_frame=4)
+        assert np.array_equal(ds.pixel_array, ref)
 
 
 # Tests for rle_handler module with Numpy available
