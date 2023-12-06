@@ -203,7 +203,7 @@ class TestNumpy_PixelDtype:
         ds.PixelRepresentation = 1
         msg = (
             "Unable to determine the endianness of the dataset, please set "
-            "an appropriate Transfer Syntax UID in the file meta"
+            "an appropriate Transfer Syntax UID in 'Dataset.file_meta'"
         )
         with pytest.raises(AttributeError, match=msg):
             pixel_dtype(ds)
@@ -1329,7 +1329,7 @@ class TestNumpy_ModalityLUT:
         ds._read_little = None
         msg = (
             "Unable to determine the endianness of the dataset, please set "
-            "an appropriate Transfer Syntax UID in the file meta"
+            "an appropriate Transfer Syntax UID in 'FileDataset.file_meta'"
         )
         with pytest.raises(AttributeError, match=msg):
             apply_modality_lut(arr, ds)
@@ -1559,7 +1559,7 @@ class TestNumpy_PaletteColor:
         ds._read_little = None
         msg = (
             "Unable to determine the endianness of the dataset, please set "
-            "an appropriate Transfer Syntax UID in the file meta"
+            "an appropriate Transfer Syntax UID in 'FileDataset.file_meta'"
         )
         with pytest.raises(AttributeError, match=msg):
             apply_color_lut(arr, ds)
@@ -2590,7 +2590,7 @@ class TestNumpy_ApplyVOI:
         arr = np.asarray([0, 1, 2, 3, 255], dtype="uint16")
         msg = (
             "Unable to determine the endianness of the dataset, please set "
-            "an appropriate Transfer Syntax UID in the file meta"
+            "an appropriate Transfer Syntax UID in 'Dataset.file_meta'"
         )
         with pytest.raises(AttributeError, match=msg):
             apply_voi(arr, ds)

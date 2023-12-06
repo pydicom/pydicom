@@ -1583,19 +1583,6 @@ class TestDataset:
 
 
 class TestDatasetSaveAs:
-    def test_extra_kwargs_raises(self):
-        """Test unknown kwargs raise exception."""
-        ds = Dataset()
-        msg = r"Invalid keyword argument\(s\) for Dataset.save_as\(\): is_implicit_VR"
-        with pytest.warns(DeprecationWarning):
-            with pytest.raises(TypeError, match=msg):
-                ds.save_as(
-                    DicomBytesIO(),
-                    implicit_vr=False,
-                    write_like_original=True,
-                    is_implicit_VR=False,
-                )
-
     def test_no_transfer_syntax(self):
         """Test basic use of Dataset.save_as()"""
         ds = Dataset()
@@ -1759,28 +1746,23 @@ class TestDatasetSaveAs:
         ds.SOPInstanceUID = "1.2.3.4"
         msg = (
             "'write_like_original' is deprecated and will be removed in v4.0, "
-            "please use 'enforce_file_format="
+            "please use 'enforce_file_format=True' instead"
         )
 
         # Test kwarg - not enforce_file_format
         with pytest.warns(DeprecationWarning, match=msg):
-            ds.save_as(DicomBytesIO(), write_like_original=True, implicit_vr=True)
+            ds.save_as(DicomBytesIO(), write_like_original=False, implicit_vr=True)
 
         # Test default - not enforce_file_format
         ds.save_as(DicomBytesIO(), implicit_vr=True)
 
         # Test positional arg - not enforce_file_format
-        ds.save_as(DicomBytesIO(), True, implicit_vr=True)
-
-        # Test positional arg - enforce_file_format
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        with pytest.warns(DeprecationWarning, match=msg):
-            ds.save_as(DicomBytesIO(), False, implicit_vr=True)
-
-        # Test kwarg - enforce_file_format
-        with pytest.warns(DeprecationWarning, match=msg):
-            ds.save_as(DicomBytesIO(), write_like_original=False)
+        msg = (
+            r"Dataset.save_as\(\) takes 2 positional arguments but 3 positional "
+            r"arguments \(and 1 keyword-only argument\) were given"
+        )
+        with pytest.raises(TypeError, match=msg):
+            ds.save_as(DicomBytesIO(), True, implicit_vr=True)
 
     def test_save_as_compressed_no_encaps(self):
         """Test saving a compressed dataset with no encapsulation."""
@@ -2646,10 +2628,7 @@ class TestFuture:
             r"'write_like_original'"
         )
         with pytest.raises(TypeError, match=msg):
-            ds.save_as(None, write_like_original=True)
-
-        with pytest.raises(TypeError):
-            ds.save_as(None, False)
+            ds.save_as(None, write_like_original=False)
 
     def test_save_as_endianness_conversion(self, use_future):
         ds = Dataset()

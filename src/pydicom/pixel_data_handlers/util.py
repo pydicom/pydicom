@@ -176,7 +176,8 @@ def apply_color_lut(
         if is_little_endian is None:
             raise AttributeError(
                 "Unable to determine the endianness of the dataset, please set "
-                "an appropriate Transfer Syntax UID in the file meta"
+                "an appropriate Transfer Syntax UID in "
+                f"'{type(ds).__name__}.file_meta'"
             )
 
         endianness = "><"[is_little_endian]
@@ -278,7 +279,8 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
             if is_little_endian is None:
                 raise AttributeError(
                     "Unable to determine the endianness of the dataset, please set "
-                    "an appropriate Transfer Syntax UID in the file meta"
+                    "an appropriate Transfer Syntax UID in "
+                    f"'{type(ds).__name__}.file_meta'"
                 )
 
             endianness = "><"[is_little_endian]
@@ -465,7 +467,8 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
         if is_little_endian is None:
             raise AttributeError(
                 "Unable to determine the endianness of the dataset, please set "
-                "an appropriate Transfer Syntax UID in the file meta"
+                "an appropriate Transfer Syntax UID in "
+                f"'{type(ds).__name__}.file_meta'"
             )
 
         unpack_fmt = f"{'><'[is_little_endian]}{nr_entries}H"
@@ -1307,7 +1310,8 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     if is_little_endian is None:
         raise AttributeError(
             "Unable to determine the endianness of the dataset, please set "
-            "an appropriate Transfer Syntax UID in the file meta"
+            "an appropriate Transfer Syntax UID in "
+            f"'{type(ds).__name__}.file_meta'"
         )
 
     if not as_float:

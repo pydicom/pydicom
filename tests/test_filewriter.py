@@ -1500,26 +1500,6 @@ class TestDCMWrite:
         with pytest.warns(DeprecationWarning, match=msg):
             dcmwrite(fp, ds, write_like_original=False)
 
-        with pytest.warns(DeprecationWarning, match=msg):
-            dcmwrite(fp, ds, write_like_original=True)
-
-        with pytest.warns(DeprecationWarning, match=msg):
-            dcmwrite(fp, ds, False)
-
-    def test_extra_kwargs_raises(self):
-        """Test unknown kwargs raise exception."""
-        msg = r"Invalid keyword argument\(s\) for dcmwrite\(\): is_implicit_VR"
-        with pytest.warns(DeprecationWarning):
-            with pytest.raises(TypeError, match=msg):
-                dcmwrite(
-                    DicomBytesIO(),
-                    Dataset(),
-                    implicit_vr=False,
-                    write_like_original=True,
-                    __write_like_original=False,
-                    is_implicit_VR=False,
-                )
-
     def test_command_set_raises(self):
         """Test exception if command set elements present."""
         ds = Dataset()
@@ -3049,7 +3029,4 @@ class TestFuture:
         ds = Dataset()
         msg = r"Invalid keyword argument for dcmwrite\(\): " r"'write_like_original'"
         with pytest.raises(TypeError, match=msg):
-            dcmwrite(None, ds, write_like_original=True)
-
-        with pytest.raises(TypeError):
-            dcmwrite(None, ds, False)
+            dcmwrite(None, ds, write_like_original=False)

@@ -2313,11 +2313,12 @@ class Dataset:
     def save_as(
         self,
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
-        __write_like_original: bool = True,
+        /,
+        *,
+        write_like_original: bool | None = True,
         implicit_vr: bool | None = None,
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
-        **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
 
@@ -2390,13 +2391,7 @@ class Dataset:
         class_name = type(self).__name__
 
         # TODO: Remove in v4.0
-        # Cover use of `write_like_original` as:
-        #   kwarg: save_as(filename, write_like_original=bool)
-        #   positional arg: save_as(filename, False)
-        #   default: save_as(filename) or save_as(filename, True) - handled
-        #       by the default of `enforce_file_format`
-        write_like_original = kwargs.get("write_like_original", None)
-        if write_like_original is not None or __write_like_original is False:
+        if write_like_original is False:
             if config._use_future:
                 raise TypeError(
                     f"Invalid keyword argument for {class_name}.save_as(): "
@@ -2406,20 +2401,11 @@ class Dataset:
             warnings.warn(
                 (
                     "'write_like_original' is deprecated and will be removed in "
-                    "v4.0, please use 'enforce_file_format="
-                    f"{not write_like_original}' instead"
+                    "v4.0, please use 'enforce_file_format=True' instead"
                 ),
                 DeprecationWarning,
             )
             enforce_file_format = not write_like_original
-
-        # Make sure kwargs only contains `write_like_original`
-        keys = [x for x in kwargs.keys() if x != "write_like_original"]
-        if keys:
-            raise TypeError(
-                f"Invalid keyword argument(s) for {class_name}.save_as(): "
-                f"{', '.join(keys)}"
-            )
 
         # The default for little_endian is `None` so we can prevent conversion
         #   between little and big endian, but we actually default it to `True`

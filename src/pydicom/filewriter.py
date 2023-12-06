@@ -946,7 +946,7 @@ def _determine_encoding(
 ) -> tuple[bool, bool]:
     """Return the encoding to use for `ds`.
 
-    If `force_encoding` isn't used the priority is:
+    If `force_encoding` isn't ``True`` the priority is:
 
     1. The encoding corresponding to `tsyntax`
     2. The encoding set by `implicit_vr` and `little_endian`
@@ -955,7 +955,7 @@ def _determine_encoding(
 
     If none of those are valid, raise an exception.
 
-    If `force_encoding` is used then `implicit_vr` and `little_endian` are
+    If `force_encoding` is ``True`` then `implicit_vr` and `little_endian` are
     required.
 
     Parameters
@@ -1057,12 +1057,13 @@ def _determine_encoding(
 def dcmwrite(
     filename: PathType | BinaryIO | DicomFileLike,
     dataset: Dataset,
-    __write_like_original: bool = True,
+    /,
+    *,
+    write_like_original: bool = True,
     implicit_vr: bool | None = None,
     little_endian: bool | None = None,
     enforce_file_format: bool = False,
     force_encoding: bool = False,
-    **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
     buffer.
@@ -1116,7 +1117,7 @@ def dcmwrite(
     (0002,eeee) group. Some of these elements are required (Type 1) while
     others are optional (Type 3/1C). If `enforce_file_format` is ``False``
     then the *File Meta Information Group* elements are all optional, otherwise
-    and attempt will be made to add the required elements using `dataset`. See
+    an attempt will be made to add the required elements using `dataset`. See
     :func:`~pydicom.filewriter.write_file_meta_info` for more information on
     which elements are required.
 
@@ -1168,7 +1169,7 @@ def dcmwrite(
     write_like_original : bool, optional
         If ``True`` (default) then write `dataset` as-is, otherwise
         ensure that `dataset` is written in the DICOM File Format or
-        raise an exception is that isn't possible. This parameter is
+        raise an exception if that isn't possible. This parameter is
         deprecated, please use `enforce_file_format` instead.
     implicit_vr : bool, optional
         Required if `dataset` has no valid public *Transfer Syntax UID*
@@ -1182,9 +1183,10 @@ def dcmwrite(
         `dataset`, otherwise use big endian.
     enforce_file_format : bool, optional
         If ``True`` then ensure `dataset` is written in the DICOM File
-        Format or raise an exception if that isn't possible. If ``False``
-        (default) then write `dataset` as-is, preserving the following -
-        which may result in a non-conformant file:
+        Format or raise an exception if that isn't possible.
+
+        If ``False`` (default) then write `dataset` as-is, preserving the
+        following - which may result in a non-conformant file:
 
         - ``dataset.preamble``: if `dataset` has no preamble then none will
           be written
@@ -1212,12 +1214,7 @@ def dcmwrite(
         Encode a dataset and write it to file, wraps ``dcmwrite()``.
     """
     # TODO: Remove in v4.0
-    # Cover use of `write_like_original` as:
-    #   kwarg - dcmwrite(fp, ds, write_like_original=bool)
-    #   positional arg - dcmwrite(fp, ds, False)
-    #   default - dcmwrite(fp, ds) covered by the default of enforce_file_format
-    write_like_original: bool | None = kwargs.get("write_like_original", None)
-    if write_like_original is not None or __write_like_original is False:
+    if write_like_original is False:
         if config._use_future:
             raise TypeError(
                 "Invalid keyword argument for dcmwrite(): 'write_like_original'"
@@ -1226,21 +1223,13 @@ def dcmwrite(
         warnings.warn(
             (
                 "'write_like_original' is deprecated and will be removed in "
-                "v4.0, please use 'enforce_file_format="
-                f"{not write_like_original}' instead"
+                "v4.0, please use 'enforce_file_format=True' instead"
             ),
             DeprecationWarning,
         )
         enforce_file_format = not write_like_original
 
-    # Ensure kwargs only contains `write_like_original`
-    keys = [x for x in kwargs.keys() if x != "write_like_original"]
-    if keys:
-        raise TypeError(
-            f"Invalid keyword argument(s) for dcmwrite(): {', '.join(keys)}"
-        )
-
-    cls_name = dataset.__class__.__name__
+    cls_name = type(dataset).__name__
 
     # Check for disallowed tags
     bad_tags = [x >> 16 for x in dataset._dict if x >> 16 in (0, 2)]
