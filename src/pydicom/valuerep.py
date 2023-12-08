@@ -8,10 +8,10 @@ import re
 from math import floor, isfinite, log10
 from typing import Optional, Any, cast
 from collections.abc import Callable, Sequence, Iterator
-import warnings
 
 # don't import datetime_conversion directly
 from pydicom import config
+from pydicom.misc import warn_and_log
 
 
 # can't import from charset or get circular import
@@ -431,7 +431,7 @@ def validate_value(
             if not is_valid:
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
-                warnings.warn(msg)
+                warn_and_log(msg)
 
 
 @unique
@@ -762,7 +762,7 @@ class DT(_DateTimeBase, datetime.datetime):
 
             # DT may include a leap second which isn't allowed by datetime
             if kwargs["second"] == 60:
-                warnings.warn(
+                warn_and_log(
                     "'datetime.datetime' doesn't allow a value of '60' for "
                     "the seconds component, changing to '59'"
                 )
@@ -855,7 +855,7 @@ class TM(_DateTimeBase, datetime.time):
             second = 0 if match.group("s") is None else int(match.group("s"))
 
             if second == 60:
-                warnings.warn(
+                warn_and_log(
                     "'datetime.time' doesn't allow a value of '60' for the "
                     "seconds component, changing to '59'"
                 )
@@ -1209,7 +1209,7 @@ class DSdecimal(Decimal):
                 )
                 if validation_mode == config.RAISE:
                     raise OverflowError(msg)
-                warnings.warn(msg)
+                warn_and_log(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 msg = (
@@ -1217,7 +1217,7 @@ class DSdecimal(Decimal):
                 )
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
-                warnings.warn(msg)
+                warn_and_log(msg)
 
     def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
@@ -1322,7 +1322,7 @@ class ISfloat(float):
         if validation_mode:
             msg = f'Value "{str(self)}" is not valid for elements with a VR ' "of IS"
             if validation_mode == config.WARN:
-                warnings.warn(msg)
+                warn_and_log(msg)
             elif validation_mode == config.RAISE:
                 msg += "\nSet reading_validation_mode to WARN or IGNORE to bypass"
                 raise TypeError(msg)

@@ -5,7 +5,6 @@ from struct import unpack, unpack_from
 from sys import byteorder
 from typing import Optional, TYPE_CHECKING, cast
 from collections.abc import Iterable, ByteString
-import warnings
 
 try:
     import numpy as np
@@ -15,6 +14,7 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom.data import get_palette_files
+from pydicom.misc import warn_and_log
 from pydicom.uid import UID
 from pydicom.valuerep import VR
 
@@ -411,7 +411,7 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
         return arr
 
     if not np.issubdtype(arr.dtype, np.integer):
-        warnings.warn(
+        warn_and_log(
             "Applying a VOI LUT on a float input array may give " "incorrect results"
         )
 
@@ -1142,7 +1142,7 @@ def get_nr_frames(ds: "Dataset", warn: bool = True) -> int:
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
     if not nr_frames:  # None or 0
         if warn:
-            warnings.warn(
+            warn_and_log(
                 f"A value of {nr_frames} for (0028,0008) 'Number of Frames' is "
                 "non-conformant. It's recommended that this value be "
                 "changed to 1"

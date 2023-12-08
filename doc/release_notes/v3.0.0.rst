@@ -115,6 +115,10 @@ Enhancements
 * Added convenience method :meth:`~pydicom.dataset.Dataset.add_new_private` to add a private tag
 * Added the :ref:`examples<api_examples>` module to make it easier and less
   confusing for users to work with the example datasets used by the documentation
+* Added the ability to set the corresponding dataset encoding for private transfer
+  syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
+  method
+* Warning messages are also sent to the pydicom logger (:issue:`1529`)
 
 Fixes
 -----
@@ -129,9 +133,12 @@ Fixes
   :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
 * Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
+* Fixed :func:`~pydicom.encaps.encapsulate_extended` not returning the correct
+  values for odd-length frames (:issue:`1968`)
 
 Pydicom Internals
 -----------------
 * Repository folder structure refactored
 * Renamed top level "source" folder to "util"
 * New CI tools - `dependabot`, and `pre-commit` using black and ruff
+* Added a script to hotfix the documentation search function (:issue:`1965`)

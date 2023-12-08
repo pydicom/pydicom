@@ -8,7 +8,6 @@ import os
 from struct import Struct, unpack
 from typing import BinaryIO, Any, cast
 from collections.abc import Callable, MutableSequence, Iterator
-import warnings
 import zlib
 
 from pydicom import config
@@ -30,7 +29,7 @@ from pydicom.fileutil import (
     PathType,
     _unpack_tag,
 )
-from pydicom.misc import size_in_bytes
+from pydicom.misc import size_in_bytes, warn_and_log
 from pydicom.sequence import Sequence
 from pydicom.tag import (
     ItemTag,
@@ -401,7 +400,7 @@ def _is_implicit_vr(
         if config.settings.reading_validation_mode == config.RAISE:
             raise InvalidDicomError(msg)
 
-        warnings.warn(msg + f" - using {found_vr} VR for reading", UserWarning)
+        warn_and_log(f"{msg} - using {found_vr} VR for reading", UserWarning)
 
     return found_implicit
 
@@ -485,10 +484,8 @@ def read_dataset(
     except EOFError as details:
         if config.settings.reading_validation_mode == config.RAISE:
             raise
-        warnings.warn(
-            f"{details} in file {getattr(fp, 'name', '<no filename>')}",
-            UserWarning,
-        )
+        msg = str(details) + " in file " + getattr(fp, "name", "<no filename>")
+        warn_and_log(msg, UserWarning)
     except NotImplementedError as details:
         logger.error(details)
 
@@ -1142,8 +1139,8 @@ def read_deferred_data_element(
         if timestamp is not None:
             statinfo = os.stat(filename_or_obj)
             if statinfo.st_mtime != timestamp:
-                warnings.warn(
-                    "Deferred read warning -- file modification time has changed"
+                warn_and_log(
+                    "Deferred read warning -- file modification time has " "changed"
                 )
 
     # Open the file, position to the right place

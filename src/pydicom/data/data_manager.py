@@ -50,7 +50,6 @@ import fnmatch
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING
-import warnings
 
 from pydicom.data.download import (
     data_path_with_download,
@@ -59,6 +58,7 @@ from pydicom.data.download import (
     get_url_map,
     get_data_dir,
 )
+from pydicom.misc import warn_and_log
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom import Dataset
@@ -250,7 +250,7 @@ def get_files(
     files += real_online_file_paths
 
     if download_error:
-        warnings.warn(
+        warn_and_log(
             "One or more download failures occurred, the list of matching "
             "file paths may be incomplete"
         )
@@ -376,7 +376,7 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
             try:
                 return os.fspath(data_path_with_download(filename))
             except Exception:
-                warnings.warn(
+                warn_and_log(
                     f"A download failure occurred while attempting to "
                     f"retrieve {name}"
                 )

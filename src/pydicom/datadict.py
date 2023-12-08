@@ -1,15 +1,12 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Access dicom dictionary information"""
-import warnings
-
-from pydicom.tag import Tag, BaseTag, TagType
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
-from pydicom._dicom_dict import DicomDictionary
-
 # those with tags like "(50xx,0005)"
-from pydicom._dicom_dict import RepeatersDictionary
+from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
+from pydicom.misc import warn_and_log
 from pydicom._private_dict import private_dictionaries
+from pydicom.tag import Tag, BaseTag, TagType
 
 
 # Generate mask dict for checking repeating groups etc.
@@ -564,7 +561,7 @@ def get_private_entry(tag: TagType, private_creator: str) -> tuple[str, str, str
             f"{tag.private_creator} '{private_creator}' "
             f"is not a valid private creator"
         )
-        warnings.warn(msg)
+        warn_and_log(msg)
         raise KeyError(msg) from exc
 
     # private elements are usually agnostic for
