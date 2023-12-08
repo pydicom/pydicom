@@ -1,8 +1,13 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Miscellaneous helper functions"""
 
+import logging
 from itertools import groupby
 from pathlib import Path
+import warnings
+
+
+LOGGER = logging.getLogger("pydicom")
 
 
 _size_factors = {
@@ -58,3 +63,21 @@ def is_dicom(file_path: str | Path) -> bool:
     with open(file_path, "rb") as fp:
         fp.read(128)  # preamble
         return fp.read(4) == b"DICM"
+
+
+def warn_and_log(
+    msg: str, category: type[Warning] | None = None, stacklevel: int = 1
+) -> None:
+    """Send warning message `msg` to the logger.
+
+    Parameters
+    ----------
+    msg : str
+        The warning message.
+    category : type[Warning] | None, optional
+        The warning category class, defaults to ``UserWarning``.
+    stacklevel : int, optional
+        The stack level to refer to, relative to where `warn_and_log` is used.
+    """
+    LOGGER.warning(msg)
+    warnings.warn(msg, category, stacklevel=stacklevel + 1)

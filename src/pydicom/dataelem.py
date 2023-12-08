@@ -11,7 +11,6 @@ import base64
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
-import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
@@ -27,6 +26,7 @@ from pydicom.datadict import (
 )
 from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter, BulkDataType
+from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
@@ -832,7 +832,7 @@ def DataElement_from_raw(
                     raise KeyError(msg + " can't look up VR")
 
                 vr = VR_.UN
-                warnings.warn(msg + " - setting VR to 'UN'")
+                warn_and_log(f"{msg} - setting VR to 'UN'")
     elif vr == VR_.UN and config.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
@@ -853,7 +853,7 @@ def DataElement_from_raw(
             f"to VR '{vr}'."
         )
         if config.convert_wrong_length_to_UN:
-            warnings.warn(f"{message} Setting VR to 'UN'.")
+            warn_and_log(f"{message} Setting VR to 'UN'.")
             vr = VR_.UN
             value = raw.value
         else:

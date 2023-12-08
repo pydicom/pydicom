@@ -10,7 +10,6 @@ import shutil
 from tempfile import TemporaryDirectory
 from typing import Optional, Union, Any, cast
 import uuid
-import warnings
 
 from pydicom.charset import default_encoding
 from pydicom.datadict import tag_for_keyword, dictionary_description
@@ -19,6 +18,7 @@ from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.filereader import dcmread
 from pydicom.filewriter import write_dataset, write_data_element, write_file_meta_info
+from pydicom.misc import warn_and_log
 from pydicom.tag import Tag, BaseTag
 import pydicom.uid as sop
 from pydicom.uid import (
@@ -1476,7 +1476,7 @@ class FileSet:
                 matches.append(instance)
 
         if not load and not has_elements:
-            warnings.warn(
+            warn_and_log(
                 "None of the records in the DICOMDIR dataset contain all "
                 "the query elements, consider using the 'load' parameter "
                 "to expand the search to the corresponding SOP instances"
@@ -1536,7 +1536,7 @@ class FileSet:
 
         missing_elements = [element for element, v in has_element.items() if not v]
         if not load and missing_elements:
-            warnings.warn(
+            warn_and_log(
                 "None of the records in the DICOMDIR dataset contain "
                 f"{missing_elements}, consider using the 'load' parameter "
                 "to expand the search to the corresponding SOP instances"
@@ -1631,7 +1631,7 @@ class FileSet:
 
         tsyntax = ds.file_meta.TransferSyntaxUID
         if tsyntax != ExplicitVRLittleEndian:
-            warnings.warn(
+            warn_and_log(
                 "The DICOMDIR dataset uses an invalid transfer syntax "
                 f"'{tsyntax.name}' and will be updated to use 'Explicit VR "
                 "Little Endian'"
@@ -1683,7 +1683,7 @@ class FileSet:
                 (cast(Path, self.path) / file_id).resolve(strict=True)
             except FileNotFoundError:
                 bad_instances.append(instance)
-                warnings.warn(
+                warn_and_log(
                     "The referenced SOP Instance for the directory record at "
                     f"offset {instance.node._offset} does not exist: "
                     f"{cast(Path, self.path) / file_id}"
@@ -1774,7 +1774,7 @@ class FileSet:
         missing = [r for r in missing if "ReferencedFileID" in r._record]
 
         if missing and not include_orphans:
-            warnings.warn(
+            warn_and_log(
                 f"The DICOMDIR has {len(missing)} orphaned directory records "
                 "that reference an instance that will not be included in the "
                 "File-set"

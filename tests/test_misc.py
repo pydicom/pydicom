@@ -1,12 +1,13 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for misc.py"""
 
+import logging
 import os
 
 import pytest
 
 from pydicom.data import get_testdata_file
-from pydicom.misc import is_dicom, size_in_bytes
+from pydicom.misc import is_dicom, size_in_bytes, warn_and_log
 
 
 test_file = get_testdata_file("CT_small.dcm")
@@ -56,3 +57,12 @@ class TestMisc:
             size_in_bytes("KB 2")
         with pytest.raises(ValueError):
             size_in_bytes("4 KB asdf")
+
+    def test_warn_and_log(self, caplog):
+        """Test warn_and_log"""
+
+        with caplog.at_level(logging.WARN, logger="pydicom"):
+            with pytest.warns(UserWarning, match="Foo"):
+                warn_and_log("Foo!")
+
+            assert "Foo" in caplog.text

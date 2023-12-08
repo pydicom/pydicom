@@ -3,9 +3,9 @@
 
 from struct import pack
 from collections.abc import Generator
-import warnings
 
 import pydicom.config
+from pydicom.misc import warn_and_log
 from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
@@ -376,7 +376,7 @@ def generate_pixel_data(
                 if frame or frame_nr != nr_frames:
                     # If data in `frame` or fewer frames yielded then we
                     #   must've missed a frame boundary
-                    warnings.warn(
+                    warn_and_log(
                         "The end of the encapsulated pixel data has been "
                         "reached but one or more frame boundaries may have "
                         "been missed; please confirm that the generated frame "

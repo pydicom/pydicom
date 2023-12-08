@@ -4,7 +4,6 @@
 from struct import pack
 from typing import BinaryIO, Any, cast
 from collections.abc import Sequence, MutableSequence, Iterable
-import warnings
 import zlib
 
 from pydicom.charset import default_encoding, convert_encodings, encode_string
@@ -13,6 +12,7 @@ from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO, DicomIO
 from pydicom.fileutil import path_from_pathlike, PathType
+from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import (
     Tag,
@@ -649,13 +649,12 @@ def write_data_element(
         and value_length > 0xFFFF
     ):
         # see PS 3.5, section 6.2.2 for handling of this case
-        msg = (
+        warn_and_log(
             f"The value for the data element {elem.tag} exceeds the "
             f"size of 64 kByte and cannot be written in an explicit transfer "
             f"syntax. The data element VR is changed from '{vr}' to 'UN' "
             f"to allow saving the data."
         )
-        warnings.warn(msg)
         vr = VR.UN
 
     # write the VR for explicit transfer syntax
@@ -1101,7 +1100,7 @@ def dcmwrite(
 
         # PS3.5 Annex A.4 - encapsulated datasets use Explicit VR Little
         if tsyntax.is_compressed and encoding != (False, True):
-            warnings.warn(
+            warn_and_log(
                 "All encapsulated (compressed) transfer syntaxes must use "
                 "explicit VR little endian encoding for the dataset. Set "
                 f"'{cls_name}.is_little_endian = True' and '{cls_name}."
