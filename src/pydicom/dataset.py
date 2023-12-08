@@ -20,7 +20,6 @@ import json
 import os
 import os.path
 import re
-import warnings
 from bisect import bisect_left
 from collections.abc import (
     ValuesView,
@@ -68,6 +67,7 @@ from pydicom.datadict import (
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.fileutil import path_from_pathlike, PathType
+from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import (
     convert_color_space,
     reshape_pixel_array,
@@ -582,7 +582,7 @@ class Dataset:
                 )
 
             if config.INVALID_KEY_BEHAVIOR == "WARN":
-                warnings.warn(msg)
+                warn_and_log(msg)
             elif config.INVALID_KEY_BEHAVIOR == "RAISE":
                 raise ValueError(msg) from exc
 
@@ -921,7 +921,7 @@ class Dataset:
     @property
     def read_encoding(self) -> str | MutableSequence[str]:
         name = type(self).__name__
-        warnings.warn(
+        warn_and_log(
             (
                 f"'{name}.read_encoding' will be removed in v4.0, use "
                 f"'{name}.original_character_set' instead"
@@ -942,7 +942,7 @@ class Dataset:
 
         """
         name = type(self).__name__
-        warnings.warn(
+        warn_and_log(
             (
                 f"'{name}.read_encoding' will be removed in v4.0, use "
                 f"'{name}.original_character_set' instead"
@@ -1279,7 +1279,7 @@ class Dataset:
             dataset.
         """
         name = type(self).__name__
-        warnings.warn(
+        warn_and_log(
             (
                 f"'{name}.is_implicit_VR' will be removed in v4.0, set the "
                 "Transfer Syntax UID or use the 'implicit_vr' argument with "
@@ -1312,7 +1312,7 @@ class Dataset:
             decoded dataset.
         """
         name = type(self).__name__
-        warnings.warn(
+        warn_and_log(
             (
                 f"'{name}.is_little_endian' will be removed in v4.0, set the "
                 "Transfer Syntax UID or use the 'little_endian' argument with "
@@ -1564,7 +1564,7 @@ class Dataset:
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN
-                    warnings.warn(f"Unknown DICOM tag {tag} - setting VR to 'UN'")
+                    warn_and_log(f"Unknown DICOM tag {tag} - setting VR to 'UN'")
 
             default = DataElement(tag, vr, default)
 
@@ -2221,7 +2221,7 @@ class Dataset:
             or buffer and used implicit VR, ``False`` if it used explicit VR.
         """
         name = type(self).__name__
-        warnings.warn(
+        warn_and_log(
             (
                 f"'{name}.read_implicit_vr' will be removed in v4.0, use "
                 f"'{name}.original_encoding[0]' instead"
@@ -2248,7 +2248,7 @@ class Dataset:
             endian.
         """
         name = type(self).__name__
-        warnings.warn(
+        warn_and_log(
             (
                 f"'{name}.read_little_endian' will be removed in v4.0, use "
                 f"'{name}.original_encoding[1]' instead"
@@ -2381,7 +2381,7 @@ class Dataset:
                     "element keyword data dictionary"
                 )
                 if config.INVALID_KEYWORD_BEHAVIOR == "WARN":
-                    warnings.warn(msg)
+                    warn_and_log(msg)
                 elif config.INVALID_KEYWORD_BEHAVIOR == "RAISE":
                     raise ValueError(msg)
 
@@ -2957,7 +2957,7 @@ class FileDataset(Dataset):
         )
         filename = self.filename
         if filename is not None and not isinstance(filename, str):
-            warnings.warn(
+            warn_and_log(
                 "The 'filename' attribute of the dataset is a "
                 "file-like object and will be set to None "
                 "in the copied object"

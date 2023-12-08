@@ -29,7 +29,6 @@ table below.
 """
 
 from typing import TYPE_CHECKING, cast, Any
-import warnings
 
 try:
     import numpy as np
@@ -38,6 +37,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers import unpack_bits
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -232,7 +232,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
-            warnings.warn("The overlay data length is odd and misses a padding byte.")
+            warn_and_log("The overlay data length is odd and misses a padding byte.")
         else:
             raise ValueError(
                 "The length of the overlay data in the dataset "
@@ -242,7 +242,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
             )
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
-        warnings.warn(
+        warn_and_log(
             f"The length of the overlay data in the dataset ({actual_length} "
             "bytes) indicates it contains excess padding. "
             f"{actual_length - expected_len} bytes will be removed "
