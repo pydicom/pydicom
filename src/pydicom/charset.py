@@ -8,9 +8,9 @@ from typing import (
     cast,
 )
 from collections.abc import MutableSequence, Sequence
-import warnings
 
 from pydicom import config
+from pydicom.misc import warn_and_log
 from pydicom.valuerep import TEXT_VR_DELIMS, PersonName, VR, CUSTOMIZABLE_CHARSET_VR
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -341,7 +341,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -
                 raise
             # IGNORE is handled as WARN here, as this is
             # not an optional validation check
-            warnings.warn(
+            warn_and_log(
                 f"Unknown encoding '{first_encoding}' - using default "
                 "encoding instead"
             )
@@ -350,7 +350,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -
         except UnicodeError:
             if config.settings.reading_validation_mode == config.RAISE:
                 raise
-            warnings.warn(
+            warn_and_log(
                 "Failed to decode byte string with encoding "
                 f"'{first_encoding}' - using replacement characters in "
                 "decoded string"
@@ -433,7 +433,7 @@ def _decode_fragment(
     except UnicodeError:
         if config.settings.reading_validation_mode == config.RAISE:
             raise
-        warnings.warn(
+        warn_and_log(
             "Failed to decode byte string with encodings: "
             f"{', '.join(encodings)} - using replacement characters in "
             "decoded string"
@@ -480,7 +480,7 @@ def _decode_escaped_fragment(
     if config.settings.reading_validation_mode == config.RAISE:
         raise ValueError(msg)
 
-    warnings.warn(msg + f" - using encoding {encodings[0]}")
+    warn_and_log(f"{msg} - using encoding {encodings[0]}")
     return byte_str.decode(encodings[0], errors="replace")
 
 
@@ -542,9 +542,9 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
         # force raising a valid UnicodeEncodeError
         value.encode(encodings[0])
 
-    warnings.warn(
-        "Failed to encode value with encodings: {} - using "
-        "replacement characters in encoded string".format(", ".join(encodings))
+    warn_and_log(
+        f"Failed to encode value with encodings: {', '.join(encodings)} "
+        "- using replacement characters in encoded string"
     )
     return _encode_string_impl(value, encodings[0], errors="replace")
 
@@ -763,7 +763,7 @@ def _warn_about_invalid_encoding(
             f"Incorrect value for Specific Character Set '{encoding}' - "
             f"assuming '{patched_encoding}'"
         )
-    warnings.warn(msg, stacklevel=2)
+    warn_and_log(msg, stacklevel=2)
 
 
 def _handle_illegal_standalone_encodings(
@@ -775,7 +775,7 @@ def _handle_illegal_standalone_encodings(
     it is removed from the encodings.
     """
     if encodings[0] in STAND_ALONE_ENCODINGS:
-        warnings.warn(
+        warn_and_log(
             (
                 f"Value '{encodings[0]}' for Specific Character Set does not "
                 f"allow code extensions, ignoring: {', '.join(encodings[1:])}"
@@ -786,11 +786,8 @@ def _handle_illegal_standalone_encodings(
 
     for i, encoding in reversed(list(enumerate(encodings[1:]))):
         if encoding in STAND_ALONE_ENCODINGS:
-            warnings.warn(
-                (
-                    f"Value '{encoding}' cannot be used as code "
-                    "extension, ignoring it"
-                ),
+            warn_and_log(
+                f"Value '{encoding}' cannot be used as code extension, ignoring it",
                 stacklevel=2,
             )
             del py_encodings[i + 1]

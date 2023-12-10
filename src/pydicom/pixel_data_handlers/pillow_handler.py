@@ -6,7 +6,6 @@ to decode *Pixel Data*.
 import io
 import logging
 from typing import TYPE_CHECKING, cast
-import warnings
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -31,6 +30,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
+from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import (
     pixel_dtype,
     get_j2k_parameters,
@@ -231,7 +231,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         # See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
         shift = bits_allocated - bits_stored
         if j2k_precision and j2k_precision != bits_stored:
-            warnings.warn(
+            warn_and_log(
                 f"The (0028,0101) 'Bits Stored' value ({bits_stored}-bit) "
                 f"doesn't match the JPEG 2000 data ({j2k_precision}-bit). "
                 f"It's recommended that you change the 'Bits Stored' value"

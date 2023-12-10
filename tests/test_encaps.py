@@ -1328,3 +1328,10 @@ class TestEncapsulateExtended:
         # Extended Offset Table Lengths are OK
         assert isinstance(out[2], bytes)
         assert [len(f) for f in frames] == list(unpack("<10Q", out[2]))
+
+    def test_encapsulate_odd_length(self):
+        """Test encapsulating odd-length frames"""
+        frames = [b"\x00", b"\x01", b"\x02"]
+        eot_encapsulated, eot, eot_lengths = encapsulate_extended(frames)
+        assert unpack(f"<{len(frames)}Q", eot) == (0, 10, 20)
+        assert unpack(f"<{len(frames)}Q", eot_lengths) == (2, 2, 2)

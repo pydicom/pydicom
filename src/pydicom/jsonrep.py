@@ -5,8 +5,8 @@ import base64
 from inspect import signature
 from typing import TypeAlias, Any, cast, TYPE_CHECKING
 from collections.abc import Callable
-import warnings
 
+from pydicom.misc import warn_and_log
 from pydicom.valuerep import FLOAT_VR, INT_VR, VR
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -208,7 +208,7 @@ class JsonDataElementConverter:
                 )
 
             if self.bulk_data_element_handler is None:
-                warnings.warn(
+                warn_and_log(
                     "No bulk data URI handler provided for retrieval "
                     f'of value of data element "{self.tag}"'
                 )
@@ -254,7 +254,7 @@ class JsonDataElementConverter:
             try:
                 return int(value, 16)
             except ValueError:
-                warnings.warn(f"Invalid value '{value}' for AT element - ignoring it")
+                warn_and_log(f"Invalid value '{value}' for AT element - ignoring it")
 
             return None
 
@@ -330,7 +330,7 @@ class JsonDataElementConverter:
             # Some DICOMweb services get this wrong, so we
             # workaround the issue and warn the user
             # rather than raising an error.
-            warnings.warn(
+            warn_and_log(
                 f"Value of data element '{self.tag}' with VR Person Name (PN) "
                 "is not formatted correctly"
             )

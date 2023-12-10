@@ -4,6 +4,7 @@
 import gzip
 import io
 from io import BytesIO
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -22,6 +23,7 @@ from pydicom.filereader import (
     dcmread,
     read_dataset,
     data_element_generator,
+    read_file_meta_info,
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
@@ -908,6 +910,73 @@ class TestReader:
         dcmread(bs, force=True)
         assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
 
+    def test_explicit_undefined_length_logged(self, enable_debugging, caplog):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00OB\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
+                ),
+                False,
+                True,
+            )
+        assert "Undefined length (FFFFFFFF)" in caplog.text
+        assert "Reading undefined length data element" in caplog.text
+
+    def test_sequence_undefined_length_logged(self, enable_debugging, caplog):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00SQ\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
+                ),
+                False,
+                True,
+            )
+        assert "0000001E: Reading/parsing undefined length sequence" in caplog.text
+        assert (
+            "00000022: fe ff 00 e0 00 00 00 00  Found Item tag (start of item)"
+        ) in caplog.text
+        assert "Finished sequence item" in caplog.text
+
+    def test_sequence_delimiter_with_length(self, enable_debugging, caplog):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00SQ\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x01"
+                ),
+                False,
+                True,
+            )
+
+        assert (
+            "Expected 0x00000000 after delimiter, found 0x1000000, at " "position 0x2A"
+        ) in caplog.text
+
+    def test_sequence_missing_item_tag(self, enable_debugging, caplog):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00SQ\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\x10\x00\x10\x00\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x01"
+                ),
+                False,
+                True,
+            )
+
+        assert (
+            "Expected sequence item with tag (FFFE,E000) at file position 0x22"
+        ) in caplog.text
+
 
 class TestIncorrectVR:
     def setup_method(self):
@@ -989,6 +1058,25 @@ class TestIncorrectVR:
         ds.remove_private_tags()  # forces it to actually parse SQ
 
 
+@pytest.fixture
+def enable_debugging():
+    original_debug = config.debugging
+    config.debugging = True
+    yield
+    config.debugging = original_debug
+
+
+@pytest.fixture
+def enable_debugging_and_implicit():
+    original_debug = config.debugging
+    original_switch = config.assume_implicit_vr_switch
+    config.debugging = True
+    config.assume_implicit_vr_switch = True
+    yield
+    config.debugging = original_debug
+    config.assume_implicit_vr_switch = original_switch
+
+
 class TestUnknownVR:
     @pytest.fixture(autouse=True)
     def restore_config_values(self):
@@ -1055,6 +1143,34 @@ class TestUnknownVR:
         msg = msg.format(str_output)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
+
+    def test_unknown_explicit(self, enable_debugging, caplog):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00XX\x00\x00\x00\x08\x00\x49"
+                ),
+                False,
+                True,
+            )
+
+        assert (
+            "Unknown VR 'XX' assuming explicit VR encoding with 2-byte length"
+        ) in caplog.text
+
+    def test_unknown_implicit(self, enable_debugging_and_implicit, caplog):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00xx\x00\x00\x00\x08\x00\x49"
+                ),
+                False,
+                True,
+            )
+
+        assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
 
 
 class TestReadDataElement:
@@ -1470,10 +1586,12 @@ class TestDeferredRead:
         with pytest.raises(OSError):
             ds.PixelData
 
-    def test_values_identical(self):
+    def test_values_identical(self, enable_debugging, caplog):
         """Deferred values exactly matches normal read."""
         ds_norm = dcmread(self.testfile_name)
-        ds_defer = dcmread(self.testfile_name, defer_size=2000)
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            ds_defer = dcmread(self.testfile_name, defer_size=2000)
+
         for data_elem in ds_norm:
             tag = data_elem.tag
 
@@ -1481,6 +1599,10 @@ class TestDeferredRead:
                 assert numpy.allclose(data_elem.value, ds_defer[tag].value)
             else:
                 assert data_elem.value == ds_defer[tag].value
+
+        assert (
+            "Defer size exceeded. Skipping forward to next data element."
+        ) in caplog.text
 
     def test_zipped_deferred(self):
         """Deferred values from a gzipped file works."""
@@ -1625,3 +1747,11 @@ class TestDataElementGenerator:
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+
+
+def test_read_file_meta_info():
+    """Test read_file_meta_info()"""
+    ds = read_file_meta_info(rtplan_name)
+    assert len(ds) == 6
+    assert isinstance(ds, FileMetaDataset)
+    assert ds.TransferSyntaxUID == ImplicitVRLittleEndian

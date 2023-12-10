@@ -129,6 +129,7 @@ Enhancements
 * Added the ability to set the corresponding dataset encoding for private transfer
   syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
   method
+* Warning messages are also sent to the pydicom logger (:issue:`1529`)
 
 
 Fixes
@@ -144,6 +145,8 @@ Fixes
   :class:`~pydicom.fileset.FileSet` (:issue:`1922`)
 * Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
+* Fixed :func:`~pydicom.encaps.encapsulate_extended` not returning the correct
+  values for odd-length frames (:issue:`1968`)
 * Fixed using the incorrect encoding when writing datasets converted between
   explicit and implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
 

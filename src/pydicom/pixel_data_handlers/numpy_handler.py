@@ -51,7 +51,6 @@ table below.
 """
 
 from typing import TYPE_CHECKING, cast
-import warnings
 
 try:
     import numpy as np
@@ -60,6 +59,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import (
     pixel_dtype,
     get_expected_length,
@@ -220,9 +220,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
-            warnings.warn(
-                "The odd length pixel data is missing a trailing padding byte"
-            )
+            warn_and_log("The odd length pixel data is missing a trailing padding byte")
         else:
             raise ValueError(
                 f"The length of the pixel data in the dataset ({actual_length} bytes) "
@@ -251,7 +249,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
                     "need to change the Photometric Interpretation to "
                     "the correct value."
                 )
-        warnings.warn(msg)
+        warn_and_log(msg)
 
     # Unpack the pixel data into a 1D ndarray
     if ds.BitsAllocated == 1:
