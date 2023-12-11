@@ -2319,7 +2319,7 @@ class Dataset:
         implicit_vr: bool | None = None,
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
 
@@ -2426,7 +2426,6 @@ class Dataset:
             enforce_file_format=enforce_file_format,
             **kwargs,
         )
-
 
     def ensure_file_meta(self) -> None:
         """Create an empty ``Dataset.file_meta`` if none exists.
