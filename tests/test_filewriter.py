@@ -1495,10 +1495,60 @@ class TestDCMWrite:
         ds.SOPInstanceUID = "1.2.3"
         msg = (
             "'write_like_original' is deprecated and will be removed in "
-            "v4.0, please use 'enforce_file_format="
+            "v4.0, please use 'enforce_file_format' instead"
         )
         with pytest.warns(DeprecationWarning, match=msg):
             dcmwrite(fp, ds, write_like_original=False)
+
+        with pytest.warns(DeprecationWarning, match=msg):
+            dcmwrite(fp, ds, write_like_original=True)
+
+        with pytest.warns(DeprecationWarning, match=msg):
+            dcmwrite(fp, ds, False)
+
+        with pytest.warns(DeprecationWarning, match=msg):
+            dcmwrite(fp, ds, True)
+
+    def test_extra_kwargs_raises(self):
+        """Test unknown kwargs raise exception."""
+        msg = r"Invalid keyword argument\(s\) for dcmwrite\(\): is_implicit_VR"
+        with pytest.warns(DeprecationWarning):
+            with pytest.raises(TypeError, match=msg):
+                dcmwrite(
+                    DicomBytesIO(),
+                    Dataset(),
+                    implicit_vr=False,
+                    write_like_original=True,
+                    is_implicit_VR=False,
+                )
+
+    def test_extra_args_raises(self):
+        """Test unknown kwargs raise exception."""
+        msg = r"dcmwrite\(\) takes from 2 to 3 positional arguments but 4 were given"
+        with pytest.raises(TypeError, match=msg):
+            dcmwrite(
+                DicomBytesIO(),
+                Dataset(),
+                True,
+                False,
+                is_implicit_VR=False,
+            )
+
+    def test_position_and_keyword_raises(self):
+        """Test position and keyword arg raises exception."""
+        msg = (
+            "'write_like_original' cannot be used as both a positional and "
+            "keyword argument"
+        )
+        with pytest.raises(TypeError, match=msg):
+            dcmwrite(
+                DicomBytesIO(),
+                Dataset(),
+                True,
+                implicit_vr=False,
+                write_like_original=True,
+                is_implicit_VR=False,
+            )
 
     def test_command_set_raises(self):
         """Test exception if command set elements present."""
@@ -3019,14 +3069,27 @@ def test_all_writers():
 
 @pytest.fixture
 def use_future():
+    original = config._use_future
     config._use_future = True
     yield
-    config._use_future = False
+    config._use_future = original
 
 
 class TestFuture:
     def test_dcmwrite_write_like_original_raises(self, use_future):
         ds = Dataset()
-        msg = r"Invalid keyword argument for dcmwrite\(\): " r"'write_like_original'"
+        msg = (
+            "'write_like_original' is no longer accepted as a positional "
+            "or keyword argument, use 'enforce_file_format' instead"
+        )
+        with pytest.raises(TypeError, match=msg):
+            dcmwrite(None, ds, write_like_original=True)
+
         with pytest.raises(TypeError, match=msg):
             dcmwrite(None, ds, write_like_original=False)
+
+        with pytest.raises(TypeError, match=msg):
+            dcmwrite(None, ds, False)
+
+        with pytest.raises(TypeError, match=msg):
+            dcmwrite(None, ds, True)

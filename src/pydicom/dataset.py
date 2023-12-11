@@ -2314,11 +2314,12 @@ class Dataset:
         self,
         filename: "str | os.PathLike[AnyStr] | BinaryIO",
         /,
+        __write_like_original: bool | None = None,
         *,
-        write_like_original: bool | None = True,
         implicit_vr: bool | None = None,
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
+        **kwargs,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
 
@@ -2388,26 +2389,7 @@ class Dataset:
         pydicom.filewriter.dcmwrite
             Encode a :class:`Dataset` and write it to a file or buffer.
         """
-        class_name = type(self).__name__
-
-        # TODO: Remove in v4.0
-        if write_like_original is False:
-            if config._use_future:
-                raise TypeError(
-                    f"Invalid keyword argument for {class_name}.save_as(): "
-                    "'write_like_original'"
-                )
-
-            warnings.warn(
-                (
-                    "'write_like_original' is deprecated and will be removed in "
-                    "v4.0, please use 'enforce_file_format=True' instead"
-                ),
-                DeprecationWarning,
-            )
-            enforce_file_format = not write_like_original
-
-        # The default for little_endian is `None` so we can prevent conversion
+        # The default for little_endian is `None` so we can detect conversion
         #   between little and big endian, but we actually default it to `True`
         #   when `implicit_vr` is used
         if implicit_vr is not None and little_endian is None:
@@ -2429,19 +2411,22 @@ class Dataset:
 
             if use_little is not None and self.original_encoding[1] != use_little:
                 raise ValueError(
-                    f"'{class_name}.save_as()' cannot be used to convert "
-                    "between little and big endian encoding. Please read the "
-                    "documentation for filewriter.dcmwrite() if this is what "
-                    "you really want to do"
+                    f"'{type(self).__name__}.save_as()' cannot be used to "
+                    "convert between little and big endian encoding. Please "
+                    "read the documentation for filewriter.dcmwrite() if this "
+                    "is what you really want to do"
                 )
 
         pydicom.dcmwrite(
             filename,
             self,
+            __write_like_original,
             implicit_vr=implicit_vr,
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
+            **kwargs,
         )
+
 
     def ensure_file_meta(self) -> None:
         """Create an empty ``Dataset.file_meta`` if none exists.

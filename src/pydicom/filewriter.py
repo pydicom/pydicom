@@ -1057,12 +1057,13 @@ def dcmwrite(
     filename: PathType | BinaryIO | DicomFileLike,
     dataset: Dataset,
     /,
+    __write_like_original: bool | None = None,
     *,
-    write_like_original: bool = True,
     implicit_vr: bool | None = None,
     little_endian: bool | None = None,
     enforce_file_format: bool = False,
     force_encoding: bool = False,
+    **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
     buffer.
@@ -1213,22 +1214,49 @@ def dcmwrite(
         Encode a dataset and write it to file, wraps ``dcmwrite()``.
     """
     # TODO: Remove in v4.0
-    if write_like_original is False:
+    # Cover use of `write_like_original` as:
+    #   optional arg - dcmwrite(fp, ds, write_like_original=bool)
+    #   positional arg - dcmwrite(fp, ds, False)
+    write_like_original: bool | None = kwargs.get("write_like_original", None)
+    if None not in (__write_like_original, write_like_original):
         if config._use_future:
             raise TypeError(
-                "Invalid keyword argument for dcmwrite(): 'write_like_original'"
+                "'write_like_original' is no longer accepted as a positional "
+                "or keyword argument, use 'enforce_file_format' instead"
+            )
+
+        raise TypeError(
+            "'write_like_original' cannot be used as both a positional "
+            "and keyword argument"
+        )
+
+    if write_like_original is None:
+        write_like_original = __write_like_original
+
+    if write_like_original is not None:
+        if config._use_future:
+            raise TypeError(
+                "'write_like_original' is no longer accepted as a positional "
+                "or keyword argument, use 'enforce_file_format' instead"
             )
 
         warn_and_log(
             (
                 "'write_like_original' is deprecated and will be removed in "
-                "v4.0, please use 'enforce_file_format=True' instead"
+                "v4.0, please use 'enforce_file_format' instead"
             ),
             DeprecationWarning,
         )
         enforce_file_format = not write_like_original
 
-    cls_name = type(dataset).__name__
+    # Ensure kwargs only contains `write_like_original`
+    keys = [x for x in kwargs.keys() if x != "write_like_original"]
+    if keys:
+        raise TypeError(
+            f"Invalid keyword argument(s) for dcmwrite(): {', '.join(keys)}"
+        )
+
+    cls_name = dataset.__class__.__name__
 
     # Check for disallowed tags
     bad_tags = [x >> 16 for x in dataset._dict if x >> 16 in (0, 2)]

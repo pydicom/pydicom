@@ -1746,7 +1746,7 @@ class TestDatasetSaveAs:
         ds.SOPInstanceUID = "1.2.3.4"
         msg = (
             "'write_like_original' is deprecated and will be removed in v4.0, "
-            "please use 'enforce_file_format=True' instead"
+            "please use 'enforce_file_format' instead"
         )
 
         # Test kwarg - not enforce_file_format
@@ -1755,14 +1755,6 @@ class TestDatasetSaveAs:
 
         # Test default - not enforce_file_format
         ds.save_as(DicomBytesIO(), implicit_vr=True)
-
-        # Test positional arg - not enforce_file_format
-        msg = (
-            r"Dataset.save_as\(\) takes 2 positional arguments but 3 positional "
-            r"arguments \(and 1 keyword-only argument\) were given"
-        )
-        with pytest.raises(TypeError, match=msg):
-            ds.save_as(DicomBytesIO(), True, implicit_vr=True)
 
     def test_save_as_compressed_no_encaps(self):
         """Test saving a compressed dataset with no encapsulation."""
@@ -2615,17 +2607,18 @@ def test_setattr_ignore(setattr_ignore):
 
 @pytest.fixture
 def use_future():
+    original = config._use_future
     config._use_future = True
     yield
-    config._use_future = False
+    config._use_future = original
 
 
 class TestFuture:
     def test_save_as_write_like_original_raises(self, use_future):
         ds = Dataset()
         msg = (
-            r"Invalid keyword argument for Dataset.save_as\(\): "
-            r"'write_like_original'"
+            "'write_like_original' is no longer accepted as a positional or "
+            "keyword argument, use 'enforce_file_format' instead"
         )
         with pytest.raises(TypeError, match=msg):
             ds.save_as(None, write_like_original=False)

@@ -227,6 +227,8 @@ class UID(str):
         """Set the corresponding dataset encoding for a privately defined transfer
         syntax.
 
+        .. versionadded:: 3.0
+
         Parameters
         ----------
         implicit_vr : bool
