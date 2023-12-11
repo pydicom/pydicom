@@ -37,7 +37,6 @@ in the table below.
 
 from struct import unpack
 from typing import TYPE_CHECKING, cast
-import warnings
 
 try:
     import numpy as np
@@ -48,6 +47,7 @@ except ImportError:
     HAVE_RLE = False
 
 from pydicom.encaps import generate_pixel_data_frame
+from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
 from pydicom.encoders.native import _encode_frame  # noqa: F401
 import pydicom.uid
@@ -336,7 +336,7 @@ def _rle_decode_frame(
                     f"{rows * columns} bytes)"
                 )
             elif actual_length != rows * columns:
-                warnings.warn(
+                warn_and_log(
                     "The decoded RLE segment contains non-conformant padding "
                     f"- {actual_length} vs. {rows * columns} bytes expected"
                 )

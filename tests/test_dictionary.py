@@ -17,6 +17,7 @@ from pydicom.datadict import (
     private_dictionary_VM,
     add_private_dict_entries,
     add_private_dict_entry,
+    _dictionary_vr_fast,
 )
 from pydicom.datadict import add_dict_entry, add_dict_entries
 from .test_util import save_private_dict
@@ -170,3 +171,11 @@ class TestDict:
     def test_private_dict_VM(self):
         """Test private_dictionary_VM"""
         assert private_dictionary_VM(0x00090000, "ACUSON") == "1"
+
+    def test_dictionary_vr_fast(self):
+        """Test _dictionary_vr_fast()."""
+        assert _dictionary_vr_fast(0x00100010) == "PN"
+        assert _dictionary_vr_fast(0x60000010) == "US"  # masked
+        msg = r"Tag \(0009,0003\) not found in DICOM dictionary"
+        with pytest.raises(KeyError, match=msg):
+            _dictionary_vr_fast(0x00090003)

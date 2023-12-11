@@ -11,7 +11,6 @@ import pathlib
 from typing import cast
 import urllib.request
 import urllib.error
-import warnings
 
 try:
     import requests
@@ -38,6 +37,7 @@ except ImportError:
     USE_PROGRESS_BAR = False
 
 from . import retry
+from pydicom.misc import warn_and_log
 
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -281,7 +281,7 @@ def data_file_hash_check(filename: str) -> bool:
     try:
         cached_filehash = get_cached_filehash(filename)
     except NoHashFound:
-        warnings.warn("Hash not found in hashes.json. File will be updated.")
+        warn_and_log("Hash not found in hashes.json. File will be updated.")
         with open(HERE / "hashes.json") as hash_file:
             hashes = json.load(hash_file)
 
