@@ -3093,3 +3093,12 @@ class TestFuture:
 
         with pytest.raises(TypeError, match=msg):
             dcmwrite(None, ds, True)
+
+    def test_dcmwrite_arg_kwarg_raises(self, use_future):
+        ds = Dataset()
+        msg = (
+            "'write_like_original' is no longer accepted as a positional "
+            "or keyword argument, use 'enforce_file_format' instead"
+        )
+        with pytest.raises(TypeError, match=msg):
+            dcmwrite(None, ds, True, write_like_original=True)
