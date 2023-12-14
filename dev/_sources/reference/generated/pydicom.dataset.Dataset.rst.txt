@@ -27,7 +27,6 @@
       ~Dataset.dir
       ~Dataset.elements
       ~Dataset.ensure_file_meta
-      ~Dataset.fix_meta_info
       ~Dataset.formatted_lines
       ~Dataset.from_json
       ~Dataset.get

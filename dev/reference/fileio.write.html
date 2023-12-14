@@ -166,8 +166,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filewriter.correct_ambiguous_vr_element.html#pydicom.filewriter.correct_ambiguous_vr_element" title="pydicom.filewriter.correct_ambiguous_vr_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct_ambiguous_vr_element</span></code></a>(elem, ds, ...)</p></td>
 <td><p>Attempt to correct the ambiguous VR element <cite>elem</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dcmwrite</span></code></a>(filename, dataset[, ...])</p></td>
-<td><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dcmwrite</span></code></a>(filename, dataset, /[, ...])</p></td>
+<td><p>Write <cite>dataset</cite> to <cite>filename</cite>, which can be a path, a file-like or a buffer.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filewriter.multi_string.html#pydicom.filewriter.multi_string" title="pydicom.filewriter.multi_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multi_string</span></code></a>(val)</p></td>
 <td><p>Put a string together with delimiter if has more than one value</p></td>
@@ -179,7 +179,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filewriter.write_dataset.html#pydicom.filewriter.write_dataset" title="pydicom.filewriter.write_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_dataset</span></code></a>(fp, dataset[, parent_encoding])</p></td>
-<td><p>Write a Dataset dictionary to the file.</p></td>
+<td><p>Encode <cite>dataset</cite> and write the encoded data to <cite>fp</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filewriter.write_data_element.html#pydicom.filewriter.write_data_element" title="pydicom.filewriter.write_data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_data_element</span></code></a>(fp, elem[, encodings])</p></td>
 <td><p>Write the data_element to file fp according to dicom media storage rules.</p></td>

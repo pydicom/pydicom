@@ -1,0 +1,6 @@
+﻿pydicom.values.multi\_string
+============================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: multi_string

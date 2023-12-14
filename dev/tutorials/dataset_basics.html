@@ -664,28 +664,26 @@ write the dataset to the supplied path:</p>
 as-is. This means that even if your dataset is not conformant to the
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a> it will
 still be written exactly as given. To be certain you’re writing the
-dataset in the DICOM File Format you can use the <cite>write_like_original</cite> keyword
+dataset in the DICOM File Format you can use the <cite>enforce_file_format</cite> keyword
 parameter:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">enforce_file_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will attempt to automatically add in any missing required group
 <code class="docutils literal notranslate"><span class="pre">0x0002</span></code> File Meta Information elements and set a blank 128 byte preamble (if
 required). If it’s unable to do so then an exception will be raised:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">enforce_file_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1794</span>, in <span class="n">save_as</span>
-<span class="w">    </span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span>
-  File <span class="nb">&quot;.../pydicom/filewriter.py&quot;</span>, line <span class="m">925</span>, in <span class="n">dcmwrite</span>
-<span class="w">    </span><span class="n">enforce_standard</span><span class="o">=</span><span class="ow">not</span> <span class="n">write_like_original</span><span class="p">)</span>
-  File <span class="nb">&quot;.../pydicom/filewriter.py&quot;</span>, line <span class="m">712</span>, in <span class="n">write_file_meta_info</span>
-<span class="w">    </span><span class="n">validate_file_meta</span><span class="p">(</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="p">)</span>
-  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">2372</span>, in <span class="n">validate_file_meta</span>
-<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Remove final newline</span>
-<span class="gr">  ValueError</span>: <span class="n">Missing required File Meta Information elements from &#39;file_meta&#39;:</span>
-<span class="x">          (0002, 0010) TransferSyntaxUID</span>
+  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">2452</span>, in <span class="n">save_as</span>
+<span class="w">    </span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span>
+  File <span class="nb">&quot;.../pydicom/filewriter.py&quot;</span>, line <span class="m">1311</span>, in <span class="n">dcmwrite</span>
+<span class="w">    </span><span class="n">validate_file_meta</span><span class="p">(</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">3204</span>, in <span class="n">validate_file_meta</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+<span class="gr">AttributeError</span>: <span class="n">Required File Meta Information elements are either missing</span>
+<span class="x">or have an empty value: (0002,0010) Transfer Syntax UID</span>
 </pre></div>
 </div>
 <p>The exception message contains the required element(s) that need to be added,
@@ -698,7 +696,7 @@ we need to add it back:</p>
 </div>
 <p>And now we can add our <em>Transfer Syntax UID</em> element and save to file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="s1">&#39;1.2.840.10008.1.2.1&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">enforce_file_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And we’re done.</p>

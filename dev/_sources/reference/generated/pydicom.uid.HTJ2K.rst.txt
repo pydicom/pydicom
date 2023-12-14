@@ -1,0 +1,6 @@
+﻿pydicom.uid.HTJ2K
+=================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: HTJ2K

@@ -160,37 +160,39 @@
 <h1>pydicom.filewriter.dcmwrite<a class="headerlink" href="#pydicom-filewriter-dcmwrite" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.filewriter.dcmwrite">
-<span class="sig-prename descclassname"><span class="pre">pydicom.filewriter.</span></span><span class="sig-name descname"><span class="pre">dcmwrite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.12)"><span class="pre">BinaryIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><span class="pre">DicomFileLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_like_original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b0df541db/pydicom/filewriter.py#L939"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Link to this definition">¶</a></dt>
-<dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
-<p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> will be
-written as is (after minimal validation checking) and may or may not
-contain all or parts of the <em>File Meta Information</em> (and hence may or
-may not be conformant with the DICOM File Format).</p>
-<p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, <cite>dataset</cite> will be stored in the
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>.  To do
-so requires that the <code class="docutils literal notranslate"><span class="pre">Dataset.file_meta</span></code> attribute
-exists and contains a <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> with the required (Type 1) <em>File
-Meta Information Group</em> elements. The byte stream of the <cite>dataset</cite> will be
-placed into the file after the DICOM <em>File Meta Information</em>.</p>
-<p><strong>File Meta Information</strong></p>
-<p>The <em>File Meta Information</em> consists of a 128-byte preamble, followed by
-a 4 byte <code class="docutils literal notranslate"><span class="pre">b'DICM'</span></code> prefix, followed by the <em>File Meta Information Group</em>
-elements.</p>
+<span class="sig-prename descclassname"><span class="pre">pydicom.filewriter.</span></span><span class="sig-name descname"><span class="pre">dcmwrite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.12)"><span class="pre">BinaryIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><span class="pre">DicomFileLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__write_like_original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implicit_vr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">little_endian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_file_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/943912bac/pydicom/filewriter.py#L1056"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Link to this definition">¶</a></dt>
+<dd><p>Write <cite>dataset</cite> to <cite>filename</cite>, which can be a path, a file-like or a
+buffer.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.0: </span>Added the <cite>enforce_file_format</cite> keyword argument.</p>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 3.0: </span><cite>write_like_original</cite> is deprecated and will be removed in v4.0, use
+<cite>enforce_file_format</cite> instead.</p>
+</div>
+<p>If <cite>enforce_file_format</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then an attempt will be made to write
+<cite>dataset</cite> using the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>, or
+raise an exception if unable to do so.</p>
+<p>If <cite>enforce_file_format</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code> (default) then <cite>dataset</cite> will be
+written as-is (after minimal validation checking) and may or may not
+contain all or parts of the <em>File Meta Information</em> and hence may or may
+not be conformant with the DICOM File Format.</p>
+<p><strong>DICOM File Format</strong></p>
+<p>The <em>DICOM File Format</em> consists of a 128-byte preamble, a 4 byte
+<code class="docutils literal notranslate"><span class="pre">b'DICM'</span></code> prefix, the <em>File Meta Information Group</em> elements and finally
+the encoded <cite>dataset</cite>.</p>
 <p><strong>Preamble and Prefix</strong></p>
-<p>The <code class="docutils literal notranslate"><span class="pre">dataset.preamble</span></code> attribute shall be 128-bytes long or <code class="docutils literal notranslate"><span class="pre">None</span></code> and
-is available for use as defined by the Application Profile or specific
-implementations. If the preamble is not used by an Application Profile or
-specific implementation then all 128 bytes should be set to <code class="docutils literal notranslate"><span class="pre">0x00</span></code>. The
-actual preamble written depends on <cite>write_like_original</cite> and
+<p>The <code class="docutils literal notranslate"><span class="pre">dataset.preamble</span></code> attribute shall be 128-bytes long or <code class="docutils literal notranslate"><span class="pre">None</span></code>. The
+actual preamble written depends on <cite>enforce_file_format</cite> and
 <code class="docutils literal notranslate"><span class="pre">dataset.preamble</span></code> (see the table below).</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"></th>
-<th class="head" colspan="2"><p>write_like_original</p></th>
+<th class="head" colspan="2"><p>enforce_file_format</p></th>
 </tr>
 <tr class="row-even"><th class="head"><p>dataset.preamble</p></th>
-<th class="head"><p>True</p></th>
 <th class="head"><p>False</p></th>
+<th class="head"><p>True</p></th>
 </tr>
 </thead>
 <tbody>
@@ -208,70 +210,84 @@ only if the preamble is present.</p>
 <p><strong>File Meta Information Group Elements</strong></p>
 <p>The preamble and prefix are followed by a set of DICOM elements from the
 (0002,eeee) group. Some of these elements are required (Type 1) while
-others are optional (Type 3/1C). If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code>
-then the <em>File Meta Information Group</em> elements are all optional. See
+others are optional (Type 3/1C). If <cite>enforce_file_format</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+then the <em>File Meta Information Group</em> elements are all optional, otherwise
+an attempt will be made to add the required elements using <cite>dataset</cite>. See
 <a class="reference internal" href="pydicom.filewriter.write_file_meta_info.html#pydicom.filewriter.write_file_meta_info" title="pydicom.filewriter.write_file_meta_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_file_meta_info()</span></code></a> for more information on
 which elements are required.</p>
-<p>The <em>File Meta Information Group</em> elements should be included within their
-own <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in the <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code>
+<p>The <em>File Meta Information Group</em> elements must be included within their
+own <a class="reference internal" href="pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileMetaDataset</span></code></a> in the <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code>
 attribute.</p>
-<p>If (0002,0010) <em>Transfer Syntax UID</em> is included then the user must ensure
-its value is compatible with the values for the
-<code class="docutils literal notranslate"><span class="pre">dataset.is_little_endian</span></code> and <code class="docutils literal notranslate"><span class="pre">dataset.is_implicit_VR</span></code> attributes.
-For example, if <code class="docutils literal notranslate"><span class="pre">is_little_endian</span></code> and <code class="docutils literal notranslate"><span class="pre">is_implicit_VR</span></code> are both
-<code class="docutils literal notranslate"><span class="pre">True</span></code> then the Transfer Syntax UID must be 1.2.840.10008.1.2 <em>Implicit
-VR Little Endian</em>. See the DICOM Standard, Part 5,
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_10.html">Section 10</a> for more information on Transfer
-Syntaxes.</p>
 <p><em>Encoding</em></p>
-<p>The preamble and prefix are encoding independent. The File Meta elements
-are encoded as <em>Explicit VR Little Endian</em> as required by the DICOM
-Standard.</p>
+<p>The preamble and prefix are encoding independent. The <em>File Meta
+Information Group</em> elements are encoded as <em>Explicit VR Little Endian</em> as
+required by the DICOM Standard.</p>
 <p><strong>Dataset</strong></p>
 <p>A DICOM Dataset representing a SOP Instance related to a DICOM Information
-Object Definition. It is up to the user to ensure the <cite>dataset</cite> conforms
-to the DICOM Standard.</p>
+Object Definition (IOD). It’s up to the user to ensure <cite>dataset</cite> conforms
+to the requirements of the IOD.</p>
 <p><em>Encoding</em></p>
-<p>The <cite>dataset</cite> is encoded as specified by the <code class="docutils literal notranslate"><span class="pre">dataset.is_little_endian</span></code>
-and <code class="docutils literal notranslate"><span class="pre">dataset.is_implicit_VR</span></code> attributes. It’s up to the user to ensure
-these attributes are set correctly (as well as setting an appropriate
-value for <code class="docutils literal notranslate"><span class="pre">dataset.file_meta.TransferSyntaxUID</span></code> if present).</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.0: </span>Added the <cite>implicit_vr</cite> and <cite>little_endian</cite> arguments.</p>
+</div>
+<p>The <cite>dataset</cite> is encoded as specified by (in order of priority):</p>
+<ul class="simple">
+<li><p>The encoding corresponding to the set <em>Transfer Syntax UID</em> in
+<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta" title="pydicom.dataset.FileDataset.file_meta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">file_meta</span></code></a>.</p></li>
+<li><p>The <cite>implicit_vr</cite> and <cite>little_endian</cite> arguments</p></li>
+<li><p><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_implicit_VR" title="pydicom.dataset.Dataset.is_implicit_VR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></a> and
+<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_little_endian" title="pydicom.dataset.Dataset.is_little_endian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_little_endian</span></code></a></p></li>
+<li><p><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_encoding" title="pydicom.dataset.Dataset.original_encoding"><code class="xref py py-attr docutils literal notranslate"><span class="pre">original_encoding</span></code></a></p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function does not automatically convert <cite>dataset</cite> from little
+to big endian encoding (or vice versa). The endianness of values for
+elements with a VR of <strong>OD</strong>, <strong>OF</strong>, <strong>OL</strong>, <strong>OW</strong>, <strong>OV</strong> and
+<strong>UN</strong> must be converted manually prior to calling
+<a class="reference internal" href="#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a>.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><em>PathLike</em><em> or </em><em>file-like</em>) – Name of file or the file-like to write the new DICOM file to.</p></li>
-<li><p><strong>dataset</strong> (<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><em>pydicom.dataset.FileDataset</em></a>) – Dataset holding the DICOM information; e.g. an object read with
-<a class="reference internal" href="pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p></li>
-<li><p><strong>write_like_original</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), preserves the following information from
-the Dataset (and may result in a non-conformant file):</p>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><em>PathLike</em><em> or </em><em>file-like</em>) – File path, file-like or buffer to write the encoded <cite>dataset</cite> to.</p></li>
+<li><p><strong>dataset</strong> (<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><em>pydicom.dataset.FileDataset</em></a>) – The dataset to be encoded.</p></li>
+<li><p><strong>write_like_original</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then write <cite>dataset</cite> as-is, otherwise
+ensure that <cite>dataset</cite> is written in the DICOM File Format or
+raise an exception if that isn’t possible. This parameter is
+deprecated, please use <cite>enforce_file_format</cite> instead.</p></li>
+<li><p><strong>implicit_vr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Required if <cite>dataset</cite> has no valid public <em>Transfer Syntax UID</em>
+set in the file meta and <cite>dataset</cite> has been created from scratch. If
+<code class="docutils literal notranslate"><span class="pre">True</span></code> then encode <cite>dataset</cite> using implicit VR, otherwise use
+explicit VR.</p></li>
+<li><p><strong>little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Required if <cite>dataset</cite> has no valid public <em>Transfer Syntax UID</em>
+set in the file meta and <cite>dataset</cite> has been created from scratch. If
+<code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then use little endian byte order when encoding
+<cite>dataset</cite>, otherwise use big endian.</p></li>
+<li><p><strong>enforce_file_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> then ensure <cite>dataset</cite> is written in the DICOM File
+Format or raise an exception if that isn’t possible.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default) then write <cite>dataset</cite> as-is, preserving the
+following - which may result in a non-conformant file:</p>
 <ul>
-<li><p>preamble – if the original file has no preamble then none will be
-written.</p></li>
-<li><p>file_meta – if the original file was missing any required <em>File
-Meta Information Group</em> elements then they will not be added or
-written.
-If (0002,0000) <em>File Meta Information Group Length</em> is present then
-it may have its value updated.</p></li>
-<li><p>seq.is_undefined_length – if original had delimiters, write them now
-too, instead of the more sensible length characters</p></li>
-<li><p>is_undefined_length_sequence_item – for datasets that belong to a
-sequence, write the undefined length delimiters if that is
-what the original had.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset.preamble</span></code>: if <cite>dataset</cite> has no preamble then none will
+be written</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code>: if <cite>dataset</cite> is missing any required <em>File
+Meta Information Group</em> elements then they will not be written.</p></li>
 </ul>
-<p>If <code class="docutils literal notranslate"><span class="pre">False</span></code>, produces a file conformant with the DICOM File Format,
-with explicit lengths for all elements.</p>
 </p></li>
+<li><p><strong>force_encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then force the encoding to follow <cite>implicit_vr</cite> and
+<cite>little_endian</cite>. Cannot be used with <cite>enforce_file_format</cite>. Default
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.12)"><strong>AttributeError</strong></a> – If either <code class="docutils literal notranslate"><span class="pre">dataset.is_implicit_VR</span></code> or <code class="docutils literal notranslate"><span class="pre">dataset.is_little_endian</span></code>
-    have not been set.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – If group 2 elements are in <code class="docutils literal notranslate"><span class="pre">dataset</span></code> rather than
-    <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code>, or if a preamble is given but is not 128 bytes
-    long, or if Transfer Syntax is a compressed type and pixel data is not
-    compressed.</p></li>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – <ul class="simple">
+<li><p>If group <code class="docutils literal notranslate"><span class="pre">0x0000</span></code> <em>Command Set</em> elements are present in <cite>dataset</cite>.
+    * If group <code class="docutils literal notranslate"><span class="pre">0x0002</span></code> <em>File Meta Information Group</em> elements are present
+      in <cite>dataset</cite>.
+    * If <code class="docutils literal notranslate"><span class="pre">dataset.preamble</span></code> exists but is not 128 bytes long.</p></li>
 </ul>
+</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -279,7 +295,7 @@ with explicit lengths for all elements.</p>
 <dl class="simple">
 <dt><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.Dataset</span></code></a></dt><dd><p>Dataset class with relevant attributes and information.</p>
 </dd>
-<dt><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.Dataset.save_as</span></code></a></dt><dd><p>Write a DICOM file from a dataset that was read in with <code class="docutils literal notranslate"><span class="pre">dcmread()</span></code>. <code class="docutils literal notranslate"><span class="pre">save_as()</span></code> wraps <code class="docutils literal notranslate"><span class="pre">dcmwrite()</span></code>.</p>
+<dt><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.Dataset.save_as</span></code></a></dt><dd><p>Encode a dataset and write it to file, wraps <code class="docutils literal notranslate"><span class="pre">dcmwrite()</span></code>.</p>
 </dd>
 </dl>
 </div>

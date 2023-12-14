@@ -1,0 +1,6 @@
+﻿pydicom.uid.HTJ2KLosslessRPCL
+=============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: HTJ2KLosslessRPCL

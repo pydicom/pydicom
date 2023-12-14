@@ -107,14 +107,60 @@
 <h1>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Link to this heading">¶</a></h1>
 <section id="changes">
 <h2>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h2>
-<ul>
+<ul class="simple">
 <li><p>Removed support for Python &lt;= 3.9</p></li>
-<li><p><cite>compat</cite> module removed</p></li>
 <li><p>All tag formats changed to upper case, no space e.g. “(7FE0,0010)” rather than “(7fe0, 0010)”</p></li>
 <li><p>Values with VR AE with an incorrect value length are now handled
 gracefully (extra bytes are ignored with a warning)</p></li>
 <li><p>A value of 0 for <code class="docutils literal notranslate"><span class="pre">NumberOfFrames</span></code> is now handled as 1 frame, with a user warning issued
 on reading the pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1844">#1844</a>)</p></li>
+<li><p>The value for <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLossless.html#pydicom.uid.JPEGLossless" title="pydicom.uid.JPEGLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLossless</span></code></a> has changed from
+1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLosslessSV1.html#pydicom.uid.JPEGLosslessSV1" title="pydicom.uid.JPEGLosslessSV1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLosslessSV1</span></code></a> instead for 1.2.840.10008.1.2.4.70</p></li>
+<li><p>The theoretical maximum number of instances supported by
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> has been reduced to 1838265625 to ensure support
+for 32-bit systems (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1743">#1743</a>)</p></li>
+<li><p>The characters used by <a class="reference internal" href="../reference/generated/pydicom.fileset.generate_filename.html#pydicom.fileset.generate_filename" title="pydicom.fileset.generate_filename"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_filename()</span></code></a> when
+<cite>alphanumeric</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> has been reduced to [0-9][A-I,K-Z]</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="pydicom.data.get_testdata_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_files()</span></code></a>
+now raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if called with an absolute path or pattern</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_uid()</span></code></a> has been changed to use a random suffix
+generated using <a class="reference external" href="https://docs.python.org/3/library/secrets.html#secrets.randbelow" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randbelow()</span></code></a> when <cite>entropy_srcs</cite> isn’t used, and
+the maximum allowed length of the <cite>prefix</cite> has been changed to 54 characters
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1773">#1773</a>)</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.VM" title="pydicom.dataelem.DataElement.VM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">VM</span></code></a> always returns <code class="docutils literal notranslate"><span class="pre">1</span></code> for <strong>SQ</strong>
+elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1481">#1481</a>)</p></li>
+<li><p>DICOM dictionary updated to 2023d</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.validate_file_meta.html#pydicom.dataset.validate_file_meta" title="pydicom.dataset.validate_file_meta"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_file_meta()</span></code></a> now checks to ensure required
+Type 1 elements aren’t empty</p></li>
+<li><p><cite>implicit_vr</cite> and <cite>little_endian</cite> optional arguments added to
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a>. In addition, this method will now
+raise an exception if the user tries to convert between little and big endian
+datasets. If this is something you need, use <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> instead.</p></li>
+<li><p><cite>implicit_vr</cite>, <cite>little_endian</cite> and <cite>force_encoding</cite> optional arguments
+added to  <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a></p></li>
+<li><p>The priority used to decide which encoding to use with
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> has been changed to:</p>
+<ol class="arabic simple">
+<li><p>The set <em>Transfer Syntax UID</em></p></li>
+<li><p>The <cite>implicit_vr</cite> and <cite>little_endian</cite> arguments</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_implicit_VR" title="pydicom.dataset.Dataset.is_implicit_VR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.is_implicit_VR</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_little_endian" title="pydicom.dataset.Dataset.is_little_endian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.is_little_endian</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_encoding" title="pydicom.dataset.Dataset.original_encoding"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.original_encoding</span></code></a></p></li>
+</ol>
+</li>
+<li><p>Datasets containing <em>Command Set</em> (0000,eeee) elements can no longer be written using
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> or <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a>,
+use <a class="reference internal" href="../reference/generated/pydicom.filewriter.write_dataset.html#pydicom.filewriter.write_dataset" title="pydicom.filewriter.write_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_dataset()</span></code></a> instead.</p></li>
+<li><p>The <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta" title="pydicom.dataset.FileDataset.file_meta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">file_meta</span></code></a> elements are no longer
+modified when writing</p></li>
+</ul>
+<section id="removals">
+<h3>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">compat</span></code> module removed</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module and <code class="docutils literal notranslate"><span class="pre">DicomDir</span></code> class have been removed and reading a
 DICOMDIR dataset now returns a normal <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance.
 For handling DICOM File-sets and DICOMDIR datasets use the
@@ -122,9 +168,6 @@ For handling DICOM File-sets and DICOMDIR datasets use the
 <li><p>The <code class="docutils literal notranslate"><span class="pre">read_file</span></code> and <code class="docutils literal notranslate"><span class="pre">write_file</span></code> functions have been removed, use
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> and <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a>
 instead.</p></li>
-<li><p>The value for <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLossless.html#pydicom.uid.JPEGLossless" title="pydicom.uid.JPEGLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLossless</span></code></a> has changed from
-1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
-<a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLosslessSV1.html#pydicom.uid.JPEGLosslessSV1" title="pydicom.uid.JPEGLosslessSV1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLosslessSV1</span></code></a> instead for 1.2.840.10008.1.2.4.70</p></li>
 <li><p>The following UID constants have been removed:</p>
 <blockquote>
 <div><ul class="simple">
@@ -161,13 +204,8 @@ instead.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">pixel_data_handlers.rle_handler.rle_encode_frame</span></code> function has been
 removed, use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
 <a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
-<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code> module, import UIDs from the <cite>uid</cite> module
-instead</p></li>
-<li><p>The theoretical maximum number of instances supported by
-<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> has been reduced to 1838265625 to ensure support
-for 32-bit systems (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1743">#1743</a>)</p></li>
-<li><p>The characters used by <a class="reference internal" href="../reference/generated/pydicom.fileset.generate_filename.html#pydicom.fileset.generate_filename" title="pydicom.fileset.generate_filename"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_filename()</span></code></a> when
-<cite>alphanumeric</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> has been reduced to [0-9][A-I,K-Z]</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code> module, import UIDs from the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">uid</span></code> module instead</p></li>
 <li><p>The following properties have been removed:</p>
 <blockquote>
 <div><ul class="simple">
@@ -179,35 +217,10 @@ for 32-bit systems (<a class="reference external" href="https://github.com/pydic
 </li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code> module has been removed, use the <a class="reference internal" href="../reference/handlers.overlay_data.html#module-pydicom.overlays" title="pydicom.overlays"><code class="xref py py-mod docutils literal notranslate"><span class="pre">overlays</span></code></a>
 module instead</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_files()</span></code>
-now raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if called with an absolute path or pattern</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_uid()</span></code></a> has been changed to use a random suffix
-generated using <a class="reference external" href="https://docs.python.org/3/library/secrets.html#secrets.randbelow" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randbelow()</span></code></a> when <cite>entropy_srcs</cite> isn’t used, and
-the maximum allowed length of the <cite>prefix</cite> has been changed to 54 characters
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1773">#1773</a>)</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.VM" title="pydicom.dataelem.DataElement.VM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">VM</span></code></a> always returns <code class="docutils literal notranslate"><span class="pre">1</span></code> for <strong>SQ</strong>
-elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1481">#1481</a>)</p></li>
-<li><p>DICOM dictionary updated to 2023e</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> is no longer a subclass of
-<code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1395">#1395</a>)</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code> no longer accepts a <code class="docutils literal notranslate"><span class="pre">validation_mode</span></code>
-optional argument</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">valuerep.MultiString</span></code> has been moved and renamed to
-<code class="xref py py-func docutils literal notranslate"><span class="pre">values.multi_string</span> <span class="pre">&lt;pydicom.values.multi_string()</span></code> and no longer accepts
-a <code class="docutils literal notranslate"><span class="pre">validation_mode</span></code> optional argument</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">Dataset.fix_meta_info()</span></code>, encoding state now follows the transfer syntax
+instead of the other way around</p></li>
 </ul>
 </section>
-<section id="deprecations">
-<h2>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_little_endian</span></code> and
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">is_implicit_VR</span></code> will be removed in v4.0</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.read_little_endian" title="pydicom.dataset.Dataset.read_little_endian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_little_endian</span></code></a> and
-<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.read_implicit_vr" title="pydicom.dataset.Dataset.read_implicit_vr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_implicit_vr</span></code></a> will be removed in v4.0,
-use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_encoding" title="pydicom.dataset.Dataset.original_encoding"><code class="xref py py-attr docutils literal notranslate"><span class="pre">original_encoding</span></code></a> instead</p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_encoding</span></code> will be removed in v4.0,
-use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_character_set" title="pydicom.dataset.Dataset.original_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">original_character_set</span></code></a> instead</p></li>
-</ul>
 </section>
 <section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
@@ -224,11 +237,11 @@ File-set (<a class="reference external" href="https://github.com/pydicom/pydicom
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP422DF.html#pydicom.uid.MPEG4HP422DF" title="pydicom.uid.MPEG4HP422DF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP422DF</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP423DF.html#pydicom.uid.MPEG4HP423DF" title="pydicom.uid.MPEG4HP423DF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP423DF</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.MPEG4HP42STEREOF.html#pydicom.uid.MPEG4HP42STEREOF" title="pydicom.uid.MPEG4HP42STEREOF"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MPEG4HP42STEREOF</span></code></a></p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">HTJ2KLossless</span></code></p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">HTJ2KLosslessRPCL</span></code></p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">HTJ2K</span></code></p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPIPHTJ2KReferenced</span></code></p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPIPHTJ2KReferencedDeflate</span></code></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.HTJ2KLossless.html#pydicom.uid.HTJ2KLossless" title="pydicom.uid.HTJ2KLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HTJ2KLossless</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.HTJ2KLosslessRPCL.html#pydicom.uid.HTJ2KLosslessRPCL" title="pydicom.uid.HTJ2KLosslessRPCL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HTJ2KLosslessRPCL</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.HTJ2K.html#pydicom.uid.HTJ2K" title="pydicom.uid.HTJ2K"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HTJ2K</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPIPHTJ2KReferenced.html#pydicom.uid.JPIPHTJ2KReferenced" title="pydicom.uid.JPIPHTJ2KReferenced"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPIPHTJ2KReferenced</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPIPHTJ2KReferencedDeflate.html#pydicom.uid.JPIPHTJ2KReferencedDeflate" title="pydicom.uid.JPIPHTJ2KReferencedDeflate"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPIPHTJ2KReferencedDeflate</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo.html#pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo" title="pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SMPTEST211020UncompressedProgressiveActiveVideo</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo.html#pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo" title="pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SMPTEST211020UncompressedInterlacedActiveVideo</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.SMPTEST211030PCMDigitalAudio.html#pydicom.uid.SMPTEST211030PCMDigitalAudio" title="pydicom.uid.SMPTEST211030PCMDigitalAudio"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SMPTEST211030PCMDigitalAudio</span></code></a></p></li>
@@ -260,13 +273,31 @@ being able to escape the temporary directory when being added to a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.update</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1816">#1816</a>)</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> not returning the correct
 values for odd-length frames (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1968">#1968</a>)</p></li>
+<li><p>Fixed using the incorrect encoding when writing datasets converted between
+explicit and implicit VR when only the <em>Transfer Syntax UID</em> was changed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1943">#1943</a>)</p></li>
+</ul>
+</section>
+<section id="deprecations">
+<h2>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_little_endian" title="pydicom.dataset.Dataset.is_little_endian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_little_endian</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_implicit_VR" title="pydicom.dataset.Dataset.is_implicit_VR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></a> will be removed in v4.0</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.read_little_endian" title="pydicom.dataset.Dataset.read_little_endian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_little_endian</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.read_implicit_vr" title="pydicom.dataset.Dataset.read_implicit_vr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_implicit_vr</span></code></a> will be removed in v4.0,
+use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_encoding" title="pydicom.dataset.Dataset.original_encoding"><code class="xref py py-attr docutils literal notranslate"><span class="pre">original_encoding</span></code></a> instead</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.read_encoding" title="pydicom.dataset.Dataset.read_encoding"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_encoding</span></code></a> will be removed in v4.0,
+use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_character_set" title="pydicom.dataset.Dataset.original_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">original_character_set</span></code></a> instead</p></li>
+<li><p>The <cite>write_like_original</cite> optional argument to
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> will be removed in v4.0, use
+<cite>enforce_file_format</cite> instead</p></li>
 </ul>
 </section>
 <section id="pydicom-internals">
 <h2>Pydicom Internals<a class="headerlink" href="#pydicom-internals" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Repository folder structure refactored</p></li>
-<li><p>Renamed top level “source” folder to “util”</p></li>
+<li><p>Renamed top level <code class="docutils literal notranslate"><span class="pre">source</span></code> folder to <code class="docutils literal notranslate"><span class="pre">util</span></code></p></li>
 <li><p>New CI tools - <cite>dependabot</cite>, and <cite>pre-commit</cite> using black and ruff</p></li>
 <li><p>Added a script to hotfix the documentation search function (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1965">#1965</a>)</p></li>
 </ul>
