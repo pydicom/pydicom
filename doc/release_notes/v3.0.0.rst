@@ -4,12 +4,55 @@ Version 3.0.0
 Changes
 -------
 * Removed support for Python <= 3.9
-* `compat` module removed
 * All tag formats changed to upper case, no space e.g. "(7FE0,0010)" rather than "(7fe0, 0010)"
 * Values with VR AE with an incorrect value length are now handled
   gracefully (extra bytes are ignored with a warning)
 * A value of 0 for ``NumberOfFrames`` is now handled as 1 frame, with a user warning issued
   on reading the pixel data (:issue:`1844`)
+* The value for :attr:`~pydicom.uid.JPEGLossless` has changed from
+  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
+  :attr:`~pydicom.uid.JPEGLosslessSV1` instead for 1.2.840.10008.1.2.4.70
+* The theoretical maximum number of instances supported by
+  :class:`~pydicom.fileset.FileSet` has been reduced to 1838265625 to ensure support
+  for 32-bit systems (:issue:`1743`)
+* The characters used by :func:`~pydicom.fileset.generate_filename` when
+  `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
+* :func:`~pydicom.data.get_testdata_file` and
+  :func:`~pydicom.data.get_testdata_files`
+  now raise ``ValueError`` if called with an absolute path or pattern
+* :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
+  generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
+  the maximum allowed length of the `prefix` has been changed to 54 characters
+  (:issue:`1773`)
+* :attr:`~pydicom.dataelem.DataElement.VM` always returns ``1`` for **SQ**
+  elements (:issue:`1481`)
+* DICOM dictionary updated to 2023d
+* :func:`~pydicom.dataset.validate_file_meta` now checks to ensure required
+  Type 1 elements aren't empty
+* `implicit_vr` and `little_endian` optional arguments added to
+  :meth:`~pydicom.dataset.Dataset.save_as`. In addition, this method will now
+  raise an exception if the user tries to convert between little and big endian
+  datasets. If this is something you need, use :func:`~pydicom.filewriter.dcmwrite` instead.
+* `implicit_vr`, `little_endian` and `force_encoding` optional arguments
+  added to  :func:`~pydicom.filewriter.dcmwrite`
+* The priority used to decide which encoding to use with
+  :meth:`~pydicom.dataset.Dataset.save_as` and
+  :func:`~pydicom.filewriter.dcmwrite` has been changed to:
+
+  1. The set *Transfer Syntax UID*
+  2. The `implicit_vr` and `little_endian` arguments
+  3. :attr:`Dataset.is_implicit_VR<pydicom.dataset.Dataset.is_implicit_VR>` and
+     :attr:`Dataset.is_little_endian<pydicom.dataset.Dataset.is_little_endian>`
+  4. :attr:`Dataset.original_encoding<pydicom.dataset.Dataset.original_encoding>`
+* Datasets containing *Command Set* (0000,eeee) elements can no longer be written using
+  :meth:`~pydicom.dataset.Dataset.save_as` or :func:`~pydicom.filewriter.dcmwrite`,
+  use :func:`~pydicom.filewriter.write_dataset` instead.
+* The :attr:`~pydicom.dataset.FileDataset.file_meta` elements are no longer
+  modified when writing
+
+Removals
+~~~~~~~~
+* ``compat`` module removed
 * The ``dicomdir`` module and ``DicomDir`` class have been removed and reading a
   DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
   For handling DICOM File-sets and DICOMDIR datasets use the
@@ -17,9 +60,6 @@ Changes
 * The ``read_file`` and ``write_file`` functions have been removed, use
   :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite`
   instead.
-* The value for :attr:`~pydicom.uid.JPEGLossless` has changed from
-  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
-  :attr:`~pydicom.uid.JPEGLosslessSV1` instead for 1.2.840.10008.1.2.4.70
 * The following UID constants have been removed:
 
     * ``JPEGBaseline`` (use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead)
@@ -48,13 +88,9 @@ Changes
 * The ``pixel_data_handlers.rle_handler.rle_encode_frame`` function has been
   removed, use :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
-* Removed the ``_storage_sopclass_uids`` module, import UIDs from the `uid` module
-  instead
-* The theoretical maximum number of instances supported by
-  :class:`~pydicom.fileset.FileSet` has been reduced to 1838265625 to ensure support
-  for 32-bit systems (:issue:`1743`)
-* The characters used by :func:`~pydicom.fileset.generate_filename` when
-  `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z]
+* Removed the ``_storage_sopclass_uids`` module, import UIDs from the
+  :mod:`~pydicom.uid` module instead
+
 * The following properties have been removed:
 
     * ``Dataset.parent`` and ``Dataset.parent_seq``
@@ -62,33 +98,8 @@ Changes
     * ``DataElement.parent``
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
-* :func:`~pydicom.data_manager.get_testdata_file` and :func:`~pydicom.data_manager.get_testdata_files`
-  now raise ``ValueError`` if called with an absolute path or pattern
-* :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
-  generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
-  the maximum allowed length of the `prefix` has been changed to 54 characters
-  (:issue:`1773`)
-* :attr:`~pydicom.dataelem.DataElement.VM` always returns ``1`` for **SQ**
-  elements (:issue:`1481`)
-* DICOM dictionary updated to 2023e
-* :class:`~pydicom.sequence.Sequence` is no longer a subclass of
-  :class:`~pydicom.multivalue.MultiValue` (:issue:`1395`)
-* :class:`~pydicom.multivalue.MultiValue` no longer accepts a ``validation_mode``
-  optional argument
-* ``valuerep.MultiString`` has been moved and renamed to
-  :func:`values.multi_string <pydicom.values.multi_string` and no longer accepts
-  a ``validation_mode`` optional argument
-
-
-Deprecations
-------------
-* :attr:`~pydicom.dataset.Dataset.is_little_endian` and
-  :attr:`~pydicom.dataset.Dataset.is_implicit_VR` will be removed in v4.0
-* :attr:`~pydicom.dataset.Dataset.read_little_endian` and
-  :attr:`~pydicom.dataset.Dataset.read_implicit_vr` will be removed in v4.0,
-  use :attr:`~pydicom.dataset.Dataset.original_encoding` instead
-* :attr:`~pydicom.dataset.Dataset.read_encoding` will be removed in v4.0,
-  use :attr:`~pydicom.dataset.Dataset.original_character_set` instead
+* Removed ``Dataset.fix_meta_info()``, encoding state now follows the transfer syntax
+  instead of the other way around
 
 
 Enhancements
@@ -120,6 +131,7 @@ Enhancements
   method
 * Warning messages are also sent to the pydicom logger (:issue:`1529`)
 
+
 Fixes
 -----
 * Fixed the GDCM and pylibjpeg handlers changing the *Pixel Representation* value to 0
@@ -135,10 +147,28 @@ Fixes
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
 * Fixed :func:`~pydicom.encaps.encapsulate_extended` not returning the correct
   values for odd-length frames (:issue:`1968`)
+* Fixed using the incorrect encoding when writing datasets converted between
+  explicit and implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
+
+
+Deprecations
+------------
+* :attr:`~pydicom.dataset.Dataset.is_little_endian` and
+  :attr:`~pydicom.dataset.Dataset.is_implicit_VR` will be removed in v4.0
+* :attr:`~pydicom.dataset.Dataset.read_little_endian` and
+  :attr:`~pydicom.dataset.Dataset.read_implicit_vr` will be removed in v4.0,
+  use :attr:`~pydicom.dataset.Dataset.original_encoding` instead
+* :attr:`~pydicom.dataset.Dataset.read_encoding` will be removed in v4.0,
+  use :attr:`~pydicom.dataset.Dataset.original_character_set` instead
+* The `write_like_original` optional argument to
+  :meth:`~pydicom.dataset.Dataset.save_as` and
+  :func:`~pydicom.filewriter.dcmwrite` will be removed in v4.0, use
+  `enforce_file_format` instead
+
 
 Pydicom Internals
 -----------------
 * Repository folder structure refactored
-* Renamed top level "source" folder to "util"
+* Renamed top level ``source`` folder to ``util``
 * New CI tools - `dependabot`, and `pre-commit` using black and ruff
 * Added a script to hotfix the documentation search function (:issue:`1965`)

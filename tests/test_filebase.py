@@ -20,7 +20,8 @@ class TestDicomIO:
         """Test __init__"""
         # All the subclasses override this anyway
         fp = DicomIO()
-        assert fp.is_implicit_VR
+        assert fp.is_implicit_VR is None
+        assert fp.is_little_endian is None
 
     def test_read_le_tag(self):
         """Test DicomIO.read_le_tag indirectly"""

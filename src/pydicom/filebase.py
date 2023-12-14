@@ -37,7 +37,8 @@ class DicomIO:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # start with this by default
-        self._implicit_VR = True
+        self._implicit_VR = None
+        self._little_endian = None
         self.write: Callable[[bytes], int]
         self.parent_read: Reader
         self.seek: Seeker
@@ -134,11 +135,11 @@ class DicomIO:
     # short or long, e.g. length fields etc
     @property
     def is_little_endian(self) -> bool:
-        return self._little_endian
+        return cast(bool, self._little_endian)
 
     @is_little_endian.setter
     def is_little_endian(self, value: bool) -> None:
-        self._little_endian = value
+        self._little_endian = value  # type: ignore[assignment]
         if value:  # Little Endian
             self.read_US = self.read_leUS
             self.read_UL = self.read_leUL
@@ -154,11 +155,11 @@ class DicomIO:
 
     @property
     def is_implicit_VR(self) -> bool:
-        return self._implicit_VR
+        return cast(bool, self._implicit_VR)
 
     @is_implicit_VR.setter
     def is_implicit_VR(self, value: bool) -> None:
-        self._implicit_VR = value
+        self._implicit_VR = value  # type: ignore[assignment]
 
 
 class DicomFileLike(DicomIO):
