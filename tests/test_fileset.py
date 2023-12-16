@@ -149,7 +149,7 @@ def private(dicomdir):
         fp.is_little_endian = True
         write_dataset(fp, ds)
 
-        return fp.parent.getvalue()
+        return fp.getvalue()
 
     def private_record():
         record = Dataset()

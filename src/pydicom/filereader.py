@@ -22,7 +22,7 @@ from pydicom.dataelem import (
 )
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import DicomFileLike
+from pydicom.filebase import ReadableBuffer
 from pydicom.fileutil import (
     read_undefined_length_value,
     path_from_pathlike,
@@ -935,7 +935,7 @@ def read_partial(
 
 
 def dcmread(
-    fp: PathType | BinaryIO | DicomFileLike,
+    fp: PathType | BinaryIO | ReadableBuffer,
     defer_size: str | int | float | None = None,
     stop_before_pixels: bool = False,
     force: bool = False,
@@ -969,11 +969,11 @@ def dcmread(
 
     Parameters
     ----------
-    fp : str or PathLike or file-like
-        Either a file-like object, a string containing the file name or the
-        path to the file. The file-like object must have ``seek()``,
-        ``read()`` and ``tell()`` methods and the caller is responsible for
-        closing it (if required).
+    fp : str, PathLike, file-like or readable buffer
+        A file-like object, a string containing the file name or the
+        path to the file or a buffer-like object. The buffer-like object must
+        have ``seek()``, ``read()`` and ``tell()`` methods and the caller is
+        responsible for closing it (if required).
     defer_size : int, str or float, optional
         If not used then all elements are read into memory. If specified,
         then if a data element's stored value is larger than `defer_size`, the
@@ -1023,10 +1023,15 @@ def dcmread(
         caller_owns_file = False
         logger.debug(f"Reading file '{fp}'")
         fp = open(fp, "rb")
-    elif fp is None or not hasattr(fp, "read") or not hasattr(fp, "seek"):
+    elif (
+        fp is None
+        or not hasattr(fp, "read")
+        or not hasattr(fp, "seek")
+        or not hasattr(fp, "tell")
+    ):
         raise TypeError(
-            "dcmread: Expected a file path or a file-like, "
-            "but got " + type(fp).__name__
+            "dcmread: Expected a file path, file-like or readable buffer, "
+            f"but got {type(fp).__name__}"
         )
 
     if config.debugging:

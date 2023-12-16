@@ -49,6 +49,9 @@ Changes
   use :func:`~pydicom.filewriter.write_dataset` instead.
 * The :attr:`~pydicom.dataset.FileDataset.file_meta` elements are no longer
   modified when writing
+* :class:`~pydicom.filebase.DicomIO` now requires a readable or writeable buffer
+  during initialisation and :class:`~pydicom.filebase.DicomBytesIO` directly
+  inherits from it.
 
 Removals
 ~~~~~~~~

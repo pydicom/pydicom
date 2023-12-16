@@ -44,8 +44,6 @@ from typing import (
     overload,
 )
 
-from pydicom.filebase import DicomFileLike
-
 try:
     import numpy
 except ImportError:
@@ -66,6 +64,7 @@ from pydicom.datadict import (
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
+from pydicom.filebase import WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import (
@@ -2312,7 +2311,7 @@ class Dataset:
 
     def save_as(
         self,
-        filename: "str | os.PathLike[AnyStr] | BinaryIO",
+        filename: str | os.PathLike[AnyStr] | BinaryIO | WriteableBuffer,
         /,
         __write_like_original: bool | None = None,
         *,
@@ -2353,7 +2352,9 @@ class Dataset:
         Parameters
         ----------
         filename : str | PathLike | BinaryIO
-            The path, file-like or buffer to write the encoded dataset to.
+            The path, file-like or writeable buffer to write the encoded
+            dataset to. If using a buffer it must have ``write()``, ``seek()``
+            and ``tell()`` methods.
         write_like_original : bool, optional
             If ``True`` (default) then write the dataset as-is, otherwise
             ensure that the dataset is written in the DICOM File Format or
@@ -2974,7 +2975,7 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: PathType | BinaryIO | DicomFileLike,
+        filename_or_obj: PathType | BinaryIO,
         dataset: _DatasetType,
         preamble: bytes | None = None,
         file_meta: Optional["FileMetaDataset"] = None,

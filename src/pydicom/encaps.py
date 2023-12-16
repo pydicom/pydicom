@@ -2,16 +2,16 @@
 """Functions for working with encapsulated (compressed) pixel data."""
 
 from struct import pack
-from collections.abc import Generator
+from collections.abc import Iterator
 
 import pydicom.config
 from pydicom.misc import warn_and_log
-from pydicom.filebase import DicomBytesIO, DicomFileLike
+from pydicom.filebase import DicomBytesIO, DicomIO
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 
 # Functions for parsing encapsulated data
-def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
+def get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
     """Return a list of the fragment offsets from the Basic Offset Table.
 
     **Basic Offset Table**
@@ -50,7 +50,7 @@ def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
 
     Parameters
     ----------
-    fp : filebase.DicomFileLike
+    fp : filebase.DicomIO
         The encapsulated pixel data positioned at the start of the Basic Offset
         Table. ``fp.is_little_endian`` should be set to ``True``.
 
@@ -98,7 +98,7 @@ def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
     return bool(length), offsets
 
 
-def get_nr_fragments(fp: DicomFileLike) -> int:
+def get_nr_fragments(fp: DicomIO) -> int:
     """Return the number of fragments in `fp`.
 
     .. versionadded:: 1.4
@@ -137,7 +137,7 @@ def get_nr_fragments(fp: DicomFileLike) -> int:
     return nr_fragments
 
 
-def generate_pixel_data_fragment(fp: DicomFileLike) -> Generator[bytes, None, None]:
+def generate_pixel_data_fragment(fp: DicomIO) -> Iterator[bytes]:
     """Yield the encapsulated pixel data fragments.
 
     For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
@@ -173,7 +173,7 @@ def generate_pixel_data_fragment(fp: DicomFileLike) -> Generator[bytes, None, No
 
     Parameters
     ----------
-    fp : filebase.DicomFileLike
+    fp : filebase.DicomIO
         The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
         item. ``fp.is_little_endian`` should be set to ``True``.
@@ -227,7 +227,7 @@ def generate_pixel_data_fragment(fp: DicomFileLike) -> Generator[bytes, None, No
 
 def generate_pixel_data_frame(
     bytestream: bytes, nr_frames: int | None = None
-) -> Generator[bytes, None, None]:
+) -> Iterator[bytes]:
     """Yield an encapsulated pixel data frame.
 
     Parameters
@@ -256,7 +256,7 @@ def generate_pixel_data_frame(
 
 def generate_pixel_data(
     bytestream: bytes, nr_frames: int | None = None
-) -> Generator[tuple[bytes, ...], None, None]:
+) -> Iterator[tuple[bytes, ...]]:
     """Yield an encapsulated pixel data frame.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -450,7 +450,7 @@ def defragment_data(data: bytes) -> bytes:
 
 
 # read_item modeled after filereader.ReadSequenceItem
-def read_item(fp: DicomFileLike) -> bytes | None:
+def read_item(fp: DicomIO) -> bytes | None:
     """Read and return a single Item in the fragmented data stream.
 
     Parameters
@@ -507,7 +507,7 @@ def read_item(fp: DicomFileLike) -> bytes | None:
 
 
 # Functions for encapsulating data
-def fragment_frame(frame: bytes, nr_fragments: int = 1) -> Generator[bytes, None, None]:
+def fragment_frame(frame: bytes, nr_fragments: int = 1) -> Iterator[bytes]:
     """Yield one or more fragments from `frame`.
 
     .. versionadded:: 1.2
@@ -605,7 +605,7 @@ def itemize_fragment(fragment: bytes) -> bytes:
 itemise_fragment = itemize_fragment
 
 
-def itemize_frame(frame: bytes, nr_fragments: int = 1) -> Generator[bytes, None, None]:
+def itemize_frame(frame: bytes, nr_fragments: int = 1) -> Iterator[bytes]:
     """Yield items generated from `frame`.
 
     .. versionadded:: 1.2

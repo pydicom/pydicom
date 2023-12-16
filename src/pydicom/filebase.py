@@ -1,212 +1,302 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 
-from io import BytesIO
-from struct import unpack, pack
-from types import TracebackType
-from typing import BinaryIO, cast, TextIO, Any
 from collections.abc import Callable
-
-try:
-    from typing import Protocol  # added in 3.8
-except ImportError:
-    Protocol = object  # type: ignore[assignment]
-
-from pydicom.tag import Tag, BaseTag, TagType
+from io import BytesIO
+import os
+from struct import Struct
+from types import TracebackType
+from typing import cast, Any, TypeVar, Protocol
 
 
-# Customise the type hints for read() and seek()
-class Reader(Protocol):
-    def __call__(self, size: int = -1) -> bytes:
-        ...
+ExitException = tuple[
+    type[BaseException] | None, BaseException | None, TracebackType | None
+]
+Self = TypeVar("Self", bound="DicomIO")
 
 
-class Seeker(Protocol):
-    def __call__(self, offset: int, whence: int = 0) -> int:
-        ...
+class ReadableBuffer(Protocol):
+    def read(self, size: int = ..., /) -> bytes:
+        ...  # pragma: no cover
+
+    def seek(self, offset: int, whence: int = ..., /) -> int:
+        ...  # pragma: no cover
+
+    def tell(self) -> int:
+        ...  # pragma: no cover
+
+
+class WriteableBuffer(Protocol):
+    def seek(self, offset: int, whence: int = ..., /) -> int:
+        ...  # pragma: no cover
+
+    def tell(self) -> int:
+        ...  # pragma: no cover
+
+    def write(self, b: bytes | bytearray | memoryview, /) -> int:
+        ...  # pragma: no cover
 
 
 class DicomIO:
-    """File object which holds transfer syntax info and anything else we need."""
+    """Wrapper for managing buffer-like objects used when reading or writing
+    DICOM datasets.
+    """
 
-    # number of times to read if don't get requested bytes
-    max_read_attempts = 3
+    def __init__(self, buffer: ReadableBuffer | WriteableBuffer) -> None:
+        """Create a new ``DicomIO`` instance.
 
-    # default
-    defer_size = None
+        Parameters
+        ----------
+        buffer : buffer-like object
+            A buffer-like object that implements:
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        # start with this by default
-        self._implicit_VR = None
-        self._little_endian = None
-        self.write: Callable[[bytes], int]
-        self.parent_read: Reader
-        self.seek: Seeker
-        self.tell: Callable[[], int]
+            * ``seek()`` and ``tell()`` methods with the same signatures as
+              :meth:`io.IOBase.seek` and :meth:`io.IOBase.tell`
+            * a ``read()`` method with the same signature as
+              :meth:`io.RawIOBase.read` if it supports reading data from
+              itself, and/or
+            * a ``write()`` method with the same signature as
+              :meth:`io.RawIOBase.write` if it supports writing data to itself
 
-    def read_le_tag(self) -> tuple[int, int]:
-        """Read and return two unsigned shorts (little endian) from the file."""
-        bytes_read = self.read(4, need_exact_length=True)
-        return cast(tuple[int, int], unpack(b"<HH", bytes_read))
-
-    def read_be_tag(self) -> tuple[int, int]:
-        """Read and return two unsigned shorts (big endian) from the file."""
-        bytes_read = self.read(4, need_exact_length=True)
-        return cast(tuple[int, int], unpack(b">HH", bytes_read))
-
-    def write_tag(self, tag: TagType) -> None:
-        """Write a dicom tag (two unsigned shorts) to the file."""
-        # make sure is an instance of class, not just a tuple or int
-        if not isinstance(tag, BaseTag):
-            tag = Tag(tag)
-        self.write_US(tag.group)
-        self.write_US(tag.element)
-
-    def read_leUS(self) -> int:
-        """Return an unsigned short from the file with little endian byte order"""
-        val: tuple[int, ...] = unpack(b"<H", self.read(2))
-        return val[0]
-
-    def read_beUS(self) -> int:
-        """Return an unsigned short from the file with big endian byte order"""
-        val: tuple[int, ...] = unpack(b">H", self.read(2))
-        return val[0]
-
-    def read_leUL(self) -> int:
-        """Return an unsigned long read with little endian byte order"""
-        val: tuple[int, ...] = unpack(b"<L", self.read(4))
-        return val[0]
-
-    def read(self, length: int | None = None, need_exact_length: bool = False) -> bytes:
-        """Reads the required length, returns EOFError if gets less
-
-        If length is ``None``, then read all bytes
+            If `buffer` supports reading it can be used with
+            :func:`~pydicom.filereader.dcmread` as the source to decode a DICOM
+            dataset from, and if it supports writing it can be used with
+            :func:`~pydicom.filewriter.dcmwrite` as the destination for the
+            encoded DICOM dataset.
         """
-        parent_read = self.parent_read  # super(DicomIO, self).read
-        if length is None:
-            return parent_read()  # get all of it
+        # Data packers/unpackers
+        self._us_unpacker: Callable[[bytes], tuple[Any, ...]]
+        self._us_packer: Callable[[int], bytes]
+        self._ul_unpacker: Callable[[bytes], tuple[Any, ...]]
+        self._ul_packer: Callable[[int], bytes]
+        self._tag_unpacker: Callable[[bytes], tuple[Any, ...]]
+        self._tag_packer: Callable[[int, int], bytes]
 
-        bytes_read = parent_read(length)
-        if len(bytes_read) < length and need_exact_length:
-            # Didn't get all the desired bytes. Keep trying to get the rest.
-            # If reading across network, might want to add a delay here
-            attempts = 0
-            max_reads = self.max_read_attempts
-            while attempts < max_reads and len(bytes_read) < length:
-                bytes_read += parent_read(length - len(bytes_read))
-                attempts += 1
-            num_bytes = len(bytes_read)
-            if num_bytes < length:
-                start_pos = self.tell() - num_bytes
-                msg = (
-                    f"Unexpected end of file. Read {len(bytes_read)} bytes "
-                    f"of {length} expected starting at position "
-                    f"0x{start_pos:x}"
-                )
-                raise EOFError(msg)
-        return bytes_read
+        # Store the encoding method
+        self._implicit_vr: bool
+        self._little_endian: bool
 
-    def write_leUS(self, val: int) -> None:
-        """Write an unsigned short with little endian byte order"""
-        self.write(pack(b"<H", val))
+        # The buffer-like object being wrapped
+        self._buffer = buffer
 
-    def write_leUL(self, val: int) -> None:
-        """Write an unsigned long with little endian byte order"""
-        self.write(pack(b"<L", val))
+        # It's more efficient to replace the existing class methods
+        #   instead of wrapping them
+        if hasattr(buffer, "read"):
+            self.read = buffer.read
 
-    def write_beUS(self, val: int) -> None:
-        """Write an unsigned short with big endian byte order"""
-        self.write(pack(b">H", val))
+        if hasattr(buffer, "write"):
+            self.write = buffer.write
 
-    def write_beUL(self, val: int) -> None:
-        """Write an unsigned long with big endian byte order"""
-        self.write(pack(b">L", val))
+        if hasattr(buffer, "close"):
+            self.close = buffer.close
 
-    write_US = write_leUS
-    write_UL = write_leUL
+        # seek() and tell() are always required
+        self.seek = buffer.seek
+        self.tell = buffer.tell
 
-    def read_beUL(self) -> int:
-        """Return an unsigned long read with big endian byte order"""
-        val: tuple[int, ...] = unpack(b">L", self.read(4))
-        return val[0]
+    def close(self, *args: Any, **kwargs: Any) -> Any:
+        """Close the buffer (if possible)"""
+        pass
 
-    # Set up properties is_little_endian and is_implicit_VR
-    # Big/Little Endian changes functions to read unsigned
-    # short or long, e.g. length fields etc
+    def __enter__(self: Self) -> Self:
+        return self
+
+    def __exit__(self, *exc_info: ExitException) -> None:
+        self.close()
+
     @property
     def is_little_endian(self) -> bool:
-        return cast(bool, self._little_endian)
+        """Get/set the endianness for encoding/decoding, ``True`` for little
+        endian and ``False`` for big endian.
+        """
+        if not hasattr(self, "_little_endian"):
+            raise AttributeError(
+                f"{type(self).__name__}.is_little_endian' has not been set"
+            )
+
+        return self._little_endian
 
     @is_little_endian.setter
     def is_little_endian(self, value: bool) -> None:
-        self._little_endian = value  # type: ignore[assignment]
-        if value:  # Little Endian
-            self.read_US = self.read_leUS
-            self.read_UL = self.read_leUL
-            self.write_US = self.write_leUS  # type: ignore[method-assign]
-            self.write_UL = self.write_leUL  # type: ignore[method-assign]
-            self.read_tag = self.read_le_tag
-        else:  # Big Endian
-            self.read_US = self.read_beUS
-            self.read_UL = self.read_beUL
-            self.write_US = self.write_beUS  # type: ignore[method-assign]
-            self.write_UL = self.write_beUL  # type: ignore[method-assign]
-            self.read_tag = self.read_be_tag
+        if not isinstance(value, bool):
+            raise TypeError(f"'{type(self).__name__}.is_little_endian' must be bool")
+
+        self._little_endian = value
+
+        endianness = "><"[value]
+        self._us_packer = Struct(f"{endianness}H").pack
+        self._us_unpacker = Struct(f"{endianness}H").unpack
+        self._ul_packer = Struct(f"{endianness}L").pack
+        self._ul_unpacker = Struct(f"{endianness}L").unpack
+        self._tag_packer = Struct(f"{endianness}2H").pack
+        self._tag_unpacker = Struct(f"{endianness}2H").unpack
 
     @property
     def is_implicit_VR(self) -> bool:
-        return cast(bool, self._implicit_VR)
+        """Get/set the VR mode for encoding/decoding. ``True`` for implicit VR
+        and ``False`` for explicit VR.
+        """
+        if not hasattr(self, "_implicit_vr"):
+            raise AttributeError(
+                f"{type(self).__name__}.is_implicit_VR' has not been set"
+            )
+
+        return self._implicit_vr
 
     @is_implicit_VR.setter
     def is_implicit_VR(self, value: bool) -> None:
-        self._implicit_VR = value  # type: ignore[assignment]
+        if not isinstance(value, bool):
+            raise TypeError(f"'{type(self).__name__}.is_implicit_VR' must be bool")
+
+        self._implicit_vr = value
+
+    @property
+    def name(self) -> str:
+        """Return the value of the :attr:`~pydicom.filebase.DicomIO.parent`'s
+        ``name`` attribute, or ``"<no filename>"`` if no such attribute.
+        """
+        return getattr(self._buffer, "name", "<no filename>")
+
+    @property
+    def parent(self) -> ReadableBuffer | WriteableBuffer:
+        """Return the buffer object being wrapped."""
+        return self._buffer
+
+    def read(self, size: int = -1, /) -> bytes:
+        """Read up to `size` bytes from the buffer and return them. If `size`
+        is unspecified, all bytes until EOF are returned.
+
+        Fewer than `size` bytes may be returned if the operating system call
+        returns fewer than `size` bytes.
+        """
+        raise TypeError(
+            f"'{type(self).__name__}' cannot be used with "
+            f"'{type(self._buffer).__name__}': object has no read() method"
+        )
+
+    def read_exact(self, length: int, nr_retries: int = 3) -> bytes:
+        """Return `length` bytes read from the buffer.
+
+        Parameters
+        ----------
+        length : int
+            The number of bytes to be read. If ``None`` (default) then read all
+            the bytes available.
+        nr_retries : int, optional
+            The number of tries to read data when the number of bytes read
+            from the buffer is less than `length`. Default ``3``.
+
+        Returns
+        -------
+        bytes
+            The read data.
+
+        Raises
+        ------
+        EOFError
+            If unable to read `length` bytes.
+        """
+        bytes_read = self.read(length)
+        if len(bytes_read) == length:
+            return bytes_read
+
+        # Use a bytearray because concatenating bytes is expensive
+        bytes_read = bytearray(bytes_read)
+        attempts = 0
+        while (num_bytes := len(bytes_read)) < length and attempts < nr_retries:
+            bytes_read += self.read(length - num_bytes)
+            attempts += 1
+
+        if num_bytes == length:
+            return bytes(bytes_read)
+
+        raise EOFError(
+            f"Unexpected end of file. Read {num_bytes} bytes of {length} "
+            f"expected starting at position 0x{self.tell() - num_bytes:x}"
+        )
+
+    def read_tag(self) -> tuple[int, int]:
+        """Return a DICOM tag value read from the buffer."""
+        return cast(
+            tuple[int, int],
+            self._tag_unpacker(self.read_exact(4)),
+        )
+
+    def read_UL(self) -> int:
+        """Return a UL value read from the buffer."""
+        return cast(int, self._ul_unpacker(self.read(4))[0])
+
+    def read_US(self) -> int:
+        """Return a US value read from the buffer."""
+        return cast(int, self._us_unpacker(self.read(2))[0])
+
+    def seek(self, offset: int, whence: int = os.SEEK_SET, /) -> int:
+        """Change the buffer position to the given byte `offset`, relative to
+        the position indicated by `whence` and return the new absolute position.
+        """
+        raise NotImplementedError()  # pragma: no cover
+
+    def tell(self) -> int:
+        """Return the current stream position of the buffer"""
+        raise NotImplementedError()  # pragma: no cover
+
+    def write(self, b: bytes | bytearray | memoryview, /) -> int:
+        """Write the bytes-like object `b` to the buffer and return the number
+        of bytes written.
+        """
+        raise TypeError(
+            f"'{type(self).__name__}' cannot be used with "
+            f"'{type(self._buffer).__name__}': object has no write() method"
+        )
+
+    def write_tag(self, tag: int) -> None:
+        """Write a DICOM tag to the buffer."""
+        self.write(self._tag_packer(tag >> 16, tag & 0xFFFF))
+
+    def write_UL(self, val: int) -> None:
+        """Write a UL value to the buffer."""
+        self.write(self._ul_packer(val))
+
+    def write_US(self, val: int) -> None:
+        """Write a US value to the buffer."""
+        self.write(self._us_packer(val))
 
 
 class DicomFileLike(DicomIO):
-    def __init__(
-        self, file_like_obj: TextIO | BinaryIO | BytesIO, *args: Any, **kwargs: Any
-    ) -> None:
-        super().__init__(*args, **kwargs)
-        self.parent = file_like_obj
-        self.parent_read = getattr(file_like_obj, "read", self.no_read)
-        self.write = getattr(file_like_obj, "write", self.no_write)
-        self.seek = getattr(file_like_obj, "seek", self.no_seek)
-        self.tell = file_like_obj.tell
-        self.close = file_like_obj.close
-        self.name: str = getattr(file_like_obj, "name", "<no filename>")
+    """Wrapper for file-likes to simplify encoding/decoding DICOM datasets.
 
-    def no_write(self, bytes_read: bytes) -> int:
-        """Used for file-like objects where no write is available"""
-        raise OSError("This DicomFileLike object has no write() method")
+    See Also
+    --------
+    :class:`~pydicom.filebase.DicomIO`
+    :class:`~pydicom.filebase.DicomBytesIO`
+    """
 
-    def no_read(self, size: int = -1) -> bytes:
-        """Used for file-like objects where no read is available"""
-        raise OSError("This DicomFileLike object has no read() method")
-
-    def no_seek(self, offset: int, whence: int = 0) -> int:
-        """Used for file-like objects where no seek is available"""
-        raise OSError("This DicomFileLike object has no seek() method")
-
-    def __enter__(self) -> "DicomFileLike":
-        return self
-
-    def __exit__(
-        self,
-        *exc_info: tuple[
-            type[BaseException] | None, BaseException | None, TracebackType | None
-        ],
-    ) -> None:
-        self.close()
+    pass
 
 
 def DicomFile(*args: Any, **kwargs: Any) -> DicomFileLike:
+    """Return an opened :class:`~pydicom.filebase.DicomFileLike` from a file-like."""
     return DicomFileLike(open(*args, **kwargs))
 
 
-class DicomBytesIO(DicomFileLike):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(BytesIO(*args, **kwargs))
+class DicomBytesIO(DicomIO):
+    """Wrapper for :class:`io.BytesIO` to simplify encoding/decoding DICOM datasets.
 
-    def getvalue(self) -> bytes:
-        self.parent = cast(BytesIO, self.parent)
-        return self.parent.getvalue()
+    See Also
+    --------
+    :class:`~pydicom.filebase.DicomIO`
+    :class:`~pydicom.filebase.DicomFileLike`
+    """
+
+    def __init__(self, initial_bytes: bytes | bytearray | memoryview = b"") -> None:
+        """Create a new DicomBytesIO instance.
+
+        Parameters
+        ----------
+        buffer : bytes | bytearray | memoryview, optional
+            The buffer to write to or read from, default is an empty buffer.
+        """
+        buffer = BytesIO(initial_bytes)
+        super().__init__(buffer)
+
+        self.getvalue = buffer.getvalue
