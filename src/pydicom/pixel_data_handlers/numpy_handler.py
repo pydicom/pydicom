@@ -260,7 +260,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         # Skip the trailing padding byte(s) if present
         dtype = pixel_dtype(ds, as_float=("Float" in px_keyword[0]))
         if (
-            not ds.is_little_endian
+            not ds.original_encoding[1]
             and dtype.itemsize == 1
             and px_keyword[0] == "PixelData"
             and ds[0x7FE00010].VR == "OW"

@@ -168,14 +168,26 @@ def apply_color_lut(
             bytes | None, getattr(ds, "SegmentedAlphaPaletteColorLookupTableData", None)
         )
 
-        endianness = "<" if ds.is_little_endian else ">"
+        if hasattr(ds, "file_meta"):
+            is_little_endian = ds.file_meta._tsyntax_encoding[1]
+        else:
+            is_little_endian = ds.original_encoding[1]
+
+        if is_little_endian is None:
+            raise AttributeError(
+                "Unable to determine the endianness of the dataset, please set "
+                "an appropriate Transfer Syntax UID in "
+                f"'{type(ds).__name__}.file_meta'"
+            )
+
+        endianness = "><"[is_little_endian]
         byte_depth = nominal_depth // 8
         fmt = "B" if byte_depth == 1 else "H"
         actual_depth = nominal_depth
 
         for seg in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
             len_seg = len(seg) // byte_depth
-            s_fmt = endianness + str(len_seg) + fmt
+            s_fmt = f"{endianness}{len_seg}{fmt}"
             lut_ints = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
             luts.append(np.asarray(lut_ints, dtype=dtype))
     else:
@@ -259,7 +271,19 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
         if item["LUTData"].VR == VR.OW:
-            endianness = "<" if ds.is_little_endian else ">"
+            if hasattr(ds, "file_meta"):
+                is_little_endian = ds.file_meta._tsyntax_encoding[1]
+            else:
+                is_little_endian = ds.original_encoding[1]
+
+            if is_little_endian is None:
+                raise AttributeError(
+                    "Unable to determine the endianness of the dataset, please set "
+                    "an appropriate Transfer Syntax UID in "
+                    f"'{type(ds).__name__}.file_meta'"
+                )
+
+            endianness = "><"[is_little_endian]
             unpack_fmt = f"{endianness}{nr_entries}H"
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
@@ -412,7 +436,7 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
 
     if not np.issubdtype(arr.dtype, np.integer):
         warn_and_log(
-            "Applying a VOI LUT on a float input array may give " "incorrect results"
+            "Applying a VOI LUT on a float input array may give incorrect results"
         )
 
     # VOI LUT Sequence contains one or more items
@@ -435,8 +459,19 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     # Ambiguous VR, US or OW
     unc_data: Iterable[int]
     if item["LUTData"].VR == VR.OW:
-        endianness = "<" if ds.is_little_endian else ">"
-        unpack_fmt = f"{endianness}{nr_entries}H"
+        if hasattr(ds, "file_meta"):
+            is_little_endian = ds.file_meta._tsyntax_encoding[1]
+        else:
+            is_little_endian = ds.original_encoding[1]
+
+        if is_little_endian is None:
+            raise AttributeError(
+                "Unable to determine the endianness of the dataset, please set "
+                "an appropriate Transfer Syntax UID in "
+                f"'{type(ds).__name__}.file_meta'"
+            )
+
+        unpack_fmt = f"{'><'[is_little_endian]}{nr_entries}H"
         unc_data = unpack_from(unpack_fmt, cast(bytes, item.LUTData))
     else:
         unc_data = cast(list[int], item.LUTData)
@@ -1266,8 +1301,18 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     if not HAVE_NP:
         raise ImportError("Numpy is required to determine the dtype.")
 
-    if ds.is_little_endian is None:
-        ds._is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
+    # Prefer Transfer Syntax UID, fall back to the original encoding
+    if hasattr(ds, "file_meta"):
+        is_little_endian = ds.file_meta._tsyntax_encoding[1]
+    else:
+        is_little_endian = ds.original_encoding[1]
+
+    if is_little_endian is None:
+        raise AttributeError(
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in "
+            f"'{type(ds).__name__}.file_meta'"
+        )
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1
@@ -1314,7 +1359,7 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         )
 
     # Correct for endianness of the system vs endianness of the dataset
-    if ds.is_little_endian != (byteorder == "little"):
+    if is_little_endian != (byteorder == "little"):
         # 'S' swap from current to opposite
         dtype = dtype.newbyteorder("S")
 
