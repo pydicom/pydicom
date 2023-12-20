@@ -11,7 +11,7 @@ from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
-from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO, DicomIO
+from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
@@ -722,7 +722,10 @@ def write_dataset(
     # TODO: Update in v4.0
     # In order of encoding priority
 
-    fp_encoding: EncodingType = (fp.is_implicit_VR, fp.is_little_endian)
+    fp_encoding: EncodingType = (
+        getattr(fp, "_implicit_vr", None),
+        getattr(fp, "_little_endian", None),
+    )
     ds_encoding: EncodingType = (None, None)
     if not config._use_future:
         ds_encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
@@ -1054,7 +1057,7 @@ def _determine_encoding(
 
 
 def dcmwrite(
-    filename: PathType | BinaryIO | DicomFileLike,
+    filename: PathType | BinaryIO | WriteableBuffer,
     dataset: Dataset,
     /,
     __write_like_original: bool | None = None,
@@ -1066,7 +1069,7 @@ def dcmwrite(
     **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
-    buffer.
+    writeable buffer.
 
     .. versionchanged:: 3.0
 
@@ -1162,8 +1165,10 @@ def dcmwrite(
 
     Parameters
     ----------
-    filename : str or PathLike or file-like
-        File path, file-like or buffer to write the encoded `dataset` to.
+    filename : str, PathLike, file-like or writeable buffer
+        File path, file-like or writeable buffer to write the encoded `dataset`
+        to. If using a writeable buffer it must have ``write()``, ``seek()``
+        and ``tell()`` methods.
     dataset : pydicom.dataset.FileDataset
         The dataset to be encoded.
     write_like_original : bool, optional
@@ -1357,17 +1362,22 @@ def dcmwrite(
     # Open file if not already a file object
     filename = path_from_pathlike(filename)
     if isinstance(filename, str):
-        fp = DicomFile(filename, "wb")
+        # A path-like to be written to
+        fp: DicomIO = DicomFile(filename, "wb")
         # caller provided a file name; we own the file handle
         caller_owns_file = False
+    elif isinstance(filename, DicomIO):
+        # A wrapped writeable buffer, don't wrap it again
+        fp = filename
     else:
+        # Anything else
         try:
-            fp = DicomFileLike(filename)
-        except AttributeError:
+            fp = DicomIO(filename)
+        except AttributeError as exc:
             raise TypeError(
-                "dcmwrite: Expected a file path or a file-like, "
+                "dcmwrite: Expected a file path, file-like or writeable buffer, "
                 f"but got {type(filename).__name__}"
-            )
+            ) from exc
 
     # Set the encoding of the buffer/file-like
     fp.is_implicit_VR, fp.is_little_endian = encoding
@@ -1391,9 +1401,7 @@ def dcmwrite(
 
             # Compress the encoded data and write to file
             compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
-            deflated = bytearray(
-                compressor.compress(buffer.parent.getvalue())  # type: ignore[union-attr]
-            )
+            deflated = bytearray(compressor.compress(buffer.getvalue()))
             deflated += compressor.flush()
             fp.write(deflated)
             if len(deflated) % 2:

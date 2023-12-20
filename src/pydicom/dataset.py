@@ -44,8 +44,6 @@ from typing import (
     overload,
 )
 
-from pydicom.filebase import DicomFileLike
-
 try:
     import numpy
 except ImportError:
@@ -66,6 +64,7 @@ from pydicom.datadict import (
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
+from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import (
@@ -2312,7 +2311,7 @@ class Dataset:
 
     def save_as(
         self,
-        filename: "str | os.PathLike[AnyStr] | BinaryIO",
+        filename: str | os.PathLike[AnyStr] | BinaryIO | WriteableBuffer,
         /,
         __write_like_original: bool | None = None,
         *,
@@ -2353,7 +2352,9 @@ class Dataset:
         Parameters
         ----------
         filename : str | PathLike | BinaryIO
-            The path, file-like or buffer to write the encoded dataset to.
+            The path, file-like or writeable buffer to write the encoded
+            dataset to. If using a buffer it must have ``write()``, ``seek()``
+            and ``tell()`` methods.
         write_like_original : bool, optional
             If ``True`` (default) then write the dataset as-is, otherwise
             ensure that the dataset is written in the DICOM File Format or
@@ -2974,7 +2975,7 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: PathType | BinaryIO | DicomFileLike,
+        filename_or_obj: PathType | BinaryIO | ReadableBuffer,
         dataset: _DatasetType,
         preamble: bytes | None = None,
         file_meta: Optional["FileMetaDataset"] = None,
@@ -2985,9 +2986,12 @@ class FileDataset(Dataset):
 
         Parameters
         ----------
-        filename_or_obj : str or PathLike or BytesIO or None
-            Full path and filename to the file, memory buffer object, or
-            ``None`` if is a :class:`io.BytesIO`.
+        filename_or_obj : str, PathLike, file-like or readable buffer
+
+            * :class:`str` or path: the full path to the dataset file
+            * file-like: a file-like object in "rb" mode
+            * readable buffer: an object with ``read()``, ``tell()`` and
+            ``seek()`` methods such as :class:`io.BytesIO`.
         dataset : Dataset or dict
             Some form of dictionary, usually a :class:`Dataset` returned from
             :func:`~pydicom.filereader.dcmread`.
@@ -3024,22 +3028,22 @@ class FileDataset(Dataset):
         self.filename: PathType | BinaryIO = ""
 
         if isinstance(filename_or_obj, str):
+            # Path to the dataset file
             filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):
+            # File-like in "rb" mode such as open(..., "rb")
             filename = filename_or_obj.name
             # This is the appropriate constructor for io.BufferedReader
             self.fileobj_type = open
         else:
-            # use __class__ python <2.7?;
-            # https://docs.python.org/3/reference/datamodel.html
-            self.fileobj_type = filename_or_obj.__class__
+            # Readable buffer with read(), seek() and tell() methods
+            self.fileobj_type = type(filename_or_obj)
             if hasattr(filename_or_obj, "name"):
                 filename = filename_or_obj.name
             elif hasattr(filename_or_obj, "filename"):
                 filename = filename_or_obj.filename
             else:
-                # e.g. came from BytesIO or something file-like
                 self.filename = filename_or_obj
 
         self.timestamp = None

@@ -115,8 +115,6 @@ class TestDataset:
         ds2.BeamSequence[0].BeamNumber = "2"
         assert ds2 != ds1
 
-        fp.close()
-
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
 

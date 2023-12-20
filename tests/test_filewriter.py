@@ -393,7 +393,7 @@ class TestWriteDataElement:
             fp.is_implicit_VR = is_implicit_VR
             fp.is_little_endian = is_little_endian
             write_data_element(fp, elem)
-            return fp.parent.getvalue()
+            return fp.getvalue()
 
     def test_empty_AT(self):
         """Write empty AT correctly.........."""
@@ -1476,12 +1476,18 @@ class TestDCMWrite:
         ds = dcmread(ct_name)
         with pytest.raises(
             TypeError,
-            match="dcmwrite: Expected a file path or a file-like, but got None",
+            match=(
+                "dcmwrite: Expected a file path, file-like or writeable "
+                "buffer, but got NoneType"
+            ),
         ):
             ds.save_as(None)
         with pytest.raises(
             TypeError,
-            match="dcmwrite: Expected a file path or a file-like, but got int",
+            match=(
+                "dcmwrite: Expected a file path, file-like or writeable "
+                "buffer, but got int"
+            ),
         ):
             ds.save_as(42)
 

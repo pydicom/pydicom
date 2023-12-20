@@ -18,26 +18,29 @@ class TestDicomIO:
 
     def test_init(self):
         """Test __init__"""
-        # All the subclasses override this anyway
-        fp = DicomIO()
-        assert fp.is_implicit_VR is None
-        assert fp.is_little_endian is None
+        fp = DicomIO(BytesIO())
+        assert not hasattr(fp, "is_implicit_VR")
+        assert not hasattr(fp, "is_little_endian")
 
-    def test_read_le_tag(self):
-        """Test DicomIO.read_le_tag indirectly"""
+    def test_parent(self):
+        """Test DicomIO.parent"""
+        buffer = BytesIO()
+        fp = DicomIO(buffer)
+        assert fp.parent is buffer
+
+    def test_read_tag(self):
+        """Test DicomIO.read_tag indirectly"""
         # Tags are 2 + 2 = 4 bytes
         bytestream = b"\x01\x02\x03\x04\x05\x06"
+        # Little endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert Tag(fp.read_le_tag()) == 0x02010403
+        assert Tag(fp.read_tag()) == 0x02010403
 
-    def test_read_be_tag(self):
-        """Test DicomIO.read_be_tag indirectly"""
-        # Tags are 2 + 2 = 4 bytes
-        bytestream = b"\x01\x02\x03\x04\x05\x06"
+        # Big endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
-        assert Tag(fp.read_be_tag()) == 0x01020304
+        assert Tag(fp.read_tag()) == 0x01020304
 
     def test_write_tag(self):
         """Test DicomIO.write_tag indirectly"""
@@ -55,129 +58,141 @@ class TestDicomIO:
         fp.write_tag(tag)
         assert fp.getvalue() == b"\x01\x02\x03\x04"
 
-    def test_read_le_us(self):
-        """Test DicomIO.read_leUS indirectly"""
+    def test_read_us(self):
+        """Test DicomIO.read_US"""
         # US are 2 bytes fixed
         bytestream = b"\x00\x00\xFF\x00\xFE\xFF"
+        # Little endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert fp.read_leUS() == 0
-        assert fp.read_leUS() == 255
-        assert fp.read_leUS() == 65534
+        assert fp.read_US() == 0
+        assert fp.read_US() == 255
+        assert fp.read_US() == 65534
 
-    def test_read_be_us(self):
-        """Test DicomIO.read_beUS indirectly"""
-        # US are 2 bytes fixed
-        bytestream = b"\x00\x00\x00\xFF\xFF\xFE"
+        # Big endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert fp.read_beUS() == 0
-        assert fp.read_beUS() == 255
-        assert fp.read_beUS() == 0xFFFE
+        assert fp.read_US() == 0
+        assert fp.read_US() == 255
+        assert fp.read_US() == 0xFFFE
 
-    def test_write_le_us(self):
-        """Test DicomIO.write_leUS indirectly"""
+    def test_write_us(self):
+        """Test DicomIO.write_US"""
+        # Little endian
         fp = DicomBytesIO()
         fp.is_little_endian = True
         assert fp.getvalue() == b""
-        fp.write_leUS(0)
+        fp.write_US(0)
         assert fp.getvalue() == b"\x00\x00"
-        fp.write_leUS(255)
+        fp.write_US(255)
         assert fp.getvalue() == b"\x00\x00\xFF\x00"
-        fp.write_leUS(65534)
+        fp.write_US(65534)
         assert fp.getvalue() == b"\x00\x00\xFF\x00\xFE\xFF"
 
-    def test_write_be_us(self):
-        """Test DicomIO.write_beUS indirectly"""
+        # Big endian
         fp = DicomBytesIO()
         fp.is_little_endian = False
         assert fp.getvalue() == b""
-        fp.write_beUS(0)
+        fp.write_US(0)
         assert fp.getvalue() == b"\x00\x00"
-        fp.write_beUS(255)
+        fp.write_US(255)
         assert fp.getvalue() == b"\x00\x00\x00\xFF"
-        fp.write_beUS(65534)
+        fp.write_US(65534)
         assert fp.getvalue() == b"\x00\x00\x00\xFF\xFF\xFE"
 
-    def test_read_le_ul(self):
-        """Test DicomIO.read_leUL indirectly"""
+    def test_read_ul(self):
+        """Test DicomIO.read_UL"""
         # UL are 4 bytes fixed
         bytestream = b"\x00\x00\x00\x00\xFF\xFF\x00\x00\xFE\xFF\xFF\xFF"
+        # Little endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert fp.read_leUL() == 0
-        assert fp.read_leUL() == 0xFFFF
-        assert fp.read_leUL() == 0xFFFFFFFE
+        assert fp.read_UL() == 0
+        assert fp.read_UL() == 0xFFFF
+        assert fp.read_UL() == 0xFFFFFFFE
 
-    def test_read_be_ul(self):
-        """Test DicomIO.read_beUL indirectly"""
-        # UL are 4 bytes fixed
+        # Big endian
         bytestream = b"\x00\x00\x00\x00\x00\x00\xFF\xFF\xFF\xFF\xFF\xFE"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
-        assert fp.read_beUL() == 0
-        assert fp.read_beUL() == 0xFFFF
-        assert fp.read_beUL() == 0xFFFFFFFE
+        assert fp.read_UL() == 0
+        assert fp.read_UL() == 0xFFFF
+        assert fp.read_UL() == 0xFFFFFFFE
 
-    def test_write_le_ul(self):
-        """Test DicomIO.write_leUL indirectly"""
+    def test_write_ul(self):
+        """Test DicomIO.write_UL indirectly"""
+        # Little endian
         fp = DicomBytesIO()
         fp.is_little_endian = True
         assert fp.getvalue() == b""
-        fp.write_leUL(0)
+        fp.write_UL(0)
         assert fp.getvalue() == b"\x00\x00\x00\x00"
-        fp.write_leUL(65535)
+        fp.write_UL(65535)
         assert fp.getvalue() == b"\x00\x00\x00\x00\xFF\xFF\x00\x00"
-        fp.write_leUL(4294967294)
+        fp.write_UL(4294967294)
         assert fp.getvalue() == (b"\x00\x00\x00\x00\xFF\xFF\x00\x00\xFE\xFF\xFF\xFF")
 
-    def test_write_be_ul(self):
-        """Test DicomIO.write_beUL indirectly"""
+        # Big endian
         fp = DicomBytesIO()
         fp.is_little_endian = False
         assert fp.getvalue() == b""
-        fp.write_beUL(0)
+        fp.write_UL(0)
         assert fp.getvalue() == b"\x00\x00\x00\x00"
-        fp.write_beUL(65535)
+        fp.write_UL(65535)
         assert fp.getvalue() == b"\x00\x00\x00\x00\x00\x00\xFF\xFF"
-        fp.write_beUL(4294967294)
+        fp.write_UL(4294967294)
         assert fp.getvalue() == (b"\x00\x00\x00\x00\x00\x00\xFF\xFF\xFF\xFF\xFF\xFE")
 
     def test_read(self):
         """Test DicomIO.read entire length"""
         fp = DicomBytesIO(b"\x00\x01\x03")
-        fp.is_little_endian = True
-        bytestream = fp.read(length=None, need_exact_length=False)
+        bytestream = fp.read()
         assert bytestream == b"\x00\x01\x03"
 
     def test_read_length(self):
         """Test DicomIO.read specific length"""
         fp = DicomBytesIO(b"\x00\x01\x03")
-        fp.is_little_endian = True
-        bytestream = fp.read(length=2, need_exact_length=False)
+        bytestream = fp.read(2)
         assert bytestream == b"\x00\x01"
 
-    def test_read_exact_length(self):
+    def test_read_exact(self):
         """Test DicomIO.read exact length"""
         fp = DicomBytesIO(b"\x00\x01\x03\x04")
-        fp.is_little_endian = True
-        bytestream = fp.read(length=4, need_exact_length=True)
+        bytestream = fp.read_exact(length=4)
+        assert bytestream == b"\x00\x01\x03\x04"
+
+    def test_read_exact_retry(self):
+        """Test DicomIO.read exact length success after retry"""
+
+        class Foo:
+            idx = 0
+            seek = None
+            tell = None
+
+            def read(self, length):
+                if self.idx == 0:
+                    self.idx += 1
+                    return b"\x00"
+
+                return b"\x01\x03\x04"
+
+        fp = DicomIO(Foo())
+        bytestream = fp.read_exact(length=4)
         assert bytestream == b"\x00\x01\x03\x04"
 
     def test_read_exact_length_raises(self):
         """Test DicomIO.read exact length raises if short"""
         fp = DicomBytesIO(b"\x00\x01\x03")
-        fp.is_little_endian = True
         with pytest.raises(
             EOFError,
             match="Unexpected end of file. Read 3 bytes of 4 "
             "expected starting at position 0x0",
         ):
-            fp.read(length=4, need_exact_length=True)
+            fp.read_exact(length=4)
 
     def test_getter_is_little_endian(self):
         """Test DicomIO.is_little_endian getter"""
-        fp = DicomIO()
+        fp = DicomIO(BytesIO())
         fp.is_little_endian = True
         assert fp.is_little_endian
         fp.is_little_endian = False
@@ -185,69 +200,80 @@ class TestDicomIO:
 
     def test_setter_is_little_endian(self):
         """Test DicomIO.is_little_endian setter"""
-        fp = DicomIO()
-        fp.is_little_endian = True
-        assert fp.read_US == fp.read_leUS
-        assert fp.read_UL == fp.read_leUL
-        assert fp.write_US == fp.write_leUS
-        assert fp.write_UL == fp.write_leUL
-        assert fp.read_tag == fp.read_le_tag
+        fp = DicomIO(BytesIO())
+        for is_little in (True, False):
+            fp.is_little_endian = is_little
+            assert hasattr(fp, "_us_packer")
+            assert hasattr(fp, "_us_unpacker")
+            assert hasattr(fp, "_ul_packer")
+            assert hasattr(fp, "_ul_unpacker")
+            assert hasattr(fp, "_us_packer")
+            assert hasattr(fp, "_tag_packer")
+            assert hasattr(fp, "_tag_unpacker")
 
-        fp.is_little_endian = False
-        assert fp.read_US == fp.read_beUS
-        assert fp.read_UL == fp.read_beUL
-        assert fp.write_US == fp.write_beUS
-        assert fp.write_UL == fp.write_beUL
-        assert fp.read_tag == fp.read_be_tag
+        msg = "'DicomIO.is_little_endian' must be bool"
+        with pytest.raises(TypeError, match=msg):
+            fp.is_little_endian = None
 
     def test_is_implicit_vr(self):
         """Test DicomIO.is_implicit_VR"""
-        fp = DicomIO()
+        fp = DicomIO(BytesIO())
         fp.is_implicit_VR = True
         assert fp.is_implicit_VR
         fp.is_implicit_VR = False
         assert not fp.is_implicit_VR
 
+        msg = "'DicomIO.is_implicit_VR' must be bool"
+        with pytest.raises(TypeError, match=msg):
+            fp.is_implicit_VR = None
 
-class TestDicomFileLike:
-    """Test filebase.DicomFileLike class"""
+    def test_methods_raise(self):
+        """Test various DicomIO methods raise exceptions."""
 
-    def test_init_good_parent(self):
-        """Test methods are set OK if parent is good"""
-        fp = DicomFileLike(BytesIO())
-        assert fp.parent_read == fp.parent.read
-        assert fp.write == fp.parent.write
-        assert fp.seek == fp.parent.seek
+        class Reader:
+            def read(self):
+                pass
 
-    def test_init_bad_parent(self):
-        """Test exceptions raised if parent has no IO methods"""
+            def seek(self):
+                pass
 
-        class IntPlus(int):
             def tell(self):
                 pass
 
-            def close(self):
+        class Writer:
+            def write(self, b):
                 pass
 
-        fp = DicomFileLike(IntPlus)
-        with pytest.raises(
-            OSError, match=r"This DicomFileLike object has no write\(\) " r"method"
-        ):
-            fp.write(b"")
-        with pytest.raises(
-            OSError, match=r"This DicomFileLike object has no read\(\) " r"method"
-        ):
-            fp.parent_read(b"")
-        with pytest.raises(
-            OSError, match=r"This DicomFileLike object has no seek\(\) " r"method"
-        ):
-            fp.seek(0, 1)
+            def seek(self):
+                pass
+
+            def tell(self):
+                pass
+
+        with pytest.raises(TypeError, match=r"object has no read\(\) method"):
+            DicomIO(Writer()).read(2)
+        with pytest.raises(TypeError, match=r"object has no write\(\) method"):
+            DicomIO(Reader()).write(b"")
+
+        fp = DicomIO(Reader())
         assert fp.name == "<no filename>"
+        fp.close()  # no exceptions
+
+    def test_init_good_buffer(self):
+        """Test methods are set OK if buffer is good"""
+        buffer = BytesIO()
+        fp = DicomFileLike(buffer)
+        assert fp._buffer == buffer
+        assert fp.write == buffer.write
+        assert fp.seek == buffer.seek
+        assert fp.read == buffer.read
+        assert fp.tell == buffer.tell
+        assert fp.close == buffer.close
 
     def test_context(self):
         """Test using DicomFileLike as a context"""
-        with DicomFileLike(BytesIO(b"\x00\x01")) as fp:
-            assert fp.parent_read(2) == b"\x00\x01"
+        with DicomIO(BytesIO(b"\x00\x01")) as fp:
+            assert fp.read(2) == b"\x00\x01"
 
 
 class TestDicomBytesIO:
@@ -265,7 +291,7 @@ class TestDicomFile:
     def test_read(self):
         """Test the function"""
         with DicomFile(TEST_FILE, "rb") as fp:
-            assert not fp.parent.closed
+            assert not fp._buffer.closed
             # Weird issue with Python 3.6 sometimes returning
             #   lowercase file path on Windows
             assert "ct_small.dcm" in fp.name.lower()

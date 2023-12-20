@@ -805,12 +805,18 @@ class TestReader:
             dcmread("InvalidFilePath")
         with pytest.raises(
             TypeError,
-            match="dcmread: Expected a file path or " "a file-like, but got None",
+            match=(
+                "dcmread: Expected a file path, file-like or readable "
+                "buffer, but got NoneType"
+            ),
         ):
             dcmread(None)
         with pytest.raises(
             TypeError,
-            match="dcmread: Expected a file path or " "a file-like, but got int",
+            match=(
+                "dcmread: Expected a file path, file-like or readable "
+                "buffer, but got int"
+            ),
         ):
             dcmread(42)
 

@@ -1058,7 +1058,7 @@ class TestDatasetCompress:
         ds.PixelData = None
         ds._pixel_array = None
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
-        assert id(ds.pixel_array) != id(arr)
+        assert arr is not ds.pixel_array
         assert np.array_equal(arr, ds.pixel_array)
 
     def test_planar_configuration(self):

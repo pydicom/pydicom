@@ -140,6 +140,7 @@ ignore_missing_imports = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+disable_error_code = ["method-assign"]
 
 [[tool.mypy.overrides]]
 # 2023-06: mypy complains for a line in this file if ignore used or not.
