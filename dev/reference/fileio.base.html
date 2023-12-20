@@ -142,17 +142,17 @@
 <p>Basic I/O support classes.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomBytesIO</span></code></a>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomBytesIO</span></code></a>([initial_bytes])</p></td>
+<td><p>Wrapper for <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BytesIO</span></code></a> to simplify encoding/decoding DICOM datasets.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomFile.html#pydicom.filebase.DicomFile" title="pydicom.filebase.DicomFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomFile</span></code></a>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<td><p>Return an opened <a class="reference internal" href="generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomFileLike</span></code></a> from a file-like.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomFileLike</span></code></a>(file_like_obj, *args, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomFileLike</span></code></a>(buffer)</p></td>
+<td><p>Wrapper for file-likes to simplify encoding/decoding DICOM datasets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomIO</span></code></a>(*args, **kwargs)</p></td>
-<td><p>File object which holds transfer syntax info and anything else we need.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DicomIO</span></code></a>(buffer)</p></td>
+<td><p>Wrapper for managing buffer-like objects used when reading or writing DICOM datasets.</p></td>
 </tr>
 </tbody>
 </table>

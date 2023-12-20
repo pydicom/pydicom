@@ -14,22 +14,17 @@
    .. autosummary::
    
       ~DicomFileLike.__init__
-      ~DicomFileLike.no_read
-      ~DicomFileLike.no_seek
-      ~DicomFileLike.no_write
+      ~DicomFileLike.close
       ~DicomFileLike.read
-      ~DicomFileLike.read_beUL
-      ~DicomFileLike.read_beUS
-      ~DicomFileLike.read_be_tag
-      ~DicomFileLike.read_leUL
-      ~DicomFileLike.read_leUS
-      ~DicomFileLike.read_le_tag
+      ~DicomFileLike.read_UL
+      ~DicomFileLike.read_US
+      ~DicomFileLike.read_exact
+      ~DicomFileLike.read_tag
+      ~DicomFileLike.seek
+      ~DicomFileLike.tell
+      ~DicomFileLike.write
       ~DicomFileLike.write_UL
       ~DicomFileLike.write_US
-      ~DicomFileLike.write_beUL
-      ~DicomFileLike.write_beUS
-      ~DicomFileLike.write_leUL
-      ~DicomFileLike.write_leUS
       ~DicomFileLike.write_tag
    
    
@@ -40,9 +35,9 @@
 
    .. autosummary::
    
-      ~DicomFileLike.defer_size
       ~DicomFileLike.is_implicit_VR
       ~DicomFileLike.is_little_endian
-      ~DicomFileLike.max_read_attempts
+      ~DicomFileLike.name
+      ~DicomFileLike.parent
    
    

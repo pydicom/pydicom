@@ -142,106 +142,99 @@
 <h1>pydicom.filebase.DicomFileLike<a class="headerlink" href="#pydicom-filebase-dicomfilelike" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydicom.filebase.DicomFileLike">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.filebase.</span></span><span class="sig-name descname"><span class="pre">DicomFileLike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_like_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TextIO" title="(in Python v3.12)"><span class="pre">TextIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.12)"><span class="pre">BinaryIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">BytesIO</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adfdd9c9a/pydicom/filebase.py#L165"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike" title="Link to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.filebase.</span></span><span class="sig-name descname"><span class="pre">DicomFileLike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReadableBuffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">WriteableBuffer</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adc43623a/pydicom/filebase.py#L265"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike" title="Link to this definition">¶</a></dt>
+<dd><p>Wrapper for file-likes to simplify encoding/decoding DICOM datasets.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomIO</span></code></a>, <a class="reference internal" href="pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomBytesIO</span></code></a></p>
+</div>
+<dl class="py method">
 <dt class="sig sig-object py" id="pydicom.filebase.DicomFileLike.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_like_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TextIO" title="(in Python v3.12)"><span class="pre">TextIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.12)"><span class="pre">BinaryIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">BytesIO</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adfdd9c9a/pydicom/filebase.py#L166"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike.__init__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReadableBuffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">WriteableBuffer</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adc43623a/pydicom/filebase.py#L45"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new <code class="docutils literal notranslate"><span class="pre">DicomIO</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>buffer</strong> (<em>buffer-like object</em>) – <p>A buffer-like object that implements:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">seek()</span></code> and <code class="docutils literal notranslate"><span class="pre">tell()</span></code> methods with the same signatures as
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase.seek" title="(in Python v3.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">io.IOBase.seek()</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase.tell" title="(in Python v3.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">io.IOBase.tell()</span></code></a></p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">read()</span></code> method with the same signature as
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.RawIOBase.read" title="(in Python v3.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">io.RawIOBase.read()</span></code></a> if it supports reading data from
+itself, and/or</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">write()</span></code> method with the same signature as
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.RawIOBase.write" title="(in Python v3.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">io.RawIOBase.write()</span></code></a> if it supports writing data to itself</p></li>
+</ul>
+<p>If <cite>buffer</cite> supports reading it can be used with
+<a class="reference internal" href="pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> as the source to decode a DICOM
+dataset from, and if it supports writing it can be used with
+<a class="reference internal" href="pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> as the destination for the
+encoded DICOM dataset.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomFileLike.__init__" title="pydicom.filebase.DicomFileLike.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(file_like_obj, *args, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomFileLike.__init__" title="pydicom.filebase.DicomFileLike.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(buffer)</p></td>
+<td><p>Create a new <code class="docutils literal notranslate"><span class="pre">DicomIO</span></code> instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomFileLike.no_read" title="pydicom.filebase.DicomFileLike.no_read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_read</span></code></a>([size])</p></td>
-<td><p>Used for file-like objects where no read is available</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code>(*args, **kwargs)</p></td>
+<td><p>Close the buffer (if possible)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomFileLike.no_seek" title="pydicom.filebase.DicomFileLike.no_seek"><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_seek</span></code></a>(offset[, whence])</p></td>
-<td><p>Used for file-like objects where no seek is available</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>([size])</p></td>
+<td><p>Read up to <cite>size</cite> bytes from the buffer and return them.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomFileLike.no_write" title="pydicom.filebase.DicomFileLike.no_write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_write</span></code></a>(bytes_read)</p></td>
-<td><p>Used for file-like objects where no write is available</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_UL</span></code>()</p></td>
+<td><p>Return a UL value read from the buffer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>([length, need_exact_length])</p></td>
-<td><p>Reads the required length, returns EOFError if gets less</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_US</span></code>()</p></td>
+<td><p>Return a US value read from the buffer.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_beUL</span></code>()</p></td>
-<td><p>Return an unsigned long read with big endian byte order</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_exact</span></code>(length[, nr_retries])</p></td>
+<td><p>Return <cite>length</cite> bytes read from the buffer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_beUS</span></code>()</p></td>
-<td><p>Return an unsigned short from the file with big endian byte order</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_tag</span></code>()</p></td>
+<td><p>Return a DICOM tag value read from the buffer.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_be_tag</span></code>()</p></td>
-<td><p>Read and return two unsigned shorts (big endian) from the file.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">seek</span></code>(offset[, whence])</p></td>
+<td><p>Change the buffer position to the given byte <cite>offset</cite>, relative to the position indicated by <cite>whence</cite> and return the new absolute position.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_leUL</span></code>()</p></td>
-<td><p>Return an unsigned long read with little endian byte order</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tell</span></code>()</p></td>
+<td><p>Return the current stream position of the buffer</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_leUS</span></code>()</p></td>
-<td><p>Return an unsigned short from the file with little endian byte order</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(b, /)</p></td>
+<td><p>Write the bytes-like object <cite>b</cite> to the buffer and return the number of bytes written.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_le_tag</span></code>()</p></td>
-<td><p>Read and return two unsigned shorts (little endian) from the file.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_UL</span></code>(val)</p></td>
+<td><p>Write a UL value to the buffer.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_UL</span></code>(val)</p></td>
-<td><p>Write an unsigned long with little endian byte order</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_US</span></code>(val)</p></td>
+<td><p>Write a US value to the buffer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_US</span></code>(val)</p></td>
-<td><p>Write an unsigned short with little endian byte order</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_beUL</span></code>(val)</p></td>
-<td><p>Write an unsigned long with big endian byte order</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_beUS</span></code>(val)</p></td>
-<td><p>Write an unsigned short with big endian byte order</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_leUL</span></code>(val)</p></td>
-<td><p>Write an unsigned long with little endian byte order</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_leUS</span></code>(val)</p></td>
-<td><p>Write an unsigned short with little endian byte order</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_tag</span></code>(tag)</p></td>
-<td><p>Write a dicom tag (two unsigned shorts) to the file.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_tag</span></code>(tag)</p></td>
+<td><p>Write a DICOM tag to the buffer.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_size</span></code></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></p></td>
+<td><p>Get/set the VR mode for encoding/decoding.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_little_endian</span></code></p></td>
+<td><p>Get/set the endianness for encoding/decoding, <code class="docutils literal notranslate"><span class="pre">True</span></code> for little endian and <code class="docutils literal notranslate"><span class="pre">False</span></code> for big endian.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_little_endian</span></code></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>Return the value of the <a class="reference internal" href="pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO.parent" title="pydicom.filebase.DicomIO.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a>'s <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute, or <code class="docutils literal notranslate"><span class="pre">&quot;&lt;no</span> <span class="pre">filename&gt;&quot;</span></code> if no such attribute.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_read_attempts</span></code></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent</span></code></p></td>
+<td><p>Return the buffer object being wrapped.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydicom.filebase.DicomFileLike.no_read">
-<span class="sig-name descname"><span class="pre">no_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adfdd9c9a/pydicom/filebase.py#L182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike.no_read" title="Link to this definition">¶</a></dt>
-<dd><p>Used for file-like objects where no read is available</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydicom.filebase.DicomFileLike.no_seek">
-<span class="sig-name descname"><span class="pre">no_seek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">whence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adfdd9c9a/pydicom/filebase.py#L186"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike.no_seek" title="Link to this definition">¶</a></dt>
-<dd><p>Used for file-like objects where no seek is available</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydicom.filebase.DicomFileLike.no_write">
-<span class="sig-name descname"><span class="pre">no_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_read</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/adfdd9c9a/pydicom/filebase.py#L178"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filebase.DicomFileLike.no_write" title="Link to this definition">¶</a></dt>
-<dd><p>Used for file-like objects where no write is available</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
