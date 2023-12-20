@@ -19,7 +19,7 @@ try:
 except ImportError:
     HAVE_JPEGLS = False
 
-from pydicom.encaps import decode_data_sequence, defragment_data
+from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
 import pydicom.uid
 
@@ -107,15 +107,10 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     pixel_bytes = bytearray()
 
-    nr_frames = get_nr_frames(ds)
-    if nr_frames > 1:
-        for src in decode_data_sequence(ds.PixelData):
-            frame = jpeg_ls.decode(numpy.frombuffer(src, dtype="u1"))
-            pixel_bytes.extend(frame.tobytes())
-    else:
-        src = defragment_data(ds.PixelData)
-        frame = jpeg_ls.decode(numpy.frombuffer(src, dtype="u1"))
-        pixel_bytes.extend(frame.tobytes())
+    nr_frames = get_nr_frames(ds, warn=False)
+    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
+        im = jpeg_ls.decode(numpy.frombuffer(frame, dtype="u1"))
+        pixel_bytes.extend(im.tobytes())
 
     arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
