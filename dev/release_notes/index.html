@@ -380,6 +380,8 @@ being able to escape the temporary directory when being added to a
 values for odd-length frames (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1968">#1968</a>)</p></li>
 <li><p>Fixed using the incorrect encoding when writing datasets converted between
 explicit and implicit VR when only the <em>Transfer Syntax UID</em> was changed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1943">#1943</a>)</p></li>
+<li><p>Fixed the <code class="docutils literal notranslate"><span class="pre">jpeg_ls</span></code>, <code class="docutils literal notranslate"><span class="pre">pillow</span></code> and <code class="docutils literal notranslate"><span class="pre">rle</span></code> pixel data handlers not working
+correctly when a frame is spread across multiple fragments (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1774">#1774</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">
