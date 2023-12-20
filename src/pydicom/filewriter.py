@@ -1264,7 +1264,7 @@ def dcmwrite(
     cls_name = dataset.__class__.__name__
 
     # Check for disallowed tags
-    bad_tags = [group for x in dataset._dict if (group := x >> 16) in (0, 2)]
+    bad_tags = [x >> 16 for x in dataset._dict if x >> 16 in (0, 2)]
     if bad_tags:
         if 0 in bad_tags:
             raise ValueError(
