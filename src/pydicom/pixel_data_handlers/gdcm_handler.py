@@ -286,7 +286,9 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     tsyntax = ds.file_meta.TransferSyntaxUID
     if config.APPLY_J2K_CORRECTIONS and tsyntax in [JPEG2000, JPEG2000Lossless]:
         nr_frames = get_nr_frames(ds)
-        codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
+        codestream = next(
+            generate_pixel_data(ds.PixelData, number_of_frames=nr_frames)
+        )[0]
 
         params = get_j2k_parameters(codestream)
         j2k_precision = cast(int, params.setdefault("precision", ds.BitsStored))

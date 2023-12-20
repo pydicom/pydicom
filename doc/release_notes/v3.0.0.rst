@@ -119,6 +119,12 @@ Enhancements
   syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
   method
 * Warning messages are also sent to the pydicom logger (:issue:`1529`)
+* Added :func:`~pydicom.encaps.get_frame` to make it easier to get the
+  encapsulated pixel data for a given frame
+* Added `extended_offsets` and `little_endian` keyword parameters to
+  :func:`~pydicom.encaps.generate_pixel_data` and
+  :func:`~pydicom.encaps.generate_pixel_data_frame` and made `number_of_frames`
+  keyword only
 
 Fixes
 -----

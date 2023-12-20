@@ -19,6 +19,7 @@ Parsing Encapsulated Data
    generate_pixel_data
    generate_pixel_data_fragment
    generate_pixel_data_frame
+   get_frame
    get_frame_offsets
    read_item
 
