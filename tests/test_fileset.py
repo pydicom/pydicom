@@ -149,7 +149,7 @@ def private(dicomdir):
         fp.is_little_endian = True
         write_dataset(fp, ds)
 
-        return fp.parent.getvalue()
+        return fp.getvalue()
 
     def private_record():
         record = Dataset()
@@ -2523,8 +2523,7 @@ class TestFileSet_Copy:
             assert ref.SOPInstanceUID == instance.SOPInstanceUID
 
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
-        assert not ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding == (False, True)
         assert not cp.is_staged
         assert "NEW ID" == cp.ID
         assert uid == cp.UID
@@ -2562,8 +2561,7 @@ class TestFileSet_Copy:
             assert ref.SOPInstanceUID == instance.SOPInstanceUID
 
         assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
-        assert ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding == (True, True)
 
     def test_file_id(self, tiny, tdir):
         """Test that the File IDs character sets switch correctly."""

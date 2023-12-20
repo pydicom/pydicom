@@ -258,7 +258,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     if missing:
         raise AttributeError(
             "Unable to convert the pixel data as the following required "
-            "elements are missing from the dataset: " + ", ".join(missing)
+            f"elements are missing from the dataset: {', '.join(missing)}"
         )
 
     decoder = _DECODERS[tsyntax]

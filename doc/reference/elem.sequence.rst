@@ -11,4 +11,3 @@ Representation of the value for sequence data elements and utilities.
    :toctree: generated/
 
    Sequence
-   validate_dataset

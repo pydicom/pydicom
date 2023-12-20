@@ -6,7 +6,7 @@ from collections.abc import Iterator, Sequence
 
 import pydicom.config
 from pydicom.misc import warn_and_log
-from pydicom.filebase import DicomBytesIO, DicomFileLike
+from pydicom.filebase import DicomBytesIO, DicomIO
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 
@@ -14,7 +14,7 @@ Buffer = bytes | bytearray | memoryview
 
 
 # Functions for parsing encapsulated data
-def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
+def get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
     """Return a list of the fragment offsets from the Basic Offset Table.
 
     **Basic Offset Table**
@@ -53,7 +53,7 @@ def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
 
     Parameters
     ----------
-    fp : filebase.DicomFileLike
+    fp : filebase.DicomIO
         The encapsulated pixel data positioned at the start of the Basic Offset
         Table. ``fp.is_little_endian`` should be set to ``True``.
 
@@ -148,7 +148,7 @@ def _get_frame_offsets(
     )
 
 
-def get_nr_fragments(fp: DicomFileLike) -> int:
+def get_nr_fragments(fp: DicomIO) -> int:
     """Return the number of fragments in `fp`.
 
     .. versionadded:: 1.4
@@ -236,7 +236,7 @@ def _get_nr_fragments(buffer: Buffer, little_endian: bool = True) -> int:
     return nr_fragments
 
 
-def generate_pixel_data_fragment(fp: DicomFileLike) -> Iterator[bytes]:
+def generate_pixel_data_fragment(fp: DicomIO) -> Iterator[bytes]:
     """Yield the encapsulated pixel data fragments.
 
     For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
@@ -272,7 +272,7 @@ def generate_pixel_data_fragment(fp: DicomFileLike) -> Iterator[bytes]:
 
     Parameters
     ----------
-    fp : filebase.DicomFileLike
+    fp : filebase.DicomIO
         The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
         item. ``fp.is_little_endian`` should be set to ``True``.
@@ -656,7 +656,7 @@ def defragment_data(data: bytes) -> bytes:
 
 
 # read_item modeled after filereader.ReadSequenceItem
-def read_item(fp: DicomFileLike) -> bytes | None:
+def read_item(fp: DicomIO) -> bytes | None:
     """Read and return a single Item in the fragmented data stream.
 
     Parameters

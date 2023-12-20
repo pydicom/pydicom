@@ -24,6 +24,7 @@ except ImportError:
     HAVE_GDCM = False
 
 
+from pydicom import config
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.encoders import RLELosslessEncoder
@@ -998,8 +999,6 @@ class TestDatasetCompress:
         assert len(ds.PixelData) == 21370
         assert "PlanarConfiguration" not in ds
         assert ds["PixelData"].is_undefined_length
-        assert not ds.is_implicit_VR
-        assert ds.is_little_endian
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
@@ -1007,16 +1006,12 @@ class TestDatasetCompress:
         ds = get_testdata_file("CT_small.dcm", read=True)
         assert hasattr(ds, "file_meta")
         arr = ds.pixel_array
-        ds._is_implicit_VR = True
-        assert ds.is_little_endian
         del ds.PixelData
         del ds.file_meta
 
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert len(ds.PixelData) == 21370
-        assert not ds.is_implicit_VR
-        assert ds.is_little_endian
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_encoder_unavailable(self, monkeypatch):
@@ -1060,9 +1055,10 @@ class TestDatasetCompress:
         """Test an encoding round-trip"""
         ds = get_testdata_file("MR_small_RLE.dcm", read=True)
         arr = ds.pixel_array
-        del ds.PixelData
+        ds.PixelData = None
+        ds._pixel_array = None
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
-        assert id(ds.pixel_array) != id(arr)
+        assert arr is not ds.pixel_array
         assert np.array_equal(arr, ds.pixel_array)
 
     def test_planar_configuration(self):
@@ -1086,3 +1082,18 @@ class TestDatasetCompress:
         ds.compress(RLELossless, encoding_plugin="pydicom", samples_per_pixel=3)
         ds.SamplesPerPixel = 3
         assert np.array_equal(ref, ds.pixel_array)
+
+
+@pytest.fixture
+def use_future():
+    config._use_future = True
+    yield
+    config._use_future = False
+
+
+class TestFuture:
+    def test_compress(self, use_future):
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds.compress(RLELossless, encoding_plugin="pydicom")
+        assert not hasattr(ds, "_is_little_endian")
+        assert not hasattr(ds, "_is_implicit_VR")
