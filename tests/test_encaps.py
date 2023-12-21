@@ -1,6 +1,8 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Test for encaps.py"""
 
+from io import BytesIO
+import mmap
 from struct import unpack
 
 import pytest
@@ -17,13 +19,14 @@ from pydicom.encaps import (
     defragment_data,
     read_item,
     fragment_frame,
-    itemise_frame,
+    itemize_frame,
     encapsulate,
     encapsulate_extended,
-    _get_frame_offsets,
-    _get_nr_fragments,
-    _generate_fragments,
-    # _generate_frame_data,
+    parse_basic_offsets,
+    parse_fragments,
+    generate_fragments,
+    generate_fragmented_frames,
+    generate_frames,
     get_frame,
 )
 from pydicom.filebase import DicomBytesIO
@@ -330,10 +333,8 @@ class TestGeneratePixelDataFragment:
         bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
-        fragments = generate_pixel_data_fragment(fp)
         with pytest.raises(ValueError, match="'fp.is_little_endian' must be True"):
-            next(fragments)
-        pytest.raises(StopIteration, next, fragments)
+            generate_pixel_data_fragment(fp)
 
 
 class TestGeneratePixelDataFrames:
@@ -369,7 +370,7 @@ class TestGeneratePixelDataFrames:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream, number_of_frames=1)
+        frames = generate_pixel_data_frame(bytestream, 1)
         assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
         pytest.raises(StopIteration, next, frames)
 
@@ -492,9 +493,7 @@ class TestGeneratePixelDataFrames:
         # Regression test for #685
         ds = dcmread(JP2K_10FRAME_NOBOT)
         assert 10 == ds.NumberOfFrames
-        frame_gen = generate_pixel_data_frame(
-            ds.PixelData, number_of_frames=ds.NumberOfFrames
-        )
+        frame_gen = generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)
         for ii in range(10):
             next(frame_gen)
 
@@ -535,7 +534,7 @@ class TestGeneratePixelData:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream, number_of_frames=1)
+        frames = generate_pixel_data(bytestream, 1)
         assert next(frames) == (
             b"\x01\x00\x00\x00",
             b"\x02\x00\x00\x00",
@@ -578,7 +577,7 @@ class TestGeneratePixelData:
             r"the dataset may be corrupt or the number of frames may be incorrect"
         )
         with pytest.raises(ValueError, match=msg):
-            next(generate_pixel_data_frame(ds.PixelData, number_of_frames=20))
+            next(generate_pixel_data_frame(ds.PixelData, 20))
 
     def test_empty_bot_multi_fragments_per_frame(self):
         """Test parsing with multiple fragments per frame."""
@@ -593,7 +592,7 @@ class TestGeneratePixelData:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
         )
 
-        frames = generate_pixel_data(bytestream, number_of_frames=4)
+        frames = generate_pixel_data(bytestream, 4)
         for ii in range(4):
             next(frames)
 
@@ -613,7 +612,7 @@ class TestGeneratePixelData:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
         )
 
-        frames = generate_pixel_data(bytestream, number_of_frames=4)
+        frames = generate_pixel_data(bytestream, 4)
         for ii in range(3):
             next(frames)
 
@@ -646,9 +645,7 @@ class TestGeneratePixelData:
             "fewer frames than expected have been found"
         )
         with pytest.warns(UserWarning, match=msg):
-            for ii, frame in enumerate(
-                generate_pixel_data(bytestream, number_of_frames=4)
-            ):
+            for ii, frame in enumerate(generate_pixel_data(bytestream, 4)):
                 pass
 
         assert 2 == ii
@@ -1177,12 +1174,12 @@ class TestFragmentFrame:
 
 
 class TestEncapsulateFrame:
-    """Test encaps.itemise_frame."""
+    """Test encaps.itemize_frame."""
 
     def test_single_item(self):
         """Test encapsulating into one fragment"""
         bytestream = b"\xFE\xFF\x00\xE1"
-        item_generator = itemise_frame(bytestream, nr_fragments=1)
+        item_generator = itemize_frame(bytestream, nr_fragments=1)
         item = next(item_generator)
 
         assert item == (b"\xfe\xff\x00\xe0\x04\x00\x00\x00\xFE\xFF\x00\xE1")
@@ -1192,7 +1189,7 @@ class TestEncapsulateFrame:
     def test_two_items(self):
         """Test encapsulating into two fragments"""
         bytestream = b"\xFE\xFF\x00\xE1"
-        item_generator = itemise_frame(bytestream, nr_fragments=2)
+        item_generator = itemize_frame(bytestream, nr_fragments=2)
 
         item = next(item_generator)
         assert item == (b"\xfe\xff\x00\xe0\x02\x00\x00\x00\xFE\xFF")
@@ -1209,7 +1206,9 @@ class TestEncapsulate:
     def test_encapsulate_single_fragment_per_frame_no_bot(self):
         """Test encapsulating single fragment per frame with no BOT values."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = decode_data_sequence(ds.PixelData)
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=False)
@@ -1223,7 +1222,9 @@ class TestEncapsulate:
     def test_encapsulate_single_fragment_per_frame_bot(self):
         """Test encapsulating single fragment per frame with BOT values."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = decode_data_sequence(ds.PixelData)
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
@@ -1250,7 +1251,9 @@ class TestEncapsulate:
     def test_encapsulate_bot(self):
         """Test the Basic Offset Table is correct."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = decode_data_sequence(ds.PixelData)
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
@@ -1303,13 +1306,17 @@ class TestEncapsulateExtended:
 
     def test_encapsulate(self):
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = decode_data_sequence(ds.PixelData)
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
         assert len(frames) == 10
 
         out = encapsulate_extended(frames)
         # Pixel Data encapsulated OK
         assert isinstance(out[0], bytes)
-        test_frames = decode_data_sequence(out[0])
+        test_frames = [
+            f for f in generate_frames(out[0], number_of_frames=ds.NumberOfFrames)
+        ]
         for a, b in zip(test_frames, frames):
             assert a == b
 
@@ -1340,20 +1347,31 @@ class TestEncapsulateExtended:
         assert unpack(f"<{len(frames)}Q", eot_lengths) == (2, 2, 2)
 
 
-class TestBuffer_GetFrameOffsets:
-    """Tests for _get_frame_offsets()"""
+def as_bytesio(buffer):
+    buffer = BytesIO(buffer)
+    buffer.seek(0)
+    return buffer
+
+
+class TestParseBasicOffsets:
+    """Tests for parse_basic_offsets()"""
 
     def test_bad_tag(self):
         """Test raises exception if no item tag."""
         # (FFFE,E100)
         buffer = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         msg = r"Unexpected tag '\(FFFE,E100\)' when parsing the Basic Table Offset item"
-        with pytest.raises(ValueError, match=msg):
-            _get_frame_offsets(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_basic_offsets(buffer)
 
+        buffer = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         msg = r"Unexpected tag '\(FEFF,00E1\)' when parsing the Basic Table Offset item"
-        with pytest.raises(ValueError, match=msg):
-            _get_frame_offsets(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_basic_offsets(buffer, little_endian=False)
 
     def test_bad_length_multiple(self):
         """Test raises exception if the item length is not a multiple of 4."""
@@ -1363,28 +1381,39 @@ class TestBuffer_GetFrameOffsets:
             b"\x0A\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A"
         )
-
         msg = "The length of the Basic Offset Table item is not a multiple of 4"
-        with pytest.raises(ValueError, match=msg):
-            _get_frame_offsets(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_basic_offsets(buffer)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
             b"\x00\x00\x00\x0A"
             b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A"
         )
-        with pytest.raises(ValueError, match=msg):
-            _get_frame_offsets(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_basic_offsets(buffer, little_endian=False)
 
     def test_zero_length(self):
         """Test reading BOT with zero length"""
         # Little endian
         buffer = b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-        assert (8, []) == _get_frame_offsets(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert (8, []) == parse_basic_offsets(buffer)
+
+        assert buffer.tell() == 8
 
         # Big endian
         buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x00"
-        assert (8, []) == _get_frame_offsets(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert (8, []) == parse_basic_offsets(buffer, little_endian=False)
+
+        assert buffer.tell() == 8
 
     def test_multi_frame(self):
         """Test reading multi-frame BOT item"""
@@ -1397,7 +1426,11 @@ class TestBuffer_GetFrameOffsets:
             b"\xF4\x25\x00\x00"
             b"\xFE\x37\x00\x00"
         )
-        assert (24, [0, 4966, 9716, 14334]) == _get_frame_offsets(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert (24, [0, 4966, 9716, 14334]) == parse_basic_offsets(buffer)
+
+        assert buffer.tell() == 24
 
         # Big endian
         buffer = (
@@ -1408,23 +1441,35 @@ class TestBuffer_GetFrameOffsets:
             b"\x00\x00\x25\xF4"
             b"\x00\x00\x37\xFE"
         )
-        assert (24, [0, 4966, 9716, 14334]) == _get_frame_offsets(
-            buffer, little_endian=False
-        )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert (24, [0, 4966, 9716, 14334]) == parse_basic_offsets(
+                buffer, little_endian=False
+            )
+
+        assert buffer.tell() == 24
 
     def test_single_frame(self):
         """Test reading single-frame BOT item"""
         # Little endian
         buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00"
-        assert (12, [0]) == _get_frame_offsets(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert (12, [0]) == parse_basic_offsets(buffer)
+
+        assert buffer.tell() == 12
 
         # Big endian
         buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x00\x00\x00\x00"
-        assert (12, [0]) == _get_frame_offsets(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert (12, [0]) == parse_basic_offsets(buffer, little_endian=False)
+
+        assert buffer.tell() == 12
 
 
-class TestBuffer_GetNrFragments:
-    """Tests for _get_nr_fragments()"""
+class TestParseFragments:
+    """Tests for parse_fragments()"""
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
@@ -1434,12 +1479,16 @@ class TestBuffer_GetNrFragments:
             "Undefined item length at offset 4 when "
             "parsing the encapsulated pixel data fragments"
         )
-        with pytest.raises(ValueError, match=msg):
-            _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_fragments(buffer)
 
         buffer = b"\xFF\xFE\xE0\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
-        with pytest.raises(ValueError, match=msg):
-            _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_fragments(buffer, little_endian=False)
 
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
@@ -1447,25 +1496,29 @@ class TestBuffer_GetNrFragments:
             b"\xFE\xFF\x00\xE0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xFE\xFF\xDD\xE0"  # sequence delimiter
             b"\x00\x00\x00\x00"
             b"\xFE\xFF\x00\xE0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
-        assert 1 == _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 1, [8] == parse_fragments(buffer)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
-            b"\xFF\xFE\xE0\xDD"
+            b"\xFF\xFE\xE0\xDD"  # sequence delimiter
             b"\x00\x00\x00\x00"
             b"\xFF\xFE\xE0\x00"
             b"\x00\x00\x00\x04`"
             b"\x00\x00\x00\x02"
         )
-        assert 1 == _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 1, [8] == parse_fragments(buffer, little_endian=False)
 
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
@@ -1483,8 +1536,10 @@ class TestBuffer_GetNrFragments:
             r"Unexpected tag '\(0010,0010\)' at offset 12 when parsing the "
             r"encapsulated pixel data fragment items"
         )
-        with pytest.raises(ValueError, match=msg):
-            _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_fragments(buffer)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1496,16 +1551,26 @@ class TestBuffer_GetNrFragments:
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x02"
         )
-        with pytest.raises(ValueError, match=msg):
-            _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_fragments(buffer, little_endian=False)
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
         buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-        assert 1 == _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 1, [8] == parse_fragments(buffer)
+
+        assert buffer.tell() == 0
 
         buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x00\x00\x00\x01"
-        assert 1 == _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 1, [8] == parse_fragments(buffer, little_endian=False)
+
+        assert buffer.tell() == 0
 
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
@@ -1517,7 +1582,11 @@ class TestBuffer_GetNrFragments:
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
-        assert 2 == _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 2, [8, 20] == parse_fragments(buffer)
+
+        assert buffer.tell() == 0
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1527,7 +1596,11 @@ class TestBuffer_GetNrFragments:
             b"\x00\x00\x00\x06"
             b"\x01\x02\x03\x04\x05\x06"
         )
-        assert 2 == _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 2, [8, 20] == parse_fragments(buffer, little_endian=False)
+
+        assert buffer.tell() == 0
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
@@ -1537,7 +1610,11 @@ class TestBuffer_GetNrFragments:
             b"\x01\x00\x00\x00"
             b"\xFE\xFF\xDD\xE0"
         )
-        assert 1 == _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 1, [8] == parse_fragments(buffer)
+
+        assert buffer.tell() == 0
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1545,7 +1622,11 @@ class TestBuffer_GetNrFragments:
             b"\x00\x00\x00\x01"
             b"\xFF\xFE\xE0\xDD"
         )
-        assert 1 == _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 1, [8] == parse_fragments(buffer, little_endian=False)
+
+        assert buffer.tell() == 0
 
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
@@ -1558,7 +1639,11 @@ class TestBuffer_GetNrFragments:
             b"\x01\x02\x03\x04\x05\x06"
             b"\xFE\xFF\xDD\xE0"
         )
-        assert 2 == _get_nr_fragments(buffer)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 2, [8, 20] == parse_fragments(buffer)
+
+        assert buffer.tell() == 0
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1569,24 +1654,39 @@ class TestBuffer_GetNrFragments:
             b"\x01\x02\x03\x04\x05\x06"
             b"\xFF\xFE\xE0\xDD"
         )
-        assert 2 == _get_nr_fragments(buffer, little_endian=False)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            assert 2, [8, 20] == parse_fragments(buffer, little_endian=False)
+
+        assert buffer.tell() == 0
 
 
-class TestBuffer_GenerateFragments:
+class TestGenerateFragments:
     """Test generate_fragments()"""
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
         buffer = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
-        fragments = _generate_fragments(buffer)
         msg = (
             "Undefined item length at offset 4 when parsing the encapsulated "
             "pixel data fragments"
         )
-        with pytest.raises(ValueError, match=msg):
-            next(fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            with pytest.raises(ValueError, match=msg):
+                next(fragments)
 
-        pytest.raises(StopIteration, next, fragments)
+            pytest.raises(StopIteration, next, fragments)
+
+        buffer = b"\xFF\xFE\xE0\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            with pytest.raises(ValueError, match=msg):
+                next(fragments)
+
+            pytest.raises(StopIteration, next, fragments)
 
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
@@ -1600,9 +1700,11 @@ class TestBuffer_GenerateFragments:
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
-        fragments = _generate_fragments(buffer)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, fragments)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1614,9 +1716,11 @@ class TestBuffer_GenerateFragments:
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x02"
         )
-        fragments = _generate_fragments(buffer, little_endian=False)
-        assert next(fragments) == b"\x00\x00\x00\x01"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            assert next(fragments) == b"\x00\x00\x00\x01"
+            pytest.raises(StopIteration, next, fragments)
 
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
@@ -1630,15 +1734,17 @@ class TestBuffer_GenerateFragments:
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
-        fragments = _generate_fragments(buffer)
-        assert next(fragments) == b"\x01\x00\x00\x00"
         msg = (
             r"Unexpected tag '\(0010,0010\)' at offset 12 when parsing the "
             "encapsulated pixel data fragment items"
         )
-        with pytest.raises(ValueError, match=msg):
-            next(fragments)
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                next(fragments)
+            pytest.raises(StopIteration, next, fragments)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1650,23 +1756,29 @@ class TestBuffer_GenerateFragments:
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
-        fragments = _generate_fragments(buffer, little_endian=False)
-        assert next(fragments) == b"\x00\x00\x00\x01"
-        with pytest.raises(ValueError, match=msg):
-            next(fragments)
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            assert next(fragments) == b"\x00\x00\x00\x01"
+            with pytest.raises(ValueError, match=msg):
+                next(fragments)
+            pytest.raises(StopIteration, next, fragments)
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
         buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-        fragments = _generate_fragments(buffer)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, fragments)
 
         buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x01\x00\x00\x00"
-        fragments = _generate_fragments(buffer, little_endian=False)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, fragments)
 
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
@@ -1678,10 +1790,12 @@ class TestBuffer_GenerateFragments:
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
-        fragments = _generate_fragments(buffer)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
+            pytest.raises(StopIteration, next, fragments)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1691,10 +1805,12 @@ class TestBuffer_GenerateFragments:
             b"\x00\x00\x00\x06"
             b"\x01\x02\x03\x04\x05\x06"
         )
-        fragments = _generate_fragments(buffer, little_endian=False)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
+            pytest.raises(StopIteration, next, fragments)
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
@@ -1704,9 +1820,11 @@ class TestBuffer_GenerateFragments:
             b"\x01\x00\x00\x00"
             b"\xFE\xFF\xDD\xE0"
         )
-        fragments = _generate_fragments(buffer)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, fragments)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1714,9 +1832,11 @@ class TestBuffer_GenerateFragments:
             b"\x01\x00\x00\x00"
             b"\xFF\xFE\xE0\xDD"
         )
-        fragments = _generate_fragments(buffer, little_endian=False)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, fragments)
 
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
@@ -1729,10 +1849,12 @@ class TestBuffer_GenerateFragments:
             b"\x01\x02\x03\x04\x05\x06"
             b"\xFE\xFF\xDD\xE0"
         )
-        fragments = _generate_fragments(buffer)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
+            pytest.raises(StopIteration, next, fragments)
 
         buffer = (
             b"\xFF\xFE\xE0\x00"
@@ -1743,14 +1865,16 @@ class TestBuffer_GenerateFragments:
             b"\x01\x02\x03\x04\x05\x06"
             b"\xFF\xFE\xE0\xDD"
         )
-        fragments = _generate_fragments(buffer, little_endian=False)
-        assert next(fragments) == b"\x01\x00\x00\x00"
-        assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
-        pytest.raises(StopIteration, next, fragments)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            fragments = generate_fragments(buffer, little_endian=False)
+            assert next(fragments) == b"\x01\x00\x00\x00"
+            assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
+            pytest.raises(StopIteration, next, fragments)
 
 
-class TestBuffer_GetFrame:
-    """Tests for get_frame()"""
+class TestGenerateFragmentedFrames:
+    """Tests for generate_fragmented_frames()"""
 
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
@@ -1762,7 +1886,24 @@ class TestBuffer_GetFrame:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        assert get_frame(buffer, 0) == b"\x01\x00\x00\x00"
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer)
+            assert next(frames) == (b"\x01\x00\x00\x00",)
+            pytest.raises(StopIteration, next, frames)
+
+        buffer = (
+            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x00\x04"
+            b"\x01\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer, little_endian=False)
+            assert next(frames) == (b"\x01\x00\x00\x00",)
+            pytest.raises(StopIteration, next, frames)
 
     def test_empty_bot_triple_fragment_single_frame(self):
         """Test a single-frame image where the frame is three fragments"""
@@ -1780,9 +1921,40 @@ class TestBuffer_GetFrame:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        assert get_frame(buffer, 0, number_of_frames=1) == (
-            b"\x01\x00\x00\x00" b"\x02\x00\x00\x00" b"\x03\x00\x00\x00"
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer, number_of_frames=1)
+            assert next(frames) == (
+                b"\x01\x00\x00\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00",
+            )
+            pytest.raises(StopIteration, next, frames)
+
+        buffer = (
+            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x00\x04"
+            b"\x01\x00\x00\x00"
+            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x00\x04"
+            b"\x02\x00\x00\x00"
+            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x00\x04"
+            b"\x03\x00\x00\x00"
         )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(
+                buffer, number_of_frames=1, little_endian=False
+            )
+            assert next(frames) == (
+                b"\x01\x00\x00\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00",
+            )
+            pytest.raises(StopIteration, next, frames)
 
     def test_empty_bot_no_number_of_frames_raises(self):
         """Test parsing raises if not BOT and no number_of_frames."""
@@ -1802,20 +1974,28 @@ class TestBuffer_GetFrame:
         )
         msg = (
             r"Unable to determine the frame boundaries for the encapsulated "
-            r"pixel data as there is no Basic or Extended Offset Table "
-            r"and the number of frames has not been supplied"
+            r"pixel data as there is no Basic or Extended Offset Table and the "
+            r"number of frames has not been supplied"
         )
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 0)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                next(generate_fragmented_frames(buffer))
 
     def test_empty_bot_too_few_fragments(self):
         """Test parsing with too few fragments."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
         assert 10 == ds.NumberOfFrames
 
-        msg = "There is insufficient pixel data to contain 12 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(ds.PixelData, 11, number_of_frames=20)
+        msg = (
+            r"Unable to parse encapsulated pixel data as there is no Basic or "
+            r"Extended Offset Table and there are fewer fragments then frames; "
+            r"the dataset may be corrupt or the number of frames may be incorrect"
+        )
+        for func in (bytes, as_bytesio):
+            buffer = func(ds.PixelData)
+            with pytest.raises(ValueError, match=msg):
+                next(generate_fragmented_frames(buffer, number_of_frames=20))
 
     def test_empty_bot_multi_fragments_per_frame(self):
         """Test parsing with multiple fragments per frame."""
@@ -1829,25 +2009,16 @@ class TestBuffer_GetFrame:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
         )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer, number_of_frames=4)
+            for ii in range(4):
+                next(frames)
 
-        # Note that we can access a single "extra" frame
-        assert (
-            get_frame(buffer, 0, number_of_frames=3)
-            == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
-        )
-        assert get_frame(buffer, 1, number_of_frames=3) == b"\x01\x00\xFF\xD9"
-        assert get_frame(buffer, 2, number_of_frames=3) == b"\x01\xFF\xD9\x00"
-        assert (
-            get_frame(buffer, 3, number_of_frames=3)
-            == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
-        )
-
-        msg = "There is insufficient pixel data to contain 5 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 4, number_of_frames=3)
+            pytest.raises(StopIteration, next, frames)
 
     def test_empty_bot_no_marker(self):
-        """Test parsing no BOT and no final marker with multi fragments."""
+        """Test parsing not BOT and no final marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         buffer = (
             b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
@@ -1858,27 +2029,48 @@ class TestBuffer_GetFrame:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
         )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer, number_of_frames=4)
+            for ii in range(3):
+                next(frames)
 
-        assert (
-            get_frame(buffer, 0, number_of_frames=3)
-            == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+            msg = (
+                "The end of the encapsulated pixel data has been reached but fewer "
+                "frames than expected have been found. Please confirm that the "
+                "generated frame data is correct"
+            )
+            with pytest.warns(UserWarning, match=msg):
+                next(frames)
+
+            pytest.raises(StopIteration, next, frames)
+
+    def test_empty_bot_missing_marker(self):
+        """Test parsing no BOT and missing marker with multi fragments."""
+        # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
+        buffer = (
+            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
         )
-        assert (
-            get_frame(buffer, 1, number_of_frames=3)
-            == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
-        )
-        assert get_frame(buffer, 2, number_of_frames=3) == b"\x01\xFF\xFF\xD9"
 
         msg = (
-            "The end of the encapsulated pixel data has been reached but no "
-            "JPEG EOI/EOC marker was found, the returned frame data may be invalid"
+            "The end of the encapsulated pixel data has been reached but "
+            "fewer frames than expected have been found"
         )
-        with pytest.warns(UserWarning, match=msg):
-            assert get_frame(buffer, 3, number_of_frames=3) == b"\x01\xFF\x00\x00"
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            with pytest.warns(UserWarning, match=msg):
+                for ii, frame in enumerate(
+                    generate_fragmented_frames(buffer, number_of_frames=4)
+                ):
+                    pass
 
-        msg = "There is insufficient pixel data to contain 5 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 4, number_of_frames=3)
+            assert 2 == ii
 
     def test_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragment"""
@@ -1891,10 +2083,11 @@ class TestBuffer_GetFrame:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        assert get_frame(buffer, 0) == b"\x01\x00\x00\x00"
-        msg = "There is insufficient pixel data to contain 2 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 1)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer)
+            assert next(frames) == (b"\x01\x00\x00\x00",)
+            pytest.raises(StopIteration, next, frames)
 
     def test_bot_triple_fragment_single_frame(self):
         """Test a single-frame image where the frame is three fragments"""
@@ -1913,14 +2106,15 @@ class TestBuffer_GetFrame:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-
-        assert get_frame(buffer, 0) == (
-            b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
-        )
-
-        msg = "There is insufficient pixel data to contain 2 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 1)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer)
+            assert next(frames) == (
+                b"\x01\x00\x00\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00",
+            )
+            pytest.raises(StopIteration, next, frames)
 
     def test_multi_frame_one_to_one(self):
         """Test a multi-frame image where each frame is one fragment"""
@@ -1941,17 +2135,17 @@ class TestBuffer_GetFrame:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        assert get_frame(buffer, 0) == b"\x01\x00\x00\x00"
-        assert get_frame(buffer, 1) == b"\x02\x00\x00\x00"
-        assert get_frame(buffer, 2) == b"\x03\x00\x00\x00"
-
-        msg = "There is insufficient pixel data to contain 4 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 3)
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer)
+            assert next(frames) == (b"\x01\x00\x00\x00",)
+            assert next(frames) == (b"\x02\x00\x00\x00",)
+            assert next(frames) == (b"\x03\x00\x00\x00",)
+            pytest.raises(StopIteration, next, frames)
 
     def test_multi_frame_three_to_one(self):
         """Test a multi-frame image where each frame is three fragments"""
-        # 3 frames, each 3 fragments long
+        # 2 frames, each 3 fragments long
         buffer = (
             b"\xFE\xFF\x00\xE0"
             b"\x0C\x00\x00\x00"
@@ -1968,19 +2162,275 @@ class TestBuffer_GetFrame:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
-        assert get_frame(buffer, 0) == (
-            b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
-        )
-        assert get_frame(buffer, 1) == (
-            b"\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
-        )
-        assert get_frame(buffer, 2) == (
-            b"\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
-        )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer)
+            assert next(frames) == (
+                b"\x01\x00\x00\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00",
+            )
+            assert next(frames) == (
+                b"\x02\x00\x00\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00",
+            )
+            assert next(frames) == (
+                b"\x03\x00\x00\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00",
+            )
+            pytest.raises(StopIteration, next, frames)
 
-        msg = "There is insufficient pixel data to contain 4 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 3)
+    def test_multi_frame_varied_ratio(self):
+        """Test a multi-frame image where each frame is random fragments"""
+        # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x0E\x00\x00\x00"
+            b"\x32\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
+            b"\xFE\xFF\x00\xE0"
+            b"\x02\x00\x00\x00\x02\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x02\x00\x00\x00\x02\x04"
+        )
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer)
+            assert next(frames) == (b"\x01\x00\x00\x00\x00\x01",)
+            assert next(frames) == (
+                b"\x02\x00",
+                b"\x02\x00\x00\x00",
+                b"\x03\x00\x00\x00\x00\x02",
+            )
+            assert next(frames) == (b"\x03\x00\x00\x00", b"\x02\x04")
+            pytest.raises(StopIteration, next, frames)
+
+    def test_eot_single_fragment(self):
+        """Test a single-frame image where the frame is one fragment"""
+        # 1 frame, 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+        )
+        eot = ([0], [4])
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer, extended_offsets=eot)
+            assert next(frames) == (b"\x01\x00\x00\x00",)
+            pytest.raises(StopIteration, next, frames)
+
+    def test_eot_multi_frame(self):
+        """Test a multi-frame image where each frame is one fragment"""
+        # 3 frames, each 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x0C\x00\x00\x00"
+            b"\x18\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"  # 0
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"  # 12
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"  # 24
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        eot = ([0, 12, 24], [4, 4, 4])
+        for func in (bytes, as_bytesio):
+            buffer = func(buffer)
+            frames = generate_fragmented_frames(buffer, extended_offsets=eot)
+            assert next(frames) == (b"\x01\x00\x00\x00",)
+            assert next(frames) == (b"\x02\x00\x00\x00",)
+            assert next(frames) == (b"\x03\x00\x00\x00",)
+            pytest.raises(StopIteration, next, frames)
+
+
+class TestGenerateFrames:
+    """Tests for generate_frames()"""
+
+    def test_empty_bot_single_fragment(self):
+        """Test a single-frame image where the frame is one fragments"""
+        # 1 frame, 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+        with memoryview(buffer) as src:
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+    def test_empty_bot_triple_fragment_single_frame(self):
+        """Test a single-frame image where the frame is three fragments"""
+        # 1 frame, 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src, number_of_frames=1)
+            assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
+            pytest.raises(StopIteration, next, frames)
+
+        with memoryview(buffer) as src:
+            frames = generate_frames(src, number_of_frames=1)
+            assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
+            pytest.raises(StopIteration, next, frames)
+
+    def test_bot_single_fragment(self):
+        """Test a single-frame image where the frame is one fragment"""
+        # 1 frame, 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+        with memoryview(buffer) as src:
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+    def test_bot_triple_fragment_single_frame(self):
+        """Test a single-frame image where the frame is three fragments"""
+        # 1 frame, 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src)
+            assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
+            pytest.raises(StopIteration, next, frames)
+
+        with memoryview(buffer) as src:
+            frames = generate_frames(src)
+            assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
+            pytest.raises(StopIteration, next, frames)
+
+    def test_multi_frame_one_to_one(self):
+        """Test a multi-frame image where each frame is one fragment"""
+        # 3 frames, each 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x0C\x00\x00\x00"
+            b"\x18\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00"
+            assert next(frames) == b"\x02\x00\x00\x00"
+            assert next(frames) == b"\x03\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+        with memoryview(buffer) as src:
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00"
+            assert next(frames) == b"\x02\x00\x00\x00"
+            assert next(frames) == b"\x03\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+    def test_multi_frame_three_to_one(self):
+        """Test a multi-frame image where each frame is three fragments"""
+        # 2 frames, each 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x24\x00\x00\x00"
+            b"\x48\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            assert next(frames) == b"\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            assert next(frames) == b"\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
+
+        with memoryview(buffer) as src:
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            assert next(frames) == b"\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            assert next(frames) == b"\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            pytest.raises(StopIteration, next, frames)
 
     def test_multi_frame_varied_ratio(self):
         """Test a multi-frame image where each frames is random fragments"""
@@ -2004,15 +2454,386 @@ class TestBuffer_GetFrame:
             b"\xFE\xFF\x00\xE0"
             b"\x02\x00\x00\x00\x02\x04"
         )
-        assert get_frame(buffer, 0) == b"\x01\x00\x00\x00\x00\x01"
-        assert get_frame(buffer, 1) == (
-            b"\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-        )
-        assert get_frame(buffer, 2) == b"\x03\x00\x00\x00\x02\x04"
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00\x00\x01"
+            assert next(frames) == (b"\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02")
+            assert next(frames) == b"\x03\x00\x00\x00\x02\x04"
+            pytest.raises(StopIteration, next, frames)
 
-        msg = "There is insufficient pixel data to contain 4 frames"
+        with memoryview(buffer) as src:
+            frames = generate_frames(src)
+            assert next(frames) == b"\x01\x00\x00\x00\x00\x01"
+            assert next(frames) == (b"\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02")
+            assert next(frames) == b"\x03\x00\x00\x00\x02\x04"
+            pytest.raises(StopIteration, next, frames)
+
+    def test_empty_bot_multi_fragments_per_frame(self):
+        """Test multi-frame where multiple frags per frame and no BOT."""
+        # Regression test for #685
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        assert 10 == ds.NumberOfFrames
+        for func in (bytes, as_bytesio):
+            src = func(ds.PixelData)
+            frame_gen = generate_frames(src, number_of_frames=ds.NumberOfFrames)
+            for ii in range(10):
+                next(frame_gen)
+
+            with pytest.raises(StopIteration):
+                next(frame_gen)
+
+        with memoryview(ds.PixelData) as src:
+            frame_gen = generate_frames(src, number_of_frames=ds.NumberOfFrames)
+            for ii in range(10):
+                next(frame_gen)
+
+            with pytest.raises(StopIteration):
+                next(frame_gen)
+
+    def test_mmap(self):
+        """Test with mmapped file."""
+        with dcmread(JP2K_10FRAME_NOBOT) as ds:
+            elem = ds["PixelData"]
+            frames = generate_frames(ds.PixelData, number_of_frames=10)
+            for ii in range(8):
+                next(frames)
+            reference = next(frames)
+            assert reference[-10:] == b"\x56\xF7\xFF\x4E\x60\xE3\xDA\x0F\xFF\xD9"
+
+        with open(JP2K_10FRAME_NOBOT, "rb") as f:
+            mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+            # Start of BOT is at offset 2352
+            mm.seek(elem.file_tell)
+            # frame 9 (index 8) starts at offset 32802 and is 3754 bytes long
+            frames = generate_frames(mm, number_of_frames=10)
+            for ii in range(8):
+                next(frames)
+            frame = next(frames)
+            assert frame == reference
+            assert len(frame) == 3754
+
+
+class TestGetFrame:
+    """Tests for get_frame()"""
+
+    def test_empty_bot_single_fragment(self):
+        """Test a single-frame image where the frame is one fragments"""
+        # 1 frame, 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+        )
+        for func in (bytes, bytearray, as_bytesio):
+            buffer = func(buffer)
+            assert get_frame(buffer, 0) == b"\x01\x00\x00\x00"
+
+    def test_empty_bot_triple_fragment_single_frame(self):
+        """Test a single-frame image where the frame is three fragments"""
+        # 1 frame, 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        for func in (bytes, bytearray, as_bytesio):
+            buffer = func(buffer)
+            assert get_frame(buffer, 0, number_of_frames=1) == (
+                b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+
+    def test_empty_bot_no_number_of_frames_raises(self):
+        """Test parsing raises if not BOT and no number_of_frames."""
+        # 1 frame, 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        msg = (
+            r"Unable to determine the frame boundaries for the encapsulated "
+            r"pixel data as there is no Basic or Extended Offset Table "
+            r"and the number of frames has not been supplied"
+        )
+        for func in (bytes, bytearray, as_bytesio):
+            buffer = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                get_frame(buffer, 0)
+
+    def test_empty_bot_too_few_fragments(self):
+        """Test parsing with too few fragments."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        assert 10 == ds.NumberOfFrames
+
+        msg = "There is insufficient pixel data to contain 12 frames"
         with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 3)
+            get_frame(ds.PixelData, 11, number_of_frames=20)
+
+    def test_empty_bot_multi_fragments_per_frame(self):
+        """Test parsing with multiple fragments per frame."""
+        # 4 frames in 6 fragments with JPEG EOI marker
+        buffer = (
+            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\xFF\xD9"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+        )
+        msg = "There is insufficient pixel data to contain 5 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            buffer = func(buffer)
+
+            # Note that we can access a single "extra" frame
+            assert (
+                get_frame(buffer, 0, number_of_frames=3)
+                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+            )
+            assert get_frame(buffer, 1, number_of_frames=3) == b"\x01\x00\xFF\xD9"
+            assert get_frame(buffer, 2, number_of_frames=3) == b"\x01\xFF\xD9\x00"
+            assert (
+                get_frame(buffer, 3, number_of_frames=3)
+                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+            )
+
+            with pytest.raises(ValueError, match=msg):
+                get_frame(buffer, 4, number_of_frames=3)
+
+    def test_empty_bot_no_marker(self):
+        """Test parsing no BOT and no final marker with multi fragments."""
+        # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
+        buffer = (
+            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
+        )
+
+        for func in (bytes, bytearray, as_bytesio):
+            buffer = func(buffer)
+            assert (
+                get_frame(buffer, 0, number_of_frames=3)
+                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+            )
+            assert (
+                get_frame(buffer, 1, number_of_frames=3)
+                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+            )
+            assert get_frame(buffer, 2, number_of_frames=3) == b"\x01\xFF\xFF\xD9"
+
+            msg = (
+                "The end of the encapsulated pixel data has been reached but no "
+                "JPEG EOI/EOC marker was found, the returned frame data may be invalid"
+            )
+            with pytest.warns(UserWarning, match=msg):
+                assert get_frame(buffer, 3, number_of_frames=3) == b"\x01\xFF\x00\x00"
+
+            msg = "There is insufficient pixel data to contain 5 frames"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(buffer, 4, number_of_frames=3)
+
+    def test_bot_single_fragment(self):
+        """Test a single-frame image where the frame is one fragment"""
+        # 1 frame, 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+        )
+        msg = "There aren't enough offsets in the Basic Offset Table for 2 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(src, 0) == b"\x01\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 1)
+
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0) == b"\x01\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 1)
+
+    def test_bot_triple_fragment_single_frame(self):
+        """Test a single-frame image where the frame is three fragments"""
+        # 1 frame, 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        msg = "There aren't enough offsets in the Basic Offset Table for 2 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(src, 0) == (
+                b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 1)
+
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0) == (
+                b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 1)
+
+    def test_multi_frame_one_to_one(self):
+        """Test a multi-frame image where each frame is one fragment"""
+        # 3 frames, each 1 fragment long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x0C\x00\x00\x00"
+            b"\x18\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00"
+            b"\x03\x00\x00\x00"
+        )
+        msg = "There aren't enough offsets in the Basic Offset Table for 4 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(src, 0) == b"\x01\x00\x00\x00"
+            assert get_frame(src, 1) == b"\x02\x00\x00\x00"
+            assert get_frame(src, 2) == b"\x03\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3)
+
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0) == b"\x01\x00\x00\x00"
+            assert get_frame(src, 1) == b"\x02\x00\x00\x00"
+            assert get_frame(src, 2) == b"\x03\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3)
+
+    def test_multi_frame_three_to_one(self):
+        """Test a multi-frame image where each frame is three fragments"""
+        # 3 frames, each 3 fragments long
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x24\x00\x00\x00"
+            b"\x48\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+        )
+        msg = "There aren't enough offsets in the Basic Offset Table for 4 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(src, 0) == (
+                b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            assert get_frame(src, 1) == (
+                b"\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            assert get_frame(src, 2) == (
+                b"\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3)
+
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0) == (
+                b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            assert get_frame(src, 1) == (
+                b"\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            assert get_frame(src, 2) == (
+                b"\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
+            )
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3)
+
+    def test_multi_frame_varied_ratio(self):
+        """Test a multi-frame image where each frames is random fragments"""
+        # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
+        buffer = (
+            b"\xFE\xFF\x00\xE0"
+            b"\x0C\x00\x00\x00"
+            b"\x00\x00\x00\x00"
+            b"\x0E\x00\x00\x00"
+            b"\x32\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
+            b"\xFE\xFF\x00\xE0"
+            b"\x02\x00\x00\x00\x02\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
+            b"\xFE\xFF\x00\xE0"
+            b"\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xFE\xFF\x00\xE0"
+            b"\x02\x00\x00\x00\x02\x04"
+        )
+        msg = "There aren't enough offsets in the Basic Offset Table for 4 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(src, 0) == b"\x01\x00\x00\x00\x00\x01"
+            assert get_frame(src, 1) == (
+                b"\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02"
+            )
+            assert get_frame(src, 2) == b"\x03\x00\x00\x00\x02\x04"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3)
+
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0) == b"\x01\x00\x00\x00\x00\x01"
+            assert get_frame(src, 1) == (
+                b"\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02"
+            )
+            assert get_frame(src, 2) == b"\x03\x00\x00\x00\x02\x04"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3)
 
     def test_eot_single_fragment(self):
         """Test a single-frame image where the frame is one fragment"""
@@ -2025,11 +2846,17 @@ class TestBuffer_GetFrame:
             b"\x01\x00\x00\x00"
         )
         eot = ([0], [4])
-        assert get_frame(buffer, 0, extended_offsets=eot) == b"\x01\x00\x00\x00"
-
         msg = "The encapsulated pixel data only contains 1 frame"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 1)
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(src, 0, extended_offsets=eot) == b"\x01\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 1)
+
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0, extended_offsets=eot) == b"\x01\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 1)
 
     def test_eot_multi_fragment(self):
         """Test a single-frame image where the frame is three fragments"""
@@ -2048,11 +2875,34 @@ class TestBuffer_GetFrame:
             b"\x03\x00\x00\x00"
         )
         eot = ([0, 12, 24], [4, 4, 4])
+        msg = "There aren't enough offsets in the Extended Offset Table for 4 frames"
+        for func in (bytes, bytearray, as_bytesio):
+            src = func(buffer)
+            assert get_frame(buffer, 0, extended_offsets=eot) == b"\x01\x00\x00\x00"
+            assert get_frame(buffer, 1, extended_offsets=eot) == b"\x02\x00\x00\x00"
+            assert get_frame(buffer, 2, extended_offsets=eot) == b"\x03\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3, extended_offsets=eot)
 
-        assert get_frame(buffer, 0, extended_offsets=eot) == b"\x01\x00\x00\x00"
-        assert get_frame(buffer, 1, extended_offsets=eot) == b"\x02\x00\x00\x00"
-        assert get_frame(buffer, 2, extended_offsets=eot) == b"\x03\x00\x00\x00"
+        with memoryview(buffer) as src:
+            assert get_frame(src, 0, extended_offsets=eot) == b"\x01\x00\x00\x00"
+            assert get_frame(src, 1, extended_offsets=eot) == b"\x02\x00\x00\x00"
+            assert get_frame(src, 2, extended_offsets=eot) == b"\x03\x00\x00\x00"
+            with pytest.raises(ValueError, match=msg):
+                get_frame(src, 3, extended_offsets=eot)
 
-        msg = "There is insufficient pixel data to contain 4 frames"
-        with pytest.raises(ValueError, match=msg):
-            get_frame(buffer, 3, extended_offsets=eot)
+    def test_mmap(self):
+        """Test with mmapped file."""
+        with dcmread(JP2K_10FRAME_NOBOT) as ds:
+            elem = ds["PixelData"]
+            reference = get_frame(ds.PixelData, 8, number_of_frames=10)
+            assert reference[-10:] == b"\x56\xF7\xFF\x4E\x60\xE3\xDA\x0F\xFF\xD9"
+
+        with open(JP2K_10FRAME_NOBOT, "rb") as f:
+            mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+            # Start of BOT is at offset 2352
+            mm.seek(elem.file_tell)
+            # frame 9 (index 8) starts at offset 32802 and is 3754 bytes long
+            frame = get_frame(mm, 8, number_of_frames=10)
+            assert frame == reference
+            assert len(frame) == 3754

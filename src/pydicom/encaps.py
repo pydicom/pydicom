@@ -1,12 +1,13 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Functions for working with encapsulated (compressed) pixel data."""
 
-from struct import pack, Struct
 from collections.abc import Iterator, Sequence
+from struct import pack, Struct
+from typing import cast
 
 import pydicom.config
 from pydicom.misc import warn_and_log
-from pydicom.filebase import DicomBytesIO, DicomIO
+from pydicom.filebase import DicomBytesIO, DicomIO, ReadableBuffer
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 
@@ -14,8 +15,1110 @@ Buffer = bytes | bytearray | memoryview
 
 
 # Functions for parsing encapsulated data
+def parse_basic_offsets(
+    buffer: Buffer | ReadableBuffer,
+    /,
+    *,
+    little_endian: bool = True,
+) -> tuple[int, list[int]]:
+    """Return the basic offset table length and the offsets to each frame.
+
+    .. versionadded:: 3.0
+
+    **Basic Offset Table**
+
+    The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
+    a length, however it may or may not have a value.
+
+    Basic Offset Table with no value::
+
+        Item Tag   | Length    |
+        FE FF 00 E0 00 00 00 00
+
+    Basic Offset Table with value (2 frames)::
+
+        Item Tag   | Length    | Offset 1  | Offset 2  |
+        FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
+
+    For single or multi-frame images with only one frame, the Basic Offset
+    Table may or may not have a value. When it has no value then its length
+    shall be ``0x00000000``.
+
+    For multi-frame images with more than one frame, the Basic Offset Table
+    should have a value containing concatenated 32-bit unsigned integer values
+    that are the byte offsets to the first byte of the Item tag of the first
+    fragment of each frame as measured from the first byte of the first item
+    tag following the Basic Offset Table Item.
+
+    Parameters
+    ----------
+    buffer : buffer-like | readable buffer
+        A buffer containing the encapsulated frame data, positioned at the
+        beginning of the basic offset table. May be an object that `supports the
+        buffer protocol <https://docs.python.org/3/c-api/buffer.html>`_ such as
+        :class:`bytes` or an object with ``read()``, ``tell()`` and ``seek()``
+        methods. If the latter then after reading it will be positioned at the
+        start of the item tag of the first fragment.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    tuple[int, list[int]]
+        The length of the basic offset table in bytes, and a list of the offset
+        positions to the first item tag of each frame, as measured from the
+        end of the offset table.
+    """
+    if hasattr(buffer, "read"):
+        return _parse_basic_offsets_binary(cast(ReadableBuffer, buffer), little_endian)
+
+    return _parse_basic_offsets_buffer(cast(Buffer, buffer), little_endian)
+
+
+def _parse_basic_offsets_buffer(
+    buffer: Buffer, little_endian: bool = True
+) -> tuple[int, list[int]]:
+    """Return the basic offset table length and the offsets to each frame.
+
+    Parameters
+    ----------
+    buffer : buffer-like | readable buffer
+        An object that supports the buffer protocol, positioned so the start
+        is at the beginning of the Basic Offset Table.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    tuple[int, list[int]]
+        The length of the basic offset table in bytes, and a list of the offset
+        positions to the first item tag of each frame, as measured from the
+        end of the offset table.
+    """
+    endianness = "><"[little_endian]
+    tag_unpacker = Struct(f"{endianness}HH").unpack
+    length_unpacker = Struct(f"{endianness}L").unpack
+
+    group, elem = tag_unpacker(buffer[:4])
+    if group << 16 | elem != 0xFFFEE000:
+        raise ValueError(
+            f"Unexpected tag '{Tag(group, elem)}' when parsing the Basic Table Offset item"
+        )
+
+    length = length_unpacker(buffer[4:8])[0]
+    if length % 4:
+        raise ValueError(
+            "The length of the Basic Offset Table item is not a multiple of 4"
+        )
+
+    if length == 0:
+        return 8, []
+
+    return (
+        8 + length,
+        [length_unpacker(buffer[ii : ii + 4])[0] for ii in range(8, 8 + length, 4)],
+    )
+
+
+def _parse_basic_offsets_binary(
+    buffer: ReadableBuffer, little_endian: bool = True
+) -> tuple[int, list[int]]:
+    """Return the basic offset table length and the offsets to each frame.
+
+    Parameters
+    ----------
+    buffer : readable buffer
+        An object with ``read()``, ``tell()`` and ``seek()`` methods. After
+        reading it will be positioned at the start of the item tag of the
+        first fragment.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    tuple[int, list[int]]
+        The length of the basic offset table in bytes, and a list of the offset
+        positions to the first item tag of each frame, as measured from the
+        end of the offset table.
+    """
+    endianness = "><"[little_endian]
+    tag_unpacker = Struct(f"{endianness}HH").unpack
+    length_unpacker = Struct(f"{endianness}L").unpack
+
+    group, elem = tag_unpacker(buffer.read(4))
+    if group << 16 | elem != 0xFFFEE000:
+        raise ValueError(
+            f"Unexpected tag '{Tag(group, elem)}' when parsing the Basic Table Offset item"
+        )
+
+    length = length_unpacker(buffer.read(4))[0]
+    if length % 4:
+        raise ValueError(
+            "The length of the Basic Offset Table item is not a multiple of 4"
+        )
+
+    if length == 0:
+        return 8, []
+
+    return (
+        8 + length,
+        [length_unpacker(buffer.read(4))[0] for ii in range(8, 8 + length, 4)],
+    )
+
+
+def parse_fragments(
+    buffer: Buffer | ReadableBuffer,
+    /,
+    *,
+    little_endian: bool = True,
+) -> tuple[int, list[int]]:
+    """Return the number of fragments and their positions in `buffer`.
+
+    .. versionadded:: 3.0
+
+    Parameters
+    ----------
+    buffer : buffer-like | readable buffer
+        A buffer containing the encapsulated frame data, starting at the first
+        byte of item tag for the first fragment after the basic offset table.
+        May be an object that `supports the buffer protocol
+        <https://docs.python.org/3/c-api/buffer.html>`_ such as :class:`bytes`
+        or an object with ``read()``, ``tell()`` and ``seek()`` methods.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    tuple[int, list[int]]
+        The number of fragments and their offset positions in `buffer`.
+    """
+    if hasattr(buffer, "read"):
+        return _parse_fragments_binary(cast(ReadableBuffer, buffer), little_endian)
+
+    return _parse_fragments_buffer(cast(Buffer, buffer), little_endian)
+
+
+def _parse_fragments_buffer(
+    buffer: Buffer, little_endian: bool = True
+) -> tuple[int, list[int]]:
+    """Return the number of fragments and their positions in `buffer`.
+
+    Parameters
+    ----------
+    buffer : bytes | bytearray | memoryview | mmap
+        The buffer containing encapsulated pixel data. Should be positioned so
+        that start is at the start of the item tag of the first fragment.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    tuple[int, list[int]]
+        The number of fragments and their offset positions in `buffer`.
+    """
+    endianness = "><"[little_endian]
+    tag_unpacker = Struct(f"{endianness}HH").unpack
+    length_unpacker = Struct(f"{endianness}L").unpack
+
+    offset = 0
+    nr_fragments = 0
+    fragment_offsets = []
+    end = len(buffer)
+    while offset + 4 <= end:
+        group, elem = tag_unpacker(buffer[offset : offset + 4])
+        tag = group << 16 | elem
+        if tag == 0xFFFEE000:
+            length = length_unpacker(buffer[offset + 4 : offset + 8])[0]
+            if length == 0xFFFFFFFF:
+                raise ValueError(
+                    f"Undefined item length at offset {offset + 4} when "
+                    "parsing the encapsulated pixel data fragments"
+                )
+
+            nr_fragments += 1
+            fragment_offsets.append(offset + 8)
+            offset += 8 + length
+        elif tag == 0xFFFEE0DD:
+            break
+        else:
+            raise ValueError(
+                f"Unexpected tag '{Tag(tag)}' at offset {offset} when "
+                "parsing the encapsulated pixel data fragment items"
+            )
+
+    return nr_fragments, fragment_offsets
+
+
+def _parse_fragments_binary(
+    buffer: ReadableBuffer, little_endian: bool = True
+) -> tuple[int, list[int]]:
+    """Return the number of fragments and their positions in `buffer`.
+
+    Parameters
+    ----------
+    buffer : readable-buffer
+        An object with ``read()``, ``tell()`` and ``seek()`` methods. `buffer`
+        will be positioned back to the start of the item tag of the first
+        fragment.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    tuple[int, list[int]]
+        The number of fragments and their offset positions in `buffer`.
+    """
+    endianness = "><"[little_endian]
+    tag_unpacker = Struct(f"{endianness}HH").unpack
+    length_unpacker = Struct(f"{endianness}L").unpack
+
+    start_offset = buffer.tell()
+
+    nr_fragments = 0
+    fragment_offsets = []
+    while True:
+        try:
+            group, elem = tag_unpacker(buffer.read(4))
+        except Exception:
+            break
+
+        tag = group << 16 | elem
+        if tag == 0xFFFEE000:
+            length = length_unpacker(buffer.read(4))[0]
+            if length == 0xFFFFFFFF:
+                raise ValueError(
+                    f"Undefined item length at offset {buffer.tell() - 4} when "
+                    "parsing the encapsulated pixel data fragments"
+                )
+            nr_fragments += 1
+            fragment_offsets.append(buffer.tell() - start_offset)
+            buffer.seek(length, 1)
+        elif tag == 0xFFFEE0DD:
+            break
+        else:
+            raise ValueError(
+                f"Unexpected tag '{Tag(tag)}' at offset {buffer.tell() - 4} when "
+                "parsing the encapsulated pixel data fragment items"
+            )
+
+    buffer.seek(start_offset)
+
+    return nr_fragments, fragment_offsets
+
+
+def generate_fragments(
+    buffer: Buffer | ReadableBuffer,
+    /,
+    *,
+    little_endian: bool = True,
+) -> Iterator[Buffer]:
+    """Yield the fragments from the encapsulated pixel data in `buffer`.
+
+    .. versionadded:: 3.0
+
+    Parameters
+    ----------
+    buffer : buffer-like | readable buffer
+        A buffer containing the encapsulated frame data, starting at the first
+        byte of item tag for the first fragment after the basic offset table.
+        May be an object that `supports the buffer protocol
+        <https://docs.python.org/3/c-api/buffer.html>`_ such as :class:`bytes`
+        or an object with ``read()``, ``tell()`` and ``seek()`` methods.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    ------
+    bytes
+        A pixel data fragment.
+    """
+    if hasattr(buffer, "read"):
+        yield from _fragments_binary(cast(ReadableBuffer, buffer), little_endian)
+    else:
+        yield from _fragments_buffer(cast(Buffer, buffer), little_endian)
+
+
+def _fragments_buffer(buffer: Buffer, little_endian: bool = True) -> Iterator[Buffer]:
+    """Yield the fragments from the encapsulated pixel data in `buffer`.
+
+    Parameters
+    ----------
+    buffer : buffer-like
+        An object supporting the buffer protocol containing the encapsulated
+        frame data, starting at the first byte of item tag for the first
+        fragment after the basic offset table.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    ------
+    bytes | bytearray | memoryview
+        A pixel data fragment of the same type as `buffer`, except for
+        :class:`mmap` which yields :class:`bytes`.
+    """
+    endianness = "><"[little_endian]
+    tag_unpacker = Struct(f"{endianness}HH").unpack
+    length_unpacker = Struct(f"{endianness}L").unpack
+
+    offset = 0
+    end = len(buffer)
+    while offset + 4 <= end:
+        group, elem = tag_unpacker(buffer[offset : offset + 4])
+        tag = group << 16 | elem
+
+        if tag == 0xFFFEE000:
+            length = length_unpacker(buffer[offset + 4 : offset + 8])[0]
+            if length == 0xFFFFFFFF:
+                raise ValueError(
+                    f"Undefined item length at offset {offset + 4} when "
+                    "parsing the encapsulated pixel data fragments"
+                )
+            yield buffer[offset + 8 : offset + 8 + length]
+            offset += 8 + length
+        elif tag == 0xFFFEE0DD:
+            break
+        else:
+            raise ValueError(
+                f"Unexpected tag '{Tag(tag)}' at offset {offset} when "
+                "parsing the encapsulated pixel data fragment items"
+            )
+
+
+def _fragments_binary(
+    buffer: ReadableBuffer, little_endian: bool = True
+) -> Iterator[bytes]:
+    """Yield the fragments from the encapsulated pixel data in `buffer`.
+
+    Parameters
+    ----------
+    buffer : buffer-like
+        An object an object with ``read()``, ``tell()`` and ``seek()`` methods
+        containing the encapsulated frame data, positioned at the first byte of
+        item tag for the first fragment after the basic offset table.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    ------
+    bytes
+        A pixel data fragment.
+    """
+    endianness = "><"[little_endian]
+    tag_unpacker = Struct(f"{endianness}HH").unpack
+    length_unpacker = Struct(f"{endianness}L").unpack
+
+    while True:
+        try:
+            group, elem = tag_unpacker(buffer.read(4))
+        except Exception:
+            break
+
+        tag = group << 16 | elem
+        if tag == 0xFFFEE000:
+            length = length_unpacker(buffer.read(4))[0]
+            if length == 0xFFFFFFFF:
+                raise ValueError(
+                    f"Undefined item length at offset {buffer.tell() - 4} when "
+                    "parsing the encapsulated pixel data fragments"
+                )
+
+            yield buffer.read(length)
+        elif tag == 0xFFFEE0DD:
+            break
+        else:
+            raise ValueError(
+                f"Unexpected tag '{Tag(tag)}' at offset {buffer.tell() - 4} when "
+                "parsing the encapsulated pixel data fragment items"
+            )
+
+
+def generate_fragmented_frames(
+    buffer: Buffer | ReadableBuffer,
+    /,
+    *,
+    number_of_frames: int | None = None,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    little_endian: bool = True,
+) -> Iterator[tuple[Buffer, ...]]:
+    """Yield fragmented pixel data frames from `buffer`.
+
+    .. versionadded:: 3.0
+
+    .. note::
+
+        When the Basic Offset Table is empty and the Extended Offset Table
+        isn't supplied then more fragmented frames may be yielded than given
+        by `number_of_frames` provided there are sufficient excess fragments
+        available.
+
+    Parameters
+    ----------
+    buffer : buffer-like | readable buffer
+        A buffer containing the encapsulated frame data, starting at the first
+        byte of the basic offset table. May be an object that `supports the
+        buffer protocol <https://docs.python.org/3/c-api/buffer.html>`_ such as
+        :class:`bytes` or an object with ``read()``, ``tell()`` and ``seek()``
+        methods.
+    number_of_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty,
+        the Extended Offset Table has not been supplied and there are
+        multiple frames. This should be the value of (0028,0008) *Number of
+        Frames* or the expected number of frames in the encapsulated data.
+    extended_offsets : tuple[list[int], list[int]], optional
+        The (offsets, lengths) of the Extended Offset Table as taken from
+        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
+        Table Lengths*.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    -------
+    tuple[bytes | bytearray | memoryview, ...]
+        An encapsulated pixel data frame, with the contents of the
+        :class:`tuple` the frame's fragmented data. If `buffer` is a buffer-like
+        then should yield a tuple of the same type, otherwise yields
+        ``tuple[bytes, ...]``.
+    """
+    if hasattr(buffer, "read"):
+        yield from _fragmented_frames_binary(
+            cast(ReadableBuffer, buffer),
+            number_of_frames,
+            extended_offsets,
+            little_endian,
+        )
+    else:
+        yield from _fragmented_frames_buffer(
+            cast(Buffer, buffer), number_of_frames, extended_offsets, little_endian
+        )
+
+
+def _fragmented_frames_buffer(
+    buffer: Buffer,
+    number_of_frames: int | None = None,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    little_endian: bool = True,
+) -> Iterator[tuple[Buffer, ...]]:
+    """Yield fragmented pixel data frames from `buffer`.
+
+    Parameters
+    ----------
+    buffer : buffer-like | readable buffer
+        A buffer containing the encapsulated frame data, starting at the first
+        byte of the basic offset table.
+    number_of_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty,
+        the Extended Offset Table has not been supplied and there are
+        multiple frames.
+    extended_offsets : tuple[list[int], list[int]], optional
+        The (offsets, lengths) of the Extended Offset Table as taken from
+        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
+        Table Lengths*.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    -------
+    tuple[bytes | bytearray | memoryview, ...]
+        An encapsulated pixel data frame, with the contents of the
+        :class:`tuple` the frame's fragmented data.
+    """
+    # Always need to know where the end of the Basic Offset Table is
+    table_length, basic_offsets = parse_basic_offsets(
+        buffer, little_endian=little_endian
+    )
+
+    # Prefer the extended offset table (if available)
+    if extended_offsets:
+        offsets = extended_offsets[0]
+        lengths = extended_offsets[1]
+        for offset, length in zip(offsets, lengths):
+            # `offset` is to the start of the item tag, so add 8 for
+            #   the item tag and item length
+            offset += table_length + 8
+            yield (buffer[offset : offset + length],)
+
+        return
+
+    # Fall back to the basic offset table (if available)
+    if basic_offsets:
+        basic_offsets = [offset + table_length for offset in basic_offsets]
+        basic_offsets.append(len(buffer))
+        for start_offset, end_offset in zip(basic_offsets, basic_offsets[1:]):
+            fragments = _fragments_buffer(
+                buffer[start_offset:end_offset],
+                little_endian,
+            )
+            yield tuple(fragment for fragment in fragments)
+
+        return
+
+    # No basic or extended offset table
+    # Determine the number of fragments in the buffer
+    nr_fragments, _ = _parse_fragments_buffer(buffer[8:], little_endian)
+    fragments = _fragments_buffer(buffer[8:], little_endian)
+
+    yield from _fragmented_frames_common(nr_fragments, fragments, number_of_frames)
+
+
+def _fragmented_frames_binary(
+    buffer: ReadableBuffer,
+    number_of_frames: int | None = None,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    little_endian: bool = True,
+) -> Iterator[tuple[bytes, ...]]:
+    """Yield fragmented pixel data frames from `buffer`.
+
+    Parameters
+    ----------
+    buffer : readable buffer
+        An object with ``read()``, ``tell()`` and ``seek()`` methods.
+    number_of_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty,
+        the Extended Offset Table has not been supplied and there are
+        multiple frames.
+    extended_offsets : tuple[list[int], list[int]], optional
+        The (offsets, lengths) of the Extended Offset Table as taken from
+        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
+        Table Lengths*.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    -------
+    tuple[bytes, ...]
+        An encapsulated pixel data frame, with the contents of the
+        :class:`tuple` the frame's fragmented data.
+    """
+    # Always need to know where the end of the Basic Offset Table is
+    table_length, basic_offsets = parse_basic_offsets(
+        buffer, little_endian=little_endian
+    )
+    # `buffer` is positioned at the end of the basic offsets table
+
+    # Prefer the extended offset table (if available)
+    if extended_offsets:
+        fragments_start = buffer.tell()
+        # +8 for the item tag and item length
+        offsets = [offset + 8 for offset in extended_offsets[0]]
+        lengths = extended_offsets[1]
+        for offset, length in zip(offsets, lengths):
+            buffer.seek(fragments_start + offset, 0)
+            yield (buffer.read(length),)
+
+        return
+
+    # Fall back to the basic offset table (if available)
+    if basic_offsets:
+        frame = []
+        current_index = 0
+        current_offset = 0
+        final_index = len(basic_offsets) - 1
+        for fragment in _fragments_binary(buffer, little_endian):
+            if current_index == final_index:
+                # Nth frame, keep adding fragments until we have no more
+                frame.append(fragment)
+                continue
+
+            if current_offset < basic_offsets[current_index + 1]:
+                # N - 1th frame, keep adding fragments until the we go
+                #   past the next frame offset
+                frame.append(fragment)
+            else:
+                # Gone past the next offset, yield and restart
+                yield tuple(frame)
+                current_index += 1
+                frame = [fragment]
+
+            # + 8 bytes for item tag and item length
+            current_offset += len(fragment) + 8
+
+        # Yield the Nth frame
+        yield tuple(frame)
+        return
+
+    # No basic or extended offset table
+    # Determine the number of fragments in the buffer
+    nr_fragments, _ = _parse_fragments_binary(buffer, little_endian)
+    # `buffer` is positioned at the end of the basic offsets table
+    fragments = _fragments_binary(buffer, little_endian)
+
+    yield from _fragmented_frames_common(nr_fragments, fragments, number_of_frames)
+
+
+def _fragmented_frames_common(
+    nr_fragments: int, fragments: Iterator[bytes], number_of_frames: int | None
+) -> Iterator[tuple[Buffer, ...]]:
+    """Common fragment parsing for for generated_fragmented_frames()"""
+    # Single fragment must be 1 frame
+    if nr_fragments == 1:
+        yield (next(fragments),)
+        return
+
+    # From this point on we require the number of frames as there are
+    #   multiple fragments and may be one or more frames
+    if not number_of_frames:
+        raise ValueError(
+            "Unable to determine the frame boundaries for the encapsulated "
+            "pixel data as there is no Basic or Extended Offset Table and "
+            "the number of frames has not been supplied"
+        )
+
+    # 1 fragment per frame, for N frames
+    if nr_fragments == number_of_frames:
+        # Covers RLE and others if 1:1 ratio
+        for fragment in fragments:
+            yield (fragment,)
+
+        return
+
+    # Multiple fragments for 1 frame
+    if number_of_frames == 1:
+        yield tuple(fragment for fragment in fragments)
+        return
+
+    # More fragments then frames
+    if nr_fragments > number_of_frames:
+        # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker which should be the
+        #   last two bytes of a frame
+        # It's possible to yield more frames than `number_of_frames` as
+        #   long as there are excess fragments with JPEG EOI/EOC markers
+        # It's also possible that we yielded too early because the marker bytes
+        #   were actually part of the compressed JPEG codestream
+        eoi_marker = b"\xff\xd9"
+        frame = []
+        frame_nr = 0
+        for fragment in fragments:
+            frame.append(fragment)
+            if eoi_marker in fragment[-10:]:
+                yield tuple(frame)
+                frame_nr += 1
+                frame = []
+
+        # There was a final set of fragments with no EOI/EOC marker, data is
+        #   probably corrupted, but yield it and warn/log anyway
+        if frame:
+            if frame_nr >= number_of_frames:
+                msg = (
+                    "The end of the encapsulated pixel data has been reached but "
+                    "no JPEG EOI/EOC marker was found, the final frame may be "
+                    "be invalid"
+                )
+            else:
+                msg = (
+                    "The end of the encapsulated pixel data has been reached but "
+                    "fewer frames than expected have been found. Please confirm "
+                    "that the generated frame data is correct"
+                )
+
+            warn_and_log(msg)
+            yield tuple(frame)
+
+        elif frame_nr < number_of_frames:
+            warn_and_log(
+                "The end of the encapsulated pixel data has been reached but "
+                "fewer frames than expected have been found",
+            )
+
+        return
+
+    # Fewer fragments than frames
+    raise ValueError(
+        "Unable to parse encapsulated pixel data as there is no Basic or "
+        "Extended Offset Table and there are fewer fragments then frames; "
+        "the dataset may be corrupt or the number of frames may be incorrect"
+    )
+
+
+def generate_frames(
+    buffer: Buffer | ReadableBuffer,
+    /,
+    *,
+    number_of_frames: int | None = None,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    little_endian: bool = True,
+) -> Iterator[bytes]:
+    """Yield complete pixel data frames from `buffer`.
+
+    .. versionadded:: 3.0
+
+    .. note::
+
+        When the Basic Offset Table is empty and the Extended Offset Table
+        isn't supplied then more frames may be yielded than given by
+        `number_of_frames` provided there are sufficient excess fragments
+        available.
+
+    Parameters
+    ----------
+    buffer : bytes | bytearray | memoryview | readable buffer
+        A buffer containing the encapsulated frame data, starting at the first
+        byte of the basic offset table. May be an object that `supports the
+        buffer protocol <https://docs.python.org/3/c-api/buffer.html>`_ such as
+        :class:`bytes` or an object with ``read()``, ``tell()`` and ``seek()``
+        methods.
+    extended_offsets : tuple[list[int], list[int]], optional
+        The (offsets, lengths) of the Extended Offset Table as taken from
+        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
+        Table Lengths*.
+    number_of_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty,
+        the Extended Offset Table has not been supplied and there are
+        multiple frames. This should be the value of (0028,0008) *Number of
+        Frames* or the expected number of frames in the encapsulated data.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Yields
+    ------
+    bytes
+        A single frame of pixel data.
+
+    References
+    ----------
+    DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
+    """
+    fragmented_frames = generate_fragmented_frames(
+        buffer,
+        number_of_frames=number_of_frames,
+        extended_offsets=extended_offsets,
+        little_endian=little_endian,
+    )
+    for fragments in fragmented_frames:
+        yield b"".join(fragments)
+
+
+def get_frame(
+    buffer: Buffer | ReadableBuffer,
+    index: int,
+    /,
+    *,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    number_of_frames: int | None = None,
+    little_endian: bool = True,
+) -> Buffer:
+    """Return the specified frame at `index`.
+
+    .. versionadded:: 3.0
+
+    .. note::
+
+        When the Basic Offset Table is empty and the Extended Offset Table
+        isn't supplied then it's possible to return a frame at a higher 'index'
+        than expected from the supplied `number_of_frames` value provided there
+        are sufficient excess fragments available.
+
+    Parameters
+    ----------
+    buffer : bytes | bytearray | memoryview | readable buffer
+        A buffer containing the encapsulated frame data, starting at the first
+        byte of the basic offset table. May be an object that `supports the
+        buffer protocol <https://docs.python.org/3/c-api/buffer.html>`_ such as
+        :class:`bytes` or an object with ``read()``, ``tell()`` and ``seek()``
+        methods. If the latter then the buffer will be reset to the starting
+        position if the frame was returned successfully.
+    index : int
+        The index of the frame to be returned.
+    number_of_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty,
+        the Extended Offset Table has not been supplied and there are
+        multiple frames. This should be the value of (0028,0008) *Number of
+        Frames* or the expected number of frames in the encapsulated data.
+    extended_offsets : tuple[list[int], list[int]], optional
+        The (offsets, lengths) of the Extended Offset Table as taken from
+        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
+        Table Lengths*.
+    little_endian : bool, optional
+        If ``True`` (default) then the encapsulated data uses little endian
+        encoding, otherwise it uses big endian encoding.
+
+    Returns
+    -------
+    bytes | bytearray | memoryview
+        A single frame of pixel data. Will return the original `buffer` type
+        when `extended_offsets` is used or when each frame consists of only one
+        fragment, otherwise :class:`bytes` will be returned.
+    """
+    if hasattr(buffer, "read"):
+        return _get_frame_binary(
+            cast(ReadableBuffer, buffer),
+            index,
+            extended_offsets,
+            number_of_frames,
+            little_endian,
+        )
+
+    return _get_frame_buffer(
+        cast(Buffer, buffer), index, extended_offsets, number_of_frames, little_endian
+    )
+
+
+def _get_frame_buffer(
+    buffer: Buffer,
+    index: int,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    number_of_frames: int | None = None,
+    little_endian: bool = True,
+) -> Buffer:
+    # Always need to know where the end of the Basic Offset Table is
+    table_length, basic_offsets = parse_basic_offsets(
+        buffer, little_endian=little_endian
+    )
+
+    # Prefer the extended offset table (if available)
+    if extended_offsets:
+        if index >= len(extended_offsets[0]):
+            raise ValueError(
+                "There aren't enough offsets in the Extended Offset Table for "
+                f"{index + 1} frames"
+            )
+        # Offset is from first byte after BOT to the start of the Item Tag
+        #   as we have the lengths we can skip the item tag and item length
+        offset = extended_offsets[0][index] + table_length + 8
+        length = extended_offsets[1][index]
+        return buffer[offset : offset + length]  # bytes, bytearray, memoryview
+
+    # Determine the number of fragments in `buffer`
+    nr_fragments, fragment_offsets = _parse_fragments_buffer(
+        buffer[table_length:], little_endian
+    )
+
+    # Fall back to the basic offset table (if available)
+    if basic_offsets:
+        if index >= len(basic_offsets):
+            raise ValueError(
+                "There aren't enough offsets in the Basic Offset Table for "
+                f"{index + 1} frames"
+            )
+        basic_offsets.append(len(buffer))
+        start_offset = basic_offsets[index] + table_length
+        end_offset = basic_offsets[index + 1] + table_length
+        frame = [
+            fragment
+            for fragment in _fragments_buffer(
+                buffer[start_offset:end_offset], little_endian
+            )
+        ]
+        # bytes, bytearray, memoryview | bytes
+        return frame[0] if len(frame) == 1 else b"".join(frame)
+
+    # No basic or extended offset table
+    fragments = _fragments_buffer(buffer[8:], little_endian)
+
+    # Single fragment must be 1 frame
+    if nr_fragments == 1:
+        if index == 0:
+            return next(fragments)  # bytes, bytearray, memoryview
+
+        raise ValueError("The encapsulated pixel data only contains 1 frame")
+
+    # From this point on we require the number of frames as there are
+    #   multiple fragments and may be one or more frames
+    if not number_of_frames:
+        raise ValueError(
+            "Unable to determine the frame boundaries for the encapsulated "
+            "pixel data as there is no Basic or Extended Offset Table and "
+            "the number of frames has not been supplied"
+        )
+
+    # 1 fragment per frame, for N frames
+    if nr_fragments == number_of_frames:
+        if index >= len(fragment_offsets):
+            raise ValueError(
+                f"There are insufficient fragments to contain {index + 1} frames"
+            )
+
+        # Covers RLE and others if 1:1 ratio
+        # `fragment_offsets` are relative to the end of the BOT
+        fragment_offsets.append(len(buffer))
+        start_offset = fragment_offsets[index] + table_length
+        end_offset = fragment_offsets[index + 1] + table_length - 8
+        return buffer[start_offset:end_offset]  # bytes, bytearray, memoryview
+
+    # Multiple fragments for 1 frame
+    if number_of_frames == 1:
+        if index == 0:
+            return b"".join(fragment for fragment in fragments)  # bytes
+
+        raise ValueError("The 'index' must be 0 if the number of frames is 1")
+
+    # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker which should be the
+    #   last two bytes of a frame
+    eoi_marker = b"\xFF\xD9"
+    frame = []
+    frame_nr = 0
+    for fragment in fragments:
+        frame.append(fragment)
+        if eoi_marker in fragment[-10:]:
+            if frame_nr == index:
+                # bytes, bytearray, memoryview | bytes
+                return frame[0] if len(frame) == 1 else b"".join(frame)
+
+            frame_nr += 1
+            frame = []
+
+    if frame and index == frame_nr:
+        warn_and_log(
+            "The end of the encapsulated pixel data has been reached but no "
+            "JPEG EOI/EOC marker was found, the returned frame data may be "
+            "invalid"
+        )
+        # bytes, bytearray, memoryview | bytes
+        return frame[0] if len(frame) == 1 else b"".join(frame)
+
+    raise ValueError(f"There is insufficient pixel data to contain {index + 1} frames")
+
+
+def _get_frame_binary(
+    buffer: ReadableBuffer,
+    index: int,
+    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
+    number_of_frames: int | None = None,
+    little_endian: bool = True,
+) -> bytes:
+    starting_position = buffer.tell()
+
+    # Always need to know where the end of the Basic Offset Table is
+    table_length, basic_offsets = parse_basic_offsets(
+        buffer, little_endian=little_endian
+    )
+    # `buffer` is positioned at the end of the basic offsets table
+
+    # Prefer the extended offset table (if available)
+    if extended_offsets:
+        if index >= len(extended_offsets[0]):
+            raise ValueError(
+                "There aren't enough offsets in the Extended Offset Table for "
+                f"{index + 1} frames"
+            )
+        # Offset is from first byte after BOT to the start of the Item Tag
+        #   as we have the lengths we can skip the item tag and item length
+        offset = extended_offsets[0][index] + 8
+        length = extended_offsets[1][index]
+        buffer.seek(offset, 1)
+        frame = buffer.read(length)
+        buffer.seek(starting_position)
+        return frame
+
+    # Fall back to the basic offset table (if available)
+    if basic_offsets:
+        if index >= len(basic_offsets):
+            raise ValueError(
+                "There aren't enough offsets in the Basic Offset Table for "
+                f"{index + 1} frames"
+            )
+
+        # If the final frame we need to read to the end (or the delimiter tag)
+        length = -1
+        if index < len(basic_offsets) - 1:
+            length = basic_offsets[index + 1] - basic_offsets[index]
+
+        buffer.seek(basic_offsets[index], 1)
+        fragments = _fragments_buffer(buffer.read(length), little_endian)
+        frame = b"".join(fragment for fragment in fragments)
+        buffer.seek(starting_position)
+        return frame
+
+    # No basic or extended offset table
+    # Determine the number of fragments in `buffer`
+    nr_fragments, fragment_offsets = _parse_fragments_binary(buffer, little_endian)
+    # `buffer` is positioned at the end of the basic offsets table
+    fragments = _fragments_binary(buffer, little_endian)
+
+    # Single fragment must be 1 frame
+    if nr_fragments == 1:
+        if index == 0:
+            frame = next(fragments)
+            buffer.seek(starting_position)
+            return frame
+
+        raise ValueError("The encapsulated pixel data only contains 1 frame")
+
+    # From this point on we require the number of frames as there are
+    #   multiple fragments and may be one or more frames
+    if not number_of_frames:
+        raise ValueError(
+            "Unable to determine the frame boundaries for the encapsulated "
+            "pixel data as there is no Basic or Extended Offset Table and "
+            "the number of frames has not been supplied"
+        )
+
+    # 1 fragment per frame, for N frames
+    if nr_fragments == number_of_frames:
+        if index >= len(fragment_offsets):
+            raise ValueError(
+                f"There are insufficient fragments to contain {index + 1} frames"
+            )
+
+        # Covers RLE and others if 1:1 ratio
+        # `fragment_offsets` are relative to the end of the BOT
+        length = -1
+        if index < len(fragment_offsets) - 1:
+            length = fragment_offsets[index + 1] - fragment_offsets[index] - 8
+
+        buffer.seek(fragment_offsets[index], 1)
+        frame = buffer.read(length)
+        buffer.seek(starting_position)
+        return frame
+
+    # Multiple fragments for 1 frame
+    if number_of_frames == 1:
+        if index == 0:
+            frame = b"".join(fragment for fragment in fragments)
+            buffer.seek(starting_position)
+            return frame
+
+        raise ValueError("The 'index' must be 0 if the number of frames is 1")
+
+    # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker which should be the
+    #   last two bytes of a frame
+    eoi_marker = b"\xFF\xD9"
+    frame_fragments = []
+    frame_nr = 0
+    for fragment in fragments:
+        frame_fragments.append(fragment)
+        if eoi_marker in fragment[-10:]:
+            if frame_nr == index:
+                frame = b"".join(frame_fragments)
+                buffer.seek(starting_position)
+                return frame
+
+            frame_nr += 1
+            frame_fragments = []
+
+    if frame_fragments and index == frame_nr:
+        warn_and_log(
+            "The end of the encapsulated pixel data has been reached but no "
+            "JPEG EOI/EOC marker was found, the returned frame data may be "
+            "invalid"
+        )
+        frame = b"".join(frame_fragments)
+        buffer.seek(starting_position)
+        return frame
+
+    raise ValueError(f"There is insufficient pixel data to contain {index + 1} frames")
+
+
+# TODO v4.0: remove
 def get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
     """Return a list of the fragment offsets from the Basic Offset Table.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, please use
+        :func:`~pydicom.encaps.parse_basic_offsets` instead.
 
     **Basic Offset Table**
 
@@ -101,143 +1204,29 @@ def get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
     return bool(length), offsets
 
 
-# Buffer version of get_frame_offsets()
-def _get_frame_offsets(
-    buffer: Buffer, little_endian: bool = True
-) -> tuple[int, list[int]]:
-    """Return a list of the fragment offsets from the Basic Offset Table.
-
-    Parameters
-    ----------
-    buffer : bytes | bytearray | memoryview
-        A buffer-like containing the encapsulated pixel data positioned at the
-        start of the Basic Offset Table.
-    little_endian : bool, optional
-        If ``True`` (default) then the values are encoded as little endian,
-        otherwise they're encoded as big endian.
-
-    Returns
-    -------
-    tuple[int, list[int]]
-        The offset to the end of the Basic Offset Table and a list of the byte
-        offsets to the first fragment of each frame, as measured from the start
-        of the first item following the Basic Offset Table item.
-    """
-    endianness = "><"[little_endian]
-    tag_unpacker = Struct(f"{endianness}HH").unpack
-    length_unpacker = Struct(f"{endianness}L").unpack
-
-    group, elem = tag_unpacker(buffer[:4])
-    if group << 16 | elem != 0xFFFEE000:
-        raise ValueError(
-            f"Unexpected tag '{Tag(group, elem)}' when parsing the Basic Table Offset item"
-        )
-
-    length = length_unpacker(buffer[4:8])[0]
-    if length % 4:
-        raise ValueError(
-            "The length of the Basic Offset Table item is not a multiple of 4"
-        )
-
-    if length == 0:
-        return 8, []
-
-    return (
-        8 + length,
-        [length_unpacker(buffer[ii : ii + 4])[0] for ii in range(8, 8 + length, 4)],
-    )
-
-
+# TODO v4.0: remove
 def get_nr_fragments(fp: DicomIO) -> int:
     """Return the number of fragments in `fp`.
 
-    .. versionadded:: 1.4
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, please use
+        :func:`~pydicom.encaps.parse_fragments` instead.
     """
     if not fp.is_little_endian:
         raise ValueError("'fp.is_little_endian' must be True")
 
-    nr_fragments = 0
-    start = fp.tell()
-    while True:
-        try:
-            tag = Tag(fp.read_tag())
-        except EOFError:
-            break
-
-        if tag == 0xFFFEE000:
-            # Item
-            length = fp.read_UL()
-            if length == 0xFFFFFFFF:
-                raise ValueError(
-                    f"Undefined item length at offset {fp.tell() - 4} when "
-                    "parsing the encapsulated pixel data fragments"
-                )
-            fp.seek(length, 1)
-            nr_fragments += 1
-        elif tag == 0xFFFEE0DD:
-            # Sequence Delimiter
-            break
-        else:
-            raise ValueError(
-                f"Unexpected tag '{tag}' at offset {fp.tell() - 4} when "
-                "parsing the encapsulated pixel data fragment items"
-            )
-
-    fp.seek(start)
-    return nr_fragments
+    return _parse_fragments_binary(fp)[0]
 
 
-# Buffer version of get_nr_fragments()
-def _get_nr_fragments(buffer: Buffer, little_endian: bool = True) -> int:
-    """Return the number of fragments in `buffer`.
-
-    Parameters
-    ----------
-    buffer : bytes | bytearray | memoryview
-        The buffer containing encapsulated pixel data. Should be positioned so
-        that start is at the start of the Basic Offset Table.
-    little_endian : bool, optional
-        If ``True`` (default) then the encapsulated data uses little endian
-        encoding, otherwise it uses big endian encoding.
-
-    Returns
-    -------
-    int
-        The number of fragments in `buffer`.
-    """
-    endianness = "><"[little_endian]
-    tag_unpacker = Struct(f"{endianness}HH").unpack
-    length_unpacker = Struct(f"{endianness}L").unpack
-
-    offset = 0
-    nr_fragments = 0
-    end = len(buffer)
-    while offset + 4 <= end:
-        group, elem = tag_unpacker(buffer[offset : offset + 4])
-        tag = group << 16 | elem
-
-        if tag == 0xFFFEE000:
-            length = length_unpacker(buffer[offset + 4 : offset + 8])[0]
-            if length == 0xFFFFFFFF:
-                raise ValueError(
-                    f"Undefined item length at offset {offset + 4} when "
-                    "parsing the encapsulated pixel data fragments"
-                )
-            offset += 8 + length
-            nr_fragments += 1
-        elif tag == 0xFFFEE0DD:
-            break
-        else:
-            raise ValueError(
-                f"Unexpected tag '{Tag(tag)}' at offset {offset} when "
-                "parsing the encapsulated pixel data fragment items"
-            )
-
-    return nr_fragments
-
-
+# TODO v4.0: remove
 def generate_pixel_data_fragment(fp: DicomIO) -> Iterator[bytes]:
     """Yield the encapsulated pixel data fragments.
+
+    .. deprecated:: 3.0
+
+        This function will be remove in v4.0, please use
+        :func:`~pydicom.encaps.generate_fragments` instead.
 
     For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
     Data* element is encoded in an encapsulated format.
@@ -295,88 +1284,13 @@ def generate_pixel_data_fragment(fp: DicomIO) -> Iterator[bytes]:
     if not fp.is_little_endian:
         raise ValueError("'fp.is_little_endian' must be True")
 
-    # We should be positioned at the start of the Item Tag for the first
-    # fragment after the Basic Offset Table
-    while True:
-        try:
-            tag = Tag(fp.read_tag())
-        except EOFError:
-            break
-
-        if tag == 0xFFFEE000:
-            # Item
-            length = fp.read_UL()
-            if length == 0xFFFFFFFF:
-                raise ValueError(
-                    f"Undefined item length at offset {fp.tell() - 4} when "
-                    "parsing the encapsulated pixel data fragments"
-                )
-            yield fp.read(length)
-        elif tag == 0xFFFEE0DD:
-            # Sequence Delimiter
-            # Behave nicely and rewind back to the end of the items
-            fp.seek(-4, 1)
-            break
-        else:
-            raise ValueError(
-                f"Unexpected tag '{tag}' at offset {fp.tell() - 4} when "
-                "parsing the encapsulated pixel data fragment items"
-            )
+    return _fragments_binary(fp)
 
 
-# Buffer version of generate_pixel_data_fragment()
-def _generate_fragments(buffer: Buffer, little_endian: bool = True) -> Iterator[Buffer]:
-    """Yield fragments from `buffer`.
-
-    Parameters
-    ----------
-    buffer : bytes | bytearray | memoryview
-        The buffer containing encapsulated pixel data. Should be positioned so
-        that start is at the start of the Basic Offset Table.
-    little_endian : bool, optional
-        If ``True`` (default) then the encapsulated data uses little endian
-        encoding, otherwise it uses big endian encoding.
-
-    Yields
-    -------
-    bytes | bytearray | memoryview
-        An encapsulated pixel data fragment of the same type as `buffer`.
-    """
-    endianness = "><"[little_endian]
-    tag_unpacker = Struct(f"{endianness}HH").unpack
-    length_unpacker = Struct(f"{endianness}L").unpack
-
-    offset = 0
-    end = len(buffer)
-    while offset + 4 <= end:
-        group, elem = tag_unpacker(buffer[offset : offset + 4])
-        tag = group << 16 | elem
-
-        if tag == 0xFFFEE000:
-            length = length_unpacker(buffer[offset + 4 : offset + 8])[0]
-            if length == 0xFFFFFFFF:
-                raise ValueError(
-                    f"Undefined item length at offset {offset + 4} when "
-                    "parsing the encapsulated pixel data fragments"
-                )
-            yield buffer[offset + 8 : offset + 8 + length]
-            offset += 8 + length
-        elif tag == 0xFFFEE0DD:
-            break
-        else:
-            raise ValueError(
-                f"Unexpected tag '{Tag(tag)}' at offset {offset} when "
-                "parsing the encapsulated pixel data fragment items"
-            )
-
-
+# TODO v4.0: remove
 def generate_pixel_data_frame(
-    buffer: Buffer,
-    /,
-    *,
-    number_of_frames: int | None = None,
-    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
-    little_endian: bool = True,
+    bytestream: bytes,
+    nr_frames: int | None = None,
 ) -> Iterator[bytes]:
     """Yield complete frames from `buffer` as :class:`bytes`.
 
@@ -384,53 +1298,40 @@ def generate_pixel_data_frame(
     more frames may be yielded than given by `number_of_frames` provided there
     are sufficient excess fragments available.
 
-    .. versionchanged:: 3.0
+    .. deprecated:: 3.0
 
-        Added the `extended_offsets` and `little_endian` keyword parameters,
-        and changed `number_of_frames` to keyword only.
-
+        This function will be remove in v4.0, please use
+        :func:`~pydicom.encaps.generate_frames` instead
 
     Parameters
     ----------
-    src : bytes | bytearray | memoryview
+    bytestream : bytes
         The encapsulated frame data with offset 0 at the start of the basic
         offset table.
-    extended_offsets : tuple[list[int], list[int]], optional
-        The (offsets, lengths) of the Extended Offset Table as taken from
-        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
-        Table Lengths*.
-    number_of_frames : int, optional
+    nr_frames : int, optional
         The expected number of frames in the encapsulated data. Required when
         the Basic Offset Table is empty and the Extended Offset Table data
         has not been supplied.
-    little_endian : bool, optional
-        If ``True`` (default) then the encapsulated data uses little endian
-        encoding, otherwise it uses big endian encoding.
 
     Yields
     ------
     bytes
         A single frame of pixel data.
     """
-    frames = generate_pixel_data(
-        buffer,
-        number_of_frames=number_of_frames,
-        extended_offsets=extended_offsets,
-        little_endian=little_endian,
-    )
-    for frame in frames:
+    for frame in _fragmented_frames_buffer(bytestream, nr_frames):
         yield b"".join(frame)
 
 
+# TODO v4.0: remove
 def generate_pixel_data(
-    buffer: Buffer,
-    /,
-    *,
-    number_of_frames: int | None = None,
-    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
-    little_endian: bool = True,
-) -> Iterator[tuple[Buffer, ...]]:
+    bytestream: bytes,
+    nr_frames: int | None = None,
+) -> Iterator[tuple[bytes, ...]]:
     """Yield an encapsulated pixel data frame.
+
+    .. deprecated:: 3.0
+
+        Please use :func:`~pydicom.encaps.generate_fragmented_frames` instead.
 
     For the following transfer syntaxes, a fragment may not contain encoded
     data from more than one frame. However data from one frame may span
@@ -455,32 +1356,20 @@ def generate_pixel_data(
 
     * 1.2.840.10008.1.2.5 - RLE Lossless
 
-    .. versionchanged:: 3.0
-
-        Added the `extended_offsets` and `little_endian` keyword parameters,
-        and changed `number_of_frames` to keyword only.
-
     Parameters
     ----------
-    buffer : bytes | bytearray | memoryview
+    buffer : bytes
         The encapsulated pixel data positioned at the start of the Basic Offset
         Table item should be present and the Sequence Delimiter item may or may
         not be present.
-    number_of_frames : int, optional
+    nr_frames : int, optional
         Required for multi-frame data when the Basic Offset Table is empty
         and there are multiple frames. This should be the value of (0028,0008)
         *Number of Frames*.
-    extended_offsets : tuple[list[int], list[int]], optional
-        The (offsets, lengths) of the Extended Offset Table as taken from
-        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
-        Table Lengths*.
-    little_endian : bool, optional
-        If ``True`` (default) then the encapsulated data uses little endian
-        encoding, otherwise it uses big endian encoding.
 
     Yields
     -------
-    tuple[bytes | bytearray | memoryview, ...]
+    tuple[bytes, ...]
         An encapsulated pixel data frame, with the contents of the
         :class:`tuple` the frame's fragmented data.
 
@@ -497,118 +1386,19 @@ def generate_pixel_data(
     ----------
     DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
-    # Always need to know where the end of the Basic Offset Table is
-    table_end, basic_offsets = _get_frame_offsets(buffer, little_endian)
-
-    # Prefer the extended offset table (if available)
-    if extended_offsets:
-        offsets = extended_offsets[0]
-        lengths = extended_offsets[1]
-        for offset, length in zip(offsets, lengths):
-            offset += table_end
-            yield (buffer[offset : offset + length],)
-
-        return
-
-    # Fall back to the basic offset table (if available)
-    if basic_offsets:
-        basic_offsets = [offset + table_end for offset in basic_offsets]
-        basic_offsets.append(len(buffer))
-        for start_offset, end_offset in zip(basic_offsets, basic_offsets[1:]):
-            fragments = _generate_fragments(
-                buffer[start_offset:end_offset],
-                little_endian,
-            )
-            yield tuple(fragment for fragment in fragments)
-
-        return
-
-    # No basic or extended offset table
-    # Determine the number of fragments in the buffer
-    nr_fragments = _get_nr_fragments(buffer[8:], little_endian)
-    fragments = _generate_fragments(buffer[8:], little_endian)
-    # Single fragment must be 1 frame
-    if nr_fragments == 1:
-        yield (next(fragments),)
-        return
-
-    # From this point on we require the number of frames as there are
-    #   multiple fragments and may be one or more frames
-    if not number_of_frames:
-        raise ValueError(
-            "Unable to determine the frame boundaries for the encapsulated "
-            "pixel data as there is no Basic or Extended Offset Table and "
-            "the number of frames has not been supplied"
-        )
-
-    # 1 fragment per frame, for N frames
-    if nr_fragments == number_of_frames:
-        # Covers RLE and others if 1:1 ratio
-        for fragment in fragments:
-            yield (fragment,)
-
-        return
-
-    # Multiple fragments for 1 frame
-    if number_of_frames == 1:
-        yield tuple(fragment for fragment in fragments)
-        return
-
-    # More fragments then frames
-    if nr_fragments > number_of_frames:
-        # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker which should be the
-        #   last two bytes of a frame
-        # It's possible to yield more frames than `number_of_frames` as
-        #   long as there are excess fragments with JPEG EOI/EOC markers
-        # It's also possible that we yielded too early because the marker bytes
-        #   were actually part of the compressed JPEG codestream
-        eoi_marker = b"\xff\xd9"
-        frame = []
-        frame_nr = 0
-        for fragment in fragments:
-            frame.append(fragment)
-            if eoi_marker in fragment[-10:]:
-                yield tuple(frame)
-                frame_nr += 1
-                frame = []
-
-        # There was a final set of fragments with no EOI/EOC marker, data is
-        #   probably corrupted, but yield it and warn/log anyway
-        if frame:
-            if frame_nr >= number_of_frames:
-                msg = (
-                    "The end of the encapsulated pixel data has been reached but "
-                    "no JPEG EOI/EOC marker was found, the final frame may be "
-                    "be invalid"
-                )
-            else:
-                msg = (
-                    "The end of the encapsulated pixel data has been reached but "
-                    "fewer frames than expected have been found. Please confirm "
-                    "that the generated frame data is correct"
-                )
-
-            warn_and_log(msg)
-            yield tuple(frame)
-
-        elif frame_nr < number_of_frames:
-            warn_and_log(
-                "The end of the encapsulated pixel data has been reached but "
-                "fewer frames than expected have been found"
-            )
-
-        return
-
-    # Fewer fragments than frames
-    raise ValueError(
-        "Unable to parse encapsulated pixel data as there is no Basic or "
-        "Extended Offset Table and there are fewer fragments then frames; "
-        "the dataset may be corrupt or the number of frames may be incorrect"
-    )
+    yield from _fragmented_frames_buffer(bytestream, number_of_frames=nr_frames)
 
 
+# TODO v4.0: remove
 def decode_data_sequence(data: bytes) -> list[bytes]:
     """Read encapsulated data and return a list of bytes.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, Please use
+        :func:`~pydicom.encaps.generate_frames` for generating frame
+        data or :func:`~pydicom.encaps.generate_fragments` for generating
+        fragment data.
 
     Parameters
     ----------
@@ -639,8 +1429,16 @@ def decode_data_sequence(data: bytes) -> list[bytes]:
         return seq
 
 
+# TODO v4.0: remove
 def defragment_data(data: bytes) -> bytes:
     """Read encapsulated data and return the fragments as one continuous bytes.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, Please use
+        :func:`~pydicom.encaps.generate_frames` for generating frame
+        data or :func:`~pydicom.encaps.generate_fragments` for generating
+        fragment data.
 
     Parameters
     ----------
@@ -655,9 +1453,14 @@ def defragment_data(data: bytes) -> bytes:
     return b"".join(decode_data_sequence(data))
 
 
-# read_item modeled after filereader.ReadSequenceItem
+# TODO v4.0: remove
 def read_item(fp: DicomIO) -> bytes | None:
     """Read and return a single Item in the fragmented data stream.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, please use
+        :func:`~pydicom.encaps.generate_fragments` instead.
 
     Parameters
     ----------
@@ -710,149 +1513,6 @@ def read_item(fp: DicomIO) -> bytes | None:
 
     item_data = fp.read(length)
     return item_data
-
-
-def get_frame(
-    src: Buffer,
-    index: int,
-    /,
-    *,
-    extended_offsets: tuple[Sequence[int], Sequence[int]] | None = None,
-    number_of_frames: int | None = None,
-    little_endian: bool = True,
-) -> Buffer:
-    """Return the specified frame at `index`.
-
-    .. versionadded:: 3.0
-
-    When the Basic and Extended Offset Tables aren't available then it's
-    possible to return a frame with an `index` greater than `number_of_frames`
-    provided there are sufficient excess fragments available.
-
-    Parameters
-    ----------
-    src : bytes | bytearray | memoryview
-        The encapsulated frame data with offset 0 at the start of the basic
-        offset table.
-    extended_offsets : tuple[list[int], list[int]], optional
-        The (offsets, lengths) of the Extended Offset Table as taken from
-        (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset
-        Table Lengths*.
-    number_of_frames : int, optional
-        The expected number of frames in the encapsulated data. Required when
-        the Basic Offset Table is empty and the Extended Offset Table data
-        hasn't been supplied.
-    little_endian : bool, optional
-        If ``True`` (default) then the encapsulated data uses little endian
-        encoding, otherwise it uses big endian encoding.
-
-    Returns
-    -------
-    bytes | bytearray | memoryview
-        A single frame of pixel data. Will return the original `src` type when
-        `extended_offsets` is used or when each frame consists of only one
-        fragment, otherwise :class:`bytes` will be returned.
-    """
-    # Always need to know where the end of the Basic Offset Table is
-    table_end, basic_offsets = _get_frame_offsets(src, little_endian)
-
-    # Prefer the extended offset table (if available)
-    if extended_offsets:
-        if index >= len(extended_offsets[0]):
-            raise ValueError(
-                f"There is insufficient pixel data to contain {index + 1} frames"
-            )
-        # Offset is from first byte after BOT to the start of the Item Tag
-        #   as we have the lengths we can skip the item tag and item length
-        offset = extended_offsets[0][index] + table_end + 8
-        length = extended_offsets[1][index]
-        return src[offset : offset + length]  # bytes, bytearray, memoryview
-
-    # Determine the number of fragments in `src`
-    nr_fragments = _get_nr_fragments(src[table_end:], little_endian)
-
-    # Fall back to the basic offset table (if available)
-    if basic_offsets:
-        if index >= len(basic_offsets):
-            raise ValueError(
-                f"There is insufficient pixel data to contain {index + 1} frames"
-            )
-        basic_offsets.append(len(src))
-        start_offset = basic_offsets[index] + table_end
-        end_offset = basic_offsets[index + 1] + table_end
-        frame = [
-            fragment
-            for fragment in _generate_fragments(
-                src[start_offset:end_offset], little_endian
-            )
-        ]
-        # bytes, bytearray, memoryview | bytes
-        return frame[0] if len(frame) == 1 else b"".join(frame)
-
-    # No basic or extended offset table
-    fragments = _generate_fragments(src[8:], little_endian)
-
-    # Single fragment must be 1 frame
-    if nr_fragments == 1:
-        if index == 0:
-            return next(fragments)  # bytes, bytearray, memoryview
-
-        raise ValueError("The encapsulated pixel data only contains 1 frame")
-
-    # From this point on we require the number of frames as there are
-    #   multiple fragments and may be one or more frames
-    if not number_of_frames:
-        raise ValueError(
-            "Unable to determine the frame boundaries for the encapsulated "
-            "pixel data as there is no Basic or Extended Offset Table and "
-            "the number of frames has not been supplied"
-        )
-
-    # 1 fragment per frame, for N frames
-    if nr_fragments == number_of_frames:
-        # Covers RLE and others if 1:1 ratio
-        for ii, fragment in enumerate(fragments):
-            if ii != index:
-                continue
-
-            return fragment  # bytes, bytearray, memoryview
-
-        raise ValueError(
-            f"There is insufficient pixel data to contain {index + 1} frames"
-        )
-
-    # Multiple fragments for 1 frame
-    if number_of_frames == 1:
-        if index == 0:
-            return b"".join(fragment for fragment in fragments)  # bytes
-
-        raise ValueError("The 'index' must be 0 if there is only 1 frame")
-
-    # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker which should be the
-    #   last two bytes of a frame
-    eoi_marker = b"\xFF\xD9"
-    frame = []
-    frame_nr = 0
-    for fragment in fragments:
-        frame.append(fragment)
-        if eoi_marker in fragment[-10:]:
-            if frame_nr == index:
-                # bytes, bytearray, memoryview | bytes
-                return frame[0] if len(frame) == 1 else b"".join(frame)
-
-            frame_nr += 1
-            frame = []
-
-    if frame and index == frame_nr:
-        warn_and_log(
-            "The end of the encapsulated pixel data has been reached but no "
-            "JPEG EOI/EOC marker was found, the returned frame data may be "
-            "invalid"
-        )
-        # bytes, bytearray, memoryview | bytes
-        return frame[0] if len(frame) == 1 else b"".join(frame)
-
-    raise ValueError(f"There is insufficient pixel data to contain {index + 1} frames")
 
 
 # Functions for encapsulating data
@@ -951,9 +1611,6 @@ def itemize_fragment(fragment: bytes) -> bytes:
     return item
 
 
-itemise_fragment = itemize_fragment
-
-
 def itemize_frame(frame: bytes, nr_fragments: int = 1) -> Iterator[bytes]:
     """Yield items generated from `frame`.
 
@@ -985,9 +1642,6 @@ def itemize_frame(frame: bytes, nr_fragments: int = 1) -> Iterator[bytes]:
     """
     for fragment in fragment_frame(frame, nr_fragments):
         yield itemize_fragment(fragment)
-
-
-itemise_frame = itemize_frame
 
 
 def encapsulate(
