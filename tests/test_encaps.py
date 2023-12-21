@@ -2502,7 +2502,7 @@ class TestGenerateFrames:
             assert reference[-10:] == b"\x56\xF7\xFF\x4E\x60\xE3\xDA\x0F\xFF\xD9"
 
         with open(JP2K_10FRAME_NOBOT, "rb") as f:
-            mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+            mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
             # Start of BOT is at offset 2352
             mm.seek(elem.file_tell)
             # frame 9 (index 8) starts at offset 32802 and is 3754 bytes long
@@ -2899,7 +2899,7 @@ class TestGetFrame:
             assert reference[-10:] == b"\x56\xF7\xFF\x4E\x60\xE3\xDA\x0F\xFF\xD9"
 
         with open(JP2K_10FRAME_NOBOT, "rb") as f:
-            mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+            mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
             # Start of BOT is at offset 2352
             mm.seek(elem.file_tell)
             # frame 9 (index 8) starts at offset 32802 and is 3754 bytes long
