@@ -29,7 +29,7 @@ except ImportError:
     HAVE_JPEG2K = False
 
 from pydicom import config
-from pydicom.encaps import generate_pixel_data_frame
+from pydicom.encaps import generate_frames
 from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import (
     pixel_dtype,
@@ -193,7 +193,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     pixel_bytes = bytearray()
     j2k_precision, j2k_sign = None, None
-    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
+    for frame in generate_frames(ds.PixelData, number_of_frames=nr_frames):
         im = _decompress_single_frame(
             frame, transfer_syntax, photometric_interpretation
         )

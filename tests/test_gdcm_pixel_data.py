@@ -19,7 +19,7 @@ except ImportError:
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data
+from pydicom.encaps import get_frame
 from pydicom.pixel_data_handlers import numpy_handler, gdcm_handler
 from pydicom.pixel_data_handlers.util import (
     _convert_YBR_FULL_to_RGB,
@@ -514,7 +514,7 @@ class TestsWithGDCM:
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
-        bs = defragment_data(ds.PixelData)
+        bs = get_frame(ds.PixelData, 0)
         params = get_j2k_parameters(bs)
         assert 13 == params["precision"]
         assert not params["is_signed"]

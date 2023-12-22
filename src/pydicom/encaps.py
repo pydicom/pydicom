@@ -4,8 +4,9 @@
 from collections.abc import Iterator
 from io import BytesIO
 from struct import pack, unpack
+from typing import Any
 
-import pydicom.config
+from pydicom import config
 from pydicom.misc import warn_and_log
 from pydicom.filebase import DicomBytesIO, DicomIO, ReadableBuffer
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
@@ -220,7 +221,7 @@ def generate_fragmented_frames(
     Parameters
     ----------
     buffer : bytes | readable buffer
-        A buffer containing the encapsulated frame data, starting at the first
+        A buffer containing the encapsulated frame data, positioned at the first
         byte of the basic offset table. May be :class:`bytes` or an object with
         ``read()``, ``tell()`` and ``seek()`` methods. If the latter then the
         final position depends on how many fragmented frames have been yielded.
@@ -249,7 +250,6 @@ def generate_fragmented_frames(
     if isinstance(buffer, bytes):
         buffer = BytesIO(buffer)
 
-    # Parse the basic offsets table - for EOT need to confirm it's empty
     basic_offsets = parse_basic_offsets(buffer, endianness=endianness)
     # `buffer` is positioned at the end of the basic offsets table
 
@@ -390,9 +390,8 @@ def generate_fragmented_frames(
     # nr_fragments < number_of_frames
     raise ValueError(
         "Unable to generate frames from the encapsulated pixel data as there "
-        "is no basic or extended offset table data and there are fewer fragments "
-        "than frames; the dataset may be corrupt or the number of frames may "
-        "be incorrect"
+        "are fewer fragments than frames; the dataset may be corrupt or the "
+        "number of frames may be incorrect"
     )
 
 
@@ -478,7 +477,7 @@ def get_frame(
     Parameters
     ----------
     buffer : bytes | readable buffer
-        A buffer containing the encapsulated frame data, starting at the first
+        A buffer containing the encapsulated frame data, positioned at the first
         byte of the basic offset table. May be :class:`bytes` or an object
         with ``read()``, ``tell()`` and ``seek()`` methods. If the latter then
         the buffer will be reset to the starting position if the frame was
@@ -516,7 +515,6 @@ def get_frame(
     # `buffer` is positioned at the start of the basic offsets table
     starting_position = buffer.tell()
 
-    # Parse the basic offsets table - for EOT need to confirm it's empty
     basic_offsets = parse_basic_offsets(buffer, endianness=endianness)
     # `buffer` is positioned at the end of the basic offsets table
 
@@ -649,409 +647,6 @@ def get_frame(
         return frame
 
     raise ValueError(f"There is insufficient pixel data to contain {index + 1} frames")
-
-
-# TODO v4.0: remove
-def get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
-    """Return a list of the fragment offsets from the Basic Offset Table.
-
-    .. deprecated:: 3.0
-
-        This function will be removed in v4.0, please use
-        :func:`~pydicom.encaps.parse_basic_offsets` instead.
-
-    **Basic Offset Table**
-
-    The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
-    a length, however it may or may not have a value.
-
-    Basic Offset Table with no value
-    ::
-
-        Item Tag   | Length    |
-        FE FF 00 E0 00 00 00 00
-
-    Basic Offset Table with value (2 frames)
-    ::
-
-        Item Tag   | Length    | Offset 1  | Offset 2  |
-        FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
-
-    For single or multi-frame images with only one frame, the Basic Offset
-    Table may or may not have a value. When it has no value then its length
-    shall be ``0x00000000``.
-
-    For multi-frame images with more than one frame, the Basic Offset Table
-    should have a value containing concatenated 32-bit unsigned integer values
-    that are the byte offsets to the first byte of the Item tag of the first
-    fragment of each frame as measured from the first byte of the first item
-    tag following the Basic Offset Table Item.
-
-    All decoders, both for single and multi-frame images should accept both
-    an empty Basic Offset Table and one containing offset values.
-
-    .. versionchanged:: 1.4
-
-        Changed to return (is BOT empty, list of offsets).
-
-    Parameters
-    ----------
-    fp : filebase.DicomIO
-        The encapsulated pixel data positioned at the start of the Basic Offset
-        Table. ``fp.is_little_endian`` should be set to ``True``.
-
-    Returns
-    -------
-    bool, list of int
-        Whether or not the BOT is empty, and a list of the byte offsets
-        to the first fragment of each frame, as measured from the start of the
-        first item following the Basic Offset Table item.
-
-    Raises
-    ------
-    ValueError
-        If the Basic Offset Table item's tag is not (FFEE,E000) or if the
-        length in bytes of the item's value is not a multiple of 4.
-
-    References
-    ----------
-    DICOM Standard, Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
-    """
-    if not fp.is_little_endian:
-        raise ValueError("'fp.is_little_endian' must be True")
-
-    tag = Tag(fp.read_tag())
-
-    if tag != 0xFFFEE000:
-        raise ValueError(
-            f"Unexpected tag '{tag}' when parsing the Basic Table Offset item"
-        )
-
-    length = fp.read_UL()
-    if length % 4:
-        raise ValueError(
-            "The length of the Basic Offset Table item is not a multiple of 4"
-        )
-
-    offsets = []
-    # Always return at least a 0 offset
-    if length == 0:
-        offsets.append(0)
-
-    for ii in range(length // 4):
-        offsets.append(fp.read_UL())
-
-    return bool(length), offsets
-
-
-# TODO v4.0: remove
-def get_nr_fragments(fp: DicomIO) -> int:
-    """Return the number of fragments in `fp`.
-
-    .. deprecated:: 3.0
-
-        This function will be removed in v4.0, please use
-        :func:`~pydicom.encaps.parse_fragments` instead.
-    """
-    if not fp.is_little_endian:
-        raise ValueError("'fp.is_little_endian' must be True")
-
-    return parse_fragments(fp)[0]
-
-
-# TODO v4.0: remove
-def generate_pixel_data_fragment(fp: DicomIO) -> Iterator[bytes]:
-    """Yield the encapsulated pixel data fragments.
-
-    .. deprecated:: 3.0
-
-        This function will be remove in v4.0, please use
-        :func:`~pydicom.encaps.generate_fragments` instead.
-
-    For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
-    Data* element is encoded in an encapsulated format.
-
-    **Encapsulation**
-
-    The encoded pixel data stream is fragmented into one or more Items. The
-    stream may represent a single or multi-frame image.
-
-    Each *Data Stream Fragment* shall have tag of (FFFE,E000), followed by a 4
-    byte *Item Length* field encoding the explicit number of bytes in the Item.
-    All Items containing an encoded fragment shall have an even number of bytes
-    greater than or equal to 2, with the last fragment being padded if
-    necessary.
-
-    The first Item in the Sequence of Items shall be a 'Basic Offset Table',
-    however the Basic Offset Table item value is not required to be present.
-    It is assumed that the Basic Offset Table item has already been read prior
-    to calling this function (and that `fp` is positioned past this item).
-
-    The remaining items in the Sequence of Items are the pixel data fragments
-    and it is these items that will be read and returned by this function.
-
-    The Sequence of Items is terminated by a (FFFE,E0DD) *Sequence Delimiter
-    Item* with an Item Length field of value ``0x00000000``. The presence
-    or absence of the *Sequence Delimiter Item* in `fp` has no effect on the
-    returned fragments.
-
-    *Encoding*
-
-    The encoding of the data shall be little endian.
-
-    Parameters
-    ----------
-    fp : filebase.DicomIO
-        The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
-        start of the item tag for the first item after the Basic Offset Table
-        item. ``fp.is_little_endian`` should be set to ``True``.
-
-    Yields
-    ------
-    bytes
-        A pixel data fragment.
-
-    Raises
-    ------
-    ValueError
-        If the data contains an item with an undefined length or an unknown
-        tag.
-
-    References
-    ----------
-    DICOM Standard Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
-    """
-    if not fp.is_little_endian:
-        raise ValueError("'fp.is_little_endian' must be True")
-
-    yield from generate_fragments(fp)
-
-
-# TODO v4.0: remove
-def generate_pixel_data_frame(
-    bytestream: bytes, nr_frames: int | None = None
-) -> Iterator[bytes]:
-    """Yield complete frames from `buffer` as :class:`bytes`.
-
-    Note that when the Basic and Extended Offset Tables aren't available then
-    more frames may be yielded than given by `number_of_frames` provided there
-    are sufficient excess fragments available.
-
-    .. deprecated:: 3.0
-
-        This function will be remove in v4.0, please use
-        :func:`~pydicom.encaps.generate_frames` instead
-
-    Parameters
-    ----------
-    bytestream : bytes
-        The encapsulated frame data with offset 0 at the start of the basic
-        offset table.
-    nr_frames : int, optional
-        The expected number of frames in the encapsulated data. Required when
-        the Basic Offset Table is empty and the Extended Offset Table data
-        has not been supplied.
-
-    Yields
-    ------
-    bytes
-        A single frame of pixel data.
-    """
-    for frame in generate_fragmented_frames(bytestream, number_of_frames=nr_frames):
-        yield b"".join(frame)
-
-
-# TODO v4.0: remove
-def generate_pixel_data(
-    bytestream: bytes,
-    nr_frames: int | None = None,
-) -> Iterator[tuple[bytes, ...]]:
-    """Yield an encapsulated pixel data frame.
-
-    .. deprecated:: 3.0
-
-        Please use :func:`~pydicom.encaps.generate_fragmented_frames` instead.
-
-    For the following transfer syntaxes, a fragment may not contain encoded
-    data from more than one frame. However data from one frame may span
-    multiple fragments.
-
-    * 1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)
-    * 1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)
-    * 1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)
-    * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order
-      Prediction (Process 14 [Selection Value 1])
-    * 1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression
-    * 1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression
-    * 1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)
-    * 1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression
-    * 1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image
-      Compression (Lossless Only)
-    * 1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image
-      Compression
-
-    For the following transfer syntaxes, each frame shall be encoded in one and
-    only one fragment.
-
-    * 1.2.840.10008.1.2.5 - RLE Lossless
-
-    Parameters
-    ----------
-    buffer : bytes
-        The encapsulated pixel data positioned at the start of the Basic Offset
-        Table item should be present and the Sequence Delimiter item may or may
-        not be present.
-    nr_frames : int, optional
-        Required for multi-frame data when the Basic Offset Table is empty
-        and there are multiple frames. This should be the value of (0028,0008)
-        *Number of Frames*.
-
-    Yields
-    -------
-    tuple[bytes, ...]
-        An encapsulated pixel data frame, with the contents of the
-        :class:`tuple` the frame's fragmented data.
-
-    Notes
-    -----
-    If the Basic and Extended Offset Tables aren't used and there are multiple
-    fragments per frame then an attempt will be made to locate the frame
-    boundaries by searching for the JPEG/JPEG-LS/JPEG2000 EOI/EOC marker
-    ``0xFFD9``. If the marker is not present or the pixel data hasn't been
-    compressed using one of the JPEG standards then the generated pixel data
-    in this case may be incorrect.
-
-    References
-    ----------
-    DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
-    """
-    yield from generate_fragmented_frames(bytestream, number_of_frames=nr_frames)
-
-
-# TODO v4.0: remove
-def decode_data_sequence(data: bytes) -> list[bytes]:
-    """Read encapsulated data and return a list of bytes.
-
-    .. deprecated:: 3.0
-
-        This function will be removed in v4.0, Please use
-        :func:`~pydicom.encaps.generate_frames` for generating frame
-        data or :func:`~pydicom.encaps.generate_fragments` for generating
-        fragment data.
-
-    Parameters
-    ----------
-    data : bytes
-        The encapsulated data, typically the value from ``Dataset.PixelData``.
-
-    Returns
-    -------
-    list of bytes
-        All fragments as a list of ``bytes``.
-    """
-    # Convert data into a memory-mapped file
-    with DicomBytesIO(data) as fp:
-        # DICOM standard requires this
-        fp.is_little_endian = True
-        BasicOffsetTable = read_item(fp)  # NOQA
-        seq = []
-
-        while True:
-            item = read_item(fp)
-
-            # None is returned if get to Sequence Delimiter
-            if not item:
-                break
-            seq.append(item)
-
-        # XXX should
-        return seq
-
-
-# TODO v4.0: remove
-def defragment_data(data: bytes) -> bytes:
-    """Read encapsulated data and return the fragments as one continuous bytes.
-
-    .. deprecated:: 3.0
-
-        This function will be removed in v4.0, Please use
-        :func:`~pydicom.encaps.generate_frames` for generating frame
-        data or :func:`~pydicom.encaps.generate_fragments` for generating
-        fragment data.
-
-    Parameters
-    ----------
-    data : bytes
-        The encapsulated pixel data fragments.
-
-    Returns
-    -------
-    bytes
-        All fragments concatenated together.
-    """
-    return b"".join(decode_data_sequence(data))
-
-
-# TODO v4.0: remove
-def read_item(fp: DicomIO) -> bytes | None:
-    """Read and return a single Item in the fragmented data stream.
-
-    .. deprecated:: 3.0
-
-        This function will be removed in v4.0, please use
-        :func:`~pydicom.encaps.generate_fragments` instead.
-
-    Parameters
-    ----------
-    fp : filebase.DicomIO
-        The file-like to read the item from.
-
-    Returns
-    -------
-    bytes
-        The Item's raw bytes.
-    """
-
-    logger = pydicom.config.logger
-    try:
-        tag = fp.read_tag()
-
-    # already read delimiter before passing data here
-    # so should just run out
-    except EOFError:
-        return None
-
-    # No more items, time for sequence to stop reading
-    if tag == SequenceDelimiterTag:
-        length = fp.read_UL()
-        logger.debug("%04x: Sequence Delimiter, length 0x%x", fp.tell() - 8, length)
-
-        if length != 0:
-            logger.warning(
-                "Expected 0x00000000 after delimiter, found 0x%x,"
-                " at data position 0x%x",
-                length,
-                fp.tell() - 4,
-            )
-        return None
-
-    if tag != ItemTag:
-        logger.warning(
-            "Expected Item with tag %s at data position 0x%x", ItemTag, fp.tell() - 4
-        )
-        length = fp.read_UL()
-    else:
-        length = fp.read_UL()
-        logger.debug("%04x: Item, length 0x%x", fp.tell() - 8, length)
-
-    if length == 0xFFFFFFFF:
-        raise ValueError(
-            "Encapsulated data fragment had Undefined Length"
-            f" at data position 0x{fp.tell() - 4:x}"
-        )
-
-    item_data = fp.read(length)
-    return item_data
 
 
 # Functions for encapsulating data
@@ -1345,3 +940,421 @@ def encapsulate_extended(frames: list[bytes]) -> tuple[bytes, bytes, bytes]:
     lengths = pack(f"<{nr_frames}Q", *frame_lengths)
 
     return encapsulate(frames, has_bot=False), offsets, lengths
+
+
+# Deprecated functions
+def _get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
+    """Return a list of the fragment offsets from the Basic Offset Table.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, please use
+        :func:`~pydicom.encaps.parse_basic_offsets` instead.
+
+    **Basic Offset Table**
+
+    The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
+    a length, however it may or may not have a value.
+
+    Basic Offset Table with no value
+    ::
+
+        Item Tag   | Length    |
+        FE FF 00 E0 00 00 00 00
+
+    Basic Offset Table with value (2 frames)
+    ::
+
+        Item Tag   | Length    | Offset 1  | Offset 2  |
+        FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
+
+    For single or multi-frame images with only one frame, the Basic Offset
+    Table may or may not have a value. When it has no value then its length
+    shall be ``0x00000000``.
+
+    For multi-frame images with more than one frame, the Basic Offset Table
+    should have a value containing concatenated 32-bit unsigned integer values
+    that are the byte offsets to the first byte of the Item tag of the first
+    fragment of each frame as measured from the first byte of the first item
+    tag following the Basic Offset Table Item.
+
+    All decoders, both for single and multi-frame images should accept both
+    an empty Basic Offset Table and one containing offset values.
+
+    .. versionchanged:: 1.4
+
+        Changed to return (is BOT empty, list of offsets).
+
+    Parameters
+    ----------
+    fp : filebase.DicomIO
+        The encapsulated pixel data positioned at the start of the Basic Offset
+        Table. ``fp.is_little_endian`` should be set to ``True``.
+
+    Returns
+    -------
+    bool, list of int
+        Whether or not the BOT is empty, and a list of the byte offsets
+        to the first fragment of each frame, as measured from the start of the
+        first item following the Basic Offset Table item.
+
+    Raises
+    ------
+    ValueError
+        If the Basic Offset Table item's tag is not (FFEE,E000) or if the
+        length in bytes of the item's value is not a multiple of 4.
+
+    References
+    ----------
+    DICOM Standard, Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
+    """
+    if not fp.is_little_endian:
+        raise ValueError("'fp.is_little_endian' must be True")
+
+    tag = Tag(fp.read_tag())
+
+    if tag != 0xFFFEE000:
+        raise ValueError(
+            f"Unexpected tag '{tag}' when parsing the Basic Table Offset item"
+        )
+
+    length = fp.read_UL()
+    if length % 4:
+        raise ValueError(
+            "The length of the Basic Offset Table item is not a multiple of 4"
+        )
+
+    offsets = []
+    # Always return at least a 0 offset
+    if length == 0:
+        offsets.append(0)
+
+    for ii in range(length // 4):
+        offsets.append(fp.read_UL())
+
+    return bool(length), offsets
+
+
+def _get_nr_fragments(fp: DicomIO) -> int:
+    """Return the number of fragments in `fp`.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, please use
+        :func:`~pydicom.encaps.parse_fragments` instead.
+    """
+    if not fp.is_little_endian:
+        raise ValueError("'fp.is_little_endian' must be True")
+
+    return parse_fragments(fp)[0]
+
+
+def _generate_pixel_data_fragment(fp: DicomIO) -> Iterator[bytes]:
+    """Yield the encapsulated pixel data fragments.
+
+    .. deprecated:: 3.0
+
+        This function will be remove in v4.0, please use
+        :func:`~pydicom.encaps.generate_fragments` instead.
+
+    For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
+    Data* element is encoded in an encapsulated format.
+
+    **Encapsulation**
+
+    The encoded pixel data stream is fragmented into one or more Items. The
+    stream may represent a single or multi-frame image.
+
+    Each *Data Stream Fragment* shall have tag of (FFFE,E000), followed by a 4
+    byte *Item Length* field encoding the explicit number of bytes in the Item.
+    All Items containing an encoded fragment shall have an even number of bytes
+    greater than or equal to 2, with the last fragment being padded if
+    necessary.
+
+    The first Item in the Sequence of Items shall be a 'Basic Offset Table',
+    however the Basic Offset Table item value is not required to be present.
+    It is assumed that the Basic Offset Table item has already been read prior
+    to calling this function (and that `fp` is positioned past this item).
+
+    The remaining items in the Sequence of Items are the pixel data fragments
+    and it is these items that will be read and returned by this function.
+
+    The Sequence of Items is terminated by a (FFFE,E0DD) *Sequence Delimiter
+    Item* with an Item Length field of value ``0x00000000``. The presence
+    or absence of the *Sequence Delimiter Item* in `fp` has no effect on the
+    returned fragments.
+
+    *Encoding*
+
+    The encoding of the data shall be little endian.
+
+    Parameters
+    ----------
+    fp : filebase.DicomIO
+        The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
+        start of the item tag for the first item after the Basic Offset Table
+        item. ``fp.is_little_endian`` should be set to ``True``.
+
+    Yields
+    ------
+    bytes
+        A pixel data fragment.
+
+    Raises
+    ------
+    ValueError
+        If the data contains an item with an undefined length or an unknown
+        tag.
+
+    References
+    ----------
+    DICOM Standard Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
+    """
+    if not fp.is_little_endian:
+        raise ValueError("'fp.is_little_endian' must be True")
+
+    yield from generate_fragments(fp)
+
+
+def _generate_pixel_data_frame(
+    bytestream: bytes, nr_frames: int | None = None
+) -> Iterator[bytes]:
+    """Yield complete frames from `buffer` as :class:`bytes`.
+
+    .. deprecated:: 3.0
+
+        This function will be remove in v4.0, please use
+        :func:`~pydicom.encaps.generate_frames` instead
+
+    Parameters
+    ----------
+    bytestream : bytes
+        The value of the (7FE0,0010) *Pixel Data* element from an encapsulated
+        dataset. The Basic Offset Table item should be present and the
+        Sequence Delimiter item may or may not be present.
+    nr_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty
+        and there are multiple frames. This should be the value of (0028,0008)
+        *Number of Frames*.
+
+    Yields
+    ------
+    bytes
+        A frame contained in the encapsulated pixel data.
+
+    References
+    ----------
+    DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
+    """
+    for frame in generate_fragmented_frames(bytestream, number_of_frames=nr_frames):
+        yield b"".join(frame)
+
+
+def _generate_pixel_data(
+    bytestream: bytes, nr_frames: int | None = None
+) -> Iterator[tuple[bytes, ...]]:
+    """Yield an encapsulated pixel data frame.
+
+    .. deprecated:: 3.0
+
+        Please use :func:`~pydicom.encaps.generate_fragmented_frames` instead.
+
+    For the following transfer syntaxes, a fragment may not contain encoded
+    data from more than one frame. However data from one frame may span
+    multiple fragments.
+
+    * 1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)
+    * 1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)
+    * 1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)
+    * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order
+      Prediction (Process 14 [Selection Value 1])
+    * 1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression
+    * 1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression
+    * 1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)
+    * 1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression
+    * 1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image
+      Compression (Lossless Only)
+    * 1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image
+      Compression
+
+    For the following transfer syntaxes, each frame shall be encoded in one and
+    only one fragment.
+
+    * 1.2.840.10008.1.2.5 - RLE Lossless
+
+    Parameters
+    ----------
+    bytestream : bytes
+        The value of the (7FE0,0010) *Pixel Data* element from an encapsulated
+        dataset. The Basic Offset Table item should be present and the
+        Sequence Delimiter item may or may not be present.
+    nr_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty
+        and there are multiple frames. This should be the value of (0028,0008)
+        *Number of Frames*.
+
+    Yields
+    -------
+    tuple of bytes
+        An encapsulated pixel data frame, with the contents of the
+        :class:`tuple` the frame's fragmented data.
+
+    Notes
+    -----
+    If the Basic Offset Table is empty and there are multiple fragments per
+    frame then an attempt will be made to locate the frame boundaries by
+    searching for the JPEG/JPEG-LS/JPEG2000 EOI/EOC marker (``0xFFD9``). If the
+    marker is not present or the pixel data hasn't been compressed using one of
+    the JPEG standards then the generated pixel data may be incorrect.
+
+    References
+    ----------
+    DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
+    """
+    yield from generate_fragmented_frames(bytestream, number_of_frames=nr_frames)
+
+
+def _decode_data_sequence(data: bytes) -> list[bytes]:
+    """Read encapsulated data and return a list of bytes.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, Please use
+        :func:`~pydicom.encaps.generate_frames` for generating frame
+        data or :func:`~pydicom.encaps.generate_fragments` for generating
+        fragment data.
+
+    Parameters
+    ----------
+    data : bytes
+        The encapsulated data, typically the value from ``Dataset.PixelData``.
+
+    Returns
+    -------
+    list of bytes
+        All fragments as a list of ``bytes``.
+    """
+    # Convert data into a memory-mapped file
+    with DicomBytesIO(data) as fp:
+        # DICOM standard requires this
+        fp.is_little_endian = True
+        BasicOffsetTable = _read_item(fp)  # NOQA
+        seq = []
+
+        while True:
+            item = _read_item(fp)
+
+            # None is returned if get to Sequence Delimiter
+            if not item:
+                break
+            seq.append(item)
+
+        # XXX should
+        return seq
+
+
+def _defragment_data(data: bytes) -> bytes:
+    """Read encapsulated data and return the fragments as one continuous bytes.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, Please use
+        :func:`~pydicom.encaps.generate_frames` for generating frame
+        data or :func:`~pydicom.encaps.generate_fragments` for generating
+        fragment data.
+
+    Parameters
+    ----------
+    data : bytes
+        The encapsulated pixel data fragments.
+
+    Returns
+    -------
+    bytes
+        All fragments concatenated together.
+    """
+    return b"".join(_decode_data_sequence(data))
+
+
+def _read_item(fp: DicomIO) -> bytes | None:
+    """Read and return a single Item in the fragmented data stream.
+
+    .. deprecated:: 3.0
+
+        This function will be removed in v4.0, please use
+        :func:`~pydicom.encaps.generate_fragments` instead.
+
+    Parameters
+    ----------
+    fp : filebase.DicomIO
+        The file-like to read the item from.
+
+    Returns
+    -------
+    bytes
+        The Item's raw bytes.
+    """
+
+    logger = config.logger
+    try:
+        tag = fp.read_tag()
+
+    # already read delimiter before passing data here
+    # so should just run out
+    except EOFError:
+        return None
+
+    # No more items, time for sequence to stop reading
+    if tag == SequenceDelimiterTag:
+        length = fp.read_UL()
+        logger.debug("%04x: Sequence Delimiter, length 0x%x", fp.tell() - 8, length)
+
+        if length != 0:
+            logger.warning(
+                "Expected 0x00000000 after delimiter, found 0x%x,"
+                " at data position 0x%x",
+                length,
+                fp.tell() - 4,
+            )
+        return None
+
+    if tag != ItemTag:
+        logger.warning(
+            "Expected Item with tag %s at data position 0x%x", ItemTag, fp.tell() - 4
+        )
+        length = fp.read_UL()
+    else:
+        length = fp.read_UL()
+        logger.debug("%04x: Item, length 0x%x", fp.tell() - 8, length)
+
+    if length == 0xFFFFFFFF:
+        raise ValueError(
+            "Encapsulated data fragment had Undefined Length"
+            f" at data position 0x{fp.tell() - 4:x}"
+        )
+
+    item_data = fp.read(length)
+    return item_data
+
+
+_DEPRECATED = {
+    "get_frame_offsets": _get_frame_offsets,
+    "get_nr_fragments": _get_nr_fragments,
+    "generate_pixel_data_fragment": _generate_pixel_data_fragment,
+    "generate_pixel_data_frame": _generate_pixel_data_frame,
+    "generate_pixel_data": _generate_pixel_data,
+    "decode_data_sequence": _decode_data_sequence,
+    "defragment_data": _defragment_data,
+    "read_item": _read_item,
+}
+
+
+def __getattr__(name: str) -> Any:
+    if name in _DEPRECATED and not config._use_future:
+        warn_and_log(
+            f"{name} is deprecated and will be removed in v4.0",
+            DeprecationWarning,
+        )
+        return _DEPRECATED[name]
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

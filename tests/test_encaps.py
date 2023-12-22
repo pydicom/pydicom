@@ -7,17 +7,9 @@ from struct import unpack
 
 import pytest
 
-from pydicom import dcmread
+from pydicom import dcmread, config, encaps
 from pydicom.data import get_testdata_file
 from pydicom.encaps import (
-    generate_pixel_data_fragment,
-    get_frame_offsets,
-    get_nr_fragments,
-    generate_pixel_data_frame,
-    generate_pixel_data,
-    decode_data_sequence,
-    defragment_data,
-    read_item,
     fragment_frame,
     itemize_frame,
     encapsulate,
@@ -38,6 +30,10 @@ JP2K_10FRAME_NOBOT = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 class TestGetFrameOffsets:
     """Test encaps.get_frame_offsets"""
 
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.get_frame_offsets
+
     def test_bad_tag(self):
         """Test raises exception if no item tag."""
         # (FFFE,E100)
@@ -49,7 +45,7 @@ class TestGetFrameOffsets:
             match=r"Unexpected tag '\(FFFE,E100\)' when "
             r"parsing the Basic Table Offset item",
         ):
-            get_frame_offsets(fp)
+            self.func(fp)
 
     def test_bad_length_multiple(self):
         """Test raises exception if the item length is not a multiple of 4."""
@@ -65,14 +61,14 @@ class TestGetFrameOffsets:
             ValueError,
             match="The length of the Basic Offset Table item is not a multiple of 4",
         ):
-            get_frame_offsets(fp)
+            self.func(fp)
 
     def test_zero_length(self):
         """Test reading BOT with zero length"""
         bytestream = b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert (False, [0]) == get_frame_offsets(fp)
+        assert (False, [0]) == self.func(fp)
 
     def test_multi_frame(self):
         """Test reading multi-frame BOT item"""
@@ -86,14 +82,14 @@ class TestGetFrameOffsets:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert (True, [0, 4966, 9716, 14334]) == get_frame_offsets(fp)
+        assert (True, [0, 4966, 9716, 14334]) == self.func(fp)
 
     def test_single_frame(self):
         """Test reading single-frame BOT item"""
         bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert (True, [0]) == get_frame_offsets(fp)
+        assert (True, [0]) == self.func(fp)
 
     def test_not_little_endian(self):
         """Test reading big endian raises exception"""
@@ -101,11 +97,15 @@ class TestGetFrameOffsets:
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         with pytest.raises(ValueError, match="'fp.is_little_endian' must be True"):
-            get_frame_offsets(fp)
+            self.func(fp)
 
 
 class TestGetNrFragments:
     """Test encaps.get_nr_fragments"""
+
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.get_nr_fragments
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
@@ -113,7 +113,7 @@ class TestGetNrFragments:
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(ValueError):
-            get_nr_fragments(fp)
+            self.func(fp)
 
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
@@ -129,7 +129,7 @@ class TestGetNrFragments:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert 1 == get_nr_fragments(fp)
+        assert 1 == self.func(fp)
 
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
@@ -150,14 +150,14 @@ class TestGetNrFragments:
             r"encapsulated pixel data fragment items"
         )
         with pytest.raises(ValueError, match=msg):
-            get_nr_fragments(fp)
+            self.func(fp)
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
         bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert 1 == get_nr_fragments(fp)
+        assert 1 == self.func(fp)
 
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
@@ -171,7 +171,7 @@ class TestGetNrFragments:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert 2 == get_nr_fragments(fp)
+        assert 2 == self.func(fp)
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
@@ -183,7 +183,7 @@ class TestGetNrFragments:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert 1 == get_nr_fragments(fp)
+        assert 1 == self.func(fp)
 
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
@@ -198,7 +198,7 @@ class TestGetNrFragments:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert 2 == get_nr_fragments(fp)
+        assert 2 == self.func(fp)
 
     def test_not_little_endian(self):
         """Test reading big endian raises exception"""
@@ -206,18 +206,22 @@ class TestGetNrFragments:
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         with pytest.raises(ValueError, match="'fp.is_little_endian' must be True"):
-            get_nr_fragments(fp)
+            self.func(fp)
 
 
 class TestGeneratePixelDataFragment:
     """Test encaps.generate_pixel_data_fragment"""
+
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.generate_pixel_data_fragment
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
         bytestream = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         with pytest.raises(
             ValueError,
             match="Undefined item length at offset 4 when "
@@ -241,7 +245,7 @@ class TestGeneratePixelDataFragment:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         assert next(fragments) == b"\x01\x00\x00\x00"
         pytest.raises(StopIteration, next, fragments)
 
@@ -259,7 +263,7 @@ class TestGeneratePixelDataFragment:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         assert next(fragments) == b"\x01\x00\x00\x00"
         with pytest.raises(
             ValueError,
@@ -275,7 +279,7 @@ class TestGeneratePixelDataFragment:
         bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         assert next(fragments) == b"\x01\x00\x00\x00"
         pytest.raises(StopIteration, next, fragments)
 
@@ -291,7 +295,7 @@ class TestGeneratePixelDataFragment:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         assert next(fragments) == b"\x01\x00\x00\x00"
         assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
         pytest.raises(StopIteration, next, fragments)
@@ -306,7 +310,7 @@ class TestGeneratePixelDataFragment:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         assert next(fragments) == b"\x01\x00\x00\x00"
         pytest.raises(StopIteration, next, fragments)
 
@@ -323,7 +327,7 @@ class TestGeneratePixelDataFragment:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         assert next(fragments) == b"\x01\x00\x00\x00"
         assert next(fragments) == b"\x01\x02\x03\x04\x05\x06"
         pytest.raises(StopIteration, next, fragments)
@@ -333,13 +337,17 @@ class TestGeneratePixelDataFragment:
         bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
-        fragments = generate_pixel_data_fragment(fp)
+        fragments = self.func(fp)
         with pytest.raises(ValueError, match="'fp.is_little_endian' must be True"):
             next(fragments)
 
 
 class TestGeneratePixelDataFrames:
     """Test encaps.generate_pixel_data_frames"""
+
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.generate_pixel_data_frame
 
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
@@ -351,7 +359,7 @@ class TestGeneratePixelDataFrames:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == b"\x01\x00\x00\x00"
         pytest.raises(StopIteration, next, frames)
 
@@ -371,7 +379,7 @@ class TestGeneratePixelDataFrames:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream, 1)
+        frames = self.func(bytestream, 1)
         assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
         pytest.raises(StopIteration, next, frames)
 
@@ -386,7 +394,7 @@ class TestGeneratePixelDataFrames:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == b"\x01\x00\x00\x00"
         pytest.raises(StopIteration, next, frames)
 
@@ -407,7 +415,7 @@ class TestGeneratePixelDataFrames:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00")
         pytest.raises(StopIteration, next, frames)
 
@@ -430,7 +438,7 @@ class TestGeneratePixelDataFrames:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == b"\x01\x00\x00\x00"
         assert next(frames) == b"\x02\x00\x00\x00"
         assert next(frames) == b"\x03\x00\x00\x00"
@@ -455,7 +463,7 @@ class TestGeneratePixelDataFrames:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data_frame(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
         assert next(frames) == b"\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
         assert next(frames) == b"\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
@@ -483,7 +491,7 @@ class TestGeneratePixelDataFrames:
             b"\xFE\xFF\x00\xE0"
             b"\x02\x00\x00\x00\x02\x04"
         )
-        frames = generate_pixel_data_frame(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == b"\x01\x00\x00\x00\x00\x01"
         assert next(frames) == (b"\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02")
         assert next(frames) == b"\x03\x00\x00\x00\x02\x04"
@@ -494,7 +502,7 @@ class TestGeneratePixelDataFrames:
         # Regression test for #685
         ds = dcmread(JP2K_10FRAME_NOBOT)
         assert 10 == ds.NumberOfFrames
-        frame_gen = generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)
+        frame_gen = self.func(ds.PixelData, ds.NumberOfFrames)
         for ii in range(10):
             next(frame_gen)
 
@@ -504,6 +512,10 @@ class TestGeneratePixelDataFrames:
 
 class TestGeneratePixelData:
     """Test encaps.generate_pixel_data"""
+
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.generate_pixel_data
 
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
@@ -515,7 +527,7 @@ class TestGeneratePixelData:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (b"\x01\x00\x00\x00",)
         pytest.raises(StopIteration, next, frames)
 
@@ -535,7 +547,7 @@ class TestGeneratePixelData:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream, 1)
+        frames = self.func(bytestream, 1)
         assert next(frames) == (
             b"\x01\x00\x00\x00",
             b"\x02\x00\x00\x00",
@@ -565,7 +577,7 @@ class TestGeneratePixelData:
             r"number of frames has not been supplied"
         )
         with pytest.raises(ValueError, match=msg):
-            next(generate_pixel_data(bytestream))
+            next(self.func(bytestream))
 
     def test_empty_bot_too_few_fragments(self):
         """Test parsing with too few fragments."""
@@ -574,12 +586,11 @@ class TestGeneratePixelData:
 
         msg = (
             "Unable to generate frames from the encapsulated pixel data as "
-            "there is no basic or extended offset table data and there are "
-            "fewer fragments than frames; the dataset may be corrupt or the "
-            "number of frames may be incorrect"
+            "there are fewer fragments than frames; the dataset may be corrupt "
+            "or the number of frames may be incorrect"
         )
         with pytest.raises(ValueError, match=msg):
-            next(generate_pixel_data_frame(ds.PixelData, 20))
+            next(self.func(ds.PixelData, 20))
 
     def test_empty_bot_multi_fragments_per_frame(self):
         """Test parsing with multiple fragments per frame."""
@@ -594,7 +605,7 @@ class TestGeneratePixelData:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
         )
 
-        frames = generate_pixel_data(bytestream, 4)
+        frames = self.func(bytestream, 4)
         for ii in range(4):
             next(frames)
 
@@ -614,7 +625,7 @@ class TestGeneratePixelData:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
         )
 
-        frames = generate_pixel_data(bytestream, 4)
+        frames = self.func(bytestream, 4)
         for ii in range(3):
             next(frames)
 
@@ -647,7 +658,7 @@ class TestGeneratePixelData:
             "fewer frames than expected have been found"
         )
         with pytest.warns(UserWarning, match=msg):
-            for ii, frame in enumerate(generate_pixel_data(bytestream, 4)):
+            for ii, frame in enumerate(self.func(bytestream, 4)):
                 pass
 
         assert 2 == ii
@@ -663,7 +674,7 @@ class TestGeneratePixelData:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (b"\x01\x00\x00\x00",)
         pytest.raises(StopIteration, next, frames)
 
@@ -684,7 +695,7 @@ class TestGeneratePixelData:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (
             b"\x01\x00\x00\x00",
             b"\x02\x00\x00\x00",
@@ -711,7 +722,7 @@ class TestGeneratePixelData:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (b"\x01\x00\x00\x00",)
         assert next(frames) == (b"\x02\x00\x00\x00",)
         assert next(frames) == (b"\x03\x00\x00\x00",)
@@ -736,7 +747,7 @@ class TestGeneratePixelData:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
-        frames = generate_pixel_data(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (
             b"\x01\x00\x00\x00",
             b"\x02\x00\x00\x00",
@@ -776,7 +787,7 @@ class TestGeneratePixelData:
             b"\xFE\xFF\x00\xE0"
             b"\x02\x00\x00\x00\x02\x04"
         )
-        frames = generate_pixel_data(bytestream)
+        frames = self.func(bytestream)
         assert next(frames) == (b"\x01\x00\x00\x00\x00\x01",)
         assert next(frames) == (
             b"\x02\x00",
@@ -790,6 +801,10 @@ class TestGeneratePixelData:
 class TestDecodeDataSequence:
     """Test encaps.decode_data_sequence"""
 
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.decode_data_sequence
+
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
@@ -800,7 +815,7 @@ class TestDecodeDataSequence:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [b"\x01\x00\x00\x00"]
 
     def test_empty_bot_triple_fragment_single_frame(self):
@@ -819,7 +834,7 @@ class TestDecodeDataSequence:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [b"\x01\x00\x00\x00", b"\x02\x00\x00\x00", b"\x03\x00\x00\x00"]
 
     def test_bot_single_fragment(self):
@@ -833,7 +848,7 @@ class TestDecodeDataSequence:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [b"\x01\x00\x00\x00"]
 
     def test_bot_triple_fragment_single_frame(self):
@@ -853,7 +868,7 @@ class TestDecodeDataSequence:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [b"\x01\x00\x00\x00", b"\x02\x00\x00\x00", b"\x03\x00\x00\x00"]
 
     def test_multi_frame_one_to_one(self):
@@ -875,7 +890,7 @@ class TestDecodeDataSequence:
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [b"\x01\x00\x00\x00", b"\x02\x00\x00\x00", b"\x03\x00\x00\x00"]
 
     def test_multi_frame_three_to_one(self):
@@ -897,7 +912,7 @@ class TestDecodeDataSequence:
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
             b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [
             b"\x01\x00\x00\x00",
             b"\x02\x00\x00\x00",
@@ -932,7 +947,7 @@ class TestDecodeDataSequence:
             b"\xFE\xFF\x00\xE0"
             b"\x02\x00\x00\x00\x02\x04"
         )
-        frames = decode_data_sequence(bytestream)
+        frames = self.func(bytestream)
         assert frames == [
             b"\x01\x00\x00\x00\x00\x01",
             b"\x02\x00",
@@ -945,6 +960,10 @@ class TestDecodeDataSequence:
 
 class TestDefragmentData:
     """Test encaps.defragment_data"""
+
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.defragment_data
 
     def test_defragment(self):
         """Test joining fragmented data works"""
@@ -963,11 +982,15 @@ class TestDefragmentData:
             b"\x03\x00\x00\x00"
         )
         reference = b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
-        assert defragment_data(bytestream) == reference
+        assert self.func(bytestream) == reference
 
 
 class TestReadItem:
     """Test encaps.read_item"""
+
+    def setup_method(self):
+        with pytest.warns(DeprecationWarning):
+            self.func = encaps.read_item
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
@@ -979,7 +1002,7 @@ class TestReadItem:
             match="Encapsulated data fragment had Undefined "
             "Length at data position 0x4",
         ):
-            read_item(fp)
+            self.func(fp)
 
     def test_item_sequence_delimiter(self):
         """Test non-zero length seq delimiter reads correctly."""
@@ -995,9 +1018,9 @@ class TestReadItem:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
-        assert read_item(fp) is None
-        assert read_item(fp) == b"\x02\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) is None
+        assert self.func(fp) == b"\x02\x00\x00\x00"
 
     def test_item_sequence_delimiter_zero_length(self):
         """Test that the fragments are returned if seq delimiter hit."""
@@ -1013,9 +1036,9 @@ class TestReadItem:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
-        assert read_item(fp) is None
-        assert read_item(fp) == b"\x02\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) is None
+        assert self.func(fp) == b"\x02\x00\x00\x00"
 
     def test_item_bad_tag(self):
         """Test item is read if it has an unexpected tag"""
@@ -1033,16 +1056,16 @@ class TestReadItem:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
-        assert read_item(fp) == b"\xFF\x00\xFF\x00"
-        assert read_item(fp) == b"\x02\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) == b"\xFF\x00\xFF\x00"
+        assert self.func(fp) == b"\x02\x00\x00\x00"
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
         bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
 
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
@@ -1056,8 +1079,8 @@ class TestReadItem:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
-        assert read_item(fp) == b"\x01\x02\x03\x04\x05\x06"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x02\x03\x04\x05\x06"
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
@@ -1069,7 +1092,7 @@ class TestReadItem:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
 
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
@@ -1084,8 +1107,8 @@ class TestReadItem:
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert read_item(fp) == b"\x01\x00\x00\x00"
-        assert read_item(fp) == b"\x01\x02\x03\x04\x05\x06"
+        assert self.func(fp) == b"\x01\x00\x00\x00"
+        assert self.func(fp) == b"\x01\x02\x03\x04\x05\x06"
 
 
 class TestFragmentFrame:
@@ -1214,7 +1237,7 @@ class TestEncapsulate:
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=False)
-        test_frames = decode_data_sequence(data)
+        test_frames = generate_frames(data, number_of_frames=ds.NumberOfFrames)
         for a, b in zip(test_frames, frames):
             assert a == b
 
@@ -1230,13 +1253,13 @@ class TestEncapsulate:
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
-        test_frames = decode_data_sequence(data)
+        test_frames = generate_frames(data, number_of_frames=ds.NumberOfFrames)
         for a, b in zip(test_frames, frames):
             assert a == b
 
         fp = DicomBytesIO(data)
         fp.is_little_endian = True
-        length, offsets = get_frame_offsets(fp)
+        offsets = parse_basic_offsets(fp)
         assert offsets == [
             0x0000,  # 0
             0x0EEE,  # 3822
@@ -1991,9 +2014,8 @@ class TestGenerateFragmentedFrames:
 
         msg = (
             "Unable to generate frames from the encapsulated pixel data as "
-            "there is no basic or extended offset table data and there are "
-            "fewer fragments than frames; the dataset may be corrupt or the "
-            "number of frames may be incorrect"
+            "there are fewer fragments than frames; the dataset may be corrupt "
+            "or the number of frames may be incorrect"
         )
         for func in (bytes, as_bytesio):
             buffer = func(ds.PixelData)
@@ -2831,3 +2853,38 @@ class TestGetFrame:
             assert frame == references[1]
             frame = get_frame(mm, 9, number_of_frames=10)
             assert frame == references[2]
+
+
+@pytest.fixture
+def use_future():
+    original = config._use_future
+    config._use_future = True
+    yield
+    config._use_future = original
+
+
+class TestFuture:
+    def test_imports_raise(self, use_future):
+        with pytest.raises(ImportError):
+            from pydicom.encaps import generate_pixel_data_fragment
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import get_frame_offsets
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import get_nr_fragments
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import generate_pixel_data_frame
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import generate_pixel_data
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import decode_data_sequence
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import defragment_data
+
+        with pytest.raises(ImportError):
+            from pydicom.encaps import read_item
