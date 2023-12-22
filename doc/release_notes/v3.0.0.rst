@@ -133,8 +133,6 @@ Enhancements
   syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
   method
 * Warning messages are also sent to the pydicom logger (:issue:`1529`)
-* Added :func:`~pydicom.encaps.get_frame` to make it easier to get the
-  encapsulated pixel data for a given frame
 * Added the following to the :mod:`~pydicom.encaps` module:
 
   * :func:`~pydicom.encaps.parse_basic_offsets` for parsing the Basic Offset Table
@@ -144,7 +142,8 @@ Enhancements
   * :func:`~pydicom.encaps.generate_fragmented_frames` for yielding encapsulated frame
     fragments
   * :func:`~pydicom.encaps.generate_frames` for yielding whole encapsulated frames
-  * :func:`~pydicom.encaps.get_item` for returning the specific encapsulated frame at `index`
+  * :func:`~pydicom.encaps.get_frame` for returning the specific encapsulated frame at `index`
+    without necessarily having to read the preceding frames into memory
 
   These new functions support reading encapsulated data from both :class:`bytes`
   or any Python object with ``read()``, ``seek()`` and ``tell()`` methods such
