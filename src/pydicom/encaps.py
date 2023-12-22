@@ -45,10 +45,6 @@ def parse_basic_offsets(
     fragment of each frame as measured from the first byte of the first item
     tag following the Basic Offset Table Item.
 
-    When the total amount of encoded frame data is too large for a 32-byte
-    offset field then it's strongly recommended you use the Extended Offset
-    Table instead (see the :func:`~pydicom.encaps.encapsulate_extended` function).
-
     Parameters
     ----------
     buffer : bytes | readable buffer
