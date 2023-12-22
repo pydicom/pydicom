@@ -147,9 +147,9 @@ Enhancements
 
   These new functions support reading encapsulated data from both :class:`bytes`
   or any Python object with ``read()``, ``seek()`` and ``tell()`` methods such
-  as :class:`typing.BinaryIO` or :class:`mmap.mmap`. They also support using the
-  :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>` for
-  determining frame boundaries.
+  as :class:`io.BytesIO`, :class:`BinaryIO<typing.BinaryIO>` or :class:`mmap.mmap`.
+  They also support using the :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>`
+  for determining frame boundaries.
 
 
 Fixes
@@ -175,22 +175,20 @@ Fixes
 
 Deprecations
 ------------
-* :attr:`~pydicom.dataset.Dataset.is_little_endian` and
-  :attr:`~pydicom.dataset.Dataset.is_implicit_VR` will be removed in v4.0
-* :attr:`~pydicom.dataset.Dataset.read_little_endian` and
-  :attr:`~pydicom.dataset.Dataset.read_implicit_vr` will be removed in v4.0,
-  use :attr:`~pydicom.dataset.Dataset.original_encoding` instead
-* :attr:`~pydicom.dataset.Dataset.read_encoding` will be removed in v4.0,
-  use :attr:`~pydicom.dataset.Dataset.original_character_set` instead
+* :attr:`Dataset.is_little_endian <pydicom.dataset.Dataset.is_little_endian>` and
+  :attr:`Dataset.is_implicit_VR<pydicom.dataset.Dataset.is_implicit_VR>` will be removed in v4.0
+* :attr:`Dataset.read_little_endian<pydicom.dataset.Dataset.read_little_endian>` and
+  :attr:`Dataset.read_implicit_vr<pydicom.dataset.Dataset.read_implicit_vr>` will be removed in v4.0,
+  use :attr:`Dataset.original_encoding<pydicom.dataset.Dataset.original_encoding>` instead
+* :attr:`Dataset.read_encoding<pydicom.dataset.Dataset.read_encoding>` will be removed in v4.0,
+  use :attr:`Dataset.original_character_set<pydicom.dataset.Dataset.original_character_set>` instead
 * The `write_like_original` optional argument to
-  :meth:`~pydicom.dataset.Dataset.save_as` and
+  :meth:`Dataset.save_as<pydicom.dataset.Dataset.save_as>` and
   :func:`~pydicom.filewriter.dcmwrite` will be removed in v4.0, use
   `enforce_file_format` instead
-* The following :mod:`~pydicom.encaps` module functions will be removed in v4.0
+* The following :mod:`~pydicom.encaps` module functions will be removed in v4.0:
 
   * :func:`~pydicom.encaps.get_frame_offsets`, use :func:`~pydicom.encaps.parse_basic_offsets`
-    instead
-  * :func:`~pydicom.encaps.get_nr_fragments`, use :func:`~pydicom.encaps.parse_fragments`
     instead
   * :func:`~pydicom.encaps.generate_pixel_data_fragment`, use :func:`~pydicom.encaps.generate_fragments`
     instead

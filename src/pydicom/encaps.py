@@ -45,6 +45,10 @@ def parse_basic_offsets(
     fragment of each frame as measured from the first byte of the first item
     tag following the Basic Offset Table Item.
 
+    When the total amount of encoded frame data is too large for a 32-byte
+    offset field then it's strongly recommended you use the Extended Offset
+    Table instead (see the :func:`~pydicom.encaps.encapsulate_extended` function).
+
     Parameters
     ----------
     buffer : bytes | readable buffer
@@ -63,6 +67,10 @@ def parse_basic_offsets(
         The length of the basic offset table in bytes, and a list of the offset
         positions to the first item tag of each frame, as measured from the
         end of the offset table.
+
+    See Also
+    --------
+    :func:`~pydicom.encaps.encapsulate_extended`
     """
     if isinstance(buffer, bytes):
         buffer = BytesIO(buffer)
@@ -242,10 +250,8 @@ def generate_fragmented_frames(
     Yields
     -------
     tuple[bytes, ...]
-        An encapsulated pixel data frame, with the contents of the
-        :class:`tuple` the frame's fragmented data. If `buffer` is a buffer-like
-        then should yield a tuple of the same type, otherwise yields
-        ``tuple[bytes, ...]``.
+        An encapsulated pixel data frame, with the contents of the tuple the
+        frame's fragmented encoded data.
     """
     if isinstance(buffer, bytes):
         buffer = BytesIO(buffer)
@@ -436,7 +442,7 @@ def generate_frames(
     Yields
     ------
     bytes
-        A single frame of pixel data.
+        A single frame of encoded pixel data.
 
     References
     ----------
@@ -468,7 +474,7 @@ def get_frame(
     .. note::
 
         When the Basic Offset Table is empty and the Extended Offset Table
-        isn't supplied then it's possible to return a frame at a higher 'index'
+        isn't supplied then it's possible to return a frame at a higher `index`
         than expected from the supplied `number_of_frames` value provided there
         are sufficient excess fragments available.
 
@@ -500,7 +506,7 @@ def get_frame(
     Returns
     -------
     bytes
-        A single frame of pixel data.
+        A single frame of encoded pixel data.
 
 
     References
@@ -882,14 +888,14 @@ def encapsulate_extended(frames: list[bytes]) -> tuple[bytes, bytes, bytes]:
     When using a compressed transfer syntax (such as RLE Lossless or one of
     JPEG formats) then any *Pixel Data* must be :dcm:`encapsulated
     <part05/sect_A.4.html>`. When many large frames are to be encapsulated, the
-    total length of encapsulated data may exceed the maximum length available
+    total length of encapsulated data may exceed the maximum offset available
     with the :dcm:`Basic Offset Table<part05/sect_A.4.html>` (2**32 - 1 bytes).
     Under these circumstances you can:
 
-    * Pass ``has_bot=False`` to :func:`~pydicom.encaps.encapsulate`
     * Use :func:`~pydicom.encaps.encapsulate_extended` and add the
       :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html>` elements to your
       dataset (recommended)
+    * Pass ``has_bot=False`` to :func:`~pydicom.encaps.encapsulate`
 
     Examples
     --------
@@ -901,8 +907,8 @@ def encapsulate_extended(frames: list[bytes]) -> tuple[bytes, bytes, bytes]:
         # 'frames' is a list of image frames that have been each been encoded
         # separately using the compression method corresponding to the Transfer
         # Syntax UID
-        frames: List[bytes] = [...]
-        out: Tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
+        frames: list[bytes] = [...]
+        out: tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
 
         ds.PixelData = out[0]
         ds.ExtendedOffsetTable = out[1]
