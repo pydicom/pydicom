@@ -261,16 +261,14 @@ def generate_fragmented_frames(
         #   following the Basic Offset Table, which *should* be empty
         # Only 1 fragment per frame is allowed (Table C.7-11a)
         if isinstance(extended_offsets[0], bytes):
-            offsets = list(
-                unpack(f"{endianness}{number_of_frames}Q", extended_offsets[0])
-            )
+            nr_offsets = len(extended_offsets[0]) // 8
+            offsets = list(unpack(f"{endianness}{nr_offsets}Q", extended_offsets[0]))
         else:
             offsets = extended_offsets[0]
 
         if isinstance(extended_offsets[1], bytes):
-            lengths = list(
-                unpack(f"{endianness}{number_of_frames}Q", extended_offsets[1])
-            )
+            nr_offsets = len(extended_offsets[1]) // 8
+            lengths = list(unpack(f"{endianness}{nr_offsets}Q", extended_offsets[1]))
         else:
             lengths = extended_offsets[1]
 
@@ -520,25 +518,23 @@ def get_frame(
 
     # Prefer the extended offset table (if available)
     if extended_offsets:
-        if index >= len(extended_offsets[0]):
-            raise ValueError(
-                "There aren't enough offsets in the Extended Offset Table for "
-                f"{index + 1} frames"
-            )
-
         if isinstance(extended_offsets[0], bytes):
-            offsets = list(
-                unpack(f"{endianness}{number_of_frames}Q", extended_offsets[0])
-            )
+            nr_offsets = len(extended_offsets[0]) // 8
+            offsets = list(unpack(f"{endianness}{nr_offsets}Q", extended_offsets[0]))
         else:
             offsets = extended_offsets[0]
 
         if isinstance(extended_offsets[1], bytes):
-            lengths = list(
-                unpack(f"{endianness}{number_of_frames}Q", extended_offsets[1])
-            )
+            nr_offsets = len(extended_offsets[1]) // 8
+            lengths = list(unpack(f"{endianness}{nr_offsets}Q", extended_offsets[1]))
         else:
             lengths = extended_offsets[1]
+
+        if index >= len(offsets):
+            raise ValueError(
+                "There aren't enough offsets in the Extended Offset Table for "
+                f"{index + 1} frames"
+            )
 
         # We have the length so skip past the item tag and item length
         buffer.seek(offsets[index] + 8, 1)
@@ -596,7 +592,7 @@ def get_frame(
 
     # 1 fragment per frame, for N frames
     if nr_fragments == number_of_frames:
-        if index > nr_fragments:
+        if index > nr_fragments - 1:
             raise ValueError(
                 f"Found {nr_fragments} frame fragments in the encapsulated "
                 f"pixel data, an 'index' of {index} is invalid"
