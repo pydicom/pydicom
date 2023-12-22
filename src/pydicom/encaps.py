@@ -16,34 +16,9 @@ from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 def parse_basic_offsets(
     buffer: bytes | ReadableBuffer, /, *, endianness: str = "<"
 ) -> list[int]:
-    """Return the basic offset table length and the offsets to each frame.
+    """Return the encapsulated pixel data's basic offset table frame offsets.
 
     .. versionadded:: 3.0
-
-    **Basic Offset Table**
-
-    The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
-    a length, however it may or may not have a value.
-
-    Basic Offset Table with no value::
-
-        Item Tag   | Length    |
-        FE FF 00 E0 00 00 00 00
-
-    Basic Offset Table with value (2 frames)::
-
-        Item Tag   | Length    | Offset 1  | Offset 2  |
-        FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
-
-    For single or multi-frame images with only one frame, the Basic Offset
-    Table may or may not have a value. When it has no value then its length
-    shall be ``0x00000000``.
-
-    For multi-frame images with more than one frame, the Basic Offset Table
-    should have a value containing concatenated 32-bit unsigned integer values
-    that are the byte offsets to the first byte of the Item tag of the first
-    fragment of each frame as measured from the first byte of the first item
-    tag following the Basic Offset Table Item.
 
     Parameters
     ----------
@@ -59,14 +34,13 @@ def parse_basic_offsets(
 
     Returns
     -------
-    tuple[int, list[int]]
-        The length of the basic offset table in bytes, and a list of the offset
-        positions to the first item tag of each frame, as measured from the
-        end of the offset table.
+    list[int]
+        A list of the offset positions to the first item tag of each frame, as
+        measured from the end of the basic offset table.
 
-    See Also
-    --------
-    :func:`~pydicom.encaps.encapsulate_extended`
+    References
+    ----------
+    :dcm:`DICOM Standard, Part 5, Annex A.4<part05/sect_A.4.html#table_A.4-1>`
     """
     if isinstance(buffer, bytes):
         buffer = BytesIO(buffer)
