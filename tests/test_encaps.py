@@ -43,7 +43,7 @@ class TestGetFrameOffsets:
         with pytest.raises(
             ValueError,
             match=r"Unexpected tag '\(FFFE,E100\)' when "
-            r"parsing the Basic Table Offset item",
+            r"parsing the Basic Offset Table item",
         ):
             self.func(fp)
 
@@ -1385,14 +1385,20 @@ class TestParseBasicOffsets:
         """Test raises exception if no item tag."""
         # (FFFE,E100)
         buffer = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
-        msg = r"Unexpected tag '\(FFFE,E100\)' when parsing the Basic Table Offset item"
+        msg = (
+            r"Found unexpected tag \(FFFE,E100\) instead of \(FFFE,E000\) when "
+            r"parsing the Basic Offset Table item"
+        )
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
                 parse_basic_offsets(src)
 
         buffer = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
-        msg = r"Unexpected tag '\(FEFF,00E1\)' when parsing the Basic Table Offset item"
+        msg = (
+            r"Found unexpected tag \(FEFF,00E1\) instead of \(FFFE,E000\) when "
+            r"parsing the Basic Offset Table item"
+        )
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1576,6 +1582,25 @@ class TestParseFragments:
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x02"
         )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_fragments(src, endianness=">")
+
+    def test_item_invalid(self):
+        """Test exception raised if sequence is too short"""
+        buffer = b"\xFE\xFF\x00\xE0" b"\x04\x00\x00"
+        msg = (
+            "Unable to determine the length of the item at offset 0 as the end "
+            "of the data has been reached - the encapsulated pixel data may "
+            "be invalid"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            with pytest.raises(ValueError, match=msg):
+                parse_fragments(src)
+
+        buffer = b"\xFF\xFE\xE0\x00" b"\x00\x00\x04"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1785,6 +1810,29 @@ class TestGenerateFragments:
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")
             assert next(fragments) == b"\x00\x00\x00\x01"
+            with pytest.raises(ValueError, match=msg):
+                next(fragments)
+            pytest.raises(StopIteration, next, fragments)
+
+    def test_item_invalid(self):
+        """Test exception raised if item is invalid"""
+        buffer = b"\xFE\xFF\x00\xE0" b"\x04\x00\x00"
+        msg = (
+            "Unable to determine the length of the item at offset 0 as the end "
+            "of the data has been reached - the encapsulated pixel data may "
+            "be invalid"
+        )
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            fragments = generate_fragments(src)
+            with pytest.raises(ValueError, match=msg):
+                next(fragments)
+            pytest.raises(StopIteration, next, fragments)
+
+        buffer = b"\xFF\xFE\xE0\x00" b"\x00\x00\x04"
+        for func in (bytes, as_bytesio):
+            src = func(buffer)
+            fragments = generate_fragments(src, endianness=">")
             with pytest.raises(ValueError, match=msg):
                 next(fragments)
             pytest.raises(StopIteration, next, fragments)

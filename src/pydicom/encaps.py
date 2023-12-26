@@ -14,7 +14,7 @@ from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 # Functions for parsing encapsulated data
 def parse_basic_offsets(
-    buffer: bytes | ReadableBuffer, /, *, endianness: str = "<"
+    buffer: bytes | ReadableBuffer, *, endianness: str = "<"
 ) -> list[int]:
     """Return the encapsulated pixel data's basic offset table frame offsets.
 
@@ -48,7 +48,8 @@ def parse_basic_offsets(
     group, elem = unpack(f"{endianness}HH", buffer.read(4))
     if group << 16 | elem != 0xFFFEE000:
         raise ValueError(
-            f"Unexpected tag '{Tag(group, elem)}' when parsing the Basic Table Offset item"
+            f"Found unexpected tag {Tag(group, elem)} instead of (FFFE,E000) "
+            "when parsing the Basic Offset Table item"
         )
 
     length = unpack(f"{endianness}L", buffer.read(4))[0]
@@ -64,7 +65,7 @@ def parse_basic_offsets(
 
 
 def parse_fragments(
-    buffer: bytes | ReadableBuffer, /, *, endianness: str = "<"
+    buffer: bytes | ReadableBuffer, *, endianness: str = "<"
 ) -> tuple[int, list[int]]:
     """Return the number of fragments and their positions in `buffer`.
 
@@ -103,7 +104,14 @@ def parse_fragments(
 
         tag = group << 16 | elem
         if tag == 0xFFFEE000:
-            length = unpack(f"{endianness}L", buffer.read(4))[0]
+            if len(raw_length := buffer.read(4)) != 4:
+                raise ValueError(
+                    "Unable to determine the length of the item at offset "
+                    f"{buffer.tell() - len(raw_length) - 4} as the end of "
+                    "the data has been reached - the encapsulated pixel data "
+                    "may be invalid"
+                )
+            length = unpack(f"{endianness}L", raw_length)[0]
             if length == 0xFFFFFFFF:
                 raise ValueError(
                     f"Undefined item length at offset {buffer.tell() - 4} when "
@@ -126,7 +134,7 @@ def parse_fragments(
 
 
 def generate_fragments(
-    buffer: bytes | ReadableBuffer, /, *, endianness: str = "<"
+    buffer: bytes | ReadableBuffer, *, endianness: str = "<"
 ) -> Iterator[bytes]:
     """Yield frame fragments from the encapsulated pixel data in `buffer`.
 
@@ -160,7 +168,14 @@ def generate_fragments(
 
         tag = group << 16 | elem
         if tag == 0xFFFEE000:
-            length = unpack(f"{endianness}L", buffer.read(4))[0]
+            if len(raw_length := buffer.read(4)) != 4:
+                raise ValueError(
+                    "Unable to determine the length of the item at offset "
+                    f"{buffer.tell() - len(raw_length) - 4} as the end of "
+                    "the data has been reached - the encapsulated pixel data "
+                    "may be invalid"
+                )
+            length = unpack(f"{endianness}L", raw_length)[0]
             if length == 0xFFFFFFFF:
                 raise ValueError(
                     f"Undefined item length at offset {buffer.tell() - 4} when "
@@ -179,7 +194,6 @@ def generate_fragments(
 
 def generate_fragmented_frames(
     buffer: bytes | ReadableBuffer,
-    /,
     *,
     number_of_frames: int | None = None,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,
@@ -371,7 +385,6 @@ def generate_fragmented_frames(
 
 def generate_frames(
     buffer: bytes | ReadableBuffer,
-    /,
     *,
     number_of_frames: int | None = None,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,
@@ -412,7 +425,7 @@ def generate_frames(
     Yields
     ------
     bytes
-        A single frame of encoded pixel data.
+        The encoded pixel data, one frame at a time.
 
     References
     ----------
@@ -431,7 +444,6 @@ def generate_frames(
 def get_frame(
     buffer: bytes | ReadableBuffer,
     index: int,
-    /,
     *,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,
     number_of_frames: int | None = None,
@@ -987,7 +999,7 @@ def _get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
 
     if tag != 0xFFFEE000:
         raise ValueError(
-            f"Unexpected tag '{tag}' when parsing the Basic Table Offset item"
+            f"Unexpected tag '{tag}' when parsing the Basic Offset Table item"
         )
 
     length = fp.read_UL()
@@ -1318,6 +1330,8 @@ _DEPRECATED = {
     "decode_data_sequence": _decode_data_sequence,
     "defragment_data": _defragment_data,
     "read_item": _read_item,
+    "itemise_frame": itemize_frame,
+    "itemise_fragment": itemize_fragment,
 }
 
 
