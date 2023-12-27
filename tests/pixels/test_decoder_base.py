@@ -7,6 +7,7 @@ from sys import byteorder
 
 import pytest
 
+from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.pixels import get_decoder, ExplicitVRLittleEndianDecoder
@@ -38,6 +39,7 @@ from .pixels_reference import (
     EXPL_8_3_1F_YBR,
     EXPL_8_3_1F_YBR422,
     EXPL_1_1_1F,
+    EXPB_8_1_1F,
 )
 
 
@@ -138,7 +140,7 @@ class TestDecodeRunner:
 
     def test_option_properties(self):
         """Tests for properties derived from options."""
-        runner = DecodeRunner(RLELossless)
+        runner = DecodeRunner(ExplicitVRLittleEndian)
         attrs = [
             "bits_allocated",
             "bits_stored",
@@ -146,6 +148,7 @@ class TestDecodeRunner:
             "photometric_interpretation",
             "pixel_representation",
             "rows",
+            "samples_per_pixel",
         ]
         for attr in attrs:
             msg = f"No value for '{attr}' has been set"
@@ -159,6 +162,14 @@ class TestDecodeRunner:
             runner.del_option(attr)
             with pytest.raises(AttributeError, match=msg):
                 getattr(runner, attr)
+
+        # pixel_keyword not deletable
+        msg = "No value for 'pixel_keyword' has been set"
+        with pytest.raises(AttributeError, match=msg):
+            runner.pixel_keyword
+
+        runner.set_option("pixel_keyword", 0)
+        assert runner.pixel_keyword == 0
 
         # number_of_frames defaults to 1 if 0 or None
         msg = "No value for 'number_of_frames' has been set"
@@ -266,6 +277,15 @@ class TestDecodeRunner:
         with pytest.raises(AttributeError, match=msg):
             runner.set_source(ds)
 
+        del ds.PixelData
+        del ds.DoubleFloatPixelData
+        msg = (
+            "The dataset has no 'Pixel Data', 'Float Pixel Data' or 'Double "
+            "Float Pixel Data' element, no pixel data to decode"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            runner.set_source(ds)
+
         ds.file_meta = Dataset()
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
@@ -309,6 +329,37 @@ class TestDecodeRunner:
         """Test the options property returns a copy of the options."""
         runner = DecodeRunner(RLELossless)
         assert runner.options is runner._opts
+
+    def test_str(self):
+        """Test str(DecodeRunner)"""
+        runner = DecodeRunner(RLELossless)
+        runner.set_decoders({"foo": None})
+        assert str(runner) == (
+            "DecodeRunner for 'RLE Lossless'\n"
+            "Options\n"
+            "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
+            "  as_rgb: True\n"
+            "  pixel_keyword: PixelData\n"
+            "Decoders\n"
+            "  foo"
+        )
+
+    def test_test_for_be_swap(self):
+        """Test test_for('be_swap_ow')"""
+        runner = DecodeRunner(ExplicitVRBigEndian)
+        with pytest.raises(ValueError, match=r"Unknown test 'foo'"):
+            runner.test_for("foo")
+
+        runner.set_option("bits_allocated", 8)
+        runner.set_option("pixel_keyword", "PixelData")
+
+        assert runner.test_for("be_swap_ow") is False
+        runner.set_option("be_swap_ow", True)
+        assert runner.test_for("be_swap_ow") is True
+        runner.set_option("be_swap_ow", False)
+        assert runner.test_for("be_swap_ow") is False
+        runner.set_option("pixel_vr", "OW")
+        assert runner.test_for("be_swap_ow") is True
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_pixel_dtype_unsupported_raises(self):
@@ -381,6 +432,68 @@ class TestDecodeRunner:
             assert runner.pixel_dtype.byteorder == "<"
             runner._opts["transfer_syntax_uid"] = ExplicitVRBigEndian
             assert runner.pixel_dtype.byteorder in [">", "="]
+
+    def test_validate_buffer(self):
+        """Tests for validate_buffer()"""
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(b"\x00\x00\x00")
+        runner.set_option("bits_allocated", 8)
+        runner.set_option("rows", 1)
+        runner.set_option("columns", 1)
+        runner.set_option("samples_per_pixel", 3)
+        runner.set_option("photometric_interpretation", "RGB")
+        runner.set_option("number_of_frames", 1)
+
+        msg = (
+            "The length of the compressed pixel data matches the "
+            "expected length for uncompressed data - check you have "
+            "set the correct transfer syntax"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            runner.validate_buffer()
+
+        runner = DecodeRunner(ExplicitVRLittleEndian)
+        runner.set_source(b"\x00\x00")
+        runner.set_option("bits_allocated", 8)
+        runner.set_option("rows", 1)
+        runner.set_option("columns", 1)
+        runner.set_option("samples_per_pixel", 3)
+        runner.set_option("photometric_interpretation", "RGB")
+        runner.set_option("number_of_frames", 1)
+
+        # Actual length 2 is less than expected 3
+        msg = (
+            "The number of bytes of pixel data is less than expected "
+            r"\(2 vs 4 bytes\) - the dataset may be corrupted, have an invalid "
+            "group 0028 element value, or the transfer syntax may be incorrect"
+        )
+        with pytest.raises(ValueError, match=msg):
+            runner.validate_buffer()
+
+        # Actual length 5 is greater than expected 3  (padding 2)
+        runner.set_source(b"\x00" * 5)
+        msg = (
+            "The pixel data is 5 bytes long, which indicates it "
+            "contains 2 bytes of excess padding to be removed"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            runner.validate_buffer()
+
+        # YBR_FULL_422 but has unsubsampled length
+        # expected 18 // 3 * 2 = 12, actual 18
+        runner.set_option("photometric_interpretation", "YBR_FULL_422")
+        runner.set_option("rows", 2)
+        runner.set_option("columns", 3)
+        runner.set_source(b"\x00" * 18)
+
+        msg = (
+            "The number of bytes of pixel data is a third larger "
+            r"than expected \(18 vs 12 bytes\) which indicates "
+            "the set photometric interpretation 'YBR_FULL_422' is "
+            "incorrect"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            runner.validate_buffer()
 
     def test_validate_options(self):
         """Tests for validate_options()"""
@@ -506,7 +619,12 @@ class TestDecodeRunner:
         def decode2(src, opts):
             raise AttributeError("Also bad, not helpful")
 
-        runner.set_decoders({"foo": decode1, "bar": decode2})
+        # Check that exception messages on decoder failure
+        # Check that the _previous attribute get's deleted on failure by all
+        #   decoders
+        # Need to update the attr to avoid resetting _previous
+        runner._decoders = {"foo": decode1, "bar": decode2}
+        assert hasattr(runner, "_previous")
         msg = (
             r"Unable to decode as exceptions were raised by all available plugins:"
             r"\n  foo: Bad decoding, many errors\n  bar: Also bad, not helpful"
@@ -1061,9 +1179,31 @@ class TestDecoder:
             assert isinstance(buffer, bytes | bytearray)
 
 
+@pytest.fixture()
+def enable_logging():
+    original = config.debugging
+    config.debugging = True
+    yield
+    config.debugging = original
+
+
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestDecoder_Array:
     """Tests for Decoder.as_array() and Decoder.iter_array()."""
+
+    def test_logging(self, enable_logging, caplog):
+        """Test that the logging works during decode"""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            decoder.as_array(EXPL_1_1_1F.ds)
+            assert "DecodeRunner for 'Explicit VR Little Endian'" in caplog.text
+            assert "  as_rgb: True" in caplog.text
+
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            next(decoder.iter_array(EXPL_1_1_1F.ds, as_rgb=False))
+            assert "DecodeRunner for 'Explicit VR Little Endian'" in caplog.text
+            assert "  as_rgb: False" in caplog.text
 
     def test_bad_index_raises(self):
         """Test invalid 'index'"""
@@ -1269,6 +1409,56 @@ class TestDecoder_Array:
         # Lossy conversion, equal to within 1 intensity unit
         assert np.allclose(out, raw, atol=1)
 
+    def test_expb_ow_view_only_warns(self, caplog):
+        """Test view_only with BE swapped OW warns"""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        reference = EXPB_8_1_1F
+        msg = (
+            "Unable to return an ndarray that's a view on the original buffer "
+            "for 8-bit pixel data encoded as OW with 'Explicit VR Big Endian'"
+        )
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            decoder.as_array(reference.ds, view_only=True)
+            assert msg in caplog.text
+
+    def test_expb_ow_index_invalid_raises(self, caplog):
+        """Test invalid index with BE swapped OW raises"""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        reference = EXPB_8_1_1F
+        msg = "There is insufficient pixel data to contain 2 frames"
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_array(reference.ds, index=1)
+
+    def test_expb_ow_index_odd_length(self):
+        """Test index with odd length BE swapped OW"""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        opts = {
+            "rows": 3,
+            "columns": 3,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": "MONOCHROME1",
+            "pixel_representation": 0,
+            "bits_allocated": 8,
+            "bits_stored": 8,
+            "number_of_frames": 3,
+            "pixel_keyword": "PixelData",
+            "pixel_vr": "OW",
+        }
+
+        src = (  #                            | 2_1 | 1_9
+            b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
+            # 2_2 | 2_3
+            b"\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
+            # 3_1                             | pad | 3_9
+            b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
+        )
+        arr = decoder.as_array(src, **opts, index=0)
+        assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        arr = decoder.as_array(src, **opts, index=1)
+        assert arr.ravel().tolist() == [9, 10, 11, 12, 13, 14, 15, 16, 17]
+        arr = decoder.as_array(src, **opts, index=2)
+        assert arr.ravel().tolist() == [18, 19, 20, 21, 22, 23, 24, 25, 26]
+
     def test_iter_native_indices(self):
         """Test the `indices` argument with native data."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -1435,11 +1625,18 @@ class TestDecoder_Buffer:
     def test_native_index(self):
         """Test `index`"""
         decoder = get_decoder(ExplicitVRLittleEndian)
+
+        assert decoder.is_available
+
         reference = EXPL_16_1_10F
         for index in [0, 4, 9]:
             arr = decoder.as_array(reference.ds, index=index)
             buffer = decoder.as_buffer(reference.ds, index=index)
             assert arr.tobytes() == buffer
+
+        msg = "There is insufficient pixel data to contain 11 frames"
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(reference.ds, index=10)
 
     def test_native_view_only(self):
         """Test `view_only`"""
@@ -1513,6 +1710,70 @@ class TestDecoder_Buffer:
         buffer = decoder.as_buffer(reference.ds, decoding_plugin="pydicom")
         assert isinstance(buffer, bytes | bytearray)
         assert arr.tobytes() == buffer
+
+    def test_encapsulated_invalid_decode_raises(self):
+        """Test invalid decode raises"""
+        decoder = Decoder(RLELossless)
+        reference = RLE_16_1_10F
+
+        def foo(src, opts):
+            return b"\x00\x01"
+
+        msg = (
+            "Unexpected number of bytes in the decoded frame with index 0 "
+            r"\(2 bytes actual vs 8192 expected\)"
+        )
+        decoder._available = {"foo": foo}
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(reference.ds)
+
+        msg = (
+            "Unexpected number of bytes in the decoded frame with index 9 "
+            r"\(2 bytes actual vs 8192 expected\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(reference.ds, index=9)
+
+    def test_expb_ow_index_invalid_raises(self, caplog):
+        """Test invalid index with BE swapped OW raises"""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        reference = EXPB_8_1_1F
+        msg = "There is insufficient pixel data to contain 2 frames"
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(reference.ds, index=1)
+
+    def test_expb_ow_index_odd_length(self):
+        """Test index with odd length BE swapped OW"""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        opts = {
+            "rows": 3,
+            "columns": 3,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": "MONOCHROME1",
+            "pixel_representation": 0,
+            "bits_allocated": 8,
+            "bits_stored": 8,
+            "number_of_frames": 3,
+            "pixel_keyword": "PixelData",
+            "pixel_vr": "OW",
+        }
+
+        src = (  #                            | 2_1 | 1_9
+            b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
+            # 2_2 | 2_3
+            b"\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
+            # 3_1                             | pad | 3_9
+            b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
+        )
+        # Includes +1 at end
+        buffer = decoder.as_buffer(src, **opts, index=0)
+        assert buffer == b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
+        # Includes -1 at start
+        buffer = decoder.as_buffer(src, **opts, index=1)
+        assert buffer == b"\x09\x08\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
+        # Includes +1 at end
+        buffer = decoder.as_buffer(src, **opts, index=2)
+        assert buffer == b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
 
     def test_iter_native_indices(self):
         """Test `index`"""

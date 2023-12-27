@@ -500,7 +500,7 @@ class DecodeRunner:
 
     def __str__(self) -> str:
         """Return nice string output for the runner."""
-        s = [f"DecoderRunner for '{self.transfer_syntax.name}'"]
+        s = [f"DecodeRunner for '{self.transfer_syntax.name}'"]
         s.append("Options")
         s.extend([f"  {name}: {value}" for name, value in self.options.items()])
         if self._decoders:
@@ -676,8 +676,9 @@ class DecodeRunner:
             if actual != expected:
                 raise ValueError(
                     f"The number of bytes of pixel data is less than expected "
-                    f"({actual} vs {padded}) - the dataset may be corrupted "
-                    "or the transfer syntax may be incorrect"
+                    f"({actual} vs {padded} bytes) - the dataset may be "
+                    "corrupted, have an invalid group 0028 element value, or "
+                    "the transfer syntax may be incorrect"
                 )
         elif actual > padded:
             # PS 3.5, Section 8.1.1
@@ -692,9 +693,9 @@ class DecodeRunner:
                 if actual >= ybr_length:
                     msg = (
                         "The number of bytes of pixel data is a third larger "
-                        f"than expected ({actual} vs {expected}) which indicates "
-                        "the set photometric interpretation 'YBR_FULL_422' is "
-                        "incorrect"
+                        f"than expected ({actual} vs {expected} bytes) which "
+                        "indicates the set photometric interpretation "
+                        "'YBR_FULL_422' is incorrect"
                     )
 
             warn_and_log(msg)
@@ -1384,7 +1385,7 @@ class Decoder:
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
-                    f"{index} ({actual} actual vs {length_bytes} expected)"
+                    f"{index} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
             return frame
@@ -1397,7 +1398,7 @@ class Decoder:
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
-                    f"{index} ({actual} actual vs {length_bytes} expected)"
+                    f"{index} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
             buffer[start : start + length_bytes] = frame
@@ -1726,7 +1727,7 @@ class Decoder:
         used to decode data, ``False`` otherwise.
         """
         # Decoders for public non-compressed syntaxes are always available
-        if not self.UID.is_private and not self.UID.is_compressed:
+        if self.is_native:
             return True
 
         return bool(self._available)
