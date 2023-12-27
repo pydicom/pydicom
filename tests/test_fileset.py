@@ -1338,14 +1338,17 @@ class TestFileSet:
         assert 1 == len(fs)
 
         # Test the DICOMDIR
-        assert 398 == (ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity)
-        assert 398 == (ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity)
+        # If uid_len is odd then actual length in dataset is uid_len + 1
+        uid_len = len(ds.file_meta.MediaStorageSOPInstanceUID)
+        length = 398 - 64 + uid_len + uid_len % 2
+        assert length == ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
+        assert length == ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
 
         seq = ds.DirectoryRecordSequence
         assert 4 == len(seq)
 
         item = seq[0]
-        assert item.seq_item_tell == 398
+        assert item.seq_item_tell == length
         assert "PATIENT" == item.DirectoryRecordType
         assert ct.PatientName == item.PatientName
         assert ct.PatientID == item.PatientID
@@ -1355,7 +1358,7 @@ class TestFileSet:
         assert 516 == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[1]
-        assert item.seq_item_tell == 516
+        assert item.seq_item_tell == length + (516 - 398)
         assert "STUDY" == item.DirectoryRecordType
         assert ct.StudyDate == item.StudyDate
         assert ct.StudyTime == item.StudyTime
@@ -1365,10 +1368,10 @@ class TestFileSet:
         assert 0xFFFF == item.RecordInUseFlag
         assert 0 == item.OffsetOfTheNextDirectoryRecord
         assert "ISO_IR 100" == item.SpecificCharacterSet
-        assert 704 == item.OffsetOfReferencedLowerLevelDirectoryEntity
+        assert length + (704 - 398) == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[2]
-        assert item.seq_item_tell == 704
+        assert item.seq_item_tell == length + (704 - 398)
         assert "SERIES" == item.DirectoryRecordType
         assert ct.Modality == item.Modality
         assert ct.SeriesInstanceUID == item.SeriesInstanceUID
@@ -1376,10 +1379,10 @@ class TestFileSet:
         assert 0xFFFF == item.RecordInUseFlag
         assert 0 == item.OffsetOfTheNextDirectoryRecord
         assert "ISO_IR 100" == item.SpecificCharacterSet
-        assert 852 == item.OffsetOfReferencedLowerLevelDirectoryEntity
+        assert length + (852 - 398) == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[3]
-        assert item.seq_item_tell == 852
+        assert item.seq_item_tell == length + (852 - 398)
         assert "IMAGE" == item.DirectoryRecordType
         assert ["PT000000", "ST000000", "SE000000", "IM000000"] == (
             item.ReferencedFileID
