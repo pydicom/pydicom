@@ -5,7 +5,7 @@ import pytest
 
 import pydicom
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data
+from pydicom.encaps import get_frame
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
     convert_color_space,
@@ -746,7 +746,7 @@ class TestJPEG2K:
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
-        bs = defragment_data(ds.PixelData)
+        bs = get_frame(ds.PixelData, 0)
         params = get_j2k_parameters(bs)
         assert 13 == params["precision"]
         assert not params["is_signed"]

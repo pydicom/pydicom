@@ -3,16 +3,13 @@
 Bulk Data Handlers
 ==================
 
-Functions for handling bulk data elements such as (7FE0,0010) *Pixel Data* and
-(60xx,3000) *Overlay Data*.
+Functions for handling bulk data elements such as (7FE0,0010) *Pixel Data*
 
 .. toctree::
    :maxdepth: 1
    :includehidden:
 
-   handlers.overlay_data
    handlers.pixel_data
-   handlers.waveform_data
 
 Pixel Data Utilities
 ====================

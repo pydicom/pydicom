@@ -1,7 +1,7 @@
 .. _api_handlers_overlaydata:
 
-Overlay Data Handlers (:mod:`pydicom.overlays`)
-============================================================
+Overlay Data Handling (:mod:`pydicom.overlays`)
+===============================================
 
 .. currentmodule:: pydicom.overlays
 

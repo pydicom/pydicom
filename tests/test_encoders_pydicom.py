@@ -14,7 +14,7 @@ except ImportError:
 from pydicom import dcmread, Dataset
 from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
-from pydicom.encaps import defragment_data
+from pydicom.encaps import get_frame
 from pydicom.encoders import RLELosslessEncoder
 from pydicom.encoders.native import _encode_frame, _encode_segment, _encode_row
 from pydicom.pixel_data_handlers.rle_handler import (
@@ -335,7 +335,7 @@ class TestEncodeSegment:
     def test_one_row(self):
         """Test encoding data that contains only a single row."""
         ds = dcmread(RLE_8_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
+        pixel_data = get_frame(ds.PixelData, 0)
         decoded = _rle_decode_segment(pixel_data[64:])
         assert ds.Rows * ds.Columns == len(decoded)
         arr = np.frombuffer(decoded, "uint8").reshape(ds.Rows, ds.Columns)
@@ -353,7 +353,7 @@ class TestEncodeSegment:
     def test_cycle(self):
         """Test the decoded data remains the same after encoding/decoding."""
         ds = dcmread(RLE_8_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
+        pixel_data = get_frame(ds.PixelData, 0)
         decoded = _rle_decode_segment(pixel_data[64:])
         assert ds.Rows * ds.Columns == len(decoded)
         # Re-encode the decoded data
