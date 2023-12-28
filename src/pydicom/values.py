@@ -458,8 +458,6 @@ def convert_OVvalue(
 ) -> bytes:
     """Return the encoded 'OV' value as :class:`bytes`.
 
-    .. versionadded:: 1.4
-
     No byte swapping will be performed.
     """
     # for now, Maybe later will have own routine

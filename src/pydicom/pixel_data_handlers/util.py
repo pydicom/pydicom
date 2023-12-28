@@ -33,8 +33,6 @@ def apply_color_lut(
 ) -> "np.ndarray":
     """Apply a color palette lookup table to `arr`.
 
-    .. versionadded:: 1.4
-
     If (0028,1201-1203) *Palette Color Lookup Table Data* are missing
     then (0028,1221-1223) *Segmented Palette Color Lookup Table Data* must be
     present and vice versa. The presence of (0028,1204) *Alpha Palette Color
@@ -223,8 +221,6 @@ def apply_color_lut(
 def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     """Apply a modality lookup table or rescale operation to `arr`.
 
-    .. versionadded:: 1.4
-
     Parameters
     ----------
     arr : numpy.ndarray
@@ -312,8 +308,6 @@ def apply_voi_lut(
     arr: "np.ndarray", ds: "Dataset", index: int = 0, prefer_lut: bool = True
 ) -> "np.ndarray":
     """Apply a VOI lookup table or windowing operation to `arr`.
-
-    .. versionadded:: 1.4
 
     .. versionchanged:: 2.1
 
@@ -628,10 +622,6 @@ def convert_color_space(
     arr: "np.ndarray", current: str, desired: str, per_frame: bool = False
 ) -> "np.ndarray":
     """Convert the image(s) in `arr` from one color space to another.
-
-    .. versionchanged:: 1.4
-
-        Added support for ``YBR_FULL_422``
 
     .. versionchanged:: 2.2
 
@@ -1005,10 +995,6 @@ def get_expected_length(ds: "Dataset", unit: str = "bytes") -> int:
     | (0028,0100) | BitsAllocated             | 1    | Required    |
     +-------------+---------------------------+------+-------------+
 
-    .. versionchanged:: 1.4
-
-        Added support for a *Photometric Interpretation* of  ``YBR_FULL_422``
-
     Parameters
     ----------
     ds : Dataset
@@ -1055,8 +1041,6 @@ def get_expected_length(ds: "Dataset", unit: str = "bytes") -> int:
 
 def get_image_pixel_ids(ds: "Dataset") -> dict[str, int]:
     """Return a dict of the pixel data affecting element's :func:`id` values.
-
-    .. versionadded:: 1.4
 
     +------------------------------------------------+
     | Element                                        |
@@ -1190,8 +1174,6 @@ def get_nr_frames(ds: "Dataset", warn: bool = True) -> int:
 def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
 
-    .. versionadded:: 1.2
-
     Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
 
     .. versionchanged:: 2.1
@@ -1271,11 +1253,6 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     +-------------+---------------------+------+------------------+
     | (0028,0103) | PixelRepresentation | 1    | 0, 1             |
     +-------------+---------------------+------+------------------+
-
-    .. versionchanged:: 1.4
-
-        Added `as_float` keyword parameter and support for float dtypes.
-
 
     Parameters
     ----------

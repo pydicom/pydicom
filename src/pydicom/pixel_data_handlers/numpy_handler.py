@@ -122,13 +122,6 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the pixel data.
 
-    .. versionchanged:: 1.4
-
-        * Added support for uncompressed pixel data with a *Photometric
-          Interpretation* of ``YBR_FULL_422``.
-        * Added support for *Float Pixel Data* and *Double Float Pixel Data*
-
-
     Parameters
     ----------
     ds : Dataset
