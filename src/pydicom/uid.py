@@ -438,11 +438,6 @@ def generate_uid(
 ) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 
-    .. versionchanged:: 1.3
-
-       When `prefix` is ``None`` a conformant UUID suffix of up to
-       39 characters will be used instead of a hashed value.
-
     .. versionchanged:: 3.0
 
        * When `entropy_srcs` is ``None`` the suffix is now generated using

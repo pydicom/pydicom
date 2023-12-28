@@ -298,8 +298,6 @@ custom_encoders = {
 def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
-    .. versionadded:: 1.2
-
     Parameters
     ----------
     value : bytes
@@ -486,8 +484,6 @@ def _decode_escaped_fragment(
 
 def encode_string(value: str, encodings: Sequence[str]) -> bytes:
     """Encode a unicode string `value` into :class:`bytes` using `encodings`.
-
-    .. versionadded:: 1.2
 
     Parameters
     ----------

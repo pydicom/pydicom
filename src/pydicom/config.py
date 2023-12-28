@@ -303,8 +303,6 @@ a text VR is ``None``, otherwise (the default), it is is an empty string.
 For all other VRs the behavior does not change - the value is en empty
 list for VR **SQ** and ``None`` for all other VRs.
 Note that the default of this value may change to ``True`` in a later version.
-
-.. versionadded:: 1.4
 """
 
 replace_un_with_known_vr = True
@@ -329,47 +327,6 @@ displaying the file meta information data elements
 logger = logging.getLogger("pydicom")
 logger.addHandler(logging.NullHandler())
 
-import pydicom.overlays.numpy_handler as overlay_np  # noqa
-
-overlay_data_handlers = [overlay_np]
-"""Handlers for converting (60xx,3000) *Overlay Data*
-
-.. versionadded:: 1.4
-
-.. deprecated:: 2.1
-
-.. currentmodule:: pydicom.dataset
-
-This is an ordered list of *Overlay Data* handlers that the
-:meth:`~Dataset.overlay_array` method will use to try to extract a correctly
-sized numpy array from an *Overlay Data* element.
-
-Handlers have two required methods:
-
-def is_available():
-    Return ``True`` if the handler's dependencies are installed, ``False``
-    otherwise.
-
-def get_overlay_array(ds, group):
-    Return a correctly shaped :class:`numpy.ndarray` derived from the
-    *Overlay Data* with element tag `group`, in :class:`Dataset` `ds` or raise
-    an exception.
-
-And two required attributes:
-
-DEPENDENCIES : dict
-    A dict containing the dependencies of the handler as
-    {'package_import_name': ('http://package.com/url', 'Package Name')}
-HANDLER_NAME : str
-    The name of the handler, e.g. 'Numpy Overlay'
-
-The first handler that both announces that it supports the transfer syntax
-and does not raise an exception is the handler that will provide the
-data.
-
-If all handlers fail to convert the data only the last exception is raised.
-"""
-
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
 import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
 import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
@@ -386,8 +343,6 @@ pixel_data_handlers = [
     rle_handler,
 ]
 """Handlers for converting (7FE0,0010) *Pixel Data*.
-
-.. versionadded:: 1.2
 
 .. currentmodule:: pydicom.dataset
 
@@ -514,10 +469,6 @@ def debug(debug_on: bool = True, default_handler: bool = True) -> None:
     that location are logged to the 'pydicom' logger using Python's
     :mod:`logging`
     module.
-
-    .. versionchanged:1.4
-
-        Added `default_handler` keyword parameter.
 
     Parameters
     ----------

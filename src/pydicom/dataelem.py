@@ -56,8 +56,6 @@ def empty_value_for_VR(
 ) -> bytes | list[str] | str | None | PersonName:
     """Return the value for an empty element for `VR`.
 
-    .. versionadded:: 1.4
-
     The behavior of this property depends on the setting of
     :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
     an empty value is represented by ``None`` (except for VR 'SQ'), otherwise
@@ -253,8 +251,6 @@ class DataElement:
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
 
-        .. versionadded:: 1.3
-
         Parameters
         ----------
         dataset_class : dataset.Dataset derived class
@@ -303,8 +299,6 @@ class DataElement:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
-
-        .. versionadded:: 1.4
 
         Parameters
         ----------
@@ -389,8 +383,6 @@ class DataElement:
     ) -> str:
         """Return a JSON representation of the :class:`DataElement`.
 
-        .. versionadded:: 1.3
-
         Parameters
         ----------
         bulk_data_threshold : int, optional
@@ -474,10 +466,7 @@ class DataElement:
 
     @property
     def is_empty(self) -> bool:
-        """Return ``True`` if the element has no value.
-
-        .. versionadded:: 1.4
-        """
+        """Return ``True`` if the element has no value."""
         if self.VR == VR_.SQ:
             return not bool(self.value)
 
@@ -486,8 +475,6 @@ class DataElement:
     @property
     def empty_value(self) -> bytes | list[str] | None | str | PersonName:
         """Return the value for an empty element.
-
-        .. versionadded:: 1.4
 
         See :func:`empty_value_for_VR` for more information.
 
@@ -500,8 +487,6 @@ class DataElement:
 
     def clear(self) -> None:
         """Clears the value, e.g. sets it to the configured empty value.
-
-        .. versionadded:: 1.4
 
         See :func:`empty_value_for_VR`.
         """

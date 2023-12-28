@@ -68,27 +68,6 @@ EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
 class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
-    def setup_method(self):
-        """Setup the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = [NP_HANDLER]
-
-    def teardown_method(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert not HAVE_NP
-        assert NP_HANDLER is not None
-
-    def test_overlay_array_raises(self):
-        """Test overlay_array raises exception"""
-        ds = dcmread(EXPL_1_1_1F)
-        msg = r"The following handlers are available to decode"
-        with pytest.raises(RuntimeError, match=msg):
-            ds.overlay_array(0x6000)
-
     def test_get_overlay_array_raises(self):
         """Test get_overlay_array raises exception"""
         ds = dcmread(EXPL_1_1_1F)
@@ -118,20 +97,6 @@ REFERENCE_DATA_LITTLE = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_NumpyHandler:
     """Tests for handling Overlay Data with the handler."""
-
-    def setup_method(self):
-        """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = [NP_HANDLER]
-
-    def teardown_method(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert HAVE_NP
-        assert NP_HANDLER is not None
 
     # Little endian datasets
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_LITTLE)
