@@ -319,7 +319,7 @@ class TestDataElement:
         """Test DataElement.__repr__ with a sequence"""
         elem = DataElement(0x300A00B0, "SQ", [Dataset()])
         elem[0].PatientID = "1234"
-        assert repr(elem) == repr(elem.value)
+        assert repr(elem) == str(elem)
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""

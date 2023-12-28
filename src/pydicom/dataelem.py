@@ -700,7 +700,7 @@ class DataElement:
 
     def __repr__(self) -> str:
         """Return the representation of the element."""
-        return repr(self.value) if self.VR == VR_.SQ else str(self)
+        return str(self)
 
 
 class RawDataElement(NamedTuple):
