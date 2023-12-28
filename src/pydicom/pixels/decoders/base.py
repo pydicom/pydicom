@@ -847,7 +847,6 @@ class Decoder:
     def as_array(
         self,
         src: Buffer | Dataset,
-        /,
         *,
         index: int | None = None,
         validate: bool = True,
@@ -1182,7 +1181,6 @@ class Decoder:
     def as_buffer(
         self,
         src: Buffer | Dataset,
-        /,
         *,
         index: int | None = None,
         validate: bool = True,
@@ -1408,7 +1406,6 @@ class Decoder:
     def iter_array(
         self,
         src: Buffer | Dataset,
-        /,
         *,
         indices: Iterable[int] | None = None,
         raw: bool = False,
@@ -1601,7 +1598,6 @@ class Decoder:
     def iter_buffer(
         self,
         src: Buffer | Dataset,
-        /,
         *,
         indices: Iterable[int] | None = None,
         validate: bool = True,
@@ -1877,7 +1873,7 @@ def _build_decoder_docstrings() -> None:
         s.append(f"Decoding plugins: {', '.join(plugins)}")
         s.append("")
         s.append(
-            "See the :class:`~pydicom.decoders.base.Decoder` "
+            "See the :class:`~pydicom.pixels.decoders.base.Decoder` "
             "reference for instance methods and attributes."
         )
         dec.__doc__ = "\n".join(s)

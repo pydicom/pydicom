@@ -4,7 +4,7 @@
 Decoder Plugins Options
 =======================
 
-.. currentmodule:: pydicom.pixels.decoders
+.. currentmodule:: pydicom.pixels.decoders.base
 
 
 .. _decoder_plugin_pydicom:

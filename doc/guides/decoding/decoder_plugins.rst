@@ -24,13 +24,13 @@ An decoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      def decoder(src: bytes, opt: DecoderOptions) -> bytearray | bytes:
+      def decoder(src: bytes, opts: DecoderOptions) -> bytearray | bytes:
 
   Where
 
   * `src` is a single frame's worth of raw compressed data to be decoded as
     :class:`bytes`.
-  * `opt` is a :class:`dict` which at a minimum contains the following
+  * `opts` is a :class:`dict` which at a minimum contains the following
     required keys:
 
     * ``'transfer_syntax_uid'``: :class:`~pydicom.uid.UID` - the *Transfer
@@ -55,13 +55,23 @@ An decoding plugin must implement three objects within the same module:
 
     And conditionally contains the following keys:
 
-    * `planar_configuration`: :class:`int` - present when `samples_per_pixel`
+    * ``'planar_configuration'``: :class:`int` - present when ``'samples_per_pixel'``
       > 1, ``0`` for color-by-pixel, ``1`` for color-by-plane.
 
     `opts` may also contain optional parameters intended to be used
     with the decoder function to allow customization of the decoding process
     or to provide additional functionality. Support for these optional
     parameters is not required, however.
+
+    `opts` is a reference to the options dict used by the
+    :class:`~pydicom.pixels.base.DecodeRunner` that manages the decoding process,
+    so if your decoder needs to signal that one of the option values needs to be
+    modified (say for example to flag that the photometric interpretation of the
+    decoded frame has already been changed from YBR_FULL to RGB by the plugin),
+    then this can be done by modifying the corresponding value in `opts`. Note
+    that you should only do this after successfully decoding the frame, as if the
+    decoding fails then changing the option value may cause issues with other
+    decoding plugins.
 
   When possible it's recommended that the decoding function return the decoded
   pixel data as a :class:`bytearray` to minimise later memory usage.
@@ -89,7 +99,7 @@ An decoding plugin must implement three objects within the same module:
           JPEG2000: ('numpy', 'gdcm'),
       }
 
-  This will be used to provide the user with a list of missing dependencies
+  This will be used to provide the user with a list of dependencies
   required by the plugin.
 
 An example of the requirements of a plugin is available :gh:`here
@@ -99,7 +109,7 @@ Adding Plugins to an Decoder
 ============================
 
 Additional plugins can be added to an existing decoder with the
-:meth:`~pydicom.decoders.base.Decoder.add_plugin` method, which takes the
+:meth:`~pydicom.pixels.decoders.base.Decoder.add_plugin` method, which takes the
 a unique :class:`str` `plugin_label`, and a :class:`tuple` of ``('the import
 path to the decoder function's module', 'decoder function name')``. For
 example, if you'd import your decoder function `my_decoder_func` with

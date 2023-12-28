@@ -46,9 +46,7 @@ def _decode_frame(src: bytes, opts: DecodeOptions) -> bytearray:
     bytearray
         The decoded frame, ordered as planar configuration 1.
     """
-    # Update the runner options to ensure the reshaping is correct
-    opts["planar_configuration"] = 1
-    return _rle_decode_frame(
+    frame = _rle_decode_frame(
         src,
         opts["rows"],
         opts["columns"],
@@ -56,6 +54,11 @@ def _decode_frame(src: bytes, opts: DecodeOptions) -> bytearray:
         opts["bits_allocated"],
         opts.get("rle_segment_order", ">"),
     )
+    # Update the runner options to ensure the reshaping is correct
+    # Only do this if we successfully decoded the frame
+    opts["planar_configuration"] = 1
+
+    return frame
 
 
 def _rle_decode_frame(
