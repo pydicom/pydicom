@@ -1633,10 +1633,20 @@ class Dataset:
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
+
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != get_image_pixel_ids(self):
+        elif self._pixel_array is None:
             already_have = False
+
+        # The _pixel_id may give a false negative if the pixel data memory
+        #   has been freed prior to setting a new value it may reuse that memory
+        #   and therefore give the same `id()` value
+        if self._pixel_id != get_image_pixel_ids(self):
+            already_have = False
+        else:
+            print("A")
+            already_have = True
 
         if already_have:
             return
@@ -1910,6 +1920,8 @@ class Dataset:
 
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self["PixelData"].is_undefined_length = True
+        self._pixel_array = None
+        self._pixel_id = {}
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, "file_meta"):
@@ -2503,6 +2515,11 @@ class Dataset:
                 if isinstance(elem, RawDataElement):
                     elem = DataElement_from_raw(elem, self._character_set, self)
                 elem.private_creator = self[private_creator_tag].value
+
+        # Changing pixel data resets the stored array
+        if elem_tag in {0x7FE00008, 0x7FE00009, 0x7FE00010}:
+            self._pixel_array = None
+            self._pixel_id = {}
 
         self._dict[elem_tag] = elem
 
