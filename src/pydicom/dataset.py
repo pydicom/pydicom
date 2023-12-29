@@ -84,6 +84,10 @@ from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
+# FloatPixelData, DoubleFloatPixelData, PixelData
+PIXEL_KEYWORDS = {0x7FE00008, 0x7FE00009, 0x7FE00010}
+
+
 class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
 
@@ -647,6 +651,11 @@ class Dataset:
         tag = cast(BaseTag, tag_for_keyword(name))
         if tag is not None and tag in self._dict:
             del self._dict[tag]
+
+            # Deleting pixel data resets the stored array
+            if tag in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -697,12 +706,22 @@ class Dataset:
             del self._dict[key]
             if self._private_blocks and key.is_private_creator:
                 self._private_blocks = {}
+
+            # Deleting pixel data resets the stored array
+            if key in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
         else:
             # If not a standard tag, than convert to Tag and try again
             tag = Tag(key)
             del self._dict[tag]
             if self._private_blocks and tag.is_private_creator:
                 self._private_blocks = {}
+
+            # Deleting pixel data resets the stored array
+            if key in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
 
     def __dir__(self) -> list[str]:
         """Return a list of methods, properties, attributes and element
@@ -1644,9 +1663,6 @@ class Dataset:
         #   and therefore give the same `id()` value
         if self._pixel_id != get_image_pixel_ids(self):
             already_have = False
-        else:
-            print("A")
-            already_have = True
 
         if already_have:
             return
@@ -2517,7 +2533,7 @@ class Dataset:
                 elem.private_creator = self[private_creator_tag].value
 
         # Changing pixel data resets the stored array
-        if elem_tag in {0x7FE00008, 0x7FE00009, 0x7FE00010}:
+        if elem_tag in PIXEL_KEYWORDS:
             self._pixel_array = None
             self._pixel_id = {}
 
