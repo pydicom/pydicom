@@ -894,6 +894,12 @@ def read_partial(
         unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
         fileobj = BytesIO(unzipped)  # a file-like object
         is_implicit_VR = False
+    elif transfer_syntax in pydicom.uid.PrivateTransferSyntaxes:
+        # Replace with the registered UID as it has the encoding information
+        index = pydicom.uid.PrivateTransferSyntaxes.index(transfer_syntax)
+        transfer_syntax = pydicom.uid.PrivateTransferSyntaxes[index]
+        is_implicit_VR = transfer_syntax.is_implicit_VR
+        is_little_endian = transfer_syntax.is_little_endian
     else:
         # Any other syntax should be Explicit VR Little Endian,
         #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE
@@ -1037,12 +1043,10 @@ def dcmread(
     if config.debugging:
         logger.debug("\n" + "-" * 80)
         logger.debug("Call to dcmread()")
-        msg = (
-            "filename:'%s', defer_size='%s', "
-            "stop_before_pixels=%s, force=%s, specific_tags=%s"
-        )
         logger.debug(
-            msg % (fp.name, defer_size, stop_before_pixels, force, specific_tags)
+            f"filename: {getattr(fp, 'name', '<none>')}, defer_size={defer_size}, "
+            f"stop_before_pixels={stop_before_pixels}, force={force}, "
+            f"specific_tags={specific_tags}"
         )
         if caller_owns_file:
             logger.debug("Caller passed file object")
