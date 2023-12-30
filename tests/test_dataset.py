@@ -27,7 +27,6 @@ from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta, FileMetaDataset
 from pydicom.encaps import encapsulate
 from pydicom.filebase import DicomBytesIO
-from pydicom.overlays import numpy_handler as NP_HANDLER
 from pydicom.pixel_data_handlers.util import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
@@ -1024,6 +1023,18 @@ class TestDataset:
 
         # Slice all items - should return original dataset
         assert ds == ds.get_item(slice(None, None))
+
+    def test_getitem_deferred(self):
+        """Test get_item(..., keep_deferred)"""
+        test_file = get_testdata_file("MR_small.dcm")
+        ds = dcmread(test_file, force=True, defer_size="0.8 kB")
+        elem = ds.get_item("PixelData", keep_deferred=True)
+        assert isinstance(elem, RawDataElement)
+        assert elem.value is None
+
+        elem = ds.get_item("PixelData", keep_deferred=False)
+        assert isinstance(elem, DataElement)
+        assert elem.value is not None
 
     def test_get_private_item(self):
         ds = Dataset()
@@ -2200,66 +2211,19 @@ class TestDatasetOverlayArray:
 
     def setup_method(self):
         """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = [NP_HANDLER]
-
         self.ds = dcmread(get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm"))
 
-        class DummyHandler:
-            def __init__(self):
-                self.raise_exc = False
-                self.has_dependencies = True
-                self.DEPENDENCIES = {
-                    "numpy": ("http://www.numpy.org/", "NumPy"),
-                }
-                self.HANDLER_NAME = "Dummy"
-
-            def supports_transfer_syntax(self, syntax):
-                return True
-
-            def is_available(self):
-                return self.has_dependencies
-
-            def get_overlay_array(self, ds, group):
-                if self.raise_exc:
-                    raise ValueError("Dummy error message")
-
-                return "Success"
-
-        self.dummy = DummyHandler()
-
-    def teardown_method(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_no_possible(self):
-        """Test with no possible handlers available."""
-        pydicom.config.overlay_data_handlers = []
-        with pytest.raises((NotImplementedError, RuntimeError)):
-            self.ds.overlay_array(0x6000)
-
+    @pytest.mark.skipif(HAVE_NP, reason="numpy is available")
     def test_possible_not_available(self):
         """Test with possible but not available handlers."""
-        self.dummy.has_dependencies = False
-        pydicom.config.overlay_data_handlers = [self.dummy]
-        msg = (
-            r"The following handlers are available to decode the overlay "
-            r"data however they are missing required dependencies: "
-        )
-        with pytest.raises(RuntimeError, match=msg):
+        msg = r"NumPy is required for FileDataset.overlay_array\(\)"
+        with pytest.raises(ImportError, match=msg):
             self.ds.overlay_array(0x6000)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="numpy is not available")
     def test_possible_available(self):
         """Test with possible and available handlers."""
-        pydicom.config.overlay_data_handlers = [self.dummy]
-        assert "Success" == self.ds.overlay_array(0x6000)
-
-    def test_handler_raises(self):
-        """Test the handler raising an exception."""
-        self.dummy.raise_exc = True
-        pydicom.config.overlay_data_handlers = [self.dummy]
-        with pytest.raises(ValueError, match=r"Dummy error message"):
-            self.ds.overlay_array(0x6000)
+        assert isinstance(self.ds.overlay_array(0x6000), numpy.ndarray)
 
 
 class TestFileMeta:

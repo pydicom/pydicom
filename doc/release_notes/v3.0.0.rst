@@ -101,6 +101,7 @@ Removals
     * ``DataElement.parent``
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
+* ``config.overlay_data_handlers`` has been removed
 * Removed ``Dataset.fix_meta_info()``, encoding state now follows the transfer syntax
   instead of the other way around
 
@@ -150,6 +151,9 @@ Enhancements
   as :class:`io.BytesIO`, :class:`BinaryIO<typing.BinaryIO>` or :class:`mmap.mmap`.
   They also support using the :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>`
   for determining frame boundaries.
+* Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
+  <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
+  element length without having to read the element value. (:issue:`1873`)
 
 
 Fixes
