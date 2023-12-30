@@ -1420,7 +1420,31 @@ class TestDataset:
         ds._pixel_id = {"SamplesPerPixel": 3}
         ds._pixel_array = True
 
+        del ds["PixelData"]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[Tag("PixelData")]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
         del ds[0x7FE00010]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[0x7FE00000:0x7FE00012]
         assert ds._pixel_id == {}
         assert ds._pixel_array is None
 

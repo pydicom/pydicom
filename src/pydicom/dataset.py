@@ -702,6 +702,10 @@ class Dataset:
                 # deleted - will be re-created on next access
                 if self._private_blocks and BaseTag(tag).is_private_creator:
                     self._private_blocks = {}
+
+                if tag in PIXEL_KEYWORDS:
+                    self._pixel_array = None
+                    self._pixel_id = {}
         elif isinstance(key, BaseTag):
             del self._dict[key]
             if self._private_blocks and key.is_private_creator:
@@ -719,7 +723,7 @@ class Dataset:
                 self._private_blocks = {}
 
             # Deleting pixel data resets the stored array
-            if key in PIXEL_KEYWORDS:
+            if tag in PIXEL_KEYWORDS:
                 self._pixel_array = None
                 self._pixel_id = {}
 
