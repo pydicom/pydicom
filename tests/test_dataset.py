@@ -1024,6 +1024,18 @@ class TestDataset:
         # Slice all items - should return original dataset
         assert ds == ds.get_item(slice(None, None))
 
+    def test_getitem_deferred(self):
+        """Test get_item(..., keep_deferred)"""
+        test_file = get_testdata_file("MR_small.dcm")
+        ds = dcmread(test_file, force=True, defer_size="0.8 kB")
+        elem = ds.get_item("PixelData", keep_deferred=True)
+        assert isinstance(elem, RawDataElement)
+        assert elem.value is None
+
+        elem = ds.get_item("PixelData", keep_deferred=False)
+        assert isinstance(elem, DataElement)
+        assert elem.value is not None
+
     def test_get_private_item(self):
         ds = Dataset()
         ds.add_new(0x00080005, "CS", "ISO_IR 100")
