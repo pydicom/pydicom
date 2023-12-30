@@ -22,11 +22,11 @@ This API reference guide details the functions, modules and objects included in
    dataset
    elem
    examples
-   handlers
-   encoders
-   fileset
    encaps
+   encoders
    errors
    fileio
+   fileset
+   handlers
    misc
    uid

@@ -30,7 +30,7 @@ import pytest
 from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data, generate_pixel_data_frame, encapsulate
+from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.uid import RLELossless, AllTransferSyntaxes, ExplicitVRLittleEndian
 
 try:
@@ -724,7 +724,9 @@ class TestNumpy_RLEHandler:
         ds = dcmread(RLE_8_1_2F)
         ref = ds.pixel_array
 
-        frames = [f for f in generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)]
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
         ds.PixelData = encapsulate(frames, fragments_per_frame=4)
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -922,7 +924,7 @@ class TestNumpy_RLEDecodeFrame:
     def test_invalid_segment_data_raises(self):
         """Test invalid segment data raises exception"""
         ds = dcmread(RLE_16_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
+        pixel_data = get_frame(ds.PixelData, 0)
         msg = r"amount \(4095 vs. 4096 bytes\)"
         with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(
@@ -936,7 +938,7 @@ class TestNumpy_RLEDecodeFrame:
     def test_nonconf_segment_padding_warns(self):
         """Test non-conformant segment padding warns"""
         ds = dcmread(RLE_16_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
+        pixel_data = get_frame(ds.PixelData, 0)
         msg = (
             r"The decoded RLE segment contains non-conformant padding - 4097 "
             r"vs. 4096 bytes expected"
