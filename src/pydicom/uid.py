@@ -468,8 +468,7 @@ def register_transfer_syntax(
     pydicom.uid.UID
         The registered UID.
     """
-    if not isinstance(uid, UID):
-        uid = UID(uid)
+    uid = UID(uid)
 
     if None in (implicit_vr, little_endian) and not uid.is_transfer_syntax:
         raise ValueError(
