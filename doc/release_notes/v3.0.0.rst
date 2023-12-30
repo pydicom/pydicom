@@ -134,6 +134,9 @@ Enhancements
   syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
   method
 * Warning messages are also sent to the pydicom logger (:issue:`1529`)
+* Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
+  <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
+  element length without having to read the element value. (:issue:`1873`)
 
 
 Fixes
