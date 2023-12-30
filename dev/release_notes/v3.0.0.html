@@ -258,6 +258,9 @@ confusing for users to work with the example datasets used by the documentation<
 <li><p>Added the ability to set the corresponding dataset encoding for private transfer
 syntaxes to <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-class docutils literal notranslate"><span class="pre">UID</span></code></a> via the <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.set_private_encoding" title="pydicom.uid.UID.set_private_encoding"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_private_encoding()</span></code></a>
 method</p></li>
+<li><p>Added the ability to register private transfer syntaxes with
+<a class="reference internal" href="../reference/generated/pydicom.uid.register_transfer_syntax.html#pydicom.uid.register_transfer_syntax" title="pydicom.uid.register_transfer_syntax"><code class="xref py py-func docutils literal notranslate"><span class="pre">register_transfer_syntax()</span></code></a> so they can be used when reading
+datasets with <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a></p></li>
 <li><p>Warning messages are also sent to the pydicom logger (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1529">#1529</a>)</p></li>
 <li><p>Added the following to the <code class="xref py py-mod docutils literal notranslate"><span class="pre">encaps</span></code> module:</p>
 <ul class="simple">

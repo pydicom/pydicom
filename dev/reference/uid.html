@@ -133,10 +133,12 @@
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.MPEGTransferSyntaxes.html">pydicom.uid.MPEGTransferSyntaxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.RLETransferSyntaxes.html">pydicom.uid.RLETransferSyntaxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.UncompressedTransferSyntaxes.html">pydicom.uid.UncompressedTransferSyntaxes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.PrivateTransferSyntaxes.html">pydicom.uid.PrivateTransferSyntaxes</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#uid-utilities">UID Utilities</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.generate_uid.html">pydicom.uid.generate_uid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.register_transfer_syntax.html">pydicom.uid.register_transfer_syntax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.PYDICOM_ROOT_UID.html">pydicom.uid.PYDICOM_ROOT_UID</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.PYDICOM_IMPLEMENTATION_UID.html">pydicom.uid.PYDICOM_IMPLEMENTATION_UID</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.uid.RE_VALID_UID.html">pydicom.uid.RE_VALID_UID</a></li>
@@ -525,6 +527,9 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.UncompressedTransferSyntaxes.html#pydicom.uid.UncompressedTransferSyntaxes" title="pydicom.uid.UncompressedTransferSyntaxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UncompressedTransferSyntaxes</span></code></a></p></td>
 <td><p>Uncompressed (native) transfer syntaxes.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.PrivateTransferSyntaxes.html#pydicom.uid.PrivateTransferSyntaxes" title="pydicom.uid.PrivateTransferSyntaxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrivateTransferSyntaxes</span></code></a></p></td>
+<td><p>Private transfer syntaxes added using the <a class="reference internal" href="generated/pydicom.uid.register_transfer_syntax.html#pydicom.uid.register_transfer_syntax" title="pydicom.uid.register_transfer_syntax"><code class="xref py py-func docutils literal notranslate"><span class="pre">register_transfer_syntax()</span></code></a> function.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -535,19 +540,22 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_uid</span></code></a>([prefix, entropy_srcs])</p></td>
 <td><p>Return a 64 character UID which starts with <cite>prefix</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.PYDICOM_ROOT_UID.html#pydicom.uid.PYDICOM_ROOT_UID" title="pydicom.uid.PYDICOM_ROOT_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PYDICOM_ROOT_UID</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.register_transfer_syntax.html#pydicom.uid.register_transfer_syntax" title="pydicom.uid.register_transfer_syntax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_transfer_syntax</span></code></a>(uid[, implicit_vr, ...])</p></td>
+<td><p>Register a private transfer syntax with the <code class="xref py py-mod docutils literal notranslate"><span class="pre">uid</span></code> module so it can be used when reading datasets with <a class="reference internal" href="generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.PYDICOM_ROOT_UID.html#pydicom.uid.PYDICOM_ROOT_UID" title="pydicom.uid.PYDICOM_ROOT_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PYDICOM_ROOT_UID</span></code></a></p></td>
 <td><p>pydicom's root UID <code class="docutils literal notranslate"><span class="pre">'1.2.826.0.1.3680043.8.498.'</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.PYDICOM_IMPLEMENTATION_UID.html#pydicom.uid.PYDICOM_IMPLEMENTATION_UID" title="pydicom.uid.PYDICOM_IMPLEMENTATION_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PYDICOM_IMPLEMENTATION_UID</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.PYDICOM_IMPLEMENTATION_UID.html#pydicom.uid.PYDICOM_IMPLEMENTATION_UID" title="pydicom.uid.PYDICOM_IMPLEMENTATION_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PYDICOM_IMPLEMENTATION_UID</span></code></a></p></td>
 <td><p>pydicom's (0002,0012) <em>Implementation Class UID</em> <code class="docutils literal notranslate"><span class="pre">'1.2.826.0.1.3680043.8.498.1'</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.RE_VALID_UID.html#pydicom.uid.RE_VALID_UID" title="pydicom.uid.RE_VALID_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RE_VALID_UID</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.RE_VALID_UID.html#pydicom.uid.RE_VALID_UID" title="pydicom.uid.RE_VALID_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RE_VALID_UID</span></code></a></p></td>
 <td><p>Regex for a valid UID</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.RE_VALID_UID_PREFIX.html#pydicom.uid.RE_VALID_UID_PREFIX" title="pydicom.uid.RE_VALID_UID_PREFIX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RE_VALID_UID_PREFIX</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.RE_VALID_UID_PREFIX.html#pydicom.uid.RE_VALID_UID_PREFIX" title="pydicom.uid.RE_VALID_UID_PREFIX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RE_VALID_UID_PREFIX</span></code></a></p></td>
 <td><p>Regex for a valid UID prefix</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UID</span></code></a>(val[, validation_mode])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UID</span></code></a>(val[, validation_mode])</p></td>
 <td><p>Human friendly UIDs as a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> subclass.</p></td>
 </tr>
 </tbody>
