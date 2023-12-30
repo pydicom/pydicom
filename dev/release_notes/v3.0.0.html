@@ -259,6 +259,8 @@ confusing for users to work with the example datasets used by the documentation<
 syntaxes to <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-class docutils literal notranslate"><span class="pre">UID</span></code></a> via the <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.set_private_encoding" title="pydicom.uid.UID.set_private_encoding"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_private_encoding()</span></code></a>
 method</p></li>
 <li><p>Warning messages are also sent to the pydicom logger (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1529">#1529</a>)</p></li>
+<li><p>Added the <cite>keep_deferred</cite> keyword argument to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.get_item" title="pydicom.dataset.Dataset.get_item"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.get_item()</span></code></a> to allow accessing the file offset and
+element length without having to read the element value. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1873">#1873</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
