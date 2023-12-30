@@ -1,0 +1,6 @@
+﻿pydicom.encaps.parse\_fragments
+===============================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: parse_fragments

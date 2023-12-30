@@ -74,8 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.encoders.RLELosslessEncoder</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pydicom.encoders.RLELosslessEncoder"><code class="docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a></li>
@@ -85,10 +84,11 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.encoders.base.Encoder.html">pydicom.encoders.base.Encoder</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
@@ -137,7 +137,7 @@
 <h1>pydicom.encoders.RLELosslessEncoder<a class="headerlink" href="#pydicom-encoders-rlelosslessencoder" title="Link to this heading">¶</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.encoders.RLELosslessEncoder">
-<span class="sig-prename descclassname"><span class="pre">pydicom.encoders.</span></span><span class="sig-name descname"><span class="pre">RLELosslessEncoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.encoders.base.Encoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/863424506/pydicom/encoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encoders.RLELosslessEncoder" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.encoders.</span></span><span class="sig-name descname"><span class="pre">RLELosslessEncoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.encoders.base.Encoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fd930b549/pydicom/encoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encoders.RLELosslessEncoder" title="Link to this definition">¶</a></dt>
 <dd><p>A <em>Pixel Data</em> encoder for <em>RLE Lossless</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code></p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.2.</span></p>

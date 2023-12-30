@@ -134,6 +134,23 @@ Enhancements
   syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
   method
 * Warning messages are also sent to the pydicom logger (:issue:`1529`)
+* Added the following to the :mod:`~pydicom.encaps` module:
+
+  * :func:`~pydicom.encaps.parse_basic_offsets` for parsing the Basic Offset Table
+  * :func:`~pydicom.encaps.parse_fragments` for determining the number of encapsulated
+    fragments and their byte offsets
+  * :func:`~pydicom.encaps.generate_fragments` for yielding encapsulated fragments
+  * :func:`~pydicom.encaps.generate_fragmented_frames` for yielding encapsulated frame
+    fragments
+  * :func:`~pydicom.encaps.generate_frames` for yielding whole encapsulated frames
+  * :func:`~pydicom.encaps.get_frame` for returning the specific encapsulated frame at `index`
+    without necessarily having to read the preceding frames into memory
+
+  These new functions support reading encapsulated data from both :class:`bytes`
+  or any Python object with ``read()``, ``seek()`` and ``tell()`` methods such
+  as :class:`io.BytesIO`, :class:`BinaryIO<typing.BinaryIO>` or :class:`mmap.mmap`.
+  They also support using the :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>`
+  for determining frame boundaries.
 * Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
   <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
   element length without having to read the element value. (:issue:`1873`)
@@ -162,17 +179,33 @@ Fixes
 
 Deprecations
 ------------
-* :attr:`~pydicom.dataset.Dataset.is_little_endian` and
-  :attr:`~pydicom.dataset.Dataset.is_implicit_VR` will be removed in v4.0
-* :attr:`~pydicom.dataset.Dataset.read_little_endian` and
-  :attr:`~pydicom.dataset.Dataset.read_implicit_vr` will be removed in v4.0,
-  use :attr:`~pydicom.dataset.Dataset.original_encoding` instead
-* :attr:`~pydicom.dataset.Dataset.read_encoding` will be removed in v4.0,
-  use :attr:`~pydicom.dataset.Dataset.original_character_set` instead
+* :attr:`Dataset.is_little_endian <pydicom.dataset.Dataset.is_little_endian>` and
+  :attr:`Dataset.is_implicit_VR<pydicom.dataset.Dataset.is_implicit_VR>` will be removed in v4.0
+* :attr:`Dataset.read_little_endian<pydicom.dataset.Dataset.read_little_endian>` and
+  :attr:`Dataset.read_implicit_vr<pydicom.dataset.Dataset.read_implicit_vr>` will be removed in v4.0,
+  use :attr:`Dataset.original_encoding<pydicom.dataset.Dataset.original_encoding>` instead
+* :attr:`Dataset.read_encoding<pydicom.dataset.Dataset.read_encoding>` will be removed in v4.0,
+  use :attr:`Dataset.original_character_set<pydicom.dataset.Dataset.original_character_set>` instead
 * The `write_like_original` optional argument to
-  :meth:`~pydicom.dataset.Dataset.save_as` and
+  :meth:`Dataset.save_as<pydicom.dataset.Dataset.save_as>` and
   :func:`~pydicom.filewriter.dcmwrite` will be removed in v4.0, use
   `enforce_file_format` instead
+* The following :mod:`~pydicom.encaps` module functions will be removed in v4.0:
+
+  * :func:`~pydicom.encaps.get_frame_offsets`, use :func:`~pydicom.encaps.parse_basic_offsets`
+    instead
+  * :func:`~pydicom.encaps.generate_pixel_data_fragment`, use :func:`~pydicom.encaps.generate_fragments`
+    instead
+  * :func:`~pydicom.encaps.generate_pixel_data_frame`, use :func:`~pydicom.encaps.generate_fragmented_frames`
+    instead
+  * :func:`~pydicom.encaps.generate_pixel_data`, use :func:`~pydicom.encaps.generate_frames`
+    instead
+  * :func:`~pydicom.encaps.decode_data_sequence`, use :func:`~pydicom.encaps.generate_fragments`
+    instead
+  * :func:`~pydicom.encaps.defragment_data`, use :func:`~pydicom.encaps.generate_frames`
+    instead
+  * :func:`~pydicom.encaps.read_item`, use :func:`~pydicom.encaps.generate_fragments`
+    instead
 
 
 Pydicom Internals

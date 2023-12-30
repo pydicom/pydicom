@@ -1,0 +1,6 @@
+﻿pydicom.encaps.generate\_fragmented\_frames
+===========================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: generate_fragmented_frames

@@ -28,7 +28,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.encaps.encapsulate" href="pydicom.encaps.encapsulate.html" />
+    <link rel="next" title="pydicom.encaps.parse_basic_offsets" href="pydicom.encaps.parse_basic_offsets.html" />
     <link rel="prev" title="pydicom.encaps.get_frame_offsets" href="pydicom.encaps.get_frame_offsets.html" /> 
 </head>
 
@@ -74,10 +74,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.decode_data_sequence.html">pydicom.encaps.decode_data_sequence</a></li>
@@ -87,13 +83,23 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.generate_pixel_data_frame.html">pydicom.encaps.generate_pixel_data_frame</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.get_frame_offsets.html">pydicom.encaps.get_frame_offsets</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.read_item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.parse_basic_offsets.html">pydicom.encaps.parse_basic_offsets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.parse_fragments.html">pydicom.encaps.parse_fragments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.generate_fragments.html">pydicom.encaps.generate_fragments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.generate_fragmented_frames.html">pydicom.encaps.generate_fragmented_frames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.generate_frames.html">pydicom.encaps.generate_frames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.get_frame.html">pydicom.encaps.get_frame</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
@@ -142,8 +148,12 @@
 <h1>pydicom.encaps.read_item<a class="headerlink" href="#pydicom-encaps-read-item" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.encaps.read_item">
-<span class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></span><span class="sig-name descname"><span class="pre">read_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><span class="pre">DicomIO</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/863424506/pydicom/encaps.py#L453"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.read_item" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></span><span class="sig-name descname"><span class="pre">read_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><span class="pre">DicomIO</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fd930b549/pydicom/encaps.py#L1263"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.read_item" title="Link to this definition">¶</a></dt>
 <dd><p>Read and return a single Item in the fragmented data stream.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 3.0: </span>This function will be removed in v4.0, please use
+<a class="reference internal" href="pydicom.encaps.generate_fragments.html#pydicom.encaps.generate_fragments" title="pydicom.encaps.generate_fragments"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_fragments()</span></code></a> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><em>filebase.DicomIO</em></a>) – The file-like to read the item from.</p>
@@ -164,7 +174,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="pydicom.encaps.get_frame_offsets.html" class="btn btn-neutral float-left" title="pydicom.encaps.get_frame_offsets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pydicom.encaps.encapsulate.html" class="btn btn-neutral float-right" title="pydicom.encaps.encapsulate" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.encaps.parse_basic_offsets.html" class="btn btn-neutral float-right" title="pydicom.encaps.parse_basic_offsets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

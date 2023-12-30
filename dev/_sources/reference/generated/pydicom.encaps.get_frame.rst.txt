@@ -1,0 +1,6 @@
+﻿pydicom.encaps.get\_frame
+=========================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: get_frame
