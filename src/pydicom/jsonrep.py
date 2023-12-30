@@ -20,8 +20,6 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     """When possible convert numeric-like values to either ints or floats
     based on their value representation.
 
-    .. versionadded:: 1.4
-
     Parameters
     ----------
     value : Any
@@ -79,8 +77,6 @@ BulkDataHandlerType = Callable[[str, str, str], BulkDataType] | None
 
 class JsonDataElementConverter:
     """Convert from a JSON struct to a :class:`DataElement`.
-
-    .. versionadded:: 1.4
 
     References
     ----------

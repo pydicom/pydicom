@@ -1574,8 +1574,6 @@ class PersonName:
         """Returns up to three decoded person name components as a
         :class:`tuple` of :class:`str`.
 
-        .. versionadded:: 1.2
-
         Returns
         -------
         Tuple[str, ...]
@@ -1600,8 +1598,6 @@ class PersonName:
     def family_name(self) -> str:
         """Return the first (family name) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(0)
 
@@ -1609,8 +1605,6 @@ class PersonName:
     def given_name(self) -> str:
         """Return the second (given name) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(1)
 
@@ -1618,8 +1612,6 @@ class PersonName:
     def middle_name(self) -> str:
         """Return the third (middle name) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(2)
 
@@ -1627,8 +1619,6 @@ class PersonName:
     def name_prefix(self) -> str:
         """Return the fourth (name prefix) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(3)
 
@@ -1636,8 +1626,6 @@ class PersonName:
     def name_suffix(self) -> str:
         """Return the fifth (name suffix) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(4)
 
@@ -1655,8 +1643,6 @@ class PersonName:
     def ideographic(self) -> str:
         """Return the second (ideographic) person name component as a
         unicode string
-
-        .. versionadded:: 1.2
         """
         try:
             return self.components[1]
@@ -1667,8 +1653,6 @@ class PersonName:
     def phonetic(self) -> str:
         """Return the third (phonetic) person name component as a
         unicode string
-
-        .. versionadded:: 1.2
         """
         try:
             return self.components[2]

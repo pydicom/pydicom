@@ -101,6 +101,7 @@ Removals
     * ``DataElement.parent``
 * The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
   module instead
+* ``config.overlay_data_handlers`` has been removed
 * Removed ``Dataset.fix_meta_info()``, encoding state now follows the transfer syntax
   instead of the other way around
 
@@ -132,6 +133,9 @@ Enhancements
 * Added the ability to set the corresponding dataset encoding for private transfer
   syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
   method
+* Added the ability to register private transfer syntaxes with
+  :func:`~pydicom.uid.register_transfer_syntax` so they can be used when reading
+  datasets with :func:`~pydicom.filereader.dcmread`
 * Warning messages are also sent to the pydicom logger (:issue:`1529`)
 * Added the following to the :mod:`~pydicom.encaps` module:
 
@@ -150,6 +154,9 @@ Enhancements
   as :class:`io.BytesIO`, :class:`BinaryIO<typing.BinaryIO>` or :class:`mmap.mmap`.
   They also support using the :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>`
   for determining frame boundaries.
+* Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
+  <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
+  element length without having to read the element value. (:issue:`1873`)
 * Added the :doc:`pixels</reference/pixels>` module and a new more flexible method for
   decoding pixel data via the following decoding class instances:
 

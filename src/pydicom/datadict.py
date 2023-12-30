@@ -153,8 +153,6 @@ def add_private_dict_entry(
 ) -> None:
     """Update the private DICOM dictionary with a new entry.
 
-    .. versionadded:: 1.3
-
     Parameters
     ----------
     private_creator : str
@@ -191,8 +189,6 @@ def add_private_dict_entries(
     private_creator: str, new_entries_dict: dict[int, tuple[str, str, str, str]]
 ) -> None:
     """Update pydicom's private DICOM tag dictionary with new entries.
-
-    .. versionadded:: 1.3
 
     Parameters
     ----------

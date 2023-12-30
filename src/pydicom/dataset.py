@@ -87,8 +87,6 @@ from pydicom.waveforms import numpy_handler as wave_handler
 class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
 
-    .. versionadded:: 1.3
-
     See the DICOM Standard, Part 5,
     :dcm:`Section 7.8.1<part05/sect_7.8.html#sect_7.8.1>` - Private Data
     Element Tags
@@ -1060,8 +1058,6 @@ class Dataset:
     ) -> PrivateBlock:
         """Return the block for the given tag `group` and `private_creator`.
 
-        .. versionadded:: 1.3
-
         If `create` is ``True`` and the `private_creator` does not exist,
         the private creator tag is added.
 
@@ -1133,8 +1129,6 @@ class Dataset:
     def private_creators(self, group: int) -> list[str]:
         """Return a list of private creator names in the given group.
 
-        .. versionadded:: 1.3
-
         Examples
         --------
         This can be used to check if a given private creator exists in
@@ -1170,8 +1164,6 @@ class Dataset:
     ) -> DataElement:
         """Return the data element for the given private tag `group`.
 
-        .. versionadded:: 1.3
-
         This is analogous to ``Dataset.__getitem__()``, but only for private
         tags. This allows to find the private tag for the correct private
         creator without the need to add the tag to the private dictionary
@@ -1205,21 +1197,28 @@ class Dataset:
         return self.__getitem__(block.get_tag(element_offset))
 
     @overload
-    def get_item(self, key: slice) -> "Dataset":
+    def get_item(self, key: slice, *, keep_deferred: bool = ...) -> "Dataset":
         pass  # pragma: no cover
 
     @overload
-    def get_item(self, key: TagType) -> DataElement:
+    def get_item(self, key: TagType, *, keep_deferred: bool = ...) -> DataElement:
         pass  # pragma: no cover
 
     def get_item(
-        self, key: "slice | TagType"
+        self,
+        key: "slice | TagType",
+        *,
+        keep_deferred: bool = False,
     ) -> "Dataset | DataElement | RawDataElement | None":
         """Return the raw data element if possible.
 
         It will be raw if the user has never accessed the value, or set their
         own value. Note if the data element is a deferred-read element,
         then it is read and converted before being returned.
+
+        .. versionchanged: 3.0
+
+            Added the `keep_deferred` keyword argument.
 
         Parameters
         ----------
@@ -1228,10 +1227,14 @@ class Dataset:
             :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
             made up of DICOM tags.
+        keep_deferred : bool, optional
+            If ``True`` then when returning :class:`~pydicom.dataelem.RawDataElement`
+            do not perform the deferred read of the element's value (accessing
+            the value will return ``None`` instead). Default ``False``.
 
         Returns
         -------
-        dataelem.DataElement
+        dataelem.DataElement | dataelem.RawDataElement
             The corresponding element.
         """
         if isinstance(key, slice):
@@ -1239,7 +1242,11 @@ class Dataset:
 
         elem = self._dict.get(Tag(key))
         # If a deferred read, return using __getitem__ to read and convert it
-        if isinstance(elem, RawDataElement) and elem.value is None:
+        if (
+            isinstance(elem, RawDataElement)
+            and not keep_deferred
+            and elem.value is None
+        ):
             return self[key]
 
         return elem
@@ -1348,8 +1355,6 @@ class Dataset:
         """Return ``True`` if the encoding to be used for writing is set and
         is the same as that used to originally encode the  :class:`Dataset`.
 
-        .. versionadded:: 1.1
-
         This includes properties related to endianness, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
@@ -1388,8 +1393,6 @@ class Dataset:
         character_encoding: str | MutableSequence[str] | None = None,
     ) -> None:
         """Set the values for the original dataset encoding.
-
-        .. versionadded:: 1.2
 
         Can be used for a :class:`Dataset` with raw data elements to enable
         optimized writing (e.g. without decoding the data elements).
@@ -1463,8 +1466,6 @@ class Dataset:
 
     def elements(self) -> Iterator[DataElement]:
         """Yield the top-level elements of the :class:`Dataset`.
-
-        .. versionadded:: 1.1
 
         Examples
         --------
@@ -1939,10 +1940,6 @@ class Dataset:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
-        .. versionadded:: 1.4
-
-            The `handler_name` keyword argument was added
-
         If not a compressed transfer syntax, then pixel data is converted
         to a :class:`numpy.ndarray` internally, but not returned.
 
@@ -1953,10 +1950,6 @@ class Dataset:
           form
         - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
           is ``False`` for the (7FE0,0010) *Pixel Data* element.
-
-        .. versionchanged:: 1.4
-
-            The `handler_name` keyword argument was added
 
         Parameters
         ----------
@@ -2007,8 +2000,6 @@ class Dataset:
     def overlay_array(self, group: int) -> "numpy.ndarray":
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
 
-        .. versionadded:: 1.4
-
         Parameters
         ----------
         group : int
@@ -2026,55 +2017,18 @@ class Dataset:
                 "between 0x6000 and 0x60FF (inclusive)"
             )
 
-        from pydicom.config import overlay_data_handlers
-
-        available_handlers = [hh for hh in overlay_data_handlers if hh.is_available()]
-        if not available_handlers:
-            # For each of the handlers we want to find which
-            #   dependencies are missing
-            msg = (
-                "The following handlers are available to decode the overlay "
-                "data however they are missing required dependencies: "
+        if not config.have_numpy:
+            raise ImportError(
+                f"NumPy is required for {type(self).__name__}.overlay_array()"
             )
-            pkg_msg = []
-            for hh in overlay_data_handlers:
-                hh_deps = hh.DEPENDENCIES
-                # Missing packages
-                missing = [dd for dd in hh_deps if have_package(dd) is None]
-                # Package names
-                names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} (req. {', '.join(names)})")
 
-            raise RuntimeError(msg + ", ".join(pkg_msg))
+        from pydicom.overlays import get_overlay_array
 
-        last_exception = None
-        for handler in available_handlers:
-            try:
-                # Use the handler to get an ndarray of the pixel data
-                func = handler.get_overlay_array
-                return cast("numpy.ndarray", func(self, group))
-            except Exception as exc:
-                logger.debug("Exception raised by overlay data handler", exc_info=exc)
-                last_exception = exc
-
-        logger.info(
-            "Unable to decode the overlay data using the following handlers: "
-            "{}. Please see the list of supported Transfer Syntaxes in the "
-            "pydicom documentation for alternative packages that might "
-            "be able to decode the data".format(
-                ", ".join([str(hh) for hh in available_handlers])
-            )
-        )
-
-        raise last_exception  # type: ignore[misc]
+        return get_overlay_array(self, group)
 
     @property
     def pixel_array(self) -> "numpy.ndarray":
         """Return the pixel data as a :class:`numpy.ndarray`.
-
-        .. versionchanged:: 1.4
-
-            Added support for *Float Pixel Data* and *Double Float Pixel Data*
 
         Returns
         -------
@@ -2429,10 +2383,7 @@ class Dataset:
         )
 
     def ensure_file_meta(self) -> None:
-        """Create an empty ``Dataset.file_meta`` if none exists.
-
-        .. versionadded:: 1.2
-        """
+        """Create an empty ``Dataset.file_meta`` if none exists."""
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
@@ -2774,8 +2725,6 @@ class Dataset:
     ) -> "Dataset":
         """Return a :class:`Dataset` from a DICOM JSON Model object.
 
-        .. versionadded:: 1.3
-
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
@@ -2833,8 +2782,6 @@ class Dataset:
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
-        .. versionadded:: 1.4
-
         Parameters
         ----------
         bulk_data_threshold : int, optional
@@ -2881,8 +2828,6 @@ class Dataset:
         suppress_invalid_tags: bool = False,
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
-
-        .. versionadded:: 1.3
 
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
@@ -3110,10 +3055,6 @@ def validate_file_meta(
     file_meta: "FileMetaDataset", enforce_standard: bool = True
 ) -> None:
     """Validate the *File Meta Information* elements in `file_meta`.
-
-    .. versionchanged:: 1.2
-
-        Moved from :mod:`pydicom.filewriter`.
 
     Parameters
     ----------

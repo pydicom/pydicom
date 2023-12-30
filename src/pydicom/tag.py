@@ -49,10 +49,6 @@ def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
     * ``Tag(0x0010, 0x0015)``
     * ``Tag("PatientName")``
 
-    .. versionchanged:: 1.3
-
-        Added support for creating a :class:`!BaseTag` using an element keyword
-
     Parameters
     ----------
     arg : int or str or 2-tuple of int
@@ -225,10 +221,7 @@ class BaseTag(int):
 
     @property
     def is_private_creator(self) -> bool:
-        """Return ``True`` if the tag is a private creator.
-
-        .. versionadded:: 1.1
-        """
+        """Return ``True`` if the tag is a private creator."""
         return self.is_private and 0x0010 <= self.element < 0x0100
 
     @property

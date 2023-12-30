@@ -116,8 +116,10 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     if tsyntax.is_compressed:
         fragments = gdcm.SequenceOfFragments.New()
         nr_frames = get_nr_frames(ds, warn=False)
-        func = generate_fragmented_frames(ds.PixelData, number_of_frames=nr_frames)
-        for frame_fragments in func:
+        fragment_gen = generate_fragmented_frames(
+            ds.PixelData, number_of_frames=nr_frames
+        )
+        for frame_fragments in fragment_gen:
             for fragment_data in frame_fragments:
                 fragment = gdcm.Fragment()
                 fragment.SetByteStringValue(fragment_data)

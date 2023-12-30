@@ -73,7 +73,12 @@ class UID(str):
             if validation_mode is None:
                 validation_mode = config.settings.reading_validation_mode
             validate_value("UI", val, validation_mode)
-            return super().__new__(cls, val.strip())
+
+            uid = super().__new__(cls, val.strip())
+            if hasattr(val, "_PRIVATE_TS_ENCODING"):
+                uid._PRIVATE_TS_ENCODING = val._PRIVATE_TS_ENCODING
+
+            return uid
 
         raise TypeError("A UID must be created from a string")
 
@@ -233,10 +238,10 @@ class UID(str):
         ----------
         implicit_vr : bool
             ``True`` if the corresponding dataset encoding uses implicit VR,
-            ``False`` otherwise.
+            ``False`` for explicit VR.
         little_endian : bool
             ``True`` if the corresponding dataset encoding uses little endian
-            byte order, ``False`` otherwise.
+            byte order, ``False`` for big endian byte order.
         """
         self._PRIVATE_TS_ENCODING = (implicit_vr, little_endian)
 
@@ -428,6 +433,57 @@ UncompressedTransferSyntaxes = [
 ]
 """Uncompressed (native) transfer syntaxes."""
 
+PrivateTransferSyntaxes = []
+"""Private transfer syntaxes added using the
+:func:`~pydicom.uid.register_transfer_syntax` function.
+"""
+
+
+def register_transfer_syntax(
+    uid: str | UID,
+    implicit_vr: bool | None = None,
+    little_endian: bool | None = None,
+) -> UID:
+    """Register a private transfer syntax with the :mod:`~pydicom.uid` module
+    so it can be used when reading datasets with :func:`~pydicom.filereader.dcmread`.
+
+    .. versionadded: 3.0
+
+    Parameters
+    ----------
+    uid : str | pydicom.uid.UID
+        A UID which may or may not have had the corresponding dataset encoding
+        set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+    implicit_vr : bool, optional
+        If ``True`` then the transfer syntax uses implicit VR encoding, otherwise
+        if ``False`` then it uses explicit VR encoding. Required when `uid` has
+        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+    little_endian : bool, optional
+        If ``True`` then the transfer syntax uses little endian encoding, otherwise
+        if ``False`` then it uses big endian encoding. Required when `uid` has
+        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+
+    Returns
+    -------
+    pydicom.uid.UID
+        The registered UID.
+    """
+    uid = UID(uid)
+
+    if None in (implicit_vr, little_endian) and not uid.is_transfer_syntax:
+        raise ValueError(
+            "The corresponding dataset encoding for 'uid' must be set using "
+            "the 'implicit_vr' and 'little_endian' arguments"
+        )
+
+    if implicit_vr is not None and little_endian is not None:
+        uid.set_private_encoding(implicit_vr, little_endian)
+
+    if uid not in PrivateTransferSyntaxes:
+        PrivateTransferSyntaxes.append(uid)
+
+    return uid
+
 
 _MAX_PREFIX_LENGTH = 54
 
@@ -437,11 +493,6 @@ def generate_uid(
     entropy_srcs: list[str] | None = None,
 ) -> UID:
     """Return a 64 character UID which starts with `prefix`.
-
-    .. versionchanged:: 1.3
-
-       When `prefix` is ``None`` a conformant UUID suffix of up to
-       39 characters will be used instead of a hashed value.
 
     .. versionchanged:: 3.0
 
