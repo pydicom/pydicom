@@ -25,6 +25,14 @@ from pydicom.uid import (
     ExplicitVRLittleEndian,
     ExplicitVRBigEndian,
     DeflatedExplicitVRLittleEndian,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
+    JPEGLossless,
+    JPEGLosslessSV1,
+    JPEGLSLossless,
+    JPEGLSNearLossless,
+    JPEG2000Lossless,
+    JPEG2000,
     RLELossless,
     UID,
 )
@@ -70,14 +78,25 @@ class DecodeOptions(TypedDict, total=False):
     be_swap_ow: bool
 
     ## RLE decoding options
-    # pydicom plugin
+    # pydicom and pylibjpeg plugins
     # Segment ordering ">" for big endian (default) or "<" for little endian
     rle_segment_order: str
+
+    # JPEG decoding options
+    # pillow plugin
+    # Undo the processing pillow performs on the raw decoded JPEG data
+    pillow_undo_processing: bool
 
     ## Processing options (ndarray only)
     as_rgb: bool  # Make best effort to return RGB output
     force_rgb: bool  # Force YBR to RGB conversion
     force_ybr: bool  # Force RGB to YBR conversion
+    # force_bit_shift: int  #
+
+    # JPEG2000
+    # Use the JPEG2000 metadata to return an ndarray matched to the decode options
+    #   (default True) otherwise return the decoded J2K data as-is (?)
+    apply_j2k_corrections: bool
 
 
 DecodeFunction = Callable[[bytes, DecodeOptions], bytes | bytearray]
@@ -843,6 +862,10 @@ class Decoder:
                 f"Plugin '{label}' does not support '{self.UID.name}'",
             )
             self._unavailable[label] = msg
+
+    def add_plugins(self, plugins: list[str, tuple[str, str]]) -> None:
+        for label, import_path in plugins:
+            self.add_plugin(label, import_path)
 
     def as_array(
         self,
@@ -1831,9 +1854,74 @@ ExplicitVRLittleEndianDecoder = Decoder(ExplicitVRLittleEndian)
 ExplicitVRBigEndianDecoder = Decoder(ExplicitVRBigEndian)
 DeflatedExplicitVRLittleEndianDecoder = Decoder(DeflatedExplicitVRLittleEndian)
 
+# Compressed transfer syntaxes
+JPEGBaseline8BitDecoder = Decoder(JPEGBaseline8Bit)
+JPEGBaseline8BitDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
+    ]
+)
+JPEGExtended12BitDecoder = Decoder(JPEGExtended12Bit)
+JPEGExtended12BitDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
+    ]
+)
+JPEGLosslessDecoder = Decoder(JPEGLossless)
+JPEGLosslessDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+JPEGLosslessSV1Decoder = Decoder(JPEGLosslessSV1)
+JPEGLosslessSV1Decoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+JPEGLSLosslessDecoder = Decoder(JPEGLSLossless)
+JPEGLSLosslessDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+JPEGLSNearLosslessDecoder = Decoder(JPEGLSNearLossless)
+JPEGLSNearLosslessDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+JPEG2000LosslessDecoder = Decoder(JPEG2000Lossless)
+JPEG2000LosslessDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
+    ]
+)
+JPEG2000Decoder = Decoder(JPEG2000)
+JPEG2000Decoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
+    ]
+)
 RLELosslessDecoder = Decoder(RLELossless)
-RLELosslessDecoder.add_plugin(
-    "pydicom", ("pydicom.pixels.decoders.rle", "_decode_frame")
+RLELosslessDecoder.add_plugins(
+    [
+        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pydicom", ("pydicom.pixels.decoders.rle", "_decode_frame")),
+    ]
 )
 
 
@@ -1844,6 +1932,14 @@ _PIXEL_DATA_DECODERS = {
     ExplicitVRLittleEndian: (ExplicitVRLittleEndianDecoder, "3.0"),
     DeflatedExplicitVRLittleEndian: (DeflatedExplicitVRLittleEndianDecoder, "3.0"),
     ExplicitVRBigEndian: (ExplicitVRBigEndianDecoder, "3.0"),
+    JPEGBaseline8Bit: (JPEGBaseline8BitDecoder, "3.0"),
+    JPEGExtended12Bit: (JPEGExtended12BitDecoder, "3.0"),
+    JPEGLossless: (JPEGLosslessDecoder, "3.0"),
+    JPEGLosslessSV1: (JPEGLosslessSV1Decoder, "3.0"),
+    JPEGLSLossless: (JPEGLSLosslessDecoder, "3.0"),
+    JPEGLSNearLossless: (JPEGLSNearLosslessDecoder, "3.0"),
+    JPEG2000Lossless: (JPEG2000LosslessDecoder, "3.0"),
+    JPEG2000: (JPEG2000Decoder, "3.0"),
     RLELossless: (RLELosslessDecoder, "3.0"),
 }
 
@@ -1899,6 +1995,22 @@ def get_decoder(uid: str) -> Decoder:
     | *Deflated Explicit VR Little Endian* | 1.2.840.10008.1.2.1.2.1.99 | 3.0     |
     +--------------------------------------+----------------------------+---------+
     | *Explicit VR Big Endian*             | 1.2.840.10008.1.2.2        | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG Baseline 8-bit*                | 1.2.840.10008.1.2.4.50     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG Extended 12-bit*               | 1.2.840.10008.1.2.4.51     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG Lossless P14*                  | 1.2.840.10008.1.2.4.57     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG Lossless SV1*                  | 1.2.840.10008.1.2.4.70     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG-LS Lossless*                   | 1.2.840.10008.1.2.4.80     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG-LS Near Lossless*              | 1.2.840.10008.1.2.4.81     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG2000 Lossless*                  | 1.2.840.10008.1.2.4.90     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *JPEG2000*                           | 1.2.840.10008.1.2.4.91     | 3.0     |
     +--------------------------------------+----------------------------+---------+
     | *RLE Lossless*                       | 1.2.840.10008.1.2.5        | 3.0     |
     +--------------------------------------+----------------------------+---------+
