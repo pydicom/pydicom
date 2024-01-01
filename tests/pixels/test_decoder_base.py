@@ -492,7 +492,7 @@ class TestDecodeRunner:
             "the set photometric interpretation 'YBR_FULL_422' is "
             "incorrect"
         )
-        with pytest.warns(UserWarning, match=msg):
+        with pytest.raises(ValueError, match=msg):
             runner.validate_buffer()
 
     def test_validate_options(self):

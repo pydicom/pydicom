@@ -681,24 +681,23 @@ class DecodeRunner:
                     "the transfer syntax may be incorrect"
                 )
         elif actual > padded:
-            # PS 3.5, Section 8.1.1
-            msg = (
-                f"The pixel data is {actual} bytes long, which indicates it "
-                f"contains {actual - expected} bytes of excess padding to "
-                "be removed"
-            )
             if self.photometric_interpretation == PI.YBR_FULL_422:
                 # PS 3.3, Annex C.7.6.3
                 ybr_length = expected / 2 * 3 + expected / 2 * 3 % 2
                 if actual >= ybr_length:
-                    msg = (
+                    raise ValueError(
                         "The number of bytes of pixel data is a third larger "
                         f"than expected ({actual} vs {expected} bytes) which "
                         "indicates the set photometric interpretation "
                         "'YBR_FULL_422' is incorrect"
                     )
 
-            warn_and_log(msg)
+            # PS 3.5, Section 8.1.1
+            warn_and_log(
+                f"The pixel data is {actual} bytes long, which indicates it "
+                f"contains {actual - expected} bytes of excess padding to "
+                "be removed"
+            )
 
     def validate_options(self) -> None:
         """Validate the supplied options to ensure they meet minimum requirements."""
