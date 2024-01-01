@@ -1372,6 +1372,26 @@ class TestDecoder_Array:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
+    def test_encapsulated_excess_frames(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames.append(frames[-1])
+        src = encapsulate(frames)
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "More frames have been found in the encapsulated pixel data than "
+            "expected from the supplied number of frames"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = decoder.as_array(src, **runner.options)
+
+        assert arr.shape == (11, 64, 64)
+
     def test_processing_colorspace(self):
         """Test the processing colorspace options."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -1733,6 +1753,26 @@ class TestDecoder_Buffer:
         )
         with pytest.raises(ValueError, match=msg):
             decoder.as_buffer(reference.ds, index=9)
+
+    def test_encapsulated_excess_frames(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames.append(frames[-1])
+        src = encapsulate(frames)
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "More frames have been found in the encapsulated pixel data than "
+            "expected from the supplied number of frames"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            buffer = decoder.as_buffer(src, **runner.options)
+
+        assert len(buffer) == 11 * 64 * 64 * 2
 
     def test_expb_ow_index_invalid_raises(self, caplog):
         """Test invalid index with BE swapped OW raises"""

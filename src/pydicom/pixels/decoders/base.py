@@ -1054,11 +1054,29 @@ class Decoder:
 
         # Return all frames
         # Preallocate container array for the frames
+        bytes_per_frame = runner.frame_length(unit="bytes")
         pixels_per_frame = runner.frame_length(unit="pixels")
         arr = np.empty(pixels_per_frame * runner.number_of_frames, dtype=dtype)
-        for idx, frame in enumerate(runner.iter_decode()):
+        frame_generator = runner.iter_decode()
+        for idx in range(runner.number_of_frames):
+            frame = next(frame_generator)
             start = idx * pixels_per_frame
             arr[start : start + pixels_per_frame] = np.frombuffer(frame, dtype=dtype)
+
+        # Check to see if we have any more frames available
+        #   Should only apply to JPEG transfer syntaxes
+        excess = []
+        for frame in frame_generator:
+            if len(frame) == bytes_per_frame:
+                excess.append(np.frombuffer(frame, dtype))
+                runner.set_option("number_of_frames", runner.number_of_frames + 1)
+
+        if excess:
+            warn_and_log(
+                "More frames have been found in the encapsulated pixel data "
+                "than expected from the supplied number of frames"
+            )
+            arr = np.concatenate([arr, *excess])
 
         return arr
 
@@ -1388,9 +1406,11 @@ class Decoder:
             return frame
 
         # Return all frames
-        # Preallocate container array for the frames
+        # Preallocate buffer for the frames
         buffer = bytearray(length_bytes * runner.number_of_frames)
-        for index, frame in enumerate(runner.iter_decode()):
+        frame_generator = runner.iter_decode()
+        for index in range(runner.number_of_frames):
+            frame = next(frame_generator)
             start = index * length_bytes
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
@@ -1399,6 +1419,21 @@ class Decoder:
                 )
 
             buffer[start : start + length_bytes] = frame
+
+        # Check to see if we have any more frames available
+        #   Should only apply to JPEG transfer syntaxes
+        excess = bytearray()
+        for frame in frame_generator:
+            if len(frame) == length_bytes:
+                excess.extend(frame)
+                runner.set_option("number_of_frames", runner.number_of_frames + 1)
+
+        if excess:
+            warn_and_log(
+                "More frames have been found in the encapsulated pixel data "
+                "than expected from the supplied number of frames"
+            )
+            buffer.extend(excess)
 
         return buffer
 
