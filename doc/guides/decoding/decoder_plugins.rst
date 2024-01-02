@@ -24,7 +24,7 @@ An decoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      def decoder(src: bytes, opts: DecoderOptions) -> bytearray | bytes:
+      def decoder(src: bytes, opts: DecodeOptions) -> bytearray | bytes:
 
   Where
 
@@ -74,7 +74,7 @@ An decoding plugin must implement three objects within the same module:
     decoding plugins.
 
   When possible it's recommended that the decoding function return the decoded
-  pixel data as a :class:`bytearray` to minimise later memory usage.
+  pixel data as a :class:`bytearray` to minimize later memory usage.
 
 * A function named ``is_available`` with the following signature:
 
@@ -105,8 +105,8 @@ An decoding plugin must implement three objects within the same module:
 An example of the requirements of a plugin is available :gh:`here
 <pydicom/blob/main/src/pydicom/pixels/decoders/rle.py>`.
 
-Adding Plugins to an Decoder
-============================
+Adding Plugins to a Decoder
+===========================
 
 Additional plugins can be added to an existing decoder with the
 :meth:`~pydicom.pixels.decoders.base.Decoder.add_plugin` method, which takes the
