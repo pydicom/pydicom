@@ -22,7 +22,10 @@ class Code(NamedTuple):
         return hash(self.scheme_designator + self.value)
 
     def __eq__(self, other: Any) -> Any:
-        if self.scheme_designator == "SRT" and self.value in snomed_mapping["SRT"]:
+        if (
+            self.scheme_designator == "SRT"
+            and self.value in snomed_mapping["SRT"]
+        ):
             self_mapped = Code(
                 value=snomed_mapping["SRT"][self.value],
                 meaning="",
@@ -37,7 +40,10 @@ class Code(NamedTuple):
                 scheme_version=self.scheme_version,
             )
 
-        if other.scheme_designator == "SRT" and other.value in snomed_mapping["SRT"]:
+        if (
+            other.scheme_designator == "SRT"
+            and other.value in snomed_mapping["SRT"]
+        ):
             other_mapped = Code(
                 value=snomed_mapping["SRT"][other.value],
                 meaning="",
