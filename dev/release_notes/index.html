@@ -409,6 +409,9 @@ values for odd-length frames (<a class="reference external" href="https://github
 explicit and implicit VR when only the <em>Transfer Syntax UID</em> was changed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1943">#1943</a>)</p></li>
 <li><p>Fixed the <code class="docutils literal notranslate"><span class="pre">jpeg_ls</span></code>, <code class="docutils literal notranslate"><span class="pre">pillow</span></code> and <code class="docutils literal notranslate"><span class="pre">rle</span></code> pixel data handlers not working
 correctly when a frame is spread across multiple fragments (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1774">#1774</a>)</p></li>
+<li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> when comparing codes with one of the codes having
+<code class="docutils literal notranslate"><span class="pre">scheme_designator</span></code> set to <code class="docutils literal notranslate"><span class="pre">SRT</span></code> but not being included in the <code class="docutils literal notranslate"><span class="pre">SRT</span></code>
+to <code class="docutils literal notranslate"><span class="pre">SCT</span></code> code mapping (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1994">#1994</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">
