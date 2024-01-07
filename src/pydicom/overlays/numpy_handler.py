@@ -50,18 +50,13 @@ DEPENDENCIES = {"numpy": ("https://numpy.org/", "NumPy")}
 
 
 def is_available() -> bool:
-    """Return ``True`` if the handler has its dependencies met.
-
-    .. versionadded:: 1.4
-    """
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP
 
 
 def get_expected_length(elem: dict[str, Any], unit: str = "bytes") -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
-
-    .. versionadded:: 1.4
 
     +------------------------------------------------+-------------+
     | Element                                        | Required or |
@@ -107,8 +102,6 @@ def get_expected_length(elem: dict[str, Any], unit: str = "bytes") -> int:
 
 def reshape_overlay_array(elem: dict[str, Any], arr: "np.ndarray") -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
-
-    .. versionadded:: 1.4
 
     +------------------------------------------------+--------------+
     | Element                                        | Supported    |
@@ -168,8 +161,6 @@ def reshape_overlay_array(elem: dict[str, Any], arr: "np.ndarray") -> "np.ndarra
 
 def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the *Overlay Data*.
-
-    .. versionadded:: 1.4
 
     Parameters
     ----------

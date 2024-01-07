@@ -262,8 +262,6 @@ def get_palette_files(pattern: str = "**/*") -> list[str]:
     """Return a list of absolute paths to palettes with filenames matching
     `pattern`.
 
-    .. versionadded:: 1.4
-
     Parameters
     ----------
     pattern : str, optional
@@ -290,8 +288,6 @@ def get_testdata_file(
 ) -> "str | Dataset | None":
     """Return an absolute path to the first matching dataset with filename
     `name` that is found in a local or external pydicom datastore.
-
-    .. versionadded:: 1.4
 
     First searches the local *pydicom* data store, then any locally available
     external sources, and finally the files available in the

@@ -319,7 +319,7 @@ class TestDataElement:
         """Test DataElement.__repr__ with a sequence"""
         elem = DataElement(0x300A00B0, "SQ", [Dataset()])
         elem[0].PatientID = "1234"
-        assert repr(elem) == repr(elem.value)
+        assert repr(elem) == str(elem)
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
@@ -449,6 +449,8 @@ class TestDataElement:
             assert 0 == elem.VM
             assert elem.value == value
             fp = DicomBytesIO()
+            fp.is_implicit_VR = True
+            fp.is_little_endian = True
             filewriter.write_dataset(fp, ds)
             ds_read = dcmread(fp, force=True)
             assert empty_value == ds_read[tag_name].value
@@ -472,7 +474,6 @@ class TestDataElement:
         }
         config.use_none_as_empty_text_VR_value = use_none
         ds = Dataset()
-        ds._is_little_endian = True
         # set value to new element
         for tag_name in text_vrs.values():
             check_empty_text_element(None)
@@ -500,6 +501,8 @@ class TestDataElement:
             assert 0 == elem.VM
             assert elem.value == value
             fp = DicomBytesIO()
+            fp.is_implicit_VR = True
+            fp.is_little_endian = True
             filewriter.write_dataset(fp, ds)
             ds_read = dcmread(fp, force=True)
             assert ds_read[tag_name].value is None
@@ -522,7 +525,6 @@ class TestDataElement:
             "UN": "SelectorUNValue",
         }
         ds = Dataset()
-        ds._is_little_endian = True
         # set value to new element
         for tag_name in non_text_vrs.values():
             check_empty_binary_element(None)
@@ -547,8 +549,8 @@ class TestDataElement:
         assert elem.value == []
 
         fp = DicomBytesIO()
-        fp.is_little_endian = True
         fp.is_implicit_VR = True
+        fp.is_little_endian = True
         filewriter.write_dataset(fp, ds)
         ds_read = dcmread(fp, force=True)
         elem = ds_read["AcquisitionContextSequence"]
@@ -666,8 +668,7 @@ class TestRawDataElement:
     def test_read_known_private_tag_implicit(self):
         fp = DicomBytesIO()
         ds = Dataset()
-        ds._is_implicit_VR = True
-        ds._is_little_endian = True
+        ds.set_original_encoding(True, True)
         ds[0x00410010] = RawDataElement(
             Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, True, True
         )
@@ -701,8 +702,7 @@ class TestRawDataElement:
     def test_read_known_private_tag_explicit(self):
         fp = DicomBytesIO()
         ds = Dataset()
-        ds._is_implicit_VR = False
-        ds._is_little_endian = True
+        ds.set_original_encoding(False, True)
         ds[0x00410010] = RawDataElement(
             Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, False, True
         )
@@ -731,8 +731,7 @@ class TestRawDataElement:
             add_private_dict_entry("ACME 3.2", 0x00410003, "IS", "Another Number")
             fp = DicomBytesIO()
             ds = Dataset()
-            ds._is_implicit_VR = False
-            ds._is_little_endian = True
+            ds.set_original_encoding(False, True)
             ds[0x00410010] = RawDataElement(
                 Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, False, True
             )
@@ -1030,8 +1029,7 @@ class TestDataElementValidation:
     def test_write_valid_length_non_ascii_text(self, enforce_writing_invalid_values):
         fp = DicomBytesIO()
         ds = Dataset()
-        ds._is_implicit_VR = True
-        ds._is_little_endian = True
+        ds.set_original_encoding(True, True)
         ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
         ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
         # shall not raise, as the number of characters is considered,
@@ -1041,8 +1039,7 @@ class TestDataElementValidation:
     def test_write_valid_non_ascii_pn(self, enforce_writing_invalid_values):
         fp = DicomBytesIO()
         ds = Dataset()
-        ds._is_implicit_VR = False
-        ds._is_little_endian = True
+        ds.set_original_encoding(False, True)
         ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
         # string length is 40
         ds.add(DataElement(0x00100010, "PN", "洪^吉洞" * 10))
@@ -1053,8 +1050,7 @@ class TestDataElementValidation:
     def test_read_valid_length_non_ascii_text(self):
         fp = DicomBytesIO()
         ds = Dataset()
-        ds._is_implicit_VR = True
-        ds._is_little_endian = True
+        ds.set_original_encoding(True, True)
         ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
         ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
         # shall not raise, as the number of characters is considered,

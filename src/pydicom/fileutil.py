@@ -7,7 +7,7 @@ from typing import BinaryIO, cast
 from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
 from pydicom.datadict import dictionary_description
-from pydicom.filebase import DicomFileLike
+from pydicom.filebase import ReadableBuffer, WriteableBuffer
 
 from pydicom.config import logger
 
@@ -420,7 +420,7 @@ def length_of_undefined_length(
 
 
 def path_from_pathlike(
-    file_object: PathType | BinaryIO | DicomFileLike,
+    file_object: PathType | BinaryIO | ReadableBuffer | WriteableBuffer,
 ) -> str | BinaryIO:
     """Returns the path if `file_object` is a path-like object, otherwise the
     original `file_object`.

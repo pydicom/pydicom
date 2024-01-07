@@ -42,6 +42,11 @@ Transfer Syntax UIDs
    HEVCMP51
    HEVCM10P51
    RLELossless
+   HTJ2KLossless
+   HTJ2KLosslessRPCL
+   HTJ2K
+   JPIPHTJ2KReferenced
+   JPIPHTJ2KReferencedDeflate
    SMPTEST211020UncompressedProgressiveActiveVideo
    SMPTEST211020UncompressedInterlacedActiveVideo
    SMPTEST211030PCMDigitalAudio
@@ -60,6 +65,7 @@ Transfer Syntax Lists
    MPEGTransferSyntaxes
    RLETransferSyntaxes
    UncompressedTransferSyntaxes
+   PrivateTransferSyntaxes
 
 
 UID Utilities
@@ -69,6 +75,7 @@ UID Utilities
    :toctree: generated/
 
    generate_uid
+   register_transfer_syntax
    PYDICOM_ROOT_UID
    PYDICOM_IMPLEMENTATION_UID
    RE_VALID_UID

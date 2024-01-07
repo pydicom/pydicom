@@ -39,6 +39,7 @@ from pydicom.pixel_data_handlers.util import (
 )
 from pydicom.uid import (
     ExplicitVRLittleEndian,
+    ExplicitVRBigEndian,
     ImplicitVRLittleEndian,
     UncompressedTransferSyntaxes,
 )
@@ -179,17 +180,33 @@ class TestNumpy_PixelDtype:
         self.ds.BitsAllocated = 16
         self.ds.PixelRepresentation = 0
 
+        # explicit little
+        meta = self.ds.file_meta
+
         # < is little, = is native, > is big
         if byteorder == "little":
-            self.ds._is_little_endian = True
+            self.ds._read_little = True
             assert pixel_dtype(self.ds).byteorder in ["<", "="]
-            self.ds._is_little_endian = False
+            meta.TransferSyntaxUID = ExplicitVRBigEndian
+            self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder == ">"
         elif byteorder == "big":
-            self.ds._is_little_endian = True
+            self.ds._read_little = True
             assert pixel_dtype(self.ds).byteorder == "<"
-            self.ds._is_little_endian = False
+            meta.TransferSyntaxUID = ExplicitVRBigEndian
+            self.ds._read_little = False
             assert pixel_dtype(self.ds).byteorder in [">", "="]
+
+    def test_no_endianness_raises(self):
+        ds = Dataset()
+        ds.BitsAllocated = 8
+        ds.PixelRepresentation = 1
+        msg = (
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in 'Dataset.file_meta'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            pixel_dtype(ds)
 
 
 if HAVE_NP:
@@ -1273,7 +1290,7 @@ class TestNumpy_ModalityLUT:
     def test_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = dcmread(MOD_16_SEQ)
-        assert ds.is_little_endian is True
+        assert ds.original_encoding == (False, True)
         seq = ds.ModalityLUTSequence[0]
         assert [4096, -2048, 16] == seq.LUTDescriptor
         seq["LUTData"].VR = "OW"
@@ -1295,6 +1312,56 @@ class TestNumpy_ModalityLUT:
         assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
         assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
         assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert 39321 == out[185, 340]
+        assert 45867 == out[185, 385]
+        assert 52428 == out[228, 385]
+        assert 58974 == out[291, 385]
+
+    def test_no_endianness_raises(self):
+        ds = dcmread(MOD_16_SEQ)
+        assert ds.original_encoding == (False, True)
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        seq["LUTData"].VR = "OW"
+        seq.LUTData = pack("<4096H", *seq.LUTData)
+        arr = ds.pixel_array
+        del ds.file_meta
+        ds._read_little = None
+        msg = (
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in 'FileDataset.file_meta'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            apply_modality_lut(arr, ds)
+
+    def test_file_meta(self):
+        """Test using file meta to determine endianness"""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        seq["LUTData"].VR = "OW"
+        seq.LUTData = pack("<4096H", *seq.LUTData)
+        arr = ds.pixel_array
+        ds._read_little = None
+        out = apply_modality_lut(arr, ds)
+
+        assert 39321 == out[185, 340]
+        assert 45867 == out[185, 385]
+        assert 52428 == out[228, 385]
+        assert 58974 == out[291, 385]
+
+    def test_original_encoding(self):
+        """Test using original encoding to determine endianness"""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        seq["LUTData"].VR = "OW"
+        seq.LUTData = pack("<4096H", *seq.LUTData)
+        arr = ds.pixel_array
+        del ds.file_meta
+        assert ds.original_encoding == (False, True)
+        out = apply_modality_lut(arr, ds)
+
         assert 39321 == out[185, 340]
         assert 45867 == out[185, 385]
         assert 52428 == out[228, 385]
@@ -1447,6 +1514,7 @@ class TestNumpy_PaletteColor:
 
     def test_uint16_16_segmented_little(self):
         """Test uint16 Pixel Data with 16-bit LUT entries."""
+        # Endianness from file_meta
         ds = dcmread(PAL_SEG_LE_16_1F)
         assert 16 == ds.BitsStored
         assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
@@ -1465,6 +1533,36 @@ class TestNumpy_PaletteColor:
         assert [10280, 11565, 16705] == list(rgb[479, 639, :])
 
         assert (orig == arr).all()
+
+        # Endianness from original encoding
+        ds = dcmread(PAL_SEG_LE_16_1F)
+        assert 16 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        del ds.file_meta
+        rgb = apply_color_lut(arr, ds)
+        assert (480, 640, 3) == rgb.shape
+        assert [10280, 11565, 16705] == list(rgb[0, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 639, :])
+        assert [0, 0, 0] == list(rgb[240, 0, :])
+        assert [257, 257, 257] == list(rgb[240, 320, :])
+        assert [2313, 2313, 2313] == list(rgb[240, 639, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 639, :])
+
+        assert (orig == arr).all()
+
+        # No endianness raises
+        ds._read_little = None
+        msg = (
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in 'FileDataset.file_meta'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            apply_color_lut(arr, ds)
 
     def test_uint16_16_segmented_big(self):
         """Test big endian uint16 Pixel Data with 16-bit LUT entries."""
@@ -2446,8 +2544,7 @@ class TestNumpy_ApplyVOI:
     def test_voi_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = Dataset()
-        ds._is_little_endian = True
-        ds._is_implicit_VR = False
+        ds.set_original_encoding(False, True)
         ds.PixelRepresentation = 0
         ds.BitsStored = 16
         ds.VOILUTSequence = [Dataset()]
@@ -2460,6 +2557,43 @@ class TestNumpy_ApplyVOI:
         out = apply_voi(arr, ds)
         assert "uint16" == out.dtype
         assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_file_meta(self):
+        """Test using file meta to determine endianness"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        item.LUTData = pack("<4H", *item.LUTData)
+        item["LUTData"].VR = "OW"
+        arr = np.asarray([0, 1, 2, 3, 255], dtype="uint16")
+        out = apply_voi(arr, ds)
+        assert "uint16" == out.dtype
+        assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_no_endianness_raises(self):
+        """Test unable to determine endianness"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        item.LUTData = pack("<4H", *item.LUTData)
+        item["LUTData"].VR = "OW"
+        arr = np.asarray([0, 1, 2, 3, 255], dtype="uint16")
+        msg = (
+            "Unable to determine the endianness of the dataset, please set "
+            "an appropriate Transfer Syntax UID in 'Dataset.file_meta'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            apply_voi(arr, ds)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")

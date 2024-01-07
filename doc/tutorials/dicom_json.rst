@@ -2,8 +2,6 @@
 Introduction to JSON support
 ============================
 
-.. versionadded:: 1.3
-
 Starting in *pydicom* version 1.3, some support for converting DICOM data to
 and from JSON format has been added. This support is considered to be in
 beta state, and the API is still subject to change.

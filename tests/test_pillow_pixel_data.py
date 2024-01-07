@@ -4,7 +4,7 @@ import pytest
 
 import pydicom
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data
+from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
@@ -501,9 +501,10 @@ class TestPillowHandler_JPEG2K:
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
         assert ds.PixelRepresentation == data[3]
-        assert getattr(ds, "NumberOfFrames", 1) == data[4]
+        nr_frames = getattr(ds, "NumberOfFrames", 1)
+        assert nr_frames == data[4]
 
-        bs = defragment_data(ds.PixelData)
+        bs = get_frame(ds.PixelData, 0, number_of_frames=nr_frames)
         if get_j2k_parameters(bs)["precision"] != ds.BitsStored:
             with pytest.warns(UserWarning, match=r"doesn't match the JPEG 20"):
                 arr = ds.pixel_array
@@ -567,7 +568,7 @@ class TestPillowHandler_JPEG2K:
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
-        bs = defragment_data(ds.PixelData)
+        bs = get_frame(ds.PixelData, 0)
         params = get_j2k_parameters(bs)
         assert 13 == params["precision"]
         assert not params["is_signed"]
@@ -682,8 +683,8 @@ class TestPillowHandler_JPEG:
         """Test decoding JPEG lossy with pillow handler fails."""
         ds = dcmread(JPGE_16_12_1_0_1F_M2)
         msg = (
-            r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) only "
-            r"supported by Pillow if Bits Allocated = 8"
+            r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) is only "
+            r"supported by Pillow if \(0028,0100\) Bits Allocated = 8"
         )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
@@ -701,3 +702,13 @@ class TestPillowHandler_JPEG:
         pixel_data = ds.pixel_array
         assert pixel_data.nbytes == 27
         assert pixel_data.shape == (3, 3, 3)
+
+    def test_frame_multiple_fragments(self):
+        """Test a frame split across multiple fragments."""
+        ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422)
+        ref = ds.pixel_array
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
+        ds.PixelData = encapsulate(frames, fragments_per_frame=4)
+        assert np.array_equal(ds.pixel_array, ref)
