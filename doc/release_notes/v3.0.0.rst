@@ -135,6 +135,9 @@ Fixes
   :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`)
 * Fixed :func:`~pydicom.encaps.encapsulate_extended` not returning the correct
   values for odd-length frames (:issue:`1968`)
+* Fixed a ``KeyError`` when comparing codes with one of the codes having
+``scheme_designator`` set to ``SRT`` but not being included in the ``SRT``
+to ``SCT`` code mapping (:issue:`1994`)
 
 Pydicom Internals
 -----------------
