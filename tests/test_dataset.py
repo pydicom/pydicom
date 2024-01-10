@@ -1415,6 +1415,51 @@ class TestDataset:
 
         pydicom.config.pixel_data_handlers = orig_handlers
 
+    def test_pixel_array_id_reset_on_delete(self):
+        """Test _pixel_array and _pixel_id reset when deleting pixel data"""
+        fpath = get_testdata_file("CT_small.dcm")
+        ds = dcmread(fpath)
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds.PixelData
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds["PixelData"]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[Tag("PixelData")]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[0x7FE00010]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[0x7FE00000:0x7FE00012]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
     def test_pixel_array_unknown_syntax(self):
         """Test that pixel_array for an unknown syntax raises exception."""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
