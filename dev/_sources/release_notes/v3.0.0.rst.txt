@@ -178,6 +178,9 @@ Fixes
   explicit and implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
 * Fixed the ``jpeg_ls``, ``pillow`` and ``rle`` pixel data handlers not working
   correctly when a frame is spread across multiple fragments (:issue:`1774`)
+* Added mitigation for a rare case where clearing the pixel data value prior
+  to updating it may sometimes result in :attr:`~pydicom.dataset.Dataset.pixel_array`
+  returning the previous array instead of creating a new one (:issue:`1983`)
 * Fixed a ``KeyError`` when comparing codes with one of the codes having
   ``scheme_designator`` set to ``SRT`` but not being included in the ``SRT``
   to ``SCT`` code mapping (:issue:`1994`)
