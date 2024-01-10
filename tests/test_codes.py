@@ -91,6 +91,12 @@ class TestCode:
         assert c1 == c2
         assert c2 == c1
 
+    def test_equal_not_in_snomed_mapping(self):
+        c1 = Code(self._value, self._scheme_designator, self._meaning)
+        c2 = Code("bla bal bla", "SRT", self._meaning)
+        assert c1 != c2
+        assert c2 != c1
+
 
 class TestCodesDict:
     def test_dcm_1(self):

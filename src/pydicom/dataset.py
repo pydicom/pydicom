@@ -1220,21 +1220,28 @@ class Dataset:
         return self.__getitem__(block.get_tag(element_offset))
 
     @overload
-    def get_item(self, key: slice) -> "Dataset":
+    def get_item(self, key: slice, *, keep_deferred: bool = ...) -> "Dataset":
         pass  # pragma: no cover
 
     @overload
-    def get_item(self, key: TagType) -> DataElement:
+    def get_item(self, key: TagType, *, keep_deferred: bool = ...) -> DataElement:
         pass  # pragma: no cover
 
     def get_item(
-        self, key: "slice | TagType"
+        self,
+        key: "slice | TagType",
+        *,
+        keep_deferred: bool = False,
     ) -> "Dataset | DataElement | RawDataElement | None":
         """Return the raw data element if possible.
 
         It will be raw if the user has never accessed the value, or set their
         own value. Note if the data element is a deferred-read element,
         then it is read and converted before being returned.
+
+        .. versionchanged: 3.0
+
+            Added the `keep_deferred` keyword argument.
 
         Parameters
         ----------
@@ -1243,10 +1250,14 @@ class Dataset:
             :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
             made up of DICOM tags.
+        keep_deferred : bool, optional
+            If ``True`` then when returning :class:`~pydicom.dataelem.RawDataElement`
+            do not perform the deferred read of the element's value (accessing
+            the value will return ``None`` instead). Default ``False``.
 
         Returns
         -------
-        dataelem.DataElement
+        dataelem.DataElement | dataelem.RawDataElement
             The corresponding element.
         """
         if isinstance(key, slice):
@@ -1254,7 +1265,11 @@ class Dataset:
 
         elem = self._dict.get(Tag(key))
         # If a deferred read, return using __getitem__ to read and convert it
-        if isinstance(elem, RawDataElement) and elem.value is None:
+        if (
+            isinstance(elem, RawDataElement)
+            and not keep_deferred
+            and elem.value is None
+        ):
             return self[key]
 
         return elem

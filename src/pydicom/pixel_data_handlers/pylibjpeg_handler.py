@@ -98,7 +98,7 @@ except ImportError:
     HAVE_RLE = False
 
 from pydicom import config
-from pydicom.encaps import generate_pixel_data_frame
+from pydicom.encaps import generate_frames as frame_generator
 from pydicom.pixel_data_handlers.util import (
     pixel_dtype,
     get_expected_length,
@@ -272,7 +272,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
 
-    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
+    for frame in frame_generator(ds.PixelData, number_of_frames=nr_frames):
         arr = decoder(frame, pixel_module)
 
         if tsyntax in [JPEG2000, JPEG2000Lossless] and config.APPLY_J2K_CORRECTIONS:

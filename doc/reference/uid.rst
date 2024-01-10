@@ -65,6 +65,7 @@ Transfer Syntax Lists
    MPEGTransferSyntaxes
    RLETransferSyntaxes
    UncompressedTransferSyntaxes
+   PrivateTransferSyntaxes
 
 
 UID Utilities
@@ -74,6 +75,7 @@ UID Utilities
    :toctree: generated/
 
    generate_uid
+   register_transfer_syntax
    PYDICOM_ROOT_UID
    PYDICOM_IMPLEMENTATION_UID
    RE_VALID_UID

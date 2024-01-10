@@ -19,7 +19,7 @@ try:
 except ImportError:
     HAVE_JPEGLS = False
 
-from pydicom.encaps import generate_pixel_data_frame
+from pydicom.encaps import generate_frames
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
 import pydicom.uid
 
@@ -108,7 +108,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     pixel_bytes = bytearray()
 
     nr_frames = get_nr_frames(ds, warn=False)
-    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
+    for frame in generate_frames(ds.PixelData, number_of_frames=nr_frames):
         im = jpeg_ls.decode(numpy.frombuffer(frame, dtype="u1"))
         pixel_bytes.extend(im.tobytes())
 

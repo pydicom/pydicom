@@ -30,7 +30,7 @@ except ImportError:
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
 from pydicom import config
-from pydicom.encaps import generate_pixel_data
+from pydicom.encaps import generate_frames, generate_fragmented_frames
 import pydicom.uid
 from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
 from pydicom.pixel_data_handlers.util import (
@@ -114,16 +114,17 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     tsyntax = ds.file_meta.TransferSyntaxUID
     data_element = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
     if tsyntax.is_compressed:
-        if get_nr_frames(ds, warn=False) > 1:
-            pixel_data_sequence = pydicom.encaps.decode_data_sequence(ds.PixelData)
-        else:
-            pixel_data_sequence = [pydicom.encaps.defragment_data(ds.PixelData)]
-
         fragments = gdcm.SequenceOfFragments.New()
-        for pixel_data in pixel_data_sequence:
-            fragment = gdcm.Fragment()
-            fragment.SetByteStringValue(pixel_data)
-            fragments.AddFragment(fragment)
+        nr_frames = get_nr_frames(ds, warn=False)
+        fragment_gen = generate_fragmented_frames(
+            ds.PixelData, number_of_frames=nr_frames
+        )
+        for frame_fragments in fragment_gen:
+            for fragment_data in frame_fragments:
+                fragment = gdcm.Fragment()
+                fragment.SetByteStringValue(fragment_data)
+                fragments.AddFragment(fragment)
+
         data_element.SetValue(fragments.__ref__())
     else:
         data_element.SetByteStringValue(ds.PixelData)
@@ -286,7 +287,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     tsyntax = ds.file_meta.TransferSyntaxUID
     if config.APPLY_J2K_CORRECTIONS and tsyntax in [JPEG2000, JPEG2000Lossless]:
         nr_frames = get_nr_frames(ds)
-        codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
+        codestream = next(generate_frames(ds.PixelData, number_of_frames=nr_frames))
 
         params = get_j2k_parameters(codestream)
         j2k_precision = cast(int, params.setdefault("precision", ds.BitsStored))

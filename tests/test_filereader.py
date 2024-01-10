@@ -31,7 +31,14 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
-from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRLittleEndian
+import pydicom.uid
+from pydicom.uid import (
+    ImplicitVRLittleEndian,
+    ExplicitVRLittleEndian,
+    UID,
+    register_transfer_syntax,
+    PrivateTransferSyntaxes,
+)
 import pydicom.valuerep
 from pydicom import values
 
@@ -105,6 +112,9 @@ def test_dicomio():
 
 
 class TestReader:
+    def teardown_method(self):
+        pydicom.uid.PrivateTransferSyntaxes = []
+
     def test_empty_numbers_tag(self):
         """Test that an empty tag with a number VR (FL, UL, SL, US,
         SS, FL, FD, OF) reads as ``None``."""
@@ -982,6 +992,38 @@ class TestReader:
         assert (
             "Expected sequence item with tag (FFFE,E000) at file position 0x22"
         ) in caplog.text
+
+    def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
+        """Test reading a dataset with a registered private transfer syntax"""
+        uid = UID("1.2.3.4")
+        uid.set_private_encoding(True, True)
+
+        ds = dcmread(ct_name)
+        assert ds.original_encoding == (False, True)
+        buffer = BytesIO()
+        ds.file_meta.TransferSyntaxUID = uid
+        assert ds.file_meta.TransferSyntaxUID.is_implicit_VR
+        assert ds.file_meta.TransferSyntaxUID.is_little_endian
+        ds.save_as(buffer)
+
+        buffer.seek(0)
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            msg = "Expected explicit VR, but found implicit VR"
+            with pytest.warns(UserWarning, match=msg):
+                dcmread(buffer)
+
+            assert msg in caplog.text
+
+        caplog.clear()
+        register_transfer_syntax(uid)
+
+        buffer.seek(0)
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            ds = dcmread(buffer)
+            assert "Expected explicit VR, but found implicit VR" not in caplog.text
+
+        assert ds.file_meta.TransferSyntaxUID == uid
+        assert ds.original_encoding == (True, True)
 
 
 class TestIncorrectVR:
