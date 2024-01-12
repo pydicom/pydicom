@@ -16,23 +16,16 @@ try:
 except ImportError:
     HAVE_PIL = False
 
-try:
-    import numpy
-
-    HAVE_NP = True
-except ImportError:
-    HAVE_NP = False
-
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.pixels.decoders.base import DecoderOptions
 
 
 DECODER_DEPENDENCIES = {
-    JPEGBaseline8Bit: ("pillow>=7.0.0",),
-    JPEGExtended12Bit: ("pillow>=7.0.0",),
-    JPEG2000Lossless: ("pillow>=7.0.0", "numpy"),
-    JPEG2000: ("pillow>=7.0.0", "numpy"),
+    JPEGBaseline8Bit: ("pillow>=10.0",),
+    JPEGExtended12Bit: ("pillow>=10.0",),
+    JPEG2000Lossless: ("pillow>=10.0",),
+    JPEG2000: ("pillow>=10.0",),
 }
 
 _LIBJPEG_SYNTAXES = [JPEGBaseline8Bit, JPEGExtended12Bit]
