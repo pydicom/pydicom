@@ -4,6 +4,11 @@
 Pixel Data Decoder Plugins
 ==========================
 
+.. note::
+
+    This guide is intended for advanced users who need support for something
+    not provided by the :doc:`existing decoder plugins </reference/pixels.decoders>`.
+
 *Pixel Data* decoding in *pydicom* uses an :class:`~pydicom.pixels.decoders.base.Decoder`
 instance for the specific *Transfer Syntax* as a manager for plugins that
 perform the decoding work. This guide covers the requirements for those plugins
@@ -64,7 +69,7 @@ An decoding plugin must implement three objects within the same module:
     parameters is not required, however.
 
     `opts` is a reference to the options dict used by the
-    :class:`~pydicom.pixels.base.DecodeRunner` that manages the decoding process,
+    :class:`~pydicom.pixels.decoders.base.DecodeRunner` that manages the decoding process,
     so if your decoder needs to signal that one of the option values needs to be
     modified (say for example to flag that the photometric interpretation of the
     decoded frame has already been changed from YBR_FULL to RGB by the plugin),

@@ -17,6 +17,6 @@ pydicom
 +                          +-----------------------+------------------------------------------------+
 |                          | Key                   | Value                                          |
 +==========================+=======================+================================================+
-|:attr:`RLELosslessDecoder`| ``rle_segment_order`` | ``"<"`` for big endian segment order (default) |
-|                          |                       | or ``">"`` for little endian segment order     |
+|:attr:`RLELosslessDecoder`| ``rle_segment_order`` | ``">"`` for big endian segment order (default) |
+|                          |                       | or ``"<"`` for little endian segment order     |
 +--------------------------+-----------------------+------------------------------------------------+

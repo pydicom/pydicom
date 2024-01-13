@@ -523,35 +523,48 @@ class TestDecodeRunner:
         runner.set_option("samples_per_pixel", -1)
         runner.set_option("extended_offsets", ([1, 2], [1]))
 
-        msg = r"Bits allocated must be in the range \(1, 64\)"
+        msg = (
+            "A bits allocated value of '-1' is invalid, it must be in the "
+            r"range \(1, 64\)"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_allocated", 4)
-        msg = r"Bits allocated must be 1 or a multiple of 8"
+        msg = (
+            "A bits allocated value of '4' is invalid, it must be 1 or a multiple of 8"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_allocated", 8)
-        msg = r"Bits stored must be in the range \(1, 64\)"
+        msg = (
+            "A bits stored value of '-1' is invalid, it must be in the range "
+            r"\(1, 64\) and no greater than the bits allocated value of 8"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_stored", 10)
         msg = (
-            r"Bits stored must be in the range \(1, 64\) and no greater than "
-            "bits allocated"
+            "A bits stored value of '10' is invalid, it must be in the range "
+            r"\(1, 64\) and no greater than the bits allocated value of 8"
         )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_stored", 8)
-        msg = r"Columns must be in the range \(1, 65535\)"
+        msg = (
+            r"A columns value of '-1' is invalid, it must be in the range \(1, 65535\)"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("columns", 8)
-        msg = r"Number of frames must be greater than or equal to 1"
+        msg = (
+            "A number of frames value of '-1' is invalid, it must be greater "
+            "than or equal to 1"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
@@ -571,17 +584,17 @@ class TestDecodeRunner:
             runner.validate_options()
 
         runner.set_option("pixel_representation", -1)
-        msg = r"Pixel representation must be 0 or 1"
+        msg = "A pixel representation value of '-1' is invalid, it must be 0 or 1"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("pixel_representation", 0)
-        msg = r"Rows must be in the range \(1, 65535\)"
+        msg = r"A rows value of '-1' is invalid, it must be in the range \(1, 65535\)"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("rows", 10)
-        msg = r"Samples per pixel must be 1 or 3"
+        msg = "A samples per pixel value of '-1' is invalid, it must be 1 or 3"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
@@ -591,7 +604,7 @@ class TestDecodeRunner:
             runner.validate_options()
 
         runner.set_option("planar_configuration", -1)
-        msg = r"Planar configuration must be 0 or 1"
+        msg = "A planar configuration value of '-1' is invalid, it must be 0 or 1"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 

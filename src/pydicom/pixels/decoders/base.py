@@ -178,7 +178,7 @@ class DecodeRunner:
             The decoded frame.
         """
         # If self._previous is not set then this is the first frame being decoded
-        # If self._previous is set and then the previously successful decoder
+        # If self._previous is set, then the previously successful decoder
         #   has failed while decoding a frame and we are trying the other decoders
         failure_messages = []
         for name, func in self._decoders.items():
@@ -213,8 +213,7 @@ class DecodeRunner:
         if name in ("transfer_syntax_uid", "pixel_keyword"):
             raise ValueError(f"Deleting '{name}' is not allowed")
 
-        if name in self._opts:
-            del self._opts[name]  # type: ignore
+        self._opts.pop(name, None)  # type: ignore[misc]
 
     @property
     def extended_offsets(
@@ -734,22 +733,35 @@ class DecodeRunner:
             raise AttributeError(f"Missing expected options: {', '.join(missing)}")
 
         if not 1 <= self.bits_allocated <= 64:
-            raise ValueError("Bits allocated must be in the range (1, 64)")
+            raise ValueError(
+                f"A bits allocated value of '{self.bits_allocated}' is invalid, "
+                "it must be in the range (1, 64)"
+            )
 
         if self.bits_allocated != 1 and self.bits_allocated % 8:
-            raise ValueError("Bits allocated must be 1 or a multiple of 8")
+            raise ValueError(
+                f"A bits allocated value of '{self.bits_allocated}' is invalid, "
+                "it must be 1 or a multiple of 8"
+            )
 
         if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
             raise ValueError(
-                "Bits stored must be in the range (1, 64) and no greater than "
-                "bits allocated"
+                f"A bits stored value of '{self.bits_stored}' is invalid, it "
+                "must be in the range (1, 64) and no greater than the bits "
+                f"allocated value of {self.bits_allocated}"
             )
 
         if not 0 < self.columns <= 2**16 - 1:
-            raise ValueError("Columns must be in the range (1, 65535)")
+            raise ValueError(
+                f"A columns value of '{self.columns}' is invalid, it must be in "
+                "the range (1, 65535)"
+            )
 
         if self.number_of_frames < 1:
-            raise ValueError("Number of frames must be greater than or equal to 1")
+            raise ValueError(
+                f"A number of frames value of '{self.number_of_frames}' is "
+                "invalid, it must be greater than or equal to 1"
+            )
 
         try:
             PI[self.photometric_interpretation]
@@ -771,20 +783,32 @@ class DecodeRunner:
                 raise AttributeError("Missing expected option: pixel_representation")
 
             if self.pixel_representation not in (0, 1):
-                raise ValueError("Pixel representation must be 0 or 1")
+                raise ValueError(
+                    f"A pixel representation value of '{self.pixel_representation}' "
+                    "is invalid, it must be 0 or 1"
+                )
 
         if not 0 < self.rows <= 2**16 - 1:
-            raise ValueError("Rows must be in the range (1, 65535)")
+            raise ValueError(
+                f"A rows value of '{self.rows}' is invalid, it must be in the "
+                "range (1, 65535)"
+            )
 
         if self.samples_per_pixel not in (1, 3):
-            raise ValueError("Samples per pixel must be 1 or 3")
+            raise ValueError(
+                f"A samples per pixel value of '{self.samples_per_pixel}' is "
+                "invalid, it must be 1 or 3"
+            )
 
         if self.samples_per_pixel == 3:
             if self.get_option("planar_configuration") is None:
                 raise AttributeError("Missing expected option: planar_configuration")
 
             if self.planar_configuration not in (0, 1):
-                raise ValueError("Planar configuration must be 0 or 1")
+                raise ValueError(
+                    f"A planar configuration value of '{self.planar_configuration}' "
+                    "is invalid, it must be 0 or 1"
+                )
 
         if self.extended_offsets:
             if len(self.extended_offsets[0]) != len(self.extended_offsets[1]):
@@ -1190,7 +1214,7 @@ class Decoder:
             if index is None:
                 length_pixels *= runner.number_of_frames
 
-            return np.unpackbits(arr, bitorder="little")[:length_pixels]
+            return np.unpackbits(arr, bitorder="little", count=length_pixels)
 
         # Expand YBR_FULL_422 (if required)
         if runner.photometric_interpretation == PI.YBR_FULL_422:
@@ -1295,7 +1319,7 @@ class Decoder:
             transfer syntaxes:
 
             * `view_only`: :class:`bool` - if ``True`` then return a
-            :class:`memoryview` on the original buffer (default ``False``).
+              :class:`memoryview` on the original buffer (default ``False``).
 
             Options for the decoding plugin(s) may also be supplied. See the
             :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
@@ -1727,7 +1751,7 @@ class Decoder:
             transfer syntaxes:
 
             * `view_only`: :class:`bool` - if ``True`` then yield a
-            :class:`memoryview` on the original buffer (default ``False``).
+              :class:`memoryview` on the original buffer (default ``False``).
 
             Options for the decoding plugin(s) may also be supplied. See the
             :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
