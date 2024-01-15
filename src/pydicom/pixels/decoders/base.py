@@ -1337,7 +1337,7 @@ class Decoder:
 
             8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
             be returned as-is and may need byte-swapping. To facilitate this
-            an extra byte before the expected start (for and odd `index`) or after
+            an extra byte before the expected start (for an odd `index`) or after
             the expected end (for an even `index`) is returned if the frame contains
             an odd number of pixels.
         """
@@ -1769,7 +1769,7 @@ class Decoder:
 
             8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
             be yielded as-is and may need byte-swapping. To facilitate this
-            an extra byte before the expected start (for and odd `index`) or after
+            an extra byte before the expected start (for an odd `index`) or after
             the expected end (for an even `index`) is yielded if the frame contains
             an odd number of pixels.
         """
