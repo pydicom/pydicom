@@ -2973,7 +2973,7 @@ class FileDataset(Dataset):
             * :class:`str` or path: the full path to the dataset file
             * file-like: a file-like object in "rb" mode
             * readable buffer: an object with ``read()``, ``tell()`` and
-            ``seek()`` methods such as :class:`io.BytesIO`.
+              ``seek()`` methods such as :class:`io.BytesIO`.
         dataset : Dataset or dict
             Some form of dictionary, usually a :class:`Dataset` returned from
             :func:`~pydicom.filereader.dcmread`.

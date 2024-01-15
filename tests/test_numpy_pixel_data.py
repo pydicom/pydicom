@@ -578,6 +578,8 @@ class TestNumpy_NumpyHandler:
         ds = dcmread(EXPL_8_3_1F_ODD)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
+            ds._pixel_id = {}
+            ds._pixel_array = None
 
             assert ds.pixel_array[0].tolist() == [
                 [166, 141, 52],

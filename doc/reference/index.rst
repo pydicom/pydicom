@@ -29,4 +29,7 @@ This API reference guide details the functions, modules and objects included in
    fileset
    handlers
    misc
+   overlays
+   pixels
+   waveforms
    uid
