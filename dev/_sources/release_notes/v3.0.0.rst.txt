@@ -157,6 +157,14 @@ Enhancements
 * Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
   <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
   element length without having to read the element value. (:issue:`1873`)
+* Added the :doc:`pixels</reference/pixels>` module and a new more flexible method for
+  decoding pixel data via the following decoding class instances:
+
+  * :attr:`~pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.RLELosslessDecoder`
 
 
 Fixes

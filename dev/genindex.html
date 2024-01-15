@@ -164,6 +164,10 @@
 </li>
         <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.__init__">(pydicom.multival.MultiValue method)</a>
 </li>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.__init__">(pydicom.pixels.decoders.base.Decoder method)</a>
+</li>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.__init__">(pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
         <li><a href="reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence.__init__">(pydicom.sequence.Sequence method)</a>
 </li>
         <li><a href="reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.__init__">(pydicom.tag.BaseTag method)</a>
@@ -222,7 +226,11 @@
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new_private">add_new_private() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.add_plugin">add_plugin() (pydicom.encoders.base.Encoder method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.add_plugin">(pydicom.pixels.decoders.base.Decoder method)</a>
 </li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries">add_private_dict_entries() (in module pydicom.datadict)</a>
 </li>
       <li><a href="reference/generated/pydicom.datadict.add_private_dict_entry.html#pydicom.datadict.add_private_dict_entry">add_private_dict_entry() (in module pydicom.datadict)</a>
@@ -278,6 +286,12 @@
       <li><a href="reference/generated/pydicom.uid.ArterialPulseWaveformStorage.html#pydicom.uid.ArterialPulseWaveformStorage">ArterialPulseWaveformStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.pylibjpeg_handler.html#pydicom.pixel_data_handlers.pylibjpeg_handler.as_array">as_array() (in module pydicom.pixel_data_handlers.pylibjpeg_handler)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array">(pydicom.pixels.decoders.base.Decoder method)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_buffer">as_buffer() (pydicom.pixels.decoders.base.Decoder method)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.assume_implicit_vr_switch.html#pydicom.config.assume_implicit_vr_switch">assume_implicit_vr_switch (in module pydicom.config)</a>
 </li>
@@ -297,10 +311,14 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.BasicVoiceAudioWaveformStorage.html#pydicom.uid.BasicVoiceAudioWaveformStorage">BasicVoiceAudioWaveformStorage (in module pydicom.uid)</a>
 </li>
-      <li><a href="reference/generated/pydicom.uid.BlendingSoftcopyPresentationStateStorage.html#pydicom.uid.BlendingSoftcopyPresentationStateStorage">BlendingSoftcopyPresentationStateStorage (in module pydicom.uid)</a>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.bits_allocated">bits_allocated (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.bits_stored">bits_stored (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.BlendingSoftcopyPresentationStateStorage.html#pydicom.uid.BlendingSoftcopyPresentationStateStorage">BlendingSoftcopyPresentationStateStorage (in module pydicom.uid)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.block_start">block_start (pydicom.dataset.PrivateBlock attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.BodyPositionWaveformStorage.html#pydicom.uid.BodyPositionWaveformStorage">BodyPositionWaveformStorage (in module pydicom.uid)</a>
@@ -342,6 +360,8 @@
       <li><a href="reference/generated/pydicom.uid.ColorPaletteStorage.html#pydicom.uid.ColorPaletteStorage">ColorPaletteStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.ColorSoftcopyPresentationStateStorage.html#pydicom.uid.ColorSoftcopyPresentationStateStorage">ColorSoftcopyPresentationStateStorage (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.columns">columns (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.component">component (pydicom.fileset.RecordNode property)</a>
 </li>
@@ -476,6 +496,8 @@
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decode">decode() (pydicom.dataset.Dataset method)</a>
 
       <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.decode">(pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
         <li><a href="reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.decode">(pydicom.valuerep.PersonName method)</a>
 </li>
       </ul></li>
@@ -485,6 +507,10 @@
 </li>
       <li><a href="reference/generated/pydicom.charset.decode_element.html#pydicom.charset.decode_element">decode_element() (in module pydicom.charset)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder">Decoder (class in pydicom.pixels.decoders.base)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner">DecodeRunner (class in pydicom.pixels.decoders.base)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress">decompress() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.default_element_format">default_element_format (pydicom.dataset.Dataset attribute)</a>
@@ -493,9 +519,13 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.DeflatedExplicitVRLittleEndian.html#pydicom.uid.DeflatedExplicitVRLittleEndian">DeflatedExplicitVRLittleEndian (in module pydicom.uid)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder">DeflatedExplicitVRLittleEndianDecoder (in module pydicom.pixels.decoders.base)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.DeformableSpatialRegistrationStorage.html#pydicom.uid.DeformableSpatialRegistrationStorage">DeformableSpatialRegistrationStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.encaps.defragment_data.html#pydicom.encaps.defragment_data">defragment_data() (in module pydicom.encaps)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.del_option">del_option() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.depth">depth (pydicom.fileset.RecordNode property)</a>
 </li>
@@ -503,14 +533,14 @@
 </li>
       <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set">descriptor_character_set (pydicom.fileset.FileSet property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id">descriptor_file_id (pydicom.fileset.FileSet property)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.descripWidth">descripWidth (pydicom.dataelem.DataElement attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO">DicomBytesIO (class in pydicom.filebase)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.filebase.DicomFile.html#pydicom.filebase.DicomFile">DicomFile() (in module pydicom.filebase)</a>
 </li>
       <li><a href="reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike">DicomFileLike (class in pydicom.filebase)</a>
@@ -617,12 +647,12 @@
       </ul></li>
       <li><a href="reference/generated/pydicom.charset.encode_string.html#pydicom.charset.encode_string">encode_string() (in module pydicom.charset)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder">Encoder (class in pydicom.encoders.base)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values">enforce_valid_values (in module pydicom.config)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.EnhancedContinuousRTImageStorage.html#pydicom.uid.EnhancedContinuousRTImageStorage">EnhancedContinuousRTImageStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.EnhancedCTImageStorage.html#pydicom.uid.EnhancedCTImageStorage">EnhancedCTImageStorage (in module pydicom.uid)</a>
@@ -651,9 +681,15 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.ExplicitVRBigEndian.html#pydicom.uid.ExplicitVRBigEndian">ExplicitVRBigEndian (in module pydicom.uid)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder">ExplicitVRBigEndianDecoder (in module pydicom.pixels.decoders.base)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.ExplicitVRLittleEndian.html#pydicom.uid.ExplicitVRLittleEndian">ExplicitVRLittleEndian (in module pydicom.uid)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder">ExplicitVRLittleEndianDecoder (in module pydicom.pixels.decoders.base)</a>
+</li>
       <li><a href="reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence.extend">extend() (pydicom.sequence.Sequence method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.extended_offsets">extended_offsets (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.ExtensibleSRStorage.html#pydicom.uid.ExtensibleSRStorage">ExtensibleSRStorage (in module pydicom.uid)</a>
 </li>
@@ -712,6 +748,8 @@
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.formatted_lines">formatted_lines() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.encaps.fragment_frame.html#pydicom.encaps.fragment_frame">fragment_frame() (in module pydicom.encaps)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.frame_length">frame_length() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.from_json">from_json() (pydicom.dataelem.DataElement class method)</a>
 
@@ -779,15 +817,17 @@
 </li>
       <li><a href="reference/generated/pydicom.encaps.get_frame_offsets.html#pydicom.encaps.get_frame_offsets">get_frame_offsets() (in module pydicom.encaps)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.get_image_pixel_ids">get_image_pixel_ids() (in module pydicom.pixel_data_handlers.util)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.get_item">get_item() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.get_j2k_parameters">get_j2k_parameters() (in module pydicom.pixel_data_handlers.util)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.get_nr_frames">get_nr_frames() (in module pydicom.pixel_data_handlers.util)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.get_option">get_option() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.overlays.numpy_handler.html#pydicom.overlays.numpy_handler.get_overlay_array">get_overlay_array() (in module pydicom.overlays.numpy_handler)</a>
 </li>
@@ -875,6 +915,8 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.ImplicitVRLittleEndian.html#pydicom.uid.ImplicitVRLittleEndian">ImplicitVRLittleEndian (in module pydicom.uid)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder">ImplicitVRLittleEndianDecoder (in module pydicom.pixels.decoders.base)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.indent_chars">indent_chars (pydicom.dataset.Dataset attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.index">index (pydicom.fileset.RecordNode property)</a>
@@ -902,7 +944,11 @@
       <li><a href="reference/generated/pydicom.valuerep.IS.html#pydicom.valuerep.IS">IS (class in pydicom.valuerep)</a>
 </li>
       <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.is_available">is_available (pydicom.encoders.base.Encoder property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.is_available">(pydicom.pixels.decoders.base.Decoder property)</a>
 </li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.overlays.numpy_handler.html#pydicom.overlays.numpy_handler.is_available">is_available() (in module pydicom.overlays.numpy_handler)</a>
 
       <ul>
@@ -929,12 +975,16 @@
 </li>
       <li><a href="reference/generated/pydicom.misc.is_dicom.html#pydicom.misc.is_dicom">is_dicom() (in module pydicom.misc)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.is_empty">is_empty (pydicom.dataelem.DataElement property)</a>
 </li>
-      <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_encapsulated">is_encapsulated (pydicom.uid.UID property)</a>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.is_encapsulated">is_encapsulated (pydicom.pixels.decoders.base.Decoder property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_encapsulated">(pydicom.uid.UID property)</a>
 </li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement.is_implicit_VR">is_implicit_VR (pydicom.dataelem.RawDataElement attribute)</a>
 
       <ul>
@@ -959,6 +1009,8 @@
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_little_endian">(pydicom.uid.UID property)</a>
 </li>
       </ul></li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.is_native">is_native (pydicom.pixels.decoders.base.Decoder property)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_original_encoding">is_original_encoding (pydicom.dataset.Dataset property)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.is_private">is_private (pydicom.dataelem.DataElement property)</a>
@@ -1004,6 +1056,12 @@
       <li><a href="reference/generated/pydicom.encaps.itemize_frame.html#pydicom.encaps.itemize_frame">itemize_frame() (in module pydicom.encaps)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.items">items() (pydicom.dataset.Dataset method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array">iter_array() (pydicom.pixels.decoders.base.Decoder method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_buffer">iter_buffer() (pydicom.pixels.decoders.base.Decoder method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.iter_decode">iter_decode() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.iter_encode">iter_encode() (pydicom.encoders.base.Encoder method)</a>
 </li>
@@ -1122,7 +1180,11 @@
       <li><a href="reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.middle_name">middle_name (pydicom.valuerep.PersonName property)</a>
 </li>
       <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.missing_dependencies">missing_dependencies (pydicom.encoders.base.Encoder property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.missing_dependencies">(pydicom.pixels.decoders.base.Decoder property)</a>
 </li>
+      </ul></li>
       <li>
     module
 
@@ -1131,7 +1193,7 @@
 </li>
         <li><a href="reference/encoders.html#module-pydicom.encoders">pydicom.encoders</a>
 </li>
-        <li><a href="reference/handlers.overlay_data.html#module-pydicom.overlays">pydicom.overlays</a>
+        <li><a href="reference/overlays.html#module-pydicom.overlays">pydicom.overlays</a>
 </li>
         <li><a href="reference/generated/pydicom.overlays.numpy_handler.html#module-pydicom.overlays.numpy_handler">pydicom.overlays.numpy_handler</a>
 </li>
@@ -1151,17 +1213,17 @@
 </li>
         <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#module-pydicom.pixel_data_handlers.util">pydicom.pixel_data_handlers.util</a>
 </li>
-        <li><a href="reference/handlers.waveform_data.html#module-pydicom.waveforms">pydicom.waveforms</a>
+        <li><a href="reference/waveforms.html#module-pydicom.waveforms">pydicom.waveforms</a>
 </li>
         <li><a href="reference/generated/pydicom.waveforms.numpy_handler.html#module-pydicom.waveforms.numpy_handler">pydicom.waveforms.numpy_handler</a>
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.uid.MPEG2MPHL.html#pydicom.uid.MPEG2MPHL">MPEG2MPHL (in module pydicom.uid)</a>
 </li>
-      <li><a href="reference/generated/pydicom.uid.MPEG2MPHLF.html#pydicom.uid.MPEG2MPHLF">MPEG2MPHLF (in module pydicom.uid)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.MPEG2MPHLF.html#pydicom.uid.MPEG2MPHLF">MPEG2MPHLF (in module pydicom.uid)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.MPEG2MPML.html#pydicom.uid.MPEG2MPML">MPEG2MPML (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.MPEG2MPMLF.html#pydicom.uid.MPEG2MPMLF">MPEG2MPMLF (in module pydicom.uid)</a>
@@ -1227,6 +1289,8 @@
 </li>
         <li><a href="reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO.name">(pydicom.filebase.DicomIO property)</a>
 </li>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.name">(pydicom.pixels.decoders.base.Decoder property)</a>
+</li>
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.name">(pydicom.uid.UID property)</a>
 </li>
       </ul></li>
@@ -1256,6 +1320,8 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.NuclearMedicineImageStorage.html#pydicom.uid.NuclearMedicineImageStorage">NuclearMedicineImageStorage (in module pydicom.uid)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.number_of_frames">number_of_frames (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1272,13 +1338,15 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.OphthalmicPhotography8BitImageStorage.html#pydicom.uid.OphthalmicPhotography8BitImageStorage">OphthalmicPhotography8BitImageStorage (in module pydicom.uid)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.OphthalmicThicknessMapStorage.html#pydicom.uid.OphthalmicThicknessMapStorage">OphthalmicThicknessMapStorage (in module pydicom.uid)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.OphthalmicTomographyImageStorage.html#pydicom.uid.OphthalmicTomographyImageStorage">OphthalmicTomographyImageStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage.html#pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage">OphthalmicVisualFieldStaticPerimetryMeasurementsStorage (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.options">options (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.original_character_set">original_character_set (pydicom.dataset.Dataset property)</a>
 </li>
@@ -1322,11 +1390,21 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.PhotoacousticImageStorage.html#pydicom.uid.PhotoacousticImageStorage">PhotoacousticImageStorage (in module pydicom.uid)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.photometric_interpretation">photometric_interpretation (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array">pixel_array (pydicom.dataset.Dataset property)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.pixel_data_handlers.html#pydicom.config.pixel_data_handlers">pixel_data_handlers (in module pydicom.config)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.pixel_dtype">pixel_dtype (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.pixel_dtype">pixel_dtype() (in module pydicom.pixel_data_handlers.util)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.pixel_keyword">pixel_keyword (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.pixel_representation">pixel_representation (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.planar_configuration">planar_configuration (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.PlannedImagingAgentAdministrationSRStorage.html#pydicom.uid.PlannedImagingAgentAdministrationSRStorage">PlannedImagingAgentAdministrationSRStorage (in module pydicom.uid)</a>
 </li>
@@ -1358,13 +1436,15 @@
 </li>
       <li><a href="reference/generated/pydicom.datadict.private_dictionary_VR.html#pydicom.datadict.private_dictionary_VR">private_dictionary_VR() (in module pydicom.datadict)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock">PrivateBlock (class in pydicom.dataset)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.PrivateTransferSyntaxes.html#pydicom.uid.PrivateTransferSyntaxes">PrivateTransferSyntaxes (in module pydicom.uid)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.ProcedureLogStorage.html#pydicom.uid.ProcedureLogStorage">ProcedureLogStorage (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.process">process() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.ProtocolApprovalStorage.html#pydicom.uid.ProtocolApprovalStorage">ProtocolApprovalStorage (in module pydicom.uid)</a>
 </li>
@@ -1388,7 +1468,7 @@
     pydicom.overlays
 
       <ul>
-        <li><a href="reference/handlers.overlay_data.html#module-pydicom.overlays">module</a>
+        <li><a href="reference/overlays.html#module-pydicom.overlays">module</a>
 </li>
       </ul></li>
       <li>
@@ -1458,7 +1538,7 @@
     pydicom.waveforms
 
       <ul>
-        <li><a href="reference/handlers.waveform_data.html#module-pydicom.waveforms">module</a>
+        <li><a href="reference/waveforms.html#module-pydicom.waveforms">module</a>
 </li>
       </ul></li>
       <li>
@@ -1541,18 +1621,24 @@
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.remove_plugin">remove_plugin() (pydicom.encoders.base.Encoder method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.remove_plugin">(pydicom.pixels.decoders.base.Decoder method)</a>
 </li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.remove_private_tags">remove_private_tags() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.datadict.repeater_has_keyword.html#pydicom.datadict.repeater_has_keyword">repeater_has_keyword() (in module pydicom.datadict)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.datadict.repeater_has_tag.html#pydicom.datadict.repeater_has_tag">repeater_has_tag() (in module pydicom.datadict)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.repval">repval (pydicom.dataelem.DataElement property)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.reset_data_element_callback.html#pydicom.config.reset_data_element_callback">reset_data_element_callback() (in module pydicom.config)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.reshape">reshape() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.overlays.numpy_handler.html#pydicom.overlays.numpy_handler.reshape_overlay_array">reshape_overlay_array() (in module pydicom.overlays.numpy_handler)</a>
 </li>
@@ -1563,6 +1649,8 @@
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.reverse">reverse() (pydicom.fileset.RecordNode method)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.RLELossless.html#pydicom.uid.RLELossless">RLELossless (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.RLELosslessDecoder.html#pydicom.pixels.decoders.base.RLELosslessDecoder">RLELosslessDecoder (in module pydicom.pixels.decoders.base)</a>
 </li>
       <li><a href="reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder">RLELosslessEncoder (in module pydicom.encoders)</a>
 </li>
@@ -1575,6 +1663,8 @@
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.root">root (pydicom.fileset.RecordNode property)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage.html#pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage">RoutineScalpElectroencephalogramWaveformStorage (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.rows">rows (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.RTBeamsDeliveryInstructionStorage.html#pydicom.uid.RTBeamsDeliveryInstructionStorage">RTBeamsDeliveryInstructionStorage (in module pydicom.uid)</a>
 </li>
@@ -1620,6 +1710,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.samples_per_pixel">samples_per_pixel (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as">save_as() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.SecondaryCaptureImageStorage.html#pydicom.uid.SecondaryCaptureImageStorage">SecondaryCaptureImageStorage (in module pydicom.uid)</a>
@@ -1632,9 +1724,17 @@
 </li>
       <li><a href="reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence">Sequence (class in pydicom.sequence)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_decoders">set_decoders() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_option">set_option() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_options">set_options() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.set_original_encoding">set_original_encoding() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.set_private_encoding">set_private_encoding() (pydicom.uid.UID method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_source">set_source() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.setdefault">setdefault() (pydicom.dataset.Dataset method)</a>
 </li>
@@ -1658,12 +1758,12 @@
       </ul></li>
       <li><a href="reference/generated/pydicom.config.show_file_meta.html#pydicom.config.show_file_meta">show_file_meta (in module pydicom.config)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.showVR">showVR (pydicom.dataelem.DataElement attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.SimplifiedAdultEchoSRStorage.html#pydicom.uid.SimplifiedAdultEchoSRStorage">SimplifiedAdultEchoSRStorage (in module pydicom.uid)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.misc.size_in_bytes.html#pydicom.misc.size_in_bytes">size_in_bytes() (in module pydicom.misc)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.SleepElectroencephalogramWaveformStorage.html#pydicom.uid.SleepElectroencephalogramWaveformStorage">SleepElectroencephalogramWaveformStorage (in module pydicom.uid)</a>
@@ -1683,6 +1783,8 @@
       <li><a href="reference/generated/pydicom.uid.SpatialRegistrationStorage.html#pydicom.uid.SpatialRegistrationStorage">SpatialRegistrationStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.SpectaclePrescriptionReportStorage.html#pydicom.uid.SpectaclePrescriptionReportStorage">SpectaclePrescriptionReportStorage (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.src">src (pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.StereometricRelationshipStorage.html#pydicom.uid.StereometricRelationshipStorage">StereometricRelationshipStorage (in module pydicom.uid)</a>
 </li>
@@ -1728,6 +1830,8 @@
 </li>
       <li><a href="reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO.tell">tell() (pydicom.filebase.DicomIO method)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.test_for">test_for() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.timestamp">timestamp (pydicom.dataset.FileDataset attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM">TM (class in pydicom.valuerep)</a>
@@ -1756,6 +1860,8 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.trait_names">trait_names() (pydicom.dataset.Dataset method)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.transfer_syntax">transfer_syntax (pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
       <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.TransferSyntaxUID">TransferSyntaxUID (pydicom.fileset.FileInstance property)</a>
 </li>
       <li><a href="reference/generated/pydicom.tag.TupleTag.html#pydicom.tag.TupleTag">TupleTag() (in module pydicom.tag)</a>
@@ -1776,6 +1882,8 @@
         <li><a href="reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.UID">(pydicom.encoders.base.Encoder property)</a>
 </li>
         <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.UID">(pydicom.fileset.FileSet property)</a>
+</li>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.UID">(pydicom.pixels.decoders.base.Decoder property)</a>
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.uid.UltrasoundImageStorage.html#pydicom.uid.UltrasoundImageStorage">UltrasoundImageStorage (in module pydicom.uid)</a>
@@ -1808,7 +1916,11 @@
         <li><a href="reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset.validate">(pydicom.dataset.FileMetaDataset static method)</a>
 </li>
       </ul></li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.validate_buffer">validate_buffer() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.validate_file_meta.html#pydicom.dataset.validate_file_meta">validate_file_meta() (in module pydicom.dataset)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.validate_options">validate_options() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value">value (pydicom.dataelem.DataElement property)</a>
 
@@ -1826,10 +1938,10 @@
 </li>
       <li><a href="reference/generated/pydicom.uid.VideoMicroscopicImageStorage.html#pydicom.uid.VideoMicroscopicImageStorage">VideoMicroscopicImageStorage (in module pydicom.uid)</a>
 </li>
-      <li><a href="reference/generated/pydicom.uid.VideoPhotographicImageStorage.html#pydicom.uid.VideoPhotographicImageStorage">VideoPhotographicImageStorage (in module pydicom.uid)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.VideoPhotographicImageStorage.html#pydicom.uid.VideoPhotographicImageStorage">VideoPhotographicImageStorage (in module pydicom.uid)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.VisualAcuityMeasurementsStorage.html#pydicom.uid.VisualAcuityMeasurementsStorage">VisualAcuityMeasurementsStorage (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.VLEndoscopicImageStorage.html#pydicom.uid.VLEndoscopicImageStorage">VLEndoscopicImageStorage (in module pydicom.uid)</a>

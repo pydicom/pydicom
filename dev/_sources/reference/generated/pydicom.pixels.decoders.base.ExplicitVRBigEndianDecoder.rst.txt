@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder
+=======================================================
+
+.. currentmodule:: pydicom.pixels.decoders.base
+
+.. autodata:: ExplicitVRBigEndianDecoder

@@ -82,6 +82,11 @@
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
 </li>
@@ -130,7 +135,7 @@
 <dd class="field-odd"><p>3.0.0.dev0</p>
 </dd>
 <dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>Jan 10, 2024</p>
+<dd class="field-even"><p>Jan 15, 2024</p>
 </dd>
 </dl>
 <p id="module-pydicom">This API reference guide details the functions, modules and objects included in
@@ -237,9 +242,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a><ul>
@@ -256,6 +259,20 @@
 <li class="toctree-l1"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.misc.is_dicom.html">pydicom.misc.is_dicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.misc.size_in_bytes.html">pydicom.misc.size_in_bytes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.overlays.numpy_handler.html">pydicom.overlays.numpy_handler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.waveforms.numpy_handler.html">pydicom.waveforms.numpy_handler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a><ul>

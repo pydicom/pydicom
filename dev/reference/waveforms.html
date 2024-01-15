@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overlay Data Handlers (pydicom.overlays) &mdash; pydicom 3.0.0.dev0 documentation</title>
+  <title>Waveform Data Handlers (pydicom.waveforms) &mdash; pydicom 3.0.0.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -28,8 +28,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pydicom.overlays.numpy_handler" href="generated/pydicom.overlays.numpy_handler.html" />
-    <link rel="prev" title="Bulk Data Handlers" href="handlers.html" /> 
+    <link rel="next" title="pydicom.waveforms.numpy_handler" href="generated/pydicom.waveforms.numpy_handler.html" />
+    <link rel="prev" title="pydicom.pixels.decoders.base.Decoder" href="generated/pydicom.pixels.decoders.base.Decoder.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -79,17 +79,17 @@
 <li class="toctree-l2"><a class="reference internal" href="errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.overlays.numpy_handler.html">pydicom.overlays.numpy_handler</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.waveforms.numpy_handler.html">pydicom.waveforms.numpy_handler</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
 </li>
@@ -123,8 +123,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="handlers.html">Bulk Data Handlers</a></li>
-      <li class="breadcrumb-item active">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</li>
+      <li class="breadcrumb-item active">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -133,23 +132,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="overlay-data-handlers-pydicom-overlays">
-<span id="api-handlers-overlaydata"></span><h1>Overlay Data Handlers (<a class="reference internal" href="#module-pydicom.overlays" title="pydicom.overlays"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code></a>)<a class="headerlink" href="#overlay-data-handlers-pydicom-overlays" title="Link to this heading">¶</a></h1>
+  <section id="waveform-data-handlers-pydicom-waveforms">
+<span id="api-handlers-waveforms"></span><h1>Waveform Data Handlers (<a class="reference internal" href="#module-pydicom.waveforms" title="pydicom.waveforms"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code></a>)<a class="headerlink" href="#waveform-data-handlers-pydicom-waveforms" title="Link to this heading">¶</a></h1>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.overlays.numpy_handler.html#module-pydicom.overlays.numpy_handler" title="pydicom.overlays.numpy_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy_handler</span></code></a></p></td>
-<td><p>Use the <a class="reference external" href="https://numpy.org/">numpy</a> package to convert supported <em>Overlay Data</em> to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.waveforms.numpy_handler.html#module-pydicom.waveforms.numpy_handler" title="pydicom.waveforms.numpy_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy_handler</span></code></a></p></td>
+<td><p>Use the <a class="reference external" href="https://numpy.org/">numpy</a> package to convert supported <em>Waveform Data</em> to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pydicom.overlays"></span></section>
+<span class="target" id="module-pydicom.waveforms"></span></section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="handlers.html" class="btn btn-neutral float-left" title="Bulk Data Handlers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generated/pydicom.overlays.numpy_handler.html" class="btn btn-neutral float-right" title="pydicom.overlays.numpy_handler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/pydicom.pixels.decoders.base.Decoder.html" class="btn btn-neutral float-left" title="pydicom.pixels.decoders.base.Decoder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/pydicom.waveforms.numpy_handler.html" class="btn btn-neutral float-right" title="pydicom.waveforms.numpy_handler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

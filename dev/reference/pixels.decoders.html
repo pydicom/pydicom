@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Waveform Data Handlers (pydicom.waveforms) &mdash; pydicom 3.0.0.dev0 documentation</title>
+  <title>Pixel Data Decoders (pydicom.pixels.decoders) &mdash; pydicom 3.0.0.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -28,8 +28,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pydicom.waveforms.numpy_handler" href="generated/pydicom.waveforms.numpy_handler.html" />
-    <link rel="prev" title="pydicom.pixel_data_handlers.rle_handler" href="generated/pydicom.pixel_data_handlers.rle_handler.html" /> 
+    <link rel="next" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html" />
+    <link rel="prev" title="Pixel Data (pydicom.pixels)" href="pixels.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -79,17 +79,26 @@
 <li class="toctree-l2"><a class="reference internal" href="errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.waveforms.numpy_handler.html">pydicom.waveforms.numpy_handler</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder.html">pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.RLELosslessDecoder.html">pydicom.pixels.decoders.base.RLELosslessDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.DecodeRunner.html">pydicom.pixels.decoders.base.DecodeRunner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.decoders.base.Decoder.html">pydicom.pixels.decoders.base.Decoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
 </li>
@@ -123,8 +132,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="handlers.html">Bulk Data Handlers</a></li>
-      <li class="breadcrumb-item active">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</li>
+          <li class="breadcrumb-item"><a href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+      <li class="breadcrumb-item active">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -133,23 +142,49 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="waveform-data-handlers-pydicom-waveforms">
-<span id="api-handlers-waveforms"></span><h1>Waveform Data Handlers (<a class="reference internal" href="#module-pydicom.waveforms" title="pydicom.waveforms"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code></a>)<a class="headerlink" href="#waveform-data-handlers-pydicom-waveforms" title="Link to this heading">¶</a></h1>
+  <section id="pixel-data-decoders-pydicom-pixels-decoders">
+<span id="api-decoders"></span><h1>Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)<a class="headerlink" href="#pixel-data-decoders-pydicom-pixels-decoders" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class instances for decoding
+native and compressed (7FE0,0010) <em>Pixel Data</em>, (7FE0,0008) <em>Float Pixel Data</em> and
+(7FE0,0009) <em>Double Float Pixel Data</em></p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.waveforms.numpy_handler.html#module-pydicom.waveforms.numpy_handler" title="pydicom.waveforms.numpy_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy_handler</span></code></a></p></td>
-<td><p>Use the <a class="reference external" href="https://numpy.org/">numpy</a> package to convert supported <em>Waveform Data</em> to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExplicitVRLittleEndianDecoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> decoder for <em>Explicit VR Little Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.1</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitVRLittleEndianDecoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> decoder for <em>Implicit VR Little Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeflatedExplicitVRLittleEndianDecoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> decoder for <em>Deflated Explicit VR Little Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.1.99</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder" title="pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExplicitVRBigEndianDecoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> decoder for <em>Explicit VR Big Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.RLELosslessDecoder.html#pydicom.pixels.decoders.base.RLELosslessDecoder" title="pydicom.pixels.decoders.base.RLELosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RLELosslessDecoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> decoder for <em>RLE Lossless</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code></p></td>
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pydicom.waveforms"></span></section>
+<p>Base decoder classes used by all decoders</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner" title="pydicom.pixels.decoders.base.DecodeRunner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecodeRunner</span></code></a>(tsyntax)</p></td>
+<td><p>Class for managing the pixel data decoding process.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decoder</span></code></a>(uid)</p></td>
+<td><p>Factory class for pixel data decoders.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="generated/pydicom.pixel_data_handlers.rle_handler.html" class="btn btn-neutral float-left" title="pydicom.pixel_data_handlers.rle_handler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generated/pydicom.waveforms.numpy_handler.html" class="btn btn-neutral float-right" title="pydicom.waveforms.numpy_handler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pixels.html" class="btn btn-neutral float-left" title="Pixel Data (pydicom.pixels)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

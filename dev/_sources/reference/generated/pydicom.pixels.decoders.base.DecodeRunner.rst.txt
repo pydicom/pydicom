@@ -1,0 +1,56 @@
+﻿pydicom.pixels.decoders.base.DecodeRunner
+=========================================
+
+.. currentmodule:: pydicom.pixels.decoders.base
+
+.. autoclass:: DecodeRunner
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DecodeRunner.__init__
+      ~DecodeRunner.decode
+      ~DecodeRunner.del_option
+      ~DecodeRunner.frame_length
+      ~DecodeRunner.get_option
+      ~DecodeRunner.iter_decode
+      ~DecodeRunner.process
+      ~DecodeRunner.reshape
+      ~DecodeRunner.set_decoders
+      ~DecodeRunner.set_option
+      ~DecodeRunner.set_options
+      ~DecodeRunner.set_source
+      ~DecodeRunner.test_for
+      ~DecodeRunner.validate_buffer
+      ~DecodeRunner.validate_options
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DecodeRunner.bits_allocated
+      ~DecodeRunner.bits_stored
+      ~DecodeRunner.columns
+      ~DecodeRunner.extended_offsets
+      ~DecodeRunner.number_of_frames
+      ~DecodeRunner.options
+      ~DecodeRunner.photometric_interpretation
+      ~DecodeRunner.pixel_dtype
+      ~DecodeRunner.pixel_keyword
+      ~DecodeRunner.pixel_representation
+      ~DecodeRunner.planar_configuration
+      ~DecodeRunner.rows
+      ~DecodeRunner.samples_per_pixel
+      ~DecodeRunner.src
+      ~DecodeRunner.transfer_syntax
+   
+   

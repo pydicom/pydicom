@@ -218,7 +218,7 @@ removed, use <a class="reference internal" href="../reference/generated/pydicom.
 </ul>
 </div></blockquote>
 </li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code> module has been removed, use the <a class="reference internal" href="../reference/handlers.overlay_data.html#module-pydicom.overlays" title="pydicom.overlays"><code class="xref py py-mod docutils literal notranslate"><span class="pre">overlays</span></code></a>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code> module has been removed, use the <a class="reference internal" href="../reference/overlays.html#module-pydicom.overlays" title="pydicom.overlays"><code class="xref py py-mod docutils literal notranslate"><span class="pre">overlays</span></code></a>
 module instead</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">config.overlay_data_handlers</span></code> has been removed</p></li>
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">Dataset.fix_meta_info()</span></code>, encoding state now follows the transfer syntax
@@ -282,6 +282,16 @@ for determining frame boundaries.</p>
 </li>
 <li><p>Added the <cite>keep_deferred</cite> keyword argument to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.get_item" title="pydicom.dataset.Dataset.get_item"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.get_item()</span></code></a> to allow accessing the file offset and
 element length without having to read the element value. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1873">#1873</a>)</p></li>
+<li><p>Added the <a class="reference internal" href="../reference/pixels.html"><span class="doc">pixels</span></a> module and a new more flexible method for
+decoding pixel data via the following decoding class instances:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ExplicitVRLittleEndianDecoder</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ImplicitVRLittleEndianDecoder</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder" title="pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ExplicitVRBigEndianDecoder</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DeflatedExplicitVRLittleEndianDecoder</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.decoders.base.RLELosslessDecoder.html#pydicom.pixels.decoders.base.RLELosslessDecoder" title="pydicom.pixels.decoders.base.RLELosslessDecoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessDecoder</span></code></a></p></li>
+</ul>
+</li>
 </ul>
 </section>
 <section id="fixes">

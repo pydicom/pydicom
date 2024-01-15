@@ -28,7 +28,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Overlay Data Handlers (pydicom.overlays)" href="handlers.overlay_data.html" />
+    <link rel="next" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" href="handlers.pixel_data.html" />
     <link rel="prev" title="pydicom.fileset.DIRECTORY_RECORDERS" href="generated/pydicom.fileset.DIRECTORY_RECORDERS.html" /> 
 </head>
 
@@ -80,9 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Bulk Data Handlers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#pixel-data-utilities">Pixel Data Utilities</a><ul>
@@ -97,6 +95,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
 </li>
@@ -141,13 +144,10 @@
              
   <section id="bulk-data-handlers">
 <span id="api-handlers"></span><h1>Bulk Data Handlers<a class="headerlink" href="#bulk-data-handlers" title="Link to this heading">¶</a></h1>
-<p>Functions for handling bulk data elements such as (7FE0,0010) <em>Pixel Data</em> and
-(60xx,3000) <em>Overlay Data</em>.</p>
+<p>Functions for handling bulk data elements such as (7FE0,0010) <em>Pixel Data</em></p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 </ul>
 </div>
 </section>
@@ -189,7 +189,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="generated/pydicom.fileset.DIRECTORY_RECORDERS.html" class="btn btn-neutral float-left" title="pydicom.fileset.DIRECTORY_RECORDERS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="handlers.overlay_data.html" class="btn btn-neutral float-right" title="Overlay Data Handlers (pydicom.overlays)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="handlers.pixel_data.html" class="btn btn-neutral float-right" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

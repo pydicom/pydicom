@@ -67,6 +67,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Guides</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decoding/index.html">Pixel Data Decoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encoding/index.html">Pixel Data Encoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli/cli_guide.html">Command-line Interface Guide</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Glossary</a><ul>
@@ -120,7 +121,7 @@
 <h1>Glossary<a class="headerlink" href="#glossary" title="Link to this heading">¶</a></h1>
 <section id="image-pixel-module">
 <span id="glossary-image-pixel"></span><h2><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel Module</a><a class="headerlink" href="#image-pixel-module" title="Link to this heading">¶</a></h2>
-<dl>
+<dl id="glossary-samples-per-pixel">
 <dt><strong>(0028,0002) Samples per Pixel</strong></dt><dd><p>The number of samples per pixel, otherwise known as the number of image
 channels, components or planes. An RGB image has 3 samples per pixel (red,
 green and blue), a grayscale image has 1 sample per pixel (intensity).
@@ -128,6 +129,8 @@ The <em>Samples per Pixel</em> for all DICOM <em>Pixel Data</em> is either 1 or 
 however 4 was previously allowed.</p>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>, but may be constrained by the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
 </dd>
+</dl>
+<dl id="glossary-photometric-interpretation">
 <dt><strong>(0028,0004) Photometric Interpretation</strong></dt><dd><p>The intended interpretation of the <em>Pixel Data</em> in its <em>current form</em> in
 the dataset. For example:</p>
 <ul class="simple">
@@ -159,6 +162,8 @@ Standard.</p>
 the <em>Transfer Syntax UID</em>, and further constraints may be required by the
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
 </dd>
+</dl>
+<dl id="glossary-planar-configuration">
 <dt><strong>(0028,0006) Planar Configuration</strong></dt><dd><p>Required when <em>Samples per Pixel</em> is greater than one, this indicates the
 order of the samples used by the pixel data, as either:</p>
 <ul class="simple">
@@ -169,6 +174,24 @@ value for the second pixel: R1, G1, B1, R2, G2, B2, …, Rn, Gn, Bn.</p></li>
 </ul>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
 </dd>
+</dl>
+<dl id="glossary-number-of-frames">
+<dt><strong>(0028,0008) Number of Frames</strong></dt><dd><p>The number of frames in a multi-frame image. May not be present if the
+pixel data only has a single frame.</p>
+<p>Allowed values: must be at least <code class="docutils literal notranslate"><span class="pre">1</span></code> (if present)</p>
+</dd>
+</dl>
+<dl id="glossary-rows">
+<dt><strong>(0028,0010) Rows</strong></dt><dd><p>The number of rows in the image.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">65535</span></code></p>
+</dd>
+</dl>
+<dl id="glossary-columns">
+<dt><strong>(0028,0011) Columns</strong></dt><dd><p>The number of columns in the image.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">65535</span></code></p>
+</dd>
+</dl>
+<dl id="glossary-bits-allocated">
 <dt><strong>(0028,0100) Bits Allocated</strong></dt><dd><p>The number of bits used to actually <em>contain</em> each sample of each pixel.
 All DICOM <em>Pixel Data</em> is either 1 (for bit-packed <em>Pixel Data</em>) or more
 typically a multiple of 8 such as 8, 16 or 32, with 64 currently being the
@@ -177,6 +200,8 @@ the actual number of bits used to contain the values must be at least 16.</p>
 <p>For more detailed information refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or a multiple of 8, however many <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IODs</a> place further restrictions on what the value may be.</p>
 </dd>
+</dl>
+<dl id="glossary-bits-stored">
 <dt><strong>(0028,0101) Bits Stored</strong></dt><dd><p>The number of bits actually <em>used</em> by each sample of each
 pixel. For example, with a <em>Bits Stored</em> value of <code class="docutils literal notranslate"><span class="pre">12</span></code>, an unsigned
 grayscale image will have pixel values in the range 0 to 4095 and an
@@ -185,11 +210,15 @@ unsigned RGB image will have values in the range (R: 0 to 4095, G: 0 to
 <p>For more detailed information refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> to <em>Bits Allocated</em> (inclusive)</p>
 </dd>
+</dl>
+<dl id="glossary-high-bit">
 <dt><strong>(0028,0102) High Bit</strong></dt><dd><p>The <a class="reference external" href="https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_bit">most significant bit</a> of the
 pixel sample data and is equal to <em>Bits Stored</em> - 1, however other values
 have been allowed in past versions of the DICOM Standard.</p>
 <p>Allowed values: <em>Bits Stored</em> - 1</p>
 </dd>
+</dl>
+<dl id="glossary-pixel-representation">
 <dt><strong>(0028,0103) Pixel Representation</strong></dt><dd><p>Describes the type of pixel values, either signed (using
 <a class="reference external" href="https://en.wikipedia.org/wiki/Two%27s_complement">2’s complement</a>)
 or unsigned integers. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> indicates the <em>Pixel Data</em> contains

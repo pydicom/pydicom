@@ -1,0 +1,39 @@
+﻿pydicom.pixels.decoders.base.Decoder
+====================================
+
+.. currentmodule:: pydicom.pixels.decoders.base
+
+.. autoclass:: Decoder
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Decoder.__init__
+      ~Decoder.add_plugin
+      ~Decoder.as_array
+      ~Decoder.as_buffer
+      ~Decoder.iter_array
+      ~Decoder.iter_buffer
+      ~Decoder.remove_plugin
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Decoder.UID
+      ~Decoder.is_available
+      ~Decoder.is_encapsulated
+      ~Decoder.is_native
+      ~Decoder.missing_dependencies
+      ~Decoder.name
+   
+   
