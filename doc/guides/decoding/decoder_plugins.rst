@@ -4,6 +4,11 @@
 Pixel Data Decoder Plugins
 ==========================
 
+.. note::
+
+    This guide is intended for advanced users who need support for something
+    not provided by the :doc:`existing decoder plugins </reference/pixels.decoders>`.
+
 *Pixel Data* decoding in *pydicom* uses an :class:`~pydicom.pixels.decoders.base.Decoder`
 instance for the specific *Transfer Syntax* as a manager for plugins that
 perform the decoding work. This guide covers the requirements for those plugins
@@ -24,7 +29,8 @@ An decoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      def decoder(src: bytes, opts: DecoderOptions) -> bytearray | bytes:
+
+    def decoder(src: bytes, opts: DecodeOptions) -> bytearray | bytes:
 
   Where
 
@@ -64,7 +70,7 @@ An decoding plugin must implement three objects within the same module:
     parameters is not required, however.
 
     `opts` is a reference to the options dict used by the
-    :class:`~pydicom.pixels.base.DecodeRunner` that manages the decoding process,
+    :class:`~pydicom.pixels.decoders.base.DecodeRunner` that manages the decoding process,
     so if your decoder needs to signal that one of the option values needs to be
     modified (say for example to flag that the photometric interpretation of the
     decoded frame has already been changed from YBR_FULL to RGB by the plugin),
@@ -74,7 +80,7 @@ An decoding plugin must implement three objects within the same module:
     decoding plugins.
 
   When possible it's recommended that the decoding function return the decoded
-  pixel data as a :class:`bytearray` to minimise later memory usage.
+  pixel data as a :class:`bytearray` to minimize later memory usage.
 
 * A function named ``is_available`` with the following signature:
 
@@ -105,8 +111,9 @@ An decoding plugin must implement three objects within the same module:
 An example of the requirements of a plugin is available :gh:`here
 <pydicom/blob/main/src/pydicom/pixels/decoders/rle.py>`.
 
-Adding Plugins to an Decoder
 ============================
+Adding Plugins to a Decoder
+===========================
 
 Additional plugins can be added to an existing decoder with the
 :meth:`~pydicom.pixels.decoders.base.Decoder.add_plugin` method, which takes the

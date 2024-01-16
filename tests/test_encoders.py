@@ -1055,11 +1055,11 @@ class TestDatasetCompress:
         """Test an encoding round-trip"""
         ds = get_testdata_file("MR_small_RLE.dcm", read=True)
         arr = ds.pixel_array
+        # Setting PixelData to None frees the memory which may
+        #   sometimes be reused, causes the _pixel_id check to fail
         ds.PixelData = None
         ds._pixel_array = None
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
-        # `pixel_array` will be regenerated
-        assert ds._pixel_array is None
         assert ds.PixelData is not None
         assert np.array_equal(arr, ds.pixel_array)
 

@@ -33,6 +33,9 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    HTJ2K,
     RLELossless,
     UID,
 )
@@ -122,12 +125,13 @@ class DecodeRunner:
             decoded.
         """
         self._src: Buffer
+        self._src_type: str
         self._opts: DecodeOptions = {
             "transfer_syntax_uid": tsyntax,
             "as_rgb": True,
         }
         self._decoders: dict[str, DecodeFunction] = {}
-        self._previous: DecodeFunction
+        self._previous: tuple[str, DecodeFunction]
 
         if self.transfer_syntax.is_encapsulated:
             self.set_option("pixel_keyword", "PixelData")
@@ -195,18 +199,30 @@ class DecodeRunner:
         bytes | bytearray
             The decoded frame.
         """
+        # If self._previous is not set then this is the first frame being decoded
+        # If self._previous is set, then the previously successful decoder
+        #   has failed while decoding a frame and we are trying the other decoders
         failure_messages = []
         for name, func in self._decoders.items():
             try:
+                # Attempt to decode the frame
                 frame = func(src, self.options)
-                self._previous = func
+
+                # Decode success, if we were previously successful then
+                #   warn about the change to the new decoder
+                if hasattr(self, "_previous") and self._previous[1] != func:
+                    warn_and_log(
+                        f"The decoding plugin has changed from '{self._previous[0]}' "
+                        f"to '{name}' during the decoding process - you may get "
+                        f"inconsistent inter-frame results, consider passing "
+                        f"'decoding_plugin=\"{name}\"' instead"
+                    )
+
+                self._previous = (name, func)
                 return frame
             except Exception as exc:
                 LOGGER.exception(exc)
                 failure_messages.append(f"{name}: {exc}")
-
-        if hasattr(self, "_previous"):
-            del self._previous
 
         messages = "\n  ".join(failure_messages)
         raise RuntimeError(
@@ -219,8 +235,7 @@ class DecodeRunner:
         if name in ("transfer_syntax_uid", "pixel_keyword"):
             raise ValueError(f"Deleting '{name}' is not allowed")
 
-        if name in self._opts:
-            del self._opts[name]  # type: ignore
+        self._opts.pop(name, None)  # type: ignore[misc]
 
     @property
     def extended_offsets(
@@ -294,14 +309,18 @@ class DecodeRunner:
             number_of_frames=self.number_of_frames,
             extended_offsets=self.extended_offsets,
         )
-        for src in encoded_frames:
+        for index, src in enumerate(encoded_frames):
             # Try the previously successful decoder first (if available)
-            if func := getattr(self, "_previous", None):
+            name, func = getattr(self, "_previous", (None, None))
+            if func:
                 try:
                     yield func(src, self.options)
                     continue
                 except Exception:
-                    del self._previous
+                    LOGGER.warning(
+                        f"The decoding plugin '{name}' failed to decode the "
+                        f"frame at index {index}"
+                    )
 
             # Otherwise try all decoders
             yield self._decode_frame(src)
@@ -512,42 +531,6 @@ class DecodeRunner:
 
         raise AttributeError("No value for 'samples_per_pixel' has been set")
 
-    @property
-    def src(self) -> Buffer:
-        """Return the buffer containing the encoded pixel data."""
-        return self._src
-
-    def __str__(self) -> str:
-        """Return nice string output for the runner."""
-        s = [f"DecodeRunner for '{self.transfer_syntax.name}'"]
-        s.append("Options")
-        s.extend([f"  {name}: {value}" for name, value in self.options.items()])
-        if self._decoders:
-            s.append("Decoders")
-            s.extend([f"  {name}" for name in self._decoders])
-
-        return "\n".join(s)
-
-    def test_for(self, test: str) -> bool:
-        """Return the result of `test` as :class:`bool`."""
-        if test == "be_swap_ow":
-            if self.get_option("be_swap_ow"):
-                return True
-
-            return (
-                not self.transfer_syntax.is_little_endian
-                and self.bits_allocated // 8 == 1
-                and self.pixel_keyword == "PixelData"
-                and self.get_option("pixel_vr") == "OW"
-            )
-
-        raise ValueError(f"Unknown test '{test}'")
-
-    @property
-    def transfer_syntax(self) -> UID:
-        """Return the expected transfer syntax corresponding to the data."""
-        return self._opts["transfer_syntax_uid"]
-
     def set_decoders(self, decoders: dict[str, DecodeFunction]) -> None:
         """Set the decoders use for decoding compressed pixel data.
 
@@ -673,22 +656,58 @@ class DecodeRunner:
         else:
             self.del_option("extended_offsets")
 
+    @property
+    def src(self) -> Buffer:
+        """Return the buffer containing the encoded pixel data."""
+        return self._src
+
+    def __str__(self) -> str:
+        """Return nice string output for the runner."""
+        s = [f"DecodeRunner for '{self.transfer_syntax.name}'"]
+        s.append("Options")
+        s.extend([f"  {name}: {value}" for name, value in self.options.items()])
+        if self._decoders:
+            s.append("Decoders")
+            s.extend([f"  {name}" for name in self._decoders])
+
+        return "\n".join(s)
+
+    def test_for(self, test: str) -> bool:
+        """Return the result of `test` as :class:`bool`."""
+        if test == "be_swap_ow":
+            if self.get_option("be_swap_ow"):
+                return True
+
+            return (
+                not self.transfer_syntax.is_little_endian
+                and self.bits_allocated // 8 == 1
+                and self.pixel_keyword == "PixelData"
+                and self.get_option("pixel_vr") == "OW"
+            )
+
+        raise ValueError(f"Unknown test '{test}'")
+
+    @property
+    def transfer_syntax(self) -> UID:
+        """Return the expected transfer syntax corresponding to the data."""
+        return self._opts["transfer_syntax_uid"]
+
     def validate_buffer(self) -> None:
         """Validate the supplied buffer data."""
+        # Check that the actual length of the pixel data is as expected
         expected = self.frame_length(unit="bytes") * self.number_of_frames
         actual = len(self._src)
 
         if self.transfer_syntax.is_encapsulated:
-            if actual == expected:
+            if actual >= expected:
                 warn_and_log(
-                    "The length of the compressed pixel data matches the "
-                    "expected length for uncompressed data - check you have "
+                    "The number of bytes of compressed pixel data matches the "
+                    "expected number for uncompressed data - check you have "
                     "set the correct transfer syntax"
                 )
 
             return
 
-        # Check that the actual length of the pixel data is as expected
         # Correct for the trailing NULL byte padding for odd length data
         padded = expected + expected % 2
         if actual < padded:
@@ -700,24 +719,23 @@ class DecodeRunner:
                     "the transfer syntax may be incorrect"
                 )
         elif actual > padded:
-            # PS 3.5, Section 8.1.1
-            msg = (
-                f"The pixel data is {actual} bytes long, which indicates it "
-                f"contains {actual - expected} bytes of excess padding to "
-                "be removed"
-            )
             if self.photometric_interpretation == PI.YBR_FULL_422:
                 # PS 3.3, Annex C.7.6.3
-                ybr_length = expected / 2 * 3 + expected / 2 * 3 % 2
-                if actual >= ybr_length:
-                    msg = (
+                ybr_length = expected // 2 * 3
+                if actual >= ybr_length + ybr_length % 2:
+                    raise ValueError(
                         "The number of bytes of pixel data is a third larger "
                         f"than expected ({actual} vs {expected} bytes) which "
                         "indicates the set photometric interpretation "
                         "'YBR_FULL_422' is incorrect"
                     )
 
-            warn_and_log(msg)
+            # PS 3.5, Section 8.1.1
+            warn_and_log(
+                f"The pixel data is {actual} bytes long, which indicates it "
+                f"contains {actual - expected} bytes of excess padding to "
+                "be removed"
+            )
 
     def validate_options(self) -> None:
         """Validate the supplied options to ensure they meet minimum requirements."""
@@ -737,19 +755,35 @@ class DecodeRunner:
             raise AttributeError(f"Missing expected options: {', '.join(missing)}")
 
         if not 1 <= self.bits_allocated <= 64:
-            raise ValueError("Bits allocated must be in the range (1, 64)")
+            raise ValueError(
+                f"A bits allocated value of '{self.bits_allocated}' is invalid, "
+                "it must be in the range (1, 64)"
+            )
 
         if self.bits_allocated != 1 and self.bits_allocated % 8:
-            raise ValueError("Bits allocated must be 1 or a multiple of 8")
+            raise ValueError(
+                f"A bits allocated value of '{self.bits_allocated}' is invalid, "
+                "it must be 1 or a multiple of 8"
+            )
 
-        if not 1 <= self.bits_stored <= 64:
-            raise ValueError("Bits stored must be in the range (1, 64)")
+        if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
+            raise ValueError(
+                f"A bits stored value of '{self.bits_stored}' is invalid, it "
+                "must be in the range (1, 64) and no greater than the bits "
+                f"allocated value of {self.bits_allocated}"
+            )
 
         if not 0 < self.columns <= 2**16 - 1:
-            raise ValueError("Columns must be in the range (1, 65535)")
+            raise ValueError(
+                f"A columns value of '{self.columns}' is invalid, it must be in "
+                "the range (1, 65535)"
+            )
 
         if self.number_of_frames < 1:
-            raise ValueError("Number of frames must be greater than or equal to 1")
+            raise ValueError(
+                f"A number of frames value of '{self.number_of_frames}' is "
+                "invalid, it must be greater than or equal to 1"
+            )
 
         try:
             PI[self.photometric_interpretation]
@@ -771,20 +805,32 @@ class DecodeRunner:
                 raise AttributeError("Missing expected option: pixel_representation")
 
             if self.pixel_representation not in (0, 1):
-                raise ValueError("Pixel representation must be 0 or 1")
+                raise ValueError(
+                    f"A pixel representation value of '{self.pixel_representation}' "
+                    "is invalid, it must be 0 or 1"
+                )
 
         if not 0 < self.rows <= 2**16 - 1:
-            raise ValueError("Rows must be in the range (1, 65535)")
+            raise ValueError(
+                f"A rows value of '{self.rows}' is invalid, it must be in the "
+                "range (1, 65535)"
+            )
 
-        if self.samples_per_pixel < 1:
-            raise ValueError("Samples per pixel must be greater than or equal to 1")
+        if self.samples_per_pixel not in (1, 3):
+            raise ValueError(
+                f"A samples per pixel value of '{self.samples_per_pixel}' is "
+                "invalid, it must be 1 or 3"
+            )
 
-        if self.samples_per_pixel > 1:
+        if self.samples_per_pixel == 3:
             if self.get_option("planar_configuration") is None:
                 raise AttributeError("Missing expected option: planar_configuration")
 
             if self.planar_configuration not in (0, 1):
-                raise ValueError("Planar configuration must be 0 or 1")
+                raise ValueError(
+                    f"A planar configuration value of '{self.planar_configuration}' "
+                    "is invalid, it must be 0 or 1"
+                )
 
         if self.extended_offsets:
             if len(self.extended_offsets[0]) != len(self.extended_offsets[1]):
@@ -862,10 +908,6 @@ class Decoder:
                 f"Plugin '{label}' does not support '{self.UID.name}'",
             )
             self._unavailable[label] = msg
-
-    def add_plugins(self, plugins: list[str, tuple[str, str]]) -> None:
-        for label, import_path in plugins:
-            self.add_plugin(label, import_path)
 
     def as_array(
         self,
@@ -1078,11 +1120,29 @@ class Decoder:
 
         # Return all frames
         # Preallocate container array for the frames
+        bytes_per_frame = runner.frame_length(unit="bytes")
         pixels_per_frame = runner.frame_length(unit="pixels")
         arr = np.empty(pixels_per_frame * runner.number_of_frames, dtype=dtype)
-        for idx, frame in enumerate(runner.iter_decode()):
+        frame_generator = runner.iter_decode()
+        for idx in range(runner.number_of_frames):
+            frame = next(frame_generator)
             start = idx * pixels_per_frame
             arr[start : start + pixels_per_frame] = np.frombuffer(frame, dtype=dtype)
+
+        # Check to see if we have any more frames available
+        #   Should only apply to JPEG transfer syntaxes
+        excess = []
+        for frame in frame_generator:
+            if len(frame) == bytes_per_frame:
+                excess.append(np.frombuffer(frame, dtype))
+                runner.set_option("number_of_frames", runner.number_of_frames + 1)
+
+        if excess:
+            warn_and_log(
+                "More frames have been found in the encapsulated pixel data "
+                "than expected from the supplied number of frames"
+            )
+            arr = np.concatenate([arr, *excess])
 
         return arr
 
@@ -1176,7 +1236,7 @@ class Decoder:
             if index is None:
                 length_pixels *= runner.number_of_frames
 
-            return np.unpackbits(arr, bitorder="little")[:length_pixels]
+            return np.unpackbits(arr, bitorder="little", count=length_pixels)
 
         # Expand YBR_FULL_422 (if required)
         if runner.photometric_interpretation == PI.YBR_FULL_422:
@@ -1281,7 +1341,7 @@ class Decoder:
             transfer syntaxes:
 
             * `view_only`: :class:`bool` - if ``True`` then return a
-            :class:`memoryview` on the original buffer (default ``False``).
+              :class:`memoryview` on the original buffer (default ``False``).
 
             Options for the decoding plugin(s) may also be supplied. See the
             :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
@@ -1299,7 +1359,7 @@ class Decoder:
 
             8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
             be returned as-is and may need byte-swapping. To facilitate this
-            an extra byte before the expected start (for and odd `index`) or after
+            an extra byte before the expected start (for an odd `index`) or after
             the expected end (for an even `index`) is returned if the frame contains
             an odd number of pixels.
         """
@@ -1412,9 +1472,11 @@ class Decoder:
             return frame
 
         # Return all frames
-        # Preallocate container array for the frames
+        # Preallocate buffer for the frames
         buffer = bytearray(length_bytes * runner.number_of_frames)
-        for index, frame in enumerate(runner.iter_decode()):
+        frame_generator = runner.iter_decode()
+        for index in range(runner.number_of_frames):
+            frame = next(frame_generator)
             start = index * length_bytes
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
@@ -1423,6 +1485,21 @@ class Decoder:
                 )
 
             buffer[start : start + length_bytes] = frame
+
+        # Check to see if we have any more frames available
+        #   Should only apply to JPEG transfer syntaxes
+        excess = bytearray()
+        for frame in frame_generator:
+            if len(frame) == length_bytes:
+                excess.extend(frame)
+                runner.set_option("number_of_frames", runner.number_of_frames + 1)
+
+        if excess:
+            warn_and_log(
+                "More frames have been found in the encapsulated pixel data "
+                "than expected from the supplied number of frames"
+            )
+            buffer.extend(excess)
 
         return buffer
 
@@ -1696,7 +1773,7 @@ class Decoder:
             transfer syntaxes:
 
             * `view_only`: :class:`bool` - if ``True`` then yield a
-            :class:`memoryview` on the original buffer (default ``False``).
+              :class:`memoryview` on the original buffer (default ``False``).
 
             Options for the decoding plugin(s) may also be supplied. See the
             :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
@@ -1714,7 +1791,7 @@ class Decoder:
 
             8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
             be yielded as-is and may need byte-swapping. To facilitate this
-            an extra byte before the expected start (for and odd `index`) or after
+            an extra byte before the expected start (for an odd `index`) or after
             the expected end (for an even `index`) is yielded if the frame contains
             an odd number of pixels.
         """
@@ -1815,6 +1892,20 @@ class Decoder:
         return self._uid
 
     def _validate_decoders(self, plugin: str = "") -> dict[str, DecodeFunction]:
+        """Return available decoders.
+
+        Parameters
+        ----------
+        plugin : str, optional
+            If not used (default) then return all available plugins, otherwise
+            only return the plugin with a matching name (if it's available).
+
+        Returns
+        -------
+        dict[str, DecodeFunction]
+            A dict of available {plugin name: decode function} that can be used
+            to decode the corresponding encoded pixel data.
+        """
         if plugin:
             if plugin in self._available:
                 return {plugin: self._available[plugin]}
@@ -1863,6 +1954,7 @@ JPEGBaseline8BitDecoder.add_plugins(
         ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
     ]
 )
+
 JPEGExtended12BitDecoder = Decoder(JPEGExtended12Bit)
 JPEGExtended12BitDecoder.add_plugins(
     [
@@ -1871,6 +1963,7 @@ JPEGExtended12BitDecoder.add_plugins(
         ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
     ]
 )
+
 JPEGLosslessDecoder = Decoder(JPEGLossless)
 JPEGLosslessDecoder.add_plugins(
     [
@@ -1878,6 +1971,7 @@ JPEGLosslessDecoder.add_plugins(
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
     ]
 )
+
 JPEGLosslessSV1Decoder = Decoder(JPEGLosslessSV1)
 JPEGLosslessSV1Decoder.add_plugins(
     [
@@ -1885,6 +1979,7 @@ JPEGLosslessSV1Decoder.add_plugins(
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
     ]
 )
+
 JPEGLSLosslessDecoder = Decoder(JPEGLSLossless)
 JPEGLSLosslessDecoder.add_plugins(
     [
@@ -1892,6 +1987,7 @@ JPEGLSLosslessDecoder.add_plugins(
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
     ]
 )
+
 JPEGLSNearLosslessDecoder = Decoder(JPEGLSNearLossless)
 JPEGLSNearLosslessDecoder.add_plugins(
     [
@@ -1899,6 +1995,7 @@ JPEGLSNearLosslessDecoder.add_plugins(
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
     ]
 )
+
 JPEG2000LosslessDecoder = Decoder(JPEG2000Lossless)
 JPEG2000LosslessDecoder.add_plugins(
     [
@@ -1907,6 +2004,7 @@ JPEG2000LosslessDecoder.add_plugins(
         ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
     ]
 )
+
 JPEG2000Decoder = Decoder(JPEG2000)
 JPEG2000Decoder.add_plugins(
     [
@@ -1915,6 +2013,28 @@ JPEG2000Decoder.add_plugins(
         ("pillow", ("pydicom.pixels.decoders.pillow", "_decode_frame")),
     ]
 )
+
+HTJ2KLosslessDecoder = Decoder(HTJ2KLossless)
+HTJ2KLosslessDecoder.add_plugins(
+    [
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+
+HTJ2KLosslessRPCLDecoder = Decoder(HTJ2KLosslessRPCL)
+HTJ2KLosslessRPCLDecoder.add_plugins(
+    [
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+
+HTJ2KDecoder = Decoder(HTJ2K)
+HTJ2KDecoder.add_plugins(
+    [
+        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+    ]
+)
+
 RLELosslessDecoder = Decoder(RLELossless)
 RLELosslessDecoder.add_plugins(
     [

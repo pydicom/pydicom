@@ -84,6 +84,10 @@ from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
+# FloatPixelData, DoubleFloatPixelData, PixelData
+PIXEL_KEYWORDS = {0x7FE00008, 0x7FE00009, 0x7FE00010}
+
+
 class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
 
@@ -647,6 +651,11 @@ class Dataset:
         tag = cast(BaseTag, tag_for_keyword(name))
         if tag is not None and tag in self._dict:
             del self._dict[tag]
+
+            # Deleting pixel data resets the stored array
+            if tag in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -693,16 +702,30 @@ class Dataset:
                 # deleted - will be re-created on next access
                 if self._private_blocks and BaseTag(tag).is_private_creator:
                     self._private_blocks = {}
+
+                if tag in PIXEL_KEYWORDS:
+                    self._pixel_array = None
+                    self._pixel_id = {}
         elif isinstance(key, BaseTag):
             del self._dict[key]
             if self._private_blocks and key.is_private_creator:
                 self._private_blocks = {}
+
+            # Deleting pixel data resets the stored array
+            if key in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
         else:
             # If not a standard tag, than convert to Tag and try again
             tag = Tag(key)
             del self._dict[tag]
             if self._private_blocks and tag.is_private_creator:
                 self._private_blocks = {}
+
+            # Deleting pixel data resets the stored array
+            if tag in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
 
     def __dir__(self) -> list[str]:
         """Return a list of methods, properties, attributes and element
@@ -1650,7 +1673,14 @@ class Dataset:
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != get_image_pixel_ids(self):
+        elif self._pixel_array is None:
+            already_have = False
+
+        # Chcking `_pixel_id` may sometimes give a false result if the pixel
+        #   data memory has been freed (such as with ds.PixelData = None)
+        #   prior to setting a new value; Python may reuse that freed memory
+        #   for the new value and therefore give the same `id()` value
+        if self._pixel_id != get_image_pixel_ids(self):
             already_have = False
 
         if already_have:
@@ -1925,6 +1955,8 @@ class Dataset:
 
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self["PixelData"].is_undefined_length = True
+        self._pixel_array = None
+        self._pixel_id = {}
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, "file_meta"):
@@ -2519,6 +2551,11 @@ class Dataset:
                     elem = DataElement_from_raw(elem, self._character_set, self)
                 elem.private_creator = self[private_creator_tag].value
 
+        # Changing pixel data resets the stored array
+        if elem_tag in PIXEL_KEYWORDS:
+            self._pixel_array = None
+            self._pixel_id = {}
+
         self._dict[elem_tag] = elem
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
@@ -2936,7 +2973,7 @@ class FileDataset(Dataset):
             * :class:`str` or path: the full path to the dataset file
             * file-like: a file-like object in "rb" mode
             * readable buffer: an object with ``read()``, ``tell()`` and
-            ``seek()`` methods such as :class:`io.BytesIO`.
+              ``seek()`` methods such as :class:`io.BytesIO`.
         dataset : Dataset or dict
             Some form of dictionary, usually a :class:`Dataset` returned from
             :func:`~pydicom.filereader.dcmread`.

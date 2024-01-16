@@ -436,7 +436,8 @@ class TestDecodeRunner:
     def test_validate_buffer(self):
         """Tests for validate_buffer()"""
         runner = DecodeRunner(RLELossless)
-        runner.set_source(b"\x00\x00\x00")
+        # Padded
+        runner.set_source(b"\x01\x02\x03\x00")
         runner.set_option("bits_allocated", 8)
         runner.set_option("rows", 1)
         runner.set_option("columns", 1)
@@ -445,10 +446,15 @@ class TestDecodeRunner:
         runner.set_option("number_of_frames", 1)
 
         msg = (
-            "The length of the compressed pixel data matches the "
-            "expected length for uncompressed data - check you have "
+            "The number of bytes of compressed pixel data matches the "
+            "expected number for uncompressed data - check you have "
             "set the correct transfer syntax"
         )
+        with pytest.warns(UserWarning, match=msg):
+            runner.validate_buffer()
+
+        # Unpadded
+        runner.set_source(b"\x01\x02\x03")
         with pytest.warns(UserWarning, match=msg):
             runner.validate_buffer()
 
@@ -492,7 +498,7 @@ class TestDecodeRunner:
             "the set photometric interpretation 'YBR_FULL_422' is "
             "incorrect"
         )
-        with pytest.warns(UserWarning, match=msg):
+        with pytest.raises(ValueError, match=msg):
             runner.validate_buffer()
 
     def test_validate_options(self):
@@ -517,27 +523,48 @@ class TestDecodeRunner:
         runner.set_option("samples_per_pixel", -1)
         runner.set_option("extended_offsets", ([1, 2], [1]))
 
-        msg = r"Bits allocated must be in the range \(1, 64\)"
+        msg = (
+            "A bits allocated value of '-1' is invalid, it must be in the "
+            r"range \(1, 64\)"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_allocated", 4)
-        msg = r"Bits allocated must be 1 or a multiple of 8"
+        msg = (
+            "A bits allocated value of '4' is invalid, it must be 1 or a multiple of 8"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_allocated", 8)
-        msg = r"Bits stored must be in the range \(1, 64\)"
+        msg = (
+            "A bits stored value of '-1' is invalid, it must be in the range "
+            r"\(1, 64\) and no greater than the bits allocated value of 8"
+        )
+        with pytest.raises(ValueError, match=msg):
+            runner.validate_options()
+
+        runner.set_option("bits_stored", 10)
+        msg = (
+            "A bits stored value of '10' is invalid, it must be in the range "
+            r"\(1, 64\) and no greater than the bits allocated value of 8"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("bits_stored", 8)
-        msg = r"Columns must be in the range \(1, 65535\)"
+        msg = (
+            r"A columns value of '-1' is invalid, it must be in the range \(1, 65535\)"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("columns", 8)
-        msg = r"Number of frames must be greater than or equal to 1"
+        msg = (
+            "A number of frames value of '-1' is invalid, it must be greater "
+            "than or equal to 1"
+        )
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
@@ -557,17 +584,17 @@ class TestDecodeRunner:
             runner.validate_options()
 
         runner.set_option("pixel_representation", -1)
-        msg = r"Pixel representation must be 0 or 1"
+        msg = "A pixel representation value of '-1' is invalid, it must be 0 or 1"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("pixel_representation", 0)
-        msg = r"Rows must be in the range \(1, 65535\)"
+        msg = r"A rows value of '-1' is invalid, it must be in the range \(1, 65535\)"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
         runner.set_option("rows", 10)
-        msg = r"Samples per pixel must be greater than or equal to 1"
+        msg = "A samples per pixel value of '-1' is invalid, it must be 1 or 3"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
@@ -577,7 +604,7 @@ class TestDecodeRunner:
             runner.validate_options()
 
         runner.set_option("planar_configuration", -1)
-        msg = r"Planar configuration must be 0 or 1"
+        msg = "A planar configuration value of '-1' is invalid, it must be 0 or 1"
         with pytest.raises(ValueError, match=msg):
             runner.validate_options()
 
@@ -599,10 +626,10 @@ class TestDecodeRunner:
             runner.decode(0)
 
         decoder = get_decoder(RLELossless)
-        runner.set_decoders(decoder._validate_decoders(""))
+        runner.set_decoders(decoder._validate_decoders())
         buffer = runner.decode(0)
 
-        assert runner._previous == runner._decoders["pydicom"]
+        assert runner._previous[1] == runner._decoders["pydicom"]
 
         arr = np.frombuffer(buffer, dtype=runner.pixel_dtype)
         arr = runner.reshape(arr, as_frame=True)
@@ -620,8 +647,6 @@ class TestDecodeRunner:
             raise AttributeError("Also bad, not helpful")
 
         # Check that exception messages on decoder failure
-        # Check that the _previous attribute get's deleted on failure by all
-        #   decoders
         # Need to update the attr to avoid resetting _previous
         runner._decoders = {"foo": decode1, "bar": decode2}
         assert hasattr(runner, "_previous")
@@ -632,10 +657,8 @@ class TestDecodeRunner:
         with pytest.raises(RuntimeError, match=msg):
             runner.decode(0)
 
-        assert not hasattr(runner, "_previous")
-
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-    def test_iter_decode(self):
+    def test_iter_decode(self, caplog):
         """Test iter_decode()"""
         runner = DecodeRunner(RLELossless)
         runner.set_source(RLE_16_1_10F.ds)
@@ -649,7 +672,7 @@ class TestDecodeRunner:
         data = runner.iter_decode()
         buffer = next(data)
 
-        assert runner._previous == runner._decoders["pydicom"]
+        assert runner._previous[1] == runner._decoders["pydicom"]
 
         arr = np.frombuffer(buffer, dtype=runner.pixel_dtype)
         arr = runner.reshape(arr, as_frame=True)
@@ -676,10 +699,40 @@ class TestDecodeRunner:
         assert not hasattr(runner, "_previous")
         data = runner.iter_decode()
         assert b"\x00\x00" == next(data)
-        assert runner._previous == foo
+        assert runner._previous[1] == foo
         raise_exc[0] = True
         pytest.raises(RuntimeError, next, data)
-        assert not hasattr(runner, "_previous")
+
+        # Test decode failure during
+        raise_exc = [False]
+
+        def decode_partial(src, opts):
+            if raise_exc[0]:
+                raise ValueError("Whoops")
+
+            return b"\x00\x00\x00\x00"
+
+        def decode_all(src, opts):
+            return b"\x03\x02\x01\x00"
+
+        runner._src = encapsulate([b"\x00\x01\x02\x03"] * 10)
+        runner.set_decoders({"foo": decode_partial})
+        runner.set_decoders({"foo": decode_partial, "bar": decode_all})
+        frame_generator = runner.iter_decode()
+        assert next(frame_generator) == b"\x00\x00\x00\x00"
+        raise_exc = [True]
+        msg = (
+            "The decoding plugin has changed from 'foo' to 'bar' during the "
+            "decoding process - you may get inconsistent inter-frame results, "
+            "consider passing 'decoding_plugin=\"bar\"' instead"
+        )
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            with pytest.warns(UserWarning, match=msg):
+                assert next(frame_generator) == b"\x03\x02\x01\x00"
+
+            assert (
+                "The decoding plugin 'foo' failed to decode the frame at index 1"
+            ) in caplog.text
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -1372,6 +1425,26 @@ class TestDecoder_Array:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
+    def test_encapsulated_excess_frames(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames.append(frames[-1])
+        src = encapsulate(frames)
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "More frames have been found in the encapsulated pixel data than "
+            "expected from the supplied number of frames"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = decoder.as_array(src, **runner.options)
+
+        assert arr.shape == (11, 64, 64)
+
     def test_processing_colorspace(self):
         """Test the processing colorspace options."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -1733,6 +1806,26 @@ class TestDecoder_Buffer:
         )
         with pytest.raises(ValueError, match=msg):
             decoder.as_buffer(reference.ds, index=9)
+
+    def test_encapsulated_excess_frames(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames.append(frames[-1])
+        src = encapsulate(frames)
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "More frames have been found in the encapsulated pixel data than "
+            "expected from the supplied number of frames"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            buffer = decoder.as_buffer(src, **runner.options)
+
+        assert len(buffer) == 11 * 64 * 64 * 2
 
     def test_expb_ow_index_invalid_raises(self, caplog):
         """Test invalid index with BE swapped OW raises"""

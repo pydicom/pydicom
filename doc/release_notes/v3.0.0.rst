@@ -158,14 +158,35 @@ Enhancements
   <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
   element length without having to read the element value. (:issue:`1873`)
 * Added the :doc:`pixels</reference/pixels>` module and a new more flexible method for
-  decoding pixel data via the following decoding class instances:
+  decoding pixel data via the Decoder factory class:
 
   * :attr:`~pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder`
   * :attr:`~pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder`
   * :attr:`~pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder`
   * :attr:`~pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGExtended12BitDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLSLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEG2000LosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEG2000Decoder`
+  * :attr:`~pydicom.pixels.decoders.base.HTJ2KLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.HTJ2KDecoder`
   * :attr:`~pydicom.pixels.decoders.base.RLELosslessDecoder`
 
+  The new decoding backend supports the following:
+
+  * Returning a view over the original pixel data buffer (:issue:`746`)
+  * Retrieving specific frames (:issue:`1263`, :issue:`1243`)
+  * Returning RGB pixel data by default for JPEG (:issue:`1781`, :issue:`1133` and many others)
+  * Returning excess frames for JPEG when the *Number of Frames* is incorrect (:issue:`1666`)
+  * Returning the decoded pixel data as either a NumPy ndarray or buffer-like object
+  * Iterating through either all or specific frames
+
+* Support has been added for decoding HTJ2K transfer syntaxes (:issue:`1848`)
 
 Fixes
 -----
@@ -186,6 +207,12 @@ Fixes
   explicit and implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`)
 * Fixed the ``jpeg_ls``, ``pillow`` and ``rle`` pixel data handlers not working
   correctly when a frame is spread across multiple fragments (:issue:`1774`)
+* Added mitigation for a rare case where clearing the pixel data value prior
+  to updating it may sometimes result in :attr:`~pydicom.dataset.Dataset.pixel_array`
+  returning the previous array instead of creating a new one (:issue:`1983`)
+* Fixed a ``KeyError`` when comparing codes with one of the codes having
+  ``scheme_designator`` set to ``SRT`` but not being included in the ``SRT``
+  to ``SCT`` code mapping (:issue:`1994`)
 
 
 Deprecations
