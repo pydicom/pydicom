@@ -102,7 +102,7 @@ class DecodeOptions(TypedDict, total=False):
     force_ybr: bool  # Force RGB to YBR conversion
 
 
-DecodeFunction = Callable[[bytes, DecodeOptions], bytes | bytearray]
+DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
 ProcessingFunction = Callable[["np.ndarray", "DecodeRunner"], "np.ndarray"]
 
 
@@ -139,7 +139,9 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     return arr
 
 
-def _apply_j2k_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
+def _apply_j2k_sign_correction(
+    arr: "np.ndarray", runner: "DecodeRunner"
+) -> "np.ndarray":
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
 
     # Example
@@ -283,8 +285,7 @@ class DecodeRunner:
         if self.transfer_syntax in JPEG2000TransferSyntaxes:
             info = get_j2k_parameters(src)
             self.set_option(
-                "j2k_is_signed",
-                info.get("is_signed", self.pixel_representation)
+                "j2k_is_signed", info.get("is_signed", self.pixel_representation)
             )
             self.set_option(
                 "j2k_precision",
@@ -955,7 +956,7 @@ class Decoder:
             The label to use for the plugin, should be unique for the decoder.
         import_path : tuple[str, str]
             The module import path and the decoding function's name (e.g.
-            ``('pydicom.pixels.decoders.pylibjpeg', 'decode_pixel_data')``).
+            ``('pydicom.pixels.decoders.pylibjpeg', '_decode_frame')``).
 
         Raises
         ------
@@ -983,7 +984,26 @@ class Decoder:
             )
             self._unavailable[label] = msg
 
-    def add_plugins(self, plugins: tuple[str, tuple[str, str]]) -> None:
+    def add_plugins(self, plugins: list[tuple[str, tuple[str, str]]]) -> None:
+        """Add multiple decoding plugins to the decoder.
+
+        The requirements for decoding plugins are available
+        :doc:`here</guides/decoding/decoder_plugins>`.
+
+        .. warning::
+
+            This method is not thread-safe.
+
+        Parameters
+        ----------
+        list[tuple[str, tuple[str, str]]]
+            A list of [label, import path] for the plugins, where:
+
+            * `label` is the label to use for the plugin, which should be unique
+              for the decoder.
+            * `import path` is the module import path and the decoding function's
+              name (e.g. ``('pydicom.pixels.decoders.pylibjpeg', '_decode_frame')``).
+        """
         for label, import_path in plugins:
             self.add_plugin(label, import_path)
 

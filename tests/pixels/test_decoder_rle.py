@@ -48,7 +48,9 @@ class TestAsArray:
     def test_reference_index(self, reference):
         """Test by index against the reference data for RLE lossless"""
         for index in range(reference.number_of_frames):
-            arr = self.decoder.as_array(reference.ds, raw=True, index=index, decoding_plugin="pydicom")
+            arr = self.decoder.as_array(
+                reference.ds, raw=True, index=index, decoding_plugin="pydicom"
+            )
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
@@ -62,7 +64,9 @@ class TestAsArray:
         """Test interpreting segment order as little endian."""
         ds = RLE_16_1_1F.ds
 
-        arr = self.decoder.as_array(ds, rle_segment_order="<", decoding_plugin="pydicom")
+        arr = self.decoder.as_array(
+            ds, rle_segment_order="<", decoding_plugin="pydicom"
+        )
         assert arr.dtype == RLE_16_1_1F.dtype
         assert arr.shape == RLE_16_1_1F.shape
         assert tuple(arr[0, 31:34]) == (-23039, 16129, 26881)
@@ -76,7 +80,9 @@ class TestAsArray:
         # Issue 1666
         reference = RLE_16_1_10F
         # Override NumberOfFrames to 9 and try and get the 10th frame
-        arr = self.decoder.as_array(reference.ds, number_of_frames=9, index=9, decoding_plugin="pydicom")
+        arr = self.decoder.as_array(
+            reference.ds, number_of_frames=9, index=9, decoding_plugin="pydicom"
+        )
         reference.test(arr, index=9)
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
@@ -93,7 +99,9 @@ class TestIterArray:
     @pytest.mark.parametrize("reference", RLE_REFERENCE)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
-        func = self.decoder.iter_array(reference.ds, raw=True, decoding_plugin="pydicom")
+        func = self.decoder.iter_array(
+            reference.ds, raw=True, decoding_plugin="pydicom"
+        )
         for index, arr in enumerate(func):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
@@ -107,7 +115,9 @@ class TestIterArray:
     def test_indices(self):
         """Test the `indices` argument."""
         indices = [0, 4, 9]
-        func = self.decoder.iter_array(RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom")
+        func = self.decoder.iter_array(
+            RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom"
+        )
         for idx, arr in enumerate(func):
             RLE_16_1_10F.test(arr, index=indices[idx])
             assert arr.dtype == RLE_16_1_10F.dtype
@@ -164,8 +174,12 @@ class TestAsBuffer:
         """Test by `index` for RLE lossless"""
         ds = reference.ds
         for index in range(reference.number_of_frames):
-            arr = self.decoder.as_array(reference.ds, raw=True, index=index, decoding_plugin="pydicom")
-            buffer = self.decoder.as_buffer(reference.ds, index=index, decoding_plugin="pydicom")
+            arr = self.decoder.as_array(
+                reference.ds, raw=True, index=index, decoding_plugin="pydicom"
+            )
+            buffer = self.decoder.as_buffer(
+                reference.ds, index=index, decoding_plugin="pydicom"
+            )
 
             if ds.SamplesPerPixel == 1:
                 assert arr.tobytes() == buffer
@@ -195,8 +209,12 @@ class TestIterBuffer:
     @pytest.mark.parametrize("reference", RLE_REFERENCE)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
-        arr_func = self.decoder.iter_array(reference.ds, raw=True, decoding_plugin="pydicom")
-        buf_func = self.decoder.iter_buffer(reference.ds, raw=True, decoding_plugin="pydicom")
+        arr_func = self.decoder.iter_array(
+            reference.ds, raw=True, decoding_plugin="pydicom"
+        )
+        buf_func = self.decoder.iter_buffer(
+            reference.ds, raw=True, decoding_plugin="pydicom"
+        )
 
         for arr, buf in zip(arr_func, buf_func):
             if reference.ds.SamplesPerPixel == 3:
@@ -220,8 +238,12 @@ class TestIterBuffer:
     def test_indices(self):
         """Test the `indices` argument."""
         indices = [0, 4, 9]
-        arr_func = self.decoder.iter_array(RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom")
-        buf_func = self.decoder.iter_buffer(RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom")
+        arr_func = self.decoder.iter_array(
+            RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom"
+        )
+        buf_func = self.decoder.iter_buffer(
+            RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom"
+        )
         for idx, (arr, buf) in enumerate(zip(arr_func, buf_func)):
             assert arr.tobytes() == buf
 

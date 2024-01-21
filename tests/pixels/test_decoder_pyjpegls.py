@@ -25,7 +25,6 @@ SKIP_TEST = not HAVE_NP or not HAVE_PYJPEGLS
 
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
 class TestPyJpegLSDecoder:
-
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSLossless])
     def test_jls_lossless(self, reference):
         """Test the decoder with JPEGLSLossless."""

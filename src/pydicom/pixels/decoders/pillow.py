@@ -6,8 +6,7 @@ This module is not intended to be used directly.
 """
 
 from io import BytesIO
-from typing import TYPE_CHECKING
-import warnings
+from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.utils import _passes_version_check
@@ -46,10 +45,10 @@ def is_available(uid: str) -> bool:
         return False
 
     if uid in _LIBJPEG_SYNTAXES:
-        return features.check_codec("jpg")
+        return bool(features.check_codec("jpg"))
 
     if uid in _OPENJPEG_SYNTAXES:
-        return features.check_codec("jpg_2000") and HAVE_NP
+        return bool(features.check_codec("jpg_2000")) and HAVE_NP
 
     return False
 
@@ -76,7 +75,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
             if "adobe_transform" not in image.info:
                 image.draft("YCbCr", image.size)
 
-        return image.tobytes()
+        return cast(bytes, image.tobytes())
 
     # JPEG 2000
     # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
@@ -99,17 +98,17 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         arr = arr.view(dtype)
         # Level-shift to match the unsigned integers range
         #   e.g. [0, 127, -128, -1] -> [-128, -1, 0, 127]
-        arr -= 2**(runner.bits_allocated - 1)
+        arr -= 2 ** (runner.bits_allocated - 1)
 
     if bit_shift := (runner.bits_allocated - precision):
         # Bit shift to undo the upscaling of N-bit to 8- or 16-bit
         np.right_shift(arr, bit_shift, out=arr)
 
     # pillow returns YBR_ICT and YBR_RCT as RGB
-    if (
-        tsyntax in _OPENJPEG_SYNTAXES
-        and runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT)
+    if tsyntax in _OPENJPEG_SYNTAXES and runner.photometric_interpretation in (
+        PI.YBR_ICT,
+        PI.YBR_RCT,
     ):
         runner.set_option("photometric_interpretation", PI.RGB)
 
-    return arr.tobytes()
+    return cast(bytes, arr.tobytes())

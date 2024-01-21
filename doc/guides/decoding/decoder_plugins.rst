@@ -41,29 +41,31 @@ An decoding plugin must implement three objects within the same module:
 
   At a minimum the following decoding options should be available:
 
-  * `transfer_syntax_uid`: :class:`~pydicom.uid.UID` - the *Transfer
+  * ``transfer_syntax_uid``: :class:`~pydicom.uid.UID` - the *Transfer
     Syntax UID* of the encoded data.
-  * `rows`: :class:`int` - the number of rows of pixels in decoded data.
-  * `columns`: :class:`int` -  the number of columns of pixels in the
+  * ``rows``: :class:`int` - the number of rows of pixels in decoded data.
+  * ``columns``: :class:`int` -  the number of columns of pixels in the
     decoded data.
-  * `samples_per_pixel`: :class:`int` - the number of samples used per
+  * ``samples_per_pixel``: :class:`int` - the number of samples used per
     pixel, e.g. 1 for grayscale images or 3 for RGB.
-  * `number_of_frames`: :class:`int` - the number of image frames
+  * ``number_of_frames``: :class:`int` - the number of image frames
     contained in `src`
-  * `bits_allocated`: :class:`int` - the number of bits used to contain
+  * ``bits_allocated``: :class:`int` - the number of bits used to contain
     each pixel in `src`, should be a multiple of 8.
-  * `bits_stored`: :class:`int` - the number of bits actually used by
+  * ``bits_stored``: :class:`int` - the number of bits actually used by
     each pixel in `src`, e.g. 12-bit pixel data (range 0 to 4095) will be
     contained by 16-bits (range 0 to 65535).
-  * `photometric_interpretation`: :class:`str` - the color space
+  * ``photometric_interpretation``: :class:`str` - the color space
     of the encoded data, such as ``'YBR_FULL'``
-  * `pixel_representation`: :class:`int` - required when
+  * ``pixel_keyword``: :class:`str` - one of ``"PixelData"``, ``"FloatPixelData"``,
+    ``"DoubleFloatPixelData"``.
+
+  And conditionally contains:
+
+  * ``pixel_representation``: :class:`int` - required when
     `pixel_keyword` is ``"PixelData"``, ``0`` for unsigned integers,
     ``1`` for signed.
-
-  And conditionally contain:
-
-  * `planar_configuration`: :class:`int` - present when `samples_per_pixel`
+  * ``planar_configuration``: :class:`int` - required when ``samples_per_pixel``
       > 1, ``0`` for color-by-pixel, ``1`` for color-by-plane.
 
   If your decoder needs to signal that one of the decoding option values needs

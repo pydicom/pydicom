@@ -4,6 +4,7 @@
 
 This module is not intended to be used directly.
 """
+from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.utils import _passes_version_check
@@ -29,4 +30,4 @@ def is_available(uid: str) -> bool:
 
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     """Return the decoded image data in `src` as a :class:`bytearray`."""
-    return jpeg_ls.decode_from_buffer(src)
+    return cast(bytearray, jpeg_ls.decode_from_buffer(src))

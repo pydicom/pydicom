@@ -1253,6 +1253,7 @@ PIXEL_REFERENCE[RLELossless] = [
 # JPGL: JPEGLossless
 # JPGS: JPEGLosslessSV1
 
+
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 # 0: JPGB, (8, 8), (1, 3, 3, 3), OB, YBR_FULL, 0
 def test(ref, arr, **kwargs):
@@ -1542,15 +1543,14 @@ PIXEL_REFERENCE[JPEGLosslessSV1] = [JPGS_08_08_1_0_1F, JPGS_16_16_1_1_1F_M2]
 # JLSN: JPEGLSNearLossless
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 
+
 # 0: JLSL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     # pylibjpeg, pyjpegls
     assert (422, 319, 361) == tuple(arr[0, 31:34])
     assert (366, 363, 322) == tuple(arr[31, :3])
     assert (1369, 1129, 862) == tuple(arr[-1, -3:])
-    assert arr[55:65, 35].tolist() == [
-        170, 193, 191, 373, 1293, 2053, 1879, 1683, 1711
-    ]
+    assert arr[55:65, 35].tolist() == [170, 193, 191, 373, 1293, 2053, 1879, 1683, 1711]
 
 
 JLSL_16_16_1_1_1F = PixelReference("MR_small_jpeg_ls_lossless.dcm", "<i2", test)
@@ -1575,6 +1575,7 @@ PIXEL_REFERENCE[JPEGLSNearLossless] = []
 # HTJR: HTJ2KLossless
 # HTJL: HTJ2KLosslessRPCL
 # HTJI: HTJ2K
+
 
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 # 0: J2KR, (8, 8), (1, 480, 640, 3), OB, YBR_RCT, 0

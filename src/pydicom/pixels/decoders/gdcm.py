@@ -1,6 +1,12 @@
 # Copyright 2024 pydicom authors. See LICENSE file for details.
+"""Use GDCM <https://github.com/malaterre/GDCM> to decompress encoded
+*Pixel Data*.
+
+This module is not intended to be used directly.
+"""
 
 import importlib
+from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.decoders.base import DecodeRunner
@@ -107,10 +113,10 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     frame = img.GetBuffer().encode("utf-8", "surrogateescape")
 
     # GDCM returns YBR_ICT and YBR_RCT as RGB
-    if (
-        tsyntax in (uid.JPEG2000Lossless, uid.JPEG2000)
-        and photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT)
-    ):
+    if tsyntax in (
+        uid.JPEG2000Lossless,
+        uid.JPEG2000,
+    ) and photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT):
         runner.set_option("photometric_interpretation", PI.RGB)
 
-    return frame
+    return cast(bytes, frame)
