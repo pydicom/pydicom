@@ -19,7 +19,7 @@ from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
 from pydicom.pixels.enums import PhotometricInterpretation as PI
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -38,6 +38,7 @@ from pydicom.uid import (
     HTJ2K,
     RLELossless,
     UID,
+    JPEG2000TransferSyntaxes,
 )
 
 
@@ -90,19 +91,96 @@ class DecodeOptions(TypedDict, total=False):
     # Undo the processing pillow performs on the raw decoded JPEG data
     pillow_undo_processing: bool
 
+    # JPEG2000/HTJ2K decoding options
+    # Use the JPEG2000 metadata to return an ndarray matched to the expect pixel
+    # representation (default True) otherwise return the decoded data as-is (ndarray only)
+    apply_j2k_sign_correction: bool
+
     ## Processing options (ndarray only)
     as_rgb: bool  # Make best effort to return RGB output
     force_rgb: bool  # Force YBR to RGB conversion
     force_ybr: bool  # Force RGB to YBR conversion
-    # force_bit_shift: int  #
-
-    # JPEG2000
-    # Use the JPEG2000 metadata to return an ndarray matched to the decode options
-    #   (default True) otherwise return the decoded J2K data as-is (?)
-    apply_j2k_corrections: bool
 
 
 DecodeFunction = Callable[[bytes, DecodeOptions], bytes | bytearray]
+ProcessingFunction = Callable[["np.ndarray", "DecodeRunner"], "np.ndarray"]
+
+
+def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
+    """Convert `arr` to a given color space, typically RGB."""
+    # If force_ybr then always do conversion (ignore as_rgb)
+    force_ybr = runner.get_option("force_ybr", False)
+    force_rgb = runner.get_option("force_rgb", False)
+    if force_ybr and force_rgb:
+        raise ValueError("'force_ybr' and 'force_rgb' cannot both be True")
+
+    to_rgb = (
+        runner.photometric_interpretation in (PI.YBR_FULL, PI.YBR_FULL_422)
+        and runner.get_option("as_rgb", False)
+    ) or force_rgb
+
+    if not arr.flags.writeable and (to_rgb or force_ybr):
+        if runner.get_option("view_only", False):
+            LOGGER.warning(
+                "Unable to return an ndarray that's a view on the original "
+                "buffer if applying a color space conversion"
+            )
+
+        arr = arr.copy()
+
+    if force_ybr:
+        # YBR_FULL and YBR_FULL_422 use the same transformation
+        arr = convert_color_space(arr, PI.RGB, PI.YBR_FULL)
+        runner.set_option("photometric_interpretation", PI.YBR_FULL)
+    elif to_rgb:
+        arr = convert_color_space(arr, PI.YBR_FULL, PI.RGB)
+        runner.set_option("photometric_interpretation", PI.RGB)
+
+    return arr
+
+
+def _apply_j2k_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
+    """Convert `arr` to match the signedness required by the 'pixel_representation'."""
+
+    # Example
+    # Pixel Representation 1, Bits Stored 13, Bits Allocated 16
+    # J2K precision 13, signed 0 (unsigned)
+    #
+    # For the raw 13-bit signed integer (value -2000):
+    #        1 1000 0011 0000
+    #
+    # If the 13-bit signed integer is incorrectly encoded as an unsigned integer,
+    # then after decoding the 16-bit signed value will be:
+    #     0001 1000 0011 0000  (value 6192)
+    # If it were encoded correctly as a signed integer it would instead be:
+    #     1111 1000 0011 0000  (value -2000)
+    #
+    # To correct for this, we need to bit shift the incorrectly interpreted 16-bit
+    # signed integer left by 3 bits:
+    #     1100 0001 1000 0000  (value -16000)
+    # And then right shift back 3 bits to get the final value:
+    #     1111 1000 0011 0000  (value -2000)
+    #
+    # And similarly, when the Pixel Representation is 0 and J2K is signed, then
+    # after decoding the 16-bit unsigned value will be:
+    #     1111 1000 0011 0000  (value 63536)
+    # If it were encoded correctly as an unsigned integer it would instead be:
+    #     0001 1000 0011 0000  (value 6192)
+    #
+    # Which can be fixed in the same way as for signed integers.
+
+    j2k_signed = runner.get_option("j2k_is_signed", runner.pixel_representation)
+    precision = runner.get_option("j2k_precision", runner.bits_stored)
+    bit_shift = runner.bits_allocated - precision
+    if bit_shift and j2k_signed != runner.pixel_representation:
+        np.left_shift(arr, bit_shift, out=arr)
+        np.right_shift(arr, bit_shift, out=arr)
+
+    return arr
+
+
+# Allow customization of the image processors
+PROCESSORS: list[ProcessingFunction] = [_process_color_space]
 
 
 class DecodeRunner:
@@ -137,6 +215,9 @@ class DecodeRunner:
             self.set_option("pixel_keyword", "PixelData")
         else:
             self.set_option("view_only", False)
+
+        if self.transfer_syntax in JPEG2000TransferSyntaxes:
+            self.set_option("apply_j2k_sign_correction", True)
 
     @property
     def bits_allocated(self) -> int:
@@ -199,6 +280,17 @@ class DecodeRunner:
         bytes | bytearray
             The decoded frame.
         """
+        if self.transfer_syntax in JPEG2000TransferSyntaxes:
+            info = get_j2k_parameters(src)
+            self.set_option(
+                "j2k_is_signed",
+                info.get("is_signed", self.pixel_representation)
+            )
+            self.set_option(
+                "j2k_precision",
+                info.get("precision", self.bits_allocated),
+            )
+
         # If self._previous is not set then this is the first frame being decoded
         # If self._previous is set, then the previously successful decoder
         #   has failed while decoding a frame and we are trying the other decoders
@@ -206,7 +298,7 @@ class DecodeRunner:
         for name, func in self._decoders.items():
             try:
                 # Attempt to decode the frame
-                frame = func(src, self.options)
+                frame = func(src, self)
 
                 # Decode success, if we were previously successful then
                 #   warn about the change to the new decoder
@@ -314,7 +406,7 @@ class DecodeRunner:
             name, func = getattr(self, "_previous", (None, None))
             if func:
                 try:
-                    yield func(src, self.options)
+                    yield func(src, self)
                     continue
                 except Exception:
                     LOGGER.warning(
@@ -433,33 +525,8 @@ class DecodeRunner:
         numpy.ndarray
             The array with the applied processing.
         """
-        # Color space conversions
-        # If force_ybr then always do conversion (ignore as_rgb)
-        force_ybr = self.get_option("force_ybr", False)
-        force_rgb = self.get_option("force_rgb", False)
-        if force_ybr and force_rgb:
-            raise ValueError("'force_ybr' and 'force_rgb' cannot both be True")
-
-        to_rgb = (
-            "YBR" in self.photometric_interpretation
-            and self.get_option("as_rgb", False)
-        ) or force_rgb
-
-        if not arr.flags.writeable and (to_rgb or force_ybr):
-            if self.get_option("view_only", False):
-                LOGGER.warning(
-                    "Unable to return an ndarray that's a view on the original "
-                    "buffer if applying a color space conversion"
-                )
-
-            arr = arr.copy()
-
-        if force_ybr:
-            arr = convert_color_space(arr, PI.RGB, PI.YBR_FULL)
-            self.set_option("photometric_interpretation", PI.YBR_FULL)
-        elif to_rgb:
-            arr = convert_color_space(arr, PI.YBR_FULL, PI.RGB)
-            self.set_option("photometric_interpretation", PI.RGB)
+        for func in PROCESSORS:
+            arr = func(arr, self)
 
         return arr
 
@@ -672,7 +739,7 @@ class DecodeRunner:
 
         return "\n".join(s)
 
-    def test_for(self, test: str) -> bool:
+    def _test_for(self, test: str) -> bool:
         """Return the result of `test` as :class:`bool`."""
         if test == "be_swap_ow":
             if self.get_option("be_swap_ow"):
@@ -683,6 +750,13 @@ class DecodeRunner:
                 and self.bits_allocated // 8 == 1
                 and self.pixel_keyword == "PixelData"
                 and self.get_option("pixel_vr") == "OW"
+            )
+
+        if test == "j2k_correction":
+            return (
+                self.transfer_syntax in JPEG2000TransferSyntaxes
+                and self.photometric_interpretation in (PI.MONOCHROME1, PI.MONOCHROME2)
+                and self.get_option("apply_j2k_sign_correction", False)
             )
 
         raise ValueError(f"Unknown test '{test}'")
@@ -699,7 +773,7 @@ class DecodeRunner:
         actual = len(self._src)
 
         if self.transfer_syntax.is_encapsulated:
-            if actual >= expected:
+            if actual in (expected, expected + expected % 2):
                 warn_and_log(
                     "The number of bytes of compressed pixel data matches the "
                     "expected number for uncompressed data - check you have "
@@ -909,6 +983,10 @@ class Decoder:
             )
             self._unavailable[label] = msg
 
+    def add_plugins(self, plugins: tuple[str, tuple[str, str]]) -> None:
+        for label, import_path in plugins:
+            self.add_plugin(label, import_path)
+
     def as_array(
         self,
         src: Buffer | Dataset,
@@ -936,6 +1014,9 @@ class Decoder:
           <glossary_photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
+        * JPEG 2000 encoded data whose signedness doesn't match the expected
+          :ref:`pixel representation<glossary_pixel_representation>` will be
+          converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
         will also be performed:
@@ -1086,6 +1167,9 @@ class Decoder:
             as_frame=False if index is None else True,
         )
 
+        if runner._test_for("j2k_correction"):
+            arr = _apply_j2k_sign_correction(arr, runner)
+
         if raw:
             return arr.copy() if not arr.flags.writeable and as_writeable else arr
 
@@ -1167,7 +1251,7 @@ class Decoder:
         dtype = runner.pixel_dtype
 
         with memoryview(runner.src) as src:
-            if runner.test_for("be_swap_ow"):
+            if runner._test_for("be_swap_ow"):
                 # Big endian 8-bit data may be encoded as OW
                 # For example a 1 x 1 x 3 image will (presumably) be:
                 #   b"\x02\x01\0x00\x03" instead of b"\x01\x02\x03\x00"
@@ -1403,7 +1487,7 @@ class Decoder:
             src = runner.src
 
         expected_length = runner.frame_length(unit="bytes")
-        if runner.test_for("be_swap_ow"):
+        if runner._test_for("be_swap_ow"):
             # Big endian 8-bit data encoded as OW
             if index is not None:
                 # Return specified frame only
@@ -1530,6 +1614,9 @@ class Decoder:
           <glossary_photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
+        * JPEG 2000 encoded data whose signedness doesn't match the expected
+          :ref:`pixel representation<glossary_pixel_representation>` will be
+          converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
         will also be performed:
@@ -1672,6 +1759,9 @@ class Decoder:
             for frame in runner.iter_decode():
                 arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
                 arr = runner.reshape(arr, as_frame=True)
+                if runner._test_for("j2k_correction"):
+                    arr = _apply_j2k_sign_correction(arr, runner)
+
                 if raw:
                     yield arr if arr.flags.writeable else arr.copy()
                     continue
@@ -1685,6 +1775,9 @@ class Decoder:
         indices = indices if indices else range(runner.number_of_frames)
         for index in indices:
             arr = runner.reshape(func(runner, index), as_frame=True)
+            if runner._test_for("j2k_correction"):
+                arr = _apply_j2k_sign_correction(arr, runner)
+
             if raw:
                 yield arr.copy() if not arr.flags.writeable and as_writeable else arr
                 continue
@@ -1985,6 +2078,7 @@ JPEGLSLosslessDecoder.add_plugins(
     [
         ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pyjpegls", ("pydicom.pixels.decoders.pyjpegls", "_decode_frame")),
     ]
 )
 
@@ -1993,6 +2087,7 @@ JPEGLSNearLosslessDecoder.add_plugins(
     [
         ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pyjpegls", ("pydicom.pixels.decoders.pyjpegls", "_decode_frame")),
     ]
 )
 
@@ -2038,7 +2133,6 @@ HTJ2KDecoder.add_plugins(
 RLELosslessDecoder = Decoder(RLELossless)
 RLELosslessDecoder.add_plugins(
     [
-        ("gdcm", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
         ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
         ("pydicom", ("pydicom.pixels.decoders.rle", "_decode_frame")),
     ]
@@ -2068,7 +2162,7 @@ def _build_decoder_docstrings() -> None:
     """Override the default Decoder docstring."""
     plugin_doc_links = {
         "gdcm": ":ref:`gdcm <decoder_plugin_gdcm>`",
-        "jpeg_ls": ":ref:`jpeg_ls <decoder_plugin_jpegls>`",
+        "pyjpegls": ":ref:`pyjpegls <decoder_plugin_pyjpegls>`",
         "pillow": ":ref:`pillow <decoder_plugin_pillow>`",
         "pydicom": ":ref:`pydicom <decoder_plugin_pydicom>`",
         "pylibjpeg": ":ref:`pylibjpeg <decoder_plugin_pylibjpeg>`",

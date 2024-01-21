@@ -1,122 +1,115 @@
+# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
+"""Use Pillow <https://github.com/python-pillow/Pillow> to decompress encoded
+*Pixel Data*.
+
+This module is not intended to be used directly.
+"""
+
 from io import BytesIO
 from typing import TYPE_CHECKING
 import warnings
 
-from pydicom.uid import (
-    JPEGBaseline8Bit,
-    JPEGExtended12Bit,
-    JPEG2000Lossless,
-    JPEG2000,
-)
+from pydicom import uid
+from pydicom.pixels.utils import _passes_version_check
+from pydicom.pixels.decoders.base import DecodeRunner
+from pydicom.pixels.enums import PhotometricInterpretation as PI
 
 try:
     from PIL import Image, features
-
-    HAVE_PIL = True
 except ImportError:
-    HAVE_PIL = False
+    pass
 
+try:
+    import numpy as np
 
-if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.pixels.decoders.base import DecoderOptions
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
 
 
 DECODER_DEPENDENCIES = {
-    JPEGBaseline8Bit: ("pillow>=10.0",),
-    JPEGExtended12Bit: ("pillow>=10.0",),
-    JPEG2000Lossless: ("pillow>=10.0",),
-    JPEG2000: ("pillow>=10.0",),
+    uid.JPEGBaseline8Bit: ("pillow>=10.0"),
+    uid.JPEGExtended12Bit: ("pillow>=10.0"),
+    uid.JPEG2000Lossless: ("numpy", "pillow>=10.0"),
+    uid.JPEG2000: ("numpy", "pillow>=10.0"),
 }
 
-_LIBJPEG_SYNTAXES = [JPEGBaseline8Bit, JPEGExtended12Bit]
-_OPENJPEG_SYNTAXES = [JPEG2000Lossless, JPEG2000]
+_LIBJPEG_SYNTAXES = [uid.JPEGBaseline8Bit, uid.JPEGExtended12Bit]
+_OPENJPEG_SYNTAXES = [uid.JPEG2000Lossless, uid.JPEG2000]
 
 
-# TODO: 12 bit for JPEGExtended12Bit?
 def is_available(uid: str) -> bool:
     """Return ``True`` if a pixel data decoder for `uid` is available for use,
     ``False`` otherwise.
     """
-    if not HAVE_PIL:
+    if not _passes_version_check("PIL", (10, 0)):
         return False
 
     if uid in _LIBJPEG_SYNTAXES:
-        # if transfer_syntax == JPEGExtended12Bit and ds.BitsAllocated != 8:
-        #     raise NotImplementedError(
-        #         f"{JPEGExtended12Bit} - {JPEGExtended12Bit.name} is only supported "
-        #         "by Pillow if (0028,0100) Bits Allocated = 8"
-        #     )
-
         return features.check_codec("jpg")
 
-    if uid in _OPENJPEG_SYNTAXES and HAVE_NP:
-        return features.check_codec("jpg_2000")
+    if uid in _OPENJPEG_SYNTAXES:
+        return features.check_codec("jpg_2000") and HAVE_NP
 
     return False
 
 
-def _decode_frame(src: bytes, opts: "DecoderOptions") -> bytearray:
-    tsyntax = opts["transfer_syntax_uid"]
+def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
+    """Return the decoded image data in `src` as a :class:`bytes`."""
+    tsyntax = runner.transfer_syntax
 
-    image = Image.open(BytesIO(src))
-    if tsyntax in _LIBJPEG_SYNTAXES:
-        # TODO: update from that closed PR
-        if opts["photometric_interpretation"] == "RGB":
-            # This hack ensures that RGB color images, which were not
-            #   color transformed (i.e. not transformed into YCbCr color space)
-            #   upon JPEG compression are decompressed correctly.
-            # Since Pillow assumes that images were transformed into YCbCr color
-            #   space prior to compression, setting the value of "mode" to YCbCr
-            #   signals Pillow to not apply any color transformation upon
-            #   decompression.
-            if "adobe_transform" not in image.info:
-                image.draft("YCbCr", image.size)
-    else:
-        # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
-        #   See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
-        # Undo pillow processing -> can this be done via pillow?
-        pass
-
-    return bytearray(image.tobytes())
-
-
-def foo():
-    # Return and use DecodeRunner for J2K post processing...
-
-    # arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
-    # arr = numpy.asarray(img, dtype=pixel_dtype(opts))  # or whatever
-
-    # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
-    #   See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
-    shift = bits_allocated - bits_stored
-    if j2k_precision != bits_stored and opts["j2k_corrections"]:
-        warnings.warn(
-            f"The (0028,0101) 'Bits Stored' value ({bits_stored}-bit) "
-            f"doesn't match the JPEG 2000 data ({j2k_precision}-bit). "
-            "It's recommended that you change the 'Bits Stored' value to "
-            f"{j2k_precision}"
+    # libjpeg only supports 8-bit JPEG Extended (can be 8 or 12 in the JPEG standard)
+    if tsyntax == uid.JPEGExtended12Bit and runner.bits_stored != 8:
+        raise NotImplementedError(
+            "Pillow does not support 'JPEG Extended' for samples with 12-bit precision"
         )
 
-        # Corrections based on J2K data
-        shift = bits_allocated - j2k_precision
-        if not j2k_sign and j2k_sign != pixel_representation:
-            # Convert unsigned J2K data to 2's complement
-            arr = numpy.right_shift(arr, shift)
-        else:
-            if pixel_representation == 1:
-                # Pillow converts signed data to unsigned
-                #   so we need to undo this conversion
-                arr -= 2 ** (bits_allocated - 1)
+    image = Image.open(BytesIO(src), formats=("JPEG", "JPEG2000"))
+    if tsyntax in _LIBJPEG_SYNTAXES:
+        if runner.samples_per_pixel != 1:
+            # If the Adobe APP14 marker is not present then Pillow assumes
+            #   that JPEG images were transformed into YCbCr color space prior
+            #   to compression, so setting the image mode to YCbCr signals we
+            #   don't want any color transformations.
+            # Any color transformations would be inconsistent with the
+            #   behavior required by the `raw` flag
+            if "adobe_transform" not in image.info:
+                image.draft("YCbCr", image.size)
 
-            if shift:
-                arr = numpy.right_shift(arr, shift)
+        return image.tobytes()
 
-    else:
-        # Corrections based on dataset elements
-        if pixel_representation == 1:
-            arr -= 2 ** (bits_allocated - 1)
+    # JPEG 2000
+    # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
+    #   See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
+    buffer = bytearray(image.tobytes())  # so the array is writeable
+    del image
+    dtype = runner.pixel_dtype
+    arr = np.frombuffer(buffer, dtype=f"u{dtype.itemsize}")
 
-        if shift:
-            arr = numpy.right_shift(arr, shift)
+    # The precision from the J2K codestream is more appropriate because the
+    #   decoder will use it to create the output integers
+    precision = runner.get_option("j2k_precision", runner.bits_stored)
+    is_signed = runner.pixel_representation
+    if runner.get_option("apply_j2k_sign_correction", False):
+        is_signed = runner.get_option("j2k_is_signed", is_signed)
 
-    return bytearray(arr.tobytes())
+    if is_signed and runner.pixel_representation == 1:
+        # Re-view the unsigned integers as signed
+        #   e.g. [0, 127, 128, 255] -> [0, 127, -128, -1]
+        arr = arr.view(dtype)
+        # Level-shift to match the unsigned integers range
+        #   e.g. [0, 127, -128, -1] -> [-128, -1, 0, 127]
+        arr -= 2**(runner.bits_allocated - 1)
+
+    if bit_shift := (runner.bits_allocated - precision):
+        # Bit shift to undo the upscaling of N-bit to 8- or 16-bit
+        np.right_shift(arr, bit_shift, out=arr)
+
+    # pillow returns YBR_ICT and YBR_RCT as RGB
+    if (
+        tsyntax in _OPENJPEG_SYNTAXES
+        and runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT)
+    ):
+        runner.set_option("photometric_interpretation", PI.RGB)
+
+    return arr.tobytes()

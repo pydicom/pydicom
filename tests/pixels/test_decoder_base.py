@@ -22,6 +22,7 @@ from pydicom.uid import (
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     RLELossless,
+    SMPTEST211030PCMDigitalAudio,
 )
 
 try:
@@ -348,18 +349,18 @@ class TestDecodeRunner:
         """Test test_for('be_swap_ow')"""
         runner = DecodeRunner(ExplicitVRBigEndian)
         with pytest.raises(ValueError, match=r"Unknown test 'foo'"):
-            runner.test_for("foo")
+            runner._test_for("foo")
 
         runner.set_option("bits_allocated", 8)
         runner.set_option("pixel_keyword", "PixelData")
 
-        assert runner.test_for("be_swap_ow") is False
+        assert runner._test_for("be_swap_ow") is False
         runner.set_option("be_swap_ow", True)
-        assert runner.test_for("be_swap_ow") is True
+        assert runner._test_for("be_swap_ow") is True
         runner.set_option("be_swap_ow", False)
-        assert runner.test_for("be_swap_ow") is False
+        assert runner._test_for("be_swap_ow") is False
         runner.set_option("pixel_vr", "OW")
-        assert runner.test_for("be_swap_ow") is True
+        assert runner._test_for("be_swap_ow") is True
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_pixel_dtype_unsupported_raises(self):
@@ -626,7 +627,7 @@ class TestDecodeRunner:
             runner.decode(0)
 
         decoder = get_decoder(RLELossless)
-        runner.set_decoders(decoder._validate_decoders())
+        runner.set_decoders(decoder._validate_decoders("pydicom"))
         buffer = runner.decode(0)
 
         assert runner._previous[1] == runner._decoders["pydicom"]
@@ -668,7 +669,8 @@ class TestDecodeRunner:
             runner.decode(0)
 
         decoder = get_decoder(RLELossless)
-        runner.set_decoders(decoder._validate_decoders(""))
+        plugins = decoder._validate_decoders("pydicom")
+        runner.set_decoders(plugins)
         data = runner.iter_decode()
         buffer = next(data)
 
@@ -1970,6 +1972,9 @@ def test_get_decoder():
         assert isinstance(decoder, Decoder)
         assert decoder.UID == uid
 
-    msg = r"No pixel data decoders have been implemented for 'JPEG Baseline \(Process 1\)'"
+    msg = (
+        "No pixel data decoders have been implemented for 'SMPTE ST 2110-30 "
+        "PCM Digital Audio'"
+    )
     with pytest.raises(NotImplementedError, match=msg):
-        get_decoder(JPEGBaseline8Bit)
+        get_decoder(SMPTEST211030PCMDigitalAudio)

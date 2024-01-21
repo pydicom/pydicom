@@ -1,39 +1,19 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
-"""Use pylibjpeg to decompress encoded *Pixel Data*.
+"""Use pylibjpeg <https://github.com/pydicom/pylibjpeg> to decompress encoded
+*Pixel Data*.
 
 This module is not intended to be used directly.
 """
 
 from pydicom import uid
+from pydicom.pixels.decoders.base import DecodeRunner
+from pydicom.pixels.enums import PhotometricInterpretation as PI
+from pydicom.pixels.utils import _passes_version_check
 
 try:
-    from pylibjpeg import __version__ as pyljv
     from pylibjpeg.utils import get_pixel_data_decoders
-
-    HAVE_PYLIBJPEG = True
 except ImportError:
-    HAVE_PYLIBJPEG = False
-
-try:
-    from openjpeg import __version__ as ojv
-
-    HAVE_OPENJPEG = True
-except ImportError:
-    HAVE_OPENJPEG = False
-
-try:
-    from libjpeg import __version__ as ljv
-
-    HAVE_LIBJPEG = True
-except ImportError:
-    HAVE_LIBJPEG = False
-
-try:
-    from rle import __version__ as rlev
-
-    HAVE_RLE = True
-except ImportError:
-    HAVE_RLE = False
+    pass
 
 
 DECODER_DEPENDENCIES = {
@@ -70,31 +50,44 @@ _RLE_SYNTAXES = [uid.RLELossless]
 
 
 def is_available(uid: str) -> bool:
-    """Return ``True`` if a pixel data decoder for `uid` is available for use,
-    ``False`` otherwise.
-    """
-    if not HAVE_PYLIBJPEG or [int(x) for x in pyljv.split(".")] < [2, 0]:
+    """Return ``True`` if the decoder has its dependencies met, ``False`` otherwise"""
+    if not _passes_version_check("pylibjpeg", (2, 0)):
         return False
 
-    if uid in _LIBJPEG_SYNTAXES and HAVE_LIBJPEG:
-        return [int(x) for x in ljv.split(".")] >= [2, 0]
+    if uid in _LIBJPEG_SYNTAXES:
+        return _passes_version_check("libjpeg", (2, 0))
 
-    if uid in _OPENJPEG_SYNTAXES and HAVE_OPENJPEG:
-        return [int(x) for x in ojv.split(".")] >= [2, 0]
+    if uid in _OPENJPEG_SYNTAXES:
+        return _passes_version_check("openjpeg", (2, 0))
 
-    if uid in _RLE_SYNTAXES and HAVE_RLE:
-        return [int(x) for x in rlev.split(".")] >= [2, 0]
+    if uid in _RLE_SYNTAXES:
+        return _passes_version_check("rle", (2, 0))
 
     return False
 
 
-def _decode_frame(src: bytes, opts: "DecodeOptions") -> bytearray:
-    tsyntax = opts["transfer_syntax_uid"]
-    # {plugin: function}
-    decoders = get_pixel_data_decoders(version=2)[tsyntax]
+def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
+    """Return the decoded image data in `src` as a :class:`bytearray`."""
+    tsyntax = runner.transfer_syntax
+
+    # {plugin name: function}
+    decoders: dict[str, DecodeFunction] = get_pixel_data_decoders(version=2)[tsyntax]
 
     # Currently only one pylibjpeg plugin is available per UID
-    # so decode using the first available decoder
-    for plugin_name, func in sorted(decoders.items()):
+    #   so decode using the first available decoder
+    for _, func in sorted(decoders.items()):
         # `version=2` to return frame as bytearray
-        return func(src, version=2, **opts)
+        frame: bytearray = func(src, version=2, **runner.options)
+
+        # pylibjpeg-rle returns decoded data as planar configuration 1
+        if tsyntax == uid.RLELossless:
+            runner.set_option("planar_configuration", 1)
+
+        # pylibjpeg-openjpeg returns YBR_ICT and YBR_RCT as RGB
+        if (
+            tsyntax in _OPENJPEG_SYNTAXES
+            and runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT)
+        ):
+            runner.set_option("photometric_interpretation", PI.RGB)
+
+        return frame
