@@ -228,6 +228,10 @@ SC_jpeg_no_color_transform_2.dcm
     from TCIA with APP14 marker segment included in JPEG header
   * Created for PR #878 using DCMTK's img2cdm script with the value of the
     Photometric Interpretation element patched
+    
+SC_jls_near_lossless.dcm
+  * 8-bit RGB, JPEG-LS Near Lossless (lossy error 2)
+  * Created using pyjpegls
 
 SC_ybr_full_uncompressed.dcm
   * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv

@@ -70,16 +70,11 @@ An decoding plugin must implement three objects within the same module:
 
   If your decoder needs to signal that one of the decoding option values needs
   to be modified then this can be done with the
-  :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_option` method:
-
-  .. code-block:: python
-
-    runner.set_option("photometric_interpretation", "RGB")
-
-  You should only do this after successfully decoding the frame, as
-  if the decoding fails then changing the option value may cause issues with
-  other decoding plugins that may attempt to decode it. It's also important to
-  be aware that any changes you make will also affect following frames (if any).
+  :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_option` method. This
+  should only do this after successfully decoding the frame, as if the
+  decoding fails changing the option value may cause issues with
+  other decoding plugins that will also attempt to decode it. It's also important
+  to be aware that any changes you make will also affect following frames (if any).
 
   When possible it's recommended that the decoding function return the decoded
   pixel data as a :class:`bytearray` to minimize later memory usage.
@@ -113,7 +108,7 @@ An decoding plugin must implement three objects within the same module:
 An example of the requirements of a plugin is available :gh:`here
 <pydicom/blob/main/src/pydicom/pixels/decoders/rle.py>`.
 
-============================
+
 Adding Plugins to a Decoder
 ===========================
 

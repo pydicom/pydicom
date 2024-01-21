@@ -15,6 +15,7 @@ except ImportError:
 
 from pydicom.encaps import get_frame
 from pydicom.pixels import get_decoder
+from pydicom.pixels.decoders.pylibjpeg import is_available
 from pydicom.uid import (
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
@@ -46,6 +47,11 @@ HAVE_RLE = bool(importlib.util.find_spec("rle"))
 SKIP_LJ = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
 SKIP_OJ = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
 SKIP_RLE = not (HAVE_NP and HAVE_PYLJ and HAVE_RLE)
+
+
+def test_is_available_unknown_uid():
+    """Test is_available() for an unknown UID"""
+    assert is_available("1.2.3.4") is False
 
 
 @pytest.mark.skipif(SKIP_LJ, reason="Test is missing dependencies")
@@ -178,6 +184,38 @@ class TestOpenJpegDecoder:
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+
+    def test_iter_array(self):
+        """Test J2k corrections are applied when using iter_array()"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        # Using all frames
+        frame_gen = decoder.iter_array(
+            reference.ds, raw=True, decoding_plugin="pylibjpeg"
+        )
+        for arr in frame_gen:
+            reference.test(arr)
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+
+            if reference.number_of_frames == 1:
+                assert arr.shape == reference.shape
+            else:
+                assert arr.shape == reference.shape[1:]
+
+        # Using indices
+        frame_gen = decoder.iter_array(
+            reference.ds, raw=True, decoding_plugin="pylibjpeg", indices=[0]
+        )
+        for arr in frame_gen:
+            reference.test(arr)
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+
+            if reference.number_of_frames == 1:
+                assert arr.shape == reference.shape
+            else:
+                assert arr.shape == reference.shape[1:]
 
 
 @pytest.mark.skipif(SKIP_RLE, reason="Test is missing dependencies")

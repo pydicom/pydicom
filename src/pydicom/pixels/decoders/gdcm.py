@@ -5,7 +5,6 @@
 This module is not intended to be used directly.
 """
 
-import importlib
 from typing import cast
 
 from pydicom import uid
@@ -14,8 +13,11 @@ from pydicom.pixels.enums import PhotometricInterpretation as PI
 
 try:
     import gdcm
+
+    GDCM_VERSION = tuple(int(x) for x in gdcm.Version.GetVersion().split("."))
+    HAVE_GDCM = True
 except ImportError:
-    pass
+    HAVE_GDCM = False
 
 
 DECODER_DEPENDENCIES = {
@@ -30,51 +32,35 @@ DECODER_DEPENDENCIES = {
 }
 
 
-def _passes_version_check(minimum_version: tuple[int, ...]) -> bool:
-    try:
-        module = importlib.import_module("gdcm", "Version")
-    except ModuleNotFoundError:
-        return False
-
-    version = module.Version.GetVersion()
-    return tuple(int(x) for x in version.split(".")) >= minimum_version
-
-
 def is_available(uid: str) -> bool:
     """Return ``True`` if a pixel data decoder for `uid` is available for use,
     ``False`` otherwise.
     """
-    if not _passes_version_check((3, 0)):
+    if not HAVE_GDCM or GDCM_VERSION < (3, 0):
         return False
 
     return uid in DECODER_DEPENDENCIES
 
 
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
-    """Return a ``gdcm.Image``.
+    """Return the decoded `src` as :class:`bytes`.
 
     Parameters
     ----------
-    elem : gdcm.DataElement
-        The ``gdcm.DataElement`` *Pixel Data* element.
-    kwargs
-        * rows
-        * columns
-        * transfer_syntax_uid
-        * samples_per_pixel
-        * bits_allocated
-        * bits_stored
-        * pixel_representation
-        * photometric_interpretation
+    src : bytes
+        An encoded pixel data frame.
+    runner : pydicom.pixels.decoders.base.DecodeRunner
+        The runner managing the decoding.
 
     Returns
     -------
-    gdcm.Image
+    bytes
+        The decoded pixel data frame.
     """
     tsyntax = runner.transfer_syntax
     photometric_interpretation = runner.photometric_interpretation
     bits_stored = runner.bits_stored
-    if tsyntax == uid.JPEGExtended12Bit:
+    if tsyntax == uid.JPEGExtended12Bit and bits_stored != 8:
         raise NotImplementedError(
             "GDCM does not support 'JPEG Extended' for samples with 12-bit precision"
         )

@@ -2,6 +2,9 @@ import importlib
 
 
 def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -> bool:
+    """Return True if `package_name` is available and it's version is greater or
+    equal to `minimum_version`
+    """
     try:
         module = importlib.import_module(package_name, "__version__")
     except ModuleNotFoundError:

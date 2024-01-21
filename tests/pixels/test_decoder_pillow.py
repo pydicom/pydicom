@@ -20,6 +20,7 @@ except ImportError:
 
 from pydicom.encaps import get_frame
 from pydicom.pixels import get_decoder
+from pydicom.pixels.decoders.pillow import is_available
 from pydicom.uid import (
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
@@ -40,6 +41,11 @@ HAVE_OJ = features.check_codec("jpg_2000") if HAVE_PILLOW else False
 
 SKIP_LJ = not (HAVE_NP and HAVE_LJ)
 SKIP_OJ = not (HAVE_NP and HAVE_OJ)
+
+
+def test_is_available_unknown_uid():
+    """Test is_available() for an unknown UID"""
+    assert is_available("1.2.3.4") is False
 
 
 @pytest.mark.skipif(SKIP_LJ, reason="Test is missing dependencies")

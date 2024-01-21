@@ -82,18 +82,13 @@ class DecodeOptions(TypedDict, total=False):
     be_swap_ow: bool
 
     ## RLE decoding options
-    # pydicom and pylibjpeg plugins
     # Segment ordering ">" for big endian (default) or "<" for little endian
-    rle_segment_order: str
-
-    # JPEG decoding options
-    # pillow plugin
-    # Undo the processing pillow performs on the raw decoded JPEG data
-    pillow_undo_processing: bool
+    rle_segment_order: str  # pydicom plugin
+    byteorder: str  # pylibjpeg + -rle plugin
 
     # JPEG2000/HTJ2K decoding options
-    # Use the JPEG2000 metadata to return an ndarray matched to the expect pixel
-    # representation (default True) otherwise return the decoded data as-is (ndarray only)
+    # Use the JPEG 2000 metadata to return an ndarray matched to the expected pixel
+    # representation otherwise return the decoded data as-is (ndarray only)
     apply_j2k_sign_correction: bool
 
     ## Processing options (ndarray only)
@@ -143,10 +138,9 @@ def _apply_j2k_sign_correction(
     arr: "np.ndarray", runner: "DecodeRunner"
 ) -> "np.ndarray":
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
-
-    # Example
-    # Pixel Representation 1, Bits Stored 13, Bits Allocated 16
-    # J2K precision 13, signed 0 (unsigned)
+    # Example:
+    # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
+    # J2K codestream: precision 13, signed 0 (unsigned)
     #
     # For the raw 13-bit signed integer (value -2000):
     #        1 1000 0011 0000
@@ -157,8 +151,8 @@ def _apply_j2k_sign_correction(
     # If it were encoded correctly as a signed integer it would instead be:
     #     1111 1000 0011 0000  (value -2000)
     #
-    # To correct for this, we need to bit shift the incorrectly interpreted 16-bit
-    # signed integer left by 3 bits:
+    # To correct for this, we need to bit shift the incorrectly interpreted
+    # 16-bit signed integer left by 3 bits:
     #     1100 0001 1000 0000  (value -16000)
     # And then right shift back 3 bits to get the final value:
     #     1111 1000 0011 0000  (value -2000)
@@ -168,9 +162,7 @@ def _apply_j2k_sign_correction(
     #     1111 1000 0011 0000  (value 63536)
     # If it were encoded correctly as an unsigned integer it would instead be:
     #     0001 1000 0011 0000  (value 6192)
-    #
     # Which can be fixed in the same way as for signed integers.
-
     j2k_signed = runner.get_option("j2k_is_signed", runner.pixel_representation)
     precision = runner.get_option("j2k_precision", runner.bits_stored)
     bit_shift = runner.bits_allocated - precision
@@ -287,10 +279,7 @@ class DecodeRunner:
             self.set_option(
                 "j2k_is_signed", info.get("is_signed", self.pixel_representation)
             )
-            self.set_option(
-                "j2k_precision",
-                info.get("precision", self.bits_allocated),
-            )
+            self.set_option("j2k_precision", info.get("precision", self.bits_stored))
 
         # If self._previous is not set then this is the first frame being decoded
         # If self._previous is set, then the previously successful decoder
@@ -996,7 +985,7 @@ class Decoder:
 
         Parameters
         ----------
-        list[tuple[str, tuple[str, str]]]
+        plugins : list[tuple[str, tuple[str, str]]]
             A list of [label, import path] for the plugins, where:
 
             * `label` is the label to use for the plugin, which should be unique
@@ -2130,24 +2119,18 @@ JPEG2000Decoder.add_plugins(
 )
 
 HTJ2KLosslessDecoder = Decoder(HTJ2KLossless)
-HTJ2KLosslessDecoder.add_plugins(
-    [
-        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
-    ]
+HTJ2KLosslessDecoder.add_plugin(
+    "pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")
 )
 
 HTJ2KLosslessRPCLDecoder = Decoder(HTJ2KLosslessRPCL)
-HTJ2KLosslessRPCLDecoder.add_plugins(
-    [
-        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
-    ]
+HTJ2KLosslessRPCLDecoder.add_plugin(
+    "pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")
 )
 
 HTJ2KDecoder = Decoder(HTJ2K)
-HTJ2KDecoder.add_plugins(
-    [
-        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
-    ]
+HTJ2KDecoder.add_plugin(
+    "pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")
 )
 
 RLELosslessDecoder = Decoder(RLELossless)
@@ -2174,6 +2157,9 @@ _PIXEL_DATA_DECODERS = {
     JPEGLSNearLossless: (JPEGLSNearLosslessDecoder, "3.0"),
     JPEG2000Lossless: (JPEG2000LosslessDecoder, "3.0"),
     JPEG2000: (JPEG2000Decoder, "3.0"),
+    HTJ2KLossless: (HTJ2KLosslessDecoder, "3.0"),
+    HTJ2KLosslessRPCL: (HTJ2KLosslessRPCLDecoder, "3.0"),
+    HTJ2K: (HTJ2KDecoder, "3.0"),
     RLELossless: (RLELosslessDecoder, "3.0"),
 }
 
@@ -2245,6 +2231,12 @@ def get_decoder(uid: str) -> Decoder:
     | *JPEG2000 Lossless*                  | 1.2.840.10008.1.2.4.90     | 3.0     |
     +--------------------------------------+----------------------------+---------+
     | *JPEG2000*                           | 1.2.840.10008.1.2.4.91     | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *HTJ2K Lossless*                     | 1.2.840.10008.1.2.4.201    | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *HTJ2K Lossless RPCL*                | 1.2.840.10008.1.2.4.202    | 3.0     |
+    +--------------------------------------+----------------------------+---------+
+    | *HTJ2K*                              | 1.2.840.10008.1.2.4.203    | 3.0     |
     +--------------------------------------+----------------------------+---------+
     | *RLE Lossless*                       | 1.2.840.10008.1.2.5        | 3.0     |
     +--------------------------------------+----------------------------+---------+
