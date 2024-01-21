@@ -35,8 +35,8 @@ from .pixels_reference import (
 
 
 HAVE_PILLOW = bool(importlib.util.find_spec("PIL"))
-HAVE_LJ = features.check_codec("jpg")
-HAVE_OJ = features.check_codec("jpg_2000")
+HAVE_LJ = features.check_codec("jpg") if HAVE_PILLOW else False
+HAVE_OJ = features.check_codec("jpg_2000") if HAVE_PILLOW else False
 
 SKIP_LJ = not (HAVE_NP and HAVE_LJ)
 SKIP_OJ = not (HAVE_NP and HAVE_OJ)
