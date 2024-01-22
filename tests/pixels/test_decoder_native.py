@@ -309,23 +309,29 @@ class TestAsBuffer:
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
     def test_reference_expb(self, reference):
         """Test against the reference data for explicit big."""
+        ds = reference.ds
         # Exclude bit-packed and YBR_FULL_422
-        if reference.ds.BitsAllocated == 1:
+        if ds.BitsAllocated == 1:
             return
 
-        if reference.ds.PhotometricInterpretation == "YBR_FULL_422":
+        if ds.PhotometricInterpretation == "YBR_FULL_422":
             return
 
-        if reference.ds.BitsAllocated == 8 and reference.ds["PixelData"].VR == "OW":
+        if ds.BitsAllocated == 8 and ds["PixelData"].VR == "OW":
             return
 
         decoder = get_decoder(ExplicitVRBigEndian)
-        arr = decoder.as_array(reference.ds, raw=True)
-        buffer = decoder.as_buffer(reference.ds)
+        arr = decoder.as_array(ds, raw=True)
+        buffer = decoder.as_buffer(ds)
+
 
         for index in range(reference.number_of_frames):
-            arr = decoder.as_array(reference.ds, raw=True, index=index)
-            buffer = decoder.as_buffer(reference.ds, index=index)
+            arr = decoder.as_array(ds, raw=True, index=index)
+            buffer = decoder.as_buffer(ds, index=index)
+            if ds.SamplesPerPixel > 1 and ds.PlanarConfiguration == 1:
+                # Transpose to match colour by plane
+                arr = arr.transpose(2, 0, 1)
+
             assert arr.tobytes() == buffer
 
     def test_expb_8bit_ow(self):
@@ -408,16 +414,21 @@ class TestIterBuffer:
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
     def test_reference_expb(self, reference):
         """Test against the reference data for explicit big."""
-        if reference.ds.BitsAllocated == 1:
+        ds = reference.ds
+        if ds.BitsAllocated == 1:
             return
 
-        if reference.ds.BitsAllocated == 8 and reference.ds["PixelData"].VR == "OW":
+        if ds.BitsAllocated == 8 and ds["PixelData"].VR == "OW":
             return
 
         decoder = get_decoder(ExplicitVRBigEndian)
-        arr_gen = decoder.iter_array(reference.ds, raw=True)
-        buf_gen = decoder.iter_buffer(reference.ds)
+        arr_gen = decoder.iter_array(ds, raw=True)
+        buf_gen = decoder.iter_buffer(ds)
         for arr, buffer in zip(arr_gen, buf_gen):
+            if ds.SamplesPerPixel > 1 and ds.PlanarConfiguration == 1:
+                # Transpose to match colour by plane
+                arr = arr.transpose(2, 0, 1)
+
             assert arr.tobytes() == buffer
 
     def test_expb_8bit_ow(self):
