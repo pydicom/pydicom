@@ -324,7 +324,6 @@ class TestAsBuffer:
         arr = decoder.as_array(ds, raw=True)
         buffer = decoder.as_buffer(ds)
 
-
         for index in range(reference.number_of_frames):
             arr = decoder.as_array(ds, raw=True, index=index)
             buffer = decoder.as_buffer(ds, index=index)

@@ -748,16 +748,12 @@ EXPB_8_3_1F_ODD = PixelReference("SC_rgb_small_odd_big_endian.dcm", "u1", test)
 
 # 6: EXPB, (8, 8), (1, 60, 80, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
-    assert arr[9, 3:6].tolist() == [
-        [171, 171, 171],
-        [255, 255, 255],
-        [255, 255, 0]
-    ]
+    assert arr[9, 3:6].tolist() == [[171, 171, 171], [255, 255, 255], [255, 255, 0]]
     assert arr[58, 8:12].tolist() == [
         [255, 236, 0],
         [255, 183, 0],
         [255, 175, 0],
-        [255, 183, 0]
+        [255, 183, 0],
     ]
 
 
@@ -1337,7 +1333,9 @@ def test(ref, arr, **kwargs):
         ]
 
 
-JPGB_08_08_3_0_1F_RGB_NO_APP14 = PixelReference("SC_jpeg_no_color_transform.dcm", "u1", test)
+JPGB_08_08_3_0_1F_RGB_NO_APP14 = PixelReference(
+    "SC_jpeg_no_color_transform.dcm", "u1", test
+)
 
 
 # 2: JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
@@ -1360,7 +1358,9 @@ def test(ref, arr, **kwargs):
     ]
 
 
-JPGB_08_08_3_0_1F_RGB_APP14 = PixelReference("SC_jpeg_no_color_transform_2.dcm", "u1", test)
+JPGB_08_08_3_0_1F_RGB_APP14 = PixelReference(
+    "SC_jpeg_no_color_transform_2.dcm", "u1", test
+)
 
 
 # 3: JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
@@ -1383,7 +1383,9 @@ def test(ref, arr, **kwargs):
     ]
 
 
-JPGB_08_08_3_0_1F_RGB_DCMD_APP14 = PixelReference("SC_rgb_jpeg_app14_dcmd.dcm", "u1", test)
+JPGB_08_08_3_0_1F_RGB_DCMD_APP14 = PixelReference(
+    "SC_rgb_jpeg_app14_dcmd.dcm", "u1", test
+)
 
 
 # 4: JPGB, (8, 8), (120, 480, 640, 3), OB, YBR_FULL_422, 0
@@ -1456,6 +1458,7 @@ def test(ref, arr, **kwargs):
 JPGB_08_08_3_0_120F_YBR_FULL_422 = PixelReference(
     "color3d_jpeg_baseline.dcm", "u1", test
 )
+
 
 # 5: JPGB, (8, 8), (1, 100, 100, 3), OB, YBR_FULL, 0
 def test(ref, arr, **kwargs):

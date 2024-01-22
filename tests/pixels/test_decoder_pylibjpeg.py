@@ -148,10 +148,14 @@ class TestLibJpegDecoder:
             "marker version unrecognized"
         )
         with pytest.raises(RuntimeError, match=msg):
-            decoder.as_array(JPGB_08_08_3_0_1F_RGB_APP14.ds, decoding_plugin="pylibjpeg")
+            decoder.as_array(
+                JPGB_08_08_3_0_1F_RGB_APP14.ds, decoding_plugin="pylibjpeg"
+            )
 
         with pytest.raises(RuntimeError, match=msg):
-            decoder.as_array(JPGB_08_08_3_0_1F_RGB_DCMD_APP14.ds, decoding_plugin="pylibjpeg")
+            decoder.as_array(
+                JPGB_08_08_3_0_1F_RGB_DCMD_APP14.ds, decoding_plugin="pylibjpeg"
+            )
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
