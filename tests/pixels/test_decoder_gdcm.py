@@ -21,6 +21,7 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
+    RLELossless,
 )
 
 from .pixels_reference import (
@@ -35,7 +36,7 @@ SKIP_TEST = not HAVE_NP or not HAVE_GDCM
 
 
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
-class TestGdcmDecoder:
+class TestDecoding:
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGBaseline8Bit])
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
@@ -118,6 +119,16 @@ class TestGdcmDecoder:
     def test_j2k(self, reference):
         """Test the decoder with JPEG2000."""
         decoder = get_decoder(JPEG2000)
+        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        reference.test(arr)
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[RLELossless])
+    def test_rle_lossless(self, reference):
+        """Test the decoder with RLE Lossless."""
+        decoder = get_decoder(RLELossless)
         arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.shape == reference.shape

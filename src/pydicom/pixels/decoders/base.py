@@ -2136,7 +2136,8 @@ HTJ2KDecoder.add_plugin(
 RLELosslessDecoder = Decoder(RLELossless)
 RLELosslessDecoder.add_plugins(
     [
-        ("pylibjpeg", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame")),
+        ("pylibjpeg", ("pydicom.pixels.decoders.gdcm", "_decode_frame")),
+        ("gdcm", ("pydicom.pixels.decoders.rle", "_decode_frame")),
         ("pydicom", ("pydicom.pixels.decoders.rle", "_decode_frame")),
     ]
 )

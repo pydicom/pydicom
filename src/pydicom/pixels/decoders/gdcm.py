@@ -29,6 +29,7 @@ DECODER_DEPENDENCIES = {
     uid.JPEGLSNearLossless: ("gdcm>=3.0",),
     uid.JPEG2000Lossless: ("gdcm>=3.0",),
     uid.JPEG2000: ("gdcm>=3.0",),
+    uid.RLELossless: ("gdcm>=3.0",),
 }
 
 
