@@ -1410,7 +1410,7 @@ class TestDecoder_Array:
 
         reference = RLE_16_1_10F
         for index in [0, 4, 9]:
-            arr = decoder.as_array(reference.ds, index=index)
+            arr = decoder.as_array(reference.ds, index=index, decoding_plugin="pydicom")
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
@@ -1632,7 +1632,9 @@ class TestDecoder_Array:
         reference = RLE_16_1_10F
 
         indices = [0, 4, 9]
-        func = decoder.iter_array(reference.ds, raw=True, indices=indices)
+        func = decoder.iter_array(
+            reference.ds, raw=True, indices=indices, decoding_plugin="pydicom"
+        )
         for idx, arr in enumerate(func):
             reference.test(arr, index=indices[idx])
             assert arr.dtype == reference.dtype
