@@ -66,5 +66,7 @@
     "US1_J2KR.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/US1_J2KR.dcm",
     "US1_UNCI.dcm": "https://github.com/pydicom/pydicom-data/raw/8c2e1c744cb8c5ac96558cbedd6741dc16602055/data/US1_UNCI.dcm",
     "US1_UNCR.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/US1_UNCR.dcm",
-    "vlut_04.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/vlut_04.dcm"
+    "vlut_04.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/vlut_04.dcm",
+    "HTJ2KLossless_08_RGB.dcm": "https://github.com/pydicom/pydicom-data/raw/9bde4d24b2d4a666fa8c4e93c8bccb2a775ea536/data/HTJ2KLossless_08_RGB.dcm",
+    "HTJ2K_08_RGB.dcm": "https://github.com/pydicom/pydicom-data/raw/9bde4d24b2d4a666fa8c4e93c8bccb2a775ea536/data/HTJ2K_08_RGB.dcm",
 }

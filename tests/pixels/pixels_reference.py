@@ -1747,8 +1747,81 @@ def test(ref, arr, **kwargs):
 JLSL_16_12_1_1_10F = PixelReference("emri_small_jpeg_ls_lossless.dcm", "<u2", test)
 
 
+# 0: JLSN, (8, 8), (1, 45, 10, 1), OB, MONOCHROME2, 0
+def test(ref, arr, **kwargs):
+    assert arr[0, 0] == 255
+    assert arr[5, 0] == 125
+    assert arr[10, 0] == 65
+    assert arr[15, 0] == 30
+    assert arr[20, 0] == 15
+    assert arr[25, 0] == 5
+    assert arr[30, 0] == 5
+    assert arr[35, 0] == 0
+    assert arr[40, 0] == 0
+
+
+JLSN_08_01_1_0_1F = PixelReference("JPEGLSNearLossless_08.dcm", "u1", test)
+
+
+# 1: JLSN, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# Line interleaved
+def test(ref, arr, **kwargs):
+    assert arr[0, 0].tolist() == [255, 0, 0]
+    assert arr[10, 0].tolist() == [255, 130, 130]
+    assert arr[20, 0].tolist() == [0, 255, 0]
+    assert arr[30, 0].tolist() == [130, 255, 130]
+    assert arr[40, 0].tolist() == [0, 0, 255]
+    assert arr[50, 0].tolist() == [130, 130, 255]
+    assert arr[60, 0].tolist() == [0, 0, 0]
+    assert arr[70, 0].tolist() == [65, 65, 65]
+    assert arr[80, 0].tolist() == [190, 190, 190]
+    assert arr[90, 0].tolist() == [255, 255, 255]
+
+
+JLSN_08_08_1_0_3F_LINE = PixelReference("SC_rgb_jls_lossy_line.dcm", "u1", test)
+
+
+# 1: JLSN, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# Sample interleaved
+def test(ref, arr, **kwargs):
+    assert arr[0, 0].tolist() == [255, 0, 0]
+    assert arr[10, 0].tolist() == [255, 130, 130]
+    assert arr[20, 0].tolist() == [0, 255, 0]
+    assert arr[30, 0].tolist() == [130, 255, 130]
+    assert arr[40, 0].tolist() == [0, 0, 255]
+    assert arr[50, 0].tolist() == [130, 130, 255]
+    assert arr[60, 0].tolist() == [0, 0, 0]
+    assert arr[70, 0].tolist() == [65, 65, 65]
+    assert arr[80, 0].tolist() == [190, 190, 190]
+    assert arr[90, 0].tolist() == [255, 255, 255]
+
+
+JLSN_08_08_1_0_3F_SAMPLE = PixelReference("SC_rgb_jls_lossy_sample.dcm", "u1", test)
+
+
+# 2: JLSN, (16, 16), (1, 45, 10, 1), OB, MONOCHROME2, 0
+def test(ref, arr, **kwargs):
+    assert arr[0, 0] == 65535
+    assert arr[5, 0] == 32765
+    assert arr[10, 0] == 16385
+    assert arr[15, 0] == 4095
+    assert arr[20, 0] == 1025
+    assert arr[25, 0] == 255
+    assert arr[30, 0] == 65
+    assert arr[35, 0] == 15
+    assert arr[40, 0] == 5
+
+
+JLSN_16_16_1_0_1F = PixelReference("JPEGLSNearLossless_16.dcm", "u2", test)
+
+
 PIXEL_REFERENCE[JPEGLSLossless] = [JLSL_16_16_1_1_1F, JLSL_16_12_1_1_10F]
-PIXEL_REFERENCE[JPEGLSNearLossless] = []
+PIXEL_REFERENCE[JPEGLSNearLossless] = [
+    JLSN_08_01_1_0_1F,
+    JLSN_08_08_1_0_3F_LINE,
+    JLSN_08_08_1_0_3F_SAMPLE,
+    JLSN_16_16_1_0_1F,
+]
 
 
 # JPEG 2000 - ISO/IEC 15444 Standard

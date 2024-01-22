@@ -19,12 +19,12 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGBaseline8Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0"),
-    uid.JPEGExtended12Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0"),
-    uid.JPEGLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0"),
-    uid.JPEGLosslessSV1: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0"),
-    uid.JPEGLSLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0"),
-    uid.JPEGLSNearLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0"),
+    uid.JPEGBaseline8Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
+    uid.JPEGExtended12Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
+    uid.JPEGLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
+    uid.JPEGLosslessSV1: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
+    uid.JPEGLSLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
+    uid.JPEGLSNearLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
     uid.JPEG2000Lossless: ("pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.0"),
     uid.JPEG2000: ("pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.0"),
     uid.HTJ2KLossless: ("pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.0"),
@@ -57,7 +57,7 @@ def is_available(uid: str) -> bool:
         return False
 
     if uid in _LIBJPEG_SYNTAXES:
-        return _passes_version_check("libjpeg", (2, 0))
+        return _passes_version_check("libjpeg", (2, 0, 2))
 
     if uid in _OPENJPEG_SYNTAXES:
         return _passes_version_check("openjpeg", (2, 0))
