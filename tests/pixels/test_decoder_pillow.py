@@ -1,4 +1,4 @@
-"""Test the pylibjpeg decoder."""
+"""Test the pillow decoder."""
 
 import importlib
 
