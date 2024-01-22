@@ -1,3 +1,5 @@
+"""Test decoding native transfer syntaxes."""
+
 import pytest
 
 from pydicom import dcmread

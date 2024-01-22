@@ -1,7 +1,5 @@
 """Test the pylibjpeg decoder."""
 
-# TODO: Add test datasets for HTJ2K
-
 import importlib
 
 import pytest

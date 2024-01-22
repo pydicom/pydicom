@@ -147,7 +147,7 @@ mlut_18.dcm
 
 no_meta.dcm
   * Same as CT_small.dcm with no File Meta Information header
-    
+
 UN_sequence.dcm
   * Contains only one private sequence with VR UN
   * Provided by @naterichman to reproduce issue #1312
@@ -208,7 +208,7 @@ SC_rgb*.dcm
     pixel data corrected using script for PR #714
   * 2 frame versions created using a script for PR #714
   * RLE encoded versions created using GDCM's gdcmconv for PR #708
-  
+
 SC_rgb_small_odd*.dcm
   * 3x3 pixel version added for PR #601
   * Big Endian version added for PR #1687
@@ -228,10 +228,6 @@ SC_jpeg_no_color_transform_2.dcm
     from TCIA with APP14 marker segment included in JPEG header
   * Created for PR #878 using DCMTK's img2cdm script with the value of the
     Photometric Interpretation element patched
-    
-SC_jls_near_lossless.dcm
-  * 8-bit RGB, JPEG-LS Near Lossless (lossy error 2)
-  * Created using pyjpegls
 
 SC_ybr_full_uncompressed.dcm
   * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv

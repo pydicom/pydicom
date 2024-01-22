@@ -16,6 +16,17 @@ native and compressed (7FE0,0010) *Pixel Data*, (7FE0,0008) *Float Pixel Data* a
    ImplicitVRLittleEndianDecoder
    DeflatedExplicitVRLittleEndianDecoder
    ExplicitVRBigEndianDecoder
+   JPEGBaseline8BitDecoder
+   JPEGExtended12BitDecoder
+   JPEGLosslessDecoder
+   JPEGLosslessSV1Decoder
+   JPEGLSLosslessDecoder
+   JPEGLSNearLosslessDecoder
+   JPEG2000LosslessDecoder
+   JPEG2000Decoder
+   HTJ2KLosslessDecoder
+   HTJ2KLosslessRPCLDecoder
+   HTJ2KDecoder
    RLELosslessDecoder
 
 

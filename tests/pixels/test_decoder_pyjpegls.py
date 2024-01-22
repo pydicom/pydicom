@@ -1,7 +1,5 @@
 """Test the pyjpegls decoder."""
 
-# TODO: add near lossless dataset
-
 import importlib
 
 import pytest

@@ -25,6 +25,32 @@ plugin which performs the actual conversion.
 
 An decoding plugin must implement three objects within the same module:
 
+* A function named ``is_available`` with the following signature:
+
+  .. code-block:: python
+
+      def is_available(uid: pydicom.uid.UID) -> bool:
+
+  Where `uid` is the *Transfer Syntax UID* for the corresponding decoder as
+  a :class:`~pydicom.uid.UID`. If the plugin supports the `uid` and has
+  its dependencies met then it should return ``True``, otherwise it should
+  return ``False``.
+
+* A :class:`dict` named ``DECODER_DEPENDENCIES`` with the type
+  ``dict[pydicom.uid.UID, tuple[str, ...]``, such as:
+
+  .. code-block:: python
+
+      from pydicom.uid import RLELossless, JPEG2000
+
+      DECODER_DEPENDENCIES = {
+          RLELossless: ('numpy', 'pillow', 'imagecodecs'),
+          JPEG2000: ('numpy', 'gdcm'),
+      }
+
+  This will be used to provide the user with a list of dependencies
+  required by the plugin.
+
 * A function that performs the decoding with the following function signature:
 
   .. code-block:: python
@@ -60,50 +86,25 @@ An decoding plugin must implement three objects within the same module:
   * ``pixel_keyword``: :class:`str` - one of ``"PixelData"``, ``"FloatPixelData"``,
     ``"DoubleFloatPixelData"``.
 
-  And conditionally contains:
+  And conditionally:
 
   * ``pixel_representation``: :class:`int` - required when
     `pixel_keyword` is ``"PixelData"``, ``0`` for unsigned integers,
     ``1`` for signed.
   * ``planar_configuration``: :class:`int` - required when ``samples_per_pixel``
-      > 1, ``0`` for color-by-pixel, ``1`` for color-by-plane.
+    > 1, ``0`` for color-by-pixel, ``1`` for color-by-plane.
 
   If your decoder needs to signal that one of the decoding option values needs
   to be modified then this can be done with the
   :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_option` method. This
-  should only do this after successfully decoding the frame, as if the
+  should only be done after successfully decoding the frame, as if the
   decoding fails changing the option value may cause issues with
-  other decoding plugins that will also attempt to decode it. It's also important
-  to be aware that any changes you make will also affect following frames (if any).
+  other decoding plugins that may also attempt to decode the same frame. It's also
+  important to be aware that any changes you make will also affect following frames
+  (if any).
 
   When possible it's recommended that the decoding function return the decoded
   pixel data as a :class:`bytearray` to minimize later memory usage.
-
-* A function named ``is_available`` with the following signature:
-
-  .. code-block:: python
-
-      def is_available(uid: pydicom.uid.UID) -> bool:
-
-  Where `uid` is the *Transfer Syntax UID* for the corresponding decoder as
-  a :class:`~pydicom.uid.UID`. If the plugin supports the `uid` and has
-  its dependencies met then it should return ``True``, otherwise it should
-  return ``False``.
-
-* A :class:`dict` named ``DECODER_DEPENDENCIES`` with the type
-  ``dict[pydicom.uid.UID, tuple[str, ...]``, such as:
-
-  .. code-block:: python
-
-      from pydicom.uid import RLELossless, JPEG2000
-
-      DECODER_DEPENDENCIES = {
-          RLELossless: ('numpy', 'pillow', 'imagecodecs'),
-          JPEG2000: ('numpy', 'gdcm'),
-      }
-
-  This will be used to provide the user with a list of dependencies
-  required by the plugin.
 
 An example of the requirements of a plugin is available :gh:`here
 <pydicom/blob/main/src/pydicom/pixels/decoders/rle.py>`.
