@@ -1914,6 +1914,66 @@ def test(ref, arr, **kwargs):
 J2KI_16_16_1_1_1F_M2 = PixelReference("JPEG2000.dcm", "<i2", test)
 
 
+def test(ref, arr, **kwargs):
+    assert arr[160, 295:305].tolist() == [
+        [90, 38, 1],
+        [94, 40, 1],
+        [97, 42, 5],
+        [173, 122, 59],
+        [172, 133, 69],
+        [169, 135, 75],
+        [168, 136, 79],
+        [169, 137, 79],
+        [169, 137, 81],
+        [169, 136, 79],
+    ]
+    assert arr[275:285, 635].tolist() == [
+        [208, 193, 172],
+        [238, 228, 215],
+        [235, 229, 216],
+        [233, 226, 212],
+        [239, 231, 218],
+        [238, 232, 219],
+        [224, 218, 205],
+        [239, 234, 223],
+        [246, 241, 232],
+        [242, 236, 226],
+    ]
+
+
+HTJR_08_08_1_1_1F_RGB = PixelReference("HTJ2KLossless_08_RGB.dcm", "u1", test)
+
+
+def test(ref, arr, **kwargs):
+    assert arr[160, 295:305].tolist() == [
+        [91, 37, 2],
+        [94, 40, 1],
+        [97, 42, 5],
+        [174, 123, 59],
+        [172, 132, 69],
+        [169, 134, 74],
+        [168, 136, 77],
+        [168, 137, 80],
+        [168, 136, 80],
+        [169, 136, 78],
+    ]
+    assert arr[275:285, 635].tolist() == [
+        [207, 193, 171],
+        [238, 229, 215],
+        [235, 228, 216],
+        [233, 226, 213],
+        [238, 231, 218],
+        [239, 232, 219],
+        [225, 218, 206],
+        [240, 234, 223],
+        [247, 240, 232],
+        [242, 236, 227],
+    ]
+
+
+HTJI_08_08_1_1_1F_RGB = PixelReference("HTJ2K_08_RGB.dcm", "u1", test)
+
+
 PIXEL_REFERENCE[JPEG2000Lossless] = [
     J2KR_08_08_3_0_1F_YBR_ICT,
     J2KR_16_10_1_0_1F_M1,
@@ -1934,6 +1994,6 @@ PIXEL_REFERENCE[JPEG2000] = [
     J2KI_16_14_1_1_1F_M2,
     J2KI_16_16_1_1_1F_M2,
 ]
-PIXEL_REFERENCE[HTJ2KLossless] = []
+PIXEL_REFERENCE[HTJ2KLossless] = [HTJR_08_08_1_1_1F_RGB]
 PIXEL_REFERENCE[HTJ2KLosslessRPCL] = []
-PIXEL_REFERENCE[HTJ2K] = []
+PIXEL_REFERENCE[HTJ2K] = [HTJI_08_08_1_1_1F_RGB]
