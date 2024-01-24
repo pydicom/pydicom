@@ -399,7 +399,15 @@ JPEGTransferSyntaxes = [
 JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
 """JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
 
-JPEG2000TransferSyntaxes = [JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC]
+JPEG2000TransferSyntaxes = [
+    JPEG2000Lossless,
+    JPEG2000,
+    JPEG2000MCLossless,
+    JPEG2000MC,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    HTJ2K,
+]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
 MPEGTransferSyntaxes = [

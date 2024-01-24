@@ -7,7 +7,7 @@ This module is not intended to be used directly.
 from struct import unpack
 
 from pydicom.misc import warn_and_log
-from pydicom.pixels.decoders.base import DecodeOptions
+from pydicom.pixels.decoders.base import DecodeRunner
 from pydicom.uid import RLELossless
 
 
@@ -21,14 +21,16 @@ def is_available(uid: str) -> bool:
     return uid in DECODER_DEPENDENCIES
 
 
-def _decode_frame(src: bytes, opts: DecodeOptions) -> bytearray:
+def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     """Wrapper for use with the decoder interface.
 
     Parameters
     ----------
     src : bytes
         A single frame of RLE encoded data.
-    opts : pydicom.pixels.decoders.DecoderOptions
+    runner : pydicom.pixels.decoders.base.DecodeRunner
+
+
         Required parameters:
 
         * `rows`: int
@@ -48,15 +50,15 @@ def _decode_frame(src: bytes, opts: DecodeOptions) -> bytearray:
     """
     frame = _rle_decode_frame(
         src,
-        opts["rows"],
-        opts["columns"],
-        opts["samples_per_pixel"],
-        opts["bits_allocated"],
-        opts.get("rle_segment_order", ">"),
+        runner.rows,
+        runner.columns,
+        runner.samples_per_pixel,
+        runner.bits_allocated,
+        runner.get_option("rle_segment_order", ">"),
     )
     # Update the runner options to ensure the reshaping is correct
     # Only do this if we successfully decoded the frame
-    opts["planar_configuration"] = 1
+    runner.set_option("planar_configuration", 1)
 
     return frame
 

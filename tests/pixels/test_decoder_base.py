@@ -22,6 +22,7 @@ from pydicom.uid import (
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     RLELossless,
+    SMPTEST211030PCMDigitalAudio,
 )
 
 try:
@@ -348,18 +349,18 @@ class TestDecodeRunner:
         """Test test_for('be_swap_ow')"""
         runner = DecodeRunner(ExplicitVRBigEndian)
         with pytest.raises(ValueError, match=r"Unknown test 'foo'"):
-            runner.test_for("foo")
+            runner._test_for("foo")
 
         runner.set_option("bits_allocated", 8)
         runner.set_option("pixel_keyword", "PixelData")
 
-        assert runner.test_for("be_swap_ow") is False
+        assert runner._test_for("be_swap_ow") is False
         runner.set_option("be_swap_ow", True)
-        assert runner.test_for("be_swap_ow") is True
+        assert runner._test_for("be_swap_ow") is True
         runner.set_option("be_swap_ow", False)
-        assert runner.test_for("be_swap_ow") is False
+        assert runner._test_for("be_swap_ow") is False
         runner.set_option("pixel_vr", "OW")
-        assert runner.test_for("be_swap_ow") is True
+        assert runner._test_for("be_swap_ow") is True
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_pixel_dtype_unsupported_raises(self):
@@ -626,7 +627,7 @@ class TestDecodeRunner:
             runner.decode(0)
 
         decoder = get_decoder(RLELossless)
-        runner.set_decoders(decoder._validate_decoders())
+        runner.set_decoders(decoder._validate_decoders("pydicom"))
         buffer = runner.decode(0)
 
         assert runner._previous[1] == runner._decoders["pydicom"]
@@ -668,7 +669,8 @@ class TestDecodeRunner:
             runner.decode(0)
 
         decoder = get_decoder(RLELossless)
-        runner.set_decoders(decoder._validate_decoders(""))
+        plugins = decoder._validate_decoders("pydicom")
+        runner.set_decoders(plugins)
         data = runner.iter_decode()
         buffer = next(data)
 
@@ -1408,7 +1410,7 @@ class TestDecoder_Array:
 
         reference = RLE_16_1_10F
         for index in [0, 4, 9]:
-            arr = decoder.as_array(reference.ds, index=index)
+            arr = decoder.as_array(reference.ds, index=index, decoding_plugin="pydicom")
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
@@ -1630,7 +1632,9 @@ class TestDecoder_Array:
         reference = RLE_16_1_10F
 
         indices = [0, 4, 9]
-        func = decoder.iter_array(reference.ds, raw=True, indices=indices)
+        func = decoder.iter_array(
+            reference.ds, raw=True, indices=indices, decoding_plugin="pydicom"
+        )
         for idx, arr in enumerate(func):
             reference.test(arr, index=indices[idx])
             assert arr.dtype == reference.dtype
@@ -1970,6 +1974,9 @@ def test_get_decoder():
         assert isinstance(decoder, Decoder)
         assert decoder.UID == uid
 
-    msg = r"No pixel data decoders have been implemented for 'JPEG Baseline \(Process 1\)'"
+    msg = (
+        "No pixel data decoders have been implemented for 'SMPTE ST 2110-30 "
+        "PCM Digital Audio'"
+    )
     with pytest.raises(NotImplementedError, match=msg):
-        get_decoder(JPEGBaseline8Bit)
+        get_decoder(SMPTEST211030PCMDigitalAudio)

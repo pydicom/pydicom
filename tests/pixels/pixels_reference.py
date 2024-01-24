@@ -22,6 +22,9 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    HTJ2K,
     RLELossless,
 )
 
@@ -138,7 +141,7 @@ PIXEL_REFERENCE = {}
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 
 
-# 0: EXPL, (1, 1), (1, 512, 512, 1), OB, MONOCHROME2, 0
+# EXPL, (1, 1), (1, 512, 512, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     assert (0, 1, 1) == tuple(arr[155, 180:183])
     assert (1, 0, 1, 0) == tuple(arr[155, 310:314])
@@ -149,7 +152,7 @@ def test(ref, arr, **kwargs):
 EXPL_1_1_1F = PixelReference("liver_1frame.dcm", "u1", test)
 
 
-# 1: EXPL, (1, 1), (3, 512, 512, 1), OB, MONOCHROME2, 0
+# EXPL, (1, 1), (3, 512, 512, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -193,7 +196,7 @@ def test(ref, arr, **kwargs):
 EXPL_1_1_3F = PixelReference("liver.dcm", "u1", test)
 
 
-# 0: DEFL, (8, 8), (1, 512, 512, 1), OB, MONOCHROME2, 0
+# DEFL, (8, 8), (1, 512, 512, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     assert 41 == arr[10].min()
     assert 255 == arr[10].max()
@@ -205,7 +208,7 @@ def test(ref, arr, **kwargs):
 DEFL_8_1_1F = PixelReference("image_dfl.dcm", "u1", test)
 
 
-# 2: EXPL, (8, 8), (1, 600, 800, 1), OW, PALETTE COLOR, 0
+# EXPL, (8, 8), (1, 600, 800, 1), OW, PALETTE COLOR, 0
 def test(ref, arr, **kwargs):
     assert 244 == arr[0].min() == arr[0].max()
     assert (1, 246, 1) == tuple(arr[300, 491:494])
@@ -215,7 +218,7 @@ def test(ref, arr, **kwargs):
 EXPL_8_1_1F = PixelReference("OBXXXX1A.dcm", "u1", test)
 
 
-# 3: EXPL, (8, 8), (2, 600, 800, 1), OW, PALETTE COLOR, "u1"
+# EXPL, (8, 8), (2, 600, 800, 1), OW, PALETTE COLOR, "u1"
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -237,7 +240,7 @@ def test(ref, arr, **kwargs):
 EXPL_8_1_2F = PixelReference("OBXXXX1A_2frame.dcm", "u1", test)
 
 
-# 4: EXPL, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# EXPL, (8, 8), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert (255, 0, 0) == tuple(arr[5, 50, :])
     assert (255, 128, 128) == tuple(arr[15, 50, :])
@@ -254,7 +257,7 @@ def test(ref, arr, **kwargs):
 EXPL_8_3_1F = PixelReference("SC_rgb.dcm", "u1", test)
 
 
-# 5: EXPL, (8, 8), (1, 3, 3, 3), OW, RGB, 0
+# EXPL, (8, 8), (1, 3, 3, 3), OW, RGB, 0
 def test(ref, arr, **kwargs):
     assert arr[0].tolist() == [
         [166, 141, 52],
@@ -276,7 +279,7 @@ def test(ref, arr, **kwargs):
 EXPL_8_3_1F_ODD = PixelReference("SC_rgb_small_odd.dcm", "u1", test)
 
 
-# 6: EXPL, (8, 8), (1, 100, 100, 3), OB, YBR_FULL_422, 0
+# EXPL, (8, 8), (1, 100, 100, 3), OB, YBR_FULL_422, 0
 def test(ref, arr, **kwargs):
     assert (76, 85, 255) == tuple(arr[5, 50, :])
     assert (166, 106, 193) == tuple(arr[15, 50, :])
@@ -293,7 +296,7 @@ def test(ref, arr, **kwargs):
 EXPL_8_3_1F_YBR422 = PixelReference("SC_ybr_full_422_uncompressed.dcm", "u1", test)
 
 
-# 7: EXPL, (8, 8),  (1, 100, 100, 3), OB, YBR_FULL, 0
+# EXPL, (8, 8),  (1, 100, 100, 3), OB, YBR_FULL, 0
 def test(ref, arr, **kwargs):
     if kwargs.get("as_rgb"):
         assert (254, 0, 0) == tuple(arr[5, 50, :])
@@ -322,7 +325,7 @@ def test(ref, arr, **kwargs):
 EXPL_8_3_1F_YBR = PixelReference("SC_ybr_full_uncompressed.dcm", "u1", test)
 
 
-# 8: EXPL, (8, 8), (2, 100, 100, 3), OB, RGB, 0
+# EXPL, (8, 8), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -358,7 +361,34 @@ def test(ref, arr, **kwargs):
 EXPL_8_3_2F = PixelReference("SC_rgb_2frame.dcm", "u1", test)
 
 
-# 0: IMPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
+# IMPL, (8, 8), (1, 256, 256, 3), OW, RGB, 0
+def test(ref, arr, **kwargs):
+    assert arr[29, 77:81].tolist() == [
+        [240, 243, 246],
+        [214, 210, 213],
+        [150, 134, 134],
+        [244, 244, 244],
+    ]
+    assert arr[224:227, 253].tolist() == [
+        [231, 236, 238],
+        [190, 175, 178],
+        [215, 200, 202],
+    ]
+
+
+IMPL_08_08_3_0_1F_RGB = PixelReference("SC_rgb_jpeg_dcmd.dcm", "u1", test)
+
+
+# EXPL, (16, 16), (1, 128, 128, 1), OW, MONOCHROME2, 1
+def test(ref, arr, **kwargs):
+    assert arr[24, 36:40].tolist() == [520, 802, 930, 1008]
+    assert arr[40:45, 40].tolist() == [1138, 1165, 1113, 1088, 1072]
+
+
+EXPL_16_16_1F = PixelReference("CT_small.dcm", "i2", test)
+
+
+# IMPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     assert (422, 319, 361) == tuple(arr[0, 31:34])
     assert (366, 363, 322) == tuple(arr[31, :3])
@@ -370,7 +400,7 @@ def test(ref, arr, **kwargs):
 IMPL_16_1_1F = PixelReference("MR_small_implicit.dcm", "<i2", test)
 
 
-# 9: EXPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
+# EXPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     assert (422, 319, 361) == tuple(arr[0, 31:34])
     assert (366, 363, 322) == tuple(arr[31, :3])
@@ -382,7 +412,7 @@ def test(ref, arr, **kwargs):
 EXPL_16_1_1F = PixelReference("MR_small.dcm", "<i2", test)
 
 
-# 10: EXPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
+# EXPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 # Pixel Data with 128 bytes trailing padding
 def test(ref, arr, **kwargs):
     assert (422, 319, 361) == tuple(arr[0, 31:34])
@@ -395,7 +425,7 @@ def test(ref, arr, **kwargs):
 EXPL_16_1_1F_PAD = PixelReference("MR_small_padded.dcm", "<i2", test)
 
 
-# 11: EXPL, (16, 12), (10, 64, 64, 1), OW, MONOCHROME2, 0
+# EXPL, (16, 12), (10, 64, 64, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -424,7 +454,7 @@ def test(ref, arr, **kwargs):
 EXPL_16_1_10F = PixelReference("emri_small.dcm", "<u2", test)
 
 
-# 12: EXPL, (16, 16), (1, 100, 100, 3), OB, RGB, 0
+# EXPL, (16, 16), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert (65535, 0, 0) == tuple(arr[5, 50, :])
     assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
@@ -441,7 +471,7 @@ def test(ref, arr, **kwargs):
 EXPL_16_3_1F = PixelReference("SC_rgb_16bit.dcm", "<u2", test)
 
 
-# 13: EXPL, (16, 16), (2, 100, 100, 3), OB, RGB, 0
+# EXPL, (16, 16), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -477,7 +507,7 @@ def test(ref, arr, **kwargs):
 EXPL_16_3_2F = PixelReference("SC_rgb_16bit_2frame.dcm", "<u2", test)
 
 
-# 1: IMPL, (32, 32), (1, 10, 10, 1), OW, MONOCHROME2, 0
+# IMPL, (32, 32), (1, 10, 10, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
     assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
@@ -487,7 +517,7 @@ def test(ref, arr, **kwargs):
 IMPL_32_1_1F = PixelReference("rtdose_1frame.dcm", "<u4", test)
 
 
-# 2: IMPL, (32, 32), (15, 10, 10, 1), OW, MONOCHROME2,
+# IMPL, (32, 32), (15, 10, 10, 1), OW, MONOCHROME2,
 def test(ref, arr, **kwargs):
     index = kwargs.get("index")
 
@@ -516,7 +546,7 @@ def test(ref, arr, **kwargs):
 IMPL_32_1_15F = PixelReference("rtdose.dcm", "<u4", test)
 
 
-# 14: EXPL, (32, 32), (1, 100, 100, 3), OB, RGB, 0
+# EXPL, (32, 32), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
     assert (4294967295, 2155905152, 2155905152) == tuple(arr[15, 50, :])
@@ -533,7 +563,7 @@ def test(ref, arr, **kwargs):
 EXPL_32_3_1F = PixelReference("SC_rgb_32bit.dcm", "<u4", test)
 
 
-# 15: EXPL, (32, 32), (2, 100, 100, 3), OB, RGB, 0
+# EXPL, (32, 32), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -579,6 +609,7 @@ PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
     EXPL_8_3_1F_YBR422,
     EXPL_8_3_1F_YBR,
     EXPL_8_3_2F,
+    EXPL_16_16_1F,
     EXPL_16_1_1F,
     EXPL_16_1_1F_PAD,
     EXPL_16_1_10F,
@@ -588,6 +619,7 @@ PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
     EXPL_32_3_2F,
 ]
 PIXEL_REFERENCE[ImplicitVRLittleEndian] = [
+    IMPL_08_08_3_0_1F_RGB,
     IMPL_16_1_1F,
     IMPL_32_1_1F,
     IMPL_32_1_15F,
@@ -600,7 +632,7 @@ PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian] = [DEFL_8_1_1F]
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 
 
-# 0: EXPB, (1, 1), (1, 512, 512, 1), OB, MONOCHROME2, 0
+# EXPB, (1, 1), (1, 512, 512, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     assert 0 == arr.min()
     assert 1 == arr.max()
@@ -610,7 +642,7 @@ def test(ref, arr, **kwargs):
 EXPB_1_1_1F = PixelReference("liver_expb_1frame.dcm", "u1", test)
 
 
-# 1: EXPB, (1, 1), (3, 512, 512, 1), OB, MONOCHROME2, 0
+# EXPB, (1, 1), (3, 512, 512, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -654,7 +686,7 @@ def test(ref, arr, **kwargs):
 EXPB_1_1_3F = PixelReference("liver_expb.dcm", "u1", test)
 
 
-# 2: EXPB, (8, 8), (1, 600, 800, 1), OW, PALETTE COLOR, 0
+# EXPB, (8, 8), (1, 600, 800, 1), OW, PALETTE COLOR, 0
 def test(ref, arr, **kwargs):
     assert 244 == arr[0].min() == arr[0].max()
     assert (1, 246, 1) == tuple(arr[300, 491:494])
@@ -664,7 +696,7 @@ def test(ref, arr, **kwargs):
 EXPB_8_1_1F = PixelReference("OBXXXX1A_expb.dcm", "u1", test)
 
 
-# 3: EXPB, (8, 8), (2, 600, 800, 1), OW, PALETTE COLOR, 0
+# EXPB, (8, 8), (2, 600, 800, 1), OW, PALETTE COLOR, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -686,7 +718,7 @@ def test(ref, arr, **kwargs):
 EXPB_8_1_2F = PixelReference("OBXXXX1A_expb_2frame.dcm", "u1", test)
 
 
-# 4: EXPB, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# EXPB, (8, 8), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert (255, 0, 0) == tuple(arr[5, 50, :])
     assert (255, 128, 128) == tuple(arr[15, 50, :])
@@ -703,7 +735,7 @@ def test(ref, arr, **kwargs):
 EXPB_8_3_1F = PixelReference("SC_rgb_expb.dcm", "u1", test)
 
 
-# 5: EXPB, (8, 8), (1, 3, 3, 3), OW, RGB, 0
+# EXPB, (8, 8), (1, 3, 3, 3), OW, RGB, 0
 def test(ref, arr, **kwargs):
     assert arr[0, 0].tolist() == [166, 141, 52]
     assert arr[1, 0].tolist() == [63, 87, 176]
@@ -714,7 +746,21 @@ def test(ref, arr, **kwargs):
 EXPB_8_3_1F_ODD = PixelReference("SC_rgb_small_odd_big_endian.dcm", "u1", test)
 
 
-# 6: EXPB, (8, 8), (2, 100, 100, 3), OB, RGB, 0
+# EXPB, (8, 8), (1, 60, 80, 3), OB, RGB, 0
+def test(ref, arr, **kwargs):
+    assert arr[9, 3:6].tolist() == [[171, 171, 171], [255, 255, 255], [255, 255, 0]]
+    assert arr[58, 8:12].tolist() == [
+        [255, 236, 0],
+        [255, 183, 0],
+        [255, 175, 0],
+        [255, 183, 0],
+    ]
+
+
+EXPB_8_8_3_1F_RGB = PixelReference("ExplVR_BigEnd.dcm", "u1", test)
+
+
+# EXPB, (8, 8), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -750,7 +796,7 @@ def test(ref, arr, **kwargs):
 EXPB_8_3_2F = PixelReference("SC_rgb_expb_2frame.dcm", "u1", test)
 
 
-# 7: EXPB, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
+# EXPB, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     assert (422, 319, 361) == tuple(arr[0, 31:34])
     assert (366, 363, 322) == tuple(arr[31, :3])
@@ -762,7 +808,7 @@ def test(ref, arr, **kwargs):
 EXPB_16_1_1F = PixelReference("MR_small_expb.dcm", ">i2", test)
 
 
-# 8: EXPB, (16, 12), (10, 64, 64, 1), OW, MONOCHROME2, 0
+# EXPB, (16, 12), (10, 64, 64, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -791,7 +837,7 @@ def test(ref, arr, **kwargs):
 EXPB_16_1_10F = PixelReference("emri_small_big_endian.dcm", ">u2", test)
 
 
-# 9: EXPB, (16, 16), (1, 100, 100, 3), OB, RGB, 0
+# EXPB, (16, 16), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert (65535, 0, 0) == tuple(arr[5, 50, :])
     assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
@@ -808,7 +854,7 @@ def test(ref, arr, **kwargs):
 EXPB_16_3_1F = PixelReference("SC_rgb_expb_16bit.dcm", ">u2", test)
 
 
-# 10: EXPB, (16, 16), (2, 100, 100, 3), OB, RGB, 0
+# EXPB, (16, 16), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -844,7 +890,7 @@ def test(ref, arr, **kwargs):
 EXPB_16_3_2F = PixelReference("SC_rgb_expb_16bit_2frame.dcm", ">u2", test)
 
 
-# 11: EXPB, (32, 32), (1, 10, 10, 1), OW, MONOCHROME2, 0
+# EXPB, (32, 32), (1, 10, 10, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
     assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
@@ -854,7 +900,7 @@ def test(ref, arr, **kwargs):
 EXPB_32_1_1F = PixelReference("rtdose_expb_1frame.dcm", ">u4", test)
 
 
-# 12: EXPB, (32, 32), (15, 10, 10, 1), OW, MONOCHROME2, 0
+# EXPB, (32, 32), (15, 10, 10, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -883,7 +929,7 @@ def test(ref, arr, **kwargs):
 EXPB_32_1_15F = PixelReference("rtdose_expb.dcm", ">u4", test)
 
 
-# 13: EXPB, (32, 32), (1, 100, 100, 3), OB, RGB, 0
+# EXPB, (32, 32), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
     assert (4294967295, 2155905152, 2155905152) == tuple(arr[15, 50, :])
@@ -900,7 +946,7 @@ def test(ref, arr, **kwargs):
 EXPB_32_3_1F = PixelReference("SC_rgb_expb_32bit.dcm", ">u4", test)
 
 
-# 14: EXPB, (32, 32), (2, 100, 100, 3), OB, RGB, 0
+# EXPB, (32, 32), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -943,6 +989,7 @@ PIXEL_REFERENCE[ExplicitVRBigEndian] = [
     EXPB_8_1_2F,
     EXPB_8_3_1F,
     EXPB_8_3_1F_ODD,
+    EXPB_8_8_3_1F_RGB,
     EXPB_8_3_2F,
     EXPB_16_1_1F,
     EXPB_16_1_10F,
@@ -960,7 +1007,7 @@ PIXEL_REFERENCE[ExplicitVRBigEndian] = [
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 
 
-# 0: RLE, (8, 8), (1, 600, 800, 1), OB, PALETTE COLOR, 0
+# RLE, (8, 8), (1, 600, 800, 1), OB, PALETTE COLOR, 0
 def test(ref, arr, **kwargs):
     assert arr[0].min() == arr[0].max() == 244
     assert tuple(arr[300, 491:494]) == (1, 246, 1)
@@ -970,7 +1017,7 @@ def test(ref, arr, **kwargs):
 RLE_8_1_1F = PixelReference("OBXXXX1A_rle.dcm", "u1", test)
 
 
-# 1: RLE, (8, 8), (2, 600, 800, 1), OB, PALETTE COLOR, 0
+# RLE, (8, 8), (2, 600, 800, 1), OB, PALETTE COLOR, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -991,7 +1038,7 @@ def test(ref, arr, **kwargs):
 RLE_8_1_2F = PixelReference("OBXXXX1A_rle_2frame.dcm", "u1", test)
 
 
-# 2: RLE, (8, 8), (1, 100, 100, 3), OB, PALETTE COLOR, 0
+# RLE, (8, 8), (1, 100, 100, 3), OB, PALETTE COLOR, 0
 def test(ref, arr, **kwargs):
     assert tuple(arr[5, 50, :]) == (255, 0, 0)
     assert tuple(arr[15, 50, :]) == (255, 128, 128)
@@ -1008,7 +1055,7 @@ def test(ref, arr, **kwargs):
 RLE_8_3_1F = PixelReference("SC_rgb_rle.dcm", "u1", test)
 
 
-# 3: RLE, (8, 8), (2, 100, 100, 3), OB, RGB, 0
+# RLE, (8, 8), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -1044,7 +1091,7 @@ def test(ref, arr, **kwargs):
 RLE_8_3_2F = PixelReference("SC_rgb_rle_2frame.dcm", "u1", test)
 
 
-# 4: RLE, (16, 16), (1, 64, 64, 1), OB, MONOCHROME2, 1
+# RLE, (16, 16), (1, 64, 64, 1), OB, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     assert tuple(arr[0, 31:34]) == (422, 319, 361)
     assert tuple(arr[31, :3]) == (366, 363, 322)
@@ -1054,7 +1101,7 @@ def test(ref, arr, **kwargs):
 RLE_16_1_1F = PixelReference("MR_small_RLE.dcm", "<i2", test)
 
 
-# 5: RLE, (16, 12), (10, 64, 64, 1), OB, MONOCHROME2, 0
+# RLE, (16, 12), (10, 64, 64, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -1083,7 +1130,7 @@ def test(ref, arr, **kwargs):
 RLE_16_1_10F = PixelReference("emri_small_RLE.dcm", "<u2", test)
 
 
-# 6: RLE, (16, 16), (1, 100, 100, 3), OW, RGB, 0
+# RLE, (16, 16), (1, 100, 100, 3), OW, RGB, 0
 def test(ref, arr, **kwargs):
     assert tuple(arr[5, 50, :]) == (65535, 0, 0)
     assert tuple(arr[15, 50, :]) == (65535, 32896, 32896)
@@ -1100,7 +1147,7 @@ def test(ref, arr, **kwargs):
 RLE_16_3_1F = PixelReference("SC_rgb_rle_16bit.dcm", "<u2", test)
 
 
-# 7: RLE, (16, 16), (2, 100, 100, 3), OW, RGB, 0
+# RLE, (16, 16), (2, 100, 100, 3), OW, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -1136,7 +1183,7 @@ def test(ref, arr, **kwargs):
 RLE_16_3_2F = PixelReference("SC_rgb_rle_16bit_2frame.dcm", "<u2", test)
 
 
-# 8: RLE, (32, 32), (1, 10, 10, 1), OW, MONOCHROME2, 0
+# RLE, (32, 32), (1, 10, 10, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     assert tuple(arr[0, :3]) == (1249000, 1249000, 1250000)
     assert tuple(arr[4, 3:6]) == (1031000, 1029000, 1027000)
@@ -1146,7 +1193,7 @@ def test(ref, arr, **kwargs):
 RLE_32_1_1F = PixelReference("rtdose_rle_1frame.dcm", "<u4", test)
 
 
-# 9: RLE, (32, 32), (15, 10, 10, 1), OW, MONOCHROME2, 0
+# RLE, (32, 32), (15, 10, 10, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -1175,7 +1222,7 @@ def test(ref, arr, **kwargs):
 RLE_32_1_15F = PixelReference("rtdose_rle.dcm", "<u4", test)
 
 
-# 10: RLE, (32, 32), (1, 100, 100, 3), OB, RGB, 0
+# RLE, (32, 32), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     assert tuple(arr[5, 50, :]) == (4294967295, 0, 0)
     assert tuple(arr[15, 50, :]) == (4294967295, 2155905152, 2155905152)
@@ -1192,7 +1239,7 @@ def test(ref, arr, **kwargs):
 RLE_32_3_1F = PixelReference("SC_rgb_rle_32bit.dcm", "<u4", test)
 
 
-# 11: RLE, (32, 32), (2, 100, 100, 3), OB, RGB, 0
+# RLE, (32, 32), (2, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
     index = kwargs.get("index", None)
 
@@ -1249,8 +1296,10 @@ PIXEL_REFERENCE[RLELossless] = [
 # JPGE: JPEGExtended12Bit
 # JPGL: JPEGLossless
 # JPGS: JPEGLosslessSV1
+
+
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
-# JPGB, (8, 8), (1, 3, 3, 3), OB, YBR_FULL, 0
+# 0: JPGB, (8, 8), (1, 3, 3, 3), OB, YBR_FULL, 0
 def test(ref, arr, **kwargs):
     # Pillow, pylibjpeg
     assert tuple(arr[0, 0, :]) == (138, 78, 147)
@@ -1261,9 +1310,87 @@ def test(ref, arr, **kwargs):
 JPGB_08_08_3_0_1F_YBR_FULL = PixelReference("SC_rgb_small_odd_jpeg.dcm", "u1", test)
 
 
+# JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# JPEG baseline in RGB colourspace with no APP14 marker
+def test(ref, arr, **kwargs):
+    assert arr[29, 77:81].tolist() == [
+        [240, 243, 246],
+        [214, 210, 213],
+        [150, 134, 134],
+        [244, 244, 244],
+    ]
+    if kwargs.get("plugin", None) in ("pillow", "gdcm"):
+        assert arr[224:227, 253].tolist() == [
+            [231, 236, 238],
+            [190, 175, 178],
+            [215, 200, 202],
+        ]
+    else:
+        assert arr[224:227, 253].tolist() == [
+            [232, 236, 238],
+            [190, 175, 178],
+            [215, 200, 202],
+        ]
+
+
+JPGB_08_08_3_0_1F_RGB_NO_APP14 = PixelReference(
+    "SC_jpeg_no_color_transform.dcm", "u1", test
+)
+
+
+# JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# JPEG baseline in RGB colourspace with APP14 Adobe v101 marker
+def test(ref, arr, **kwargs):
+    # Works with pillow and GDCM
+    # pylibjpeg: decoding error due to unknown Adobe marker version
+    assert arr[99:104, 172].tolist() == [
+        [243, 244, 246],
+        [229, 224, 235],
+        [204, 190, 213],
+        [194, 176, 203],
+        [204, 188, 211],
+    ]
+    assert arr[84, 239:243].tolist() == [
+        [229, 225, 234],
+        [174, 174, 202],
+        [187, 185, 203],
+        [210, 207, 225],
+    ]
+
+
+JPGB_08_08_3_0_1F_RGB_APP14 = PixelReference(
+    "SC_jpeg_no_color_transform_2.dcm", "u1", test
+)
+
+
+# JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# JPEG baseline in RGB colourspace with APP14 Adobe v101 marker
+def test(ref, arr, **kwargs):
+    # Works with pillow and GDCM
+    # pylibjpeg: decoding error due to unknown Adobe marker version
+    assert arr[99:104, 172].tolist() == [
+        [243, 244, 246],
+        [229, 224, 235],
+        [204, 190, 213],
+        [194, 176, 203],
+        [204, 188, 211],
+    ]
+    assert arr[84, 239:243].tolist() == [
+        [229, 225, 234],
+        [174, 174, 202],
+        [187, 185, 203],
+        [210, 207, 225],
+    ]
+
+
+JPGB_08_08_3_0_1F_RGB_DCMD_APP14 = PixelReference(
+    "SC_rgb_jpeg_app14_dcmd.dcm", "u1", test
+)
+
+
 # JPGB, (8, 8), (120, 480, 640, 3), OB, YBR_FULL_422, 0
 def test(ref, arr, **kwargs):
-    # Pillow, pylibjpeg
+    # Pillow, pylibjpeg, gdcm
     assert arr[0, 278, 300:310].tolist() == [
         [64, 128, 128],
         [76, 128, 128],
@@ -1276,7 +1403,7 @@ def test(ref, arr, **kwargs):
         [106, 128, 128],
         [108, 128, 128],
     ]
-    if kwargs.get("plugin", None) == "pillow":
+    if kwargs.get("plugin", None) in ("pillow", "gdcm"):
         assert arr[59, 278, 300:310].tolist() == [
             [22, 128, 128],
             [22, 128, 128],
@@ -1289,7 +1416,7 @@ def test(ref, arr, **kwargs):
             [24, 128, 128],
             [33, 128, 128],
         ]
-        assert arr[-1, 278, 300:310] == [
+        assert arr[-1, 278, 300:310].tolist() == [
             [46, 128, 128],
             [55, 128, 128],
             [64, 128, 128],
@@ -1301,26 +1428,25 @@ def test(ref, arr, **kwargs):
             [110, 128, 128],
             [117, 128, 128],
         ]
-    else:
-        # pylibjpeg
+    elif kwargs.get("plugin", None) == "pylibjpeg":
         assert arr[59, 278, 300:310].tolist() == [
             [22, 128, 128],
             [22, 128, 128],
             [27, 128, 128],
             [32, 128, 128],
             [32, 128, 128],
-            [30, 128, 128],
+            [30, 128, 128],  #
             [23, 128, 128],
             [21, 128, 128],
             [24, 128, 128],
             [33, 128, 128],
         ]
-        assert arr[-1, 278, 300:310] == [
+        assert arr[-1, 278, 300:310].tolist() == [
             [46, 128, 128],
             [55, 128, 128],
             [64, 128, 128],
             [74, 128, 128],
-            [81, 128, 128],
+            [81, 128, 128],  #
             [86, 128, 128],
             [97, 128, 128],
             [104, 128, 128],
@@ -1334,10 +1460,27 @@ JPGB_08_08_3_0_120F_YBR_FULL_422 = PixelReference(
 )
 
 
-# Different subsampling 411, 422, 444
-# JPGB, (8, 8), (1, 100, 100, 3), OB, YBR_FULL_422, 0
+# JPGB, (8, 8), (1, 100, 100, 3), OB, YBR_FULL, 0
 def test(ref, arr, **kwargs):
-    if kwargs.get("plugin", None) == "pillow":
+    assert tuple(arr[5, 50, :]) == (76, 85, 255)
+    assert tuple(arr[15, 50, :]) == (166, 106, 193)
+    assert tuple(arr[25, 50, :]) == (150, 46, 20)
+    assert tuple(arr[35, 50, :]) == (203, 86, 75)
+    assert tuple(arr[45, 50, :]) == (29, 255, 107)
+    assert tuple(arr[55, 50, :]) == (142, 193, 118)
+    assert tuple(arr[65, 50, :]) == (0, 128, 128)
+    assert tuple(arr[75, 50, :]) == (64, 128, 128)
+    assert tuple(arr[85, 50, :]) == (192, 128, 128)
+    assert tuple(arr[95, 50, :]) == (255, 128, 128)
+
+
+JPGB_08_08_3_1F_YBR_FULL = PixelReference("SC_rgb_jpeg_dcmtk.dcm", "u1", test)
+
+
+# JPGB, (8, 8), (1, 100, 100, 3), OB, YBR_FULL_422, 0
+# Different subsampling 411, 422, 444
+def test(ref, arr, **kwargs):
+    if kwargs.get("plugin", None) in ("pillow", "gdcm"):
         assert tuple(arr[5, 50, :]) == (76, 85, 254)
         assert tuple(arr[15, 50, :]) == (166, 109, 190)  #
         assert tuple(arr[25, 50, :]) == (150, 46, 21)
@@ -1389,7 +1532,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_422_422 = PixelReference(
 
 # JPGB, (8, 8), (1, 100, 100, 3), OB, YBR_FULL, 0
 def test(ref, arr, **kwargs):
-    if kwargs.get("plugin", None) == "pillow":
+    if kwargs.get("plugin", None) in ("pillow", "gdcm"):
         assert tuple(arr[5, 50, :]) == (76, 85, 254)
         assert tuple(arr[15, 50, :]) == (166, 109, 190)  #
         assert tuple(arr[25, 50, :]) == (150, 46, 21)
@@ -1461,7 +1604,6 @@ JPGB_08_08_3_0_1F_YBR_FULL_444 = PixelReference(
 
 # JPGB, (8, 8), (1, 100, 100, 3), OB, RGB, 0
 def test(ref, arr, **kwargs):
-    # pillow, pylibjpeg
     assert tuple(arr[5, 50, :]) == (255, 0, 0)
     assert tuple(arr[15, 50, :]) == (255, 128, 128)
     assert tuple(arr[25, 50, :]) == (0, 255, 0)
@@ -1477,16 +1619,33 @@ def test(ref, arr, **kwargs):
 JPGB_08_08_3_0_1F_RGB = PixelReference("SC_rgb_dcmtk_+eb+cr.dcm", "u1", test)
 
 
+# JPGB, (8, 8), (1, 100, 100, 3), OB, YBR_FULL, 0
+def test(ref, arr, **kwargs):
+    assert tuple(arr[5, 50, :]) == (76, 85, 255)
+    assert tuple(arr[15, 50, :]) == (166, 107, 191)
+    assert tuple(arr[25, 50, :]) == (150, 44, 21)
+    assert tuple(arr[35, 50, :]) == (203, 86, 75)
+    assert tuple(arr[45, 50, :]) == (29, 255, 107)
+    assert tuple(arr[55, 50, :]) == (142, 191, 118)
+    assert tuple(arr[65, 50, :]) == (0, 128, 128)
+    assert tuple(arr[75, 50, :]) == (64, 128, 128)
+    assert tuple(arr[85, 50, :]) == (192, 128, 128)
+    assert tuple(arr[95, 50, :]) == (255, 128, 128)
+
+
+JPGB_08_08_3_1F_YBR_FULL = PixelReference("SC_rgb_jpeg_lossy_gdcm.dcm", "u1", test)
+
+
 # JPGE, (16, 12), (1, 1024, 256, 1), OB, MONOCHROME2, 0
 # Bad file - scan stop has invalid value
 def test(ref, arr, **kwargs):
-    # gdcm only
     # pylibjpeg won't decode due to invalid value scan stop value
+    # gdcm won't decode due to 12-bit
     assert 244 == arr[420, 140]
     assert 95 == arr[230, 120]
 
 
-JPGE_BAD = PixelReference("JPEG-lossy.dcm", "u1", test)
+JPGE_BAD = PixelReference("JPEG-lossy.dcm", "u2", test)
 
 
 # JPGE, (16, 12), (1, 1024, 256, 1), OB, MONOCHROME2,
@@ -1497,68 +1656,184 @@ def test(ref, arr, **kwargs):
     assert 95 == arr[230, 120]
 
 
-JPGE_16_12_1_0_1F_M2 = PixelReference("JPGExtended.dcm", "u1", test)
+JPGE_16_12_1_0_1F_M2 = PixelReference("JPGExtended.dcm", "u2", test)
 
 
-# JPGL, (8, 8), (1, 768, 1024, 1), OB, MONOCHROME2, 0
+# JPGS, (8, 8), (1, 768, 1024, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     # pylibjpeg
     assert tuple(arr[300, 512:520]) == (26, 26, 25, 22, 19, 16, 14, 15)
     assert tuple(arr[600, 512:520]) == (45, 43, 41, 38, 33, 30, 26, 21)
 
 
-JPGL_08_08_1_0_1F = PixelReference("JPGLosslessP14SV1_1s_1f_8b.dcm", "u1", test)
+JPGS_08_08_1_0_1F = PixelReference("JPGLosslessP14SV1_1s_1f_8b.dcm", "u1", test)
 
 
-# JPGL, (16, 16), (1, 1024, 256, 1), OB, MONOCHROME2, 1
+# JPGS, (16, 16), (1, 1024, 256, 1), OB, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     # pylibjpeg
     assert tuple(arr[400, 124:132]) == (60, 58, 61, 68, 59, 65, 64, 67)
     assert tuple(arr[600, 124:132]) == (3, 1, 2, 0, 2, 1, 2, 0)
 
 
-JPGL_16_16_1_1_1F_M2 = PixelReference("JPEG-LL.dcm", "<i2", test)
+JPGS_16_16_1_1_1F_M2 = PixelReference("JPEG-LL.dcm", "<i2", test)
+
+
+# JPGS, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+def test(ref, arr, **kwargs):
+    assert tuple(arr[5, 50, :]) == (255, 0, 0)
+    assert tuple(arr[15, 50, :]) == (255, 128, 128)
+    assert tuple(arr[25, 50, :]) == (0, 255, 0)
+    assert tuple(arr[35, 50, :]) == (128, 255, 128)
+    assert tuple(arr[45, 50, :]) == (0, 0, 255)
+    assert tuple(arr[55, 50, :]) == (128, 128, 255)
+    assert tuple(arr[65, 50, :]) == (0, 0, 0)
+    assert tuple(arr[75, 50, :]) == (64, 64, 64)
+    assert tuple(arr[85, 50, :]) == (192, 192, 192)
+    assert tuple(arr[95, 50, :]) == (255, 255, 255)
+
+
+JPGS_08_08_3_1F_RGB = PixelReference("SC_rgb_jpeg_gdcm.dcm", "u1", test)
 
 
 PIXEL_REFERENCE[JPEGBaseline8Bit] = [
     JPGB_08_08_3_0_1F_YBR_FULL,
+    JPGB_08_08_3_0_1F_RGB_NO_APP14,
+    JPGB_08_08_3_0_1F_RGB_APP14,
+    JPGB_08_08_3_0_1F_RGB_DCMD_APP14,
     JPGB_08_08_3_0_120F_YBR_FULL_422,
+    JPGB_08_08_3_1F_YBR_FULL,
     JPGB_08_08_3_0_1F_YBR_FULL_422_411,
     JPGB_08_08_3_0_1F_YBR_FULL_422_422,
     JPGB_08_08_3_0_1F_YBR_FULL_411,
     JPGB_08_08_3_0_1F_YBR_FULL_422,
     JPGB_08_08_3_0_1F_YBR_FULL_444,
     JPGB_08_08_3_0_1F_RGB,
+    JPGB_08_08_3_1F_YBR_FULL,
 ]
 PIXEL_REFERENCE[JPEGExtended12Bit] = [JPGE_BAD, JPGE_16_12_1_0_1F_M2]
-PIXEL_REFERENCE[JPEGLossless] = [JPGL_08_08_1_0_1F, JPGL_16_16_1_1_1F_M2]
-PIXEL_REFERENCE[JPEGLosslessSV1] = []
+PIXEL_REFERENCE[JPEGLossless] = []
+PIXEL_REFERENCE[JPEGLosslessSV1] = [
+    JPGS_08_08_1_0_1F,
+    JPGS_16_16_1_1_1F_M2,
+    JPGS_08_08_3_1F_RGB,
+]
 
 
 # JPEG-LS - ISO/IEC 14495 Standard
 # JLSL: JPEGLSLossless
 # JLSN: JPEGLSNearLossless
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
+
+
 # JLSL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
-    # pylibjpeg
+    # pylibjpeg, pyjpegls
     assert (422, 319, 361) == tuple(arr[0, 31:34])
     assert (366, 363, 322) == tuple(arr[31, :3])
     assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+    assert arr[55:65, 35].tolist() == [170, 193, 191, 373, 1293, 2053, 1879, 1683, 1711]
 
 
-JPLS_16_16_1_1_1F = PixelReference("MR_small_jpeg_ls_lossless.dcm", "<i2", test)
+JLSL_16_16_1_1_1F = PixelReference("MR_small_jpeg_ls_lossless.dcm", "<i2", test)
 
 
-PIXEL_REFERENCE[JPEGLSLossless] = [JPLS_16_16_1_1_1F]
-PIXEL_REFERENCE[JPEGLSNearLossless] = []
+# JLSL, (16, 12), (10, 64, 64, 1), OB, MONOCHROME2, 0
+def test(ref, arr, **kwargs):
+    ref = get_testdata_file("emri_small.dcm", read=True).pixel_array
+    assert np.array_equal(arr, ref)
+
+
+JLSL_16_12_1_1_10F = PixelReference("emri_small_jpeg_ls_lossless.dcm", "<u2", test)
+
+
+# JLSN, (8, 8), (1, 45, 10, 1), OB, MONOCHROME2, 0
+def test(ref, arr, **kwargs):
+    assert arr[0, 0] == 255
+    assert arr[5, 0] == 125
+    assert arr[10, 0] == 65
+    assert arr[15, 0] == 30
+    assert arr[20, 0] == 15
+    assert arr[25, 0] == 5
+    assert arr[30, 0] == 5
+    assert arr[35, 0] == 0
+    assert arr[40, 0] == 0
+
+
+JLSN_08_01_1_0_1F = PixelReference("JPEGLSNearLossless_08.dcm", "u1", test)
+
+
+# JLSN, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# Line interleaved
+def test(ref, arr, **kwargs):
+    assert arr[0, 0].tolist() == [255, 0, 0]
+    assert arr[10, 0].tolist() == [255, 130, 130]
+    assert arr[20, 0].tolist() == [0, 255, 0]
+    assert arr[30, 0].tolist() == [130, 255, 130]
+    assert arr[40, 0].tolist() == [0, 0, 255]
+    assert arr[50, 0].tolist() == [130, 130, 255]
+    assert arr[60, 0].tolist() == [0, 0, 0]
+    assert arr[70, 0].tolist() == [65, 65, 65]
+    assert arr[80, 0].tolist() == [190, 190, 190]
+    assert arr[90, 0].tolist() == [255, 255, 255]
+
+
+JLSN_08_08_1_0_3F_LINE = PixelReference("SC_rgb_jls_lossy_line.dcm", "u1", test)
+
+
+# JLSN, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# Sample interleaved
+def test(ref, arr, **kwargs):
+    assert arr[0, 0].tolist() == [255, 0, 0]
+    assert arr[10, 0].tolist() == [255, 130, 130]
+    assert arr[20, 0].tolist() == [0, 255, 0]
+    assert arr[30, 0].tolist() == [130, 255, 130]
+    assert arr[40, 0].tolist() == [0, 0, 255]
+    assert arr[50, 0].tolist() == [130, 130, 255]
+    assert arr[60, 0].tolist() == [0, 0, 0]
+    assert arr[70, 0].tolist() == [65, 65, 65]
+    assert arr[80, 0].tolist() == [190, 190, 190]
+    assert arr[90, 0].tolist() == [255, 255, 255]
+
+
+JLSN_08_08_1_0_3F_SAMPLE = PixelReference("SC_rgb_jls_lossy_sample.dcm", "u1", test)
+
+
+# JLSN, (16, 16), (1, 45, 10, 1), OB, MONOCHROME2, 0
+def test(ref, arr, **kwargs):
+    assert arr[0, 0] == 65535
+    assert arr[5, 0] == 32765
+    assert arr[10, 0] == 16385
+    assert arr[15, 0] == 4095
+    assert arr[20, 0] == 1025
+    assert arr[25, 0] == 255
+    assert arr[30, 0] == 65
+    assert arr[35, 0] == 15
+    assert arr[40, 0] == 5
+
+
+JLSN_16_16_1_0_1F = PixelReference("JPEGLSNearLossless_16.dcm", "u2", test)
+
+
+PIXEL_REFERENCE[JPEGLSLossless] = [JLSL_16_16_1_1_1F, JLSL_16_12_1_1_10F]
+PIXEL_REFERENCE[JPEGLSNearLossless] = [
+    JLSN_08_01_1_0_1F,
+    JLSN_08_08_1_0_3F_LINE,
+    JLSN_08_08_1_0_3F_SAMPLE,
+    JLSN_16_16_1_0_1F,
+]
 
 
 # JPEG 2000 - ISO/IEC 15444 Standard
 # J2KR: JPEG2000Lossless
 # J2KI: JPEG2000
+# HTJR: HTJ2KLossless
+# HTJL: HTJ2KLosslessRPCL
+# HTJI: HTJ2K
+
+
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
-# J2KR, (8, 8), (1, 480, 640, 3), OB, YBR_RCT, 0
+# 0: J2KR, (8, 8), (1, 480, 640, 3), OB, YBR_RCT, 0
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("US1_UNCR.dcm", read=True).pixel_array
     assert np.array_equal(arr, ref)
@@ -1594,7 +1869,7 @@ def test(ref, arr, **kwargs):
 J2KR_16_15_1_0_1F_M1 = PixelReference("RG1_J2KR.dcm", "<u2", test)
 
 
-# J2KR, (16, 12), (10, 64, 64, 1), OW, MONOCHROME2,
+# J2KR, (16, 12), (10, 64, 64, 1), OW, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("emri_small.dcm", read=True).pixel_array
     assert np.array_equal(arr, ref)
@@ -1603,7 +1878,8 @@ def test(ref, arr, **kwargs):
 J2KR_16_12_1_0_10F_M2 = PixelReference("emri_small_jpeg_2k_lossless.dcm", "<u2", test)
 
 
-# J2KR, (16, 16), (1, 512, 512, 1), OB, MONOCHROME2,
+# J2KR, (16, 16), (1, 512, 512, 1), OB, MONOCHROME2, 1
+# J2K codestream has 14-bit precision
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("693_UNCR.dcm", read=True).pixel_array
     assert np.array_equal(arr, ref)
@@ -1624,8 +1900,13 @@ J2KR_16_16_1_1_1F_M2 = PixelReference("MR_small_jp2klossless.dcm", "<i2", test)
 # J2KR, (16, 13), (1, 512, 512, 1), OB, MONOCHROME2, 1
 # Mismatch between J2K sign and dataset Pixel Representation
 def test(ref, arr, **kwargs):
-    ref = get_testdata_file("emri_small.dcm", read=True).pixel_array
-    assert np.array_equal(arr, ref)
+    assert -2000 == arr[0, 0]
+    assert [621, 412, 138, -193, -520, -767, -907, -966, -988, -995] == (
+        arr[47:57, 279].tolist()
+    )
+    assert [-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
+        arr[328:338, 106].tolist()
+    )
 
 
 J2KR_16_13_1_1_1F_M2_MISMATCH = PixelReference("J2K_pixelrep_mismatch.dcm", "<i2", test)
@@ -1634,6 +1915,7 @@ J2KR_16_13_1_1_1F_M2_MISMATCH = PixelReference("J2K_pixelrep_mismatch.dcm", "<i2
 # J2KR, (8, 8), (1, 400, 400, 3), OB, YBR_RCT, 0
 # Non-conformant pixel data -> JP2 header present
 def test(ref, arr, **kwargs):
+    # Decoding error with pillow, OK in gdcm, pylibjpeg
     assert tuple(arr[45, 140]) == (223, 32, 32)
     assert tuple(arr[46, 140]) == (255, 0, 0)
     assert tuple(arr[350, 195]) == (128, 128, 128)
@@ -1705,6 +1987,68 @@ def test(ref, arr, **kwargs):
 J2KI_16_16_1_1_1F_M2 = PixelReference("JPEG2000.dcm", "<i2", test)
 
 
+# HTJR, (8, 8), (1, 480, 640, 3), OB, RBG, 0
+def test(ref, arr, **kwargs):
+    assert arr[160, 295:305].tolist() == [
+        [90, 38, 1],
+        [94, 40, 1],
+        [97, 42, 5],
+        [173, 122, 59],
+        [172, 133, 69],
+        [169, 135, 75],
+        [168, 136, 79],
+        [169, 137, 79],
+        [169, 137, 81],
+        [169, 136, 79],
+    ]
+    assert arr[275:285, 635].tolist() == [
+        [208, 193, 172],
+        [238, 228, 215],
+        [235, 229, 216],
+        [233, 226, 212],
+        [239, 231, 218],
+        [238, 232, 219],
+        [224, 218, 205],
+        [239, 234, 223],
+        [246, 241, 232],
+        [242, 236, 226],
+    ]
+
+
+HTJR_08_08_1_1_1F_RGB = PixelReference("HTJ2KLossless_08_RGB.dcm", "u1", test)
+
+
+# HTJI, (8, 8), (1, 480, 640, 3), OB, RBG, 0
+def test(ref, arr, **kwargs):
+    assert arr[160, 295:305].tolist() == [
+        [91, 37, 2],
+        [94, 40, 1],
+        [97, 42, 5],
+        [174, 123, 59],
+        [172, 132, 69],
+        [169, 134, 74],
+        [168, 136, 77],
+        [168, 137, 80],
+        [168, 136, 80],
+        [169, 136, 78],
+    ]
+    assert arr[275:285, 635].tolist() == [
+        [207, 193, 171],
+        [238, 229, 215],
+        [235, 228, 216],
+        [233, 226, 213],
+        [238, 231, 218],
+        [239, 232, 219],
+        [225, 218, 206],
+        [240, 234, 223],
+        [247, 240, 232],
+        [242, 236, 227],
+    ]
+
+
+HTJI_08_08_1_1_1F_RGB = PixelReference("HTJ2K_08_RGB.dcm", "u1", test)
+
+
 PIXEL_REFERENCE[JPEG2000Lossless] = [
     J2KR_08_08_3_0_1F_YBR_ICT,
     J2KR_16_10_1_0_1F_M1,
@@ -1725,3 +2069,6 @@ PIXEL_REFERENCE[JPEG2000] = [
     J2KI_16_14_1_1_1F_M2,
     J2KI_16_16_1_1_1F_M2,
 ]
+PIXEL_REFERENCE[HTJ2KLossless] = [HTJR_08_08_1_1_1F_RGB]
+PIXEL_REFERENCE[HTJ2KLosslessRPCL] = []
+PIXEL_REFERENCE[HTJ2K] = [HTJI_08_08_1_1_1F_RGB]
