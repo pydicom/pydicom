@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.base.JPEGLSLosslessDecoder
+==================================================
+
+.. currentmodule:: pydicom.pixels.decoders.base
+
+.. autodata:: JPEGLSLosslessDecoder

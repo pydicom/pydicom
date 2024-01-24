@@ -28,7 +28,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.pixels.decoders.base.RLELosslessDecoder" href="pydicom.pixels.decoders.base.RLELosslessDecoder.html" />
+    <link rel="next" title="pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder" href="pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder.html" />
     <link rel="prev" title="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder" href="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html" /> 
 </head>
 
@@ -90,6 +90,17 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder.html">pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEGExtended12BitDecoder.html">pydicom.pixels.decoders.base.JPEGExtended12BitDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEGLosslessDecoder.html">pydicom.pixels.decoders.base.JPEGLosslessDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder.html">pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEGLSLosslessDecoder.html">pydicom.pixels.decoders.base.JPEGLSLosslessDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder.html">pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEG2000LosslessDecoder.html">pydicom.pixels.decoders.base.JPEG2000LosslessDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.JPEG2000Decoder.html">pydicom.pixels.decoders.base.JPEG2000Decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.HTJ2KLosslessDecoder.html">pydicom.pixels.decoders.base.HTJ2KLosslessDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder.html">pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.HTJ2KDecoder.html">pydicom.pixels.decoders.base.HTJ2KDecoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.RLELosslessDecoder.html">pydicom.pixels.decoders.base.RLELosslessDecoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.DecodeRunner.html">pydicom.pixels.decoders.base.DecodeRunner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.decoders.base.Decoder.html">pydicom.pixels.decoders.base.Decoder</a></li>
@@ -147,7 +158,7 @@
 <h1>pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder<a class="headerlink" href="#pydicom-pixels-decoders-base-explicitvrbigendiandecoder" title="Link to this heading">¶</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.decoders.base.</span></span><span class="sig-name descname"><span class="pre">ExplicitVRBigEndianDecoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.pixels.decoders.base.Decoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/800635fb2/pydicom/pixels/decoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.decoders.base.</span></span><span class="sig-name descname"><span class="pre">ExplicitVRBigEndianDecoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.pixels.decoders.base.Decoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ca5a35f61/pydicom/pixels/decoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder" title="Link to this definition">¶</a></dt>
 <dd><p>A <em>Pixel Data</em> decoder for <em>Explicit VR Big Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.2</span></code></p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 3.0.</span></p>
@@ -163,7 +174,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html" class="btn btn-neutral float-left" title="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pydicom.pixels.decoders.base.RLELosslessDecoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.decoders.base.RLELosslessDecoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

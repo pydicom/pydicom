@@ -25,7 +25,6 @@
       ~DecodeRunner.set_option
       ~DecodeRunner.set_options
       ~DecodeRunner.set_source
-      ~DecodeRunner.test_for
       ~DecodeRunner.validate_buffer
       ~DecodeRunner.validate_options
    

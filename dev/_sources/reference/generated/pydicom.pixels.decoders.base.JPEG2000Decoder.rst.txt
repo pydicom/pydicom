@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.base.JPEG2000Decoder
+============================================
+
+.. currentmodule:: pydicom.pixels.decoders.base
+
+.. autodata:: JPEG2000Decoder

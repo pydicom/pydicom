@@ -152,20 +152,44 @@ Enhancements
   These new functions support reading encapsulated data from both :class:`bytes`
   or any Python object with ``read()``, ``seek()`` and ``tell()`` methods such
   as :class:`io.BytesIO`, :class:`BinaryIO<typing.BinaryIO>` or :class:`mmap.mmap`.
-  They also support using the :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>`
-  for determining frame boundaries.
+  They also support using the :dcm:`Extended Offset Table
+  <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>` for determining frame boundaries.
 * Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
   <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
   element length without having to read the element value. (:issue:`1873`)
 * Added the :doc:`pixels</reference/pixels>` module and a new more flexible method for
-  decoding pixel data via the following decoding class instances:
+  decoding pixel data via the :class:`~pydicom.pixels.decoders.base.Decoder` factory class:
 
   * :attr:`~pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder`
   * :attr:`~pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder`
   * :attr:`~pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder`
   * :attr:`~pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGExtended12BitDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLSLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEG2000LosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.JPEG2000Decoder`
+  * :attr:`~pydicom.pixels.decoders.base.HTJ2KLosslessDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder`
+  * :attr:`~pydicom.pixels.decoders.base.HTJ2KDecoder`
   * :attr:`~pydicom.pixels.decoders.base.RLELosslessDecoder`
 
+  The new decoding backend supports the following:
+
+  * Returning a view over the original pixel data buffer (:issue:`746`)
+  * Retrieving specific frames (:issue:`1263`, :issue:`1243`)
+  * Returning RGB pixel data by default for JPEG (:issue:`1781`, :issue:`1133`
+    and many others)
+  * Returning excess frames for JPEG when there is no Basic or Extended Offset
+    Table and the *Number of Frames* is incorrect (:issue:`1666`)
+  * Returning the decoded pixel data as either a NumPy :class:`~numpy.ndarray` or
+    buffer-like object
+  * Iterating through either all or specific frames
+
+* Support has been added for decoding HTJ2K transfer syntaxes (:issue:`1848`)
 
 Fixes
 -----

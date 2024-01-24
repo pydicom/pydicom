@@ -15,6 +15,7 @@
    
       ~Decoder.__init__
       ~Decoder.add_plugin
+      ~Decoder.add_plugins
       ~Decoder.as_array
       ~Decoder.as_buffer
       ~Decoder.iter_array

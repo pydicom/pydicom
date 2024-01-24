@@ -20,3 +20,18 @@ pydicom
 |:attr:`RLELosslessDecoder`| ``rle_segment_order`` | ``">"`` for big endian segment order (default) |
 |                          |                       | or ``"<"`` for little endian segment order     |
 +--------------------------+-----------------------+------------------------------------------------+
+
+
+.. _decoder_plugin_pyligjpeg:
+
+pylibjpeg
+=========
+
++--------------------------+----------------------------------------------------------------+
+| Decoder                  | Options                                                        |
++                          +---------------+------------------------------------------------+
+|                          | Key           | Value                                          |
++==========================+===============+================================================+
+|:attr:`RLELosslessDecoder`| ``byteorder`` | ``">"`` for big endian segment order (default) |
+|                          |               | or ``"<"`` for little endian segment order     |
++--------------------------+---------------+------------------------------------------------+
