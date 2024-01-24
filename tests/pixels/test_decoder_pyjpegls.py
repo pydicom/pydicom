@@ -21,9 +21,13 @@ HAVE_PYJPEGLS = bool(importlib.util.find_spec("jpeg_ls"))
 SKIP_TEST = not HAVE_NP or not HAVE_PYJPEGLS
 
 
+def name(ref):
+    return f"{ref.name}"
+
+
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
 class TestPyJpegLSDecoder:
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSLossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSLossless], ids=name)
     def test_jls_lossless(self, reference):
         """Test the decoder with JPEGLSLossless."""
         decoder = get_decoder(JPEGLSLossless)
@@ -33,7 +37,7 @@ class TestPyJpegLSDecoder:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless], ids=name)
     def test_jls_lossy(self, reference):
         """Test the decoder with JPEGLSNearLossless."""
         decoder = get_decoder(JPEGLSNearLossless)

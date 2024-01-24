@@ -41,6 +41,10 @@ SKIP_LJ = not (HAVE_NP and HAVE_LJ)
 SKIP_OJ = not (HAVE_NP and HAVE_OJ)
 
 
+def name(ref):
+    return f"{ref.name}"
+
+
 def test_is_available_unknown_uid():
     """Test is_available() for an unknown UID"""
     assert is_available("1.2.3.4") is False
@@ -48,7 +52,7 @@ def test_is_available_unknown_uid():
 
 @pytest.mark.skipif(SKIP_LJ, reason="Test is missing dependencies")
 class TestLibJpegDecoder:
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGBaseline8Bit])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGBaseline8Bit], ids=name)
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
         decoder = get_decoder(JPEGBaseline8Bit)
@@ -58,7 +62,7 @@ class TestLibJpegDecoder:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGExtended12Bit])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGExtended12Bit], ids=name)
     def test_jpg_extended(self, reference):
         """Test the decoder with JPEGExtended12Bit."""
         decoder = get_decoder(JPEGExtended12Bit)
@@ -80,7 +84,7 @@ class TestLibJpegDecoder:
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
 class TestOpenJpegDecoder:
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000Lossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000Lossless], ids=name)
     def test_j2k_lossless(self, reference):
         """Test the decoder with JPEG2000Lossless."""
         decoder = get_decoder(JPEG2000Lossless)
@@ -98,7 +102,7 @@ class TestOpenJpegDecoder:
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000], ids=name)
     def test_j2k(self, reference):
         """Test the decoder with JPEG2000."""
         decoder = get_decoder(JPEG2000)

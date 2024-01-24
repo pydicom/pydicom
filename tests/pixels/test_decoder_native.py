@@ -28,11 +28,17 @@ except ImportError:
 from .pixels_reference import PIXEL_REFERENCE, EXPL_16_1_1F_PAD
 
 
+def name(ref):
+    return f"{ref.name}"
+
+
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestAsArray:
     """Tests for decoder.as_array() with native transfer syntaxes"""
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRLittleEndian], ids=name
+    )
     def test_reference_expl(self, reference):
         """Test against the reference data for explicit little."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -50,7 +56,9 @@ class TestAsArray:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRLittleEndian], ids=name
+    )
     def test_reference_expl_index(self, reference):
         """Test by index against the reference data for explicit little."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -73,7 +81,9 @@ class TestAsArray:
             else:
                 assert arr.shape == reference.shape[1:]
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ImplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ImplicitVRLittleEndian], ids=name
+    )
     def test_reference_impl(self, reference):
         """Test against the reference data for implicit little."""
         decoder = get_decoder(ImplicitVRLittleEndian)
@@ -83,7 +93,9 @@ class TestAsArray:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ImplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ImplicitVRLittleEndian], ids=name
+    )
     def test_reference_impl_index(self, reference):
         """Test by index against the reference data for implicit little."""
         decoder = get_decoder(ImplicitVRLittleEndian)
@@ -99,7 +111,7 @@ class TestAsArray:
                 assert arr.shape == reference.shape[1:]
 
     @pytest.mark.parametrize(
-        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian]
+        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian], ids=name
     )
     def test_reference_defl(self, reference):
         """Test against the reference data for deflated little."""
@@ -111,7 +123,7 @@ class TestAsArray:
         assert arr.flags.writeable
 
     @pytest.mark.parametrize(
-        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian]
+        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian], ids=name
     )
     def test_reference_defl_index(self, reference):
         """Test by index against the reference data for deflated little."""
@@ -127,7 +139,9 @@ class TestAsArray:
             else:
                 assert arr.shape == reference.shape[1:]
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRBigEndian], ids=name
+    )
     def test_reference_expb(self, reference):
         """Test against the reference data for explicit big."""
         decoder = get_decoder(ExplicitVRBigEndian)
@@ -137,7 +151,9 @@ class TestAsArray:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRBigEndian], ids=name
+    )
     def test_reference_expb_index(self, reference):
         """Test by index against the reference data for explicit big."""
         decoder = get_decoder(ExplicitVRBigEndian)
@@ -157,7 +173,9 @@ class TestAsArray:
 class TestIterArray:
     """Tests for Decoder.iter_array() with native transfer syntaxes"""
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRLittleEndian], ids=name
+    )
     def test_reference_expl(self, reference):
         """Test against the reference data for explicit little."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -191,7 +209,9 @@ class TestIterArray:
             else:
                 assert arr.shape == reference.shape[1:]
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ImplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ImplicitVRLittleEndian], ids=name
+    )
     def test_reference_impl(self, reference):
         """Test against the reference data for implicit little."""
         decoder = get_decoder(ImplicitVRLittleEndian)
@@ -206,7 +226,7 @@ class TestIterArray:
                 assert arr.shape == reference.shape[1:]
 
     @pytest.mark.parametrize(
-        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian]
+        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian], ids=name
     )
     def test_reference_defl(self, reference):
         """Test against the reference data for deflated little."""
@@ -221,7 +241,9 @@ class TestIterArray:
             else:
                 assert arr.shape == reference.shape[1:]
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRBigEndian], ids=name
+    )
     def test_reference_expb(self, reference):
         """Test against the reference data for explicit big."""
         decoder = get_decoder(ExplicitVRBigEndian)
@@ -240,7 +262,9 @@ class TestIterArray:
 class TestAsBuffer:
     """Tests for Decoder.as_buffer() with native transfer syntaxes"""
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRLittleEndian], ids=name
+    )
     def test_reference_expl(self, reference):
         """Test against the reference data for explicit little."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -280,7 +304,9 @@ class TestAsBuffer:
 
             assert arr.tobytes() == buffer
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ImplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ImplicitVRLittleEndian], ids=name
+    )
     def test_reference_impl(self, reference):
         """Test against the reference data for implicit little."""
         decoder = get_decoder(ImplicitVRLittleEndian)
@@ -294,7 +320,7 @@ class TestAsBuffer:
             assert arr.tobytes() == buffer
 
     @pytest.mark.parametrize(
-        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian]
+        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian], ids=name
     )
     def test_reference_defl(self, reference):
         """Test against the reference data for deflated little."""
@@ -308,7 +334,9 @@ class TestAsBuffer:
             buffer = decoder.as_buffer(reference.ds, index=index)
             assert arr.tobytes() == buffer
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRBigEndian], ids=name
+    )
     def test_reference_expb(self, reference):
         """Test against the reference data for explicit big."""
         ds = reference.ds
@@ -363,7 +391,9 @@ class TestAsBuffer:
 class TestIterBuffer:
     """Tests for Decoder.iter_buffer() with native transfer syntaxes"""
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRLittleEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRLittleEndian], ids=name
+    )
     def test_reference_expl(self, reference):
         """Test against the reference data for explicit little."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -402,7 +432,7 @@ class TestIterBuffer:
             assert arr.tobytes() == buffer
 
     @pytest.mark.parametrize(
-        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian]
+        "reference", PIXEL_REFERENCE[DeflatedExplicitVRLittleEndian], ids=name
     )
     def test_reference_defl(self, reference):
         """Test against the reference data for deflated little."""
@@ -412,7 +442,9 @@ class TestIterBuffer:
         for arr, buffer in zip(arr_gen, buf_gen):
             assert arr.tobytes() == buffer
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[ExplicitVRBigEndian])
+    @pytest.mark.parametrize(
+        "reference", PIXEL_REFERENCE[ExplicitVRBigEndian], ids=name
+    )
     def test_reference_expb(self, reference):
         """Test against the reference data for explicit big."""
         ds = reference.ds

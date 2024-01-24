@@ -34,9 +34,13 @@ HAVE_GDCM = bool(importlib.util.find_spec("gdcm"))
 SKIP_TEST = not HAVE_NP or not HAVE_GDCM
 
 
+def name(ref):
+    return f"{ref.name}"
+
+
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
 class TestDecoding:
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGBaseline8Bit])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGBaseline8Bit], ids=name)
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
         decoder = get_decoder(JPEGBaseline8Bit)
@@ -46,7 +50,7 @@ class TestDecoding:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGExtended12Bit])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGExtended12Bit], ids=name)
     def test_jpg_extended(self, reference):
         """Test the decoder with JPEGExtended12Bit."""
         decoder = get_decoder(JPEGExtended12Bit)
@@ -65,7 +69,7 @@ class TestDecoding:
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLossless], ids=name)
     def test_jpg_lossless(self, reference):
         """Test the decoder with JPEGLossless."""
         decoder = get_decoder(JPEGLossless)
@@ -75,7 +79,7 @@ class TestDecoding:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLosslessSV1])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLosslessSV1], ids=name)
     def test_jpg_lossless_sv1(self, reference):
         """Test the decoder with JPEGLosslessSV1."""
         decoder = get_decoder(JPEGLosslessSV1)
@@ -84,7 +88,7 @@ class TestDecoding:
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSLossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSLossless], ids=name)
     def test_jls_lossless(self, reference):
         """Test the decoder with JPEGLSLossless."""
         decoder = get_decoder(JPEGLSLossless)
@@ -94,7 +98,7 @@ class TestDecoding:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless], ids=name)
     def test_jls_lossy(self, reference):
         """Test the decoder with JPEGLSNearLossless."""
         decoder = get_decoder(JPEGLSNearLossless)
@@ -104,7 +108,7 @@ class TestDecoding:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000Lossless])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000Lossless], ids=name)
     def test_j2k_lossless(self, reference):
         """Test the decoder with JPEG2000Lossless."""
         decoder = get_decoder(JPEG2000Lossless)
@@ -114,7 +118,7 @@ class TestDecoding:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000])
+    @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000], ids=name)
     def test_j2k(self, reference):
         """Test the decoder with JPEG2000."""
         decoder = get_decoder(JPEG2000)

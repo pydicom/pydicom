@@ -28,6 +28,10 @@ from .pixels_reference import PIXEL_REFERENCE, RLE_16_1_1F, RLE_16_1_10F
 RLE_REFERENCE = PIXEL_REFERENCE[RLELossless]
 
 
+def name(ref):
+    return f"{ref.name}"
+
+
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestAsArray:
     """Tests for as_array() with RLE lossless"""
@@ -35,7 +39,7 @@ class TestAsArray:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE)
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless using dataset."""
         arr = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
@@ -44,7 +48,7 @@ class TestAsArray:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE)
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference_index(self, reference):
         """Test by index against the reference data for RLE lossless"""
         for index in range(reference.number_of_frames):
@@ -96,7 +100,7 @@ class TestIterArray:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE)
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         func = self.decoder.iter_array(
@@ -134,7 +138,7 @@ class TestAsBuffer:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE)
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         ds = reference.ds
@@ -169,7 +173,7 @@ class TestAsBuffer:
                 buf_plane = buffer_frame[2 * plane_length :]
                 assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE)
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference_index(self, reference):
         """Test by `index` for RLE lossless"""
         ds = reference.ds
@@ -206,7 +210,7 @@ class TestIterBuffer:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE)
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         arr_func = self.decoder.iter_array(
