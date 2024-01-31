@@ -25,15 +25,36 @@ from pydicom.filereader import (
     _read_file_meta_info,
     read_dataset,
     _at_pixel_data,
-    ENCODED_VR,
 )
 from pydicom.tag import BaseTag
 from pydicom.uid import UID
-from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR
 
 
 LOGGER = logging.getLogger(__name__)
-GROUP_0028 = {k for k in DicomDictionary if k >> 16 == 0x0028}
+
+# All non-retired group 0x0028 elements
+_GROUP_0028 = {
+    k for k, v in DicomDictionary.items() if k >> 16 == 0x0028 and v[3] == ""
+}
+# The minimum required elements
+_REQUIRED_TAGS = {
+    0x00280002,
+    0x00280004,
+    0x00280006,
+    0x00280008,
+    0x00280010,
+    0x00280011,
+    0x00280100,
+    0x00280101,
+    0x00280103,
+    0x7FE00001,
+    0x7FE00002,
+}
+_PIXEL_KEYWORDS = {
+    (0x7FE0, 0x0008): "FloatPixelData",
+    (0x7FE0, 0x0009): "DoubleFloatPixelData",
+    (0x7FE0, 0x0010): "PixelData",
+}
 
 
 class DecodeOptions(TypedDict, total=False):
@@ -126,7 +147,7 @@ def pixel_array(
     src: str | PathLike[str] | BinaryIO,
     *,
     ds_out: Union["Dataset", None] = None,
-    specific_tags: list[BaseTag | int] | None = None,
+    specific_tags: list[int] | None = None,
     index: int | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
@@ -184,8 +205,8 @@ def pixel_array(
         'rb' mode containing the dataset.
     ds_out : pydicom.dataset.Dataset, optional
         A :class:`~pydicom.dataset.Dataset` that will be updated with the
-        group ``0x0028`` image pixel module elements and the group ``0x0002``
-        file meta information elements from the dataset in `src` .
+        non-retired group ``0x0028`` image pixel module elements and the group
+        ``0x0002`` file meta information elements from the dataset in `src` .
     specific_tags : list[int | pydicom.tag.BaseTag], optional
         A list of additional tags from the dataset in `src` to be added to the
         `ds_out` dataset.
@@ -238,10 +259,13 @@ def pixel_array(
         file_offset = f.tell()
         f.seek(0)
 
-    tags = specific_tags if specific_tags else []
+    tags = _REQUIRED_TAGS
+    if ds_out is not None:
+        tags = set(specific_tags) if specific_tags else set()
+        tags = tags | _GROUP_0028 | {0x7FE00001, 0x7FE00002}
 
     try:
-        ds, opts = _array_common(f, tags, **kwargs)
+        ds, opts = _array_common(f, list(tags), **kwargs)
 
         decoder = get_decoder(opts["transfer_syntax_uid"])
         arr = decoder.as_array(
@@ -323,6 +347,13 @@ def iter_pixels(
         * file-like: a `file-like object
         <https://docs.python.org/3/glossary.html#term-file-object>`_ in
         'rb' mode containing the dataset.
+    ds_out : pydicom.dataset.Dataset, optional
+        A :class:`~pydicom.dataset.Dataset` that will be updated with the
+        non-retired group ``0x0028`` image pixel module elements and the group
+        ``0x0002`` file meta information elements from the dataset in `src` .
+    specific_tags : list[int | pydicom.tag.BaseTag], optional
+        A list of additional tags from the dataset in `src` to be added to the
+        `ds_out` dataset.
     indices : Iterable[int] | None, optional
         If ``None`` (default) then iterate through the entire pixel data,
         otherwise only iterate through the frames specified by `indices`.
@@ -368,10 +399,13 @@ def iter_pixels(
         file_offset = f.tell()
         f.seek(0)
 
-    tags = specific_tags if specific_tags else []
+    tags = _REQUIRED_TAGS
+    if ds_out is not None:
+        tags = set(specific_tags) if specific_tags else set()
+        tags = tags | _GROUP_0028 | {0x7FE00001, 0x7FE00002}
 
     try:
-        ds, opts = _array_common(f, tags, **kwargs)
+        ds, opts = _array_common(f, list(tags), **kwargs)
 
         if isinstance(ds_out, Dataset):
             ds_out.file_meta = ds.file_meta
@@ -397,8 +431,8 @@ def iter_pixels(
 
 def _array_common(
     f: BinaryIO, specific_tags: list[BaseTag | int], **kwargs: Any
-) -> tuple["Dataset", DecodeOptions]:
-    """
+) -> tuple["Dataset", dict[str, Any]]:
+    """Return a dataset from `f` and a corresponding decoding options dict.
 
     Parameters
     ----------
@@ -408,11 +442,17 @@ def _array_common(
     specific_tags : list[BaseTag | int]
         A list of additional tags to be read from the dataset and possibly
         returned via the `ds_out` dataset.
+    kwargs : dict[str, Any]
+        Required and optional arguments for the pixel data decoding functions.
 
     Returns
     -------
-    tuple[Dataset, DecodeOptions]
-        A dataset containing the group 0x0028 elements, the extended
+    tuple[Dataset, dict[str, Any]]
+
+        * A dataset containing the group 0x0028 elements, the extended offset
+          elements (if any) and elements from `specific_tags`.
+        * The required and optional arguments for the pixel data decoding
+          functions.
     """
 
     # Read preamble (if present)
@@ -420,10 +460,10 @@ def _array_common(
 
     # Read the File Meta (if present)
     file_meta = _read_file_meta_info(f)
-    tsyntax = kwargs.get("transfer_syntax_uid", None)
-    if tsyntax is None:
-        tsyntax = file_meta.get("TransferSyntaxUID")
-
+    tsyntax = kwargs.setdefault(
+        "transfer_syntax_uid",
+        file_meta.get("TransferSyntaxUID", None),
+    )
     if not tsyntax:
         raise AttributeError(
             "'transfer_syntax_uid' is required if the dataset in 'src' is not "
@@ -431,26 +471,24 @@ def _array_common(
         )
 
     tsyntax = UID(tsyntax)
-    is_implicit, is_little = tsyntax.is_implicit_VR, tsyntax.is_little_endian
 
     # Get the *Image Pixel* module 0028 elements, any extended offsets and
-    #   tags wanted by the user
-    tags = GROUP_0028 | {0x7FE00001, 0x7FE00002} | set(specific_tags)
+    #   any other tags wanted by the user
     ds = read_dataset(
         f,
-        is_implicit_VR=is_implicit,
-        is_little_endian=is_little,
+        is_implicit_VR=tsyntax.is_implicit_VR,
+        is_little_endian=tsyntax.is_little_endian,
         stop_when=_at_pixel_data,
-        specific_tags=sorted(list(tags)),
+        specific_tags=specific_tags,
     )
     ds.file_meta = file_meta
 
-    opts = _as_options(ds, **kwargs)
+    opts = kwargs
+    opts = _as_options(ds, opts)
     opts["transfer_syntax_uid"] = tsyntax
-    encoding = cast(tuple[bool, bool], ds.original_encoding)
 
     # We are either at the start of the element tag for a pixel data
-    #   element or at EOF because there was none
+    #   element or at EOF because there were none
     try:
         data = f.read(8)
         assert len(data) == 8
@@ -460,89 +498,76 @@ def _array_common(
             "'Double Float Pixel Data' element, no pixel data to decode"
         )
 
-    endianness = "><"[encoding[1]]
-    if encoding[0]:
+    endianness = "><"[tsyntax.is_little_endian]
+    if tsyntax.is_implicit_VR:
         vr = None
         group, elem, length = unpack(f"{endianness}HHL", data)
     else:
+        # Is always 32-bit extended length for pixel data VRs
         group, elem, vr, length = unpack(f"{endianness}HH2sH", data)
+        opts["pixel_vr"] = vr.decode(default_encoding)
+        unpack(f"{endianness}L", f.read(4))
 
-    keywords = {
-        (0x7FE0, 0x0008): "FloatPixelData",
-        (0x7FE0, 0x0009): "DoubleFloatPixelData",
-        (0x7FE0, 0x0010): "PixelData",
-    }
+    # We should now be positioned at the start of the pixel data value
 
-    pixel_keyword = keywords[(group, elem)]
-    opts["pixel_keyword"] = pixel_keyword
-    if pixel_keyword == "PixelData" and "pixel_representation" not in opts:
+    opts["pixel_keyword"] = _PIXEL_KEYWORDS[(group, elem)]
+    if opts["pixel_keyword"] == "PixelData" and "pixel_representation" not in opts:
         raise AttributeError(
             "The dataset in 'src' is missing a required element: (0028,0103) "
             "Pixel Representation"
         )
 
-    if vr in ENCODED_VR:
-        # Explicit VR
-        vr = vr.decode(default_encoding)
-        opts["pixel_vr"] = vr
-        if vr in EXPLICIT_VR_LENGTH_32:
-            unpack(f"{endianness}L", f.read(4))
-    else:
-        # Implicit VR is ambiguous
-        opts["pixel_vr"] = VR.OB if length == 0xFFFFFFFF else VR.OW
-
-    # We should now be positioned at the start of the pixel data value
-    opts.update(**kwargs)  # type: ignore[call-arg]
-
     return ds, opts
 
 
-def _as_options(ds: "Dataset", **kwargs: Any) -> DecodeOptions:
-    """Return a DecodeOptions dict created from the dataset `ds`.
+def _as_options(ds: "Dataset", opts: dict[str, Any]) -> dict[str, Any]:
+    """Return a decoding options dict created from the dataset `ds`.
 
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
         The dataset to use.
+    opts : dict[str, Any]
+        The required and optional arguments for the pixel data decoding
+        functions. When supplied these should take priority over the
+        corresponding `ds` element values.
 
     Returns
     -------
     dict
-        A dict containing values from `ds`.
+        The `opts` dict updated with values from `ds` (if required).
     """
-    opts = DecodeOptions()
-
     msg = "The dataset in 'src' is missing a required element: (0028,"
-    bits_allocated = kwargs.get("bits_allocated", ds.get("BitsAllocated", None))
+    bits_allocated = opts.get("bits_allocated", ds.get("BitsAllocated", None))
     if bits_allocated is None:
         raise AttributeError(f"{msg}0100) Bits Allocated")
 
-    bits_stored = kwargs.get("bits_stored", ds.get("BitsStored", None))
+    bits_stored = opts.get("bits_stored", ds.get("BitsStored", None))
     if bits_stored is None:
         raise AttributeError(f"{msg}0101) Bits Stored")
 
-    columns = kwargs.get("columns", ds.get("Columns", None))
+    columns = opts.get("columns", ds.get("Columns", None))
     if columns is None:
         raise AttributeError(f"{msg}0011) Columns")
 
-    rows = kwargs.get("rows", ds.get("Rows", None))
+    rows = opts.get("rows", ds.get("Rows", None))
     if rows is None:
         raise AttributeError(f"{msg}0010) Rows")
 
-    number_of_frames = kwargs.get("number_of_frames", ds.get("NumberOfFrames", 1))
+    number_of_frames = opts.get("number_of_frames", ds.get("NumberOfFrames", 1))
 
-    photometric_interpretation = kwargs.get(
+    photometric_interpretation = opts.get(
         "photometric_interpretation", ds.get("PhotometricInterpretation", None)
     )
     if photometric_interpretation is None:
         raise AttributeError(f"{msg}0004) Photometric Interpretation")
 
-    samples_per_pixel = kwargs.get("samples_per_pixel", ds.get("SamplesPerPixel", None))
+    samples_per_pixel = opts.get("samples_per_pixel", ds.get("SamplesPerPixel", None))
     if samples_per_pixel is None:
         raise AttributeError(f"{msg}0002) Samples per Pixel")
 
     if samples_per_pixel > 1:
-        planar_configuration = kwargs.get(
+        planar_configuration = opts.get(
             "planar_configuration", ds.get("PlanarConfiguration", None)
         )
         if planar_configuration is None:
@@ -558,20 +583,17 @@ def _as_options(ds: "Dataset", **kwargs: Any) -> DecodeOptions:
     opts["rows"] = rows
     opts["samples_per_pixel"] = samples_per_pixel
 
-    pixel_representation = kwargs.get(
+    pixel_representation = opts.get(
         "pixel_representation", ds.get("PixelRepresentation")
     )
     if pixel_representation is not None:
         opts["pixel_representation"] = pixel_representation
 
     # Encapsulation - Extended Offset Table
-    if "ExtendedOffsetTable" in ds and "ExtendedOffsetTableLengths" in ds:
-        opts["extended_offsets"] = kwargs.get(
+    if 0x7FE00001 in ds._dict and 0x7FE00002 in ds._dict:
+        opts.setdefault(
             "extended_offsets",
-            (
-                ds.ExtendedOffsetTable,
-                ds.ExtendedOffsetTableLengths,
-            ),
+            (ds.ExtendedOffsetTable, ds.ExtendedOffsetTableLengths),
         )
 
     return opts
