@@ -53,7 +53,7 @@ def data_element_generator(
     stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
-    specific_tags: list[BaseTag] | None = None,
+    specific_tags: list[BaseTag | int] | None = None,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -413,7 +413,7 @@ def read_dataset(
     stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
     defer_size: str | int | float | None = None,
     parent_encoding: str | MutableSequence[str] = default_encoding,
-    specific_tags: list[BaseTag] | None = None,
+    specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
@@ -794,7 +794,7 @@ def read_partial(
     stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
     defer_size: int | str | float | None = None,
     force: bool = False,
-    specific_tags: list[BaseTag] | None = None,
+    specific_tags: list[BaseTag | int] | None = None,
 ) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 
@@ -1057,7 +1057,7 @@ def dcmread(
     if specific_tags:
         specific_tags = [Tag(t) for t in specific_tags]
 
-    specific_tags = cast(list[BaseTag] | None, specific_tags)
+    specific_tags = cast(list[BaseTag | int] | None, specific_tags)
 
     # Iterate through all items and store them --include file meta if present
     stop_when = None

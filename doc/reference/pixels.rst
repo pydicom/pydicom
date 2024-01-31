@@ -22,6 +22,8 @@ Pixel Data Decoding
 Pixel Data Utilities
 ====================
 
-.. currentmodule:: pydicom.pixels.decoders.base
+.. currentmodule:: pydicom.pixels
 
-  get_decoder
+  decoders.base.get_decoder
+  utils.pixel_array
+  utils.iter_pixels

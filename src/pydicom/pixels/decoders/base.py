@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Iterable
 from importlib import import_module
 import logging
 from sys import byteorder
-from typing import Any, TypedDict
+from typing import Any, BinaryIO, cast
 
 try:
     import numpy as np
@@ -18,7 +18,7 @@ from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
-from pydicom.pixels.enums import PhotometricInterpretation as PI
+from pydicom.pixels.utils import PhotometricInterpretation as PI, DecodeOptions
 from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -46,57 +46,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 Buffer = bytes | bytearray | memoryview
-
-
-class DecodeOptions(TypedDict, total=False):
-    """Options accepted by DecodeRunner and decoding plugins"""
-
-    ## Pixel data description options
-    # Required
-    bits_allocated: int
-    bits_stored: int
-    columns: int
-    number_of_frames: int
-    photometric_interpretation: str
-    pixel_keyword: str
-    rows: int
-    samples_per_pixel: int
-    transfer_syntax_uid: UID
-
-    # Conditionally required
-    # Required if `pixel_keyword` is "PixelData"
-    pixel_representation: int
-    # Required if native transfer syntax and samples_per_pixel > 1
-    planar_configuration: int
-
-    # Optional
-    # The Extended Offset Table values - used with encapsulated transfer syntaxes
-    extended_offsets: tuple[bytes, bytes] | tuple[list[int], list[int]]
-    # The VR used for the pixel data - may be used with Explicit VR Big Endian
-    pixel_vr: str
-
-    ## Native transfer syntax decoding options
-    # Return/yield a view of the original buffer where possible
-    view_only: bool
-    # (ndarray only) Force byte swapping on 8-bit values encoded as OW
-    be_swap_ow: bool
-
-    ## RLE decoding options
-    # Segment ordering ">" for big endian (default) or "<" for little endian
-    rle_segment_order: str  # pydicom plugin
-    byteorder: str  # pylibjpeg + -rle plugin
-
-    # JPEG2000/HTJ2K decoding options
-    # Use the JPEG 2000 metadata to return an ndarray matched to the expected pixel
-    # representation otherwise return the decoded data as-is (ndarray only)
-    apply_j2k_sign_correction: bool
-
-    ## Processing options (ndarray only)
-    as_rgb: bool  # Make best effort to return RGB output
-    force_rgb: bool  # Force YBR to RGB conversion
-    force_ybr: bool  # Force RGB to YBR conversion
-
-
 DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
 ProcessingFunction = Callable[["np.ndarray", "DecodeRunner"], "np.ndarray"]
 
@@ -123,8 +72,8 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
 
         arr = arr.copy()
 
+    # Converting to/from YBR_FULL and YBR_FULL_422 uses the same transformation
     if force_ybr:
-        # YBR_FULL and YBR_FULL_422 use the same transformation
         arr = convert_color_space(arr, PI.RGB, PI.YBR_FULL)
         runner.set_option("photometric_interpretation", PI.YBR_FULL)
     elif to_rgb:
@@ -196,7 +145,7 @@ class DecodeRunner:
             The transfer syntax UID corresponding to the pixel data to be
             decoded.
         """
-        self._src: Buffer
+        self._src: Buffer | BinaryIO
         self._src_type: str
         self._opts: DecodeOptions = {
             "transfer_syntax_uid": tsyntax,
@@ -377,12 +326,52 @@ class DecodeRunner:
 
         return length
 
+    def get_data(self, src: Buffer | BinaryIO, offset: int, length: int) -> bytes:
+        """Return `length` bytes from `src`, starting at `offset`.
+
+        Parameters
+        ----------
+        src : buffer-like | file-like
+            The source of the data to be returned. If a file-like then the file
+            position after reading will returned to the original offset.
+        offset : int
+            The starting offset of the data in `src`.
+        length : int
+            The number of bytes to try to return.
+
+        Returns
+        -------
+        bytes
+            The data from `src`, may return fewer bytes if the end of `src` is
+            reached before ``offset + length``.
+        """
+        if self.is_buffer:
+            src = cast(Buffer, src)
+            return src[offset : offset + length]
+
+        src = cast(BinaryIO, src)
+        file_offset = src.tell()
+        src.seek(offset)
+        buffer = src.read(length)
+        src.seek(file_offset)
+        return buffer
+
     def get_option(self, name: str, default: Any = None) -> Any:
         """Return the value of the option `name`."""
         return self._opts.get(name, default)
 
+    @property
+    def is_buffer(self) -> bool:
+        """Return ``True`` if the :attr:`src` type is a buffer-like, ``False``
+        if it is a file-like.
+        """
+        return self._src_type == "Buffer"
+
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data."""
+        if not self.is_buffer:
+            file_offset = cast(BinaryIO, self.src).tell()
+
         # For encapsulated data `self.src` should not be memoryview as doing so
         #   will create a duplicate object in memory by `generate_frames`
         # May yield more frames than `number_of_frames` for JPEG!
@@ -406,6 +395,9 @@ class DecodeRunner:
 
             # Otherwise try all decoders
             yield self._decode_frame(src)
+
+        if not self.is_buffer:
+            cast(BinaryIO, self.src).seek(file_offset)
 
     @property
     def number_of_frames(self) -> int:
@@ -600,7 +592,7 @@ class DecodeRunner:
         if hasattr(self, "_previous"):
             del self._previous
 
-    def set_source(self, src: Buffer | Dataset) -> None:
+    def set_source(self, src: Buffer | Dataset | BinaryIO) -> None:
         """Set the pixel data to be decoded.
 
         Parameters
@@ -613,8 +605,13 @@ class DecodeRunner:
         if isinstance(src, Dataset):
             self._set_options_ds(src)
             self._src = src[self.pixel_keyword].value
+            self._src_type = "Buffer"
+        elif hasattr(src, "read"):
+            self._src = src
+            self._src_type = "BinaryIO"
         else:
             self._src = src
+            self._src_type = "Buffer"
 
     def set_option(self, name: str, value: Any) -> None:
         """Set a decoding option.
@@ -714,8 +711,8 @@ class DecodeRunner:
             self.del_option("extended_offsets")
 
     @property
-    def src(self) -> Buffer:
-        """Return the buffer containing the encoded pixel data."""
+    def src(self) -> Buffer | BinaryIO:
+        """Return the buffer-like or file-like containing the encoded pixel data."""
         return self._src
 
     def __str__(self) -> str:
@@ -756,11 +753,17 @@ class DecodeRunner:
         """Return the expected transfer syntax corresponding to the data."""
         return self._opts["transfer_syntax_uid"]
 
-    def validate_buffer(self) -> None:
+    def validate(self) -> None:
+        """Validate the decoding options and source buffer (if any)."""
+        self._validate_options()
+        if self.is_buffer:
+            self._validate_buffer()
+
+    def _validate_buffer(self) -> None:
         """Validate the supplied buffer data."""
         # Check that the actual length of the pixel data is as expected
         expected = self.frame_length(unit="bytes") * self.number_of_frames
-        actual = len(self._src)
+        actual = len(cast(Buffer, self._src))
 
         if self.transfer_syntax.is_encapsulated:
             if actual in (expected, expected + expected % 2):
@@ -801,7 +804,7 @@ class DecodeRunner:
                 "be removed"
             )
 
-    def validate_options(self) -> None:
+    def _validate_options(self) -> None:
         """Validate the supplied options to ensure they meet minimum requirements."""
         # Minimum required
         required_keys = [
@@ -998,7 +1001,7 @@ class Decoder:
 
     def as_array(
         self,
-        src: Buffer | Dataset,
+        src: Dataset | Buffer | BinaryIO,
         *,
         index: int | None = None,
         validate: bool = True,
@@ -1032,11 +1035,11 @@ class Decoder:
 
         * Pixel data with a :ref:`photometric interpretation
           <glossary_photometric_interpretation>` of ``"YBR_FULL"`` or
-          ``"YBR_FULL_422"`` will be converted to ``"RGB"``.
+          ``"YBR_FULL_422"`` will be converted to RGB.
 
         Parameters
         ----------
-        src : buffer-like | :class:`~pydicom.dataset.Dataset`
+        src : :class:`~pydicom.dataset.Dataset` | buffer-like | file-like
             Single or multi-frame pixel data as one of the following:
 
             * :class:`~pydicom.dataset.Dataset`: a dataset containing
@@ -1044,6 +1047,14 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
+            * :class:`BinaryIO`: a file-like positioned at the start of the
+              pixel data element's value. The position will be returned
+              to the starting offset prior to returning the array.
+
+            When `src` is not a :class:`~pydicom.dataset.Dataset` then a number
+            of keyword parameters are also required. Please see the
+            :doc:`decoding options documentation</guides/decoding/decoder_options>`
+            for more information.
         index : int | None, optional
             If ``None`` (default) then return an array containing all the
             frames in the pixel data, otherwise return one containing only
@@ -1068,67 +1079,9 @@ class Decoder:
             one returned. For information on the available plugins for each
             decoder see the :doc:`API documentation</reference/pixels.decoders>`.
         **kwargs
-            The following keyword parameters are required when `src` is not
-            a :class:`~pydicom.dataset.Dataset`, or may be used to override the
-            corresponding element values when `src` is a
-            :class:`~pydicom.dataset.Dataset`:
-
-            * `rows`: :class:`int` - the number of :ref:`rows<glossary_rows>`
-              of pixels in `src`, maximum 65535.
-            * `columns`: :class:`int` - the number of :ref:`columns
-              <glossary_columns>` of pixels in `src`, maximum 65535.
-            * `number_of_frames`: :class:`int` - the :ref:`number of frames
-              <glossary_number_of_frames>` in `src`, minimum 1.
-            * `samples_per_pixel`: :class:`int` - the number of :ref:`samples
-              per pixel<glossary_samples_per_pixel>` in `src`, should be 1 or 3.
-            * `bits_allocated`: :class:`int` - the number of :ref:`bits used
-              to contain<glossary_bits_allocated>` each pixel, should be 1
-              or a multiple of 8.
-            * `bits_stored`: :class:`int` - the number of :ref:`bits actually
-              used<glossary_bits_stored>` per pixel. For example, `src` might
-              have 16-bits allocated (range 0 to 65535) but only contain 12-bit
-              pixel values (range 0 to 4095).
-            * `photometric_interpretation`: :class:`str` - the :ref:`color
-              space<glossary_photometric_interpretation>` of the *encoded*
-              pixel data, such as ``"YBR_FULL"``.
-
-            The following keyword parameters are conditionally required:
-
-            * `planar_configuration`: :class:`int` - required for native
-              (uncompressed) transfer syntaxes when `samples_per_pixel` > 1,
-              this is whether the pixel data is :ref:`color-by-plane or
-              color-by-pixel<glossary_planar_configuration>`. ``0``
-              for color-by-pixel, ``1`` for color-by-plane.
-            * `pixel_keyword`: :class:`str` - required for native
-              (uncompressed) transfer syntaxes, one of ``"PixelData"``,
-              ``"FloatPixelData"``, ``"DoubleFloatPixelData"``.
-            * `pixel_representation`: :class:`int` - required when
-              `pixel_keyword` is ``"PixelData"``, this is the :ref:`type of pixel
-              values<glossary_pixel_representation>`, ``0`` for unsigned integers,
-              ``1`` for signed.
-
-            The following options may be used with any transfer syntax:
-
-            * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel
-              data with a YCbCr :ref:`photometric interpretation
-              <glossary_photometric_interpretation>` such as ``"YBR_FULL_422"``
-              to RGB.
-            * `force_rgb`: :class:`bool` - if ``True`` then force a YCbCr to RGB
-              color space conversion on the array (default ``False``).
-            * `force_ybr`: :class:`bool` - if ``True`` then force an RGB to YCbCr
-              color space conversion on the array (default ``False``).
-
-            The following options may be used with native (uncompressed)
-            transfer syntaxes:
-
-            * `view_only`: :class:`bool` - if ``True`` then make a best effort
-              attempt to return an :class:`~numpy.ndarray` that's a `view
-              <https://numpy.org/doc/stable/user/basics.copies.html#view>`_
-              on the original buffer (default ``False``).
-
-            Options for the decoding plugin(s) may also be supplied. See the
-            :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
-            for more information.
+            Optional keyword parameters for controlling decoding are also
+            available, please see the :doc:`decoding options documentation
+            </guides/decoding/decoder_options>` for more information.
 
         Returns
         -------
@@ -1141,7 +1094,7 @@ class Decoder:
             * (frames, rows, columns, planes) for multi-frame, multi-plane data
 
             A writeable :class:`~numpy.ndarray` is returned by default. For
-            native transfer syntaxes with ``view_only=True`` a read-only
+            native transfer syntaxes with ``view_only=True``, a read-only
             :class:`~numpy.ndarray` will be returned if `src` is immutable.
         """
         if not HAVE_NP:
@@ -1161,8 +1114,7 @@ class Decoder:
             LOGGER.debug(runner)
 
         if validate:
-            runner.validate_options()
-            runner.validate_buffer()
+            runner.validate()
 
         if self.is_native:
             func = self._as_array_native
@@ -1241,7 +1193,8 @@ class Decoder:
 
     @staticmethod
     def _as_array_native(runner: DecodeRunner, index: int | None) -> "np.ndarray":
-        """Return natively encoded pixel data as :class:`~numpy.ndarray`.
+        """Return natively encoded pixel data from a buffer-like as
+        :class:`~numpy.ndarray`.
 
         Parameters
         ----------
@@ -1259,63 +1212,79 @@ class Decoder:
         length_bytes = runner.frame_length(unit="bytes")
         dtype = runner.pixel_dtype
 
-        with memoryview(runner.src) as src:
-            if runner._test_for("be_swap_ow"):
-                # Big endian 8-bit data may be encoded as OW
-                # For example a 1 x 1 x 3 image will (presumably) be:
-                #   b"\x02\x01\0x00\x03" instead of b"\x01\x02\x03\x00"
-                # Note that the padding byte is displaced, so we need to
-                #  swap the bytes pairwise.
-                # This will also affect the start and end of individual frames
+        src: memoryview | BinaryIO
+        if runner.is_buffer:
+            src = memoryview(cast(Buffer, runner.src))
+            file_offset = 0
+            length_source = len(src)
+        else:
+            src = cast(BinaryIO, runner.src)
+            # Should be the start of the pixel data element's value
+            file_offset = src.tell()
+            length_source = length_bytes * runner.number_of_frames
 
-                if runner.get_option("view_only", False):
-                    LOGGER.warning(
-                        "Unable to return an ndarray that's a view on the "
-                        "original buffer for 8-bit pixel data encoded as OW with "
-                        "'Explicit VR Big Endian'"
+        if runner._test_for("be_swap_ow"):
+            # Big endian 8-bit data may be encoded as OW
+            # For example a 1 x 1 x 3 image will (presumably) be:
+            #   b"\x02\x01\x00\x03" instead of b"\x01\x02\x03\x00"
+            # Note that the padding byte is displaced, so we need to
+            #  swap the bytes pairwise.
+            # This will also affect the start and end of individual frames
+            if runner.get_option("view_only", False):
+                LOGGER.warning(
+                    "Unable to return an ndarray that's a view on the "
+                    "original buffer for 8-bit pixel data encoded as OW with "
+                    "'Explicit VR Big Endian'"
+                )
+
+            # ndarray.byteswap() creates a new memory object
+            if index is not None:
+                # Return specified frame only
+                start_offset = file_offset + index * length_bytes
+                if (start_offset + length_bytes) > file_offset + length_source:
+                    raise ValueError(
+                        f"There is insufficient pixel data to contain {index + 1} frames"
                     )
 
-                # ndarray.byteswap() creates a new memory object
-                if index is not None:
-                    # Return specified frame only
-                    start_offset = index * length_bytes
-                    if (end_offset := start_offset + length_bytes) > len(src):
-                        raise ValueError(
-                            f"There is insufficient pixel data to contain {index + 1} frames"
-                        )
-
-                    if length_bytes % 2 == 0:
-                        # Even length frame: start and end correct
-                        frame = src[start_offset:end_offset]
-                        arr = np.frombuffer(frame, dtype="u2").byteswap()
-                        arr = arr.view(dtype)
-                    elif index % 2 == 0:
-                        # Odd length frame, even index: start correct, end incorrect
-                        frame = src[start_offset : end_offset + 1]
-                        arr = np.frombuffer(frame, dtype="u2").byteswap()
-                        arr = arr.view(dtype)[:-1]
-                    else:
-                        # Odd length frame, odd index: start incorrect, end correct
-                        frame = src[start_offset - 1 : end_offset]
-                        arr = np.frombuffer(frame, dtype="u2").byteswap()
-                        arr = arr.view(dtype)[1:]
+                if length_bytes % 2 == 0:
+                    # Even length frame: start and end correct
+                    frame = runner.get_data(src, start_offset, length_bytes)
+                    arr = np.frombuffer(frame, dtype="u2").byteswap()
+                    arr = arr.view(dtype)
                 else:
-                    # Return all frames
-                    length_bytes *= runner.number_of_frames
-                    arr = np.frombuffer(src, dtype="u2").byteswap()
-                    arr = arr.view(dtype)[:length_bytes]
+                    # Odd length frame
+                    # Even index: start correct, end incorrect
+                    #   src[start:start + length + 1] -> ... -> arr[:-1]
+                    # Odd index: start incorrect, end correct
+                    #   src[start - 1:start + length + 1] -> ... -> arr[1:]
+                    odd_index = index % 2
+                    frame = runner.get_data(
+                        src, start_offset - odd_index, length_bytes + 1
+                    )
+                    arr = np.frombuffer(frame, dtype="u2").byteswap()
+                    arr = arr.view(dtype)[odd_index : None if odd_index else -1]
             else:
-                if index is not None:
-                    start_offset = index * length_bytes
-                    if (end_offset := start_offset + length_bytes) > len(src):
-                        raise ValueError(
-                            f"There is insufficient pixel data to contain {index + 1} frames"
-                        )
+                # Return all frames
+                length_bytes *= runner.number_of_frames
+                buffer = runner.get_data(
+                    src, file_offset, length_bytes + length_bytes % 2
+                )
+                arr = np.frombuffer(buffer, dtype="u2").byteswap()
+                arr = arr.view(dtype)[:length_bytes]
+        else:
+            if index is not None:
+                start_offset = file_offset + index * length_bytes
+                if (start_offset + length_bytes) > file_offset + length_source:
+                    raise ValueError(
+                        f"There is insufficient pixel data to contain {index + 1} frames"
+                    )
 
-                    arr = np.frombuffer(src[start_offset:end_offset], dtype=dtype)
-                else:
-                    length_bytes *= runner.number_of_frames
-                    arr = np.frombuffer(src[:length_bytes], dtype=dtype)
+                frame = runner.get_data(src, start_offset, length_bytes)
+                arr = np.frombuffer(frame, dtype=dtype)
+            else:
+                length_bytes *= runner.number_of_frames
+                buffer = runner.get_data(src, file_offset, length_bytes)
+                arr = np.frombuffer(buffer, dtype=dtype)
 
         # Unpack bit-packed data (if required)
         if runner.bits_allocated == 1:
@@ -1331,32 +1300,32 @@ class Decoder:
 
             return np.unpackbits(arr, bitorder="little", count=length_pixels)
 
+        if runner.photometric_interpretation != PI.YBR_FULL_422:
+            return arr
+
         # Expand YBR_FULL_422 (if required)
-        if runner.photometric_interpretation == PI.YBR_FULL_422:
-            if runner.get_option("view_only", False):
-                LOGGER.warning(
-                    "Unable to return an ndarray that's a view on the original "
-                    "buffer for uncompressed pixel data with a photometric "
-                    "interpretation of 'YBR_FULL_422'"
-                )
+        if runner.get_option("view_only", False):
+            LOGGER.warning(
+                "Unable to return an ndarray that's a view on the original "
+                "buffer for uncompressed pixel data with a photometric "
+                "interpretation of 'YBR_FULL_422'"
+            )
 
-            # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
-            # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
-            out = np.empty(arr.shape[0] // 2 * 3, dtype=dtype)
-            out[::6] = arr[::4]  # Y1
-            out[3::6] = arr[1::4]  # Y2
-            out[1::6], out[4::6] = arr[2::4], arr[2::4]  # B
-            out[2::6], out[5::6] = arr[3::4], arr[3::4]  # R
+        # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
+        # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
+        out = np.empty(arr.shape[0] // 2 * 3, dtype=dtype)
+        out[::6] = arr[::4]  # Y1
+        out[3::6] = arr[1::4]  # Y2
+        out[1::6], out[4::6] = arr[2::4], arr[2::4]  # B
+        out[2::6], out[5::6] = arr[3::4], arr[3::4]  # R
 
-            runner.set_option("photometric_interpretation", PI.YBR_FULL)
+        runner.set_option("photometric_interpretation", PI.YBR_FULL)
 
-            return out
-
-        return arr
+        return out
 
     def as_buffer(
         self,
-        src: Buffer | Dataset,
+        src: Dataset | Buffer | BinaryIO,
         *,
         index: int | None = None,
         validate: bool = True,
@@ -1367,7 +1336,7 @@ class Decoder:
 
         Parameters
         ----------
-        src : buffer-like | :class:`~pydicom.dataset.Dataset`
+        src : :class:`~pydicom.dataset.Dataset` | buffer-like | file-like
             Single or multi-frame pixel data as one of the following:
 
             * :class:`~pydicom.dataset.Dataset`: a dataset containing
@@ -1375,6 +1344,14 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
+            * :class:`BinaryIO`: a file-like positioned at the start of the
+              pixel data element's value. The position will be returned
+              to the starting offset prior to returning the buffer.
+
+            When `src` is not a :class:`~pydicom.dataset.Dataset` then a number
+            of keyword parameters are also required. Please see the
+            :doc:`decoding options documentation</guides/decoding/decoder_options>`
+            for more information.
         index : int | None, optional
             If ``None`` (default) then return a buffer-like containing all the
             frames in the pixel data, otherwise return one containing only
@@ -1391,63 +1368,20 @@ class Decoder:
             one returned. For information on the available plugins for each
             decoder see the :doc:`API documentation</reference/pixels.decoders>`.
         **kwargs
-            The following keyword parameters are required when `src` is not
-            a :class:`~pydicom.dataset.Dataset`, or may be used to override the
-            corresponding element values when `src` is a
-            :class:`~pydicom.dataset.Dataset`:
-
-            * `rows`: :class:`int` - the number of :ref:`rows<glossary_rows>`
-              of pixels in `src`, maximum 65535.
-            * `columns`: :class:`int` - the number of :ref:`columns
-              <glossary_columns>` of pixels in `src`, maximum 65535.
-            * `number_of_frames`: :class:`int` - the :ref:`number of frames
-              <glossary_number_of_frames>` in `src`, minimum 1.
-            * `samples_per_pixel`: :class:`int` - the number of :ref:`samples
-              per pixel<glossary_samples_per_pixel>` in `src`, should be 1 or 3.
-            * `bits_allocated`: :class:`int` - the number of :ref:`bits used
-              to contain<glossary_bits_allocated>` each pixel, should be a 1
-              or a multiple of 8.
-            * `bits_stored`: :class:`int` - the number of :ref:`bits actually
-              used<glossary_bits_stored>` per pixel. For example, `src` might
-              have 16-bits allocated (range 0 to 65535) but only contain 12-bit
-              pixel values (range 0 to 4095).
-            * `photometric_interpretation`: :class:`str` - the :ref:`color
-              space<glossary_photometric_interpretation>` of the *encoded*
-              pixel data, such as ``"YBR_FULL"``.
-
-            The following keyword parameters are conditionally required:
-
-            * `planar_configuration`: :class:`int` - required for native
-              (uncompressed) transfer syntaxes when `samples_per_pixel` > 1,
-              this is whether the pixel data is :ref:`color-by-plane or
-              color-by-pixel<glossary_planar_configuration>`. ``0``
-              for color-by-pixel, ``1`` for color-by-plane.
-            * `pixel_keyword`: :class:`str` - required for native
-              (uncompressed) transfer syntaxes, one of ``"PixelData"``,
-              ``"FloatPixelData"``, ``"DoubleFloatPixelData"``.
-            * `pixel_representation`: :class:`int` - required when
-              `pixel_keyword` is ``"PixelData"``, this is the :ref:`type of pixel
-              values<glossary_pixel_representation>`, ``0`` for unsigned integers,
-              ``1`` for signed.
-
-            The following options may be used with native (uncompressed)
-            transfer syntaxes:
-
-            * `view_only`: :class:`bool` - if ``True`` then return a
-              :class:`memoryview` on the original buffer (default ``False``).
-
-            Options for the decoding plugin(s) may also be supplied. See the
-            :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
-            for more information.
+            Optional keyword parameters for controlling decoding are also
+            available, please see the :doc:`decoding options documentation
+            </guides/decoding/decoder_options>` for more information.
 
         Returns
         -------
         buffer-like
             The decoded pixel data.
 
-            * For natively encoded pixel data the same type in `src` will be
-              returned, however if `view_only` is ``True`` then a
-              :class:`memoryview` on the original buffer will be returned instead.
+            * For natively encoded pixel data when `src` is a buffer-like the
+              same type in `src` will be returned, except if `view_only` is
+              ``True`` in which case a :class:`memoryview` on the original
+              buffer will be returned instead. If `src` is a file-like then
+              :class:`bytes` will always be returned.
             * Encapsulated pixel data will be returned as :class:`bytearray`.
 
             8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
@@ -1462,8 +1396,7 @@ class Decoder:
         runner.set_decoders(self._validate_decoders(decoding_plugin))
 
         if validate:
-            runner.validate_options()
-            runner.validate_buffer()
+            runner.validate()
 
         if self.is_native:
             return self._as_buffer_native(runner, index)
@@ -1490,47 +1423,59 @@ class Decoder:
             `view_only` is ``True`` in which case a :class:`memoryview` of the
             original buffer will be returned instead.
         """
-        if runner.get_option("view_only", False):
-            src: Buffer = memoryview(runner.src)
-        else:
-            src = runner.src
+        length_bytes = runner.frame_length(unit="bytes")
+        src: Buffer | BinaryIO
+        if runner.is_buffer:
+            if runner.get_option("view_only", False):
+                src = memoryview(cast(Buffer, runner.src))
+            else:
+                src = cast(Buffer, runner.src)
 
-        expected_length = runner.frame_length(unit="bytes")
+            file_offset = 0
+            length_source = len(src)
+        else:
+            src = cast(BinaryIO, runner.src)
+            file_offset = src.tell()
+            length_source = length_bytes * runner.number_of_frames
+
         if runner._test_for("be_swap_ow"):
             # Big endian 8-bit data encoded as OW
             if index is not None:
                 # Return specified frame only
-                start_offset = index * expected_length
-                if (end_offset := start_offset + expected_length) > len(src):
+                start_offset = file_offset + index * length_bytes
+                if start_offset + length_bytes > file_offset + length_source:
                     raise ValueError(
                         f"There is insufficient pixel data to contain {index + 1} frames"
                     )
 
-                if expected_length % 2 == 0:
+                if length_bytes % 2 == 0:
                     # Even length frame: start and end correct
-                    return src[start_offset:end_offset]
+                    return runner.get_data(src, start_offset, length_bytes)
 
-                if index % 2 == 0:
-                    # Odd length frame, even index: start correct, end incorrect
-                    return src[start_offset : end_offset + 1]
-
-                # Odd length frame, odd index: start incorrect, end correct
-                return src[start_offset - 1 : end_offset]
+                # Odd length frame
+                # Even index: start correct, end incorrect
+                #   -> src[start:start + length + 1]
+                # Odd index: start incorrect, end correct
+                #   -> src[start - 1:start + length + 1]
+                return runner.get_data(src, start_offset - index % 2, length_bytes + 1)
 
             # Return all frames
-            return src
+            length_bytes *= runner.number_of_frames
+            return runner.get_data(src, file_offset, length_bytes + length_bytes % 2)
 
         if index is not None:
-            start_offset = index * expected_length
-            if (end_offset := start_offset + expected_length) > len(src):
+            # Return specified frame only
+            start_offset = file_offset + index * length_bytes
+            if start_offset + length_bytes > file_offset + length_source:
                 raise ValueError(
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            return src[start_offset:end_offset]
+            return runner.get_data(src, start_offset, length_bytes)
 
-        expected_length *= runner.number_of_frames
-        return src[:expected_length]
+        # Return all frames
+        length_bytes *= runner.number_of_frames
+        return runner.get_data(src, file_offset, length_bytes)
 
     @staticmethod
     def _as_buffer_encapsulated(
@@ -1598,7 +1543,7 @@ class Decoder:
 
     def iter_array(
         self,
-        src: Buffer | Dataset,
+        src: Dataset | Buffer | BinaryIO,
         *,
         indices: Iterable[int] | None = None,
         raw: bool = False,
@@ -1636,7 +1581,7 @@ class Decoder:
 
         Parameters
         ----------
-        src : buffer-like | :class:`~pydicom.dataset.Dataset`
+        src : :class:`~pydicom.dataset.Dataset` | buffer-like | file-like
             Single or multi-frame pixel data as one of the following:
 
             * :class:`~pydicom.dataset.Dataset`: a dataset containing
@@ -1644,6 +1589,14 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
+            * :class:`BinaryIO`: a file-like positioned at the start of the
+              pixel data element's value. The position will be returned
+              to the starting offset only after all frames have been yielded.
+
+            When `src` is not a :class:`~pydicom.dataset.Dataset` then a number
+            of keyword parameters are also required. Please see the
+            :doc:`decoding options documentation</guides/decoding/decoder_options>`
+            for more information.
         indices : Iterable[int] | None, optional
             If ``None`` (default) then iterate through the entire pixel data,
             otherwise only iterate through the frames specified by `indices`.
@@ -1666,67 +1619,9 @@ class Decoder:
             one yielded. For information on the available plugins for each
             decoder see the :doc:`API documentation</reference/pixels.decoders>`.
         **kwargs
-            The following keyword parameters are required when `src` is not
-            a :class:`~pydicom.dataset.Dataset`, or may be used to override the
-            corresponding element values when `src` is a
-            :class:`~pydicom.dataset.Dataset`:
-
-            * `rows`: :class:`int` - the number of :ref:`rows<glossary_rows>`
-              of pixels in `src`, maximum 65535.
-            * `columns`: :class:`int` - the number of :ref:`columns
-              <glossary_columns>` of pixels in `src`, maximum 65535.
-            * `number_of_frames`: :class:`int` - the :ref:`number of frames
-              <glossary_number_of_frames>` in `src`, minimum 1.
-            * `samples_per_pixel`: :class:`int` - the number of :ref:`samples
-              per pixel<glossary_samples_per_pixel>` in `src`, should be 1 or 3.
-            * `bits_allocated`: :class:`int` - the number of :ref:`bits used
-              to contain<glossary_bits_allocated>` each pixel, should be a 1
-              or a multiple of 8.
-            * `bits_stored`: :class:`int` - the number of :ref:`bits actually
-              used<glossary_bits_stored>` per pixel. For example, `src` might
-              have 16-bits allocated (range 0 to 65535) but only contain 12-bit
-              pixel values (range 0 to 4095).
-            * `photometric_interpretation`: :class:`str` - the :ref:`color
-              space<glossary_photometric_interpretation>` of the *encoded*
-              pixel data, such as ``"YBR_FULL"``.
-
-            The following keyword parameters are conditionally required:
-
-            * `planar_configuration`: :class:`int` - required for native
-              (uncompressed) transfer syntaxes when `samples_per_pixel` > 1,
-              this is whether the pixel data is :ref:`color-by-plane or
-              color-by-pixel<glossary_planar_configuration>`. ``0``
-              for color-by-pixel, ``1`` for color-by-plane.
-            * `pixel_keyword`: :class:`str` - required for native
-              (uncompressed) transfer syntaxes, one of ``"PixelData"``,
-              ``"FloatPixelData"``, ``"DoubleFloatPixelData"``.
-            * `pixel_representation`: :class:`int` - required when
-              `pixel_keyword` is ``"PixelData"``, this is the :ref:`type of pixel
-              values<glossary_pixel_representation>`, ``0`` for unsigned integers,
-              ``1`` for signed.
-
-            The following options may be used with any transfer syntax:
-
-            * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel
-              data with a YCbCr :ref:`photometric interpretation
-              <glossary_photometric_interpretation>` such as ``"YBR_FULL_422"``
-              to RGB.
-            * `force_rgb`: :class:`bool` - if ``True`` then force a YCbCr to RGB
-              color space conversion on the array (default ``False``).
-            * `force_ybr`: :class:`bool` - if ``True`` then force an RGB to YCbCr
-              color space conversion on the array (default ``False``).
-
-            The following options may be used with native (uncompressed)
-            transfer syntaxes:
-
-            * `view_only`: :class:`bool` - if ``True`` then make a best effort
-              attempt to yield an :class:`~numpy.ndarray` that's a `view
-              <https://numpy.org/doc/stable/user/basics.copies.html#view>`_
-              on the original buffer (default ``False``).
-
-            Options for the decoding plugin(s) may also be supplied. See the
-            :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
-            for more information.
+            Optional keyword parameters for controlling decoding are also
+            available, please see the :doc:`decoding options documentation
+            </guides/decoding/decoder_options>` for more information.
 
         Yields
         ------
@@ -1754,8 +1649,7 @@ class Decoder:
             LOGGER.debug(runner)
 
         if validate:
-            runner.validate_options()
-            runner.validate_buffer()
+            runner.validate()
 
         if self.is_native:
             func = self._as_array_native
@@ -1799,7 +1693,7 @@ class Decoder:
 
     def iter_buffer(
         self,
-        src: Buffer | Dataset,
+        src: Dataset | Buffer | BinaryIO,
         *,
         indices: Iterable[int] | None = None,
         validate: bool = True,
@@ -1810,7 +1704,7 @@ class Decoder:
 
         Parameters
         ----------
-        src : buffer-like | :class:`~pydicom.dataset.Dataset`
+        src : :class:`~pydicom.dataset.Dataset` | buffer-like | file-like
             Single or multi-frame pixel data as one of the following:
 
             * :class:`~pydicom.dataset.Dataset`: a dataset containing
@@ -1818,6 +1712,14 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
+            * :class:`BinaryIO`: a file-like positioned at the start of the
+              pixel data element's value. The position will be returned
+              to the starting offset only after all frames have been yielded.
+
+            When `src` is not a :class:`~pydicom.dataset.Dataset` then a number
+            of keyword parameters are also required. Please see the
+            :doc:`decoding options documentation</guides/decoding/decoder_options>`
+            for more information.
         indices : Iterable[int] | None, optional
             If ``None`` (default) then iterate through the entire pixel data,
             otherwise only iterate through the frames specified by `indices`.
@@ -1832,63 +1734,20 @@ class Decoder:
             one yielded. For information on the available plugins for each
             decoder see the :doc:`API documentation</reference/pixels.decoders>`.
         **kwargs
-            The following keyword parameters are required when `src` is not
-            a :class:`~pydicom.dataset.Dataset`, or may be used to override the
-            corresponding element values when `src` is a
-            :class:`~pydicom.dataset.Dataset`:
-
-            * `rows`: :class:`int` - the number of :ref:`rows<glossary_rows>`
-              of pixels in `src`, maximum 65535.
-            * `columns`: :class:`int` - the number of :ref:`columns
-              <glossary_columns>` of pixels in `src`, maximum 65535.
-            * `number_of_frames`: :class:`int` - the :ref:`number of frames
-              <glossary_number_of_frames>` in `src`, minimum 1.
-            * `samples_per_pixel`: :class:`int` - the number of :ref:`samples
-              per pixel<glossary_samples_per_pixel>` in `src`, should be 1 or 3.
-            * `bits_allocated`: :class:`int` - the number of :ref:`bits used
-              to contain<glossary_bits_allocated>` each pixel, should be a 1
-              or a multiple of 8.
-            * `bits_stored`: :class:`int` - the number of :ref:`bits actually
-              used<glossary_bits_stored>` per pixel. For example, `src` might
-              have 16-bits allocated (range 0 to 65535) but only contain 12-bit
-              pixel values (range 0 to 4095).
-            * `photometric_interpretation`: :class:`str` - the :ref:`color
-              space<glossary_photometric_interpretation>` of the *encoded*
-              pixel data, such as ``"YBR_FULL"``.
-
-            The following keyword parameters are conditionally required:
-
-            * `planar_configuration`: :class:`int` - required for native
-              (uncompressed) transfer syntaxes when `samples_per_pixel` > 1,
-              this is whether the pixel data is :ref:`color-by-plane or
-              color-by-pixel<glossary_planar_configuration>`. ``0``
-              for color-by-pixel, ``1`` for color-by-plane.
-            * `pixel_keyword`: :class:`str` - required for native
-              (uncompressed) transfer syntaxes, one of ``"PixelData"``,
-              ``"FloatPixelData"``, ``"DoubleFloatPixelData"``.
-            * `pixel_representation`: :class:`int` - required when
-              `pixel_keyword` is ``"PixelData"``, this is the :ref:`type of pixel
-              values<glossary_pixel_representation>`, ``0`` for unsigned integers,
-              ``1`` for signed.
-
-            The following options may be used with native (uncompressed)
-            transfer syntaxes:
-
-            * `view_only`: :class:`bool` - if ``True`` then yield a
-              :class:`memoryview` on the original buffer (default ``False``).
-
-            Options for the decoding plugin(s) may also be supplied. See the
-            :doc:`decoding plugin options </guides/decoding/decoder_plugin_options>`
-            for more information.
+            Optional keyword parameters for controlling decoding are also
+            available, please see the :doc:`decoding options documentation
+            </guides/decoding/decoder_options>` for more information.
 
         Yields
         -------
         buffer-like
             The decoded pixel data.
 
-            * For natively encoded pixel data the same type in `src` will be
-              yielded, however if `view_only` is ``True`` then a
-              :class:`memoryview` on the original buffer will be yielded instead.
+            * For natively encoded pixel data when `src` is a buffer-like the
+              same type in `src` will be yielded, except if `view_only` is
+              ``True`` in which case a :class:`memoryview` on the original
+              buffer will be yielded instead. If `src` is a file-like then
+              :class:`bytes` will always be yielded.
             * Encapsulated pixel data will be yielded as :class:`bytearray`.
 
             8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
@@ -1903,11 +1762,11 @@ class Decoder:
         runner.set_decoders(self._validate_decoders(decoding_plugin))
 
         if validate:
-            runner.validate_options()
-            runner.validate_buffer()
+            runner.validate()
 
         if self.is_encapsulated and not indices:
             yield from runner.iter_decode()
+
             return
 
         if self.is_native:

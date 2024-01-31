@@ -189,7 +189,11 @@ Enhancements
     buffer-like object
   * Iterating through either all or specific frames
 
-* Support has been added for decoding HTJ2K transfer syntaxes (:issue:`1848`)
+* Added support for decoding HTJ2K transfer syntaxes (:issue:`1848`)
+* Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
+  from a path or file-like while minimizing memory-usage :func:`~pydicom.pixels.as_array`
+  and :func:`~pydicom.pixels.iter_array`.
+
 
 Fixes
 -----
