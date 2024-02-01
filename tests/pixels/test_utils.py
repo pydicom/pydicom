@@ -235,7 +235,8 @@ class TestPixelArray:
         """Test that the extended offset table values are retrieved OK"""
         ds = EXPL_8_3_1F_YBR422.ds
         offsets = (
-            b"\x00\x00\x00\x00\x00\x00\x00\x01", b"\x00\x00\x00\x00\x00\x00\x00\x02"
+            b"\x00\x00\x00\x00\x00\x00\x00\x01",
+            b"\x00\x00\x00\x00\x00\x00\x00\x02",
         )
         ds.ExtendedOffsetTable = offsets[0]
         ds.ExtendedOffsetTableLengths = offsets[1]
@@ -243,7 +244,8 @@ class TestPixelArray:
         assert opts["extended_offsets"] == offsets
 
         offsets = (
-            b"\x00\x00\x00\x00\x00\x00\x00\x03", b"\x00\x00\x00\x00\x00\x00\x00\x04"
+            b"\x00\x00\x00\x00\x00\x00\x00\x03",
+            b"\x00\x00\x00\x00\x00\x00\x00\x04",
         )
         opts = _as_options(ds, {"extended_offsets": offsets})
         assert opts["extended_offsets"] == offsets
