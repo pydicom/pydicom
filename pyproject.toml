@@ -50,7 +50,7 @@ dev = [
     "pydicom-data",
     "pytest",
     "pytest-cov",
-    "ruff==0.1.9",
+    "ruff==0.1.15",
     "types-requests"
 ]
 
