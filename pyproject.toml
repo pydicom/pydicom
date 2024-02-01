@@ -45,7 +45,7 @@ docs = [
 ]
 
 dev = [
-    "black==23.12.1",
+    "black==24.1.1",
     "mypy==1.8.0",
     "pydicom-data",
     "pytest",
