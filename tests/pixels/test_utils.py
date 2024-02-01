@@ -14,6 +14,7 @@ except ImportError:
 from pydicom import dcmread, Dataset
 from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.pixels import pixel_array, iter_pixels
+from pydicom.pixels.utils import _as_options
 from pydicom.uid import EnhancedMRImageStorage, ExplicitVRLittleEndian
 
 from .pixels_reference import (
@@ -229,6 +230,23 @@ class TestPixelArray:
         )
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b)
+
+    def test_extended_offsets(self):
+        """Test that the extended offset table values are retrieved OK"""
+        ds = EXPL_8_3_1F_YBR422.ds
+        offsets = (
+            b"\x00\x00\x00\x00\x00\x00\x00\x01", b"\x00\x00\x00\x00\x00\x00\x00\x02"
+        )
+        ds.ExtendedOffsetTable = offsets[0]
+        ds.ExtendedOffsetTableLengths = offsets[1]
+        opts = _as_options(ds, {})
+        assert opts["extended_offsets"] == offsets
+
+        offsets = (
+            b"\x00\x00\x00\x00\x00\x00\x00\x03", b"\x00\x00\x00\x00\x00\x00\x00\x04"
+        )
+        opts = _as_options(ds, {"extended_offsets": offsets})
+        assert opts["extended_offsets"] == offsets
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")

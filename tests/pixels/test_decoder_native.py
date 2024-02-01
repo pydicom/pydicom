@@ -25,7 +25,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from .pixels_reference import PIXEL_REFERENCE, EXPL_16_1_1F_PAD
+from .pixels_reference import PIXEL_REFERENCE, EXPL_16_1_1F_PAD, IMPL_32_1_1F
 
 
 def name(ref):
@@ -228,6 +228,35 @@ class TestAsArray:
                     assert arr.shape == reference.shape
                 else:
                     assert arr.shape == reference.shape[1:]
+
+    def test_float_pixel_data(self):
+        """Test Float Pixel Data."""
+        # Only 1 sample per pixel allowed
+        ds = dcmread(IMPL_32_1_1F.path)
+        ds.FloatPixelData = ds.PixelData
+        del ds.PixelData
+        assert 32 == ds.BitsAllocated
+        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
+        arr = decoder.as_array(ds, raw=True)
+        assert "float32" == arr.dtype
+
+        ref = decoder.as_array(IMPL_32_1_1F.ds, raw=True).view("float32")
+        assert np.array_equal(arr, ref)
+
+    def test_double_float_pixel_data(self):
+        """Test Double Float Pixel Data."""
+        # Only 1 sample per pixel allowed
+        ds = dcmread(IMPL_32_1_1F.path)
+        ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
+        del ds.PixelData
+        ds.BitsAllocated = 64
+        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
+        arr = decoder.as_array(ds, raw=True)
+        assert "float64" == arr.dtype
+
+        ref = decoder.as_array(IMPL_32_1_1F.ds, raw=True).view("float64")
+        assert np.array_equal(arr.ravel()[:50], ref.ravel())
+        assert np.array_equal(arr.ravel()[50:], ref.ravel())
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
@@ -675,6 +704,28 @@ class TestAsBuffer:
                     out = np.zeros((28), dtype=arr.dtype)
                     out[:27] = arr.ravel()
                     assert out.view(">u2").byteswap().tobytes() == buffer
+
+    def test_float_pixel_data(self):
+        """Test Float Pixel Data."""
+        ds = dcmread(IMPL_32_1_1F.path)
+        ref = ds.PixelData
+        ds.FloatPixelData = ref
+        del ds.PixelData
+        assert 32 == ds.BitsAllocated
+        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
+        buffer = decoder.as_buffer(ds, raw=True)
+        assert buffer == ref
+
+    def test_double_float_pixel_data(self):
+        """Test Double Float Pixel Data."""
+        ds = dcmread(IMPL_32_1_1F.path)
+        ref = ds.PixelData + ds.PixelData
+        ds.DoubleFloatPixelData = ref
+        del ds.PixelData
+        ds.BitsAllocated = 64
+        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
+        buffer = decoder.as_buffer(ds, raw=True)
+        assert buffer == ref
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
