@@ -83,9 +83,7 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     return arr
 
 
-def _apply_j2k_sign_correction(
-    arr: "np.ndarray", runner: "DecodeRunner"
-) -> "np.ndarray":
+def _apply_j2k_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
     # Example:
     # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
@@ -1021,20 +1019,20 @@ class Decoder:
         performed:
 
         * Natively encoded bit-packed pixel data for a :ref:`bits allocated
-          <glossary_bits_allocated>` of ``1`` will be unpacked.
+          <bits_allocated>` of ``1`` will be unpacked.
         * Natively encoded pixel data with a :ref:`photometric interpretation
-          <glossary_photometric_interpretation>` of ``"YBR_FULL_422"`` will
+          <photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
         * JPEG 2000 encoded data whose signedness doesn't match the expected
-          :ref:`pixel representation<glossary_pixel_representation>` will be
+          :ref:`pixel representation<pixel_representation>` will be
           converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
         will also be performed:
 
         * Pixel data with a :ref:`photometric interpretation
-          <glossary_photometric_interpretation>` of ``"YBR_FULL"`` or
+          <photometric_interpretation>` of ``"YBR_FULL"`` or
           ``"YBR_FULL_422"`` will be converted to RGB.
 
         Parameters
@@ -1563,20 +1561,20 @@ class Decoder:
         performed:
 
         * Natively encoded bit-packed pixel data for a :ref:`bits allocated
-          <glossary_bits_allocated>` of ``1`` will be unpacked.
+          <bits_allocated>` of ``1`` will be unpacked.
         * Natively encoded pixel data with a :ref:`photometric interpretation
-          <glossary_photometric_interpretation>` of ``"YBR_FULL_422"`` will
+          <photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
         * JPEG 2000 encoded data whose signedness doesn't match the expected
-          :ref:`pixel representation<glossary_pixel_representation>` will be
+          :ref:`pixel representation<pixel_representation>` will be
           converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
         will also be performed:
 
         * Pixel data with a :ref:`photometric interpretation
-          <glossary_photometric_interpretation>` of ``"YBR_FULL"`` or
+          <photometric_interpretation>` of ``"YBR_FULL"`` or
           ``"YBR_FULL_422"`` will be converted to ``"RGB"``.
 
         Parameters
@@ -2037,15 +2035,19 @@ def _build_decoder_docstrings() -> None:
         uid = dec.UID
         available = dec._available.keys()
         unavailable = dec._unavailable.keys()
+
         plugins = list(available) + list(unavailable)
 
-        plugins = [plugin_doc_links[name] for name in sorted(plugins)]
-
-        s = [f"A *Pixel Data* decoder for *{uid.name}* - ``{uid}``"]
+        s = [f"A pixel data decoder for *{uid.name}* - ``{uid}``"]
         s.append("")
         s.append(f".. versionadded:: {versionadded}")
         s.append("")
-        s.append(f"Decoding plugins: {', '.join(plugins)}")
+        s.append(f"Available decoding plugins: {', '.join(sorted(plugins))}.")
+        s.append("")
+        s.append(
+            "Plugin-specific options are given in the :doc:`decoder  "
+            "options documentation</guides/decoding/decoder_options>`."
+        )
         s.append("")
         s.append(
             "See the :class:`~pydicom.pixels.decoders.base.Decoder` "
@@ -2062,10 +2064,11 @@ def get_decoder(uid: str) -> Decoder:
 
     .. versionadded:: 3.0
 
-    +-------------------------------------------------------------------+---------+
-    | Transfer Syntax                                                   | Version |
-    +--------------------------------------+----------------------------+ added   +
-    | Name                                 | UID                        |         |
+    +-----------------------------------------------------------------------------+
+    | Supported Transfer Syntaxes                                                 |
+    +--------------------------------------+----------------------------+---------+
+    | Name                                 | UID                        | Version |
+    |                                      |                            | added   |
     +======================================+============================+=========+
     | *Implicit VR Little Endian*          | 1.2.840.10008.1.2          | 3.0     |
     +--------------------------------------+----------------------------+---------+

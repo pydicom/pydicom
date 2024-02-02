@@ -166,20 +166,20 @@ def pixel_array(
     performed:
 
     * Natively encoded bit-packed pixel data for a :ref:`bits allocated
-      <glossary_bits_allocated>` of ``1`` will be unpacked.
+      <bits_allocated>` of ``1`` will be unpacked.
     * Natively encoded pixel data with a :ref:`photometric interpretation
-      <glossary_photometric_interpretation>` of ``"YBR_FULL_422"`` will
+      <photometric_interpretation>` of ``"YBR_FULL_422"`` will
       have it's sub-sampling removed.
     * The output array will be reshaped to the specified dimensions.
     * JPEG 2000 encoded data whose signedness doesn't match the expected
-      :ref:`pixel representation<glossary_pixel_representation>` will be
+      :ref:`pixel representation<pixel_representation>` will be
       converted to match.
 
     If ``raw = False`` (the default) then the following processing operation
     will also be performed:
 
     * Pixel data with a :ref:`photometric interpretation
-      <glossary_photometric_interpretation>` of ``"YBR_FULL"`` or
+      <photometric_interpretation>` of ``"YBR_FULL"`` or
       ``"YBR_FULL_422"`` will be converted to RGB.
 
     Examples
@@ -192,7 +192,7 @@ def pixel_array(
     Return the 3rd frame of a dataset containing at least 3 frames::
 
         with open("path/to/dataset.dcm", "rb") as f:
-            arr = pixel_array(f, index=2)  # `index` starts at 0
+            arr = pixel_array(f, index=2)  # 'index' starts at 0
 
     Parameters
     ----------
@@ -201,8 +201,8 @@ def pixel_array(
         * :class:`str` | :class:`os.PathLike`: the path to a DICOM dataset
           containing pixel data, or
         * file-like: a `file-like object
-        <https://docs.python.org/3/glossary.html#term-file-object>`_ in
-        'rb' mode containing the dataset.
+          <https://docs.python.org/3/glossary.html#term-file-object>`_ in
+          'rb' mode containing the dataset.
     ds_out : pydicom.dataset.Dataset, optional
         A :class:`~pydicom.dataset.Dataset` that will be updated with the
         non-retired group ``0x0028`` image pixel module elements and the group
@@ -220,9 +220,7 @@ def pixel_array(
         minimal processing (see the processing section above). If ``False``
         (default) then additional processing may be applied to convert the
         pixel data to it's most commonly used form (such as converting from
-        YCbCr to RGB). To return the raw pixel data with no processing
-        whatsoever, use the :meth:`~pydicom.pixels.decoders.base.Decoder.as_buffer`
-        method.
+        YCbCr to RGB).
     decoding_plugin : str, optional
         The name of the decoding plugin to use when decoding compressed
         pixel data. If no `decoding_plugin` is specified (default) then all
@@ -246,7 +244,7 @@ def pixel_array(
 
         A writeable :class:`~numpy.ndarray` is returned by default. For
         native transfer syntaxes with ``view_only=True`` a read-only
-        :class:`~numpy.ndarray` will be returned if `src` is immutable.
+        :class:`~numpy.ndarray` will be returned.
     """
     from pydicom.pixels import get_decoder
 
@@ -314,20 +312,20 @@ def iter_pixels(
     performed:
 
     * Natively encoded bit-packed pixel data for a :ref:`bits allocated
-      <glossary_bits_allocated>` of ``1`` will be unpacked.
+      <bits_allocated>` of ``1`` will be unpacked.
     * Natively encoded pixel data with a :ref:`photometric interpretation
-      <glossary_photometric_interpretation>` of ``"YBR_FULL_422"`` will
+      <photometric_interpretation>` of ``"YBR_FULL_422"`` will
       have it's sub-sampling removed.
     * The output array will be reshaped to the specified dimensions.
     * JPEG 2000 encoded data whose signedness doesn't match the expected
-      :ref:`pixel representation<glossary_pixel_representation>` will be
+      :ref:`pixel representation<pixel_representation>` will be
       converted to match.
 
     If ``raw = False`` (the default) then the following processing operation
     will also be performed:
 
     * Pixel data with a :ref:`photometric interpretation
-      <glossary_photometric_interpretation>` of ``"YBR_FULL"`` or
+      <photometric_interpretation>` of ``"YBR_FULL"`` or
       ``"YBR_FULL_422"`` will be converted to ``"RGB"``.
 
     Examples
@@ -345,8 +343,8 @@ def iter_pixels(
         * :class:`str` | :class:`os.PathLike`: the path to a DICOM dataset
           containing pixel data, or
         * file-like: a `file-like object
-        <https://docs.python.org/3/glossary.html#term-file-object>`_ in
-        'rb' mode containing the dataset.
+          <https://docs.python.org/3/glossary.html#term-file-object>`_ in
+          'rb' mode containing the dataset.
     ds_out : pydicom.dataset.Dataset, optional
         A :class:`~pydicom.dataset.Dataset` that will be updated with the
         non-retired group ``0x0028`` image pixel module elements and the group
@@ -362,9 +360,7 @@ def iter_pixels(
         minimal processing (see the processing section above). If ``False``
         (default) then additional processing may be applied to convert the
         pixel data to it's most commonly used form (such as converting from
-        YCbCr to RGB). To yield frames of pixel data with no processing
-        whatsoever, use the :meth:`~pydicom.pixels.decoders.base.Decoder.iter_buffer`
-        method.
+        YCbCr to RGB).
     decoding_plugin : str, optional
         The name of the decoding plugin to use when decoding compressed
         pixel data. If no `decoding_plugin` is specified (default) then all
@@ -384,8 +380,8 @@ def iter_pixels(
         * (rows, columns) for single plane data
         * (rows, columns, planes) for multi-plane data
 
-        Writeable :class:`~numpy.ndarray` are yielded by default. For
-        native transfer syntaxes with ``view_only=True`` read-only
+        A writeable :class:`~numpy.ndarray` is yielded by default. For
+        native transfer syntaxes with ``view_only=True`` a read-only
         :class:`~numpy.ndarray` will be yielded.
     """
     from pydicom.pixels import get_decoder

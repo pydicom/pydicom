@@ -8,7 +8,7 @@ Glossary
 :dcm:`Image Pixel Module<part03/sect_C.7.6.3.html>`
 ===================================================
 
-.. _glossary_samples_per_pixel:
+.. _samples_per_pixel:
 
 **(0028,0002) Samples per Pixel**
     The number of samples per pixel, otherwise known as the number of image
@@ -20,7 +20,7 @@ Glossary
     Allowed values: ``1`` or ``3``, but may be constrained by the :dcm:`IOD
     <part03/ps3.3.html>`.
 
-.. _glossary_photometric_interpretation:
+.. _photometric_interpretation:
 
 **(0028,0004) Photometric Interpretation**
     The intended interpretation of the *Pixel Data* in its *current form* in
@@ -37,12 +37,12 @@ Glossary
     * On the other hand, if you take your original RGB data and apply *JPEG
       2000 Lossless* encoding then the *Photometric Interpretation* will either
       be ``'RGB'`` or ``'YBR_RCT'`` depending on whether or not the encoder
-      performs multiple component transformation.
+      performs a multi-component transformation when encoding.
 
     When compressing pixel data using one of the JPEG encodings it's important
     to know if the encoder is performing any color space transformation prior
     to compression, as this needs to be taken into account when setting
-    the *Photometric Interpretation*. This is important when an encoder
+    the *Photometric Interpretation*. This is especially important when an encoder
     performs a transformation and the decoder doesn't, since having a correct
     *Photometric Interpretation* makes it possible to determine which inverse
     transformation to use to return the pixel data to its original color space.
@@ -58,7 +58,7 @@ Glossary
     the *Transfer Syntax UID*, and further constraints may be required by the
     :dcm:`IOD<part03/ps3.3.html>`.
 
-.. _glossary_planar_configuration:
+.. _planar_configuration:
 
 **(0028,0006) Planar Configuration**
     Required when *Samples per Pixel* is greater than one, this indicates the
@@ -71,7 +71,7 @@ Glossary
 
     Allowed values: ``0`` or ``1``
 
-.. _glossary_number_of_frames:
+.. _number_of_frames:
 
 **(0028,0008) Number of Frames**
     The number of frames in a multi-frame image. May not be present if the
@@ -79,21 +79,21 @@ Glossary
 
     Allowed values: must be at least ``1`` (if present)
 
-.. _glossary_rows:
+.. _rows:
 
 **(0028,0010) Rows**
     The number of rows in the image.
 
     Allowed values: ``1`` to ``65535``
 
-.. _glossary_columns:
+.. _columns:
 
 **(0028,0011) Columns**
     The number of columns in the image.
 
     Allowed values: ``1`` to ``65535``
 
-.. _glossary_bits_allocated:
+.. _bits_allocated:
 
 **(0028,0100) Bits Allocated**
     The number of bits used to actually *contain* each sample of each pixel.
@@ -106,10 +106,10 @@ Glossary
     <part05/chapter_8.html#sect_8.1.1>` and :dcm:`Annex D
     <part05/chapter_D.html>` in Part 5 of the DICOM Standard.
 
-    Allowed values: ``1`` or a multiple of 8, however many :dcm:`IODs
+    Allowed values: ``1`` or a multiple of ``8``, however many :dcm:`IODs
     <part03/ps3.3.html>` place further restrictions on what the value may be.
 
-.. _glossary_bits_stored:
+.. _bits_stored:
 
 **(0028,0101) Bits Stored**
     The number of bits actually *used* by each sample of each
@@ -124,7 +124,7 @@ Glossary
 
     Allowed values: ``1`` to *Bits Allocated* (inclusive)
 
-.. _glossary_high_bit:
+.. _high_bit:
 
 **(0028,0102) High Bit**
     The `most significant bit
@@ -134,7 +134,7 @@ Glossary
 
     Allowed values: *Bits Stored* - 1
 
-.. _glossary_pixel_representation:
+.. _pixel_representation:
 
 **(0028,0103) Pixel Representation**
     Describes the type of pixel values, either signed (using
