@@ -83,7 +83,9 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     return arr
 
 
-def _apply_j2k_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
+def _apply_j2k_sign_correction(
+    arr: "np.ndarray", runner: "DecodeRunner"
+) -> "np.ndarray":
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
     # Example:
     # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
