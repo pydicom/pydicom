@@ -21,7 +21,7 @@ as well as the following methods of the :class:`~Decoder` class:
 
 The following options are required when the decoding source `src` is not a
 :class:`~pydicom.dataset.Dataset` and are used to describe the encoded pixel data.
-They may be also be used to override the corresponding element values when `src`
+They may also be used to override the corresponding element values when `src`
 is a :class:`~pydicom.dataset.Dataset`:
 
 
