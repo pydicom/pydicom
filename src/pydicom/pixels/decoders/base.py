@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Iterable
 from importlib import import_module
 import logging
 from sys import byteorder
-from typing import Any, BinaryIO, cast
+from typing import Any, TypedDict, BinaryIO, cast
 
 try:
     import numpy as np
@@ -18,7 +18,7 @@ from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
-from pydicom.pixels.utils import PhotometricInterpretation as PI, DecodeOptions
+from pydicom.pixels.utils import PhotometricInterpretation as PI
 from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -48,6 +48,55 @@ LOGGER = logging.getLogger(__name__)
 Buffer = bytes | bytearray | memoryview
 DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
 ProcessingFunction = Callable[["np.ndarray", "DecodeRunner"], "np.ndarray"]
+
+
+class DecodeOptions(TypedDict, total=False):
+    """Options accepted by DecodeRunner and decoding plugins"""
+
+    ## Pixel data description options
+    # Required
+    bits_allocated: int
+    bits_stored: int
+    columns: int
+    number_of_frames: int
+    photometric_interpretation: str
+    pixel_keyword: str
+    rows: int
+    samples_per_pixel: int
+    transfer_syntax_uid: UID
+
+    # Conditionally required
+    # Required if `pixel_keyword` is "PixelData"
+    pixel_representation: int
+    # Required if native transfer syntax and samples_per_pixel > 1
+    planar_configuration: int
+
+    # Optional
+    # The Extended Offset Table values - used with encapsulated transfer syntaxes
+    extended_offsets: tuple[bytes, bytes] | tuple[list[int], list[int]]
+    # The VR used for the pixel data - may be used with Explicit VR Big Endian
+    pixel_vr: str
+
+    ## Native transfer syntax decoding options
+    # Return/yield a view of the original buffer where possible
+    view_only: bool
+    # (ndarray only) Force byte swapping on 8-bit values encoded as OW
+    be_swap_ow: bool
+
+    ## RLE decoding options
+    # Segment ordering ">" for big endian (default) or "<" for little endian
+    rle_segment_order: str  # pydicom plugin
+    byteorder: str  # pylibjpeg + -rle plugin
+
+    # JPEG2000/HTJ2K decoding options
+    # Use the JPEG 2000 metadata to return an ndarray matched to the expected pixel
+    # representation otherwise return the decoded data as-is (ndarray only)
+    apply_j2k_sign_correction: bool
+
+    ## Processing options (ndarray only)
+    as_rgb: bool  # Make best effort to return RGB output
+    force_rgb: bool  # Force YBR to RGB conversion
+    force_ybr: bool  # Force RGB to YBR conversion
 
 
 def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
@@ -1047,8 +1096,8 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
-            * :class:`BinaryIO`: a file-like positioned at the start of the
-              pixel data element's value. The position will be returned
+            * :class:`~typing.BinaryIO`: a file-like positioned at the start of
+              the pixel data element's value. The position will be returned
               to the starting offset prior to returning the array.
 
             When `src` is not a :class:`~pydicom.dataset.Dataset` then a number
@@ -1344,7 +1393,7 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
-            * :class:`BinaryIO`: a file-like positioned at the start of the
+            * :class:`~typing.BinaryIO`: a file-like positioned at the start of the
               pixel data element's value. The position will be returned
               to the starting offset prior to returning the buffer.
 
@@ -1589,7 +1638,7 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
-            * :class:`BinaryIO`: a file-like positioned at the start of the
+            * :class:`~typing.BinaryIO`: a file-like positioned at the start of the
               pixel data element's value. The position will be returned
               to the starting offset only after all frames have been yielded.
 
@@ -1712,7 +1761,7 @@ class Decoder:
               *Image Pixel* module elements.
             * :class:`bytes` | :class:`bytearray` | :class:`memoryview`: the
               encoded (and possibly encapsulated) pixel data to be decoded.
-            * :class:`BinaryIO`: a file-like positioned at the start of the
+            * :class:`~typing.BinaryIO`: a file-like positioned at the start of the
               pixel data element's value. The position will be returned
               to the starting offset only after all frames have been yielded.
 
@@ -2025,14 +2074,6 @@ _PIXEL_DATA_DECODERS = {
 
 def _build_decoder_docstrings() -> None:
     """Override the default Decoder docstring."""
-    plugin_doc_links = {
-        "gdcm": ":ref:`gdcm <decoder_plugin_gdcm>`",
-        "pyjpegls": ":ref:`pyjpegls <decoder_plugin_pyjpegls>`",
-        "pillow": ":ref:`pillow <decoder_plugin_pillow>`",
-        "pydicom": ":ref:`pydicom <decoder_plugin_pydicom>`",
-        "pylibjpeg": ":ref:`pylibjpeg <decoder_plugin_pylibjpeg>`",
-    }
-
     for dec, versionadded in _PIXEL_DATA_DECODERS.values():
         uid = dec.UID
         available = dec._available.keys()
@@ -2044,8 +2085,9 @@ def _build_decoder_docstrings() -> None:
         s.append("")
         s.append(f".. versionadded:: {versionadded}")
         s.append("")
-        s.append(f"Available decoding plugins: {', '.join(sorted(plugins))}.")
-        s.append("")
+        if plugins:
+            s.append(f"Available decoding plugins: {', '.join(sorted(plugins))}.")
+            s.append("")
         s.append(
             "Plugin-specific options are given in the :doc:`decoder  "
             "options documentation</guides/decoding/decoder_options>`."

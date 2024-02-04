@@ -93,7 +93,6 @@ Removals
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
 * Removed the ``_storage_sopclass_uids`` module, import UIDs from the
   :mod:`~pydicom.uid` module instead
-
 * The following properties have been removed:
 
     * ``Dataset.parent`` and ``Dataset.parent_seq``
@@ -173,7 +172,7 @@ Enhancements
 
 * Added support for decoding HTJ2K transfer syntaxes (:issue:`1848`)
 * Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
-  from a path or file-like while minimizing memory-usage :func:`~pydicom.pixels.pixel_array`
+  from a path to a dataset while minimizing memory-usage :func:`~pydicom.pixels.pixel_array`
   and :func:`~pydicom.pixels.iter_pixels`.
 
 

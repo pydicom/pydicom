@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from os import PathLike
 from struct import unpack
-from typing import BinaryIO, Any, TypedDict, Union, cast
+from typing import BinaryIO, Any, Union, cast
 
 try:
     import numpy as np
@@ -55,55 +55,6 @@ _PIXEL_KEYWORDS = {
     (0x7FE0, 0x0009): "DoubleFloatPixelData",
     (0x7FE0, 0x0010): "PixelData",
 }
-
-
-class DecodeOptions(TypedDict, total=False):
-    """Options accepted by DecodeRunner and decoding plugins"""
-
-    ## Pixel data description options
-    # Required
-    bits_allocated: int
-    bits_stored: int
-    columns: int
-    number_of_frames: int
-    photometric_interpretation: str
-    pixel_keyword: str
-    rows: int
-    samples_per_pixel: int
-    transfer_syntax_uid: UID
-
-    # Conditionally required
-    # Required if `pixel_keyword` is "PixelData"
-    pixel_representation: int
-    # Required if native transfer syntax and samples_per_pixel > 1
-    planar_configuration: int
-
-    # Optional
-    # The Extended Offset Table values - used with encapsulated transfer syntaxes
-    extended_offsets: tuple[bytes, bytes] | tuple[list[int], list[int]]
-    # The VR used for the pixel data - may be used with Explicit VR Big Endian
-    pixel_vr: str
-
-    ## Native transfer syntax decoding options
-    # Return/yield a view of the original buffer where possible
-    view_only: bool
-    # (ndarray only) Force byte swapping on 8-bit values encoded as OW
-    be_swap_ow: bool
-
-    ## RLE decoding options
-    # Segment ordering ">" for big endian (default) or "<" for little endian
-    rle_segment_order: str  # pydicom plugin
-    byteorder: str  # pylibjpeg + -rle plugin
-
-    # JPEG2000/HTJ2K decoding options
-    # Use the JPEG 2000 metadata to return an ndarray matched to the expected pixel
-    # representation otherwise return the decoded data as-is (ndarray only)
-    apply_j2k_sign_correction: bool
-
-    ## Processing options (ndarray only)
-    as_rgb: bool  # Make best effort to return RGB output
-    force_rgb: bool  # Force YBR to RGB conversion
-    force_ybr: bool  # Force RGB to YBR conversion
 
 
 def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -> bool:
@@ -212,9 +163,8 @@ def pixel_array(
         `ds_out` dataset.
     index : int | None, optional
         If ``None`` (default) then return an array containing all the
-        frames in the pixel data, otherwise return one containing only
-        the frame from the specified `index`, which starts at 0 for the
-        first frame.
+        frames in the pixel data, otherwise return only the frame from the
+        specified `index`, which starts at 0 for the first frame.
     raw : bool, optional
         If ``True`` then return the decoded pixel data after only
         minimal processing (see the processing section above). If ``False``
@@ -227,7 +177,7 @@ def pixel_array(
         available plugins will be tried and the result from the first successful
         one returned. For information on the available plugins for each
         decoder see the :doc:`API documentation</reference/pixels.decoders>`.
-    kwargs
+    **kwargs
         Optional keyword parameters for controlling decoding, please see the
         :doc:`decoding options documentation</guides/decoding/decoder_options>`
         for more information.
@@ -332,8 +282,13 @@ def iter_pixels(
     --------
     Iterate through all the pixel data frames in a dataset::
 
+        for arr in iter_pixels("dataset.dcm"):
+            print(arr.shape)
+
+    Iterate through the even frames for a dataset with 10 frames::
+
         with open("dataset.dcm", "rb") as f:
-            for arr in iter_pixels(f):
+            for arr in iter_pixels(f, indices=range(0, 10, 2)):
                 print(arr.shape)
 
     Parameters

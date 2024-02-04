@@ -3,6 +3,47 @@
 Glossary
 ========
 
+.. _glossary_file_meta:
+
+:dcm:`File Meta Information<>`
+==============================
+
+.. _transfer_syntax:
+
+**(0002,0010) Transfer Syntax UID**
+    The *Transfer Syntax UID* is a unique identifier that provides information
+    on how a DICOM dataset has been encoded. All transfer syntaxes have two
+    attributes that describe how the dataset's encoded elements should be
+    interpreted:
+
+    * Whether the dataset uses little-endian or big-endian byte ordering (retired),
+    * Whether the dataset uses implicit or explicit VR encoding
+
+    In addition, transfer syntaxes can be grouped by how the dataset's *Pixel Data*
+    has been encoded:
+
+    * **Encapsulated transfer syntaxes**: so-called because any *Pixel Data* present
+      in the dataset is :func:`encapsulated<pydicom.encaps.encapsulate>`. All
+      encapsulated transfer syntaxes have pixel data that's been compressed using
+      the compression technique specified by the transfer syntax. For example, a
+      dataset with the *JPEG Baseline (Process 1)* transfer syntax will have pixel
+      data that's compressed using :dcm:`ISO/IEC 10918-1 JPEG compression
+      <part05/sect_A.4.html#sect_A.4.1>`.
+    * **Native (unencapsulated) transfer syntaxes**: these have no encapsulation,
+      and hence no compression of the *Pixel Data*.
+
+    All encapsulated transfer syntaxes use explicit VR, little endian encoding,
+    while native transfer syntaxes use the encoding matching their description:
+    a dataset with the *Implicit VR Little Endian* transfer syntax uses implicit
+    VR, little endian encoding, for example.
+
+    The DICOM Standard provides a :dcm:`list of public transfer syntaxes
+    <part06/chapter_A.html>`, however privately defined transfer syntaxes are
+    also allowed.
+
+    References: :dcm:`DICOM Standard, Part 5, Section 10<part05/chapter_10.html>`
+    and :dcm:`Annex A<part05/chapter_A.html>`
+
 .. _glossary_image_pixel:
 
 :dcm:`Image Pixel Module<part03/sect_C.7.6.3.html>`
@@ -19,6 +60,9 @@ Glossary
 
     Allowed values: ``1`` or ``3``, but may be constrained by the :dcm:`IOD
     <part03/ps3.3.html>`.
+
+    Reference: :dcm:`DICOM Standard, Part 3, Section C.7.6.3.1.1
+    <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1>`
 
 .. _photometric_interpretation:
 
@@ -70,6 +114,9 @@ Glossary
       ..., Rn, G1, G2, ..., Gn, B1, B2, ..., Bn.
 
     Allowed values: ``0`` or ``1``
+
+    Reference: :dcm:`DICOM Standard, Part 3, Section C.7.6.3.1.3
+    <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3>`
 
 .. _number_of_frames:
 

@@ -9,7 +9,7 @@ Pixel Data Decoder Options
 The following applies to the functions and class methods that use the
 :doc:`pixels</reference/pixels>` backend for decoding pixel data. This includes functions
 such as :func:`~pydicom.pixels.pixel_array` and :func:`~pydicom.pixels.iter_pixels`
-as well as the following methods of :class:`~Decoder` class:
+as well as the following methods of the :class:`~Decoder` class:
 
 * :meth:`Decoder.as_array`
 * :meth:`Decoder.as_buffer`
@@ -56,10 +56,10 @@ is a :class:`~pydicom.dataset.Dataset`:
 | `planar_configuration`       |:class:`int`|(0028,0006)|*Planar        | Required if `samples_per_pixel` > 1, the :ref:`pixel     |
 |                              |            |           |Configuration* | encoding order<planar_configuration>`                    |
 +------------------------------+------------+-----------+---------------+----------------------------------------------------------+
-| `pixel_keyword`              |:class:`str`|                           | Required if `src` uses a native (uncompressed) transfer  |
-|                              |            |                           | syntax, the keyword of the element containing the pixel  |
-|                              |            |                           | data. One of ``'PixelData'``, ``'FloatPixelData'``,      |
-|                              |            |                           | ``'DoubleFloatPixelData'``                               |
+| `pixel_keyword`              |:class:`str`|                           | Required if `src` uses a :ref:`native transfer syntax    |
+|                              |            |                           | <transfer_syntax>`, the keyword of the element containing|
+|                              |            |                           | the pixel data. One of ``'PixelData'``,                  |
+|                              |            |                           | ``'FloatPixelData'``, ``'DoubleFloatPixelData'``         |
 +------------------------------+------------+---------------------------+----------------------------------------------------------+
 
 
