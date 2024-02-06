@@ -17,6 +17,7 @@
       ~DecodeRunner.decode
       ~DecodeRunner.del_option
       ~DecodeRunner.frame_length
+      ~DecodeRunner.get_data
       ~DecodeRunner.get_option
       ~DecodeRunner.iter_decode
       ~DecodeRunner.process
@@ -25,8 +26,7 @@
       ~DecodeRunner.set_option
       ~DecodeRunner.set_options
       ~DecodeRunner.set_source
-      ~DecodeRunner.validate_buffer
-      ~DecodeRunner.validate_options
+      ~DecodeRunner.validate
    
    
 
@@ -40,6 +40,7 @@
       ~DecodeRunner.bits_stored
       ~DecodeRunner.columns
       ~DecodeRunner.extended_offsets
+      ~DecodeRunner.is_buffer
       ~DecodeRunner.number_of_frames
       ~DecodeRunner.options
       ~DecodeRunner.photometric_interpretation

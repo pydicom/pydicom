@@ -9,10 +9,9 @@ Pixel Data Decoder Plugins
     This guide is intended for advanced users who need support for something
     not provided by the :doc:`existing decoder plugins </reference/pixels.decoders>`.
 
-*Pixel Data* decoding in *pydicom* uses an :class:`~pydicom.pixels.decoders.base.Decoder`
-instance for the specific *Transfer Syntax* as a manager for plugins that
-perform the decoding work. This guide covers the requirements for those plugins
-and how to add them to *pydicom*.
+*Pixel Data* decoding in *pydicom* uses a :class:`~pydicom.pixels.decoders.base.Decoder`
+instance to manage plugins that perform the actual decoding work. This guide covers
+the requirements for those plugins and how to add them to *pydicom*.
 
 Plugin Requirements
 ===================

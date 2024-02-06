@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Pixel Data Encoding" href="../encoding/index.html" />
-    <link rel="prev" title="Decoder Plugins Options" href="decoder_plugin_options.html" /> 
+    <link rel="prev" title="Pixel Data Decoder Options" href="decoder_options.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -68,7 +68,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guides</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Decoding</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="decoder_plugin_options.html">Decoder Plugins Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="decoder_options.html">Pixel Data Decoder Options</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Pixel Data Decoder Plugins</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#plugin-requirements">Plugin Requirements</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#adding-plugins-to-a-decoder">Adding Plugins to a Decoder</a></li>
@@ -130,10 +130,9 @@
 <p>This guide is intended for advanced users who need support for something
 not provided by the <a class="reference internal" href="../../reference/pixels.decoders.html"><span class="doc">existing decoder plugins</span></a>.</p>
 </div>
-<p><em>Pixel Data</em> decoding in <em>pydicom</em> uses an <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a>
-instance for the specific <em>Transfer Syntax</em> as a manager for plugins that
-perform the decoding work. This guide covers the requirements for those plugins
-and how to add them to <em>pydicom</em>.</p>
+<p><em>Pixel Data</em> decoding in <em>pydicom</em> uses a <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a>
+instance to manage plugins that perform the actual decoding work. This guide covers
+the requirements for those plugins and how to add them to <em>pydicom</em>.</p>
 <section id="plugin-requirements">
 <h2>Plugin Requirements<a class="headerlink" href="#plugin-requirements" title="Link to this heading">¶</a></h2>
 <p>Each available pixel data decoder in <em>pydicom</em> corresponds directly to a
@@ -246,7 +245,7 @@ following:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="decoder_plugin_options.html" class="btn btn-neutral float-left" title="Decoder Plugins Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decoder_options.html" class="btn btn-neutral float-left" title="Pixel Data Decoder Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../encoding/index.html" class="btn btn-neutral float-right" title="Pixel Data Encoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Data Decoder Options &mdash; pydicom 3.0.0.dev0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Pixel Data Decoder Plugins" href="decoder_plugins.html" />
+    <link rel="prev" title="Pixel Data Decoding" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0.dev0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Decoding</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Pixel Data Decoder Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#image-pixel-options"><em>Image Pixel</em> Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#image-processing-options">Image Processing Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#miscellaneous-options">Miscellaneous Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#decoding-plugin-options">Decoding Plugin Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="decoder_plugins.html">Pixel Data Decoder Plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../encoding/index.html">Pixel Data Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli/cli_guide.html">Command-line Interface Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../writing_documentation.html">Writing documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Guides</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Pixel Data Decoding</a></li>
+      <li class="breadcrumb-item active">Pixel Data Decoder Options</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pixel-data-decoder-options">
+<span id="guide-decoder-options"></span><h1>Pixel Data Decoder Options<a class="headerlink" href="#pixel-data-decoder-options" title="Link to this heading">¶</a></h1>
+<p>The following applies to the functions and class methods that use the
+<a class="reference internal" href="../../reference/pixels.html"><span class="doc">pixels</span></a> backend for decoding pixel data. This includes functions
+such as <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
+as well as the following methods of the <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_buffer" title="pydicom.pixels.decoders.base.Decoder.as_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_buffer()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_buffer" title="pydicom.pixels.decoders.base.Decoder.iter_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_buffer()</span></code></a></p></li>
+</ul>
+<section id="image-pixel-options">
+<h2><em>Image Pixel</em> Options<a class="headerlink" href="#image-pixel-options" title="Link to this heading">¶</a></h2>
+<p>The following options are required when the decoding source <cite>src</cite> is not a
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and are used to describe the encoded pixel data.
+They may also be used to override the corresponding element values when <cite>src</cite>
+is a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Option</p></th>
+<th class="head" rowspan="2"><p>Type</p></th>
+<th class="head" colspan="2"><p>Corresponding Element</p></th>
+<th class="head" rowspan="2"><p>Description</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p><cite>rows</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0010)</p></td>
+<td><p><em>Rows</em></p></td>
+<td><p>The number of <a class="reference internal" href="../glossary.html#rows"><span class="std std-ref">rows</span></a> in <cite>src</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><cite>columns</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0011)</p></td>
+<td><p><em>Columns</em></p></td>
+<td><p>The number of <a class="reference internal" href="../glossary.html#columns"><span class="std std-ref">columns</span></a> in <cite>src</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>number_of_frames</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0008)</p></td>
+<td><p><em>Number
+of Frames</em></p></td>
+<td><p>The <a class="reference internal" href="../glossary.html#number-of-frames"><span class="std std-ref">number of frames</span></a> in <cite>src</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><cite>samples_per_pixel</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0002)</p></td>
+<td><p><em>Samples
+Per Pixel</em></p></td>
+<td><p>The number of <a class="reference internal" href="../glossary.html#samples-per-pixel"><span class="std std-ref">samples per pixel</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>bits_allocated</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0100)</p></td>
+<td><p><em>Bits
+Allocated</em></p></td>
+<td><p>The number of bits used to <a class="reference internal" href="../glossary.html#bits-allocated"><span class="std std-ref">contain each pixel</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><cite>bits_stored</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0101)</p></td>
+<td><p><em>Bits Stored</em></p></td>
+<td><p>The number of bits actually <a class="reference internal" href="../glossary.html#bits-stored"><span class="std std-ref">used by each pixel</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>photometric_interpretation</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p>(0028,0004)</p></td>
+<td><p><em>Photometric
+Interpretation</em></p></td>
+<td><p>The <a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">color space</span></a>
+of the encoded pixel data</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>pixel_representation</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0103)</p></td>
+<td><p><em>Pixel
+Representation</em></p></td>
+<td><p>Required if <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>, whether
+the pixels are <a class="reference internal" href="../glossary.html#pixel-representation"><span class="std std-ref">signed or unsigned</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>planar_configuration</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>(0028,0006)</p></td>
+<td><p><em>Planar
+Configuration</em></p></td>
+<td><p>Required if <cite>samples_per_pixel</cite> &gt; 1, the <a class="reference internal" href="../glossary.html#planar-configuration"><span class="std std-ref">pixel
+encoding order</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><cite>pixel_keyword</cite></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td colspan="2"></td>
+<td><p>Required if <cite>src</cite> uses a <a class="reference internal" href="../glossary.html#transfer-syntax"><span class="std std-ref">native transfer syntax</span></a>, the keyword of the element containing
+the pixel data. One of <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'FloatPixelData'</span></code>, <code class="docutils literal notranslate"><span class="pre">'DoubleFloatPixelData'</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="image-processing-options">
+<h2>Image Processing Options<a class="headerlink" href="#image-processing-options" title="Link to this heading">¶</a></h2>
+<p>The following options may be used with any transfer syntax for controlling the
+processing applied after decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> using
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>, <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>,
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a>.</p>
+<ul class="simple">
+<li><p><cite>as_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then convert pixel data with a
+YCbCr <a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">photometric interpretation</span></a>
+such as <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code> to RGB.</p></li>
+<li><p><cite>force_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force a YCbCr to RGB color space
+conversion on the array (default <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><cite>force_ybr</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force an RGB to YCbCr color space
+conversion on the array (default <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</section>
+<section id="miscellaneous-options">
+<h2>Miscellaneous Options<a class="headerlink" href="#miscellaneous-options" title="Link to this heading">¶</a></h2>
+<p>The following options may be used with native (uncompressed) transfer syntaxes
+when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> using <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>,
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>, <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a>.</p>
+<ul class="simple">
+<li><p><cite>view_only</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> and <cite>src</cite> is a
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or buffer-like then make a best effort
+attempt to return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> that’s a <a class="reference external" href="https://numpy.org/doc/stable/user/basics.copies.html#view">view</a> on the original
+buffer (default <code class="docutils literal notranslate"><span class="pre">False</span></code>). Note that if the original buffer is immutable then
+the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will be read-only.</p></li>
+</ul>
+</section>
+<section id="decoding-plugin-options">
+<span id="guide-decoder-plugin-opts"></span><h2>Decoding Plugin Options<a class="headerlink" href="#decoding-plugin-options" title="Link to this heading">¶</a></h2>
+<p>The following options are plugin and transfer syntax specific.</p>
+<section id="rle-lossless">
+<h3><em>RLE Lossless</em><a class="headerlink" href="#rle-lossless" title="Link to this heading">¶</a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Plugin
+name</p></th>
+<th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pydicom</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rle_segment_order</span></code></p></td>
+<td rowspan="2"><p><code class="docutils literal notranslate"><span class="pre">&quot;&gt;&quot;</span></code> for big endian segment order
+(default) or <code class="docutils literal notranslate"><span class="pre">&quot;&lt;&quot;</span></code> for little endian
+segment order</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pylibjpeg</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">byteorder</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Pixel Data Decoding" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decoder_plugins.html" class="btn btn-neutral float-right" title="Pixel Data Decoder Plugins" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
