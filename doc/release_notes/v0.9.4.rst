@@ -1,9 +1,6 @@
 Version 0.9.4
 =============
 
-Changelog
----------
-
 .. note::
 
    * there is a *backwards incompatible* change made to storage of file_meta
@@ -12,7 +9,7 @@ Changelog
      Python 2.3)
 
 Major changes/additions in this version
-.......................................
+---------------------------------------
 
 * file reading code reorganized substantially
 * significant speed increase for reading DICOM files -- approx 3 times faster
@@ -45,7 +42,7 @@ Major changes/additions in this version
   CP805/916; Supp 43 and 117 (and UID dict), Supp 119 and 122
 
 Other changes and bug fixes
-...........................
+---------------------------
 
 * Tag is now a factory function; the class is called !BaseTag. This was part of
   the file reading speed-up process -- a new class !TupleTag was also created,
