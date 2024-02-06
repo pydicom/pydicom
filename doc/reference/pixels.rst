@@ -28,3 +28,5 @@ Pixel Data Utilities
    :toctree: generated/
 
    get_decoder
+   pixel_array
+   iter_pixels

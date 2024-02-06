@@ -12,7 +12,7 @@ from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.pixels import get_decoder, ExplicitVRLittleEndianDecoder
 from pydicom.pixels.decoders.base import DecodeRunner, Decoder
-from pydicom.pixels.enums import PhotometricInterpretation as PI
+from pydicom.pixels.utils import PhotometricInterpretation as PI
 from pydicom.pixel_data_handlers.util import convert_color_space
 
 from pydicom.uid import (
@@ -248,6 +248,7 @@ class TestDecodeRunner:
         ds.ExtendedOffsetTableLengths = b"\x00\x02"
         ds.PhotometricInterpretation = "PALETTE COLOR"
         runner.set_source(ds)
+        assert runner.is_buffer
 
         assert runner.bits_allocated == 32
         assert runner.bits_stored == 24
@@ -452,12 +453,12 @@ class TestDecodeRunner:
             "set the correct transfer syntax"
         )
         with pytest.warns(UserWarning, match=msg):
-            runner.validate_buffer()
+            runner._validate_buffer()
 
         # Unpadded
         runner.set_source(b"\x01\x02\x03")
         with pytest.warns(UserWarning, match=msg):
-            runner.validate_buffer()
+            runner._validate_buffer()
 
         runner = DecodeRunner(ExplicitVRLittleEndian)
         runner.set_source(b"\x00\x00")
@@ -475,7 +476,7 @@ class TestDecodeRunner:
             "group 0028 element value, or the transfer syntax may be incorrect"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_buffer()
+            runner._validate_buffer()
 
         # Actual length 5 is greater than expected 3  (padding 2)
         runner.set_source(b"\x00" * 5)
@@ -484,7 +485,7 @@ class TestDecodeRunner:
             "contains 2 bytes of excess padding to be removed"
         )
         with pytest.warns(UserWarning, match=msg):
-            runner.validate_buffer()
+            runner._validate_buffer()
 
         # YBR_FULL_422 but has unsubsampled length
         # expected 18 // 3 * 2 = 12, actual 18
@@ -500,7 +501,7 @@ class TestDecodeRunner:
             "incorrect"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_buffer()
+            runner._validate_buffer()
 
     def test_validate_options(self):
         """Tests for validate_options()"""
@@ -512,7 +513,7 @@ class TestDecodeRunner:
             "samples_per_pixel"
         )
         with pytest.raises(AttributeError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("bits_allocated", -1)
         runner.set_option("bits_stored", -1)
@@ -529,14 +530,14 @@ class TestDecodeRunner:
             r"range \(1, 64\)"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("bits_allocated", 4)
         msg = (
             "A bits allocated value of '4' is invalid, it must be 1 or a multiple of 8"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("bits_allocated", 8)
         msg = (
@@ -544,7 +545,7 @@ class TestDecodeRunner:
             r"\(1, 64\) and no greater than the bits allocated value of 8"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("bits_stored", 10)
         msg = (
@@ -552,14 +553,14 @@ class TestDecodeRunner:
             r"\(1, 64\) and no greater than the bits allocated value of 8"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("bits_stored", 8)
         msg = (
             r"A columns value of '-1' is invalid, it must be in the range \(1, 65535\)"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("columns", 8)
         msg = (
@@ -567,52 +568,52 @@ class TestDecodeRunner:
             "than or equal to 1"
         )
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("number_of_frames", 8)
         msg = r"Unknown photometric interpretation '-1'"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("photometric_interpretation", PI.RGB)
         msg = r"Unknown pixel data keyword '-1'"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("pixel_keyword", "PixelData")
         msg = r"Missing expected option: pixel_representation"
         with pytest.raises(AttributeError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("pixel_representation", -1)
         msg = "A pixel representation value of '-1' is invalid, it must be 0 or 1"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("pixel_representation", 0)
         msg = r"A rows value of '-1' is invalid, it must be in the range \(1, 65535\)"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("rows", 10)
         msg = "A samples per pixel value of '-1' is invalid, it must be 1 or 3"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("samples_per_pixel", 3)
         msg = r"Missing expected option: planar_configuration"
         with pytest.raises(AttributeError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("planar_configuration", -1)
         msg = "A planar configuration value of '-1' is invalid, it must be 0 or 1"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("planar_configuration", 1)
         msg = r"There must be an equal number of extended offsets and offset lengths"
         with pytest.raises(ValueError, match=msg):
-            runner.validate_options()
+            runner._validate_options()
 
         runner.set_option("extended_offsets", ([0], [10]))
 
@@ -735,6 +736,25 @@ class TestDecodeRunner:
             assert (
                 "The decoding plugin 'foo' failed to decode the frame at index 1"
             ) in caplog.text
+
+    def test_get_data(self):
+        """Test get_data()"""
+        src = b"\x00\x01\x02\x03\x04\x05"
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(src)
+        assert runner.is_buffer
+        assert runner.get_data(src, 0, 4) == b"\x00\x01\x02\x03"
+        assert runner.get_data(src, 3, 4) == b"\x03\x04\x05"
+
+        src = BytesIO(src)
+        runner.set_source(src)
+        assert not runner.is_buffer
+        assert runner.get_data(src, 0, 4) == b"\x00\x01\x02\x03"
+        assert src.tell() == 0
+        assert runner.get_data(src, 3, 4) == b"\x03\x04\x05"
+        assert src.seek(2)
+        assert runner.get_data(src, 3, 4) == b"\x03\x04\x05"
+        assert src.tell() == 2
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -1344,20 +1364,24 @@ class TestDecoder_Array:
 
         # Also tests buffer-like `src`
         ds = reference.ds
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": ds.get("NumberOfFrames", 1),
+            "planar_configuration": ds.get("PlanarConfiguration", 0),
+            "pixel_keyword": "PixelData",
+        }
+
         arr = decoder.as_array(
             bytearray(ds.PixelData),  # mutable
             raw=True,
             view_only=True,
-            rows=ds.Rows,
-            columns=ds.Columns,
-            samples_per_pixel=ds.SamplesPerPixel,
-            photometric_interpretation=ds.PhotometricInterpretation,
-            pixel_representation=ds.PixelRepresentation,
-            bits_allocated=ds.BitsAllocated,
-            bits_stored=ds.BitsStored,
-            number_of_frames=ds.get("NumberOfFrames", 1),
-            planar_configuration=ds.get("PlanarConfiguration", 0),
-            pixel_keyword="PixelData",
+            **opts,
         )
         reference.test(arr)
         assert arr.shape == reference.shape
@@ -1368,16 +1392,7 @@ class TestDecoder_Array:
             memoryview(ds.PixelData),  # view of an immutable
             raw=True,
             view_only=True,
-            rows=ds.Rows,
-            columns=ds.Columns,
-            samples_per_pixel=ds.SamplesPerPixel,
-            photometric_interpretation=ds.PhotometricInterpretation,
-            pixel_representation=ds.PixelRepresentation,
-            bits_allocated=ds.BitsAllocated,
-            bits_stored=ds.BitsStored,
-            number_of_frames=ds.get("NumberOfFrames", 1),
-            planar_configuration=ds.get("PlanarConfiguration", 0),
-            pixel_keyword="PixelData",
+            **opts,
         )
         reference.test(arr)
         assert arr.shape == reference.shape
@@ -1388,21 +1403,27 @@ class TestDecoder_Array:
             memoryview(bytearray(ds.PixelData)),  # view of a mutable
             raw=True,
             view_only=True,
-            rows=ds.Rows,
-            columns=ds.Columns,
-            samples_per_pixel=ds.SamplesPerPixel,
-            photometric_interpretation=ds.PhotometricInterpretation,
-            pixel_representation=ds.PixelRepresentation,
-            bits_allocated=ds.BitsAllocated,
-            bits_stored=ds.BitsStored,
-            number_of_frames=ds.get("NumberOfFrames", 1),
-            planar_configuration=ds.get("PlanarConfiguration", 0),
-            pixel_keyword="PixelData",
+            **opts,
         )
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable  # not read-only
+
+        # BinaryIO
+        with open(reference.path, "rb") as f:
+            f.seek(ds["PixelData"].file_tell)
+            arr = decoder.as_array(
+                f,
+                raw=True,
+                view_only=True,
+                **opts,
+            )
+
+        reference.test(arr)
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert not arr.flags.writeable  # read-only
 
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""
@@ -1504,8 +1525,8 @@ class TestDecoder_Array:
         with pytest.raises(ValueError, match=msg):
             decoder.as_array(reference.ds, index=1)
 
-    def test_expb_ow_index_odd_length(self):
-        """Test index with odd length BE swapped OW"""
+    def test_expb_ow(self):
+        """Test BE swapped OW"""
         decoder = get_decoder(ExplicitVRBigEndian)
         opts = {
             "rows": 3,
@@ -1527,12 +1548,33 @@ class TestDecoder_Array:
             # 3_1                             | pad | 3_9
             b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
         )
+        # Test by frame - odd-length
         arr = decoder.as_array(src, **opts, index=0)
         assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8]
         arr = decoder.as_array(src, **opts, index=1)
         assert arr.ravel().tolist() == [9, 10, 11, 12, 13, 14, 15, 16, 17]
         arr = decoder.as_array(src, **opts, index=2)
         assert arr.ravel().tolist() == [18, 19, 20, 21, 22, 23, 24, 25, 26]
+
+        # Test all - odd-length
+        opts["number_of_frames"] = 1
+        arr = decoder.as_array(b"\x01\x00\x03\x02\x05\x04\x07\x06\x00\x08", **opts)
+        assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+        # Test all - even-length
+        opts["rows"] = 5
+        opts["columns"] = 2
+        arr = decoder.as_array(b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08", **opts)
+        assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        # Test by frame - even length
+        opts["number_of_frames"] = 3
+        arr = decoder.as_array(src + b"\x1D\x1C", **opts, index=0)
+        assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        arr = decoder.as_array(src + b"\x1D\x1C", **opts, index=1)
+        assert arr.ravel().tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        arr = decoder.as_array(src + b"\x1D\x1C", **opts, index=2)
+        assert arr.ravel().tolist() == [20, 21, 22, 23, 24, 25, 26, 0, 28, 29]
 
     def test_iter_native_indices(self):
         """Test the `indices` argument with native data."""

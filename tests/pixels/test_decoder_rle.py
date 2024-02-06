@@ -48,9 +48,6 @@ class TestAsArray:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
-    def test_reference_index(self, reference):
-        """Test by index against the reference data for RLE lossless"""
         for index in range(reference.number_of_frames):
             arr = self.decoder.as_array(
                 reference.ds, raw=True, index=index, decoding_plugin="pydicom"
@@ -63,6 +60,47 @@ class TestAsArray:
                 assert arr.shape == reference.shape
             else:
                 assert arr.shape == reference.shape[1:]
+
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    def test_reference_binary(self, reference):
+        """Test against the reference data for RLE lossless using binary IO."""
+        ds = reference.ds
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": ds.get("NumberOfFrames", 1),
+            "planar_configuration": ds.get("PlanarConfiguration", 0),
+            "pixel_keyword": "PixelData",
+        }
+
+        with open(reference.path, "rb") as f:
+            file_offset = reference.ds["PixelData"].file_tell
+            f.seek(file_offset)
+            arr = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
+            reference.test(arr)
+            assert arr.shape == reference.shape
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+
+            for index in range(reference.number_of_frames):
+                arr = self.decoder.as_array(
+                    f, raw=True, index=index, decoding_plugin="pydicom", **opts
+                )
+                reference.test(arr, index=index)
+                assert arr.dtype == reference.dtype
+                assert arr.flags.writeable
+
+                if reference.number_of_frames == 1:
+                    assert arr.shape == reference.shape
+                else:
+                    assert arr.shape == reference.shape[1:]
+
+                assert f.tell() == file_offset
 
     def test_little_endian_segment_order(self):
         """Test interpreting segment order as little endian."""
@@ -115,6 +153,41 @@ class TestIterArray:
                 assert arr.shape == reference.shape
             else:
                 assert arr.shape == reference.shape[1:]
+
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    def test_reference_binary(self, reference):
+        """Test against the reference data for RLE lossless for binary IO."""
+        ds = reference.ds
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": ds.get("NumberOfFrames", 1),
+            "planar_configuration": ds.get("PlanarConfiguration", 0),
+            "pixel_keyword": "PixelData",
+        }
+
+        with open(reference.path, "rb") as f:
+            file_offset = reference.ds["PixelData"].file_tell
+            f.seek(file_offset)
+            func = self.decoder.iter_array(
+                f, raw=True, decoding_plugin="pydicom", **opts
+            )
+            for index, arr in enumerate(func):
+                reference.test(arr, index=index)
+                assert arr.dtype == reference.dtype
+                assert arr.flags.writeable
+
+                if reference.number_of_frames == 1:
+                    assert arr.shape == reference.shape
+                else:
+                    assert arr.shape == reference.shape[1:]
+
+            assert f.tell() == file_offset
 
     def test_indices(self):
         """Test the `indices` argument."""
@@ -174,6 +247,61 @@ class TestAsBuffer:
                 assert arr_plane == buf_plane
 
     @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    def test_reference_binary(self, reference):
+        """Test against the reference data for RLE lossless for binary IO."""
+        ds = reference.ds
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": ds.get("NumberOfFrames", 1),
+            "planar_configuration": ds.get("PlanarConfiguration", 0),
+            "pixel_keyword": "PixelData",
+        }
+
+        with open(reference.path, "rb") as f:
+            file_offset = reference.ds["PixelData"].file_tell
+            f.seek(file_offset)
+            arr = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
+            assert f.tell() == file_offset
+            buffer = self.decoder.as_buffer(f, **opts)
+            assert f.tell() == file_offset
+
+            frame_len = (
+                ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+            )
+
+            for index in range(reference.number_of_frames):
+                if reference.number_of_frames == 1:
+                    arr_frame = arr
+                    buffer_frame = buffer
+                else:
+                    arr_frame = arr[index, ...]
+                    start = index * frame_len
+                    buffer_frame = buffer[start : start + frame_len]
+
+                if ds.SamplesPerPixel == 1:
+                    assert arr_frame.tobytes() == buffer_frame
+                else:
+                    # Red
+                    arr_plane = arr_frame[..., 0].tobytes()
+                    plane_length = len(arr_plane)
+                    buf_plane = buffer_frame[:plane_length]
+                    assert arr_plane == buf_plane
+                    # Green
+                    arr_plane = arr_frame[..., 1].tobytes()
+                    buf_plane = buffer_frame[plane_length : 2 * plane_length]
+                    assert arr_plane == buf_plane
+                    # Blue
+                    arr_plane = arr_frame[..., 2].tobytes()
+                    buf_plane = buffer_frame[2 * plane_length :]
+                    assert arr_plane == buf_plane
+
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference_index(self, reference):
         """Test by `index` for RLE lossless"""
         ds = reference.ds
@@ -201,6 +329,53 @@ class TestAsBuffer:
                 arr_plane = arr[..., 2].tobytes()
                 buf_plane = buffer[2 * plane_length :]
                 assert arr_plane == buf_plane
+
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    def test_reference_index_binary(self, reference):
+        """Test by `index` for RLE lossless for binary IO"""
+        ds = reference.ds
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": ds.get("NumberOfFrames", 1),
+            "planar_configuration": ds.get("PlanarConfiguration", 0),
+            "pixel_keyword": "PixelData",
+        }
+
+        with open(reference.path, "rb") as f:
+            file_offset = reference.ds["PixelData"].file_tell
+            f.seek(file_offset)
+            for index in range(reference.number_of_frames):
+                arr = self.decoder.as_array(
+                    f, raw=True, index=index, decoding_plugin="pydicom", **opts
+                )
+                assert f.tell() == file_offset
+                buffer = self.decoder.as_buffer(
+                    f, index=index, decoding_plugin="pydicom", **opts
+                )
+                assert f.tell() == file_offset
+
+                if ds.SamplesPerPixel == 1:
+                    assert arr.tobytes() == buffer
+                else:
+                    # Red
+                    arr_plane = arr[..., 0].tobytes()
+                    plane_length = len(arr_plane)
+                    buf_plane = buffer[:plane_length]
+                    assert arr_plane == buf_plane
+                    # Green
+                    arr_plane = arr[..., 1].tobytes()
+                    buf_plane = buffer[plane_length : 2 * plane_length]
+                    assert arr_plane == buf_plane
+                    # Blue
+                    arr_plane = arr[..., 2].tobytes()
+                    buf_plane = buffer[2 * plane_length :]
+                    assert arr_plane == buf_plane
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
@@ -238,6 +413,58 @@ class TestIterBuffer:
                 assert arr_frame == buf_frame
             else:
                 assert arr.tobytes() == buf
+
+    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    def test_reference_binary(self, reference):
+        """Test against the reference data for RLE lossless for binary IO."""
+        ds = reference.ds
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": ds.get("NumberOfFrames", 1),
+            "planar_configuration": ds.get("PlanarConfiguration", 0),
+            "pixel_keyword": "PixelData",
+        }
+
+        with open(reference.path, "rb") as f:
+            file_offset = reference.ds["PixelData"].file_tell
+            f.seek(file_offset)
+
+            # Can't do two encapsulated iters at once with binary IO...
+            arr_func = self.decoder.iter_array(
+                f, raw=True, decoding_plugin="pydicom", **opts
+            )
+            arrays = [arr for arr in arr_func]
+            assert f.tell() == file_offset
+            buf_func = self.decoder.iter_buffer(
+                f, raw=True, decoding_plugin="pydicom", **opts
+            )
+            for arr, buf in zip(arrays, buf_func):
+                if reference.ds.SamplesPerPixel == 3:
+                    # If samples per pixel is 3 then bytes are planar configuration 1
+                    # Red
+                    arr_frame = arr[..., 0].tobytes()
+                    frame_len = len(arr_frame)
+                    buf_frame = buf[:frame_len]
+                    assert arr_frame == buf_frame
+                    # Green
+                    arr_frame = arr[..., 1].tobytes()
+                    buf_frame = buf[frame_len : 2 * frame_len]
+                    assert arr_frame == buf_frame
+                    # Blue
+                    arr_frame = arr[..., 2].tobytes()
+                    buf_frame = buf[2 * frame_len :]
+                    assert arr_frame == buf_frame
+                else:
+                    assert arr.tobytes() == buf
+
+            pytest.raises(StopIteration, next, buf_func)
+            assert f.tell() == file_offset
 
     def test_indices(self):
         """Test the `indices` argument."""

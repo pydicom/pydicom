@@ -9,13 +9,15 @@ from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.enums import PhotometricInterpretation as PI
-from pydicom.pixels.utils import _passes_version_check
+from pydicom.pixels.utils import _passes_version_check, PhotometricInterpretation as PI
 
 try:
     from pylibjpeg.utils import get_pixel_data_decoders, Decoder
+
+    # {UID: {plugin name: function}}
+    _DECODERS: dict[uid.UID, dict[str, "Decoder"]] = get_pixel_data_decoders(version=2)
 except ImportError:
-    pass
+    _DECODERS = {}
 
 
 DECODER_DEPENDENCIES = {
@@ -72,15 +74,9 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
     """Return the decoded image data in `src` as a :class:`bytearray`."""
     tsyntax = runner.transfer_syntax
 
-    # {plugin name: function}
-    decoders = cast(
-        dict[str, "Decoder"],
-        get_pixel_data_decoders(version=2)[tsyntax],
-    )
-
     # Currently only one pylibjpeg plugin is available per UID
     #   so decode using the first available decoder
-    for _, func in sorted(decoders.items()):
+    for _, func in sorted(_DECODERS[tsyntax].items()):
         # `version=2` to return frame as bytearray
         frame = cast(bytearray, func(src, version=2, **runner.options))
 

@@ -5,6 +5,7 @@ UID Definitions and Utilities (:mod:`pydicom.uid`)
 
 .. currentmodule:: pydicom.uid
 
+
 Transfer Syntax UIDs
 --------------------
 

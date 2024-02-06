@@ -1,5 +1,6 @@
-from typing import TYPE_CHECKING, Any
 from collections.abc import Callable
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 try:
     import numpy as np
@@ -80,6 +81,10 @@ class PixelReference:
             attr.append(self.ds.PixelRepresentation)
 
         return attr
+
+    @property
+    def path(self) -> Path:
+        return Path(get_testdata_file(self.name))
 
     @property
     def pixel_keyword(self) -> str:

@@ -9,7 +9,7 @@ from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.enums import PhotometricInterpretation as PI
+from pydicom.pixels.utils import PhotometricInterpretation as PI
 
 try:
     import gdcm
