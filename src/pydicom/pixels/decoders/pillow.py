@@ -9,9 +9,8 @@ from io import BytesIO
 from typing import cast
 
 from pydicom import uid
-from pydicom.pixels.utils import _passes_version_check
+from pydicom.pixels.utils import _passes_version_check, PhotometricInterpretation as PI
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.enums import PhotometricInterpretation as PI
 
 try:
     from PIL import Image, features
