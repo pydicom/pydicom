@@ -6,11 +6,8 @@ This is a major release, with major changes, including backwards-incompatible
 changes.
 
 
-Changelog
----------
-
 Major changes
-.............
+-------------
 
 * full Python 3 compatibility - one code base for both Python 2 and Python 3
 * package name and import name now match -- use ``import pydicom``
@@ -26,7 +23,7 @@ Major changes
 * cleaned up DICOM dictionary code, old non-DICOM-keyword code removed
 
 Other enhancements
-..................
+------------------
 
 * added ``util/fixer.py`` callbacks available to fix non DICOM-compliant
   values before exceptions thrown
@@ -56,7 +53,7 @@ Other enhancements
   greater clarity. Previous names still available for backwards compatibility.
 
 Infrastructure
-..............
+--------------
 
 * added `TravisCI <https://travis-ci.org/pydicom/pydicom/>`_ and
   `AppVeyor <https://ci.appveyor.com/project/pydicom/pydicom>`_ builds for
@@ -70,7 +67,7 @@ Infrastructure
 * removed support for Python 2.6, added support for Python 3.6
 
 Fixes
-.....
+-----
 
 * correctly handle PlanarConfiguration==0 (:issue:`151`)
 * updated uid generation to ensure uniqueness (:issue:`125`)

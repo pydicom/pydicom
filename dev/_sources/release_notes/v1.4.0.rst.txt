@@ -1,11 +1,8 @@
 Version 1.4.0
 =================================
 
-Changelog
----------
-
 Fixes
-.....
+-----
 * Fixed handling of VRs AT and PN in json encoding (:issue:`915`)
 * Fixed handling of binary values in json encoding (:issue:`887`)
 * Prevent exception if assigning `None` to UI element (:issue:`894`)
@@ -39,7 +36,7 @@ Fixes
   (:issue:`1004`)
 
 Enhancements
-............
+------------
 
 * Added support for converting (60xx,3000) *Overlay Data* to a numpy ndarray
   using :meth:`Dataset.overlay_array()
@@ -75,11 +72,11 @@ Enhancements
 * Updated DICOM dictionary to 2019e edition (:issue:`1013`)
 * Added support for new VRs OV, SV, UV (:issue:`1016`)
 * Code dictionaries and ``Code`` class for structured reporting added
-  (alpha release only).  See the 
+  (alpha release only).  See the
   :doc:`Structured Reporting tutorial <../tutorials/sr_basics>` for more
   information
 
 Changes
-.......
+-------
 
 * :func:`~pydicom.encaps.get_frame_offsets` now returns whether the Basic Offset Table is empty and a list of the offsets.

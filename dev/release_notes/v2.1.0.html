@@ -105,13 +105,8 @@
              
   <section id="version-2-1-0">
 <h1>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Link to this heading">¶</a></h1>
-<section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
-</ul>
 <section id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h3>
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Large testing data is no longer distributed within the pydicom package
 with the aim to reduce the package download size. These test files
@@ -185,8 +180,9 @@ an Extended Offset Table is required (<a class="reference external" href="https:
 </ul>
 </section>
 <section id="changes">
-<h3>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h3>
+<h2>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
+<li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
 per default, only when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
@@ -237,7 +233,7 @@ deprecated, the default handler will always be used.</p></li>
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h3>
+<h2>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.copy()</span></code></a> now works as expected
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1146">#1146</a>)</p></li>
@@ -260,7 +256,6 @@ adding working correctly when the <cite>default</cite> value is <code class="doc
 adding private elements when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
 <code class="docutils literal notranslate"><span class="pre">True</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1215">#1215</a>)</p></li>
 </ul>
-</section>
 </section>
 </section>
 

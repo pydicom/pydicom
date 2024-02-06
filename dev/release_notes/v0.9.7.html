@@ -105,13 +105,11 @@
              
   <section id="version-0-9-7">
 <h1>Version 0.9.7<a class="headerlink" href="#version-0-9-7" title="Link to this heading">¶</a></h1>
-<section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
 <p>pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
 compatibility. ** It is the last version which will run with Python &lt; 2.6 **
 (it will run with Python 2.4 to Python 2.7)</p>
 <section id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Link to this heading">¶</a></h3>
+<h2>Major changes<a class="headerlink" href="#major-changes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added DICOM 2011 keywords. Old “named tags” still work, but will be
 deprecated in future versions. Most names are identical, but some have changed.
@@ -137,7 +135,7 @@ part of the standard, and promote consistency across programming languages and
 libraries.</p>
 </section>
 <section id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h3>
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>New way to read file meta information, not using the group length, instead
 reading until end of group 2 data elements. If group length dose not match,
@@ -150,7 +148,7 @@ log a warning (revision b6b3658f3b14).</p></li>
 </ul>
 </section>
 <section id="other-enhancements">
-<h3>Other Enhancements<a class="headerlink" href="#other-enhancements" title="Link to this heading">¶</a></h3>
+<h2>Other Enhancements<a class="headerlink" href="#other-enhancements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>New Sequence class which verifies items are Datasets (issue 52)</p></li>
 <li><p>Assignment to SQ data element checks value is a Sequence or can be converted
@@ -164,7 +162,6 @@ only on Python &gt;= 2.6 as previous versions do not call __dir__ method
 </ul>
 <p>Many of the bug fixes/enhancements were submitted by users. Many thanks to
 those who contributed.</p>
-</section>
 </section>
 </section>
 
