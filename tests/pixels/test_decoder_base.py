@@ -1517,7 +1517,7 @@ class TestDecoder_Array:
             decoder.as_array(reference.ds, view_only=True)
             assert msg in caplog.text
 
-    def test_expb_ow_index_invalid_raises(self, caplog):
+    def test_expb_ow_index_invalid_raises(self):
         """Test invalid index with BE swapped OW raises"""
         decoder = get_decoder(ExplicitVRBigEndian)
         reference = EXPB_8_1_1F
@@ -1873,7 +1873,7 @@ class TestDecoder_Buffer:
 
         assert len(buffer) == 11 * 64 * 64 * 2
 
-    def test_expb_ow_index_invalid_raises(self, caplog):
+    def test_expb_ow_index_invalid_raises(self):
         """Test invalid index with BE swapped OW raises"""
         decoder = get_decoder(ExplicitVRBigEndian)
         reference = EXPB_8_1_1F

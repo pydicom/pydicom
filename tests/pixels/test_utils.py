@@ -1,5 +1,6 @@
 import importlib
 from io import BytesIO
+import logging
 import os
 
 import pytest
@@ -14,7 +15,7 @@ except ImportError:
 from pydicom import dcmread, Dataset
 from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.pixels import pixel_array, iter_pixels
-from pydicom.pixels.utils import _as_options
+from pydicom.pixels.utils import _as_options, _passes_version_check
 from pydicom.uid import EnhancedMRImageStorage, ExplicitVRLittleEndian
 
 from .pixels_reference import (
@@ -346,3 +347,10 @@ class TestIterPixels:
         pylibjpeg_gen = iter_pixels(RLE_16_1_10F.path, decoding_plugin="pylibjpeg")
         for frame1, frame2 in zip(pydicom_gen, pylibjpeg_gen):
             assert np.array_equal(frame1, frame2)
+
+
+def test_version_check(caplog):
+    """Test _passes_version_check() when the package is absent"""
+    with caplog.at_level(logging.ERROR, logger="pydicom"):
+        assert _passes_version_check("foo", (3, 0)) is False
+        assert "No module named 'foo'" in caplog.text
