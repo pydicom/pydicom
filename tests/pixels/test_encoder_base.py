@@ -1,4 +1,4 @@
-"""Unit tests for the pydicom.encoders module and Dataset.compress()."""
+"""Unit tests for the pydicom.pixels.encoders module and Dataset.compress()."""
 
 import pytest
 
@@ -74,7 +74,9 @@ class TestEncoder:
         """Test adding an unavailable plugin."""
         enc = Encoder(RLELossless)
         assert not enc.is_available
-        enc.add_plugin("foo", ("pydicom.encoders.pylibjpeg", "encode_pixel_data"))
+        enc.add_plugin(
+            "foo", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")
+        )
         assert enc._available == {}
         assert "foo" in enc._unavailable
         assert enc._unavailable["foo"] == ("numpy", "pylibjpeg", "pylibjpeg-rle")
@@ -141,7 +143,9 @@ class TestEncoder:
     def test_remove_plugin_unavailable(self):
         """Test removing a plugin."""
         enc = Encoder(RLELossless)
-        enc.add_plugin("foo", ("pydicom.encoders.pylibjpeg", "encode_pixel_data"))
+        enc.add_plugin(
+            "foo", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")
+        )
         assert "foo" in enc._unavailable
         assert {} == enc._available
 
@@ -916,7 +920,9 @@ class TestEncoder_Process:
     def test_no_plugins(self):
         """Test with no available plugins"""
         enc = Encoder(RLELossless)
-        enc.add_plugin("foo", ("pydicom.encoders.pylibjpeg", "encode_pixel_data"))
+        enc.add_plugin(
+            "foo", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")
+        )
         msg = (
             r"Unable to encode because the encoding plugins are missing "
             r"dependencies:\n    foo - requires numpy, pylibjpeg and "
