@@ -17,4 +17,8 @@ from pydicom.pixels.decoders.base import (
     HTJ2KDecoder,
     RLELosslessDecoder,
 )
+from pydicom.pixels.encoders.base import (
+    get_encoder,
+    RLELosslessEncoder,
+)
 from pydicom.pixels.utils import pixel_array, iter_pixels
