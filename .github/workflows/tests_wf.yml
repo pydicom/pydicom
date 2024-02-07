@@ -65,7 +65,7 @@ jobs:
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pylibjpeg.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pillow_pixel_data.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_JPEG_LS_transfer_syntax.py tests/test_jpeg_ls_pixel_data.py
-        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/test_encoders_gdcm.py
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/pixels/test_encoder_gdcm.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/pixels
         python -m pip uninstall -y pydicom-data
 
