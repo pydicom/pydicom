@@ -20,3 +20,5 @@ Base encoder class used by all encoders
    :toctree: generated/
 
    Encoder
+
+.. automodule:: pydicom.pixels.encoders

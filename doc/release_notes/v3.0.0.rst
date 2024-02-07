@@ -52,7 +52,7 @@ Changes
 * :class:`~pydicom.filebase.DicomIO` now requires a readable or writeable buffer
   during initialisation and :class:`~pydicom.filebase.DicomBytesIO` directly
   inherits from it.
-* The ``pydicom.encoders`` module has been moved to ``pydicom.pixels.encoders``,
+* The ``pydicom.encoders`` module has been moved to :mod:`pydicom.pixels.encoders`,
   the original import path will be removed in v4.0
 
 
