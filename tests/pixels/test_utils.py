@@ -350,13 +350,7 @@ class TestIterPixels:
 
 
 def test_version_check(caplog):
-    """Test _passes_version_check() when the package has no __version__"""
-    # GDCM doesn't have a __version__ attribute
-    with caplog.at_level(logging.ERROR, logger="pydicom"):
-        assert _passes_version_check("gdcm", (3, 0)) is False
-        assert "module 'gdcm' has no attribute '__version__'" in caplog.text
-
-    caplog.clear()
+    """Test _passes_version_check() when the package is absent"""
     with caplog.at_level(logging.ERROR, logger="pydicom"):
         assert _passes_version_check("foo", (3, 0)) is False
         assert "No module named 'foo'" in caplog.text

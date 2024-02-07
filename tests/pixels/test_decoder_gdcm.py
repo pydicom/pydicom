@@ -1,6 +1,7 @@
 """Test the GDCM decoder."""
 
 import importlib
+import logging
 
 import pytest
 
@@ -12,6 +13,7 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom.pixels import get_decoder
+from pydicom.pixels.utils import _passes_version_check
 from pydicom.uid import (
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
@@ -127,3 +129,12 @@ class TestDecoding:
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+
+
+@pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
+def test_version_check(caplog):
+    """Test _passes_version_check() when the package has no __version__"""
+    # GDCM doesn't have a __version__ attribute
+    with caplog.at_level(logging.ERROR, logger="pydicom"):
+        assert _passes_version_check("gdcm", (3, 0)) is False
+        assert "module 'gdcm' has no attribute '__version__'" in caplog.text
