@@ -1731,6 +1731,48 @@ PIXEL_REFERENCE[JPEGLosslessSV1] = [
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 
 
+# JLSL, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# Plane interleaved (ILV 0)
+def test(ref, arr, **kwargs):
+    assert arr[124:128, 40].tolist() == [
+        [115, 109, 91],
+        [109, 105, 100],
+        [100, 111, 94],
+        [192, 53, 172],
+    ]
+
+
+JLSL_08_08_3_0_1F_ILV0 = PixelReference("JLSL_RGB_ILV0.dcm", "u1", test)
+
+
+# JLSL, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# Line interleaved (ILV 1)
+def test(ref, arr, **kwargs):
+    assert arr[124:128, 40].tolist() == [
+        [115, 109, 91],
+        [109, 105, 100],
+        [100, 111, 94],
+        [192, 53, 172],
+    ]
+
+
+JLSL_08_08_3_0_1F_ILV1 = PixelReference("JLSL_RGB_ILV1.dcm", "u1", test)
+
+
+# JLSL, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# Sample interleaved (ILV 2)
+def test(ref, arr, **kwargs):
+    assert arr[124:128, 40].tolist() == [
+        [115, 109, 91],
+        [109, 105, 100],
+        [100, 111, 94],
+        [192, 53, 172],
+    ]
+
+
+JLSL_08_08_3_0_1F_ILV2 = PixelReference("JLSL_RGB_ILV2.dcm", "u1", test)
+
+
 # JLSL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     # pylibjpeg, pyjpegls
@@ -1768,8 +1810,22 @@ def test(ref, arr, **kwargs):
 JLSN_08_01_1_0_1F = PixelReference("JPEGLSNearLossless_08.dcm", "u1", test)
 
 
+# JLSN, (8, 8), (1, 256, 256, 3), OB, RGB, 0
+# Plane interleaved (ILV 0), lossy error 3
+def test(ref, arr, **kwargs):
+    assert arr[124:128, 40].tolist() == [
+        [118, 110, 92],
+        [110, 103, 99],
+        [97, 113, 96],
+        [191, 55, 175],
+    ]
+
+
+JLSN_08_08_3_0_1F_ILV0 = PixelReference("JLSN_RGB_ILV0.dcm", "u1", test)
+
+
 # JLSN, (8, 8), (1, 100, 100, 3), OB, RGB, 0
-# Line interleaved
+# Line interleaved (ILV 1)
 def test(ref, arr, **kwargs):
     assert arr[0, 0].tolist() == [255, 0, 0]
     assert arr[10, 0].tolist() == [255, 130, 130]
@@ -1787,7 +1843,7 @@ JLSN_08_08_1_0_3F_LINE = PixelReference("SC_rgb_jls_lossy_line.dcm", "u1", test)
 
 
 # JLSN, (8, 8), (1, 100, 100, 3), OB, RGB, 0
-# Sample interleaved
+# Sample interleaved (ILV 2)
 def test(ref, arr, **kwargs):
     assert arr[0, 0].tolist() == [255, 0, 0]
     assert arr[10, 0].tolist() == [255, 130, 130]
@@ -1820,9 +1876,16 @@ def test(ref, arr, **kwargs):
 JLSN_16_16_1_0_1F = PixelReference("JPEGLSNearLossless_16.dcm", "u2", test)
 
 
-PIXEL_REFERENCE[JPEGLSLossless] = [JLSL_16_16_1_1_1F, JLSL_16_12_1_1_10F]
+PIXEL_REFERENCE[JPEGLSLossless] = [
+    JLSL_08_08_3_0_1F_ILV0,
+    JLSL_08_08_3_0_1F_ILV1,
+    JLSL_08_08_3_0_1F_ILV2,
+    JLSL_16_16_1_1_1F,
+    JLSL_16_12_1_1_10F,
+]
 PIXEL_REFERENCE[JPEGLSNearLossless] = [
     JLSN_08_01_1_0_1F,
+    JLSN_08_08_3_0_1F_ILV0,
     JLSN_08_08_1_0_3F_LINE,
     JLSN_08_08_1_0_3F_SAMPLE,
     JLSN_16_16_1_0_1F,

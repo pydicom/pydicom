@@ -18,16 +18,23 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGLSLossless: ("jpeg_ls>=1.1"),
-    uid.JPEGLSNearLossless: ("jpeg_ls>=1.1"),
+    uid.JPEGLSLossless: ("numpy", "pyjpegls>=1.2"),
+    uid.JPEGLSNearLossless: ("numpy", "pyjpegls>=1.2"),
 }
 
 
 def is_available(uid: str) -> bool:
     """Return ``True`` if the decoder has its dependencies met, ``False`` otherwise"""
-    return _passes_version_check("jpeg_ls", (1, 1))
+    return _passes_version_check("jpeg_ls", (1, 2))
 
 
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     """Return the decoded image data in `src` as a :class:`bytearray`."""
-    return cast(bytearray, jpeg_ls.decode_from_buffer(src))
+    buffer, info = jpeg_ls.decode_pixel_data(src)
+    # Interleave mode 0 is colour-by-plane, 1 and 2 are colour-by-pixel
+    if info["components"] > 1 and info["interleave_mode"] == 0:
+        runner.set_option("planar_configuration", 1)
+    else:
+        runner.set_option("planar_configuration", 0)
+
+    return cast(bytearray, buffer)
