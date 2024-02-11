@@ -18,8 +18,8 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGLSLossless: ("numpy", "jpeg_ls>=1.2"),
-    uid.JPEGLSNearLossless: ("numpy", "jpeg_ls>=1.2"),
+    uid.JPEGLSLossless: ("numpy", "pyjpegls>=1.2"),
+    uid.JPEGLSNearLossless: ("numpy", "pyjpegls>=1.2"),
 }
 
 
