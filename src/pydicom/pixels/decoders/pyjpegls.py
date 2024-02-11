@@ -34,5 +34,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     # Interleave mode 0 is colour-by-plane, 1 and 2 are colour-by-pixel
     if info["components"] > 1 and info["interleave_mode"] == 0:
         runner.set_option("planar_configuration", 1)
+    else:
+        runner.set_option("planar_configuration", 0)
 
     return cast(bytearray, buffer)
