@@ -87,10 +87,17 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     ts_type = gdcm.TransferSyntax.GetTSType(str.__str__(tsyntax))
     img.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
 
-    if tsyntax in uid.JPEGLSTransferSyntaxes and runner.bits_allocated == 16:
+    if tsyntax in uid.JPEGLSTransferSyntaxes:
         bits_stored = runner.get_option("jls_precision")
-        bits_allocated = math.ceil(bits_stored / 8) * 8
-        runner.set_option("bits_allocated", bits_allocated)
+        if bits_stored in (6, 7):
+            raise ValueError(
+                "Unable to correctly decode JPEG-LS pixel data with a sample "
+                "precision of 6 or 7 bits"
+            )
+
+        if runner.bits_allocated == 16:
+            bits_allocated = math.ceil(bits_stored / 8) * 8
+            runner.set_option("bits_allocated", bits_allocated)
 
     pixel_format = gdcm.PixelFormat(
         runner.samples_per_pixel,

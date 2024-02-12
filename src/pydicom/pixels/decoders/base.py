@@ -815,7 +815,7 @@ class DecodeRunner:
             use_jls_correction = (
                 self.transfer_syntax in JPEGLSTransferSyntaxes
                 and self.pixel_representation == 1
-                and self.get_option("apply_jls_sign_correction", True)
+                and self.get_option("apply_jls_sign_correction", False)
             )
             return use_j2k_correction or use_jls_correction
 
