@@ -36,6 +36,7 @@ from .pixels_reference import (
     J2KR_16_13_1_1_1F_M2_MISMATCH,
     JPGB_08_08_3_0_1F_RGB_APP14,  # fails to decode
     JPGB_08_08_3_0_1F_RGB_DCMD_APP14,  # fails to decode
+    JLSN_08_01_1_0_1F,
 )
 
 
@@ -158,6 +159,23 @@ class TestLibJpegDecoder:
             decoder.as_array(
                 JPGB_08_08_3_0_1F_RGB_DCMD_APP14.ds, decoding_plugin="pylibjpeg"
             )
+
+    def test_bits_allocated_mismatch(self):
+        """Test the result when bits stored <= 8 and bits allocated 16"""
+        # The JPEG-LS codestream uses a precision of 8, so it will return
+        #   8-bit values, however the decoding process nominally expects 16-bit
+        decoder = get_decoder(JPEGLSNearLossless)
+        arr = decoder.as_array(
+            JLSN_08_01_1_0_1F.ds,
+            raw=True,
+            decoding_plugin="pylibjpeg",
+            bits_allocated=16,
+        )
+        JLSN_08_01_1_0_1F.test(arr)
+        assert arr.shape == JLSN_08_01_1_0_1F.shape
+        assert arr.dtype != JLSN_08_01_1_0_1F.dtype
+        assert arr.dtype == np.uint16
+        assert arr.flags.writeable
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")

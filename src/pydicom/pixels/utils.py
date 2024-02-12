@@ -549,3 +549,64 @@ def _as_options(ds: "Dataset", opts: dict[str, Any]) -> dict[str, Any]:
         )
 
     return opts
+
+
+def _get_jls_parameters(src: bytes) -> dict[str, int]:
+    """Return a dict containing JPEG-LS component parameters.
+
+    Parameters
+    ----------
+    src : bytes
+        The JPEG-LS (ISO/IEC 14495-1) codestream to be parsed.
+
+    Returns
+    -------
+    dict[str, int]
+        A dict containing JPEG-LS coding parameters or an empty dict if unable
+        to parse the data. Available parameters are:
+
+        * ``precision``: int
+        * ``height``: int
+        * ``width``: int
+        * ``components``: int
+        * ``interleave_mode``: int
+        * ``lossy_error``: int
+    """
+    info = {}
+    try:
+        # First 2 bytes should be the SOI marker - otherwise wrong format
+        #   or has a SPIFF header
+        if src[0:2] != b"\xFF\xD8":
+            return info
+
+        # Skip to the SOF55 (JPEG-LS) marker
+        offset = 2
+        while (marker := src[offset:offset + 2]) != b"\xFF\xF7":
+            length = unpack(">H", src[offset + 2:offset + 4])[0]
+            offset += length + 2
+
+        # Next 2 bytes are marker length, then 1 byte precision
+        sof_length = unpack(">H", src[offset + 2:offset + 4])[0]
+        info["precision"] = unpack("B", src[offset + 4:offset + 5])[0]
+        # Then 2 bytes rows, 2 bytes columns, 1 byte number of components in frame
+        info["height"] = unpack(">H", src[offset + 5:offset + 7])[0]
+        info["width"] = unpack(">H", src[offset + 7:offset + 9])[0]
+        info["components"] = unpack("B", src[offset + 9:offset + 10])[0]
+        offset += 2 + sof_length
+
+        # Skip to the SOS marker
+        while (marker := src[offset:offset + 2]) != b"\xFF\xDA":
+            length = unpack(">H", src[offset + 2:offset + 4])[0]
+            offset += length + 2
+
+        # Next 2 bytes are marker length, then 1 byte number of components in scan
+        sos_length = unpack(">H", src[offset + 2:offset + 4])[0]
+        nr_components = unpack("B", src[offset + 4:offset + 5])[0]
+        # Skip past the component Td and Ta values
+        offset += 5 + nr_components
+        info["lossy_error"] = unpack("B", src[offset:offset + 1])[0]
+        info["interleave_mode"] = unpack("B", src[offset + 1:offset + 2])[0]
+    except (IndexError, TypeError):
+        pass
+
+    return info
