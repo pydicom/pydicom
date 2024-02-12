@@ -288,14 +288,18 @@ class DecodeRunner:
             The decoded frame.
         """
         if self.transfer_syntax in JPEG2000TransferSyntaxes:
-            info = get_j2k_parameters(src)
+            j2k_info = get_j2k_parameters(src)
             self.set_option(
-                "j2k_is_signed", info.get("is_signed", self.pixel_representation)
+                "j2k_is_signed", j2k_info.get("is_signed", self.pixel_representation)
             )
-            self.set_option("j2k_precision", info.get("precision", self.bits_stored))
+            self.set_option(
+                "j2k_precision", j2k_info.get("precision", self.bits_stored)
+            )
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
-            info = _get_jls_parameters(src)
-            self.set_option("jls_precision", info.get("precision", self.bits_stored))
+            jls_info = _get_jls_parameters(src)
+            self.set_option(
+                "jls_precision", jls_info.get("precision", self.bits_stored)
+            )
 
         # If self._previous is not set then this is the first frame being decoded
         # If self._previous is set, then the previously successful decoder

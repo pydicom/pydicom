@@ -30,6 +30,7 @@ from .pixels_reference import (
     JPGE_BAD,
     J2KR_16_13_1_1_1F_M2_MISMATCH,
     JLSN_08_01_1_0_1F,
+    JLSL_08_07_1_0_1F,
 )
 
 
@@ -95,11 +96,20 @@ class TestDecoding:
     def test_jls_lossless(self, reference):
         """Test the decoder with JPEGLSLossless."""
         decoder = get_decoder(JPEGLSLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
-        reference.test(arr)
-        assert arr.shape == reference.shape
-        assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        if reference == JLSL_08_07_1_0_1F:
+            msg = (
+                "Unable to decode as exceptions were raised by all available "
+                "plugins:\n  gdcm: Unable to correctly decode JPEG-LS pixel "
+                "data with a sample precision of 6 or 7"
+            )
+            with pytest.raises(RuntimeError, match=msg):
+                decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        else:
+            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+            reference.test(arr)
+            assert arr.shape == reference.shape
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless], ids=name)
     def test_jls_lossy(self, reference):

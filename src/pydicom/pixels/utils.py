@@ -572,7 +572,7 @@ def _get_jls_parameters(src: bytes) -> dict[str, int]:
         * ``interleave_mode``: int
         * ``lossy_error``: int
     """
-    info = {}
+    info: dict[str, int] = {}
     try:
         # First 2 bytes should be the SOI marker - otherwise wrong format
         #   or has a SPIFF header
@@ -581,7 +581,7 @@ def _get_jls_parameters(src: bytes) -> dict[str, int]:
 
         # Skip to the SOF55 (JPEG-LS) marker
         offset = 2
-        while (marker := src[offset : offset + 2]) != b"\xFF\xF7":
+        while src[offset : offset + 2] != b"\xFF\xF7":
             length = unpack(">H", src[offset + 2 : offset + 4])[0]
             offset += length + 2
 
@@ -595,12 +595,11 @@ def _get_jls_parameters(src: bytes) -> dict[str, int]:
         offset += 2 + sof_length
 
         # Skip to the SOS marker
-        while (marker := src[offset : offset + 2]) != b"\xFF\xDA":
+        while src[offset : offset + 2] != b"\xFF\xDA":
             length = unpack(">H", src[offset + 2 : offset + 4])[0]
             offset += length + 2
 
         # Next 2 bytes are marker length, then 1 byte number of components in scan
-        sos_length = unpack(">H", src[offset + 2 : offset + 4])[0]
         nr_components = unpack("B", src[offset + 4 : offset + 5])[0]
         # Skip past the component Td and Ta values
         offset += 5 + nr_components

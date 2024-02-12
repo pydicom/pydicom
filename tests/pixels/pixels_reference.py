@@ -1773,6 +1773,22 @@ def test(ref, arr, **kwargs):
 JLSL_08_08_3_0_1F_ILV2 = PixelReference("JLSL_RGB_ILV2.dcm", "u1", test)
 
 
+# JLSL, (8, 7), (1, 128, 128, 1), OB, MONOCHROME2, 0
+def test(ref, arr, **kwargs):
+    assert arr[59:69, 58].tolist() == [55, 53, 58, 85, 109, 123, 116, 102, 98, 89]
+
+
+JLSL_08_07_1_0_1F = PixelReference("JLSL_08_07_0_1F.dcm", "u1", test)
+
+
+# JLSL, (16, 15), (1, 128, 128, 1), OB, MONOCHROME2, 1
+def test(ref, arr, **kwargs):
+    assert arr[59:65, 58].tolist() == [-2073, -2629, -1167, 5566, 11808, 15604]
+
+
+JLSL_16_15_1_1_1F = PixelReference("JLSL_16_15_1_1F.dcm", "i2", test)
+
+
 # JLSL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     # pylibjpeg, pyjpegls
@@ -1880,6 +1896,8 @@ PIXEL_REFERENCE[JPEGLSLossless] = [
     JLSL_08_08_3_0_1F_ILV0,
     JLSL_08_08_3_0_1F_ILV1,
     JLSL_08_08_3_0_1F_ILV2,
+    JLSL_08_07_1_0_1F,
+    JLSL_16_15_1_1_1F,
     JLSL_16_16_1_1_1F,
     JLSL_16_12_1_1_10F,
 ]
