@@ -687,7 +687,7 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
         offset += 5 + src[offset + 4] * 2
         info["lossy_error"] = src[offset]
         info["interleave_mode"] = src[offset + 1]
-    except Exception as exc:
+    except Exception:
         return {}
 
     return info
