@@ -18,7 +18,7 @@ from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
-from pydicom.pixels.utils import PhotometricInterpretation as PI, _get_jls_parameters
+from pydicom.pixels.utils import PhotometricInterpretation as PI, _get_jpg_parameters
 from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -296,7 +296,7 @@ class DecodeRunner:
                 "j2k_precision", j2k_info.get("precision", self.bits_stored)
             )
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
-            jls_info = _get_jls_parameters(src)
+            jls_info = _get_jpg_parameters(src)
             self.set_option(
                 "jls_precision", jls_info.get("precision", self.bits_stored)
             )

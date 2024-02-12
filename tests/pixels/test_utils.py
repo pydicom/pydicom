@@ -13,9 +13,14 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom import dcmread, Dataset
+from pydicom.encaps import get_frame
 from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.pixels import pixel_array, iter_pixels
-from pydicom.pixels.utils import _as_options, _passes_version_check
+from pydicom.pixels.utils import (
+    _as_options,
+    _passes_version_check,
+    _get_jpg_parameters,
+)
 from pydicom.uid import EnhancedMRImageStorage, ExplicitVRLittleEndian
 
 from .pixels_reference import (
@@ -24,6 +29,13 @@ from .pixels_reference import (
     EXPL_16_1_10F,
     EXPL_8_3_1F_YBR422,
     IMPL_16_1_1F,
+    JPGB_08_08_3_0_1F_RGB_NO_APP14,
+    JPGB_08_08_3_0_1F_RGB_APP14,
+    JPGB_08_08_3_0_1F_RGB,
+    JLSL_08_08_3_0_1F_ILV0,
+    JLSL_08_08_3_0_1F_ILV1,
+    JLSL_08_08_3_0_1F_ILV2,
+    JLSN_08_01_1_0_1F,
 )
 
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
@@ -354,3 +366,98 @@ def test_version_check(caplog):
     with caplog.at_level(logging.ERROR, logger="pydicom"):
         assert _passes_version_check("foo", (3, 0)) is False
         assert "No module named 'foo'" in caplog.text
+
+
+class TestGetJpgParameters:
+    """Tests for _get_jpg_parameters()"""
+
+    def test_jpg_no_app(self):
+        """Test parsing a JPEG codestream with no APP markers."""
+        data = get_frame(JPGB_08_08_3_0_1F_RGB_NO_APP14.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 256
+        assert info["width"] == 256
+        assert info["components"] == 3
+        assert info["component_ids"] == [0, 1, 2]
+        assert "app" not in info
+        assert "lossy_error" not in info
+        assert "interleave_mode" not in info
+
+    def test_jpg_app(self):
+        """Test parsing a JPEG codestream with APP markers."""
+        data = get_frame(JPGB_08_08_3_0_1F_RGB_APP14.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 256
+        assert info["width"] == 256
+        assert info["components"] == 3
+        assert info["component_ids"] == [0, 1, 2]
+        assert isinstance(info["app"][b"\xFF\xEE"], bytes)
+        assert "lossy_error" not in info
+        assert "interleave_mode" not in info
+
+    def test_jpg_component_ids(self):
+        """Test parsing a JPEG codestream with ASCII component IDs."""
+        data = get_frame(JPGB_08_08_3_0_1F_RGB.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 100
+        assert info["width"] == 100
+        assert info["components"] == 3
+        assert info["component_ids"] == [82, 71, 66]  # R, G, B
+        assert isinstance(info["app"][b"\xFF\xEE"], bytes)
+        assert "lossy_error" not in info
+        assert "interleave_mode" not in info
+
+    def test_jls_ilv0(self):
+        """Test parsing a lossless JPEG-LS codestream with ILV 0."""
+        data = get_frame(JLSL_08_08_3_0_1F_ILV0.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 256
+        assert info["width"] == 256
+        assert info["components"] == 3
+        assert info["component_ids"] == [1, 2, 3]
+        assert "app" not in info
+        assert info["lossy_error"] == 0
+        assert info["interleave_mode"] == 0
+
+    def test_jls_ilv1(self):
+        """Test parsing a lossless JPEG-LS codestream with ILV 1."""
+        data = get_frame(JLSL_08_08_3_0_1F_ILV1.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 256
+        assert info["width"] == 256
+        assert info["components"] == 3
+        assert info["component_ids"] == [1, 2, 3]
+        assert "app" not in info
+        assert info["lossy_error"] == 0
+        assert info["interleave_mode"] == 1
+
+    def test_jls_ilv2(self):
+        """Test parsing a lossless JPEG-LS codestream with ILV 2."""
+        data = get_frame(JLSL_08_08_3_0_1F_ILV2.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 256
+        assert info["width"] == 256
+        assert info["components"] == 3
+        assert info["component_ids"] == [1, 2, 3]
+        assert "app" not in info
+        assert info["lossy_error"] == 0
+        assert info["interleave_mode"] == 2
+
+    def test_jls_lossy(self):
+        """Test parsing a lossy JPEG-LS codestream."""
+        data = get_frame(JLSN_08_01_1_0_1F.ds.PixelData, 0)
+        info = _get_jpg_parameters(data)
+        assert info["precision"] == 8
+        assert info["height"] == 45
+        assert info["width"] == 10
+        assert info["components"] == 1
+        assert info["component_ids"] == [1]
+        assert "app" not in info
+        assert info["lossy_error"] == 2
+        assert info["interleave_mode"] == 0
