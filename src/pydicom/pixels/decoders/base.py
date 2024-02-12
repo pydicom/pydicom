@@ -138,9 +138,7 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     return arr
 
 
-def _apply_sign_correction(
-    arr: "np.ndarray", runner: "DecodeRunner"
-) -> "np.ndarray":
+def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
     # JPEG 2000 Example:
     # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
@@ -1250,8 +1248,8 @@ class Decoder:
         for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
             start = idx * pixels_per_frame
-            arr[start : start + pixels_per_frame] = (
-                np.frombuffer(frame, dtype=runner.pixel_dtype)
+            arr[start : start + pixels_per_frame] = np.frombuffer(
+                frame, dtype=runner.pixel_dtype
             )
 
         # Check to see if we have any more frames available
