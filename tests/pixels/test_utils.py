@@ -393,7 +393,9 @@ class TestGetJpgParameters:
         assert info["width"] == 256
         assert info["components"] == 3
         assert info["component_ids"] == [0, 1, 2]
-        assert isinstance(info["app"][b"\xFF\xEE"], bytes)
+        assert info["app"][b"\xFF\xEE"] == (
+            b"\x41\x64\x6F\x62\x65\x00\x65\x00\x00\x00\x00\x00"
+        )
         assert "lossy_error" not in info
         assert "interleave_mode" not in info
 
@@ -461,3 +463,9 @@ class TestGetJpgParameters:
         assert "app" not in info
         assert info["lossy_error"] == 2
         assert info["interleave_mode"] == 0
+
+    def test_invalid(self):
+        """Test invalid codestreams."""
+        assert _get_jpg_parameters(b"\x00\x00") == {}
+        data = get_frame(JLSN_08_01_1_0_1F.ds.PixelData, 0)
+        assert _get_jpg_parameters(data[:20]) == {}

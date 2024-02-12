@@ -591,7 +591,7 @@ _UNPACK_SHORT = Struct(">H").unpack
 
 
 def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
-    """Return a dict containing JPEG or JPEG-LS component parameters.
+    """Return a dict containing JPEG or JPEG-LS encoding parameters.
 
     Parameters
     ----------
@@ -602,8 +602,8 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
     Returns
     -------
     dict[str, int | dict[bytes, bytes] | list[int]]
-        A dict containing JPEG or JPEG-LS coding parameters or an empty dict if
-        unable to parse the data. Available parameters are:
+        A dict containing JPEG or JPEG-LS encoding parameters or an empty dict
+        if unable to parse the data. Available parameters are:
 
         * ``precision``: int
         * ``height``: int
@@ -629,6 +629,7 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
         while (marker := src[offset : offset + 2]) not in _SOF:
             length = _UNPACK_SHORT(src[offset + 2 : offset + 4])[0]
             if marker in _APP:
+                # `length` counts from the first byte of the APP length
                 app_markers[marker] = src[offset + 4 : offset + 2 + length]
 
             offset += length + 2  # at the start of the next marker
@@ -669,13 +670,11 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
 
         # Skip to the SOS marker
         while src[offset : offset + 2] != b"\xFF\xDA":
-            length = _UNPACK_SHORT(src[offset + 2 : offset + 4])[0]
-            offset += length + 2
+            offset += _UNPACK_SHORT(src[offset + 2 : offset + 4])[0] + 2
 
         # `offset` is at the start of the SOS marker
 
-        # SOS segment layout is the same for JPEG and JPEG-LS, but certain
-        # values are interpreted differently
+        # SOS segment layout is the same for JPEG and JPEG-LS
         #   2 byte SOS marker
         #   2 bytes header length
         #   1 byte number of components in scan
@@ -689,7 +688,6 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
         info["lossy_error"] = src[offset]
         info["interleave_mode"] = src[offset + 1]
     except Exception as exc:
-        raise exc
-        pass
+        return {}
 
     return info
