@@ -18,6 +18,17 @@ Pixel Data Decoding
    pixels.decoders
 
 
+Pixel Data Encoding
+-------------------
+
+.. currentmodule:: pydicom.pixels
+
+.. toctree::
+   :maxdepth: 1
+   :includehidden:
+
+   pixels.encoders
+
 
 Pixel Data Utilities
 --------------------
@@ -28,5 +39,6 @@ Pixel Data Utilities
    :toctree: generated/
 
    get_decoder
+   get_encoder
    pixel_array
    iter_pixels

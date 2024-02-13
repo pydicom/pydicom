@@ -1,7 +1,7 @@
-﻿pydicom.encoders.base.Encoder
-=============================
+﻿pydicom.pixels.encoders.base.Encoder
+====================================
 
-.. currentmodule:: pydicom.encoders.base
+.. currentmodule:: pydicom.pixels.encoders.base
 
 .. autoclass:: Encoder
 

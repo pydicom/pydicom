@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom.encoders.RLELosslessEncoder &mdash; pydicom 3.0.0.dev0 documentation</title>
+  <title>pydicom.pixels.get_encoder &mdash; pydicom 3.0.0.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -28,8 +28,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.encoders.get_encoder" href="pydicom.encoders.get_encoder.html" />
-    <link rel="prev" title="Pixel Data Encoders (pydicom.encoders)" href="../encoders.html" /> 
+    <link rel="next" title="pydicom.pixels.pixel_array" href="pydicom.pixels.pixel_array.html" />
+    <link rel="prev" title="pydicom.pixels.get_decoder" href="pydicom.pixels.get_decoder.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -75,15 +75,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.encoders.RLELosslessEncoder</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pydicom.encoders.RLELosslessEncoder"><code class="docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="pydicom.encoders.get_encoder.html">pydicom.encoders.get_encoder</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pydicom.encoders.base.Encoder.html">pydicom.encoders.base.Encoder</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
@@ -91,7 +82,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../pixels.html#pixel-data-decoding">Pixel Data Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pixels.html#pixel-data-encoding">Pixel Data Encoding</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../pixels.html#pixel-data-utilities">Pixel Data Utilities</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
@@ -126,8 +128,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
-      <li class="breadcrumb-item active">pydicom.encoders.RLELosslessEncoder</li>
+          <li class="breadcrumb-item"><a href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.pixels.get_encoder</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -136,17 +138,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pydicom-encoders-rlelosslessencoder">
-<h1>pydicom.encoders.RLELosslessEncoder<a class="headerlink" href="#pydicom-encoders-rlelosslessencoder" title="Link to this heading">¶</a></h1>
-<dl class="py data">
-<dt class="sig sig-object py" id="pydicom.encoders.RLELosslessEncoder">
-<span class="sig-prename descclassname"><span class="pre">pydicom.encoders.</span></span><span class="sig-name descname"><span class="pre">RLELosslessEncoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.encoders.base.Encoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0c4246eb5/pydicom/encoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encoders.RLELosslessEncoder" title="Link to this definition">¶</a></dt>
-<dd><p>A <em>Pixel Data</em> encoder for <em>RLE Lossless</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code></p>
+  <section id="pydicom-pixels-get-encoder">
+<h1>pydicom.pixels.get_encoder<a class="headerlink" href="#pydicom-pixels-get-encoder" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicom.pixels.get_encoder">
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.</span></span><span class="sig-name descname"><span class="pre">get_encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><span class="pre">Encoder</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c2686e0c7/pydicom/pixels/encoders/base.py#L913"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.get_encoder" title="Link to this definition">¶</a></dt>
+<dd><p>Return the pixel data encoder corresponding to <cite>uid</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.2.</span></p>
 </div>
-<p>Encoding plugins: <a class="reference internal" href="../../guides/encoding/encoder_plugin_options.html#encoder-plugin-gdcm"><span class="std std-ref">gdcm</span></a>, <a class="reference internal" href="../../guides/encoding/encoder_plugin_options.html#encoder-plugin-pydicom"><span class="std std-ref">pydicom</span></a>, <a class="reference internal" href="../../guides/encoding/encoder_plugin_options.html#encoder-plugin-pylibjpeg"><span class="std std-ref">pylibjpeg</span></a></p>
-<p>See the <a class="reference internal" href="pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder" title="pydicom.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a> reference for instance methods and attributes.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" colspan="2"><p>Transfer Syntax</p></th>
+<th class="head" rowspan="2"><p>Version added</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Name</p></th>
+<th class="head"><p>UID</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p><em>RLE Lossless</em></p></td>
+<td><p>1.2.840.10008.1.2.5</p></td>
+<td><p>2.2</p></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </section>
@@ -155,8 +171,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../encoders.html" class="btn btn-neutral float-left" title="Pixel Data Encoders (pydicom.encoders)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pydicom.encoders.get_encoder.html" class="btn btn-neutral float-right" title="pydicom.encoders.get_encoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.pixels.get_decoder.html" class="btn btn-neutral float-left" title="pydicom.pixels.get_decoder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.pixels.pixel_array.html" class="btn btn-neutral float-right" title="pydicom.pixels.pixel_array" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

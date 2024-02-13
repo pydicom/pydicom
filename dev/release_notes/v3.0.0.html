@@ -159,6 +159,8 @@ modified when writing</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomIO</span></code></a> now requires a readable or writeable buffer
 during initialisation and <a class="reference internal" href="../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomBytesIO</span></code></a> directly
 inherits from it.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">pydicom.encoders</span></code> module has been moved to <a class="reference internal" href="../reference/pixels.encoders.html#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code></a>,
+the original import path will be removed in v4.0</p></li>
 </ul>
 <section id="removals">
 <h3>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h3>
@@ -206,7 +208,7 @@ instead.</p></li>
 <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.name" title="pydicom.dataelem.DataElement.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.name</span></code></a> instead</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">pixel_data_handlers.rle_handler.rle_encode_frame</span></code> function has been
 removed, use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code> instead.</p></li>
 <li><p>Removed the <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code> module, import UIDs from the
 <code class="xref py py-mod docutils literal notranslate"><span class="pre">uid</span></code> module instead</p></li>
 <li><p>The following properties have been removed:</p>

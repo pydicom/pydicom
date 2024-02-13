@@ -23,7 +23,6 @@ This API reference guide details the functions, modules and objects included in
    elem
    examples
    encaps
-   encoders
    errors
    fileio
    fileset

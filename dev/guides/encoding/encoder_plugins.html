@@ -126,7 +126,7 @@
              
   <section id="pixel-data-encoder-plugins">
 <span id="guide-encoder-plugins"></span><h1>Pixel Data Encoder Plugins<a class="headerlink" href="#pixel-data-encoder-plugins" title="Link to this heading">¶</a></h1>
-<p><em>Pixel Data</em> encoding in <em>pydicom</em> uses an <a class="reference internal" href="../../reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder" title="pydicom.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a>
+<p><em>Pixel Data</em> encoding in <em>pydicom</em> uses an <a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a>
 instance for the specific <em>Transfer Syntax</em> as a manager for plugins that
 perform the encoding work. This guide covers the requirements for those plugins
 and how to add them to <em>pydicom</em>. For a more general introduction to compression
@@ -210,18 +210,18 @@ return <code class="docutils literal notranslate"><span class="pre">False</span>
 required by the plugin.</p>
 </li>
 </ul>
-<p>An example of the requirements of a plugin is available <a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/encoders/pylibjpeg.py">here</a>.</p>
+<p>An example of the requirements of a plugin is available <a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/pixels/encoders/pylibjpeg.py">here</a>.</p>
 </section>
 <section id="adding-plugins-to-an-encoder">
 <h2>Adding Plugins to an Encoder<a class="headerlink" href="#adding-plugins-to-an-encoder" title="Link to this heading">¶</a></h2>
 <p>Additional plugins can be added to an existing encoder with the
-<a class="reference internal" href="../../reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.add_plugin" title="pydicom.encoders.base.Encoder.add_plugin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_plugin()</span></code></a> method, which takes the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder.add_plugin" title="pydicom.pixels.encoders.base.Encoder.add_plugin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_plugin()</span></code></a> method, which takes the
 a unique <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <cite>plugin_label</cite>, and a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <code class="docutils literal notranslate"><span class="pre">('the</span> <span class="pre">import</span>
 <span class="pre">path</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">encoder</span> <span class="pre">function's</span> <span class="pre">module',</span> <span class="pre">'encoder</span> <span class="pre">function</span> <span class="pre">name')</span></code>. For
 example, if you’d import your encoder function <cite>my_encoder_func</cite> with
 <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">my_package.encoders</span> <span class="pre">import</span> <span class="pre">my_encoder_func</span></code>, then you’d do the
 following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.encoders</span> <span class="kn">import</span> <span class="n">RLELosslessEncoder</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.pixels.encoders</span> <span class="kn">import</span> <span class="n">RLELosslessEncoder</span>
 
 <span class="n">RLELosslessEncoder</span><span class="o">.</span><span class="n">add_plugin</span><span class="p">(</span>
     <span class="s1">&#39;my_encoder&#39;</span><span class="p">,</span>  <span class="c1"># the plugin&#39;s label</span>

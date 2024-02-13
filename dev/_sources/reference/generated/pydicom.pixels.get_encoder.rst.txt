@@ -1,0 +1,6 @@
+﻿pydicom.pixels.get\_encoder
+===========================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: get_encoder
