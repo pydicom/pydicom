@@ -91,12 +91,12 @@ class DecodeOptions(TypedDict, total=False):
 
     ## JPEG-LS decoding options
     # Use the JPEG-LS metadata to return an ndarray matched to the expected pixel
-    # representation otherwise return the decoded data as-is (ndarray only)
+    # representation, otherwise return the decoded data as-is (ndarray only)
     apply_jls_sign_correction: bool
 
     ## JPEG2000/HTJ2K decoding options
     # Use the JPEG 2000 metadata to return an ndarray matched to the expected pixel
-    # representation otherwise return the decoded data as-is (ndarray only)
+    # representation, otherwise return the decoded data as-is (ndarray only)
     apply_j2k_sign_correction: bool
 
     ## Processing options (ndarray only)
@@ -142,7 +142,7 @@ def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.nda
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
     # JPEG 2000 Example:
     # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
-    # J2K codestream: precision 13, signed 0 (unsigned)
+    # J2K codestream: precision 13, signedness 0 (i.e. unsigned)
     #
     # For the raw 13-bit signed integer (value -2000):
     #        1 1000 0011 0000
@@ -1242,11 +1242,10 @@ class Decoder:
 
         # Return all frames
         # Preallocate container array for the frames
-        bytes_per_frame = runner.frame_length(unit="bytes")
+        # The preallocated array's dtype itemsize is based off the dataset's
+        #   bits allocated value, however each decoded frame may have a smaller
+        #   itemsize if the bits allocated value is modified during decoding
         pixels_per_frame = runner.frame_length(unit="pixels")
-        # The returned array's dtype itemsize is based off the dataset's bits
-        #   allocated value, however each frame may have a smaller itemsize if
-        #   the bits allocated value is modified during decoding
         arr = np.empty(pixels_per_frame * runner.number_of_frames, dtype=dtype)
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
@@ -1260,7 +1259,7 @@ class Decoder:
         #   Should only apply to JPEG transfer syntaxes
         excess = []
         for frame in frame_generator:
-            if len(frame) == bytes_per_frame:
+            if len(frame) == runner.frame_length(unit="bytes"):
                 excess.append(np.frombuffer(frame, runner.pixel_dtype))
                 runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
@@ -1578,11 +1577,11 @@ class Decoder:
         bytes | bytearray
             A buffer-like containing the decoded pixel data.
         """
-        length_bytes = runner.frame_length(unit="bytes")
 
         # Return the specified frame only
         if index is not None:
             frame = runner.decode(index=index)
+            length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
@@ -1592,25 +1591,24 @@ class Decoder:
             return frame
 
         # Return all frames
-        # Preallocate buffer for the frames
-        buffer = bytearray(length_bytes * runner.number_of_frames)
+        buffer = bytearray()
         frame_generator = runner.iter_decode()
         for index in range(runner.number_of_frames):
             frame = next(frame_generator)
-            start = index * length_bytes
+            length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
                     f"{index} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
-            buffer[start : start + length_bytes] = frame
+            buffer.extend(frame)
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
         excess = bytearray()
         for frame in frame_generator:
-            if len(frame) == length_bytes:
+            if len(frame) == runner.frame_length(unit="bytes"):
                 excess.extend(frame)
                 runner.set_option("number_of_frames", runner.number_of_frames + 1)
 

@@ -177,6 +177,23 @@ class TestLibJpegDecoder:
         assert arr.dtype == np.uint16
         assert arr.flags.writeable
 
+    def test_bits_allocated_mismatch_as_buffer(self):
+        """Test the result when bits stored <= 8 and bits allocated 16"""
+        decoder = get_decoder(JPEGLSNearLossless)
+        ds = JLSN_08_01_1_0_1F.ds
+        buffer = decoder.as_buffer(
+            ds,
+            raw=True,
+            decoding_plugin="pylibjpeg",
+            bits_allocated=16,
+        )
+        assert ds.BitsStored == 8
+        assert len(buffer) == ds.Rows * ds.Columns * ds.SamplesPerPixel
+        arr = np.frombuffer(buffer, dtype="u1")
+        arr = arr.reshape((ds.Rows, ds.Columns))
+        JLSN_08_01_1_0_1F.test(arr)
+        assert arr.shape == JLSN_08_01_1_0_1F.shape
+
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
 class TestOpenJpegDecoder:
