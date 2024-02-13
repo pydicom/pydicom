@@ -1103,8 +1103,8 @@ class Decoder:
           <photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
-        * JPEG 2000 encoded data whose signedness doesn't match the expected
-          :ref:`pixel representation<pixel_representation>` will be
+        * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+          expected :ref:`pixel representation<pixel_representation>` will be
           converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
@@ -1648,8 +1648,8 @@ class Decoder:
           <photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
-        * JPEG 2000 encoded data whose signedness doesn't match the expected
-          :ref:`pixel representation<pixel_representation>` will be
+        * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+          expected :ref:`pixel representation<pixel_representation>` will be
           converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
