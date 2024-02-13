@@ -53,7 +53,7 @@ Changes
   during initialisation and :class:`~pydicom.filebase.DicomBytesIO` directly
   inherits from it.
 * Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a *Bits Stored* of
-  6 or 7 produces incorrect results, so attemping to do so now raises an exception.
+  6 or 7 produces incorrect results, so attempting to do so now raises an exception.
   ``pyjpegls or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`)
 
 Removals
