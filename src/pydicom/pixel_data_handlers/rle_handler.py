@@ -49,7 +49,6 @@ except ImportError:
 from pydicom.encaps import generate_frames
 from pydicom.misc import warn_and_log
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
-from pydicom.encoders.native import _encode_frame  # noqa: F401
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
