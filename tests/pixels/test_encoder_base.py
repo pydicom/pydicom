@@ -1,4 +1,4 @@
-"""Unit tests for the pydicom.encoders module and Dataset.compress()."""
+"""Unit tests for the pydicom.pixels.encoders module and Dataset.compress()."""
 
 import pytest
 
@@ -27,8 +27,8 @@ except ImportError:
 from pydicom import config
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.encoders import RLELosslessEncoder
-from pydicom.encoders.base import Encoder
+from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders.base import Encoder
 from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
     UID,
@@ -64,7 +64,7 @@ class TestEncoder:
     def test_add_plugin_available(self):
         """Test adding an available plugin."""
         assert not self.enc.is_available
-        self.enc.add_plugin("foo", ("pydicom.encoders.native", "_encode_frame"))
+        self.enc.add_plugin("foo", ("pydicom.pixels.encoders.native", "_encode_frame"))
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
         assert self.enc.is_available
@@ -74,7 +74,9 @@ class TestEncoder:
         """Test adding an unavailable plugin."""
         enc = Encoder(RLELossless)
         assert not enc.is_available
-        enc.add_plugin("foo", ("pydicom.encoders.pylibjpeg", "encode_pixel_data"))
+        enc.add_plugin(
+            "foo", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")
+        )
         assert enc._available == {}
         assert "foo" in enc._unavailable
         assert enc._unavailable["foo"] == ("numpy", "pylibjpeg", "pylibjpeg-rle")
@@ -95,13 +97,11 @@ class TestEncoder:
         """Test encoding function missing when adding a plugin."""
         enc = Encoder(RLELossless)
 
-        msg = (
-            r"module 'pydicom.encoders.native' has no " r"attribute 'bad_function_name'"
-        )
+        msg = r"module 'pydicom.pixels.encoders.native' has no attribute 'bad_function_name'"
         with pytest.raises(AttributeError, match=msg):
             enc.add_plugin(
                 "foo",
-                ("pydicom.encoders.native", "bad_function_name"),
+                ("pydicom.pixels.encoders.native", "bad_function_name"),
             )
         assert {} == enc._available
         assert {} == enc._unavailable
@@ -109,21 +109,23 @@ class TestEncoder:
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_add_plugin_twice(self):
         """Test adding a plugin that already exists."""
-        self.enc.add_plugin("foo", ("pydicom.encoders.native", "_encode_frame"))
+        self.enc.add_plugin("foo", ("pydicom.pixels.encoders.native", "_encode_frame"))
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
 
         msg = r"'Encoder' already has a plugin named 'foo'"
         with pytest.raises(ValueError, match=msg):
-            self.enc.add_plugin("foo", ("pydicom.encoders.native", "_encode_frame"))
+            self.enc.add_plugin(
+                "foo", ("pydicom.pixels.encoders.native", "_encode_frame")
+            )
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_remove_plugin(self):
         """Test removing a plugin."""
-        self.enc.add_plugin("foo", ("pydicom.encoders.native", "_encode_frame"))
-        self.enc.add_plugin("bar", ("pydicom.encoders.native", "_encode_frame"))
+        self.enc.add_plugin("foo", ("pydicom.pixels.encoders.native", "_encode_frame"))
+        self.enc.add_plugin("bar", ("pydicom.pixels.encoders.native", "_encode_frame"))
         assert "foo" in self.enc._available
         assert "bar" in self.enc._available
         assert {} == self.enc._unavailable
@@ -141,7 +143,9 @@ class TestEncoder:
     def test_remove_plugin_unavailable(self):
         """Test removing a plugin."""
         enc = Encoder(RLELossless)
-        enc.add_plugin("foo", ("pydicom.encoders.pylibjpeg", "encode_pixel_data"))
+        enc.add_plugin(
+            "foo", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")
+        )
         assert "foo" in enc._unavailable
         assert {} == enc._available
 
@@ -916,7 +920,9 @@ class TestEncoder_Process:
     def test_no_plugins(self):
         """Test with no available plugins"""
         enc = Encoder(RLELossless)
-        enc.add_plugin("foo", ("pydicom.encoders.pylibjpeg", "encode_pixel_data"))
+        enc.add_plugin(
+            "foo", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")
+        )
         msg = (
             r"Unable to encode because the encoding plugins are missing "
             r"dependencies:\n    foo - requires numpy, pylibjpeg and "
@@ -1088,9 +1094,10 @@ class TestDatasetCompress:
 
 @pytest.fixture
 def use_future():
+    original = config._use_future
     config._use_future = True
     yield
-    config._use_future = False
+    config._use_future = original
 
 
 class TestFuture:
@@ -1099,3 +1106,19 @@ class TestFuture:
         ds.compress(RLELossless, encoding_plugin="pydicom")
         assert not hasattr(ds, "_is_little_endian")
         assert not hasattr(ds, "_is_implicit_VR")
+
+    def test_imports_raise(self, use_future):
+        with pytest.raises(ImportError):
+            from pydicom.encoders import get_encoder
+
+        with pytest.raises(ImportError):
+            from pydicom.encoders import RLELosslessEncoder
+
+
+def test_deprecation_warning():
+    msg = (
+        "The 'pydicom.encoders' module will be removed in v4.0, please use "
+        "'from pydicom.pixels import get_encoder' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.encoders import get_encoder as get_foo
