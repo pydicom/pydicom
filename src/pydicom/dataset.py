@@ -1953,6 +1953,9 @@ class Dataset:
         else:
             self.PixelData = encapsulate(encoded)
 
+        # Might have been OW originally but must be OB now
+        self["PixelData"].VR = 'OB'
+
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self["PixelData"].is_undefined_length = True
         self._pixel_array = None
