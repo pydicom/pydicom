@@ -300,6 +300,9 @@ during initialisation and <a class="reference internal" href="../reference/gener
 inherits from it.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">pydicom.encoders</span></code> module has been moved to <a class="reference internal" href="../reference/pixels.encoders.html#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code></a>,
 the original import path will be removed in v4.0</p></li>
+<li><p>Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a <em>Bits Stored</em> of
+6 or 7 produces incorrect results, so attempting to do so now raises an exception.
+<code class="docutils literal notranslate"><span class="pre">pyjpegls</span></code> or <code class="docutils literal notranslate"><span class="pre">pylibjpeg</span></code> with <code class="docutils literal notranslate"><span class="pre">pylibjpeg-libjpeg</span></code> can be used instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2008">#2008</a>)</p></li>
 </ul>
 <section id="removals">
 <h4>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h4>
@@ -469,6 +472,10 @@ returning the previous array instead of creating a new one (<a class="reference 
 <li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> when comparing codes with one of the codes having
 <code class="docutils literal notranslate"><span class="pre">scheme_designator</span></code> set to <code class="docutils literal notranslate"><span class="pre">SRT</span></code> but not being included in the <code class="docutils literal notranslate"><span class="pre">SRT</span></code>
 to <code class="docutils literal notranslate"><span class="pre">SCT</span></code> code mapping (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1994">#1994</a>)</p></li>
+<li><p>Fixed JPEG-LS datasets with a <em>Pixel Representation</em> of 1 returning incorrect
+image data when <em>Bits Stored</em> is less than <em>Bits Allocated</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2009">#2009</a>)</p></li>
+<li><p>Fixed decoding failures for JPEG-LS datasets with <em>Bits Allocated</em> of 16 and
+<em>Bits Stored</em> &lt;= 8 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2010">#2010</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">

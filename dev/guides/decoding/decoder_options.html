@@ -256,6 +256,19 @@ attempt to return an <a class="reference external" href="https://numpy.org/doc/s
 buffer (default <code class="docutils literal notranslate"><span class="pre">False</span></code>). Note that if the original buffer is immutable then
 the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will be read-only.</p></li>
 </ul>
+<p>The following options may be used with encapsulated (compressed) transfer syntaxes
+of the corresponding type when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> using
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>, <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>,
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a>.</p>
+<ul class="simple">
+<li><p><cite>apply_jls_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
+JPEG-LS compressed pixel data and the pixel representation is 1, then convert
+the raw decoded pixel values from unsigned to signed integers.</p></li>
+<li><p><cite>apply_j2k_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
+JPEG 2000 compressed pixel data and the pixel representation doesn’t match the
+signedness given in the JPEG 2000 codestream, then convert the raw decoded
+pixel values to match the pixel representation.</p></li>
+</ul>
 </section>
 <section id="decoding-plugin-options">
 <span id="guide-decoder-plugin-opts"></span><h2>Decoding Plugin Options<a class="headerlink" href="#decoding-plugin-options" title="Link to this heading">¶</a></h2>
