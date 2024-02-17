@@ -18,7 +18,7 @@ from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
-from pydicom.pixels.utils import PhotometricInterpretation as PI
+from pydicom.pixels.utils import PhotometricInterpretation as PI, _get_jpg_parameters
 from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -39,6 +39,7 @@ from pydicom.uid import (
     RLELossless,
     UID,
     JPEG2000TransferSyntaxes,
+    JPEGLSTransferSyntaxes,
 )
 
 
@@ -88,9 +89,14 @@ class DecodeOptions(TypedDict, total=False):
     rle_segment_order: str  # pydicom plugin
     byteorder: str  # pylibjpeg + -rle plugin
 
-    # JPEG2000/HTJ2K decoding options
+    ## JPEG-LS decoding options
+    # Use the JPEG-LS metadata to return an ndarray matched to the expected pixel
+    # representation, otherwise return the decoded data as-is (ndarray only)
+    apply_jls_sign_correction: bool
+
+    ## JPEG2000/HTJ2K decoding options
     # Use the JPEG 2000 metadata to return an ndarray matched to the expected pixel
-    # representation otherwise return the decoded data as-is (ndarray only)
+    # representation, otherwise return the decoded data as-is (ndarray only)
     apply_j2k_sign_correction: bool
 
     ## Processing options (ndarray only)
@@ -132,13 +138,11 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     return arr
 
 
-def _apply_j2k_sign_correction(
-    arr: "np.ndarray", runner: "DecodeRunner"
-) -> "np.ndarray":
+def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
     """Convert `arr` to match the signedness required by the 'pixel_representation'."""
-    # Example:
+    # JPEG 2000 Example:
     # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
-    # J2K codestream: precision 13, signed 0 (unsigned)
+    # J2K codestream: precision 13, signedness 0 (i.e. unsigned)
     #
     # For the raw 13-bit signed integer (value -2000):
     #        1 1000 0011 0000
@@ -161,12 +165,21 @@ def _apply_j2k_sign_correction(
     # If it were encoded correctly as an unsigned integer it would instead be:
     #     0001 1000 0011 0000  (value 6192)
     # Which can be fixed in the same way as for signed integers.
-    j2k_signed = runner.get_option("j2k_is_signed", runner.pixel_representation)
-    precision = runner.get_option("j2k_precision", runner.bits_stored)
-    bit_shift = runner.bits_allocated - precision
-    if bit_shift and j2k_signed != runner.pixel_representation:
-        np.left_shift(arr, bit_shift, out=arr)
-        np.right_shift(arr, bit_shift, out=arr)
+    if runner.transfer_syntax in JPEG2000TransferSyntaxes:
+        j2k_signed = runner.get_option("j2k_is_signed", runner.pixel_representation)
+        precision = runner.get_option("j2k_precision", runner.bits_stored)
+        bit_shift = runner.bits_allocated - precision
+        if bit_shift and j2k_signed != runner.pixel_representation:
+            np.left_shift(arr, bit_shift, out=arr)
+            np.right_shift(arr, bit_shift, out=arr)
+    elif runner.transfer_syntax in JPEGLSTransferSyntaxes:
+        # JPEG-LS has no way to track signedness, so signed integers are
+        #   always decoded as unsigned
+        precision = runner.get_option("jls_precision", runner.bits_stored)
+        bit_shift = runner.bits_allocated - precision
+        if bit_shift:
+            np.left_shift(arr, bit_shift, out=arr)
+            np.right_shift(arr, bit_shift, out=arr)
 
     return arr
 
@@ -210,6 +223,8 @@ class DecodeRunner:
 
         if self.transfer_syntax in JPEG2000TransferSyntaxes:
             self.set_option("apply_j2k_sign_correction", True)
+        elif self.transfer_syntax in JPEGLSTransferSyntaxes:
+            self.set_option("apply_jls_sign_correction", True)
 
     @property
     def bits_allocated(self) -> int:
@@ -273,11 +288,18 @@ class DecodeRunner:
             The decoded frame.
         """
         if self.transfer_syntax in JPEG2000TransferSyntaxes:
-            info = get_j2k_parameters(src)
+            j2k_info = get_j2k_parameters(src)
             self.set_option(
-                "j2k_is_signed", info.get("is_signed", self.pixel_representation)
+                "j2k_is_signed", j2k_info.get("is_signed", self.pixel_representation)
             )
-            self.set_option("j2k_precision", info.get("precision", self.bits_stored))
+            self.set_option(
+                "j2k_precision", j2k_info.get("precision", self.bits_stored)
+            )
+        elif self.transfer_syntax in JPEGLSTransferSyntaxes:
+            jls_info = _get_jpg_parameters(src)
+            self.set_option(
+                "jls_precision", jls_info.get("precision", self.bits_stored)
+            )
 
         # If self._previous is not set then this is the first frame being decoded
         # If self._previous is set, then the previously successful decoder
@@ -788,12 +810,18 @@ class DecodeRunner:
                 and self.get_option("pixel_vr") == "OW"
             )
 
-        if test == "j2k_correction":
-            return (
+        if test == "sign_correction":
+            use_j2k_correction = (
                 self.transfer_syntax in JPEG2000TransferSyntaxes
                 and self.photometric_interpretation in (PI.MONOCHROME1, PI.MONOCHROME2)
                 and self.get_option("apply_j2k_sign_correction", False)
             )
+            use_jls_correction = (
+                self.transfer_syntax in JPEGLSTransferSyntaxes
+                and self.pixel_representation == 1
+                and self.get_option("apply_jls_sign_correction", False)
+            )
+            return use_j2k_correction or use_jls_correction
 
         raise ValueError(f"Unknown test '{test}'")
 
@@ -1075,8 +1103,8 @@ class Decoder:
           <photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
-        * JPEG 2000 encoded data whose signedness doesn't match the expected
-          :ref:`pixel representation<pixel_representation>` will be
+        * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+          expected :ref:`pixel representation<pixel_representation>` will be
           converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
@@ -1177,8 +1205,8 @@ class Decoder:
             as_frame=False if index is None else True,
         )
 
-        if runner._test_for("j2k_correction"):
-            arr = _apply_j2k_sign_correction(arr, runner)
+        if runner._test_for("sign_correction"):
+            arr = _apply_sign_correction(arr, runner)
 
         if raw:
             return arr.copy() if not arr.flags.writeable and as_writeable else arr
@@ -1214,21 +1242,25 @@ class Decoder:
 
         # Return all frames
         # Preallocate container array for the frames
-        bytes_per_frame = runner.frame_length(unit="bytes")
+        # The preallocated array's dtype itemsize is based off the dataset's
+        #   bits allocated value, however each decoded frame may have a smaller
+        #   itemsize if the bits allocated value is modified during decoding
         pixels_per_frame = runner.frame_length(unit="pixels")
         arr = np.empty(pixels_per_frame * runner.number_of_frames, dtype=dtype)
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
             start = idx * pixels_per_frame
-            arr[start : start + pixels_per_frame] = np.frombuffer(frame, dtype=dtype)
+            arr[start : start + pixels_per_frame] = np.frombuffer(
+                frame, dtype=runner.pixel_dtype
+            )
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
         excess = []
         for frame in frame_generator:
-            if len(frame) == bytes_per_frame:
-                excess.append(np.frombuffer(frame, dtype))
+            if len(frame) == runner.frame_length(unit="bytes"):
+                excess.append(np.frombuffer(frame, runner.pixel_dtype))
                 runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
         if excess:
@@ -1545,11 +1577,11 @@ class Decoder:
         bytes | bytearray
             A buffer-like containing the decoded pixel data.
         """
-        length_bytes = runner.frame_length(unit="bytes")
 
         # Return the specified frame only
         if index is not None:
             frame = runner.decode(index=index)
+            length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
@@ -1559,25 +1591,24 @@ class Decoder:
             return frame
 
         # Return all frames
-        # Preallocate buffer for the frames
-        buffer = bytearray(length_bytes * runner.number_of_frames)
+        buffer = bytearray()
         frame_generator = runner.iter_decode()
         for index in range(runner.number_of_frames):
             frame = next(frame_generator)
-            start = index * length_bytes
+            length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
                     f"{index} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
-            buffer[start : start + length_bytes] = frame
+            buffer.extend(frame)
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
         excess = bytearray()
         for frame in frame_generator:
-            if len(frame) == length_bytes:
+            if len(frame) == runner.frame_length(unit="bytes"):
                 excess.extend(frame)
                 runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
@@ -1617,8 +1648,8 @@ class Decoder:
           <photometric_interpretation>` of ``"YBR_FULL_422"`` will
           have it's sub-sampling removed.
         * The output array will be reshaped to the specified dimensions.
-        * JPEG 2000 encoded data whose signedness doesn't match the expected
-          :ref:`pixel representation<pixel_representation>` will be
+        * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+          expected :ref:`pixel representation<pixel_representation>` will be
           converted to match.
 
         If ``raw = False`` (the default) then the following processing operation
@@ -1711,8 +1742,8 @@ class Decoder:
             for frame in runner.iter_decode():
                 arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
                 arr = runner.reshape(arr, as_frame=True)
-                if runner._test_for("j2k_correction"):
-                    arr = _apply_j2k_sign_correction(arr, runner)
+                if runner._test_for("sign_correction"):
+                    arr = _apply_sign_correction(arr, runner)
 
                 if raw:
                     yield arr if arr.flags.writeable else arr.copy()
@@ -1727,8 +1758,8 @@ class Decoder:
         indices = indices if indices else range(runner.number_of_frames)
         for index in indices:
             arr = runner.reshape(func(runner, index), as_frame=True)
-            if runner._test_for("j2k_correction"):
-                arr = _apply_j2k_sign_correction(arr, runner)
+            if runner._test_for("sign_correction"):
+                arr = _apply_sign_correction(arr, runner)
 
             if raw:
                 yield arr.copy() if not arr.flags.writeable and as_writeable else arr

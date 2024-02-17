@@ -7,7 +7,7 @@ import importlib
 import logging
 from pathlib import Path
 from os import PathLike
-from struct import unpack
+from struct import unpack, Struct
 from typing import BinaryIO, Any, Union, cast
 
 try:
@@ -123,8 +123,8 @@ def pixel_array(
       <photometric_interpretation>` of ``"YBR_FULL_422"`` will
       have it's sub-sampling removed.
     * The output array will be reshaped to the specified dimensions.
-    * JPEG 2000 encoded data whose signedness doesn't match the expected
-      :ref:`pixel representation<pixel_representation>` will be
+    * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+      expected :ref:`pixel representation<pixel_representation>` will be
       converted to match.
 
     If ``raw = False`` (the default) then the following processing operation
@@ -268,8 +268,8 @@ def iter_pixels(
       <photometric_interpretation>` of ``"YBR_FULL_422"`` will
       have it's sub-sampling removed.
     * The output array will be reshaped to the specified dimensions.
-    * JPEG 2000 encoded data whose signedness doesn't match the expected
-      :ref:`pixel representation<pixel_representation>` will be
+    * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+      expected :ref:`pixel representation<pixel_representation>` will be
       converted to match.
 
     If ``raw = False`` (the default) then the following processing operation
@@ -549,3 +549,145 @@ def _as_options(ds: "Dataset", opts: dict[str, Any]) -> dict[str, Any]:
         )
 
     return opts
+
+
+# JPEG/JPEG-LS SOF markers
+_SOF = {
+    b"\xFF\xC0",
+    b"\xFF\xC1",
+    b"\xFF\xC2",
+    b"\xFF\xC3",
+    b"\xFF\xC5",
+    b"\xFF\xC6",
+    b"\xFF\xC7",
+    b"\xFF\xC9",
+    b"\xFF\xCA",
+    b"\xFF\xCB",
+    b"\xFF\xCD",
+    b"\xFF\xCE",
+    b"\xFF\xCF",
+    b"\xFF\xF7",
+}
+# JPEG APP markers
+_APP = {
+    b"\xFF\xE0",
+    b"\xFF\xE1",
+    b"\xFF\xE2",
+    b"\xFF\xE3",
+    b"\xFF\xE4",
+    b"\xFF\xE5",
+    b"\xFF\xE6",
+    b"\xFF\xE7",
+    b"\xFF\xE8",
+    b"\xFF\xE9",
+    b"\xFF\xEA",
+    b"\xFF\xEB",
+    b"\xFF\xEC",
+    b"\xFF\xED",
+    b"\xFF\xEE",
+    b"\xFF\xEF",
+}
+_UNPACK_SHORT = Struct(">H").unpack
+
+
+def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
+    """Return a dict containing JPEG or JPEG-LS encoding parameters.
+
+    Parameters
+    ----------
+    src : bytes
+        The JPEG (ISO/IEC 10918-1) or JPEG-LS (ISO/IEC 14495-1) codestream to
+        be parsed.
+
+    Returns
+    -------
+    dict[str, int | dict[bytes, bytes] | list[int]]
+        A dict containing JPEG or JPEG-LS encoding parameters or an empty dict
+        if unable to parse the data. Available parameters are:
+
+        * ``precision``: int
+        * ``height``: int
+        * ``width``: int
+        * ``components``: int
+        * ``component_ids``: list[int]
+        * ``app``: dict[bytes: bytes]
+        * ``interleave_mode``: int, JPEG-LS only
+        * ``lossy_error``: int, JPEG-LS only
+    """
+    info: dict[str, Any] = {}
+    try:
+        # First 2 bytes should be the SOI marker - otherwise wrong format
+        #   or non-conformant (JFIF or SPIFF header)
+        if src[0:2] != b"\xFF\xD8":
+            return info
+
+        # Skip to the SOF0 to SOF15 (JPEG) or SOF55 (JPEG-LS) marker
+        # We skip through any other segments except APP as they sometimes
+        #   contain color space information (such as Adobe's APP14)
+        offset = 2
+        app_markers = {}
+        while (marker := src[offset : offset + 2]) not in _SOF:
+            length = _UNPACK_SHORT(src[offset + 2 : offset + 4])[0]
+            if marker in _APP:
+                # `length` counts from the first byte of the APP length
+                app_markers[marker] = src[offset + 4 : offset + 2 + length]
+
+            offset += length + 2  # at the start of the next marker
+
+        if app_markers:
+            info["app"] = app_markers
+
+        # SOF segment layout is identical for JPEG and JPEG-LS
+        #   2 byte SOF marker
+        #   2 bytes header length
+        #   1 byte precision (bits stored)
+        #   2 bytes rows
+        #   2 bytes columns
+        #   1 byte number of components in frame (samples per pixel)
+        #   for _ in range(number of components):
+        #       1 byte component ID
+        #       4/4 bits horizontal/vertical sampling factors
+        #       1 byte table selector
+        offset += 2  # at the start of the SOF length
+        info["precision"] = src[offset + 2]
+        info["height"] = _UNPACK_SHORT(src[offset + 3 : offset + 5])[0]
+        info["width"] = _UNPACK_SHORT(src[offset + 5 : offset + 7])[0]
+        info["components"] = src[offset + 7]
+
+        # Parse the component IDs - these are sometimes used to denote the color
+        #   space of the input by using ASCII codes for the IDs (such as R G B)
+        offset += 8  # start of the component IDs
+        info["component_ids"] = []
+        for _ in range(info["components"]):
+            info["component_ids"].append(src[offset])
+            offset += 3
+
+        # `offset` is at the start of the next marker
+
+        # If JPEG then return
+        if marker != b"\xFF\xF7":
+            return info
+
+        # Skip to the SOS marker
+        while src[offset : offset + 2] != b"\xFF\xDA":
+            offset += _UNPACK_SHORT(src[offset + 2 : offset + 4])[0] + 2
+
+        # `offset` is at the start of the SOS marker
+
+        # SOS segment layout is the same for JPEG and JPEG-LS
+        #   2 byte SOS marker
+        #   2 bytes header length
+        #   1 byte number of components in scan
+        #   for _ in range(number of components):
+        #       1 byte scan component ID selector
+        #       4/4 bits DC/AC entropy table selectors
+        #   1 byte start spectral selector (JPEG) or NEAR (JPEG-LS)
+        #   1 byte end spectral selector (JPEG) or ILV (JPEG-LS)
+        #   4/4 bits approx bit high/low
+        offset += 5 + src[offset + 4] * 2
+        info["lossy_error"] = src[offset]
+        info["interleave_mode"] = src[offset + 1]
+    except Exception:
+        return {}
+
+    return info

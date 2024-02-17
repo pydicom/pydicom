@@ -94,6 +94,19 @@ when decoding to a NumPy :class:`~numpy.ndarray` using :func:`~pydicom.pixels.pi
   buffer (default ``False``). Note that if the original buffer is immutable then
   the returned :class:`~numpy.ndarray` will be read-only.
 
+The following options may be used with encapsulated (compressed) transfer syntaxes
+of the corresponding type when decoding to a NumPy :class:`~numpy.ndarray` using
+:func:`~pydicom.pixels.pixel_array`, :func:`~pydicom.pixels.iter_pixels`,
+:meth:`Decoder.as_array` or :meth:`Decoder.iter_array`.
+
+* `apply_jls_sign_correction`: :class:`bool` - if ``True`` (default), `src` contains
+  JPEG-LS compressed pixel data and the pixel representation is 1, then convert
+  the raw decoded pixel values from unsigned to signed integers.
+* `apply_j2k_sign_correction`: :class:`bool` - if ``True`` (default), `src` contains
+  JPEG 2000 compressed pixel data and the pixel representation doesn't match the
+  signedness given in the JPEG 2000 codestream, then convert the raw decoded
+  pixel values to match the pixel representation.
+
 
 .. _guide_decoder_plugin_opts:
 

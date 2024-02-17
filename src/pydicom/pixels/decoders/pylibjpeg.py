@@ -5,6 +5,7 @@
 This module is not intended to be used directly.
 """
 
+import math
 from typing import cast
 
 from pydicom import uid
@@ -90,5 +91,10 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
             PI.YBR_RCT,
         ):
             runner.set_option("photometric_interpretation", PI.RGB)
+
+        if tsyntax in uid.JPEGLSTransferSyntaxes and runner.bits_allocated == 16:
+            bits_stored = runner.get_option("jls_precision", runner.bits_stored)
+            bits_allocated = math.ceil(bits_stored / 8) * 8
+            runner.set_option("bits_allocated", bits_allocated)
 
         return frame
