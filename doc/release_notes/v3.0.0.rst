@@ -218,6 +218,8 @@ Fixes
   image data when *Bits Stored* is less than *Bits Allocated* (:issue:`2009`)
 * Fixed decoding failures for JPEG-LS datasets with *Bits Allocated* of 16 and
   *Bits Stored* <= 8 (:issue:`2010`)
+* Fixed the VR not being set correctly with :func:`~pydicom.dataset.Dataset.compress`
+  (:issue:`2013`)
 
 
 Deprecations
