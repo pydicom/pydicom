@@ -40,8 +40,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
             runner.set_option("planar_configuration", 0)
 
     if runner.bits_allocated == 16:
-        bits_stored = runner.get_option("jls_precision", runner.bits_stored)
-        bits_allocated = math.ceil(bits_stored / 8) * 8
+        bits_allocated = math.ceil(info["bits_per_sample"] / 8) * 8
         runner.set_option("bits_allocated", bits_allocated)
 
     return cast(bytearray, buffer)

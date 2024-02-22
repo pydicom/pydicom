@@ -33,7 +33,6 @@ native and compressed (7FE0,0010) *Pixel Data*, (7FE0,0008) *Float Pixel Data* a
 Base decoder classes used by all decoders
 
 .. autosummary::
-    :inherited-members:
    :toctree: generated/
 
    DecodeRunner
