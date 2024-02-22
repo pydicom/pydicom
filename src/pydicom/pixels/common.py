@@ -228,7 +228,7 @@ class CoderBase:
             )
 
         if self._decoder and not self.UID.is_encapsulated:
-            return {}
+            return {}  # type: ignore[return-value]
 
         if self._available:
             return self._available.copy()
