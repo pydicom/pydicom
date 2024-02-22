@@ -11,7 +11,12 @@ except ImportError:
 
 from pydicom import dcmread
 from pydicom.pixels.common import CoderBase, RunnerBase, PhotometricInterpretation as PI
-from pydicom.uid import RLELossless, ExplicitVRLittleEndian, JPEGBaseline8Bit
+from pydicom.uid import (
+    RLELossless,
+    ExplicitVRLittleEndian,
+    JPEGBaseline8Bit,
+    JPEGLSLossless,
+)
 
 from .pixels_reference import RLE_16_1_10F, EXPL_8_3_1F_YBR
 
@@ -465,22 +470,29 @@ class TestCoderBase:
     def test_add_plugin_unavailable(self):
         """Test adding an unavailable plugin."""
         coder = CoderBase(ExplicitVRLittleEndian, decoder=True)
-        coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+        # UID isn't supported by decoder
+        msg = "The 'foo' plugin doesn't support 'Explicit VR Little Endian'"
+        with pytest.raises(ValueError, match=msg):
+            coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+
+        # UID is supported but dependencies not met
+        coder = CoderBase(JPEGLSLossless, decoder=True)
+        coder.add_plugin("foo", ("pydicom.pixels.decoders.pylibjpeg", "_decode_frame"))
         assert "foo" not in coder._available
         assert "foo" in coder._unavailable
-        assert coder._unavailable["foo"] == (
-            "The 'foo' plugin doesn't support 'Explicit VR Little Endian'"
-        )
         coder.remove_plugin("foo")
         assert {} == coder._unavailable
 
+        # UID isn't supported by encoder
         coder = CoderBase(ExplicitVRLittleEndian, decoder=False)
-        coder.add_plugin("foo", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame"))
+        with pytest.raises(ValueError, match=msg):
+            coder.add_plugin("foo", ("pydicom.pixels.encoders.pyjpegls", "_encode_frame"))
+
+        # UID is supported but dependencies not met
+        coder = CoderBase(JPEGLSLossless, decoder=False)
+        coder.add_plugin("foo", ("pydicom.pixels.encoders.pyjpegls", "_encode_frame"))
         assert "foo" not in coder._available
         assert "foo" in coder._unavailable
-        assert coder._unavailable["foo"] == (
-            "The 'foo' plugin doesn't support 'Explicit VR Little Endian'"
-        )
         coder.remove_plugin("foo")
         assert {} == coder._unavailable
 

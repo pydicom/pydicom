@@ -60,13 +60,13 @@ class EncodeRunner(RunnerBase):
     """
 
     def __init__(self, tsyntax: UID) -> None:
-        """Create a new runner for decoding data encoded as `tsyntax`.
+        """Create a new runner for encoding data as `tsyntax`.
 
         Parameters
         ----------
         tsyntax : pydicom.uid.UID
             The transfer syntax UID corresponding to the pixel data to be
-            decoded.
+            encoded.
         """
         self._src: Buffer | np.ndarray
         self._src_type: str
@@ -300,9 +300,6 @@ class EncodeRunner(RunnerBase):
         self._validate_options()
         if self.is_dataset or self.is_buffer:
             self._validate_buffer()
-            if self.is_buffer:
-                return
-
         else:
             self._validate_array()
 
@@ -490,7 +487,8 @@ class Encoder(CoderBase):
 
             With the exception of *RLE Lossless*, this method requires the
             installation of additional packages to perform the actual pixel
-            data encoding. See the encoding documentation for more information.
+            data encoding. See the :doc:`encoding documentation
+            </old/image_data_compression>` for more information.
 
         Parameters
         ----------
@@ -509,10 +507,8 @@ class Encoder(CoderBase):
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
               the uncompressed *Pixel Data* to be encoded.
             * :class:`bytes`: the uncompressed little-endian ordered pixel
-              data. Using ``bytes`` as the `src` will bypass some of the
-              validation checks and is only recommended for advanced users.
-              `src` must also use 1, 2 or 4 bytes per pixel, whichever subset of
-              these is sufficient for the (0028,0103) *Bits Stored* value.
+              data. `src` should use 1, 2, 4 or 8 bytes per pixel, whichever
+              of these is sufficient for the (0028,0103) *Bits Stored* value.
         index : int, optional
             Required when `src` contains multiple frames, this is the index
             of the frame to be encoded.
@@ -600,7 +596,8 @@ class Encoder(CoderBase):
 
             With the exception of *RLE Lossless*, this method requires the
             installation of additional packages to perform the actual pixel
-            data encoding. See the encoding documentation for more information.
+            data encoding. See the :doc:`encoding documentation
+            </old/image_data_compression>` for more information.
 
         Parameters
         ----------
@@ -619,10 +616,8 @@ class Encoder(CoderBase):
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
               the uncompressed *Pixel Data* to be encoded.
             * :class:`bytes`: the uncompressed little-endian ordered pixel
-              data. Using ``bytes`` as the `src` will bypass some of the
-              validation checks and is only recommended for advanced users.
-              `src` must also use 1, 2 or 4 bytes per pixel, whichever subset of
-              these is sufficient for the (0028,0103) *Bits Stored* value.
+              data. `src` should use 1, 2, 4 or 8 bytes per pixel, whichever
+              of these is sufficient for the (0028,0103) *Bits Stored* value.
         validate : bool, optional
             If ``True`` (default) then validate the supplied encoding options
             and pixel data prior to encoding, otherwise if ``False`` no
