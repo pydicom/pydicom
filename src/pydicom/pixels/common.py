@@ -92,11 +92,11 @@ class CoderBase:
                 deps = module.ENCODER_DEPENDENCIES
 
             if self.UID not in deps:
-                self._unavailable[
-                    label
-                ] = f"The '{label}' plugin doesn't support '{self.UID.name}'"
-            else:
-                self._unavailable[label] = deps[self.UID]
+                raise ValueError(
+                    f"The '{label}' plugin doesn't support '{self.UID.name}'"
+                )
+
+            self._unavailable[label] = deps[self.UID]
 
     def add_plugins(self, plugins: list[tuple[str, tuple[str, str]]]) -> None:
         """Add multiple plugins to the class instance.
