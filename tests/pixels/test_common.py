@@ -486,7 +486,9 @@ class TestCoderBase:
         # UID isn't supported by encoder
         coder = CoderBase(ExplicitVRLittleEndian, decoder=False)
         with pytest.raises(ValueError, match=msg):
-            coder.add_plugin("foo", ("pydicom.pixels.encoders.pyjpegls", "_encode_frame"))
+            coder.add_plugin(
+                "foo", ("pydicom.pixels.encoders.pyjpegls", "_encode_frame")
+            )
 
         # UID is supported but dependencies not met
         coder = CoderBase(JPEGLSLossless, decoder=False)
