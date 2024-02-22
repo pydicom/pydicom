@@ -13,6 +13,7 @@ except ImportError:
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
+from pydicom.pixels.encoders.pylibjpeg import is_available
 from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import RLELossless
 
@@ -55,3 +56,8 @@ class TestRLEEncoding:
         )
         assert np.array_equal(ref.newbyteorder(">"), ds.pixel_array)
         assert ref is not ds.pixel_array
+
+
+def test_is_available_unknown_uid():
+    """Test is_available() with an unsupported UID."""
+    assert is_available("1.2.3.4") is False

@@ -1,6 +1,7 @@
 """Tests for pydicom.pixels.encoders.base and Dataset.compress()."""
 
 import importlib
+import logging
 
 import pytest
 
@@ -11,7 +12,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom import config
+from pydicom import config, examples
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.pixels import RLELosslessEncoder
@@ -398,6 +399,22 @@ class TestEncodeRunner:
         )
         with pytest.raises(ValueError, match=msg):
             runner._validate_encoding_profile()
+
+        # Test validation skipped if unknown transfer syntax
+        runner = EncodeRunner("1.2.3.4")
+        opts = {
+            "rows": 3,
+            "columns": 4,
+            "number_of_frames": 1,
+            "samples_per_pixel": 3,
+            "bits_allocated": 24,
+            "bits_stored": 12,
+            "pixel_representation": 0,
+            "photometric_interpretation": PI.RGB,
+            "planar_configuration": 0,
+        }
+        runner.set_options(**opts)
+        runner._validate_encoding_profile()
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -1433,6 +1450,14 @@ class TestEncodeRunner_Encode:
             RLELosslessEncoder.encode(EXPL_16_16_1F.ds, byteorder=">")
 
 
+@pytest.fixture()
+def enable_logging():
+    original = config.debugging
+    config.debugging = True
+    yield
+    config.debugging = original
+
+
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder:
     """Tests for Encoder and related methods."""
@@ -1462,6 +1487,20 @@ class TestEncoder:
         assert {} == enc._available
         assert {} == enc._unavailable
         assert enc._decoder is False
+
+    def test_logging(self, enable_logging, caplog):
+        """Test that the logging works during encode"""
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            self.enc.encode(self.bytes, **self.kwargs)
+            assert "EncodeRunner for 'RLE Lossless'" in caplog.text
+            assert "  byteorder: <" in caplog.text
+
+        caplog.clear()
+
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            next(self.enc.iter_encode(self.bytes, **self.kwargs))
+            assert "EncodeRunner for 'RLE Lossless'" in caplog.text
+            assert "Encoders" in caplog.text
 
     def test_encode_invalid_type_raises(self):
         """Test exception raised if passing invalid type."""
@@ -1529,6 +1568,12 @@ class TestEncoder:
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(self.bytes * 2, **self.kwargs)
 
+        msg = "'index' must be greater than or equal to 0"
+        with pytest.raises(ValueError, match=msg):
+            out = self.enc.encode(
+                self.bytes * 2, index=-1, encoding_plugin="pydicom", **self.kwargs
+            )
+
     def test_bytes_iter_encode(self):
         """Test encoding multiframe bytes with iter_encode"""
         self.kwargs["number_of_frames"] = 2
@@ -1578,6 +1623,12 @@ class TestEncoder:
         )
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(arr, **self.kwargs)
+
+        msg = "'index' must be greater than or equal to 0"
+        with pytest.raises(ValueError, match=msg):
+            out = self.enc.encode(
+                arr, index=-1, encoding_plugin="pydicom", **self.kwargs
+            )
 
     def test_array_iter_encode(self):
         """Test encoding a multiframe array with iter_encode"""
@@ -1730,6 +1781,16 @@ class TestDatasetCompress:
         )
         ds.SamplesPerPixel = 3
         assert np.array_equal(ref, ds.pixel_array)
+
+    def test_planar_configuration_rle(self):
+        """Test that multi-sample data has correct planar configuration."""
+        ds = examples.rgb_color
+        assert ds.SamplesPerPixel == 3
+        assert ds.PlanarConfiguration == 0
+
+        ds.compress(RLELossless, encoding_plugin="pydicom")
+        assert ds.PlanarConfiguration == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
 
 
 @pytest.fixture
