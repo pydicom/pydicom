@@ -1626,9 +1626,7 @@ class TestEncoder:
 
         msg = "'index' must be greater than or equal to 0"
         with pytest.raises(ValueError, match=msg):
-            self.enc.encode(
-                arr, index=-1, encoding_plugin="pydicom", **self.kwargs
-            )
+            self.enc.encode(arr, index=-1, encoding_plugin="pydicom", **self.kwargs)
 
     def test_array_iter_encode(self):
         """Test encoding a multiframe array with iter_encode"""
