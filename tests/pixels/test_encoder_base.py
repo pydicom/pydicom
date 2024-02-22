@@ -1570,7 +1570,7 @@ class TestEncoder:
 
         msg = "'index' must be greater than or equal to 0"
         with pytest.raises(ValueError, match=msg):
-            out = self.enc.encode(
+            self.enc.encode(
                 self.bytes * 2, index=-1, encoding_plugin="pydicom", **self.kwargs
             )
 
@@ -1626,7 +1626,7 @@ class TestEncoder:
 
         msg = "'index' must be greater than or equal to 0"
         with pytest.raises(ValueError, match=msg):
-            out = self.enc.encode(
+            self.enc.encode(
                 arr, index=-1, encoding_plugin="pydicom", **self.kwargs
             )
 
