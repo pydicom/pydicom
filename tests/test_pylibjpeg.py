@@ -401,9 +401,6 @@ def test_unsupported_syntaxes():
         assert syntax not in UNSUPPORTED_SYNTAXES
 
 
-print(not HAVE_PYLIBJPEG, (HAVE_LJ or HAVE_OJ or HAVE_RLE))
-
-
 @pytest.mark.skipif(not HAVE_PYLIBJPEG, reason="pylibjpeg not available")
 class TestHandler:
     """Tests for handling Pixel Data with the handler."""
@@ -867,31 +864,3 @@ class TestRLE:
 
         with pytest.raises(StopIteration):
             next(frame_generator)
-
-
-@pytest.mark.skipif(not TEST_RLE, reason="no -rle plugin")
-class TestRLEEncoding:
-    def test_encode(self):
-        """Test encoding"""
-        ds = dcmread(EXPL)
-        assert "PlanarConfiguration" not in ds
-        expected = get_expected_length(ds, "bytes")
-        assert expected == len(ds.PixelData)
-        ref = ds.pixel_array
-        del ds.PixelData
-        del ds._pixel_array
-        ds.compress(RLELossless, ref, encoding_plugin="pylibjpeg")
-        assert expected > len(ds.PixelData)
-        assert np.array_equal(ref, ds.pixel_array)
-        assert ref is not ds.pixel_array
-
-    def test_encode_bit(self):
-        """Test encoding big-endian src"""
-        ds = dcmread(IMPL)
-        ref = ds.pixel_array
-        del ds._pixel_array
-        ds.compress(
-            RLELossless, ds.PixelData, byteorder=">", encoding_plugin="pylibjpeg"
-        )
-        assert np.array_equal(ref.newbyteorder(">"), ds.pixel_array)
-        assert ref is not ds.pixel_array

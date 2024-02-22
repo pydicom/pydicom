@@ -14,7 +14,7 @@ from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 # Functions for parsing encapsulated data
 def parse_basic_offsets(
-    buffer: bytes | ReadableBuffer, *, endianness: str = "<"
+    buffer: bytes | bytearray | ReadableBuffer, *, endianness: str = "<"
 ) -> list[int]:
     """Return the encapsulated pixel data's basic offset table frame offsets.
 
@@ -22,7 +22,7 @@ def parse_basic_offsets(
 
     Parameters
     ----------
-    buffer : bytes | readable buffer
+    buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, positioned at the
         beginning of the Basic Offset Table. May be :class:`bytes` or an object
         with ``read()``, ``tell()`` and ``seek()`` methods. If the latter then
@@ -42,7 +42,7 @@ def parse_basic_offsets(
     ----------
     :dcm:`DICOM Standard, Part 5, Annex A.4<part05/sect_A.4.html#table_A.4-1>`
     """
-    if isinstance(buffer, bytes):
+    if isinstance(buffer, bytes | bytearray):
         buffer = BytesIO(buffer)
 
     group, elem = unpack(f"{endianness}HH", buffer.read(4))
@@ -65,7 +65,7 @@ def parse_basic_offsets(
 
 
 def parse_fragments(
-    buffer: bytes | ReadableBuffer, *, endianness: str = "<"
+    buffer: bytes | bytearray | ReadableBuffer, *, endianness: str = "<"
 ) -> tuple[int, list[int]]:
     """Return the number of fragments and their positions in `buffer`.
 
@@ -73,7 +73,7 @@ def parse_fragments(
 
     Parameters
     ----------
-    buffer : bytes | readable buffer
+    buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, starting at the first
         byte of item tag for a fragment, such as after the end of the Basic
         Basic Offset Table. May be :class:`bytes` or an object with ``read()``,
@@ -89,7 +89,7 @@ def parse_fragments(
         The number of fragments and the absolute offset position of the first
         byte of the item tag for each fragment in `buffer`.
     """
-    if isinstance(buffer, bytes):
+    if isinstance(buffer, bytes | bytearray):
         buffer = BytesIO(buffer)
 
     start_offset = buffer.tell()
@@ -134,7 +134,7 @@ def parse_fragments(
 
 
 def generate_fragments(
-    buffer: bytes | ReadableBuffer, *, endianness: str = "<"
+    buffer: bytes | bytearray | ReadableBuffer, *, endianness: str = "<"
 ) -> Iterator[bytes]:
     """Yield frame fragments from the encapsulated pixel data in `buffer`.
 
@@ -142,7 +142,7 @@ def generate_fragments(
 
     Parameters
     ----------
-    buffer : bytes | readable buffer
+    buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, starting at the first
         byte of item tag for a fragment, usually this will be after the end
         of the Basic Offset Table. May be :class:`bytes` or an object with
@@ -157,7 +157,7 @@ def generate_fragments(
     bytes
         A pixel data fragment.
     """
-    if isinstance(buffer, bytes):
+    if isinstance(buffer, bytes | bytearray):
         buffer = BytesIO(buffer)
 
     while True:
@@ -193,7 +193,7 @@ def generate_fragments(
 
 
 def generate_fragmented_frames(
-    buffer: bytes | ReadableBuffer,
+    buffer: bytes | bytearray | ReadableBuffer,
     *,
     number_of_frames: int | None = None,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,
@@ -212,7 +212,7 @@ def generate_fragmented_frames(
 
     Parameters
     ----------
-    buffer : bytes | readable buffer
+    buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, positioned at the first
         byte of the basic offset table. May be :class:`bytes` or an object with
         ``read()``, ``tell()`` and ``seek()`` methods. If the latter then the
@@ -237,7 +237,7 @@ def generate_fragmented_frames(
         An encapsulated pixel data frame, with the contents of the tuple the
         frame's fragmented encoded data.
     """
-    if isinstance(buffer, bytes):
+    if isinstance(buffer, bytes | bytearray):
         buffer = BytesIO(buffer)
 
     basic_offsets = parse_basic_offsets(buffer, endianness=endianness)
@@ -442,7 +442,7 @@ def generate_frames(
 
 
 def get_frame(
-    buffer: bytes | ReadableBuffer,
+    buffer: bytes | bytearray | ReadableBuffer,
     index: int,
     *,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,
@@ -462,7 +462,7 @@ def get_frame(
 
     Parameters
     ----------
-    buffer : bytes | readable buffer
+    buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, positioned at the first
         byte of the basic offset table. May be :class:`bytes` or an object
         with ``read()``, ``tell()`` and ``seek()`` methods. If the latter then
@@ -495,7 +495,7 @@ def get_frame(
     ----------
     DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
-    if isinstance(buffer, bytes):
+    if isinstance(buffer, bytes | bytearray):
         buffer = BytesIO(buffer)
 
     # `buffer` is positioned at the start of the basic offsets table

@@ -54,6 +54,9 @@ Changes
   inherits from it.
 * The ``pydicom.encoders`` module has been moved to :mod:`pydicom.pixels.encoders`,
   the original import path will be removed in v4.0
+* Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a *Bits Stored* of
+  6 or 7 produces incorrect results, so attempting to do so now raises an exception.
+  ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`)
 
 
 Removals
@@ -175,8 +178,15 @@ Enhancements
 
 * Added support for decoding HTJ2K transfer syntaxes (:issue:`1848`)
 * Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
-  from a path to a dataset while minimizing memory-usage :func:`~pydicom.pixels.pixel_array`
+  from a path to a dataset while minimizing memory-usage: :func:`~pydicom.pixels.pixel_array`
   and :func:`~pydicom.pixels.iter_pixels`.
+* Added support for the following transfer syntaxes to :meth:`Dataset.compress
+  <pydicom.dataset.Dataset.compress>` (:issue:`1997`):
+
+  * *JPEG-LS Lossless*
+  * *JPEG-LS Near Lossless*
+
+  See the :doc:`JPEG-LS encoding guide</guides/encoding/jpeg_ls>` for more information.
 
 
 Fixes
@@ -204,6 +214,10 @@ Fixes
 * Fixed a ``KeyError`` when comparing codes with one of the codes having
   ``scheme_designator`` set to ``SRT`` but not being included in the ``SRT``
   to ``SCT`` code mapping (:issue:`1994`)
+* Fixed JPEG-LS datasets with a *Pixel Representation* of 1 returning incorrect
+  image data when *Bits Stored* is less than *Bits Allocated* (:issue:`2009`)
+* Fixed decoding failures for JPEG-LS datasets with *Bits Allocated* of 16 and
+  *Bits Stored* <= 8 (:issue:`2010`)
 
 
 Deprecations

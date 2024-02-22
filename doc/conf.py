@@ -74,7 +74,7 @@ autosummary_generate = True
 
 autodoc_default_options = {
     "members": None,
-    "no-inherited-members": None,
+    "inherited-members": True,
 }
 
 # copybutton conf

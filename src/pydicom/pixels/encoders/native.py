@@ -2,9 +2,10 @@
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
 from itertools import groupby
+import math
 from struct import pack
-from typing import Any
 
+from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.uid import RLELossless
 
 
@@ -18,7 +19,7 @@ def is_available(uid: str) -> bool:
     return True
 
 
-def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
+def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes:
     """Wrapper for use with the encoder interface.
 
     Parameters
@@ -38,17 +39,12 @@ def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
     bytes
         An RLE encoded frame.
     """
-    if kwargs.get("byteorder", "<") == ">":
-        raise ValueError(
-            "Unsupported option for the 'pydicom' encoding plugin: "
-            f"\"byteorder = '{kwargs['byteorder']}'\""
-        )
+    if runner.get_option("byteorder", "<") == ">":
+        raise ValueError("Unsupported option \"byteorder = '>'\"")
 
-    samples_per_pixel = kwargs["samples_per_pixel"]
-    bits_allocated = kwargs["bits_allocated"]
-    bytes_allocated = bits_allocated // 8
+    bytes_allocated = math.ceil(runner.bits_allocated / 8)
 
-    nr_segments = bytes_allocated * samples_per_pixel
+    nr_segments = bytes_allocated * runner.samples_per_pixel
     if nr_segments > 15:
         raise ValueError(
             "Unable to encode as the DICOM standard only allows "
@@ -58,10 +54,11 @@ def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
     rle_data = bytearray()
     seg_lengths = []
 
-    for sample_nr in range(samples_per_pixel):
+    columns = runner.columns
+    for sample_nr in range(runner.samples_per_pixel):
         for byte_offset in reversed(range(bytes_allocated)):
             idx = byte_offset + bytes_allocated * sample_nr
-            segment = _encode_segment(src[idx::nr_segments], **kwargs)
+            segment = _encode_segment(src[idx::nr_segments], columns)
             rle_data.extend(segment)
             seg_lengths.append(len(segment))
 
@@ -81,7 +78,7 @@ def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
     return bytes(rle_header + rle_data)
 
 
-def _encode_segment(src: bytes, **kwargs: Any) -> bytearray:
+def _encode_segment(src: bytes, columns: int) -> bytearray:
     """Return `src` as an RLE encoded bytearray.
 
     Each row of the image is encoded separately as required by the DICOM
@@ -93,6 +90,8 @@ def _encode_segment(src: bytes, **kwargs: Any) -> bytearray:
         The little-endian ordered data to be encoded, representing a Byte
         Segment as in the DICOM Standard, Part 5,
         :dcm:`Annex G.2<part05/sect_G.2.html>`.
+    columns : int
+        The number of columns in the image.
 
     Returns
     -------
@@ -102,9 +101,8 @@ def _encode_segment(src: bytes, **kwargs: Any) -> bytearray:
         to be even length.
     """
     out = bytearray()
-    row_length = kwargs["columns"]
-    for idx in range(0, len(src), row_length):
-        out.extend(_encode_row(src[idx : idx + row_length]))
+    for idx in range(0, len(src), columns):
+        out.extend(_encode_row(src[idx : idx + columns]))
 
     # Pad odd length data with a trailing 0x00 byte
     out.extend(b"\x00" * (len(out) % 2))

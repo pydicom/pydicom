@@ -72,5 +72,7 @@
     "JLSL_RGB_ILV0.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSL_RGB_ILV0.dcm",
     "JLSL_RGB_ILV1.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSL_RGB_ILV1.dcm",
     "JLSL_RGB_ILV2.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSL_RGB_ILV2.dcm",
-    "JLSN_RGB_ILV0.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSN_RGB_ILV0.dcm"
+    "JLSN_RGB_ILV0.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSN_RGB_ILV0.dcm",
+    "JLSL_08_07_0_1F.dcm": "https://github.com/pydicom/pydicom-data/raw/831d25636b0aff13916975c493b20d6fadc01d2e/data_store/data/JLSL_08_07_0_1F.dcm",
+    "JLSL_16_15_1_1F.dcm": "https://github.com/pydicom/pydicom-data/raw/eaaec0d930f5e578db5e56892da57a8e63af71d7/data_store/data/JLSL_16_15_1_1F.dcm"
 }

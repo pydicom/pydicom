@@ -79,6 +79,7 @@ from pydicom.uid import (
     RLELossless,
     PYDICOM_IMPLEMENTATION_UID,
     UID,
+    JPEGLSNearLossless,
 )
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
@@ -1820,6 +1821,7 @@ class Dataset:
         encoding_plugin: str = "",
         decoding_plugin: str = "",
         encapsulate_ext: bool = False,
+        jls_error: int | None = None,
         **kwargs: Any,
     ) -> None:
         """Compress and update an uncompressed dataset in-place with the
@@ -1862,13 +1864,23 @@ class Dataset:
 
         **Supported Transfer Syntax UIDs**
 
-        +----------------------+----------+----------------------------------+
-        | UID                  | Plugins  | Encoding Guide                   |
-        +======================+==========+==================================+
-        | *RLE Lossless* -     |pydicom,  | :doc:`RLE Lossless               |
-        | 1.2.840.10008.1.2.5  |pylibjpeg,| </guides/encoding/rle_lossless>` |
-        |                      |gdcm      |                                  |
-        +----------------------+----------+----------------------------------+
+        +---------------------------+----------+----------------------------------+
+        | UID                       | Plugins  | Encoding Guide                   |
+        +===========================+==========+==================================+
+        | *JPEG-LS Lossless* -      |pyjpegls  | :doc:`JPEG-LS Lossless           |
+        | 1.2.840.10008.1.2.4.80    |          | </guides/encoding/jpeg_ls>`      |
+        +---------------------------+----------+----------------------------------+
+        | *JPEG-LS Near Lossless* - |pyjpegls  | :doc:`JPEG-LS Near Lossless      |
+        | 1.2.840.10008.1.2.4.81    |          | </guides/encoding/jpeg_ls>`      |
+        +---------------------------+----------+----------------------------------+
+        | *RLE Lossless* -          |pydicom,  | :doc:`RLE Lossless               |
+        | 1.2.840.10008.1.2.5       |pylibjpeg,| </guides/encoding/rle_lossless>` |
+        |                           |gdcm      |                                  |
+        +---------------------------+----------+----------------------------------+
+
+        .. versionadded:: 3.0
+
+            Added the `jls_error` keyword parameter.
 
         Examples
         --------
@@ -1904,12 +1916,15 @@ class Dataset:
             If ``False`` (default) then an extended offset table
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
+        jls_error : int, optional
+            The allowed absolute compression error in the pixel values (*JPEG-LS
+            Near Lossless* only).
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
         """
-        from pydicom.pixels import get_encoder
+        from pydicom.pixels import get_encoder, as_pixel_options
 
         uid = UID(transfer_syntax_uid)
 
@@ -1923,19 +1938,19 @@ class Dataset:
                 f"{missing}"
             )
 
+        if uid == JPEGLSNearLossless and jls_error is not None:
+            kwargs["jls_error"] = jls_error
+
         if arr is None:
             # Encode the current *Pixel Data*
             frame_iterator = encoder.iter_encode(
-                self,
-                encoding_plugin=encoding_plugin,
-                decoding_plugin=decoding_plugin,
-                **kwargs,
+                self, encoding_plugin=encoding_plugin, **kwargs
             )
         else:
             # Encode from an uncompressed pixel data array
-            kwargs.update(encoder.kwargs_from_ds(self))
+            opts = as_pixel_options(self, **kwargs)
             frame_iterator = encoder.iter_encode(
-                arr, encoding_plugin=encoding_plugin, **kwargs
+                arr, encoding_plugin=encoding_plugin, **opts
             )
 
         # Encode!
@@ -1955,6 +1970,7 @@ class Dataset:
 
         # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self["PixelData"].is_undefined_length = True
+        self["PixelData"].VR = VR_.OB
         self._pixel_array = None
         self._pixel_id = {}
 
@@ -2945,11 +2961,6 @@ class FileDataset(Dataset):
     fileobj_type
         The object type of the file-like the :class:`FileDataset` was read
         from.
-    is_implicit_VR : bool
-        ``True`` if the dataset encoding is implicit VR, ``False`` otherwise.
-    is_little_endian : bool
-        ``True`` if the dataset encoding is little endian byte ordering,
-        ``False`` otherwise.
     timestamp : float or None
         The modification time of the file the :class:`FileDataset` was read
         from, ``None`` if the modification time is not available.

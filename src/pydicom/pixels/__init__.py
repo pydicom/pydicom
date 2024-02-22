@@ -20,5 +20,7 @@ from pydicom.pixels.decoders.base import (
 from pydicom.pixels.encoders.base import (
     get_encoder,
     RLELosslessEncoder,
+    JPEGLSLosslessEncoder,
+    JPEGLSNearLosslessEncoder,
 )
-from pydicom.pixels.utils import pixel_array, iter_pixels
+from pydicom.pixels.utils import pixel_array, iter_pixels, as_pixel_options

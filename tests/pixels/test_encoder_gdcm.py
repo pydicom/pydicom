@@ -1,10 +1,11 @@
-"""Generic tests for RLELosslessEncoder plugins."""
+"""Tests for encoding pixel data with GDCM."""
 
 import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.encoders.gdcm import _rle_encode as gdcm_rle_encode
 from pydicom.pixel_data_handlers.rle_handler import _rle_decode_frame
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
@@ -126,8 +127,18 @@ class TestRLELossless:
         assert ds.PixelRepresentation == 0
         assert ds.PhotometricInterpretation == "MONOCHROME2"
 
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+
         enc = RLELosslessEncoder
-        kwargs = enc.kwargs_from_ds(ds)
         encoded = enc.encode(ds.PixelData, encoding_plugin="gdcm", **kwargs)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
@@ -137,7 +148,6 @@ class TestRLELossless:
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skipif(GDCM_VERSION < [3, 0, 10], reason="GDCM bug")
     def test_cycle_u32_3s_1f(self):
         """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
         ds = dcmread(EXPL_32_3_1F)
@@ -148,8 +158,19 @@ class TestRLELossless:
         assert ds.PhotometricInterpretation == "RGB"
         assert ds.PlanarConfiguration == 0
 
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+
         enc = RLELosslessEncoder
-        kwargs = enc.kwargs_from_ds(ds)
         encoded = enc.encode(ds.PixelData, encoding_plugin="gdcm", **kwargs)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
@@ -161,46 +182,35 @@ class TestRLELossless:
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skipif(GDCM_VERSION >= [3, 0, 10], reason="GDCM bug fixed")
-    def test_cycle_u32_3s_1f_raises(self):
-        """Test that 32-bit, 3 sample/px data raises exception."""
-        ds = dcmread(EXPL_32_3_1F)
-        assert ds.BitsAllocated == 32
-        assert ds.SamplesPerPixel == 3
-
-        enc = RLELosslessEncoder
-        kwargs = enc.kwargs_from_ds(ds)
-        msg = (
-            r"The 'gdcm' plugin is unable to RLE encode 32-bit, 3 samples/px "
-            r"data with GDCM v3.0.9 or older"
-        )
-        with pytest.raises(RuntimeError, match=msg):
-            gdcm_rle_encode(ds.PixelData, **kwargs)
-
     def test_invalid_byteorder_raises(self):
         """Test that big endian source raises exception."""
         ds = dcmread(EXPL_8_1_1F)
-        enc = RLELosslessEncoder
-        kwargs = enc.kwargs_from_ds(ds)
 
         msg = (
-            r"Unable to encode as an exception was raised by the 'gdcm' "
-            r"plugin's encoding function"
+            r"Unable to encode as exceptions were raised by all available "
+            "plugins:\n  gdcm: Unsupported option \"byteorder = '>'\""
         )
         with pytest.raises(RuntimeError, match=msg):
-            enc.encode(ds.PixelData, encoding_plugin="gdcm", byteorder=">", **kwargs)
+            RLELosslessEncoder.encode(ds, encoding_plugin="gdcm", byteorder=">")
 
     def test_above_32bit_raises(self):
         """Test that > 32-bit Bits Allocated raises exception."""
         ds = dcmread(EXPL_8_1_1F)
         enc = RLELosslessEncoder
-        kwargs = enc.kwargs_from_ds(ds)
-        kwargs["bits_allocated"] = 64
-        kwargs["columns"] = 100
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": 100,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": 64,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
 
         msg = (
-            r"Unable to encode as an exception was raised by the 'gdcm' "
-            r"plugin's encoding function"
+            r"Unable to encode as exceptions were raised by all available "
+            "plugins:\n  gdcm: Unable to encode more than 32-bit data"
         )
         with pytest.raises(RuntimeError, match=msg):
             enc.encode(ds.PixelData, encoding_plugin="gdcm", **kwargs)
@@ -218,12 +228,11 @@ class TestRLELossless:
             "photometric_interpretation": "PALETTE COLOR",
             "transfer_syntax_uid": ExplicitVRLittleEndian,
         }
-        msg = (
-            r"An error occurred with the 'gdcm' plugin: "
-            r"unexpected number of fragments found in the 'Pixel Data'"
-        )
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        msg = "Unexpected number of fragments found in the 'Pixel Data'"
         with pytest.raises(RuntimeError, match=msg):
-            gdcm_rle_encode(b"\x00", **kwargs)
+            gdcm_rle_encode(b"\x00", runner)
 
     def test_no_sequence_raises(self):
         """Test that no sequence of fragments raises an exception"""
@@ -236,18 +245,15 @@ class TestRLELossless:
             "pixel_representation": 0,
             "number_of_frames": 1,
             "photometric_interpretation": "PALETTE COLOR",
-            "transfer_syntax_uid": JPEG2000,
         }
-        msg = (
-            r"An error occurred with the 'gdcm' plugin: "
-            r"ImageChangeTransferSyntax.Change\(\) returned a failure result"
-        )
+        runner = EncodeRunner(JPEG2000)
+        runner.set_options(**kwargs)
+        msg = r"ImageChangeTransferSyntax.Change\(\) returned a failure result"
         with pytest.raises(RuntimeError, match=msg):
-            gdcm_rle_encode(b"\x00", **kwargs)
+            gdcm_rle_encode(b"\x00", runner)
 
     def test_invalid_photometric_interpretation_raises(self):
         """Test an invalid photometric interpretation raises exception"""
-        # Its either that or having to debug users getting segfaults
         kwargs = {
             "rows": 1,
             "columns": 1,
@@ -256,12 +262,10 @@ class TestRLELossless:
             "bits_stored": 8,
             "pixel_representation": 0,
             "number_of_frames": 1,
-            "photometric_interpretation": "PALETTE_COLOR",
-            "transfer_syntax_uid": RLELossless,
+            "photometric_interpretation": "PALETTES COLOR",
         }
-        msg = (
-            r"An error occurred with the 'gdcm' plugin: invalid photometric "
-            r"interpretation 'PALETTE_COLOR'"
-        )
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        msg = "Invalid photometric interpretation 'PALETTES COLOR'"
         with pytest.raises(ValueError, match=msg):
-            gdcm_rle_encode(b"\x00", **kwargs)
+            gdcm_rle_encode(b"\x00", runner)

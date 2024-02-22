@@ -1,24 +1,40 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
-from typing import Any, cast
+from typing import cast
 
-from pydicom.uid import RLELossless
+from pydicom.pixels.encoders.base import EncodeRunner
+from pydicom.pixels.utils import _passes_version_check
+from pydicom import uid
 
 try:
     from pylibjpeg.utils import get_pixel_data_encoders
 
-    HAVE_PYLJ = True
+    _ENCODERS = get_pixel_data_encoders()
 except ImportError:
-    HAVE_PYLJ = False
+    _ENCODERS = {}
 
 
 ENCODER_DEPENDENCIES = {
-    RLELossless: ("numpy", "pylibjpeg", "pylibjpeg-rle"),
+    uid.RLELossless: ("numpy", "pylibjpeg>=2.0", "pylibjpeg-rle>=2.0"),
 }
+_RLE_SYNTAXES = [uid.RLELossless]
 
 
-def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
+def is_available(uid: str) -> bool:
+    """Return ``True`` if a pixel data encoder for `uid` is available for use,
+    ``False`` otherwise.
+    """
+    if not _passes_version_check("pylibjpeg", (2, 0)):
+        return False
+
+    if uid in _RLE_SYNTAXES:
+        return _passes_version_check("rle", (2, 0))
+
+    return False
+
+
+def encode_pixel_data(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     """Return the encoded image data in `src`.
 
     Parameters
@@ -33,16 +49,6 @@ def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
     bytes
         The encoded image data.
     """
-    encoder = get_pixel_data_encoders()[kwargs["transfer_syntax_uid"]]
+    encoder = _ENCODERS[runner.transfer_syntax]
 
-    return cast(bytes, encoder(src, **kwargs))
-
-
-def is_available(uid: str) -> bool:
-    """Return ``True`` if a pixel data encoder for `uid` is available for use,
-    ``False`` otherwise.
-    """
-    if not HAVE_PYLJ:
-        return False
-
-    return uid in get_pixel_data_encoders()
+    return cast(bytes, encoder(src, **runner.options))

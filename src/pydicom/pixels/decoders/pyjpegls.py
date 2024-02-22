@@ -4,6 +4,7 @@
 
 This module is not intended to be used directly.
 """
+import math
 from typing import cast
 
 from pydicom import uid
@@ -32,9 +33,15 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     """Return the decoded image data in `src` as a :class:`bytearray`."""
     buffer, info = jpeg_ls.decode_pixel_data(src)
     # Interleave mode 0 is colour-by-plane, 1 and 2 are colour-by-pixel
-    if info["components"] > 1 and info["interleave_mode"] == 0:
-        runner.set_option("planar_configuration", 1)
-    else:
-        runner.set_option("planar_configuration", 0)
+    if info["components"] > 1:
+        if info["interleave_mode"] == 0:
+            runner.set_option("planar_configuration", 1)
+        else:
+            runner.set_option("planar_configuration", 0)
+
+    if runner.bits_allocated == 16:
+        bits_stored = runner.get_option("jls_precision", runner.bits_stored)
+        bits_allocated = math.ceil(bits_stored / 8) * 8
+        runner.set_option("bits_allocated", bits_allocated)
 
     return cast(bytearray, buffer)
