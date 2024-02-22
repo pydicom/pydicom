@@ -139,7 +139,12 @@ class TestRLELossless:
         }
 
         enc = RLELosslessEncoder
-        encoded = enc.encode(ds.PixelData, encoding_plugin="gdcm", **kwargs)
+        encoded = enc.encode(
+            ds.PixelData,
+            encoding_plugin="gdcm",
+            validate=False,
+            **kwargs,
+        )
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -171,7 +176,12 @@ class TestRLELossless:
         }
 
         enc = RLELosslessEncoder
-        encoded = enc.encode(ds.PixelData, encoding_plugin="gdcm", **kwargs)
+        encoded = enc.encode(
+            ds.PixelData,
+            encoding_plugin="gdcm",
+            validate=False,
+            **kwargs,
+        )
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -213,7 +223,7 @@ class TestRLELossless:
             "plugins:\n  gdcm: Unable to encode more than 32-bit data"
         )
         with pytest.raises(RuntimeError, match=msg):
-            enc.encode(ds.PixelData, encoding_plugin="gdcm", **kwargs)
+            enc.encode(ds.PixelData, encoding_plugin="gdcm", validate=False, **kwargs)
 
     def test_encoding_failure_raises(self):
         """Test that a encoding failure result raises an exception"""
