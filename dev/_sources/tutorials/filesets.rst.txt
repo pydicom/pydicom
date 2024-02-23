@@ -110,6 +110,7 @@ To load an existing File-set just pass a DICOMDIR
 
 .. code-block:: python
 
+    >>> from pydicom import dcmread
     >>> from pydicom.fileset import FileSet
     >>> from pydicom.data import get_testdata_file
     >>> path = get_testdata_file("DICOMDIR")
