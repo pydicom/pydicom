@@ -27,11 +27,8 @@ from pydicom.pixel_data_handlers.gdcm_handler import get_pixeldata
 
 HAVE_JLS = bool(importlib.util.find_spec("jpeg_ls"))
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
-HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
 HAVE_GDCM = bool(importlib.util.find_spec("gdcm"))
 
-SKIP_PYLJ = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
-SKIP_GDCM = not (HAVE_NP and HAVE_GDCM)
 SKIP_TEST = not (HAVE_NP and HAVE_JLS)
 
 

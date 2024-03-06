@@ -19,7 +19,6 @@ from pydicom.uid import RLELossless
 
 
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
-HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
 HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
 HAVE_RLE = bool(importlib.util.find_spec("rle"))
 

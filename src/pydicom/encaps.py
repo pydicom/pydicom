@@ -24,10 +24,11 @@ def parse_basic_offsets(
     ----------
     buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, positioned at the
-        beginning of the Basic Offset Table. May be :class:`bytes` or an object
-        with ``read()``, ``tell()`` and ``seek()`` methods. If the latter then
-        after reading it will be positioned at the start of the item tag of the
-        first fragment after the Basic Offset Table.
+        beginning of the Basic Offset Table. May be :class:`bytes`,
+        :class:`bytearray` or an object with ``read()``, ``tell()`` and
+        ``seek()`` methods. If the latter then after reading it will be
+        positioned at the start of the item tag of the first fragment after the
+        Basic Offset Table.
     endianness : str, optional
         If ``"<"`` (default) then the encapsulated data uses little endian
         encoding, otherwise if ``">"`` it uses big endian encoding.
@@ -76,9 +77,9 @@ def parse_fragments(
     buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, starting at the first
         byte of item tag for a fragment, such as after the end of the Basic
-        Basic Offset Table. May be :class:`bytes` or an object with ``read()``,
-        ``tell()`` and ``seek()`` methods. If the latter then the offset will
-        be reset to the starting position afterwards.
+        Basic Offset Table. May be :class:`bytes`, :class:`bytearray` or an
+        object with ``read()``, ``tell()`` and ``seek()`` methods. If the latter
+        then the offset will be reset to the starting position afterwards.
     endianness : str, optional
         If ``"<"`` (default) then the encapsulated data uses little endian
         encoding, otherwise if ``">"`` it uses big endian encoding.
@@ -145,9 +146,10 @@ def generate_fragments(
     buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, starting at the first
         byte of item tag for a fragment, usually this will be after the end
-        of the Basic Offset Table. May be :class:`bytes` or an object with
-        ``read()``, ``tell()`` and ``seek()`` methods. If the latter than the
-        final offset position depends on how many fragments have been yielded.
+        of the Basic Offset Table. May be :class:`bytes`, :class:`bytearray` or
+        an object with ``read()``, ``tell()`` and ``seek()`` methods. If the
+        latter than the final offset position depends on how many fragments have
+        been yielded.
     endianness : str, optional
         If ``"<"`` (default) then the encapsulated data uses little endian
         encoding, otherwise if ``">"`` it uses big endian encoding.
@@ -214,9 +216,10 @@ def generate_fragmented_frames(
     ----------
     buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, positioned at the first
-        byte of the basic offset table. May be :class:`bytes` or an object with
-        ``read()``, ``tell()`` and ``seek()`` methods. If the latter then the
-        final position depends on how many fragmented frames have been yielded.
+        byte of the basic offset table. May be :class:`bytes`,
+        :class:`bytearray` or an object with ``read()``, ``tell()`` and
+        ``seek()`` methods. If the latter then the final position depends on
+        how many fragmented frames have been yielded.
     number_of_frames : int, optional
         Required for multi-frame data when the Basic Offset Table is empty,
         the Extended Offset Table has not been supplied and there are
@@ -405,9 +408,10 @@ def generate_frames(
     ----------
     buffer : bytes | readable buffer
         A buffer containing the encapsulated frame data, starting at the first
-        byte of the basic offset table. May be :class:`bytes` or an object
-        with ``read()``, ``tell()`` and ``seek()`` methods. If the latter
-        then the final offset position depends on the number of yielded frames.
+        byte of the basic offset table. May be :class:`bytes`,
+        :class:`bytearray` or an object with ``read()``, ``tell()`` and
+        ``seek()`` methods. If the latter then the final offset position depends
+        on the number of yielded frames.
     number_of_frames : int, optional
         Required for multi-frame data when the Basic Offset Table is empty,
         the Extended Offset Table has not been supplied and there are
@@ -464,9 +468,10 @@ def get_frame(
     ----------
     buffer : bytes | bytearray | readable buffer
         A buffer containing the encapsulated frame data, positioned at the first
-        byte of the basic offset table. May be :class:`bytes` or an object
-        with ``read()``, ``tell()`` and ``seek()`` methods. If the latter then
-        the buffer will be reset to the starting position if the frame was
+        byte of the basic offset table. May be :class:`bytes`,
+        :class:`bytearray` or an object with ``read()``, ``tell()`` and
+        ``seek()`` methods. If the latter then the buffer will be reset to the
+        starting position if the frame was
         returned successfully.
     index : int
         The index of the frame to be returned, starting at ``0`` for the first
