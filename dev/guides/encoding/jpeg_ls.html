@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JPEG-LS Encoding &mdash; pydicom 3.0.0.dev0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="RLE Lossless Encoding" href="rle_lossless.html" />
+    <link rel="prev" title="Pixel Data Encoding" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0.dev0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decoding/index.html">Pixel Data Decoding</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Encoding</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">JPEG-LS Encoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#valid-image-pixel-parameters">Valid Image Pixel Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#available-plugins">Available Plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rle_lossless.html">RLE Lossless Encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="encoder_plugin_options.html">Encoder Plugins Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="encoder_plugins.html">Pixel Data Encoder Plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli/cli_guide.html">Command-line Interface Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../writing_documentation.html">Writing documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Guides</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Pixel Data Encoding</a></li>
+      <li class="breadcrumb-item active">JPEG-LS Encoding</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="jpeg-ls-encoding">
+<h1>JPEG-LS Encoding<a class="headerlink" href="#jpeg-ls-encoding" title="Link to this heading">¶</a></h1>
+<p>The requirements for JPEG-LS encoding are defined in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.3.html">Section 8.2.3</a> and Annex <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.3.html">A.4.3</a> of Part
+5 of the DICOM Standard. The JPEG-LS compression scheme is defined by <a class="reference external" href="https://www.iso.org/standard/22397.html">ISO/IEC
+14495-1</a>/<a class="reference external" href="https://www.itu.int/rec/T-REC-T.87-199806-I">ITU T.87</a> (the second link has free access).</p>
+<section id="valid-image-pixel-parameters">
+<h2>Valid Image Pixel Parameters<a class="headerlink" href="#valid-image-pixel-parameters" title="Link to this heading">¶</a></h2>
+<p>The table below lists the valid <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a>
+module parameters for <em>Pixel Data</em> encoded using <em>JPEG-LS Lossless</em> or <em>JPEG-LS
+Near-lossless</em> encoding. For an explanation of each parameter and its relationship
+with the <em>Pixel Data</em> see the <a class="reference internal" href="../glossary.html"><span class="doc">glossary of Image Pixel elements</span></a>.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><em>Samples
+per Pixel</em></p></th>
+<th class="head"><p><em>Photometric
+Interpretation</em></p></th>
+<th class="head"><p><em>Pixel
+Representation</em></p></th>
+<th class="head"><p><em>Planar
+Configuration</em></p></th>
+<th class="head"><p><em>Bits
+Allocated</em></p></th>
+<th class="head"><p><em>Bits
+Stored</em></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td rowspan="3"><p>1</p></td>
+<td><p>MONOCHROME1</p></td>
+<td rowspan="2"><p>0 or 1</p></td>
+<td rowspan="3"><p>(absent)</p></td>
+<td rowspan="3"><p>8 or 16</p></td>
+<td rowspan="3"><p>2 to 16</p></td>
+</tr>
+<tr class="row-odd"><td><p>MONOCHROME2</p></td>
+</tr>
+<tr class="row-even"><td><p>PALETTE COLOR <sup>1</sup></p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><p>3</p></td>
+<td><p>RGB</p></td>
+<td rowspan="2"><p>0</p></td>
+<td rowspan="2"><p>0</p></td>
+<td><p>8 or 16</p></td>
+<td><p>2 to 16</p></td>
+</tr>
+<tr class="row-even"><td><p>YBR_FULL</p></td>
+<td><p>8</p></td>
+<td><p>2 to 8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><sup>1</sup> <em>JPEG-LS Lossless</em> only</div>
+</div>
+<section id="pixel-representation">
+<h3>Pixel Representation<a class="headerlink" href="#pixel-representation" title="Link to this heading">¶</a></h3>
+<p>The DICOM Standard allows the use of the <em>JPEG-LS Near Lossless</em> transfer
+syntax with signed pixel data as long as the <em>Photometric Interpretation</em>
+is <code class="docutils literal notranslate"><span class="pre">MONOCHROME1</span></code> or <code class="docutils literal notranslate"><span class="pre">MONOCHROME2</span></code>. In practice, however, this is complicated
+by the way lossy JPEG-LS encoding works:</p>
+<ul class="simple">
+<li><p>JPEG-LS does not track the signedness of the pixel data, so all data is
+assumed to be unsigned during compression</p></li>
+<li><p>JPEG-LS uses the specified absolute pixel value error as the constraint when
+performing lossy encoding (the NEAR parameter - in <em>pydicom</em> this is the
+<cite>jls_error</cite> parameter passed to the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">encoding</span> <span class="pre">functions</span></code></a>)</p></li>
+</ul>
+<p>Because of this, even though a NEAR value of <code class="docutils literal notranslate"><span class="pre">1</span></code> should limit the absolute
+pixel value error to 1 intensity unit, it’s possible to have pixels with an
+absolute error up to the sample bit-depth of the data:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Raw 8-bit value:
+    -128: 0b10000000 (as signed integer)
+     128: 0b10000000 (as unsigned integer)
+
+Possible value after lossy encoding with a NEAR value of 1:
+     127: 0b01111111 (as signed/unsigned integer)
+
+Total error as unsigned: 1 - OK
+Total error as signed: 255 - Very much not OK
+</pre></div>
+</div>
+<p>Signed pixel data values should therefore be limited to the range (MIN + NEAR,
+MAX - NEAR), where MIN and MAX are the minimum and maximum values allowed for
+the given <em>Bits Stored</em> value: <code class="docutils literal notranslate"><span class="pre">-2**(Bits</span> <span class="pre">Stored</span> <span class="pre">-</span> <span class="pre">1)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">2**(Bits</span> <span class="pre">Stored</span> <span class="pre">-</span> <span class="pre">1)</span> <span class="pre">-</span> <span class="pre">1</span></code>. For example, when performing lossy encoding of
+8-bit signed data and a NEAR value of 3 you should limit the pixel data values
+to the range (-128 + 3, 127 - 3).</p>
+<p>Lossless JPEG-LS encoding has no such restriction and the full value range for
+the given <em>Bits Stored</em> can be used with both signed and unsigned pixel data.</p>
+</section>
+<section id="photometric-interpretation">
+<h3>Photometric Interpretation<a class="headerlink" href="#photometric-interpretation" title="Link to this heading">¶</a></h3>
+<p>To ensure you have the correct <em>Photometric Interpretation</em> the uncompressed
+pixel data should already be in the corresponding color space:</p>
+<ul class="simple">
+<li><p>If your uncompressed pixel data is grayscale (intensity) based:</p>
+<ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">MONOCHROME1</span></code> if the minimum intensity value should be displayed as
+white.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">MONOCHROME2</span></code> if the minimum intensity value should be displayed as
+black.</p></li>
+</ul>
+</li>
+<li><p>If your uncompressed pixel data uses a single sample per pixel and is an index
+to the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.5">Red, Green and Blue Palette Color Lookup Tables</a>:</p>
+<ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">PALETTE</span> <span class="pre">COLOR</span></code>.</p></li>
+</ul>
+</li>
+<li><p>If your uncompressed pixel data is in RGB color space:</p>
+<ul>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code> nothing else is required.</p></li>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code></p>
+<ul>
+<li><p>For <em>Bits Allocated</em> and <em>Bits Stored</em> less than or equal to 8: pixel
+data must be <a class="reference internal" href="../../reference/generated/pydicom.pixel_data_handlers.convert_color_space.html#pydicom.pixel_data_handlers.convert_color_space" title="pydicom.pixel_data_handlers.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">YCbCr</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However
+you should keep in mind that the conversion operation is lossy.</p></li>
+<li><p>For <em>Bits Allocated</em> and <em>Bits Stored</em> between 9 and 16 (inclusive):
+pixel data should be downscaled to 8-bit (with <em>Bits Stored</em>, <em>Bits
+Allocated</em> and <em>High Bit</em> updated accordingly) and converted to <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space. Both of these
+operations are lossy.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>If your uncompressed pixel data is in <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space:</p>
+<ul>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code> the pixel data must first be
+<a class="reference internal" href="../../reference/generated/pydicom.pixel_data_handlers.convert_color_space.html#pydicom.pixel_data_handlers.convert_color_space" title="pydicom.pixel_data_handlers.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">RGB</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However the conversion
+operation is lossy.</p></li>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> nothing else is required.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="planar-configuration">
+<h3>Planar Configuration<a class="headerlink" href="#planar-configuration" title="Link to this heading">¶</a></h3>
+<p>If your uncompressed pixel data is in <code class="docutils literal notranslate"><span class="pre">RGB</span></code> or <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> color space then
+you may use a <em>Planar Configuration</em> of either <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code> as JPEG-LS allows
+the use of different interleave modes. While a <em>Planar Configuration</em> of
+<code class="docutils literal notranslate"><span class="pre">1</span></code> (interleave mode 0) may result in better compression ratios, its also
+more likely to result in downstream issues with decoders that expect the more
+common <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> (interleave mode 2) pixel ordering.</p>
+<p>For either case, if the pixel data being encoded is in an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+then each frame should be shaped as (rows, columns, planes). If the pixel data
+being encoded is <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> it must be ordered as:</p>
+<p>With <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> the data is ordered as color-by-pixel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Three 8-bit RGB pixels: (255, 255, 0), (0, 255, 0), (0, 255, 255)</span>
+<span class="c1"># Each pixel is encoded separately the concatenated</span>
+<span class="c1">#       first pixel | second px | third px  |</span>
+<span class="n">src</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\xFF\xFF\x00\x00\xFF\x00\x00\xFF\xFF</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>With <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">1</span></code> the data is ordered as color-by-plane:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Three 8-bit RGB pixels: (255, 255, 0), (0, 255, 0), (0, 255, 255)</span>
+<span class="c1"># Each color channel is encoded separately then concatenated</span>
+<span class="c1">#       red channel | green ch. | blue ch.  |</span>
+<span class="n">src</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\xFF\x00\x00\xFF\xFF\xFF\x00\x00\xFF</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<section id="jpeg-ls-lossless">
+<h3>JPEG-LS Lossless<a class="headerlink" href="#jpeg-ls-lossless" title="Link to this heading">¶</a></h3>
+<p>Losslessly compress unsigned RGB pixel data in-place:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSLossless</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s1">&#39;RGB&#39;</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">8</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">8</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">921600</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSLossless</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~261792</span>
+</pre></div>
+</div>
+<p>Losslessly compress signed greyscale pixel data in-place:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSLossless</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s1">&#39;MONOCHROME2&#39;</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">16</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">16</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">32768</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSLossless</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~14180</span>
+</pre></div>
+</div>
+</section>
+<section id="jpeg-ls-near-lossless">
+<h3>JPEG-LS Near-lossless<a class="headerlink" href="#jpeg-ls-near-lossless" title="Link to this heading">¶</a></h3>
+<p>Lossy compression of unsigned pixel data with a maximum error of 2 pixel
+intensity units:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s1">&#39;RGB&#39;</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">8</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">8</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">921600</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSNearLossless</span><span class="p">,</span> <span class="n">jls_error</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~149188</span>
+</pre></div>
+</div>
+<p>Lossy compression of signed pixel data with a maximum error of 3 pixel
+intensity units:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s1">&#39;MONOCHROME2&#39;</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">16</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">16</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">32768</span>
+
+<span class="c1"># Our pixel data therefore uses signed 16-bit integers with a single channel</span>
+<span class="c1"># We need to make sure the maximum and minimum values are within the allowed</span>
+<span class="c1">#   range (see the section on Pixel Representation near the start of this page)</span>
+<span class="n">jls_error</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># The minimum and maximum sample values for the given *Bits Stored*</span>
+<span class="n">minimum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">maximum</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+
+<span class="c1"># Clip the array so all values are within the limits, you may want to</span>
+<span class="c1"># rescale instead of clipping. For this dataset this isn&#39;t actually</span>
+<span class="c1"># necessary as the pixel data is already within the limits</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">minimum</span> <span class="o">+</span> <span class="n">jls_error</span><span class="p">,</span> <span class="n">maximum</span> <span class="o">-</span> <span class="n">jls_error</span><span class="p">)</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSNearLossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">jls_error</span><span class="o">=</span><span class="n">jls_error</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>  <span class="c1"># ~8508</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="available-plugins">
+<h2>Available Plugins<a class="headerlink" href="#available-plugins" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Encoder</p></th>
+<th class="head" colspan="3"><p>Plugins</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Name</p></th>
+<th class="head"><p>Requires</p></th>
+<th class="head"><p>Added</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSLosslessEncoder</span></code></p></td>
+<td rowspan="2"><p>pyjpegls</p></td>
+<td rowspan="2"><p><a class="reference external" href="https://numpy.org/">numpy</a>,
+<a class="reference external" href="https://github.com/pydicom/pyjpegls">pyjpegls</a></p></td>
+<td rowspan="2"><p>v3.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSNearLosslessEncoder</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Pixel Data Encoding" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rle_lossless.html" class="btn btn-neutral float-right" title="RLE Lossless Encoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -69,6 +69,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../decoding/index.html">Pixel Data Decoding</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Encoding</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="jpeg_ls.html">JPEG-LS Encoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rle_lossless.html">RLE Lossless Encoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugin_options.html">Encoder Plugins Options</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Pixel Data Encoder Plugins</a><ul>
@@ -126,6 +127,11 @@
              
   <section id="pixel-data-encoder-plugins">
 <span id="guide-encoder-plugins"></span><h1>Pixel Data Encoder Plugins<a class="headerlink" href="#pixel-data-encoder-plugins" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This guide is intended for advanced users who need support for something
+not provided by the <a class="reference internal" href="../../reference/pixels.encoders.html"><span class="doc">existing encoder plugins</span></a>.</p>
+</div>
 <p><em>Pixel Data</em> encoding in <em>pydicom</em> uses an <a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a>
 instance for the specific <em>Transfer Syntax</em> as a manager for plugins that
 perform the encoding work. This guide covers the requirements for those plugins
@@ -141,18 +147,27 @@ performs the actual conversion.</p>
 <p>An encoding plugin must implement three objects within the same module:</p>
 <ul>
 <li><p>A function that performs the encoding with the following function signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">runner</span><span class="p">:</span> <span class="n">EncodeRunner</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">bytearray</span><span class="p">:</span>
 </pre></div>
 </div>
-<p>Where</p>
+<p>Where:</p>
 <ul>
 <li><p><cite>src</cite> is the raw uncompressed data to be encoded as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. When
-the data in <cite>src</cite> represents multi-byte values
-(such as 16-bit pixels), then <cite>src</cite> will use little-endian byte
-ordering by default. Support for big-endian byte ordering by the encoding
-function is completely optional.</p></li>
-<li><p><cite>kwargs</cite> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> which at a minimum contains the following
-required keys:</p>
+the data in <cite>src</cite> represents multi-byte values (such as 16-bit pixels), then
+<cite>src</cite> will use little-endian byte ordering by default. Support for big-endian
+byte ordering by the encoding function is completely optional.</p>
+<p>The data in <cite>src</cite> will be sized as:</p>
+<ul class="simple">
+<li><p>1 byte per sample for 0 &lt; <em>Bits Stored</em> &lt;= 8</p></li>
+<li><p>2 bytes per sample for 8 &lt; <em>Bits Stored</em> &lt;= 16</p></li>
+<li><p>4 bytes per sample for 16 &lt; <em>Bits Stored</em> &lt;= 32</p></li>
+<li><p>8 bytes per sample for 32 &lt; <em>Bits Stored</em> &lt;= 64</p></li>
+</ul>
+</li>
+<li><p><cite>runner</cite> is an <a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner" title="pydicom.pixels.encoders.base.EncodeRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncodeRunner</span></code></a> instance
+that manages the encoding process and has access to the encoding options,
+either directly through the class properties or indirectly with the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.get_option" title="pydicom.pixels.encoders.base.EncodeRunner.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> method.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">'transfer_syntax_uid'</span></code>: <a class="reference internal" href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-class docutils literal notranslate"><span class="pre">UID</span></code></a> - the intended
 <em>Transfer Syntax UID</em> of the encoded data.</p></li>
@@ -176,16 +191,20 @@ integers.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'photometric_interpretation'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the intended color space
 of the encoded data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code></p></li>
 </ul>
-<p><cite>kwargs</cite> may also contain optional parameters intended to be used
-with the encoder function to allow customization of the encoding process
-or to provide additional functionality. Support for these optional
-parameters is not required, however.</p>
+<p>If your encoder needs to signal that one of the encoding option values needs
+to be modified then this can be done with the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.set_option" title="pydicom.pixels.encoders.base.EncodeRunner.set_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_option()</span></code></a> method. This
+should only be done after successfully encoding the frame, as if the
+encoding fails changing the option value may cause issues with
+other encoding plugins that may also attempt to encode the same frame. It’s also
+important to be aware that any changes you make will also affect following frames
+(if any).</p>
 </li>
 </ul>
 <p>At a minimum the encoding function must support the encoding of
 little-endian byte ordered data and should return the encoded
 data in a format meeting the requirements of the corresponding <em>Transfer
-Syntax UID</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p>
+Syntax UID</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
 </li>
 <li><p>A function named <code class="docutils literal notranslate"><span class="pre">is_available</span></code> with the following signature:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_available</span><span class="p">(</span><span class="n">uid</span><span class="p">:</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">UID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>

@@ -133,17 +133,18 @@
 <p>It’s assumed that you’re already familiar with the <a class="reference internal" href="../dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
 <p><strong>Prerequisites</strong></p>
 <p>This tutorial uses packages in addition to <em>pydicom</em> that are not installed
-by default, but are required for <em>RLE Lossless</em> compression of <em>Pixel Data</em>.
-For more information on what packages are available to compress a given
-transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html#guide-compression-supported"><span class="std std-ref">image compression guide</span></a>.</p>
+by default, but are required for <em>RLE Lossless</em> and <em>JPEG-LS Near-lossless</em>
+compression of <em>Pixel Data</em>. For more information on what packages are
+available to compress a given transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html#guide-compression-supported"><span class="std std-ref">image compression
+guide</span></a>.</p>
 <p>Installing using pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom&gt;<span class="o">=</span><span class="m">2</span>.2<span class="w"> </span>numpy<span class="w"> </span>pylibjpeg
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom<span class="w"> </span>numpy<span class="w"> </span>pylibjpeg<span class="w"> </span>pyjpegls
 </pre></div>
 </div>
 <p>Installing on conda:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy
-conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom&gt;<span class="o">=</span><span class="m">2</span>.2
-pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg
+conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom
+pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg<span class="w"> </span>pyjpegls
 </pre></div>
 </div>
 <section id="introduction">
@@ -160,9 +161,10 @@ When you factor in other SOP Classes such as <em>Whole Slide Microscopy</em> whi
 uses even larger full color images, the size of the uncompressed <em>Pixel Data</em>
 may get into the gigabyte territory. Being able to compress these images can
 result in significantly reduced file sizes.</p>
-<p>However, with the exception of <em>RLE Lossless</em>, <em>pydicom</em> doesn’t currently
-offer any native support for compression of <em>Pixel Data</em>. This means that it’s
-entirely up to you to compress the <em>Pixel Data</em> in a manner conformant to
+<p><em>pydicom</em> can perform <em>RLE Lossless</em> compression without needing to install any
+additional packages, and can perform <em>JPEG-LS Lossless</em> and <em>JPEG-LS
+Near-lossless</em> compression with the installation of <a class="reference external" href="https://github.com/pydicom/pyjpegls">pyjpegls</a>. For all other transfer syntaxes
+it’s entirely up to you to compress the <em>Pixel Data</em> in a manner conformant to
 the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">requirements of the DICOM Standard</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -219,9 +221,10 @@ dataset, with either the <a class="reference internal" href="../../reference/gen
 </section>
 <section id="compressing-using-pydicom">
 <h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Link to this heading">¶</a></h2>
-<p>Currently, only the <em>RLE Lossless</em> transfer syntax is supported for
-compressing <em>Pixel Data</em> natively using <em>pydicom</em>. The easiest method is to
-pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>:</p>
+<p>The <em>RLE Lossless</em> and <em>JPEG-LS Lossless</em> transfer syntaxes are currently
+supported for lossless compression of <em>Pixel Data</em> using <em>pydicom</em>.
+The easiest compression method is to pass the UID for one of those transfer
+syntaxes to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
@@ -231,6 +234,30 @@ pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="..
 </div>
 <p>This will compress the existing <em>Pixel Data</em> and update the <em>Transfer Syntax
 UID</em> before saving the dataset to file as  <code class="docutils literal notranslate"><span class="pre">ct_rle_lossless.dcm</span></code>.</p>
+<p><em>JPEG-LS Near-lossless</em> is currently the only transfer syntax that supports
+lossy compression, which works similarly to lossless but requires
+passing one or more keyword parameters to control the image quality. In the
+case of <em>JPEG-LS Near-lossless</em> this means the <cite>jls_error</cite> parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSNearLossless</span><span class="p">,</span> <span class="n">jls_error</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will compress the existing <em>Pixel Data</em> with an absolute error of no more
+than 3 pixel intensity units.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><em>pydicom</em> makes no recommendations for specifying the image quality for
+lossy encoding methods. Any examples of lossy encoding are for
+<strong>illustration purposes only</strong>.</p>
+</div>
+<p>Each supported compression method has a corresponding encoding guide that can be
+used to help you understand it’s requirements:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../guides/encoding/rle_lossless.html"><span class="doc">RLE Lossless Encoding Guide</span></a></p></li>
+<li><p><a class="reference internal" href="../../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS Encoding Guide</span></a></p></li>
+</ul>
 <p>If you’re creating a dataset from scratch you can instead pass a
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to be compressed and used as the <em>Pixel Data</em>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -246,17 +273,16 @@ exception:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1697</span>, in <span class="n">compress</span>
+  File <span class="nb">&quot;.../pydicom/src/pydicom/dataset.py&quot;</span>, line <span class="m">1957</span>, in <span class="n">compress</span>
 <span class="w">    </span><span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
-  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1697</span>, in <span class="n">&lt;listcomp&gt;</span>
-<span class="w">    </span><span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
-  File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">382</span>, in <span class="n">iter_encode</span>
-<span class="w">    </span><span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_array</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">209</span>, in <span class="n">_encode_array</span>
-<span class="w">    </span><span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">533</span>, in <span class="n">_preprocess</span>
+<span class="w">              </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+  File <span class="nb">&quot;.../pydicom/pixels/encoders/base.py&quot;</span>, line <span class="m">678</span>, in <span class="n">iter_encode</span>
+<span class="w">    </span><span class="n">runner</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+  File <span class="nb">&quot;.../pydicom/pixels/encoders/base.py&quot;</span>, line <span class="m">304</span>, in <span class="n">validate</span>
+<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">()</span>
+  File <span class="nb">&quot;.../pydicom/pixels/encoders/base.py&quot;</span>, line <span class="m">333</span>, in <span class="n">_validate_array</span>
 <span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="gr">ValueError</span>: <span class="n">Unable to encode as the shape of the ndarray (128, 129) doesn&#39;t match the values for the rows, columns and samples per pixel</span>
+<span class="gr">  ValueError</span>: <span class="n">Mismatch between the expected ndarray shape (128, 128) and the actual shape (128, 129)</span>
 </pre></div>
 </div>
 <p>A specific encoding plugin can be used by passing the plugin name via the
@@ -265,7 +291,7 @@ exception:</p>
 </pre></div>
 </div>
 <p>The plugins available for each encoder are listed in the
-<a class="reference internal" href="../../reference/pixels.encoders.html#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">reference</span></code></a> for the encoder type.</p>
+<a class="reference internal" href="../../reference/pixels.encoders.html"><span class="doc">API reference</span></a> for the encoder type.</p>
 <p>Implicitly changing the compression on an already compressed dataset is not
 currently supported, however it can still be done explicitly by decompressing
 prior to calling <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a>. In the example

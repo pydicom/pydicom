@@ -1,0 +1,6 @@
+﻿pydicom.pixels.as\_pixel\_options
+=================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: as_pixel_options

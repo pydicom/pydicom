@@ -28,7 +28,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pydicom.pixels.encoders.base.RLELosslessEncoder" href="generated/pydicom.pixels.encoders.base.RLELosslessEncoder.html" />
+    <link rel="next" title="pydicom.pixels.encoders.base.JPEGLSLosslessEncoder" href="generated/pydicom.pixels.encoders.base.JPEGLSLosslessEncoder.html" />
     <link rel="prev" title="pydicom.pixels.decoders.base.Decoder" href="generated/pydicom.pixels.decoders.base.Decoder.html" /> 
 </head>
 
@@ -136,32 +136,41 @@
            <div itemprop="articleBody">
              
   <section id="pixel-data-encoders-pydicom-pixels-encoders">
-<span id="api-encoders"></span><h1>Pixel Data Encoders (<a class="reference internal" href="#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code></a>)<a class="headerlink" href="#pixel-data-encoders-pydicom-pixels-encoders" title="Link to this heading">¶</a></h1>
+<span id="api-encoders"></span><h1>Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)<a class="headerlink" href="#pixel-data-encoders-pydicom-pixels-encoders" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a> class instances for compressing
 (7FE0,0010) <em>Pixel Data</em>.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.encoders.base.JPEGLSLosslessEncoder.html#pydicom.pixels.encoders.base.JPEGLSLosslessEncoder" title="pydicom.pixels.encoders.base.JPEGLSLosslessEncoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLSLosslessEncoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> encoder for <em>JPEG-LS Lossless Image Compression</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.80</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.encoders.base.JPEGLSNearLosslessEncoder.html#pydicom.pixels.encoders.base.JPEGLSNearLosslessEncoder" title="pydicom.pixels.encoders.base.JPEGLSNearLosslessEncoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLSNearLosslessEncoder</span></code></a></p></td>
+<td><p>A <em>Pixel Data</em> encoder for <em>JPEG-LS Lossy (Near-Lossless) Image Compression</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.81</span></code></p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.encoders.base.RLELosslessEncoder.html#pydicom.pixels.encoders.base.RLELosslessEncoder" title="pydicom.pixels.encoders.base.RLELosslessEncoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a></p></td>
 <td><p>A <em>Pixel Data</em> encoder for <em>RLE Lossless</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code></p></td>
 </tr>
 </tbody>
 </table>
-<p>Base encoder class used by all encoders</p>
+<p>Base encoder classes used by all encoders</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Encoder</span></code></a>(uid)</p></td>
 <td><p>Factory class for data encoders.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner" title="pydicom.pixels.encoders.base.EncodeRunner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EncodeRunner</span></code></a>(tsyntax)</p></td>
+<td><p>Class for managing the pixel data encoding process.</p></td>
+</tr>
 </tbody>
 </table>
-<span class="target" id="module-pydicom.pixels.encoders"></span></section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="generated/pydicom.pixels.decoders.base.Decoder.html" class="btn btn-neutral float-left" title="pydicom.pixels.decoders.base.Decoder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generated/pydicom.pixels.encoders.base.RLELosslessEncoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.encoders.base.RLELosslessEncoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/pydicom.pixels.encoders.base.JPEGLSLosslessEncoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.encoders.base.JPEGLSLosslessEncoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -4,6 +4,11 @@
 Pixel Data Encoder Plugins
 ==========================
 
+.. note::
+
+    This guide is intended for advanced users who need support for something
+    not provided by the :doc:`existing encoder plugins </reference/pixels.encoders>`.
+
 *Pixel Data* encoding in *pydicom* uses an :class:`~pydicom.pixels.encoders.base.Encoder`
 instance for the specific *Transfer Syntax* as a manager for plugins that
 perform the encoding work. This guide covers the requirements for those plugins
@@ -25,17 +30,26 @@ An encoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      def foo(src: bytes, **kwargs: Any) -> bytes:
+      def foo(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
 
-  Where
+  Where:
 
   * `src` is the raw uncompressed data to be encoded as :class:`bytes`. When
-    the data in `src` represents multi-byte values
-    (such as 16-bit pixels), then `src` will use little-endian byte
-    ordering by default. Support for big-endian byte ordering by the encoding
-    function is completely optional.
-  * `kwargs` is a :class:`dict` which at a minimum contains the following
-    required keys:
+    the data in `src` represents multi-byte values (such as 16-bit pixels), then
+    `src` will use little-endian byte ordering by default. Support for big-endian
+    byte ordering by the encoding function is completely optional.
+
+    The data in `src` will be sized as:
+
+    * 1 byte per sample for 0 < *Bits Stored* <= 8
+    * 2 bytes per sample for 8 < *Bits Stored* <= 16
+    * 4 bytes per sample for 16 < *Bits Stored* <= 32
+    * 8 bytes per sample for 32 < *Bits Stored* <= 64
+
+  * `runner` is an :class:`~pydicom.pixels.encoders.base.EncodeRunner` instance
+    that manages the encoding process and has access to the encoding options,
+    either directly through the class properties or indirectly with the
+    :meth:`~pydicom.pixels.encoders.base.EncodeRunner.get_option` method.
 
     * ``'transfer_syntax_uid'``: :class:`~pydicom.uid.UID` - the intended
       *Transfer Syntax UID* of the encoded data.
@@ -59,15 +73,19 @@ An encoding plugin must implement three objects within the same module:
     * ``'photometric_interpretation'``: :class:`str` - the intended color space
       of the encoded data, such as ``'YBR_FULL'``
 
-    `kwargs` may also contain optional parameters intended to be used
-    with the encoder function to allow customization of the encoding process
-    or to provide additional functionality. Support for these optional
-    parameters is not required, however.
+    If your encoder needs to signal that one of the encoding option values needs
+    to be modified then this can be done with the
+    :meth:`~pydicom.pixels.encoders.base.EncodeRunner.set_option` method. This
+    should only be done after successfully encoding the frame, as if the
+    encoding fails changing the option value may cause issues with
+    other encoding plugins that may also attempt to encode the same frame. It's also
+    important to be aware that any changes you make will also affect following frames
+    (if any).
 
   At a minimum the encoding function must support the encoding of
   little-endian byte ordered data and should return the encoded
   data in a format meeting the requirements of the corresponding *Transfer
-  Syntax UID* as :class:`bytes`.
+  Syntax UID* as :class:`bytes` or :class:`bytearray`.
 
 * A function named ``is_available`` with the following signature:
 

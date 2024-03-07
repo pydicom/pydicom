@@ -35,6 +35,5 @@
       ~Decoder.is_encapsulated
       ~Decoder.is_native
       ~Decoder.missing_dependencies
-      ~Decoder.name
    
    

@@ -298,7 +298,7 @@ modified when writing</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomIO</span></code></a> now requires a readable or writeable buffer
 during initialisation and <a class="reference internal" href="../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomBytesIO</span></code></a> directly
 inherits from it.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">pydicom.encoders</span></code> module has been moved to <a class="reference internal" href="../reference/pixels.encoders.html#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code></a>,
+<li><p>The <code class="docutils literal notranslate"><span class="pre">pydicom.encoders</span></code> module has been moved to <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>,
 the original import path will be removed in v4.0</p></li>
 <li><p>Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a <em>Bits Stored</em> of
 6 or 7 produces incorrect results, so attempting to do so now raises an exception.
@@ -442,8 +442,15 @@ Table and the <em>Number of Frames</em> is incorrect (<a class="reference extern
 </li>
 <li><p>Added support for decoding HTJ2K transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1848">#1848</a>)</p></li>
 <li><p>Added two functions for returning pixel data as a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
-from a path to a dataset while minimizing memory-usage <a class="reference internal" href="../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>
+from a path to a dataset while minimizing memory-usage: <a class="reference internal" href="../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>
 and <a class="reference internal" href="../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>.</p></li>
+<li><p>Added support for the following transfer syntaxes to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1997">#1997</a>):</p>
+<ul class="simple">
+<li><p><em>JPEG-LS Lossless</em></p></li>
+<li><p><em>JPEG-LS Near Lossless</em></p></li>
+</ul>
+<p>See the <a class="reference internal" href="../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS encoding guide</span></a> for more information.</p>
+</li>
 </ul>
 </section>
 <section id="fixes">
@@ -476,6 +483,8 @@ to <code class="docutils literal notranslate"><span class="pre">SCT</span></code
 image data when <em>Bits Stored</em> is less than <em>Bits Allocated</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2009">#2009</a>)</p></li>
 <li><p>Fixed decoding failures for JPEG-LS datasets with <em>Bits Allocated</em> of 16 and
 <em>Bits Stored</em> &lt;= 8 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2010">#2010</a>)</p></li>
+<li><p>Fixed the VR not being set correctly with <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">compress()</span></code></a>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2013">#2013</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">

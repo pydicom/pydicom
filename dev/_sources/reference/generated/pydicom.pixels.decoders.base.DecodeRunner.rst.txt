@@ -40,7 +40,10 @@
       ~DecodeRunner.bits_stored
       ~DecodeRunner.columns
       ~DecodeRunner.extended_offsets
+      ~DecodeRunner.is_array
+      ~DecodeRunner.is_binary
       ~DecodeRunner.is_buffer
+      ~DecodeRunner.is_dataset
       ~DecodeRunner.number_of_frames
       ~DecodeRunner.options
       ~DecodeRunner.photometric_interpretation
