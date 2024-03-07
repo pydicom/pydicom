@@ -1,19 +1,21 @@
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
-from typing import Any, cast
+from typing import cast
 
+from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.uid import RLELossless
 
 try:
     import gdcm
 
+    GDCM_VERSION = tuple(int(x) for x in gdcm.Version.GetVersion().split("."))
     HAVE_GDCM = True
 except ImportError:
     HAVE_GDCM = False
 
 
 ENCODER_DEPENDENCIES = {
-    RLELossless: ("gdcm",),
+    RLELossless: ("gdcm>=3.0.10",),
 }
 
 
@@ -21,13 +23,13 @@ def is_available(uid: str) -> bool:
     """Return ``True`` if a pixel data encoder for `uid` is available for use,
     ``False`` otherwise.
     """
-    if not HAVE_GDCM:
+    if not HAVE_GDCM or GDCM_VERSION < (3, 0, 10):
         return False
 
     return uid in ENCODER_DEPENDENCIES
 
 
-def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
+def encode_pixel_data(src: bytes, runner: EncodeRunner) -> bytes:
     """Return the encoded image data in `src`.
 
     Parameters
@@ -52,16 +54,14 @@ def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
     bytes
         The encoded image data.
     """
-    if kwargs["byteorder"] != "<":
-        raise ValueError(
-            "Unsupported option for the 'gdcm' encoding plugin: "
-            f"\"byteorder = '{kwargs['byteorder']}'\""
-        )
+    byteorder = runner.get_option("byteorder", "<")
+    if byteorder == ">":
+        raise ValueError("Unsupported option \"byteorder = '>'\"")
 
-    return _ENCODERS[kwargs["transfer_syntax_uid"]](src, **kwargs)
+    return _ENCODERS[runner.transfer_syntax](src, runner)
 
 
-def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
+def _rle_encode(src: bytes, runner: EncodeRunner) -> bytes:
     """Return RLE encoded image data from `src`.
 
     Parameters
@@ -85,37 +85,16 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     bytes
         The encoded image data.
     """
-    # Check the parameters are valid for RLE encoding with GDCM
-    rows = kwargs["rows"]
-    columns = kwargs["columns"]
-    samples_per_pixel = kwargs["samples_per_pixel"]
-    pixel_representation = kwargs["pixel_representation"]
-    bits_allocated = kwargs["bits_allocated"]
-    bits_stored = kwargs["bits_stored"]
-    photometric_interpretation = kwargs["photometric_interpretation"]
-
-    # Bug up to v3.0.9 (Apr 2021) in handling 32-bit, 3 sample/px data
-    gdcm_version = [int(c) for c in gdcm.Version.GetVersion().split(".")]
-    if gdcm_version < [3, 0, 10]:
-        if bits_allocated == 32 and samples_per_pixel == 3:
-            raise RuntimeError(
-                "The 'gdcm' plugin is unable to RLE encode 32-bit, 3 "
-                "samples/px data with GDCM v3.0.9 or older"
-            )
-
-    if bits_allocated > 32:
-        raise ValueError(
-            f"The 'gdcm' plugin is unable to encode {bits_allocated}-bit data"
-        )
+    if runner.bits_allocated > 32:
+        raise ValueError("Unable to encode more than 32-bit data")
 
     # Create a gdcm.Image with the uncompressed `src` data
-    pi = gdcm.PhotometricInterpretation.GetPIType(photometric_interpretation)
+    pi = gdcm.PhotometricInterpretation.GetPIType(runner.photometric_interpretation)
 
     # GDCM's null photometric interpretation gets used for invalid values
     if pi == gdcm.PhotometricInterpretation.PI_END:
         raise ValueError(
-            "An error occurred with the 'gdcm' plugin: invalid photometric "
-            f"interpretation '{photometric_interpretation}'"
+            f"Invalid photometric interpretation '{runner.photometric_interpretation}'"
         )
 
     # `src` uses little-endian byte ordering
@@ -126,19 +105,19 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     writer = gdcm.ImageWriter()
     image = writer.GetImage()
     image.SetNumberOfDimensions(2)
-    image.SetDimensions((columns, rows, 1))
+    image.SetDimensions((runner.columns, runner.rows, 1))
     image.SetPhotometricInterpretation(gdcm.PhotometricInterpretation(pi))
     image.SetTransferSyntax(gdcm.TransferSyntax(ts))
 
     pixel_format = gdcm.PixelFormat(
-        samples_per_pixel,
-        bits_allocated,
-        bits_stored,
-        bits_stored - 1,
-        pixel_representation,
+        runner.samples_per_pixel,
+        runner.bits_allocated,
+        runner.bits_stored,
+        runner.bits_stored - 1,
+        runner.pixel_representation,
     )
     image.SetPixelFormat(pixel_format)
-    if samples_per_pixel > 1:
+    if runner.samples_per_pixel > 1:
         # Default `src` is planar configuration 0 (i.e. R1 G1 B1 R2 G2 B2)
         image.SetPlanarConfiguration(0)
 
@@ -151,7 +130,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     converter = gdcm.ImageChangeTransferSyntax()
 
     # Set up the converter with the intended transfer syntax...
-    rle = gdcm.TransferSyntax.GetTSType(kwargs["transfer_syntax_uid"])
+    rle = gdcm.TransferSyntax.GetTSType(runner.transfer_syntax)
     converter.SetTransferSyntax(gdcm.TransferSyntax(rle))
     # ...and image to be converted
     converter.SetInput(image)
@@ -161,7 +140,6 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     result = converter.Change()
     if not result:
         raise RuntimeError(
-            "An error occurred with the 'gdcm' plugin: "
             "ImageChangeTransferSyntax.Change() returned a failure result"
         )
 
@@ -174,10 +152,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     # RLECodec::Code() uses only 1 fragment per frame
     if seq is None or seq.GetNumberOfFragments() != 1:
         # Covers both no sequence and unexpected number of fragments
-        raise RuntimeError(
-            "An error occurred with the 'gdcm' plugin: unexpected number of "
-            "fragments found in the 'Pixel Data'"
-        )
+        raise RuntimeError("Unexpected number of fragments found in the 'Pixel Data'")
 
     fragment = seq.GetFragment(0).GetByteValue().GetBuffer()
     return cast(bytes, fragment.encode("utf-8", "surrogateescape"))

@@ -10,7 +10,7 @@ from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.utils import PhotometricInterpretation as PI
+from pydicom.pixels.common import PhotometricInterpretation as PI
 
 try:
     import gdcm
@@ -22,14 +22,14 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGBaseline8Bit: ("gdcm>=3.0",),
-    uid.JPEGExtended12Bit: ("gdcm>=3.0",),
-    uid.JPEGLossless: ("gdcm>=3.0",),
-    uid.JPEGLosslessSV1: ("gdcm>=3.0",),
-    uid.JPEGLSLossless: ("gdcm>=3.0",),
-    uid.JPEGLSNearLossless: ("gdcm>=3.0",),
-    uid.JPEG2000Lossless: ("gdcm>=3.0",),
-    uid.JPEG2000: ("gdcm>=3.0",),
+    uid.JPEGBaseline8Bit: ("gdcm>=3.0.10",),
+    uid.JPEGExtended12Bit: ("gdcm>=3.0.10",),
+    uid.JPEGLossless: ("gdcm>=3.0.10",),
+    uid.JPEGLosslessSV1: ("gdcm>=3.0.10",),
+    uid.JPEGLSLossless: ("gdcm>=3.0.10",),
+    uid.JPEGLSNearLossless: ("gdcm>=3.0.10",),
+    uid.JPEG2000Lossless: ("gdcm>=3.0.10",),
+    uid.JPEG2000: ("gdcm>=3.0.10",),
 }
 
 
@@ -66,6 +66,22 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
             "GDCM does not support 'JPEG Extended' for samples with 12-bit precision"
         )
 
+    if (
+        tsyntax == uid.JPEGLSNearLossless
+        and runner.pixel_representation == 1
+        and bits_stored < 8
+    ):
+        raise ValueError(
+            "Unable to decode signed lossy JPEG-LS pixel data with a sample "
+            "precision less than 8 bits"
+        )
+
+    if tsyntax in uid.JPEGLSTransferSyntaxes and bits_stored in (6, 7):
+        raise ValueError(
+            "Unable to decode unsigned JPEG-LS pixel data with a sample "
+            "precision of 6 or 7 bits"
+        )
+
     fragment = gdcm.Fragment()
     fragment.SetByteStringValue(src)
 
@@ -82,19 +98,16 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
 
     pi_type = gdcm.PhotometricInterpretation.GetPIType(photometric_interpretation)
     img.SetPhotometricInterpretation(gdcm.PhotometricInterpretation(pi_type))
-    img.SetPlanarConfiguration(runner.planar_configuration)
+    if runner.samples_per_pixel > 1:
+        img.SetPlanarConfiguration(runner.planar_configuration)
 
     ts_type = gdcm.TransferSyntax.GetTSType(str.__str__(tsyntax))
     img.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
 
     if tsyntax in uid.JPEGLSTransferSyntaxes:
-        bits_stored = runner.get_option("jls_precision")
-        if bits_stored in (6, 7):
-            raise ValueError(
-                "Unable to correctly decode JPEG-LS pixel data with a sample "
-                "precision of 6 or 7 bits"
-            )
-
+        # GDCM always returns JPEG-LS data as color-by-pixel
+        runner.set_option("planar_configuration", 0)
+        bits_stored = runner.get_option("jls_precision", bits_stored)
         if runner.bits_allocated == 16:
             bits_allocated = math.ceil(bits_stored / 8) * 8
             runner.set_option("bits_allocated", bits_allocated)
@@ -103,7 +116,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         runner.samples_per_pixel,
         runner.bits_allocated,
         bits_stored,
-        runner.bits_stored - 1,
+        bits_stored - 1,
         runner.pixel_representation,
     )
     img.SetPixelFormat(pixel_format)
@@ -112,10 +125,10 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     frame = img.GetBuffer().encode("utf-8", "surrogateescape")
 
     # GDCM returns YBR_ICT and YBR_RCT as RGB
-    if tsyntax in (
-        uid.JPEG2000Lossless,
-        uid.JPEG2000,
-    ) and photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT):
+    if tsyntax in uid.JPEG2000TransferSyntaxes and photometric_interpretation in (
+        PI.YBR_ICT,
+        PI.YBR_RCT,
+    ):
         runner.set_option("photometric_interpretation", PI.RGB)
 
     return cast(bytes, frame)

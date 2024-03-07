@@ -2,10 +2,9 @@
 """Pixel data decoding."""
 
 from collections.abc import Callable, Iterator, Iterable
-from importlib import import_module
 import logging
-from sys import byteorder
-from typing import Any, TypedDict, BinaryIO, cast
+import sys
+from typing import Any, BinaryIO, cast
 
 try:
     import numpy as np
@@ -18,7 +17,14 @@ from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
-from pydicom.pixels.utils import PhotometricInterpretation as PI, _get_jpg_parameters
+from pydicom.pixels.common import (
+    Buffer,
+    RunnerBase,
+    RunnerOptions,
+    CoderBase,
+    PhotometricInterpretation as PI,
+)
+from pydicom.pixels.utils import _get_jpg_parameters
 from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -46,35 +52,13 @@ from pydicom.uid import (
 LOGGER = logging.getLogger(__name__)
 
 
-Buffer = bytes | bytearray | memoryview
 DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
 ProcessingFunction = Callable[["np.ndarray", "DecodeRunner"], "np.ndarray"]
 
 
-class DecodeOptions(TypedDict, total=False):
+class DecodeOptions(RunnerOptions, total=False):
     """Options accepted by DecodeRunner and decoding plugins"""
 
-    ## Pixel data description options
-    # Required
-    bits_allocated: int
-    bits_stored: int
-    columns: int
-    number_of_frames: int
-    photometric_interpretation: str
-    pixel_keyword: str
-    rows: int
-    samples_per_pixel: int
-    transfer_syntax_uid: UID
-
-    # Conditionally required
-    # Required if `pixel_keyword` is "PixelData"
-    pixel_representation: int
-    # Required if native transfer syntax and samples_per_pixel > 1
-    planar_configuration: int
-
-    # Optional
-    # The Extended Offset Table values - used with encapsulated transfer syntaxes
-    extended_offsets: tuple[bytes, bytes] | tuple[list[int], list[int]]
     # The VR used for the pixel data - may be used with Explicit VR Big Endian
     pixel_vr: str
 
@@ -168,7 +152,7 @@ def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.nda
     if runner.transfer_syntax in JPEG2000TransferSyntaxes:
         j2k_signed = runner.get_option("j2k_is_signed", runner.pixel_representation)
         precision = runner.get_option("j2k_precision", runner.bits_stored)
-        bit_shift = runner.bits_allocated - precision
+        bit_shift = 8 * arr.dtype.itemsize - precision
         if bit_shift and j2k_signed != runner.pixel_representation:
             np.left_shift(arr, bit_shift, out=arr)
             np.right_shift(arr, bit_shift, out=arr)
@@ -176,7 +160,7 @@ def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.nda
         # JPEG-LS has no way to track signedness, so signed integers are
         #   always decoded as unsigned
         precision = runner.get_option("jls_precision", runner.bits_stored)
-        bit_shift = runner.bits_allocated - precision
+        bit_shift = 8 * arr.dtype.itemsize - precision
         if bit_shift:
             np.left_shift(arr, bit_shift, out=arr)
             np.right_shift(arr, bit_shift, out=arr)
@@ -188,7 +172,7 @@ def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.nda
 PROCESSORS: list[ProcessingFunction] = [_process_color_space]
 
 
-class DecodeRunner:
+class DecodeRunner(RunnerBase):
     """Class for managing the pixel data decoding process.
 
     .. versionadded:: 3.0
@@ -213,6 +197,7 @@ class DecodeRunner:
             "transfer_syntax_uid": tsyntax,
             "as_rgb": True,
         }
+        self._undeletable = ("transfer_syntax_uid", "pixel_keyword")
         self._decoders: dict[str, DecodeFunction] = {}
         self._previous: tuple[str, DecodeFunction]
 
@@ -225,30 +210,6 @@ class DecodeRunner:
             self.set_option("apply_j2k_sign_correction", True)
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
             self.set_option("apply_jls_sign_correction", True)
-
-    @property
-    def bits_allocated(self) -> int:
-        """Return the expected number of bits allocated used by the data."""
-        if (value := self._opts.get("bits_allocated", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'bits_allocated' has been set")
-
-    @property
-    def bits_stored(self) -> int:
-        """Return the expected number of bits stored used by the data."""
-        if (value := self._opts.get("bits_stored", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'bits_stored' has been set")
-
-    @property
-    def columns(self) -> int:
-        """Return the expected number of columns in the data."""
-        if (value := self._opts.get("columns", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'columns' has been set")
 
     def decode(self, index: int) -> bytes | bytearray:
         """Decode the frame of pixel data at `index`.
@@ -332,71 +293,6 @@ class DecodeRunner:
             f"plugins:\n  {messages}"
         )
 
-    def del_option(self, name: str) -> None:
-        """Delete option `name` from the runner."""
-        if name in ("transfer_syntax_uid", "pixel_keyword"):
-            raise ValueError(f"Deleting '{name}' is not allowed")
-
-        self._opts.pop(name, None)  # type: ignore[misc]
-
-    @property
-    def extended_offsets(
-        self,
-    ) -> tuple[list[int], list[int]] | tuple[bytes, bytes] | None:
-        """Return the extended offsets table and lengths
-
-        Returns
-        -------
-        tuple[list[int], list[int]] | tuple[bytes, bytes] | None
-            Returns the extended offsets and lengths as either lists of int
-            or their equivalent encoded values, or ``None`` if no extended
-            offsets have been set.
-        """
-        return self._opts.get("extended_offsets", None)
-
-    def frame_length(self, unit: str = "bytes") -> int:
-        """Return the expected length (in number of bytes or pixels) of each
-        frame of pixel data.
-
-        Parameters
-        ----------
-        unit: str, optional
-            If ``"bytes"`` then returns the expected length of the pixel data
-            in whole bytes and NOT including an odd length trailing NULL
-            padding byte. If ``"pixels"`` then returns the expected length of
-            the pixel data in terms of the total number of pixels (default
-            ``"bytes"``).
-
-        Returns
-        -------
-        int
-            The expected length of a single frame of pixel data in either
-            whole bytes or pixels, excluding the NULL trailing padding byte
-            for odd length data.
-        """
-        length = self.rows * self.columns * self.samples_per_pixel
-
-        if unit == "pixels":
-            return length
-
-        # Correct for the number of bytes per pixel
-        if self.bits_allocated == 1:
-            # Determine the nearest whole number of bytes needed to contain
-            #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
-            #   are packed into 12.5 -> 13 bytes
-            length = length // 8 + (length % 8 > 0)
-        else:
-            length *= self.bits_allocated // 8
-
-        # DICOM Standard, Part 4, Annex C.7.6.3.1.2 - native only
-        if (
-            self.photometric_interpretation == PI.YBR_FULL_422
-            and not self.transfer_syntax.is_encapsulated
-        ):
-            length = length // 3 * 2
-
-        return length
-
     def get_data(self, src: Buffer | BinaryIO, offset: int, length: int) -> bytes:
         """Return `length` bytes from `src`, starting at `offset`.
 
@@ -416,7 +312,7 @@ class DecodeRunner:
             The data from `src`, may return fewer bytes if the end of `src` is
             reached before ``offset + length``.
         """
-        if self.is_buffer:
+        if self.is_dataset or self.is_buffer:
             src = cast(Buffer, src)
             return src[offset : offset + length]
 
@@ -427,20 +323,9 @@ class DecodeRunner:
         src.seek(file_offset)
         return buffer
 
-    def get_option(self, name: str, default: Any = None) -> Any:
-        """Return the value of the option `name`."""
-        return self._opts.get(name, default)
-
-    @property
-    def is_buffer(self) -> bool:
-        """Return ``True`` if the :attr:`src` type is a buffer-like, ``False``
-        if it is a file-like.
-        """
-        return self._src_type == "Buffer"
-
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data."""
-        if not self.is_buffer:
+        if self.is_binary:
             file_offset = cast(BinaryIO, self.src).tell()
 
         # For encapsulated data `self.src` should not be memoryview as doing so
@@ -467,29 +352,8 @@ class DecodeRunner:
             # Otherwise try all decoders
             yield self._decode_frame(src)
 
-        if not self.is_buffer:
+        if self.is_binary:
             cast(BinaryIO, self.src).seek(file_offset)
-
-    @property
-    def number_of_frames(self) -> int:
-        """Return the expected number of frames in the data."""
-        if (value := self._opts.get("number_of_frames", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'number_of_frames' has been set")
-
-    @property
-    def options(self) -> DecodeOptions:
-        """Return a reference to the runner's decoding options dict."""
-        return self._opts
-
-    @property
-    def photometric_interpretation(self) -> str:
-        """Return the expected photometric interpretation of the data."""
-        if (value := self._opts.get("photometric_interpretation", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'photometric_interpretation' has been set")
 
     @property
     def pixel_dtype(self) -> "np.dtype":
@@ -528,47 +392,11 @@ class DecodeRunner:
                 )
 
         # Correct for endianness of the system vs endianness of the dataset
-        if self.transfer_syntax.is_little_endian != (byteorder == "little"):
+        if self.transfer_syntax.is_little_endian != (sys.byteorder == "little"):
             # 'S' swap from current to opposite
             dtype = dtype.newbyteorder("S")
 
         return dtype
-
-    @property
-    def pixel_keyword(self) -> str:
-        """Return the expected pixel keyword of the data.
-
-        Returns
-        -------
-        str
-            One of ``"PixelData"``, ``"FloatPixelData"``, ``"DoubleFloatPixelData"``
-        """
-        if (value := self._opts.get("pixel_keyword", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'pixel_keyword' has been set")
-
-    @property
-    def pixel_representation(self) -> int:
-        """Return the expected pixel representation of the data."""
-        if (value := self._opts.get("pixel_representation", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'pixel_representation' has been set")
-
-    @property
-    def planar_configuration(self) -> int:
-        """Return the expected planar configuration of the data."""
-        # Only required when number of samples is more than 1
-        # Uncompressed may be either 0 or 1
-        if (value := self._opts.get("planar_configuration", None)) is not None:
-            return value
-
-        # Planar configuration is not relevant for compressed syntaxes
-        if self.transfer_syntax.is_compressed:
-            return 0
-
-        raise AttributeError("No value for 'planar_configuration' has been set")
 
     def process(self, arr: "np.ndarray") -> "np.ndarray":
         """Return `arr` after applying zero or more processing operations.
@@ -635,22 +463,6 @@ class DecodeRunner:
         arr = arr.reshape(samples_per_pixel, rows, columns)
         return arr.transpose(1, 2, 0)
 
-    @property
-    def rows(self) -> int:
-        """Return the expected number of rows in the data."""
-        if (value := self._opts.get("rows", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'rows' has been set")
-
-    @property
-    def samples_per_pixel(self) -> int:
-        """Return the expected number of samples per pixel in the data."""
-        if (value := self._opts.get("samples_per_pixel", None)) is not None:
-            return value
-
-        raise AttributeError("No value for 'samples_per_pixel' has been set")
-
     def set_decoders(self, decoders: dict[str, DecodeFunction]) -> None:
         """Set the decoders use for decoding compressed pixel data.
 
@@ -663,71 +475,16 @@ class DecodeRunner:
         if hasattr(self, "_previous"):
             del self._previous
 
-    def set_source(self, src: Buffer | Dataset | BinaryIO) -> None:
-        """Set the pixel data to be decoded.
-
-        Parameters
-        ----------
-        src : bytes | bytearray | memoryview | pydicom.dataset.Dataset
-            If a buffer-like then the encoded pixel data, otherwise the
-            :class:`~pydicom.dataset.Dataset` containing the pixel data and
-            associated group ``0x0028`` elements.
-        """
-        if isinstance(src, Dataset):
-            self._set_options_ds(src)
-            self._src = src[self.pixel_keyword].value
-            self._src_type = "Buffer"
-        elif hasattr(src, "read"):
-            self._src = src
-            self._src_type = "BinaryIO"
-        else:
-            self._src = src
-            self._src_type = "Buffer"
-
-    def set_option(self, name: str, value: Any) -> None:
-        """Set a decoding option.
-
-        Parameters
-        ----------
-        name : str
-            The name of the option to be set.
-        value : Any
-            The value of the option.
-        """
-        if name == "number_of_frames":
-            value = int(value) if isinstance(value, str) else value
-            if value in (None, 0):
-                value = 1
-        elif name == "photometric_interpretation":
-            if value == "PALETTE COLOR":
-                value = PI.PALETTE_COLOR
-            try:
-                value = PI[value]
-            except KeyError:
-                pass
-
-        self._opts[name] = value  # type: ignore[literal-required]
-
-    def set_options(self, **kwargs: DecodeOptions) -> None:
-        """Set decoding options.
-
-        Parameters
-        ----------
-        kwargs : dict[str, Any]
-            A dictionary containing the options as ``{name: value}``, where
-            `name` is the name of the option and `value` is it's value.
-        """
-        for name, value in kwargs.items():
-            self.set_option(name, value)
-
     def _set_options_ds(self, ds: "Dataset") -> None:
-        """Set decoding options using a dataset.
+        """Set options using a dataset.
 
         Parameters
         ----------
         ds : pydicom.dataset.Dataset
             The dataset to use.
         """
+        super()._set_options_ds(ds)
+
         file_meta = getattr(ds, "file_meta", {})
         if tsyntax := file_meta.get("TransferSyntaxUID", None):
             if tsyntax != self.transfer_syntax:
@@ -735,16 +492,6 @@ class DecodeRunner:
                     f"The dataset's transfer syntax '{tsyntax.name}' doesn't "
                     "match the pixel data decoder"
                 )
-
-        self.set_option("bits_allocated", ds.BitsAllocated)  # US
-        self.set_option("bits_stored", ds.BitsStored)  # US
-        self.set_option("columns", ds.Columns)  # US
-        self.set_option("number_of_frames", ds.get("NumberOfFrames", 1))  # IS
-        self.set_option(
-            "photometric_interpretation", ds.PhotometricInterpretation
-        )  # CS
-        self.set_option("rows", ds.Rows)  # US
-        self.set_option("samples_per_pixel", ds.SamplesPerPixel)  # US
 
         keywords = ["PixelData", "FloatPixelData", "DoubleFloatPixelData"]
         px_keyword = [kw for kw in keywords if kw in ds]
@@ -759,27 +506,30 @@ class DecodeRunner:
                 "One and only one of 'Pixel Data', 'Float Pixel Data' or "
                 "'Double Float Pixel Data' may be present in the dataset"
             )
+
         self.set_option("pixel_keyword", px_keyword[0])
         self.set_option("pixel_vr", ds[px_keyword[0]].VR)
 
-        if px_keyword[0] == "PixelData":
-            self.set_option("pixel_representation", ds.PixelRepresentation)
-        else:
-            self.del_option("pixel_representation")
+    def set_source(self, src: Buffer | Dataset | BinaryIO) -> None:
+        """Set the pixel data to be decoded.
 
-        if self.samples_per_pixel > 1:
-            self.set_option("planar_configuration", ds.PlanarConfiguration)  # US
+        Parameters
+        ----------
+        src : bytes | bytearray | memoryview | pydicom.dataset.Dataset
+            If a buffer-like then the encoded pixel data, otherwise the
+            :class:`~pydicom.dataset.Dataset` containing the pixel data and
+            associated group ``0x0028`` elements.
+        """
+        if isinstance(src, Dataset):
+            self._set_options_ds(src)
+            self._src = src[self.pixel_keyword].value
+            self._src_type = "Dataset"
+        elif hasattr(src, "read"):
+            self._src = src
+            self._src_type = "BinaryIO"
         else:
-            self.del_option("planar_configuration")
-
-        # Encapsulation - Extended Offset Table
-        if "ExtendedOffsetTable" in ds and "ExtendedOffsetTableLengths" in ds:
-            self.set_option(
-                "extended_offsets",
-                (ds.ExtendedOffsetTable, ds.ExtendedOffsetTableLengths),
-            )
-        else:
-            self.del_option("extended_offsets")
+            self._src = src
+            self._src_type = "Buffer"
 
     @property
     def src(self) -> Buffer | BinaryIO:
@@ -825,15 +575,10 @@ class DecodeRunner:
 
         raise ValueError(f"Unknown test '{test}'")
 
-    @property
-    def transfer_syntax(self) -> UID:
-        """Return the expected transfer syntax corresponding to the data."""
-        return self._opts["transfer_syntax_uid"]
-
     def validate(self) -> None:
         """Validate the decoding options and source buffer (if any)."""
         self._validate_options()
-        if self.is_buffer:
+        if self.is_dataset or self.is_buffer:
             self._validate_buffer()
 
     def _validate_buffer(self) -> None:
@@ -846,8 +591,8 @@ class DecodeRunner:
             if actual in (expected, expected + expected % 2):
                 warn_and_log(
                     "The number of bytes of compressed pixel data matches the "
-                    "expected number for uncompressed data - check you have "
-                    "set the correct transfer syntax"
+                    "expected number for uncompressed data - check that the "
+                    "transfer syntax has been set correctly"
                 )
 
             return
@@ -870,8 +615,9 @@ class DecodeRunner:
                     raise ValueError(
                         "The number of bytes of pixel data is a third larger "
                         f"than expected ({actual} vs {expected} bytes) which "
-                        "indicates the set photometric interpretation "
-                        "'YBR_FULL_422' is incorrect"
+                        "indicates the set (0028,0004) 'Photometric Interpretation' "
+                        "value of 'YBR_FULL_422' is incorrect and may need to be "
+                        "changed to either 'RGB' or 'YBR_FULL'"
                     )
 
             # PS 3.5, Section 8.1.1
@@ -883,107 +629,21 @@ class DecodeRunner:
 
     def _validate_options(self) -> None:
         """Validate the supplied options to ensure they meet minimum requirements."""
-        # Minimum required
-        required_keys = [
-            "bits_allocated",
-            "bits_stored",
-            "columns",
-            "number_of_frames",
-            "photometric_interpretation",
-            "pixel_keyword",
-            "rows",
-            "samples_per_pixel",
-        ]
-        missing = [k for k in required_keys if k not in self._opts]
-        if missing:
-            raise AttributeError(f"Missing expected options: {', '.join(missing)}")
+        super()._validate_options()
 
-        if not 1 <= self.bits_allocated <= 64:
-            raise ValueError(
-                f"A bits allocated value of '{self.bits_allocated}' is invalid, "
-                "it must be in the range (1, 64)"
-            )
-
-        if self.bits_allocated != 1 and self.bits_allocated % 8:
-            raise ValueError(
-                f"A bits allocated value of '{self.bits_allocated}' is invalid, "
-                "it must be 1 or a multiple of 8"
-            )
-
-        if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
-            raise ValueError(
-                f"A bits stored value of '{self.bits_stored}' is invalid, it "
-                "must be in the range (1, 64) and no greater than the bits "
-                f"allocated value of {self.bits_allocated}"
-            )
-
-        if not 0 < self.columns <= 2**16 - 1:
-            raise ValueError(
-                f"A columns value of '{self.columns}' is invalid, it must be in "
-                "the range (1, 65535)"
-            )
-
-        if self.number_of_frames < 1:
-            raise ValueError(
-                f"A number of frames value of '{self.number_of_frames}' is "
-                "invalid, it must be greater than or equal to 1"
-            )
-
-        try:
-            PI[self.photometric_interpretation]
-        except KeyError:
-            if self.photometric_interpretation != "PALETTE COLOR":
-                raise ValueError(
-                    f"Unknown photometric interpretation '{self.photometric_interpretation}'"
-                )
-
-        if self.pixel_keyword not in (
-            "PixelData",
-            "FloatPixelData",
-            "DoubleFloatPixelData",
+        # The Extended Offset Table is optional
+        if self.extended_offsets and len(self.extended_offsets[0]) != len(
+            self.extended_offsets[1]
         ):
-            raise ValueError(f"Unknown pixel data keyword '{self.pixel_keyword}'")
-
-        if self.pixel_keyword == "PixelData":
-            if self.get_option("pixel_representation") is None:
-                raise AttributeError("Missing expected option: pixel_representation")
-
-            if self.pixel_representation not in (0, 1):
-                raise ValueError(
-                    f"A pixel representation value of '{self.pixel_representation}' "
-                    "is invalid, it must be 0 or 1"
-                )
-
-        if not 0 < self.rows <= 2**16 - 1:
-            raise ValueError(
-                f"A rows value of '{self.rows}' is invalid, it must be in the "
-                "range (1, 65535)"
+            warn_and_log(
+                "The number of items in (7FE0,0001) 'Extended Offset Table' and "
+                "(7FE0,0002) 'Extended Offset Table Lengths' don't match - the "
+                "extended offset table will be ignored"
             )
-
-        if self.samples_per_pixel not in (1, 3):
-            raise ValueError(
-                f"A samples per pixel value of '{self.samples_per_pixel}' is "
-                "invalid, it must be 1 or 3"
-            )
-
-        if self.samples_per_pixel == 3:
-            if self.get_option("planar_configuration") is None:
-                raise AttributeError("Missing expected option: planar_configuration")
-
-            if self.planar_configuration not in (0, 1):
-                raise ValueError(
-                    f"A planar configuration value of '{self.planar_configuration}' "
-                    "is invalid, it must be 0 or 1"
-                )
-
-        if self.extended_offsets:
-            if len(self.extended_offsets[0]) != len(self.extended_offsets[1]):
-                raise ValueError(
-                    "There must be an equal number of extended offsets and offset lengths"
-                )
+            self.del_option("extended_offsets")
 
 
-class Decoder:
+class Decoder(CoderBase):
     """Factory class for pixel data decoders.
 
     Every available ``Decoder`` instance in *pydicom* corresponds directly
@@ -1002,79 +662,7 @@ class Decoder:
         uid : pydicom.uid.UID
             The *Transfer Syntax UID* that the decoder supports.
         """
-        # The *Transfer Syntax UID* of the encoded data
-        self._uid = uid
-        # Available decoding plugins
-        self._available: dict[str, Callable] = {}
-        # Unavailable decoding plugins - missing dependencies or other reason
-        self._unavailable: dict[str, tuple[str, ...]] = {}
-
-    def add_plugin(self, label: str, import_path: tuple[str, str]) -> None:
-        """Add a decoding plugin to the decoder.
-
-        The requirements for decoding plugins are available
-        :doc:`here</guides/decoding/decoder_plugins>`.
-
-        .. warning::
-
-            This method is not thread-safe.
-
-        Parameters
-        ----------
-        label : str
-            The label to use for the plugin, should be unique for the decoder.
-        import_path : tuple[str, str]
-            The module import path and the decoding function's name (e.g.
-            ``('pydicom.pixels.decoders.pylibjpeg', '_decode_frame')``).
-
-        Raises
-        ------
-        ModuleNotFoundError
-            If the module import path is incorrect or unavailable.
-        AttributeError
-            If the plugin's decoding function, ``is_available()`` or
-            ``DECODER_DEPENDENCIES`` aren't found in the module.
-        ValueError
-            If the plugin doesn't support the decoder's UID.
-        """
-        if label in self._available or label in self._unavailable:
-            raise ValueError(f"'{self.name}' already has a plugin named '{label}'")
-
-        module = import_module(import_path[0])
-
-        # `is_available(UID)` is required for plugins
-        if module.is_available(self.UID):
-            self._available[label] = getattr(module, import_path[1])
-        else:
-            # `DECODER_DEPENDENCIES[UID]` is required for plugins
-            msg = module.DECODER_DEPENDENCIES.get(
-                self.UID,
-                f"Plugin '{label}' does not support '{self.UID.name}'",
-            )
-            self._unavailable[label] = msg
-
-    def add_plugins(self, plugins: list[tuple[str, tuple[str, str]]]) -> None:
-        """Add multiple decoding plugins to the decoder.
-
-        The requirements for decoding plugins are available
-        :doc:`here</guides/decoding/decoder_plugins>`.
-
-        .. warning::
-
-            This method is not thread-safe.
-
-        Parameters
-        ----------
-        plugins : list[tuple[str, tuple[str, str]]]
-            A list of [label, import path] for the plugins, where:
-
-            * `label` is the label to use for the plugin, which should be unique
-              for the decoder.
-            * `import path` is the module import path and the decoding function's
-              name (e.g. ``('pydicom.pixels.decoders.pylibjpeg', '_decode_frame')``).
-        """
-        for label, import_path in plugins:
-            self.add_plugin(label, import_path)
+        super().__init__(uid, decoder=True)
 
     def as_array(
         self,
@@ -1090,7 +678,10 @@ class Decoder:
 
         .. warning::
 
-            This method requires `NumPy <https://numpy.org/>`_
+            This method requires `NumPy <https://numpy.org/>`_ and may require
+            the installation of additional packages to perform the actual pixel
+            data decoding. See the :doc:`pixel data decompression documentation
+            </old/image_data_handlers>` for more information.
 
         **Processing**
 
@@ -1185,7 +776,12 @@ class Decoder:
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
-        runner.set_decoders(self._validate_decoders(decoding_plugin))
+        runner.set_decoders(
+            cast(
+                dict[str, "DecodeFunction"],
+                self._validate_plugins(decoding_plugin),
+            ),
+        )
 
         if config.debugging:
             LOGGER.debug(runner)
@@ -1294,7 +890,7 @@ class Decoder:
         dtype = runner.pixel_dtype
 
         src: memoryview | BinaryIO
-        if runner.is_buffer:
+        if runner.is_dataset or runner.is_buffer:
             src = memoryview(cast(Buffer, runner.src))
             file_offset = 0
             length_source = len(src)
@@ -1415,6 +1011,13 @@ class Decoder:
     ) -> Buffer:
         """Return the raw decoded pixel data as a buffer-like.
 
+        .. warning::
+
+            This method may require the installation of additional packages to
+            perform the actual pixel data decoding. See the :doc:`pixel data
+            decompression documentation</old/image_data_handlers>` for more
+            information.
+
         Parameters
         ----------
         src : :class:`~pydicom.dataset.Dataset` | buffer-like | file-like
@@ -1474,7 +1077,12 @@ class Decoder:
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
-        runner.set_decoders(self._validate_decoders(decoding_plugin))
+        runner.set_decoders(
+            cast(
+                dict[str, "DecodeFunction"],
+                self._validate_plugins(decoding_plugin),
+            ),
+        )
 
         if validate:
             runner.validate()
@@ -1483,80 +1091,6 @@ class Decoder:
             return self._as_buffer_native(runner, index)
 
         return self._as_buffer_encapsulated(runner, index)
-
-    @staticmethod
-    def _as_buffer_native(runner: DecodeRunner, index: int | None) -> Buffer:
-        """ "Return the raw encoded pixel data as a buffer-like.
-
-        Parameters
-        ----------
-        runner : pydicom.pixels.decoders.base.DecodeRunner
-            The runner with the encoded data and decoding options.
-        index : int | None
-            The index of the frame to be returned, or ``None`` if all frames
-            are to be returned
-
-        Returns
-        -------
-        bytes | bytearray | memoryview
-            A buffer-like containing the decoded pixel data. Will return the
-            same type as in the buffer containing the pixel data unless
-            `view_only` is ``True`` in which case a :class:`memoryview` of the
-            original buffer will be returned instead.
-        """
-        length_bytes = runner.frame_length(unit="bytes")
-        src: Buffer | BinaryIO
-        if runner.is_buffer:
-            if runner.get_option("view_only", False):
-                src = memoryview(cast(Buffer, runner.src))
-            else:
-                src = cast(Buffer, runner.src)
-
-            file_offset = 0
-            length_source = len(src)
-        else:
-            src = cast(BinaryIO, runner.src)
-            file_offset = src.tell()
-            length_source = length_bytes * runner.number_of_frames
-
-        if runner._test_for("be_swap_ow"):
-            # Big endian 8-bit data encoded as OW
-            if index is not None:
-                # Return specified frame only
-                start_offset = file_offset + index * length_bytes
-                if start_offset + length_bytes > file_offset + length_source:
-                    raise ValueError(
-                        f"There is insufficient pixel data to contain {index + 1} frames"
-                    )
-
-                if length_bytes % 2 == 0:
-                    # Even length frame: start and end correct
-                    return runner.get_data(src, start_offset, length_bytes)
-
-                # Odd length frame
-                # Even index: start correct, end incorrect
-                #   -> src[start:start + length + 1]
-                # Odd index: start incorrect, end correct
-                #   -> src[start - 1:start + length + 1]
-                return runner.get_data(src, start_offset - index % 2, length_bytes + 1)
-
-            # Return all frames
-            length_bytes *= runner.number_of_frames
-            return runner.get_data(src, file_offset, length_bytes + length_bytes % 2)
-
-        if index is not None:
-            # Return specified frame only
-            start_offset = file_offset + index * length_bytes
-            if start_offset + length_bytes > file_offset + length_source:
-                raise ValueError(
-                    f"There is insufficient pixel data to contain {index + 1} frames"
-                )
-
-            return runner.get_data(src, start_offset, length_bytes)
-
-        # Return all frames
-        length_bytes *= runner.number_of_frames
-        return runner.get_data(src, file_offset, length_bytes)
 
     @staticmethod
     def _as_buffer_encapsulated(
@@ -1621,6 +1155,80 @@ class Decoder:
 
         return buffer
 
+    @staticmethod
+    def _as_buffer_native(runner: DecodeRunner, index: int | None) -> Buffer:
+        """ "Return the raw encoded pixel data as a buffer-like.
+
+        Parameters
+        ----------
+        runner : pydicom.pixels.decoders.base.DecodeRunner
+            The runner with the encoded data and decoding options.
+        index : int | None
+            The index of the frame to be returned, or ``None`` if all frames
+            are to be returned
+
+        Returns
+        -------
+        bytes | bytearray | memoryview
+            A buffer-like containing the decoded pixel data. Will return the
+            same type as in the buffer containing the pixel data unless
+            `view_only` is ``True`` in which case a :class:`memoryview` of the
+            original buffer will be returned instead.
+        """
+        length_bytes = runner.frame_length(unit="bytes")
+        src: Buffer | BinaryIO
+        if runner.is_dataset or runner.is_buffer:
+            if runner.get_option("view_only", False):
+                src = memoryview(cast(Buffer, runner.src))
+            else:
+                src = cast(Buffer, runner.src)
+
+            file_offset = 0
+            length_source = len(src)
+        else:
+            src = cast(BinaryIO, runner.src)
+            file_offset = src.tell()
+            length_source = length_bytes * runner.number_of_frames
+
+        if runner._test_for("be_swap_ow"):
+            # Big endian 8-bit data encoded as OW
+            if index is not None:
+                # Return specified frame only
+                start_offset = file_offset + index * length_bytes
+                if start_offset + length_bytes > file_offset + length_source:
+                    raise ValueError(
+                        f"There is insufficient pixel data to contain {index + 1} frames"
+                    )
+
+                if length_bytes % 2 == 0:
+                    # Even length frame: start and end correct
+                    return runner.get_data(src, start_offset, length_bytes)
+
+                # Odd length frame
+                # Even index: start correct, end incorrect
+                #   -> src[start:start + length + 1]
+                # Odd index: start incorrect, end correct
+                #   -> src[start - 1:start + length + 1]
+                return runner.get_data(src, start_offset - index % 2, length_bytes + 1)
+
+            # Return all frames
+            length_bytes *= runner.number_of_frames
+            return runner.get_data(src, file_offset, length_bytes + length_bytes % 2)
+
+        if index is not None:
+            # Return specified frame only
+            start_offset = file_offset + index * length_bytes
+            if start_offset + length_bytes > file_offset + length_source:
+                raise ValueError(
+                    f"There is insufficient pixel data to contain {index + 1} frames"
+                )
+
+            return runner.get_data(src, start_offset, length_bytes)
+
+        # Return all frames
+        length_bytes *= runner.number_of_frames
+        return runner.get_data(src, file_offset, length_bytes)
+
     def iter_array(
         self,
         src: Dataset | Buffer | BinaryIO,
@@ -1635,7 +1243,10 @@ class Decoder:
 
         .. warning::
 
-            This method requires `NumPy <https://numpy.org/>`_
+            This method requires `NumPy <https://numpy.org/>`_ and may require
+            the installation of additional packages to perform the actual pixel
+            data decoding. See the :doc:`pixel data decompression documentation
+            </old/image_data_handlers>` for more information.
 
         **Processing**
 
@@ -1723,7 +1334,12 @@ class Decoder:
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
-        runner.set_decoders(self._validate_decoders(decoding_plugin))
+        runner.set_decoders(
+            cast(
+                dict[str, "DecodeFunction"],
+                self._validate_plugins(decoding_plugin),
+            ),
+        )
 
         if config.debugging:
             LOGGER.debug(runner)
@@ -1782,6 +1398,13 @@ class Decoder:
     ) -> Iterator[Buffer]:
         """Yield raw decoded pixel data frames as a buffer-like.
 
+        .. warning::
+
+            This method may require the installation of additional packages to
+            perform the actual pixel data decoding. See the :doc:`pixel data
+            decompression documentation</old/image_data_handlers>` for more
+            information.
+
         Parameters
         ----------
         src : :class:`~pydicom.dataset.Dataset` | buffer-like | file-like
@@ -1839,7 +1462,12 @@ class Decoder:
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
-        runner.set_decoders(self._validate_decoders(decoding_plugin))
+        runner.set_decoders(
+            cast(
+                dict[str, "DecodeFunction"],
+                self._validate_plugins(decoding_plugin),
+            ),
+        )
 
         if validate:
             runner.validate()
@@ -1857,126 +1485,6 @@ class Decoder:
         indices = indices if indices else range(runner.number_of_frames)
         for index in indices:
             yield func(runner, index)
-
-    @property
-    def is_available(self) -> bool:
-        """Return ``True`` if the decoder has plugins available that can be
-        used to decode data, ``False`` otherwise.
-        """
-        # Decoders for public non-compressed syntaxes are always available
-        if self.is_native:
-            return True
-
-        return bool(self._available)
-
-    @property
-    def is_encapsulated(self) -> bool:
-        """Return ``True`` if the decoder is for an encapsulated transfer
-        syntax, ``False`` otherwise.
-        """
-        return self.UID.is_encapsulated
-
-    @property
-    def is_native(self) -> bool:
-        """Return ``True`` if the decoder is for an native transfer
-        syntax, ``False`` otherwise.
-        """
-        return not self.is_encapsulated
-
-    @property
-    def missing_dependencies(self) -> list[str]:
-        """Return nice strings for plugins with missing dependencies as
-        list[str].
-        """
-        s = []
-        for label, deps in self._unavailable.items():
-            if not deps:
-                # A plugin might have no dependencies and be unavailable for
-                #   other reasons
-                s.append(f"{label} - plugin indicating it is unavailable")
-            elif len(deps) > 1:
-                s.append(f"{label} - requires {', '.join(deps[:-1])} and {deps[-1]}")
-            else:
-                s.append(f"{label} - requires {deps[0]}")
-
-        return s
-
-    @property
-    def name(self) -> str:
-        """Return the name of the decoder as :class:`str`."""
-        return f"{self.UID.keyword}Decoder"
-
-    def remove_plugin(self, label: str) -> None:
-        """Remove a plugin from the decoder.
-
-        .. warning::
-
-            This method is not thread-safe.
-
-        Parameters
-        ----------
-        label : str
-            The label of the plugin to remove.
-        """
-        if label in self._available:
-            del self._available[label]
-        elif label in self._unavailable:
-            del self._unavailable[label]
-        else:
-            raise ValueError(f"Unable to remove '{label}', no such plugin'")
-
-    @property
-    def UID(self) -> UID:
-        """Return the decoder's corresponding *Transfer Syntax UID* as a
-        :class:`~pydicom.uid.UID`.
-        """
-        return self._uid
-
-    def _validate_decoders(self, plugin: str = "") -> dict[str, DecodeFunction]:
-        """Return available decoders.
-
-        Parameters
-        ----------
-        plugin : str, optional
-            If not used (default) then return all available plugins, otherwise
-            only return the plugin with a matching name (if it's available).
-
-        Returns
-        -------
-        dict[str, DecodeFunction]
-            A dict of available {plugin name: decode function} that can be used
-            to decode the corresponding encoded pixel data.
-        """
-        if plugin:
-            if plugin in self._available:
-                return {plugin: self._available[plugin]}
-
-            if deps := self._unavailable.get(plugin, None):
-                missing = deps[0]
-                if len(deps) > 1:
-                    missing = f"{', '.join(deps[:-1])} and {deps[-1]}"
-
-                raise RuntimeError(
-                    f"Unable to decode with the '{plugin}' decoding plugin "
-                    f"because it's missing dependencies - requires {missing}"
-                )
-
-            raise ValueError(
-                f"No decoding plugin named '{plugin}' has been added to "
-                f"the '{self.name}'"
-            )
-
-        if not self.UID.is_encapsulated:
-            return {}
-
-        if self._available:
-            return self._available.copy()
-
-        missing = "\n".join([f"\t{s}" for s in self.missing_dependencies])
-        raise RuntimeError(
-            f"Unable to decode because the decoding plugins are all missing "
-            f"dependencies:\n{missing}"
-        )
 
 
 # Decoder names should be f"{UID.keyword}Decoder"

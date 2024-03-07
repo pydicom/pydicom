@@ -17,7 +17,7 @@ from pydicom.encaps import get_frame
 from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.pixels import pixel_array, iter_pixels
 from pydicom.pixels.utils import (
-    _as_options,
+    as_pixel_options,
     _passes_version_check,
     _get_jpg_parameters,
 )
@@ -152,59 +152,68 @@ class TestPixelArray:
         ds.save_as(b)
         b.seek(0)
 
-        msg = (
-            r"The dataset in 'src' is missing a required element: \(0028,0100\) "
-            "Bits Allocated"
-        )
+        msg = r"Missing required element: \(0028,0100\) 'Bits Allocated'"
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b)
 
-        msg = r"required element: \(0028,0101\) Bits Stored"
+        msg = r"Missing required element: \(0028,0101\) 'Bits Stored'"
         opts = {
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
         }
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b, **opts)
 
-        msg = r"required element: \(0028,0011\) Columns"
-        opts = {
-            "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
-            "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
-        }
-        with pytest.raises(AttributeError, match=msg):
-            pixel_array(b, **opts)
-
-        msg = r"required element: \(0028,0010\) Rows"
+        msg = r"Missing required element: \(0028,0011\) 'Columns'"
         opts = {
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
-            "columns": EXPL_8_3_1F_YBR422.ds.Columns,
         }
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b, **opts)
 
-        msg = r"required element: \(0028,0004\) Photometric Interpretation"
+        msg = r"Missing required element: \(0028,0004\) 'Photometric Interpretation'"
         opts = {
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
             "columns": EXPL_8_3_1F_YBR422.ds.Columns,
-            "rows": EXPL_8_3_1F_YBR422.ds.Rows,
         }
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b, **opts)
 
-        msg = r"required element: \(0028,0002\) Samples per Pixel"
+        msg = r"Missing required element: \(0028,0103\) 'Pixel Representation'"
         opts = {
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
             "columns": EXPL_8_3_1F_YBR422.ds.Columns,
-            "rows": EXPL_8_3_1F_YBR422.ds.Rows,
             "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
         }
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b, **opts)
 
-        msg = r"required element: \(0028,0006\) Planar Configuration"
+        msg = r"Missing required element: \(0028,0010\) 'Rows'"
+        opts = {
+            "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
+            "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
+            "columns": EXPL_8_3_1F_YBR422.ds.Columns,
+            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
+            "pixel_representation": EXPL_8_3_1F_YBR422.ds.PixelRepresentation,
+        }
+        with pytest.raises(AttributeError, match=msg):
+            pixel_array(b, **opts)
+
+        msg = r"Missing required element: \(0028,0002\) 'Samples per Pixel'"
+        opts = {
+            "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
+            "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
+            "columns": EXPL_8_3_1F_YBR422.ds.Columns,
+            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
+            "pixel_representation": EXPL_8_3_1F_YBR422.ds.PixelRepresentation,
+            "rows": EXPL_8_3_1F_YBR422.ds.Rows,
+        }
+        with pytest.raises(AttributeError, match=msg):
+            pixel_array(b, **opts)
+
+        msg = r"Missing required element: \(0028,0006\) 'Planar Configuration'"
         opts = {
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
@@ -212,19 +221,7 @@ class TestPixelArray:
             "rows": EXPL_8_3_1F_YBR422.ds.Rows,
             "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
             "samples_per_pixel": EXPL_8_3_1F_YBR422.ds.SamplesPerPixel,
-        }
-        with pytest.raises(AttributeError, match=msg):
-            pixel_array(b, **opts)
-
-        msg = r"required element: \(0028,0103\) Pixel Representation"
-        opts = {
-            "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
-            "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
-            "columns": EXPL_8_3_1F_YBR422.ds.Columns,
-            "rows": EXPL_8_3_1F_YBR422.ds.Rows,
-            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
-            "samples_per_pixel": EXPL_8_3_1F_YBR422.ds.SamplesPerPixel,
-            "planar_configuration": EXPL_8_3_1F_YBR422.ds.PlanarConfiguration,
+            "pixel_representation": EXPL_8_3_1F_YBR422.ds.PixelRepresentation,
         }
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b, **opts)
@@ -253,14 +250,14 @@ class TestPixelArray:
         )
         ds.ExtendedOffsetTable = offsets[0]
         ds.ExtendedOffsetTableLengths = offsets[1]
-        opts = _as_options(ds, {})
+        opts = as_pixel_options(ds)
         assert opts["extended_offsets"] == offsets
 
         offsets = (
             b"\x00\x00\x00\x00\x00\x00\x00\x03",
             b"\x00\x00\x00\x00\x00\x00\x00\x04",
         )
-        opts = _as_options(ds, {"extended_offsets": offsets})
+        opts = as_pixel_options(ds, **{"extended_offsets": offsets})
         assert opts["extended_offsets"] == offsets
 
 

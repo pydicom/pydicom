@@ -99,7 +99,7 @@ class TestDecoding:
         if reference == JLSL_08_07_1_0_1F:
             msg = (
                 "Unable to decode as exceptions were raised by all available "
-                "plugins:\n  gdcm: Unable to correctly decode JPEG-LS pixel "
+                "plugins:\n  gdcm: Unable to decode unsigned JPEG-LS pixel "
                 "data with a sample precision of 6 or 7"
             )
             with pytest.raises(RuntimeError, match=msg):
@@ -174,6 +174,25 @@ class TestDecoding:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
+
+    def test_jls_lossy_signed_raises(self):
+        """Test decoding JPEG-LS signed with < 8-bits raises."""
+        decoder = get_decoder(JPEGLSNearLossless)
+        ds = JLSN_08_01_1_0_1F.ds
+
+        msg = (
+            "Unable to decode as exceptions were raised by all available plugins:\n  "
+            "gdcm: Unable to decode signed lossy JPEG-LS pixel data with a sample "
+            "precision less than 8 bits"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decoder.as_buffer(
+                ds,
+                raw=True,
+                decoding_plugin="gdcm",
+                bits_stored=7,
+                pixel_representation=1,
+            )
 
 
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")

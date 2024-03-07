@@ -10,7 +10,8 @@ from typing import cast
 
 from pydicom import uid
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.utils import _passes_version_check, PhotometricInterpretation as PI
+from pydicom.pixels.utils import _passes_version_check
+from pydicom.pixels.common import PhotometricInterpretation as PI
 
 try:
     from pylibjpeg.utils import get_pixel_data_decoders, Decoder
@@ -92,9 +93,13 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
         ):
             runner.set_option("photometric_interpretation", PI.RGB)
 
-        if tsyntax in uid.JPEGLSTransferSyntaxes and runner.bits_allocated == 16:
-            bits_stored = runner.get_option("jls_precision", runner.bits_stored)
-            bits_allocated = math.ceil(bits_stored / 8) * 8
-            runner.set_option("bits_allocated", bits_allocated)
+        if tsyntax in uid.JPEGLSTransferSyntaxes:
+            # libjpeg always returns JPEG-LS data as color-by-pixel
+            runner.set_option("planar_configuration", 0)
+
+            if runner.bits_allocated == 16:
+                bits_stored = runner.get_option("jls_precision", runner.bits_stored)
+                bits_allocated = math.ceil(bits_stored / 8) * 8
+                runner.set_option("bits_allocated", bits_allocated)
 
         return frame

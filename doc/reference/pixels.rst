@@ -42,3 +42,4 @@ Pixel Data Utilities
    get_encoder
    pixel_array
    iter_pixels
+   as_pixel_options

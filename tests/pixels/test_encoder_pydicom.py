@@ -16,12 +16,14 @@ from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import get_frame
 from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.encoders.native import _encode_frame, _encode_segment, _encode_row
 from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_frame,
     _rle_decode_segment,
 )
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
+from pydicom.uid import RLELossless
 
 
 # EXPL: Explicit VR Little Endian
@@ -127,8 +129,20 @@ class TestEncodeFrame:
         assert 8 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
 
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-        encoded = _encode_frame(ds.PixelData, **kwargs)
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -145,8 +159,21 @@ class TestEncodeFrame:
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
 
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-        encoded = _encode_frame(ds.PixelData, **kwargs)
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -164,8 +191,20 @@ class TestEncodeFrame:
         assert 16 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
 
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-        encoded = _encode_frame(ds.PixelData, **kwargs)
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -182,8 +221,21 @@ class TestEncodeFrame:
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
 
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-        encoded = _encode_frame(ds.PixelData, **kwargs)
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -201,8 +253,20 @@ class TestEncodeFrame:
         assert 32 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
 
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-        encoded = _encode_frame(ds.PixelData, **kwargs)
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -219,8 +283,21 @@ class TestEncodeFrame:
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
 
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-        encoded = _encode_frame(ds.PixelData, **kwargs)
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -238,14 +315,22 @@ class TestEncodeFrame:
         )
         assert (1, 1, 16) == arr.shape
         assert 1 == arr.dtype.itemsize
+
+        kwargs = {
+            "rows": 1,
+            "columns": 1,
+            "samples_per_pixel": 16,
+            "bits_allocated": 8,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
         msg = (
             r"Unable to encode as the DICOM standard only allows "
             r"a maximum of 15 segments in RLE encoded data"
         )
         with pytest.raises(ValueError, match=msg):
-            _encode_frame(
-                arr.tobytes(), rows=1, columns=1, samples_per_pixel=16, bits_allocated=8
-            )
+            _encode_frame(arr.tobytes(), runner)
 
     def test_15_segment(self):
         """Test encoding 15 segments works as expected."""
@@ -255,9 +340,16 @@ class TestEncodeFrame:
         assert (1, 1, 15) == arr.shape
         assert 1 == arr.dtype.itemsize
 
-        encoded = _encode_frame(
-            arr.tobytes(), rows=1, columns=1, samples_per_pixel=15, bits_allocated=8
-        )
+        kwargs = {
+            "rows": 1,
+            "columns": 1,
+            "samples_per_pixel": 15,
+            "bits_allocated": 8,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(arr.tobytes(), runner)
         header = (
             b"\x0f\x00\x00\x00"
             b"\x40\x00\x00\x00"
@@ -287,9 +379,16 @@ class TestEncodeFrame:
         """Test encoding a single row of 1 sample/pixel data."""
         # Rows 1, Columns 5, SamplesPerPixel 1
         arr = np.asarray([[0, 1, 2, 3, 4]], dtype="uint8")
-        encoded = _encode_frame(
-            arr.tobytes(), rows=1, columns=5, samples_per_pixel=1, bits_allocated=8
-        )
+        kwargs = {
+            "rows": 1,
+            "columns": 5,
+            "samples_per_pixel": 1,
+            "bits_allocated": 8,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(arr.tobytes(), runner)
         header = b"\x01\x00\x00\x00\x40\x00\x00\x00" + b"\x00" * 56
         assert header == encoded[:64]
         assert b"\x04\x00\x01\x02\x03\x04" == encoded[64:]
@@ -301,9 +400,16 @@ class TestEncodeFrame:
             [[[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]], dtype="uint8"
         )
         assert (1, 5, 3) == arr.shape
-        encoded = _encode_frame(
-            arr.tobytes(), rows=1, columns=5, samples_per_pixel=3, bits_allocated=8
-        )
+        kwargs = {
+            "rows": 1,
+            "columns": 5,
+            "samples_per_pixel": 3,
+            "bits_allocated": 8,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_frame(arr.tobytes(), runner)
         header = (
             b"\x03\x00\x00\x00"
             b"\x40\x00\x00\x00"
@@ -320,12 +426,19 @@ class TestEncodeFrame:
 
     def test_invalid_byteorder_raises(self):
         """Test big endian `src` raises an exception."""
-        msg = (
-            r"Unsupported option for the 'pydicom' encoding plugin: "
-            r"\"byteorder = '>'\""
-        )
+        kwargs = {
+            "rows": 1,
+            "columns": 5,
+            "samples_per_pixel": 3,
+            "bits_allocated": 8,
+            "byteorder": ">",
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        msg = r"Unsupported option \"byteorder = '>'\""
         with pytest.raises(ValueError, match=msg):
-            _encode_frame(b"", byteorder=">")
+            _encode_frame(b"", runner)
 
 
 class TestEncodeSegment:
@@ -343,7 +456,7 @@ class TestEncodeSegment:
         # Re-encode a single row of the decoded data
         row = arr[0]
         assert (ds.Columns,) == row.shape
-        encoded = _encode_segment(row.tobytes(), columns=ds.Columns, rows=ds.Rows)
+        encoded = _encode_segment(row.tobytes(), columns=ds.Columns)
 
         # Decode the re-encoded data and check that it's the same
         redecoded = _rle_decode_segment(encoded)
@@ -357,7 +470,7 @@ class TestEncodeSegment:
         decoded = _rle_decode_segment(pixel_data[64:])
         assert ds.Rows * ds.Columns == len(decoded)
         # Re-encode the decoded data
-        encoded = _encode_segment(decoded, columns=ds.Columns, rows=ds.Rows)
+        encoded = _encode_segment(decoded, columns=ds.Columns)
 
         # Decode the re-encoded data and check that it's the same
         redecoded = _rle_decode_segment(encoded)

@@ -17,24 +17,24 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 **Prerequisites**
 
 This tutorial uses packages in addition to *pydicom* that are not installed
-by default, but are required for *RLE Lossless* compression of *Pixel Data*.
-For more information on what packages are available to compress a given
-transfer syntax see the :ref:`image compression guide
-<guide_compression_supported>`.
+by default, but are required for *RLE Lossless* and *JPEG-LS Near-lossless*
+compression of *Pixel Data*. For more information on what packages are
+available to compress a given transfer syntax see the :ref:`image compression
+guide <guide_compression_supported>`.
 
 Installing using pip:
 
 .. code-block:: bash
 
-    python -m pip install -U pydicom>=2.2 numpy pylibjpeg
+    python -m pip install -U pydicom numpy pylibjpeg pyjpegls
 
 Installing on conda:
 
 .. code-block:: bash
 
     conda install numpy
-    conda install -c conda-forge pydicom>=2.2
-    pip install pylibjpeg
+    conda install -c conda-forge pydicom
+    pip install pylibjpeg pyjpegls
 
 
 Introduction
@@ -54,9 +54,11 @@ uses even larger full color images, the size of the uncompressed *Pixel Data*
 may get into the gigabyte territory. Being able to compress these images can
 result in significantly reduced file sizes.
 
-However, with the exception of *RLE Lossless*, *pydicom* doesn't currently
-offer any native support for compression of *Pixel Data*. This means that it's
-entirely up to you to compress the *Pixel Data* in a manner conformant to
+*pydicom* can perform *RLE Lossless* compression without needing to install any
+additional packages, and can perform *JPEG-LS Lossless* and *JPEG-LS
+Near-lossless* compression with the installation of `pyjpegls
+<https://github.com/pydicom/pyjpegls>`_. For all other transfer syntaxes
+it's entirely up to you to compress the *Pixel Data* in a manner conformant to
 the :dcm:`requirements of the DICOM Standard<part05/sect_8.2.html>`.
 
 .. note::
@@ -122,10 +124,10 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
 Compressing using pydicom
 -------------------------
 
-Currently, only the *RLE Lossless* transfer syntax is supported for
-compressing *Pixel Data* natively using *pydicom*. The easiest method is to
-pass the UID for *RLE Lossless* to :func:`Dataset.compress()
-<pydicom.dataset.Dataset.compress>`:
+The *RLE Lossless* and *JPEG-LS Lossless* transfer syntaxes are currently
+supported for lossless compression of *Pixel Data* using *pydicom*.
+The easiest compression method is to pass the UID for one of those transfer
+syntaxes to :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>`:
 
 .. code-block:: python
 
@@ -137,6 +139,33 @@ pass the UID for *RLE Lossless* to :func:`Dataset.compress()
 
 This will compress the existing *Pixel Data* and update the *Transfer Syntax
 UID* before saving the dataset to file as  ``ct_rle_lossless.dcm``.
+
+*JPEG-LS Near-lossless* is currently the only transfer syntax that supports
+lossy compression, which works similarly to lossless but requires
+passing one or more keyword parameters to control the image quality. In the
+case of *JPEG-LS Near-lossless* this means the `jls_error` parameter:
+
+.. code-block:: python
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEGLSNearLossless
+    >>> ds = examples.ct
+    >>> ds.compress(JPEGLSNearLossless, jls_error=3)
+
+This will compress the existing *Pixel Data* with an absolute error of no more
+than 3 pixel intensity units.
+
+.. warning::
+
+    *pydicom* makes no recommendations for specifying the image quality for
+    lossy encoding methods. Any examples of lossy encoding are for
+    **illustration purposes only**.
+
+Each supported compression method has a corresponding encoding guide that can be
+used to help you understand it's requirements:
+
+* :doc:`RLE Lossless Encoding Guide</guides/encoding/rle_lossless>`
+* :doc:`JPEG-LS Encoding Guide</guides/encoding/jpeg_ls>`
 
 If you're creating a dataset from scratch you can instead pass a
 :class:`~numpy.ndarray` to be compressed and used as the *Pixel Data*:
@@ -158,17 +187,16 @@ exception:
     >>> ds.compress(RLELossless, arr)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-      File ".../pydicom/dataset.py", line 1697, in compress
+      File ".../pydicom/src/pydicom/dataset.py", line 1957, in compress
         encoded = [f for f in frame_iterator]
-      File ".../pydicom/dataset.py", line 1697, in <listcomp>
-        encoded = [f for f in frame_iterator]
-      File ".../pydicom/encoders/base.py", line 382, in iter_encode
-        yield self._encode_array(src, idx, encoding_plugin, **kwargs)
-      File ".../pydicom/encoders/base.py", line 209, in _encode_array
-        src = self._preprocess(arr, **kwargs)
-      File ".../pydicom/encoders/base.py", line 533, in _preprocess
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File ".../pydicom/pixels/encoders/base.py", line 678, in iter_encode
+        runner.validate()
+      File ".../pydicom/pixels/encoders/base.py", line 304, in validate
+        self._validate_array()
+      File ".../pydicom/pixels/encoders/base.py", line 333, in _validate_array
         raise ValueError(
-    ValueError: Unable to encode as the shape of the ndarray (128, 129) doesn't match the values for the rows, columns and samples per pixel
+      ValueError: Mismatch between the expected ndarray shape (128, 128) and the actual shape (128, 129)
 
 A specific encoding plugin can be used by passing the plugin name via the
 `encoding_plugin` argument:
@@ -178,7 +206,7 @@ A specific encoding plugin can be used by passing the plugin name via the
     >>> ds.compress(RLELossless, encoding_plugin='pylibjpeg')
 
 The plugins available for each encoder are listed in the
-:mod:`API reference<pydicom.pixels.encoders>` for the encoder type.
+:doc:`API reference</reference/pixels.encoders>` for the encoder type.
 
 Implicitly changing the compression on an already compressed dataset is not
 currently supported, however it can still be done explicitly by decompressing
