@@ -21,6 +21,7 @@ There are the following possibilities:
 
 * PixelRepresentation
 * BitsAllocated
+* BitsStored
 * SamplesPerPixel
 * NumberOfFrames
 * PlanarConfiguration
@@ -1306,3 +1307,11 @@ class TestNumpy_GetPixelData:
         data2 = ds2.pixel_array
         assert len(data1) == len(data2)
         assert (data1 == data2).all()
+
+    def test_bits_stored(self):
+        ds = dcmread(IMPL_16_1_1F)
+        assert ds.pixel_array.max() > 2047
+
+        ds = dcmread(IMPL_16_1_1F)
+        ds.BitsStored = 12
+        assert ds.pixel_array.max() <= 2047
