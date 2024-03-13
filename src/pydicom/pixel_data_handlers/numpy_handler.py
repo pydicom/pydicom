@@ -43,7 +43,7 @@ table below.
 | (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32, | Required |
 |             |                           |      | 64            |          |
 +-------------+---------------------------+------+---------------+----------+
-| (0028,0101) | BitsStored                | 1    | 1, 8, 12, 16  | Optional |
+| (0028,0101) | BitsStored                | 1    | any           | Optional |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0103) | PixelRepresentation       | 1C   | 0, 1          | Optional |
 +-------------+---------------------------+------+---------------+----------+
@@ -135,8 +135,9 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     read_only : bool, optional
         If ``False`` (default) then returns a writeable array that no longer
         uses the original memory. If ``True`` and the value of (0028,0100)
-        *Bits Allocated* > 1 then returns a read-only array that uses the
-        original memory buffer of the pixel data. If *Bits Allocated* = 1 then
+        *Bits Allocated* > 1 and (0028,0101) *Bits Stored* equals (0028,0100)
+        *Bits Allocated* or is unset then returns a read-only array that uses
+        the original memory buffer of the pixel data. Otherwise, this function
         always returns a writeable array.
 
     Returns
@@ -245,10 +246,12 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         warn_and_log(msg)
 
     # Unpack the pixel data into a 1D ndarray
+    arr_copied = False
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
         nr_pixels = get_expected_length(ds, unit="pixels")
         arr = cast("np.ndarray", unpack_bits(pixel_data, as_array=True)[:nr_pixels])
+        arr_copied = True
     else:
         # Skip the trailing padding byte(s) if present
         dtype = pixel_dtype(ds, as_float=("Float" in px_keyword[0]))
@@ -278,10 +281,16 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
             out[2::6], out[5::6] = arr[3::4], arr[3::4]  # R
             arr = out
 
+        if px_keyword[0] == "PixelData" and ds.BitsAllocated != ds.BitsStored:
+            unused = ds.BitsAllocated - ds.BitsStored
+            # sign extend or nullify unused bits depending on arr.dtype
+            arr = (arr << unused) >> unused
+            arr_copied = True
+
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    if not read_only and ds.BitsAllocated > 1:
+    if not read_only and not arr_copied:
         return arr.copy()
 
     return arr
