@@ -29,7 +29,6 @@ from pydicom.uid import (
 from .pixels_reference import (
     PIXEL_REFERENCE,
     J2KR_08_08_3_0_1F_YBR_RCT,
-    JPGB_08_08_3_0_1F_RGB,
     JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
 )
