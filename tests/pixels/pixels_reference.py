@@ -1608,6 +1608,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_444 = PixelReference(
 
 
 # JPGB, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# Uses RGB component IDs
 def test(ref, arr, **kwargs):
     assert tuple(arr[5, 50, :]) == (255, 0, 0)
     assert tuple(arr[15, 50, :]) == (255, 128, 128)
