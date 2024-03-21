@@ -71,7 +71,13 @@ class TestLibJpegDecoder:
             return
 
         decoder = get_decoder(JPEGBaseline8Bit)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+
+        if reference in (JPGB_08_08_3_0_1F_RGB, JPGB_08_08_3_0_1F_YBR_FULL):
+            with pytest.warns(UserWarning):
+                arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        else:
+            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
