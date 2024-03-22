@@ -46,6 +46,7 @@ from pydicom.uid import (
     UID,
     JPEG2000TransferSyntaxes,
     JPEGLSTransferSyntaxes,
+    JPEGTransferSyntaxes,
 )
 
 
@@ -211,6 +212,45 @@ class DecodeRunner(RunnerBase):
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
             self.set_option("apply_jls_sign_correction", True)
 
+    def _conform_jpg_colorspace(self, info: dict[str, Any]) -> None:
+        """Conform the photometric interpretation to the JPEG/JPEG-LS codestream.
+
+        Parameters
+        ----------
+        info : dict[str, Any]
+            A dictionary containing JPEG/JPEG-LS codestream metadata.
+        """
+        if self.samples_per_pixel != 3:
+            return
+
+        pi = self.photometric_interpretation
+
+        # Check the component IDs for RGB or rgb (in ASCII)
+        has_rgb_ids = info.get("component_ids", None) in ([82, 71, 66], [114, 103, 98])
+        if has_rgb_ids and pi != PI.RGB:
+            self.set_option("photometric_interpretation", PI.RGB)
+            warn_and_log(
+                f"The (0028,0004) 'Photometric Interpretation' value is '{pi}' "
+                "however the encoded image's codestream uses component IDs that "
+                "indicate it should be 'RGB'"
+            )
+            return
+
+        # A JFIF APP marker means the decoded image should be YBR colour space
+        #   https://www.w3.org/Graphics/JPEG/jfif.pdf
+        cs = (
+            PI.YBR_FULL_422 if self.transfer_syntax == JPEGBaseline8Bit else PI.YBR_FULL
+        )
+        for marker in info.get("app", {}).values():
+            if marker.startswith(b"JFIF") and "YBR" not in pi:
+                self.set_option("photometric_interpretation", cs)
+                warn_and_log(
+                    "The (0028,0004) 'Photometric Interpretation' value is "
+                    f"'{pi}' however the encoded image's codestream contains a "
+                    f"JFIF APP marker which indicates it should be '{cs}'"
+                )
+                return
+
     def decode(self, index: int) -> bytes | bytearray:
         """Decode the frame of pixel data at `index`.
 
@@ -261,6 +301,10 @@ class DecodeRunner(RunnerBase):
             self.set_option(
                 "jls_precision", jls_info.get("precision", self.bits_stored)
             )
+            self._conform_jpg_colorspace(jls_info)
+        elif self.transfer_syntax in JPEGTransferSyntaxes:
+            jpg_info = _get_jpg_parameters(src)
+            self._conform_jpg_colorspace(jpg_info)
 
         # If self._previous is not set then this is the first frame being decoded
         # If self._previous is set, then the previously successful decoder
