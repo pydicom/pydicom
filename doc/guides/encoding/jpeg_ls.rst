@@ -195,6 +195,18 @@ Losslessly compress signed greyscale pixel data in-place:
 JPEG-LS Near-lossless
 .....................
 
+.. warning::
+
+    *pydicom* makes no recommendations for specifying image quality for lossy
+    encoding methods. Any examples of lossy encoding in the documentation,
+    code base or anywhere else in the project are for **illustration purposes only**.
+
+When using the *JPEG-LS Near-lossless* transfer syntax, image quality is
+controlled by passing the `jls_error` parameter to the encoding function.
+`jls_error` is directly related to the JPEG-LS NEAR parameter, which is the
+allowed absolute error in pixel intensity units from the compression process and
+should be in the range ``(0, 2**BitsStored - 1)``.
+
 Lossy compression of unsigned pixel data with a maximum error of 2 pixel
 intensity units:
 

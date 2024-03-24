@@ -9,6 +9,7 @@ Pixel Data Encoding
    :maxdepth: 1
 
    jpeg_ls
+   jpeg_2k
    rle_lossless
 
 

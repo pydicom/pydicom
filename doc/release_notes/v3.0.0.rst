@@ -185,8 +185,11 @@ Enhancements
 
   * *JPEG-LS Lossless*
   * *JPEG-LS Near Lossless*
+  * *JPEG 2000 Lossless*
+  * *JPEG 2000*
 
-  See the :doc:`JPEG-LS encoding guide</guides/encoding/jpeg_ls>` for more information.
+  See the :doc:`JPEG-LS</guides/encoding/jpeg_ls>` and :doc:`JPEG 2000
+  </guides/encoding/jpeg_2k>` encoding guides for more information.
 
 
 Fixes

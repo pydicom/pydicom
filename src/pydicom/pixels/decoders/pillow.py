@@ -53,6 +53,7 @@ def is_available(uid: str) -> bool:
     return False
 
 
+# TODO: raise exception for RGB > 8 bits stored
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     """Return the decoded image data in `src` as a :class:`bytes`."""
     tsyntax = runner.transfer_syntax
@@ -78,16 +79,25 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         return cast(bytes, image.tobytes())
 
     # JPEG 2000
+    # The precision from the J2K codestream is more appropriate because the
+    #   decoder will use it to create the output integers
+    precision = runner.get_option("j2k_precision", runner.bits_stored)
+    if 0 < precision <= 8:
+        runner.set_option("bits_allocated", 8)
+    elif 8 < precision <= 16:
+        runner.set_option("bits_allocated", 16)
+    else:
+        # FIXME
+        raise RuntimeError("Pillow doesn't support more than 16 bits stored")
+
     # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
     #   See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
     buffer = bytearray(image.tobytes())  # so the array is writeable
     del image
+
     dtype = runner.pixel_dtype
     arr = np.frombuffer(buffer, dtype=f"u{dtype.itemsize}")
 
-    # The precision from the J2K codestream is more appropriate because the
-    #   decoder will use it to create the output integers
-    precision = runner.get_option("j2k_precision", runner.bits_stored)
     is_signed = runner.pixel_representation
     if runner.get_option("apply_j2k_sign_correction", False):
         is_signed = runner.get_option("j2k_is_signed", is_signed)
@@ -105,10 +115,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         np.right_shift(arr, bit_shift, out=arr)
 
     # pillow returns YBR_ICT and YBR_RCT as RGB
-    if tsyntax in _OPENJPEG_SYNTAXES and runner.photometric_interpretation in (
-        PI.YBR_ICT,
-        PI.YBR_RCT,
-    ):
+    if runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT):
         runner.set_option("photometric_interpretation", PI.RGB)
 
     return cast(bytes, arr.tobytes())

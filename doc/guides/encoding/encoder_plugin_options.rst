@@ -48,7 +48,6 @@ pylibjpeg
 |                                |                 |                  | be little- or big-endian    |
 +--------------------------------+-----------------+------------------+-----------------------------+
 
-
 .. _encoder_plugin_pyjpegls:
 
 pyjpegls

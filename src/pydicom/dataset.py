@@ -80,6 +80,7 @@ from pydicom.uid import (
     PYDICOM_IMPLEMENTATION_UID,
     UID,
     JPEGLSNearLossless,
+    JPEG2000,
 )
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
@@ -1822,6 +1823,8 @@ class Dataset:
         decoding_plugin: str = "",
         encapsulate_ext: bool = False,
         jls_error: int | None = None,
+        j2k_cr: list[float] | None = None,
+        j2k_psnr: list[float] | None = None,
         **kwargs: Any,
     ) -> None:
         """Compress and update an uncompressed dataset in-place with the
@@ -1873,6 +1876,12 @@ class Dataset:
         | *JPEG-LS Near Lossless* - |pyjpegls  | :doc:`JPEG-LS Near Lossless      |
         | 1.2.840.10008.1.2.4.81    |          | </guides/encoding/jpeg_ls>`      |
         +---------------------------+----------+----------------------------------+
+        | *JPEG 2000 Lossless* -    |pylibjpeg | :doc:`JPEG 2000 Lossless         |
+        | 1.2.840.10008.1.2.4.90    |          | </guides/encoding/jpeg_2k>`      |
+        +---------------------------+----------+----------------------------------+
+        | *JPEG 2000* -             |pylibjpeg | :doc:`JPEG 2000                  |
+        | 1.2.840.10008.1.2.4.91    |          | </guides/encoding/jpeg_2k>`      |
+        +---------------------------+----------+----------------------------------+
         | *RLE Lossless* -          |pydicom,  | :doc:`RLE Lossless               |
         | 1.2.840.10008.1.2.5       |pylibjpeg,| </guides/encoding/rle_lossless>` |
         |                           |gdcm      |                                  |
@@ -1880,7 +1889,7 @@ class Dataset:
 
         .. versionadded:: 3.0
 
-            Added the `jls_error` keyword parameter.
+            Added the `jls_error`, `j2k_cr` and `j2k_psnr` keyword parameters.
 
         Examples
         --------
@@ -1917,14 +1926,30 @@ class Dataset:
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
         jls_error : int, optional
-            The allowed absolute compression error in the pixel values (*JPEG-LS
-            Near Lossless* only).
+            *JPEG-LS Near Lossless* only. The allowed absolute compression error
+            in the pixel values.
+        j2k_cr : list[float], optional
+            *JPEG 2000* only. A list of the compression ratios to use for each
+            quality layer, should be in decreasing order. For example, to use
+            2 quality layers with 20x and 5x compression ratios then `j2k_cr`
+            should be ``[20, 5]``.
+
+            Cannot be used with `j2k_psnr`.
+        j2k_psnr : list[float], optional
+            *JPEG 2000* only. A list of the peak signal-to-noise ratios (PSNR)
+            to use for each quality layer, should be in increasing order. For
+            example, to use 2 quality layers with PSNR of 80 and 300 then
+            `j2k_psnr` should be ``[80, 100]``.
+
+            Cannot be used with `j2k_cr`.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
         """
         from pydicom.pixels import get_encoder, as_pixel_options
+
+        # TODO: Check if current pixel data is uncompressed
 
         uid = UID(transfer_syntax_uid)
 
@@ -1940,6 +1965,13 @@ class Dataset:
 
         if uid == JPEGLSNearLossless and jls_error is not None:
             kwargs["jls_error"] = jls_error
+
+        if uid == JPEG2000:
+            if j2k_cr is not None:
+                kwargs["j2k_cr"] = j2k_cr
+
+            if j2k_psnr is not None:
+                kwargs["j2k_psnr"] = j2k_psnr
 
         if arr is None:
             # Encode the current *Pixel Data*
