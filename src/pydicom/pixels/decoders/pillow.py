@@ -53,7 +53,6 @@ def is_available(uid: str) -> bool:
     return False
 
 
-# TODO: raise exception for RGB > 8 bits stored
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     """Return the decoded image data in `src` as a :class:`bytes`."""
     tsyntax = runner.transfer_syntax
@@ -82,19 +81,20 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     # The precision from the J2K codestream is more appropriate because the
     #   decoder will use it to create the output integers
     precision = runner.get_option("j2k_precision", runner.bits_stored)
+    # pillow's pixel container size is based on precision
     if 0 < precision <= 8:
         runner.set_option("bits_allocated", 8)
     elif 8 < precision <= 16:
         runner.set_option("bits_allocated", 16)
     else:
-        # FIXME
-        raise RuntimeError("Pillow doesn't support more than 16 bits stored")
+        raise ValueError(
+            "only (0028,0101) 'Bits Stored' values of up to 16 are supported"
+        )
 
     # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
     #   See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
     buffer = bytearray(image.tobytes())  # so the array is writeable
     del image
-
     dtype = runner.pixel_dtype
     arr = np.frombuffer(buffer, dtype=f"u{dtype.itemsize}")
 

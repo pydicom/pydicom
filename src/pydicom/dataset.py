@@ -1846,15 +1846,16 @@ class Dataset:
         * (0028,0101) *Bits Stored*
         * (0028,0103) *Pixel Representation*
 
+        If *Samples per Pixel* is greater than 1 then the following element
+        is also required:
+
+        * (0028,0006) *Planar Configuration*
+
         This method will add the file meta dataset if none is present and add
         or modify the following elements:
 
         * (0002,0010) *Transfer Syntax UID*
         * (7FE0,0010) *Pixel Data*
-
-        If *Samples per Pixel* is greater than 1 then the following element
-        will also be added:
-
         * (0028,0006) *Planar Configuration*
 
         If the compressed pixel data is too large for encapsulation using a
@@ -1867,25 +1868,23 @@ class Dataset:
 
         **Supported Transfer Syntax UIDs**
 
-        +---------------------------+----------+----------------------------------+
-        | UID                       | Plugins  | Encoding Guide                   |
-        +===========================+==========+==================================+
-        | *JPEG-LS Lossless* -      |pyjpegls  | :doc:`JPEG-LS Lossless           |
-        | 1.2.840.10008.1.2.4.80    |          | </guides/encoding/jpeg_ls>`      |
-        +---------------------------+----------+----------------------------------+
-        | *JPEG-LS Near Lossless* - |pyjpegls  | :doc:`JPEG-LS Near Lossless      |
-        | 1.2.840.10008.1.2.4.81    |          | </guides/encoding/jpeg_ls>`      |
-        +---------------------------+----------+----------------------------------+
-        | *JPEG 2000 Lossless* -    |pylibjpeg | :doc:`JPEG 2000 Lossless         |
-        | 1.2.840.10008.1.2.4.90    |          | </guides/encoding/jpeg_2k>`      |
-        +---------------------------+----------+----------------------------------+
-        | *JPEG 2000* -             |pylibjpeg | :doc:`JPEG 2000                  |
-        | 1.2.840.10008.1.2.4.91    |          | </guides/encoding/jpeg_2k>`      |
-        +---------------------------+----------+----------------------------------+
-        | *RLE Lossless* -          |pydicom,  | :doc:`RLE Lossless               |
-        | 1.2.840.10008.1.2.5       |pylibjpeg,| </guides/encoding/rle_lossless>` |
-        |                           |gdcm      |                                  |
-        +---------------------------+----------+----------------------------------+
+        +-----------------------------------------------+-----------+----------------------------------+
+        | UID                                           |  Plugins  | Encoding Guide                   |
+        +------------------------+----------------------+           |                                  |
+        | Name                   | Value                |           |                                  |
+        +========================+======================+===========+==================================+
+        |*JPEG-LS Lossless*      |1.2.840.10008.1.2.4.80| pyjpegls  | :doc:`JPEG-LS                    |
+        +------------------------+----------------------+           | </guides/encoding/jpeg_ls>`      |
+        | *JPEG-LS Near Lossless*|1.2.840.10008.1.2.4.81|           |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
+        | *JPEG 2000 Lossless*   |1.2.840.10008.1.2.4.90| pylibjpeg | :doc:`JPEG 2000                  |
+        +------------------------+----------------------+           | </guides/encoding/jpeg_2k>`      |
+        | *JPEG 2000*            |1.2.840.10008.1.2.4.91|           |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
+        | *RLE Lossless*         | 1.2.840.10008.1.2.5  | pydicom,  | :doc:`RLE Lossless               |
+        |                        |                      | pylibjpeg,| </guides/encoding/rle_lossless>` |
+        |                        |                      | gdcm      |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
 
         .. versionadded:: 3.0
 
@@ -1926,30 +1925,29 @@ class Dataset:
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
         jls_error : int, optional
-            *JPEG-LS Near Lossless* only. The allowed absolute compression error
+            **JPEG-LS Near Lossless only**. The allowed absolute compression error
             in the pixel values.
         j2k_cr : list[float], optional
-            *JPEG 2000* only. A list of the compression ratios to use for each
-            quality layer, should be in decreasing order. For example, to use
-            2 quality layers with 20x and 5x compression ratios then `j2k_cr`
-            should be ``[20, 5]``.
-
-            Cannot be used with `j2k_psnr`.
+            **JPEG 2000 only**. A list of the compression ratios to use for each
+            quality layer. There must be at least one quality layer and the
+            minimum allowable compression ratio is ``1``. When using multiple
+            quality layers they should be ordered in decreasing value from left
+            to right. For example, to use 2 quality layers with 20x and 5x
+            compression ratios then `j2k_cr` should be ``[20, 5]``. Cannot be
+            used with `j2k_psnr`.
         j2k_psnr : list[float], optional
-            *JPEG 2000* only. A list of the peak signal-to-noise ratios (PSNR)
-            to use for each quality layer, should be in increasing order. For
-            example, to use 2 quality layers with PSNR of 80 and 300 then
-            `j2k_psnr` should be ``[80, 100]``.
-
-            Cannot be used with `j2k_cr`.
+            **JPEG 2000 only**. A list of the peak signal-to-noise ratios (in dB)
+            to use for each quality layer. There must be at least one quality
+            layer and when using multiple quality layers they should be ordered
+            in increasing value from left to right. For example, to use 2
+            quality layers with PSNR of 80 and 300 then `j2k_psnr` should be
+            ``[80, 100]``. Cannot be used with `j2k_cr`.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
         """
         from pydicom.pixels import get_encoder, as_pixel_options
-
-        # TODO: Check if current pixel data is uncompressed
 
         uid = UID(transfer_syntax_uid)
 

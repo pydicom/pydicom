@@ -215,6 +215,9 @@ class TestJ2KLosslessEncoding:
             "number_of_frames": 1,
             "bits_allocated": 32,
         }
+        plugins = ["pylibjpeg"]
+        if HAVE_GDCM:
+            plugins.append("gdcm")
 
         for bits_stored in range(1, 25):
             ref = self.ref * (2**bits_stored - 1)
@@ -225,12 +228,13 @@ class TestJ2KLosslessEncoding:
             cs = JPEG2000LosslessEncoder.encode(
                 ref, encoding_plugin="pylibjpeg", **opts
             )
-            out = JPEG2000LosslessDecoder.as_array(
-                encapsulate([cs]),
-                decoding_plugin="pylibjpeg",
-                **opts,
-            )
-            assert np.array_equal(out, ref)
+            for plugin in plugins:
+                out = JPEG2000LosslessDecoder.as_array(
+                    encapsulate([cs]),
+                    decoding_plugin=plugin,
+                    **opts,
+                )
+                assert np.array_equal(out, ref)
 
     def test_arr_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
@@ -427,6 +431,10 @@ class TestJ2KLosslessEncoding:
             "bits_allocated": 32,
         }
 
+        plugins = ["pylibjpeg"]
+        if HAVE_GDCM:
+            plugins.append("gdcm")
+
         for bits_stored in range(1, 25):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
@@ -437,12 +445,13 @@ class TestJ2KLosslessEncoding:
             cs = JPEG2000LosslessEncoder.encode(
                 ref, encoding_plugin="pylibjpeg", **opts
             )
-            out = JPEG2000LosslessDecoder.as_array(
-                encapsulate([cs]),
-                decoding_plugin="pylibjpeg",
-                **opts,
-            )
-            assert np.array_equal(out, ref)
+            for plugin in plugins:
+                out = JPEG2000LosslessDecoder.as_array(
+                    encapsulate([cs]),
+                    decoding_plugin=plugin,
+                    **opts,
+                )
+                assert np.array_equal(out, ref)
 
     def test_buffer_u1_spp1(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 1"""
@@ -1621,7 +1630,7 @@ class TestJ2KEncoding:
         assert info["mct"] is True
 
     def test_both_lossy_kwargs_raises(self):
-        """Test that lossy kwargs are ignored for lossless"""
+        """Test that having both lossy kwargs raises an exception"""
         ds = examples.rgb_color
         arr = ds.pixel_array
         opts = {
@@ -1642,6 +1651,30 @@ class TestJ2KEncoding:
             "Unable to encode as exceptions were raised by all available "
             "plugins:\n  pylibjpeg: Only one of 'compression_ratios' or "
             "'signal_noise_ratios' is allowed when performing lossy compression"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
+
+    def test_neither_lossy_kwargs_raises(self):
+        """Test that having neither lossy kwarg raises an exception"""
+        ds = examples.rgb_color
+        arr = ds.pixel_array
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": "RGB",
+            "pixel_representation": 0,
+            "number_of_frames": 1,
+            "bits_allocated": 8,
+            "bits_stored": 8,
+            "planar_configuration": 0,
+        }
+
+        msg = (
+            "Unable to encode as exceptions were raised by all available "
+            "plugins:\n  pylibjpeg: The 'JPEG 2000' transfer syntax requires "
+            "either the 'j2k_cr' or 'j2k_psnr' parameter"
         )
         with pytest.raises(RuntimeError, match=msg):
             JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
@@ -1672,6 +1705,8 @@ class TestJ2KEncoding:
         with pytest.raises(RuntimeError, match=msg):
             JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
 
+
+
     def test_dataset_compress(self):
         """Test that the j2k_cr and j2k_psnr kwargs are passed OK."""
         ds = examples.ct
@@ -1699,6 +1734,7 @@ class TestJ2KEncoding:
         )
         assert not np.array_equal(out, ref)
         assert np.allclose(out, ref, atol=3)
+
 
 
 def test_is_available_unknown_uid():

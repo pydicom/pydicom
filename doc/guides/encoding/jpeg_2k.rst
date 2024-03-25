@@ -8,6 +8,18 @@ The requirements for JPEG 2000 encoding are defined in :dcm:`Section 8.2.4
 15444-1 <https://www.iso.org/standard/78321.html>`_/`ITU T.800
 <https://www.itu.int/rec/T-REC-T.800-201511-S/en>`_ (the second link has free access).
 
+The following JPEG 2000 encoding parameters are used by `pylibjpeg` plugin:
+
+* For *JPEG 2000 Lossless* the reversible DWT 5-3 wavelet
+* For *JPEG 2000* the irreversible DWT 9-7 wavelet
+* 6 DWT decomposition levels
+* 64 x 64 code block size
+* 1 tile
+* LRCP progression order
+* No sub-sampling
+* No JP2 header
+
+
 Valid Image Pixel Parameters
 ----------------------------
 
@@ -79,6 +91,11 @@ during the encoding process, which should result in a higher compression ratio
 for a given image quality. If you don't wish to use MCT then keep the
 *Photometric Interpretation* as ``RGB``
 
+Bits Stored
+...........
+The maximum supported *Bits Stored* value for encoding is ``24``.
+
+
 Examples
 --------
 
@@ -103,7 +120,7 @@ multiple-component transformation:
 
     ds.compress(JPE2000Lossless)
 
-    print(len(ds.PixelData))  # ~
+    print(len(ds.PixelData))  # ~334412
 
 Losslessly compress unsigned RGB pixel data in-place with multiple-component
 transformation:
@@ -125,7 +142,7 @@ transformation:
     ds.PhotometricInterpretation = "YBR_RCT"
     ds.compress(JPE2000Lossless)
 
-    print(len(ds.PixelData))  # ~
+    print(len(ds.PixelData))  # ~152342
 
 
 Losslessly compress signed greyscale pixel data in-place:
@@ -145,7 +162,7 @@ Losslessly compress signed greyscale pixel data in-place:
 
     ds.compress(JPE2000Lossless)
 
-    print(len(ds.PixelData))  # ~152342
+    print(len(ds.PixelData))  # ~13656
 
 
 JPEG 2000
@@ -154,27 +171,19 @@ JPEG 2000
 .. warning::
 
     *pydicom* makes no recommendations for specifying image quality for lossy
-    encoding methods. Any examples of lossy encoding in the documentation,
-    code base or anywhere else in the project are for **illustration purposes only**.
+    encoding methods. Any examples of lossy encoding are for **illustration
+    purposes only**.
 
-The following encoding parameters are used with the lossy *JPEG 2000* transfer
-syntax:
+When performing lossy encoding one or more quality layers may be used, with each
+quality layer allowing the reconstruction of the pixel data at a given resolution.
+The image quality of each layer is controlled by passing either the `j2k_cr` or the
+`j2k_psnr` parameter to the :meth:`encoding function<pydicom.dataset.Dataset.compress>`
+as ``list[float]``, where:
 
-* The irreversible 9-7 DWT wavelet with 6 DWT decomposition levels
-* (Optionally) the irreversible multiple component transformation
-* 64 x 64 code block size
-* No sub-sampling
-* LRCP progression order
-
-One or more quality layers may be used, with each quality layer allowing
-the reconstruction of the pixel data at a given resolution. The image quality
-of each layer is controlled by passing either the `j2k_cr` or the `j2k_psnr`
-parameter to the encoding function as ``list[float]``, where:
-
-* 'j2k_cr': a list of the compression ratios to use for each quality
-  layer. They should be ordered in decreasing value from left to right.
-
-  Examples::
+* `j2k_cr`: a list of the compression ratios to use for each quality
+  layer. There must be at least one quality layer and the minimum allowable
+  compression ratio is ``1``. When using multiple quality layers they should be
+  ordered in decreasing value from left to right::
 
     # 1 quality layer at 1.5:1
     j2k_cr = [1.5]
@@ -183,10 +192,9 @@ parameter to the encoding function as ``list[float]``, where:
     j2k_cr = [5, 2]
 
 * `j2k_psnr`: a list of the peak signal-to-noise ratios (in dB) to use
-  for each quality layer. They should be ordered in increasing value from left
-  to right.
-
-  Examples::
+  for each quality layer. There must be at least one quality layer and when
+  using multiple quality layers they should be ordered in increasing value from
+  left to right::
 
     # 1 quality layer
     j2k_psnr = [80]
@@ -278,6 +286,6 @@ pylibjpeg
 |                                                          | Name      | Requires                    |Added|
 +==========================================================+===========+=============================+=====+
 |:attr:`~pydicom.pixels.encoders.JPEG2000LosslessEncoder`  | pylibjpeg | `numpy <np_>`_,             |v3.0 |
-+----------------------------------------------------------+           | `pylibjpeg <_pylj>`_        |     |
++----------------------------------------------------------+           | `pylibjpeg <_pylj>`_,       |     |
 |:attr:`~pydicom.pixels.encoders.JPEG2000Encoder`          |           | `pylibjpeg-openjpeg <_oj>`_ |     |
 +----------------------------------------------------------+-----------+-----------------------------+-----+

@@ -67,7 +67,7 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     if not cr and not psnr:
         raise ValueError(
             "The 'JPEG 2000' transfer syntax requires either the 'j2k_cr' "
-            "or 'j2k_psnr' parameters"
+            "or 'j2k_psnr' parameter"
         )
 
     cs = encoder(src, **opts, compression_ratios=cr, signal_noise_ratios=psnr)
