@@ -71,7 +71,7 @@ pixel data should already be in the corresponding color space:
 
 * If your uncompressed pixel data is in RGB color space:
 
-  * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` and ``YBR_RCT`` nothing
+  * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` or ``YBR_RCT``; nothing
     else is required.
   * For *Photometric Interpretation* ``YBR_FULL`` the pixel data must first be
     converted into RGB color space, however the conversion operation is lossy.
@@ -79,7 +79,7 @@ pixel data should already be in the corresponding color space:
 * If your uncompressed pixel data is in `YCbCr
   <https://en.wikipedia.org/wiki/YCbCr>`_ color space:
 
-  * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` or ``YBR_RCT`` the
+  * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` or ``YBR_RCT``; the
     pixel data must first be converted into RGB color space, however the
     conversion operation is lossy.
   * For *Photometric Interpretation* ``YBR_FULL`` nothing else is required.

@@ -1822,6 +1822,7 @@ class Dataset:
         encoding_plugin: str = "",
         decoding_plugin: str = "",
         encapsulate_ext: bool = False,
+        *,
         jls_error: int | None = None,
         j2k_cr: list[float] | None = None,
         j2k_psnr: list[float] | None = None,
@@ -1941,7 +1942,7 @@ class Dataset:
             layer and when using multiple quality layers they should be ordered
             in increasing value from left to right. For example, to use 2
             quality layers with PSNR of 80 and 300 then `j2k_psnr` should be
-            ``[80, 100]``. Cannot be used with `j2k_cr`.
+            ``[80, 300]``. Cannot be used with `j2k_cr`.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
