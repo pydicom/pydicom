@@ -52,7 +52,7 @@ Changes
 * :class:`~pydicom.filebase.DicomIO` now requires a readable or writeable buffer
   during initialisation and :class:`~pydicom.filebase.DicomBytesIO` directly
   inherits from it.
-* The ``pydicom.encoders`` module has been moved to :mod:`pydicom.pixels.encoders`,
+* The ``pydicom.encoders`` module has been moved to :doc:`pydicom.pixels.encoders</reference/pixels.encoders>`,
   the original import path will be removed in v4.0
 * Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a *Bits Stored* of
   6 or 7 produces incorrect results, so attempting to do so now raises an exception.
@@ -96,9 +96,9 @@ Removals
   :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead
 * The ``pixel_data_handlers.rle_handler.rle_encode_frame`` function has been
   removed, use :meth:`~pydicom.dataset.Dataset.compress` or
-  :attr:`~pydicom.pixels.encoders.RLELosslessEncoder` instead.
+  :attr:`~pydicom.pixels.encoders.base.RLELosslessEncoder` instead.
 * Removed the ``_storage_sopclass_uids`` module, import UIDs from the
-  :mod:`~pydicom.uid` module instead
+  :doc:`uid</reference/uid>` module instead
 * The following properties have been removed:
 
     * ``Dataset.parent`` and ``Dataset.parent_seq``
@@ -180,13 +180,16 @@ Enhancements
 * Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
   from a path to a dataset while minimizing memory-usage: :func:`~pydicom.pixels.pixel_array`
   and :func:`~pydicom.pixels.iter_pixels`.
-* Added support for the following transfer syntaxes to :meth:`Dataset.compress
+* Added support for the following transfer syntaxes to :meth:`Dataset.compress()
   <pydicom.dataset.Dataset.compress>` (:issue:`1997`):
 
   * *JPEG-LS Lossless*
   * *JPEG-LS Near Lossless*
+  * *JPEG 2000 Lossless*
+  * *JPEG 2000*
 
-  See the :doc:`JPEG-LS encoding guide</guides/encoding/jpeg_ls>` for more information.
+  See the :doc:`JPEG-LS</guides/encoding/jpeg_ls>` and :doc:`JPEG 2000
+  </guides/encoding/jpeg_2k>` encoding guides for more information.
 
 
 Fixes

@@ -77,16 +77,25 @@ array([[175, 180, 166, ..., 203, 207, 216],
        [914, 954, 938, ..., 942, 925, 905],
        [959, 955, 916, ..., 911, 904, 909]], dtype=int16)
 ```
-### Compressed *Pixel Data*
+### Decompressing *Pixel Data*
 #### JPEG, JPEG-LS and JPEG 2000
-Converting JPEG compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/old/image_data_handlers.html#guide-compressed).
-
-Currently only JPEG-LS (with [pyjpegls](https://github.com/pydicom/pyjpegls)) is supported for compressing data.
+Converting JPEG, JPEG-LS or JPEG 2000 compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/old/image_data_handlers.html#guide-compressed).
 
 #### RLE
-Encoding and decoding RLE *Pixel Data* only requires NumPy, however it can
-be quite slow. You may want to consider [installing one or more additional
-Python libraries](https://pydicom.github.io/pydicom/stable/old/image_data_compression.html) to speed up the process.
+Decompressing RLE *Pixel Data* only requires NumPy, however it can be quite slow. You may want to consider [installing one or more additional Python libraries](https://pydicom.github.io/pydicom/stable/old/image_data_compression.html) to speed up the process.
+
+### Compressing *Pixel Data*
+Information on compressing *Pixel Data* using one of the below formats can be found in the corresponding [encoding guides](https://pydicom.github.io/pydicom/stable/guides/encoding/index.html). These guides cover the specific requirements for each encoding method and we recommend you be familiar with them when performing image compression.
+
+#### JPEG-LS, JPEG 2000
+Compressing image data from an ``ndarray`` or ``bytes`` object to JPEG-LS or JPEG 2000 requires installing the following:
+
+* JPEG-LS requires [pyjpegls](https://github.com/pydicom/pyjpegls)
+* JPEG 2000 requires [pylibjpeg](https://github.com/pydicom/pylibjpeg) and the [pylibjpeg-openjpeg](https://github.com/pydicom/pylibjpeg-openjpeg) plugin
+
+#### RLE
+Compressing using RLE requires no additional packages but can be quite slow. It can be sped up by installing [pylibjpeg](https://github.com/pydicom/pylibjpeg) with the [pylibjpeg-rle](https://github.com/pydicom/pylibjpeg-rle) plugin, or [gdcm](https://github.com/tfmoraes/python-gdcm).
+
 
 ## Examples
 More [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) are available in the documentation.

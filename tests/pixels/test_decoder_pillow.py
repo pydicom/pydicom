@@ -111,3 +111,18 @@ class TestOpenJpegDecoder:
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+
+    def test_u4_raises(self):
+        """Test decoding greyscale with bits stored > 16 raises exception."""
+        decoder = get_decoder(JPEG2000Lossless)
+        ds = J2KR_08_08_3_0_1F_YBR_RCT.ds
+
+        msg = (
+            "Unable to decode as exceptions were raised by all available plugins:\n"
+            r"  pillow: only \(0028,0101\) 'Bits Stored' values of up "
+            "to 16 are supported"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decoder.as_array(
+                ds, decoding_plugin="pillow", bits_stored=17, bits_allocated=32
+            )

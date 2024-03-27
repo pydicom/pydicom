@@ -22,5 +22,7 @@ from pydicom.pixels.encoders.base import (
     RLELosslessEncoder,
     JPEGLSLosslessEncoder,
     JPEGLSNearLosslessEncoder,
+    JPEG2000LosslessEncoder,
+    JPEG2000Encoder,
 )
 from pydicom.pixels.utils import pixel_array, iter_pixels, as_pixel_options
