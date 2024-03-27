@@ -95,8 +95,8 @@ Removals
 * The ``DataElement.description`` attribute has been removed, use
   :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead
 * The ``pixel_data_handlers.rle_handler.rle_encode_frame`` function has been
-  removed, use :meth:`~pydicom.dataset.Dataset.compress` or
-  :attr:`~pydicom.pixels.encoders.RLELosslessEncoder` instead.
+  removed, use :meth:`Dataset.compress()<pydicom.dataset.Dataset.compress>` or
+  :attr:`~pydicom.pixels.encoders.base.RLELosslessEncoder` instead.
 * Removed the ``_storage_sopclass_uids`` module, import UIDs from the
   :mod:`~pydicom.uid` module instead
 * The following properties have been removed:
@@ -162,7 +162,7 @@ Enhancements
 * Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
   <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
   element length without having to read the element value. (:issue:`1873`)
-* Added the :doc:`pixels</reference/pixels>` module and a new more flexible backend for
+* Added the :mod:`~pydicom.pixels` module and a new more flexible backend for
   decoding pixel data via :class:`~pydicom.pixels.decoders.base.Decoder` factory class
   instances. The new decoding backend adds support for the following:
 
@@ -180,7 +180,7 @@ Enhancements
 * Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
   from a path to a dataset while minimizing memory-usage: :func:`~pydicom.pixels.pixel_array`
   and :func:`~pydicom.pixels.iter_pixels`.
-* Added support for the following transfer syntaxes to :meth:`Dataset.compress
+* Added support for the following transfer syntaxes to :meth:`Dataset.compress()
   <pydicom.dataset.Dataset.compress>` (:issue:`1997`):
 
   * *JPEG-LS Lossless*
@@ -218,7 +218,7 @@ Fixes
   image data when *Bits Stored* is less than *Bits Allocated* (:issue:`2009`)
 * Fixed decoding failures for JPEG-LS datasets with *Bits Allocated* of 16 and
   *Bits Stored* <= 8 (:issue:`2010`)
-* Fixed the VR not being set correctly with :func:`~pydicom.dataset.Dataset.compress`
+* Fixed the VR not being set correctly with :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>`
   (:issue:`2013`)
 
 
@@ -251,6 +251,37 @@ Deprecations
     instead
   * :func:`~pydicom.encaps.read_item`, use :func:`~pydicom.encaps.generate_fragments`
     instead
+
+* The :mod:`pydicom.pixel_data_handlers` module will be removed in v4.0. All pixel
+  data processing will use the :mod:`pydicom.pixels` module instead starting
+  with v3.0.
+
+    * The following functions from :mod:`pydicom.pixel_data_handlers.util` have been
+      moved to :mod:`pydicom.pixels.processing`:
+
+      * :func:`~pydicom.pixels.processing.apply_color_lut`
+      * :func:`~pydicom.pixels.processing.apply_modality_lut`
+      * :func:`~pydicom.pixels.processing.apply_rescale`
+      * :func:`~pydicom.pixels.processing.apply_voi_lut`
+      * :func:`~pydicom.pixels.processing.apply_voi`
+      * :func:`~pydicom.pixels.processing.apply_windowing`
+      * :func:`~pydicom.pixels.processing.convert_color_space`
+
+    * The following functions from :mod:`pydicom.pixel_data_handlers.util` have been
+      moved to :mod:`pydicom.pixels.utils`:
+
+      * :func:`~pydicom.pixels.utils.expand_ybr422`
+      * :func:`~pydicom.pixels.utils.get_expected_length`
+      * :func:`~pydicom.pixels.utils.get_image_pixel_ids`
+      * :func:`~pydicom.pixels.utils.get_j2k_parameters`
+      * :func:`~pydicom.pixels.utils.get_nr_frames`
+      * :func:`~pydicom.pixels.utils.pack_bits`
+      * :func:`~pydicom.pixels.utils.pixel_dtype`
+      * :func:`~pydicom.pixels.utils.reshape_pixel_array`
+      * :func:`~pydicom.pixels.utils.unpack_bits`
+
+    * :func:`~pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness` will be
+      removed in v4.0
 
 
 Pydicom Internals

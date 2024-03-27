@@ -3,6 +3,8 @@
 Pixel Data Encoders (:mod:`pydicom.pixels.encoders`)
 ====================================================
 
+.. module:: pydicom.pixels.encoders
+
 :class:`~pydicom.pixels.encoders.base.Encoder` class instances for compressing
 (7FE0,0010) *Pixel Data*.
 

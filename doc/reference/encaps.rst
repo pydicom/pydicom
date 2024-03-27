@@ -3,6 +3,7 @@
 Bulk Data Encapsulation Utilities (:mod:`pydicom.encaps`)
 =========================================================
 
+.. module:: pydicom.encaps
 .. currentmodule:: pydicom.encaps
 
 Functions for parsing and applying encapsulation to bulk data elements such

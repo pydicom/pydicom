@@ -67,8 +67,8 @@ from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
-from pydicom.pixel_data_handlers.util import (
-    convert_color_space,
+from pydicom.pixels.processing import convert_color_space
+from pydicom.pixels.utils import (
     reshape_pixel_array,
     get_image_pixel_ids,
     get_nr_frames,

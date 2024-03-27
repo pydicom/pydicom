@@ -4,7 +4,7 @@
 from collections.abc import Callable, Iterator, Iterable
 import logging
 import sys
-from typing import Any, BinaryIO, cast
+from typing import Any, BinaryIO, cast, TYPE_CHECKING
 
 try:
     import numpy as np
@@ -14,7 +14,6 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom import config
-from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames
 from pydicom.misc import warn_and_log
 from pydicom.pixels.common import (
@@ -24,8 +23,11 @@ from pydicom.pixels.common import (
     CoderBase,
     PhotometricInterpretation as PI,
 )
-from pydicom.pixels.utils import _get_jpg_parameters
-from pydicom.pixel_data_handlers.util import convert_color_space, get_j2k_parameters
+from pydicom.pixels.processing import convert_color_space
+from pydicom.pixels.utils import (
+    _get_jpg_parameters,
+    get_j2k_parameters,
+)
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -47,6 +49,9 @@ from pydicom.uid import (
     JPEG2000TransferSyntaxes,
     JPEGLSTransferSyntaxes,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
 
 
 LOGGER = logging.getLogger(__name__)
@@ -510,7 +515,7 @@ class DecodeRunner(RunnerBase):
         self.set_option("pixel_keyword", px_keyword[0])
         self.set_option("pixel_vr", ds[px_keyword[0]].VR)
 
-    def set_source(self, src: Buffer | Dataset | BinaryIO) -> None:
+    def set_source(self, src: "Buffer | Dataset | BinaryIO") -> None:
         """Set the pixel data to be decoded.
 
         Parameters
@@ -520,6 +525,8 @@ class DecodeRunner(RunnerBase):
             :class:`~pydicom.dataset.Dataset` containing the pixel data and
             associated group ``0x0028`` elements.
         """
+        from pydicom.dataset import Dataset
+
         if isinstance(src, Dataset):
             self._set_options_ds(src)
             self._src = src[self.pixel_keyword].value
@@ -666,7 +673,7 @@ class Decoder(CoderBase):
 
     def as_array(
         self,
-        src: Dataset | Buffer | BinaryIO,
+        src: "Dataset | Buffer | BinaryIO",
         *,
         index: int | None = None,
         validate: bool = True,
@@ -1002,7 +1009,7 @@ class Decoder(CoderBase):
 
     def as_buffer(
         self,
-        src: Dataset | Buffer | BinaryIO,
+        src: "Dataset | Buffer | BinaryIO",
         *,
         index: int | None = None,
         validate: bool = True,
@@ -1231,7 +1238,7 @@ class Decoder(CoderBase):
 
     def iter_array(
         self,
-        src: Dataset | Buffer | BinaryIO,
+        src: "Dataset | Buffer | BinaryIO",
         *,
         indices: Iterable[int] | None = None,
         raw: bool = False,
@@ -1389,7 +1396,7 @@ class Decoder(CoderBase):
 
     def iter_buffer(
         self,
-        src: Dataset | Buffer | BinaryIO,
+        src: "Dataset | Buffer | BinaryIO",
         *,
         indices: Iterable[int] | None = None,
         validate: bool = True,

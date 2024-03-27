@@ -60,7 +60,7 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom.misc import warn_and_log
-from pydicom.pixel_data_handlers.util import (
+from pydicom.pixels.utils import (
     pixel_dtype,
     get_expected_length,
     unpack_bits,

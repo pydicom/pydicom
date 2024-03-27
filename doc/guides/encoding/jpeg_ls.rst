@@ -100,7 +100,7 @@ pixel data should already be in the corresponding color space:
 
     * For *Bits Allocated* and *Bits Stored* less than or equal to 8: pixel
       data must be :func:`converted into YCbCr color space
-      <pydicom.pixel_data_handlers.convert_color_space>`. However
+      <pydicom.pixels.processing.convert_color_space>`. However
       you should keep in mind that the conversion operation is lossy.
     * For *Bits Allocated* and *Bits Stored* between 9 and 16 (inclusive):
       pixel data should be downscaled to 8-bit (with *Bits Stored*, *Bits
@@ -113,7 +113,7 @@ pixel data should already be in the corresponding color space:
 
   * For *Photometric Interpretation* ``RGB`` the pixel data must first be
     :func:`converted into RGB color space
-    <pydicom.pixel_data_handlers.convert_color_space>`. However the conversion
+    <pydicom.pixels.processing.convert_color_space>`. However the conversion
     operation is lossy.
   * For *Photometric Interpretation* ``YBR_FULL`` nothing else is required.
 
