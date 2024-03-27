@@ -85,7 +85,7 @@ Converting JPEG, JPEG-LS or JPEG 2000 compressed *Pixel Data* to an ``ndarray`` 
 Decompressing RLE *Pixel Data* only requires NumPy, however it can be quite slow. You may want to consider [installing one or more additional Python libraries](https://pydicom.github.io/pydicom/stable/old/image_data_compression.html) to speed up the process.
 
 ### Compressing *Pixel Data*
-Information on compressing *Pixel Data* using one of the below formats can be found in the corresponding [encoding guides](https://pydicom.github.io/pydicom/stable/guides/encoding/index.html). These guides cover the specific requirements for each encoding method and we recommended you be familiar with them when performing image compression.
+Information on compressing *Pixel Data* using one of the below formats can be found in the corresponding [encoding guides](https://pydicom.github.io/pydicom/stable/guides/encoding/index.html). These guides cover the specific requirements for each encoding method and we recommend you be familiar with them when performing image compression.
 
 #### JPEG-LS, JPEG 2000
 Compressing image data from an ``ndarray`` or ``bytes`` object to JPEG-LS or JPEG 2000 requires installing the following:
