@@ -1,0 +1,23 @@
+.. _api_pixel_utils:
+
+Pixel Data Encoders (:mod:`pydicom.pixels.utils`)
+======================================================
+
+.. module:: pydicom.pixels.utils
+.. currentmodule:: pydicom.pixels.utils
+
+.. autosummary::
+   :toctree: generated/
+
+   as_pixel_options
+   expand_ybr422
+   get_expected_length
+   get_image_pixel_ids
+   get_j2k_parameters
+   get_nr_frames
+   iter_pixels
+   pack_bits
+   pixel_array
+   pixel_dtype
+   reshape_pixel_array
+   unpack_bits
