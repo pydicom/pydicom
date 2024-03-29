@@ -3,10 +3,8 @@ from typing import Any
 
 from pydicom import config
 from pydicom.misc import warn_and_log
-from pydicom.pixels import (
-    get_encoder as _get_encoder,
-    RLELosslessEncoder as _rle_encoder,
-)
+from pydicom.pixels import get_encoder as _get_encoder
+from pydicom.pixels.encoders import RLELosslessEncoder as _rle_encoder
 
 
 _DEPRECATED = {

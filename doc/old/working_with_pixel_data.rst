@@ -195,7 +195,7 @@ first.
 .. code-block:: python
 
     from pydicom import examples
-    from pydicom.pixels.processing import apply_modality_lut
+    from pydicom.pixels import apply_modality_lut
 
     ds = examples.ct
     arr = ds.pixel_array
@@ -219,7 +219,7 @@ that the modality LUT or rescale operation has already been applied.
 .. code-block:: python
 
     from pydicom import examples
-    from pydicom.pixels.processing import apply_voi_lut
+    from pydicom.pixels import apply_voi_lut
 
     ds = examples.overlay
     arr = ds.pixel_array

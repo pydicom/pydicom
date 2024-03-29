@@ -33,7 +33,7 @@ from pydicom import config
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixels.processing import convert_color_space
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,

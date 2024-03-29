@@ -1,3 +1,4 @@
+# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
 from typing import cast

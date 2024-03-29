@@ -7,11 +7,8 @@ import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.encaps import get_frame
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import (
-    convert_color_space,
-    get_j2k_parameters,
-    get_expected_length,
-)
+from pydicom.pixels.processing import convert_color_space
+from pydicom.pixels.utils import get_j2k_parameters, get_expected_length
 from pydicom.uid import (
     JPEGBaseline8Bit,
     JPEGExtended12Bit,

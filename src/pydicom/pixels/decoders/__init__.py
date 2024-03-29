@@ -1,3 +1,5 @@
+# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
+
 from pydicom.pixels.decoders.base import (
     ImplicitVRLittleEndianDecoder,
     ExplicitVRLittleEndianDecoder,

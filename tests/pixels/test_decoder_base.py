@@ -10,10 +10,11 @@ import pytest
 from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames, encapsulate
-from pydicom.pixels import get_decoder, ExplicitVRLittleEndianDecoder
+from pydicom.pixels import get_decoder
 from pydicom.pixels.common import PhotometricInterpretation as PI
+from pydicom.pixels.decoders import ExplicitVRLittleEndianDecoder
 from pydicom.pixels.decoders.base import DecodeRunner, Decoder
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixels.processing import convert_color_space
 
 from pydicom.uid import (
     ExplicitVRLittleEndian,

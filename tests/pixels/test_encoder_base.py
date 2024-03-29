@@ -15,10 +15,10 @@ except ImportError:
 from pydicom import config, examples
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.encoders.base import Encoder, EncodeRunner
-from pydicom.pixel_data_handlers.util import get_expected_length
+from pydicom.pixels.utils import get_expected_length
 from pydicom.uid import (
     UID,
     RLELossless,
