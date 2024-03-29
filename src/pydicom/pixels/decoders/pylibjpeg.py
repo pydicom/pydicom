@@ -23,12 +23,12 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGBaseline8Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
-    uid.JPEGExtended12Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
-    uid.JPEGLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
-    uid.JPEGLosslessSV1: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
-    uid.JPEGLSLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
-    uid.JPEGLSNearLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.0.2"),
+    uid.JPEGBaseline8Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.1"),
+    uid.JPEGExtended12Bit: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.1"),
+    uid.JPEGLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.1"),
+    uid.JPEGLosslessSV1: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.1"),
+    uid.JPEGLSLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.1"),
+    uid.JPEGLSNearLossless: ("pylibjpeg>=2.0", "pylibjpeg-libjpeg>=2.1"),
     uid.JPEG2000Lossless: ("pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.0"),
     uid.JPEG2000: ("pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.0"),
     uid.HTJ2KLossless: ("pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.0"),
@@ -86,12 +86,19 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
         if tsyntax == uid.RLELossless:
             runner.set_option("planar_configuration", 1)
 
-        # pylibjpeg-openjpeg returns YBR_ICT and YBR_RCT as RGB
-        if tsyntax in _OPENJPEG_SYNTAXES and runner.photometric_interpretation in (
-            PI.YBR_ICT,
-            PI.YBR_RCT,
-        ):
-            runner.set_option("photometric_interpretation", PI.RGB)
+        if tsyntax in _OPENJPEG_SYNTAXES:
+            # pylibjpeg-openjpeg returns YBR_ICT and YBR_RCT as RGB
+            if runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT):
+                runner.set_option("photometric_interpretation", PI.RGB)
+
+            # pylibjpeg-openjpeg pixel container size is based on precision
+            precision = runner.get_option("j2k_precision", runner.bits_stored)
+            if 0 < precision <= 8:
+                runner.set_option("bits_allocated", 8)
+            elif 8 < precision <= 16:
+                runner.set_option("bits_allocated", 16)
+            elif 16 < precision <= 32:
+                runner.set_option("bits_allocated", 32)
 
         if tsyntax in uid.JPEGLSTransferSyntaxes:
             # libjpeg always returns JPEG-LS data as color-by-pixel

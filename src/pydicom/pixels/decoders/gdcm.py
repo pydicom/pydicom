@@ -112,6 +112,16 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
             bits_allocated = math.ceil(bits_stored / 8) * 8
             runner.set_option("bits_allocated", bits_allocated)
 
+    if tsyntax in uid.JPEG2000TransferSyntaxes:
+        # GDCM pixel container size is based on precision
+        bits_stored = runner.get_option("j2k_precision", bits_stored)
+        if 0 < bits_stored <= 8:
+            runner.set_option("bits_allocated", 8)
+        elif 8 < bits_stored <= 16:
+            runner.set_option("bits_allocated", 16)
+        elif 16 < bits_stored <= 32:
+            runner.set_option("bits_allocated", 32)
+
     pixel_format = gdcm.PixelFormat(
         runner.samples_per_pixel,
         runner.bits_allocated,

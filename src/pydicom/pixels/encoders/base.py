@@ -50,6 +50,13 @@ class EncodeOptions(RunnerOptions, total=False):
     # The maximum allowable error in *unsigned* pixel intensity
     jls_error: int
 
+    # JPEG 2000
+    # Either j2k_cr or j2k_psnr is required
+    # The compression ratio for each quality layer, should be in decreasing order
+    j2k_cr: list[float]
+    # The peak signal-to-noise ratio for each layer, should be in increasing order
+    j2k_psnr: list[float]
+
 
 class EncodeRunner(RunnerBase):
     """Class for managing the pixel data encoding process.
@@ -120,7 +127,8 @@ class EncodeRunner(RunnerBase):
         if self.is_array:
             return self._get_frame_array(index)
 
-        return self._get_frame_buffer(index)
+        frame = self._get_frame_buffer(index)
+        return bytes(frame) if not isinstance(frame, bytes) else frame
 
     def _get_frame_array(self, index: int | None) -> bytes:
         """Return a frame's worth of uncompressed pixel data from an ndarray."""
@@ -157,7 +165,7 @@ class EncodeRunner(RunnerBase):
 
         return cast(bytes, arr.tobytes())
 
-    def _get_frame_buffer(self, index: int | None) -> bytes:
+    def _get_frame_buffer(self, index: int | None) -> bytes | bytearray:
         """Return a frame's worth of uncompressed pixel data from buffer-like."""
         # The encoded pixel data may use a larger container than is strictly
         #   needed: e.g. 32 bits allocated with 7 bits stored
@@ -748,7 +756,6 @@ ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
     JPEG2000: [  # 1.2.840.10008.1.2.4.91: Table 8.2.4-1 in PS3.5
         ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
         ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("YBR_RCT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_ICT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
@@ -767,7 +774,7 @@ RLELosslessEncoder = Encoder(RLELossless)
 RLELosslessEncoder.add_plugins(
     [
         ("gdcm", ("pydicom.pixels.encoders.gdcm", "encode_pixel_data")),
-        ("pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "encode_pixel_data")),
+        ("pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame")),
         ("pydicom", ("pydicom.pixels.encoders.native", "_encode_frame")),
     ],
 )
@@ -782,6 +789,16 @@ JPEGLSNearLosslessEncoder.add_plugin(
     "pyjpegls", ("pydicom.pixels.encoders.pyjpegls", "_encode_frame")
 )
 
+JPEG2000LosslessEncoder = Encoder(JPEG2000Lossless)
+JPEG2000LosslessEncoder.add_plugin(
+    "pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame")
+)
+
+JPEG2000Encoder = Encoder(JPEG2000)
+JPEG2000Encoder.add_plugin(
+    "pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame")
+)
+
 
 # Available pixel data encoders
 _PIXEL_DATA_ENCODERS = {
@@ -789,6 +806,8 @@ _PIXEL_DATA_ENCODERS = {
     RLELossless: (RLELosslessEncoder, "2.2"),
     JPEGLSLossless: (JPEGLSLosslessEncoder, "3.0"),
     JPEGLSNearLossless: (JPEGLSNearLosslessEncoder, "3.0"),
+    JPEG2000Lossless: (JPEG2000LosslessEncoder, "3.0"),
+    JPEG2000: (JPEG2000Encoder, "3.0"),
 }
 
 
@@ -838,6 +857,10 @@ def get_encoder(uid: str) -> Encoder:
     | *JPEG-LS Lossless*      | 1.2.840.10008.1.2.4.80 | 3.0            |
     +-------------------------+------------------------+----------------+
     | *JPEG-LS Near Lossless* | 1.2.840.10008.1.2.4.81 | 3.0            |
+    +-------------------------+------------------------+----------------+
+    | *JPEG 2000 Lossless*    | 1.2.840.10008.1.2.4.90 | 3.0            |
+    +-------------------------+------------------------+----------------+
+    | *JPEG 2000*             | 1.2.840.10008.1.2.4.91 | 3.0            |
     +-------------------------+------------------------+----------------+
     | *RLE Lossless*          | 1.2.840.10008.1.2.5    | 2.2            |
     +-------------------------+------------------------+----------------+

@@ -1346,21 +1346,35 @@ JPGB_08_08_3_0_1F_RGB_NO_APP14 = PixelReference(
 # JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
 # JPEG baseline in RGB colourspace with APP14 Adobe v101 marker
 def test(ref, arr, **kwargs):
-    # Works with pillow and GDCM
-    # pylibjpeg: decoding error due to unknown Adobe marker version
-    assert arr[99:104, 172].tolist() == [
-        [243, 244, 246],
-        [229, 224, 235],
-        [204, 190, 213],
-        [194, 176, 203],
-        [204, 188, 211],
-    ]
-    assert arr[84, 239:243].tolist() == [
-        [229, 225, 234],
-        [174, 174, 202],
-        [187, 185, 203],
-        [210, 207, 225],
-    ]
+    plugin = kwargs.get("plugin", None)
+    if plugin in ("pillow", "gdcm"):
+        assert arr[99:104, 172].tolist() == [
+            [243, 244, 246],
+            [229, 224, 235],
+            [204, 190, 213],
+            [194, 176, 203],
+            [204, 188, 211],
+        ]
+        assert arr[84, 239:243].tolist() == [
+            [229, 225, 234],
+            [174, 174, 202],
+            [187, 185, 203],
+            [210, 207, 225],
+        ]
+    elif plugin == "pylibjpeg":
+        assert arr[99:104, 172].tolist() == [
+            [243, 244, 246],
+            [229, 224, 235],
+            [204, 191, 213],
+            [194, 176, 203],
+            [204, 188, 211],
+        ]
+        assert arr[84, 239:243].tolist() == [
+            [229, 225, 234],
+            [174, 174, 202],
+            [187, 185, 203],
+            [211, 207, 225],
+        ]
 
 
 JPGB_08_08_3_0_1F_RGB_APP14 = PixelReference(
@@ -1371,21 +1385,35 @@ JPGB_08_08_3_0_1F_RGB_APP14 = PixelReference(
 # JPGB, (8, 8), (1, 256, 256, 3), OB, RGB, 0
 # JPEG baseline in RGB colourspace with APP14 Adobe v101 marker
 def test(ref, arr, **kwargs):
-    # Works with pillow and GDCM
-    # pylibjpeg: decoding error due to unknown Adobe marker version
-    assert arr[99:104, 172].tolist() == [
-        [243, 244, 246],
-        [229, 224, 235],
-        [204, 190, 213],
-        [194, 176, 203],
-        [204, 188, 211],
-    ]
-    assert arr[84, 239:243].tolist() == [
-        [229, 225, 234],
-        [174, 174, 202],
-        [187, 185, 203],
-        [210, 207, 225],
-    ]
+    plugin = kwargs.get("plugin", None)
+    if plugin in ("pillow", "gdcm"):
+        assert arr[99:104, 172].tolist() == [
+            [243, 244, 246],
+            [229, 224, 235],
+            [204, 190, 213],
+            [194, 176, 203],
+            [204, 188, 211],
+        ]
+        assert arr[84, 239:243].tolist() == [
+            [229, 225, 234],
+            [174, 174, 202],
+            [187, 185, 203],
+            [210, 207, 225],
+        ]
+    elif plugin == "pylibjpeg":
+        assert arr[99:104, 172].tolist() == [
+            [243, 244, 246],
+            [229, 224, 235],
+            [204, 191, 213],
+            [194, 176, 203],
+            [204, 188, 211],
+        ]
+        assert arr[84, 239:243].tolist() == [
+            [229, 225, 234],
+            [174, 174, 202],
+            [187, 185, 203],
+            [211, 207, 225],
+        ]
 
 
 JPGB_08_08_3_0_1F_RGB_DCMD_APP14 = PixelReference(

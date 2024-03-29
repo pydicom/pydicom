@@ -129,9 +129,8 @@ common *Planar Configuration* ``0`` (interleave mode 2) pixel ordering.
 
 For either case, if the pixel data being encoded is in an :class:`~numpy.ndarray`
 then each frame should be shaped as (rows, columns, planes). If the pixel data
-being encoded is :class:`bytes` it must be ordered as:
-
-With *Planar Configuration* ``0`` the data is ordered as color-by-pixel::
+being encoded is :class:`bytes` then with *Planar Configuration* ``0`` the data
+is ordered as color-by-pixel::
 
     # Three 8-bit RGB pixels: (255, 255, 0), (0, 255, 0), (0, 255, 255)
     # Each pixel is encoded separately the concatenated
@@ -194,6 +193,18 @@ Losslessly compress signed greyscale pixel data in-place:
 
 JPEG-LS Near-lossless
 .....................
+
+.. warning::
+
+    *pydicom* makes no recommendations for specifying image quality for lossy
+    encoding methods. Any examples of lossy encoding are for **illustration
+    purposes only**.
+
+When using the *JPEG-LS Near-lossless* transfer syntax, image quality is
+controlled by passing the `jls_error` parameter to the :meth:`encoding function
+<pydicom.dataset.Dataset.compress>`. `jls_error` is directly related to the JPEG-LS
+NEAR parameter, which is the allowed absolute error in pixel intensity units from
+the compression process and should be in the range ``(0, 2**BitsStored - 1)``.
 
 Lossy compression of unsigned pixel data with a maximum error of 2 pixel
 intensity units:

@@ -15,6 +15,8 @@ Pixel Data Encoders (:mod:`pydicom.pixels.encoders`)
 
    JPEGLSLosslessEncoder
    JPEGLSNearLosslessEncoder
+   JPEG2000LosslessEncoder
+   JPEG2000Encoder
    RLELosslessEncoder
 
 
