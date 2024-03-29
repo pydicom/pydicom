@@ -28,7 +28,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="RLE Lossless Encoding" href="rle_lossless.html" />
+    <link rel="next" title="JPEG 2000 Encoding" href="jpeg_2k.html" />
     <link rel="prev" title="Pixel Data Encoding" href="index.html" /> 
 </head>
 
@@ -75,6 +75,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#available-plugins">Available Plugins</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="jpeg_2k.html">JPEG 2000 Encoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rle_lossless.html">RLE Lossless Encoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugin_options.html">Encoder Plugins Options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugins.html">Pixel Data Encoder Plugins</a></li>
@@ -273,8 +274,8 @@ more likely to result in downstream issues with decoders that expect the more
 common <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> (interleave mode 2) pixel ordering.</p>
 <p>For either case, if the pixel data being encoded is in an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
 then each frame should be shaped as (rows, columns, planes). If the pixel data
-being encoded is <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> it must be ordered as:</p>
-<p>With <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> the data is ordered as color-by-pixel:</p>
+being encoded is <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> then with <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> the data
+is ordered as color-by-pixel:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Three 8-bit RGB pixels: (255, 255, 0), (0, 255, 0), (0, 255, 255)</span>
 <span class="c1"># Each pixel is encoded separately the concatenated</span>
 <span class="c1">#       first pixel | second px | third px  |</span>
@@ -331,6 +332,16 @@ being encoded is <a class="reference external" href="https://docs.python.org/3/l
 </section>
 <section id="jpeg-ls-near-lossless">
 <h3>JPEG-LS Near-lossless<a class="headerlink" href="#jpeg-ls-near-lossless" title="Link to this heading">¶</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><em>pydicom</em> makes no recommendations for specifying image quality for lossy
+encoding methods. Any examples of lossy encoding are for <strong>illustration
+purposes only</strong>.</p>
+</div>
+<p>When using the <em>JPEG-LS Near-lossless</em> transfer syntax, image quality is
+controlled by passing the <cite>jls_error</cite> parameter to the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">encoding</span> <span class="pre">function</span></code></a>. <cite>jls_error</cite> is directly related to the JPEG-LS
+NEAR parameter, which is the allowed absolute error in pixel intensity units from
+the compression process and should be in the range <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">2**BitsStored</span> <span class="pre">-</span> <span class="pre">1)</span></code>.</p>
 <p>Lossy compression of unsigned pixel data with a maximum error of 2 pixel
 intensity units:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
@@ -416,7 +427,7 @@ intensity units:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Pixel Data Encoding" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="rle_lossless.html" class="btn btn-neutral float-right" title="RLE Lossless Encoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="jpeg_2k.html" class="btn btn-neutral float-right" title="JPEG 2000 Encoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

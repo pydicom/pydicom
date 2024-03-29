@@ -298,7 +298,7 @@ modified when writing</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO" title="pydicom.filebase.DicomIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomIO</span></code></a> now requires a readable or writeable buffer
 during initialisation and <a class="reference internal" href="../reference/generated/pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomBytesIO</span></code></a> directly
 inherits from it.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">pydicom.encoders</span></code> module has been moved to <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>,
+<li><p>The <code class="docutils literal notranslate"><span class="pre">pydicom.encoders</span></code> module has been moved to <a class="reference internal" href="../reference/pixels.encoders.html"><span class="doc">pydicom.pixels.encoders</span></a>,
 the original import path will be removed in v4.0</p></li>
 <li><p>Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a <em>Bits Stored</em> of
 6 or 7 produces incorrect results, so attempting to do so now raises an exception.
@@ -350,9 +350,9 @@ instead.</p></li>
 <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.name" title="pydicom.dataelem.DataElement.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.name</span></code></a> instead</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">pixel_data_handlers.rle_handler.rle_encode_frame</span></code> function has been
 removed, use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code> instead.</p></li>
+<a class="reference internal" href="../reference/generated/pydicom.pixels.encoders.base.RLELosslessEncoder.html#pydicom.pixels.encoders.base.RLELosslessEncoder" title="pydicom.pixels.encoders.base.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
 <li><p>Removed the <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code> module, import UIDs from the
-<code class="xref py py-mod docutils literal notranslate"><span class="pre">uid</span></code> module instead</p></li>
+<a class="reference internal" href="../reference/uid.html"><span class="doc">uid</span></a> module instead</p></li>
 <li><p>The following properties have been removed:</p>
 <blockquote>
 <div><ul class="simple">
@@ -444,12 +444,14 @@ Table and the <em>Number of Frames</em> is incorrect (<a class="reference extern
 <li><p>Added two functions for returning pixel data as a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
 from a path to a dataset while minimizing memory-usage: <a class="reference internal" href="../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>
 and <a class="reference internal" href="../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>.</p></li>
-<li><p>Added support for the following transfer syntaxes to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1997">#1997</a>):</p>
+<li><p>Added support for the following transfer syntaxes to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1997">#1997</a>):</p>
 <ul class="simple">
 <li><p><em>JPEG-LS Lossless</em></p></li>
 <li><p><em>JPEG-LS Near Lossless</em></p></li>
+<li><p><em>JPEG 2000 Lossless</em></p></li>
+<li><p><em>JPEG 2000</em></p></li>
 </ul>
-<p>See the <a class="reference internal" href="../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS encoding guide</span></a> for more information.</p>
+<p>See the <a class="reference internal" href="../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS</span></a> and <a class="reference internal" href="../guides/encoding/jpeg_2k.html"><span class="doc">JPEG 2000</span></a> encoding guides for more information.</p>
 </li>
 </ul>
 </section>

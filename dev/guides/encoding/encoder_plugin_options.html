@@ -70,6 +70,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../decoding/index.html">Pixel Data Decoding</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Encoding</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="jpeg_ls.html">JPEG-LS Encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jpeg_2k.html">JPEG 2000 Encoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rle_lossless.html">RLE Lossless Encoding</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Encoder Plugins Options</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pydicom">pydicom</a></li>
@@ -180,9 +181,32 @@
 </tr>
 </thead>
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000LosslessEncoder</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'use_mct'</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Enable MCT for RGB pixel data
+(default <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000Encoder</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'use_mct'</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Enable MCT for RGB pixel data
+(default <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">compression_ratios</span></code></p></td>
+<td><p>list[float]</p></td>
+<td><p>The compression ratio for
+each quality layer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">signal_to_noise_ratios</span></code></p></td>
+<td><p>list[float]</p></td>
+<td><p>The peak signal-to-noise
+ratio for each quality layer</p></td>
+</tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'byteorder'</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">'&lt;'</span></code>, <code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'&lt;'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code></p></td>
 <td><p>The byte order of <cite>src</cite> may
 be little- or big-endian</p></td>
 </tr>
@@ -202,9 +226,21 @@ be little- or big-endian</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSLosslessEncoder</span></code>
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSNearLosslessEncoder</span></code></p></td>
-<td colspan="3"><p>(none available)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSLosslessEncoder</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'interleave_mode'</span></code></p></td>
+<td><p>int</p></td>
+<td><p>The interleave mode used by the image data, 0
+for color-by-plane, 2 for color-by-pixel</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSNearLosslessEncoder</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'lossy_error'</span></code></p></td>
+<td><p>int</p></td>
+<td><p>The absolute error in pixel intensity units</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'interleave_mode'</span></code></p></td>
+<td><p>int</p></td>
+<td><p>The interleave mode used by the image data, 0
+for color-by-plane, 2 for color-by-pixel</p></td>
 </tr>
 </tbody>
 </table>

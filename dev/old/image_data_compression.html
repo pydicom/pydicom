@@ -70,12 +70,12 @@
 <li class="toctree-l2"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Compressing <em>Pixel Data</em></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#compressing-using-third-party-packages">Compressing using third-party packages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#compressing-using-pydicom">Compressing using pydicom</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#supported-transfer-syntaxes">Supported Transfer Syntaxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#compressing-with-dataset-compress">Compressing with <code class="docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#compressing-using-third-party-packages">Compressing using third-party packages</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
@@ -129,60 +129,6 @@
   <section id="compressing-pixel-data">
 <span id="guide-compression"></span><h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Link to this heading">¶</a></h1>
 <p class="rubric">How to compress Pixel Data</p>
-<section id="compressing-using-third-party-packages">
-<h2>Compressing using third-party packages<a class="headerlink" href="#compressing-using-third-party-packages" title="Link to this heading">¶</a></h2>
-<p>Because <em>pydicom</em> currently offers limited support for compressing <em>Pixel Data</em>
-you’ll have to rely on third-party packages to perform the actual compression.
-<em>pydicom</em> can then be used to take that compressed data and add it to the
-dataset.</p>
-<p>The requirements for compressed <em>Pixel Data</em> in the DICOM Standard are:</p>
-<ul class="simple">
-<li><p>Each frame of pixel data must be encoded separately</p></li>
-<li><p>All the encoded frames must then be <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulated</span></code></a> using a basic offset table. When the amount
-of encoded data is too large for the basic offset table then the use of
-the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">extended</span> <span class="pre">offset</span> <span class="pre">table</span></code></a> is
-recommended.</p></li>
-<li><p>A dataset with encapsulated pixel data must use explicit VR little endian
-encoding</p></li>
-</ul>
-<p>See the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">relevant sections of the DICOM Standard</a>
-for more information.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
-
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
-
-<span class="c1"># Fetch an example dataset</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
-
-<span class="c1"># Use third-party package to compress</span>
-<span class="c1"># Let&#39;s assume it compresses to JPEG 2000 (lossless)</span>
-<span class="n">frames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">third_party_compression_func</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-
-<span class="c1"># Set the *Transfer Syntax UID* appropriately</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEG2000Lossless</span>
-<span class="c1"># For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged</span>
-
-<span class="c1"># Basic encapsulation</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
-
-<span class="c1"># Set the dataset encoding</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="c1"># Save!</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_basic.dcm&quot;</span><span class="p">)</span>
-
-<span class="c1"># Extended encapsulation</span>
-<span class="n">result</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTableLength</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_ext.dcm&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
 <section id="compressing-using-pydicom">
 <h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Link to this heading">¶</a></h2>
 <section id="supported-transfer-syntaxes">
@@ -202,13 +148,22 @@ transfer syntaxes:</p>
 <tbody>
 <tr class="row-odd"><td><p>JPEG-LS Lossless</p></td>
 <td><p>1.2.840.10008.1.2.4.80</p></td>
-<td><p>pyjpegls</p></td>
+<td rowspan="2"><p>pyjpegls</p></td>
 <td rowspan="2"><p><a class="reference external" href="https://numpy.org/">numpy</a>,
 <a class="reference external" href="https://github.com/pydicom/pyjpegls">pyjpegls</a></p></td>
 </tr>
 <tr class="row-even"><td><p>JPEG-LS Near Lossless</p></td>
 <td><p>1.2.840.10008.1.2.4.81</p></td>
-<td><p>pyjpegls</p></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG 2000 Lossless</p></td>
+<td><p>1.2.840.10008.1.2.4.90</p></td>
+<td rowspan="2"><p>pylibjpeg</p></td>
+<td rowspan="2"><p><a class="reference external" href="https://numpy.org/">numpy</a>,
+<a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a>,
+<a class="reference external" href="https://github.com/pydicom/pylibjpeg-openjpeg">pylibjpeg-openjpeg</a></p></td>
+</tr>
+<tr class="row-even"><td><p>JPEG 2000</p></td>
+<td><p>1.2.840.10008.1.2.4.91</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="3"><p>RLE Lossless</p></td>
 <td rowspan="3"><p>1.2.840.10008.1.2.5</p></td>
@@ -228,6 +183,30 @@ transfer syntaxes:</p>
 <div class="line-block">
 <div class="line"><sup>1</sup> <em>~20x slower than the other plugins</em></div>
 </div>
+<p>Each of the supported transfer syntaxes has a corresponding encoding guide to help
+you with the specific requirements of the encoding method.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Transfer Syntax</p></th>
+<th class="head"><p>Encoding guide</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>JPEG-LS Lossless</p></td>
+<td rowspan="2"><p><a class="reference internal" href="../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS Encoding</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG-LS Near Lossless</p></td>
+</tr>
+<tr class="row-even"><td><p>JPEG 2000 Lossless</p></td>
+<td rowspan="2"><p><a class="reference internal" href="../guides/encoding/jpeg_2k.html"><span class="doc">JPEG 2000 Encoding</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG 2000</p></td>
+</tr>
+<tr class="row-even"><td><p>RLE Lossless</p></td>
+<td><p><a class="reference internal" href="../guides/encoding/rle_lossless.html"><span class="doc">RLE Encoding</span></a></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="compressing-with-dataset-compress">
 <h3>Compressing with <code class="docutils literal notranslate"><span class="pre">Dataset.compress()</span></code><a class="headerlink" href="#compressing-with-dataset-compress" title="Link to this heading">¶</a></h3>
@@ -269,6 +248,59 @@ Interpretation</em> has been set and that the decompressed pixel data is in the
 correct color space prior to actually calling
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a>.</p>
 </section>
+</section>
+<section id="compressing-using-third-party-packages">
+<h2>Compressing using third-party packages<a class="headerlink" href="#compressing-using-third-party-packages" title="Link to this heading">¶</a></h2>
+<p>If you need to perform pixel data compression using an encoding method not
+supported by <em>pydicom</em> - such as :dcm:<a href="#id1"><span class="problematic" id="id2">`</span></a>ISO/IEC 10918-1 JPEG
+&lt;part05/sect_8.2.html#sect_8.2.1&gt; - then you’ll need to find a third-party
+package or application to do so. Once you’ve done that you have to follow the
+requirements for compressed <em>Pixel Data</em> in the DICOM Standard:</p>
+<ul class="simple">
+<li><p>Each frame of pixel data must be encoded separately</p></li>
+<li><p>All the encoded frames must then be <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulated</span></code></a> using a basic offset table. When the amount
+of encoded data is too large for the basic offset table then the use of
+the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">extended</span> <span class="pre">offset</span> <span class="pre">table</span></code></a> is
+recommended.</p></li>
+<li><p>A dataset with encapsulated pixel data must use explicit VR little endian
+encoding</p></li>
+</ul>
+<p>See the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">relevant sections of the DICOM Standard</a>
+for more information.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGBaseline8Bit</span>
+
+<span class="c1"># Fetch an example dataset</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+
+<span class="c1"># Use third-party package to compress</span>
+<span class="c1"># Let&#39;s assume it compresses to JPEG Baseline (lossy)</span>
+<span class="n">frames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">third_party_compression_func</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Set the *Transfer Syntax UID* appropriately</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEGBaseline8Bit</span>
+
+<span class="c1"># Basic encapsulation</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+
+<span class="c1"># Set the element&#39;s VR and use an undefined length</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_undefined_length</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s2">&quot;OB&quot;</span>
+
+<span class="c1"># Save!</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_basic.dcm&quot;</span><span class="p">)</span>
+
+<span class="c1"># Extended encapsulation</span>
+<span class="n">result</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTableLength</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_ext.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 </section>
 

@@ -1,0 +1,6 @@
+﻿pydicom.pixels.encoders.base.JPEG2000LosslessEncoder
+====================================================
+
+.. currentmodule:: pydicom.pixels.encoders.base
+
+.. autodata:: JPEG2000LosslessEncoder
