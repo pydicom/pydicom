@@ -34,8 +34,6 @@ from .pixels_reference import (
     PIXEL_REFERENCE,
     JPGE_BAD,
     J2KR_16_13_1_1_1F_M2_MISMATCH,
-    JPGB_08_08_3_0_1F_RGB_APP14,  # fails to decode
-    JPGB_08_08_3_0_1F_RGB_DCMD_APP14,  # fails to decode
     JLSN_08_01_1_0_1F,
 )
 
@@ -64,10 +62,6 @@ class TestLibJpegDecoder:
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGBaseline8Bit], ids=name)
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
-        # Decoding failures due to unknown APP14 version
-        # if reference in (JPGB_08_08_3_0_1F_RGB_APP14, JPGB_08_08_3_0_1F_RGB_DCMD_APP14):
-        #     return
-
         decoder = get_decoder(JPEGBaseline8Bit)
         arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr, plugin="pylibjpeg")
@@ -140,25 +134,6 @@ class TestLibJpegDecoder:
         )
         with pytest.raises(RuntimeError, match=msg):
             decoder.as_array(JPGE_BAD.ds, decoding_plugin="pylibjpeg")
-
-    # def test_decode_failures(self):
-    #     """Test decoding failures."""
-    #     decoder = get_decoder(JPEGBaseline8Bit)
-    #     msg = (
-    #         "Unable to decode as exceptions were raised by all available "
-    #         "plugins:\n  pylibjpeg: libjpeg error code '-1038' returned "
-    #         r"from Decode\(\): A misplaced marker segment was found - Adobe "
-    #         "marker version unrecognized"
-    #     )
-    #     with pytest.raises(RuntimeError, match=msg):
-    #         decoder.as_array(
-    #             JPGB_08_08_3_0_1F_RGB_APP14.ds, decoding_plugin="pylibjpeg"
-    #         )
-    #
-    #     with pytest.raises(RuntimeError, match=msg):
-    #         decoder.as_array(
-    #             JPGB_08_08_3_0_1F_RGB_DCMD_APP14.ds, decoding_plugin="pylibjpeg"
-    #         )
 
     def test_bits_allocated_mismatch(self):
         """Test the result when bits stored <= 8 and bits allocated 16"""
