@@ -35,48 +35,7 @@ from pydicom.pixels.utils import (
 )
 
 
-_DEPRECATED = {
-    "apply_color_lut": _apply_color_lut,
-    "apply_modality_lut": _apply_modality_lut,
-    "apply_voi_lut": _apply_voi_lut,
-    "apply_voi": _apply_voi,
-    "apply_windowing": _apply_windowing,
-    "convert_color_space": _convert_color_space,
-    "pack_bits": _pack_bits,
-    "unpack_bits": _unpack_bits,
-}
-_DEPRECATED_UTIL = {
-    "expand_ybr422": _expand_ybr422,
-    "get_expected_length": _get_expected_length,
-    "get_image_pixel_ids": _get_image_pixel_ids,
-    "get_j2k_parameters": _get_j2k_parameters,
-    "get_nr_frames": _get_nr_frames,
-    "pixel_dtype": _pixel_dtype,
-    "reshape_pixel_array": _reshape_pixel_array,
-}
-
-
-def __getattr__(name: str) -> Any:
-    if name in _DEPRECATED and not config._use_future:
-        msg = (
-            "The 'pydicom.pixel_data_handlers.util' module will be removed "
-            f"in v4.0, please use 'from pydicom.pixels import {name}' instead"
-        )
-        warn_and_log(msg, DeprecationWarning)
-        return _DEPRECATED[name]
-
-    if name in _DEPRECATED_UTIL and not config._use_future:
-        msg = (
-            "The 'pydicom.pixel_data_handlers.util' module will be removed "
-            f"in v4.0, please use 'from pydicom.pixels.utils import {name}' instead"
-        )
-        warn_and_log(msg, DeprecationWarning)
-        return _DEPRECATED_UTIL[name]
-
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-
-def dtype_corrected_for_endianness(
+def _dtype_corrected_for_endianness(
     is_little_endian: bool, numpy_dtype: "np.dtype"
 ) -> "np.dtype":
     """Return a :class:`numpy.dtype` corrected for system and :class:`Dataset`
@@ -115,3 +74,52 @@ def dtype_corrected_for_endianness(
         return numpy_dtype.newbyteorder("S")
 
     return numpy_dtype
+
+
+_DEPRECATED = {
+    "apply_color_lut": _apply_color_lut,
+    "apply_modality_lut": _apply_modality_lut,
+    "apply_voi_lut": _apply_voi_lut,
+    "apply_voi": _apply_voi,
+    "apply_windowing": _apply_windowing,
+    "convert_color_space": _convert_color_space,
+    "pack_bits": _pack_bits,
+    "unpack_bits": _unpack_bits,
+}
+_DEPRECATED_UTIL = {
+    "expand_ybr422": _expand_ybr422,
+    "get_expected_length": _get_expected_length,
+    "get_image_pixel_ids": _get_image_pixel_ids,
+    "get_j2k_parameters": _get_j2k_parameters,
+    "get_nr_frames": _get_nr_frames,
+    "pixel_dtype": _pixel_dtype,
+    "reshape_pixel_array": _reshape_pixel_array,
+}
+
+
+def __getattr__(name: str) -> Any:
+    if name in _DEPRECATED and not config._use_future:
+        msg = (
+            "The 'pydicom.pixel_data_handlers' module will be removed "
+            f"in v4.0, please use 'from pydicom.pixels import {name}' instead"
+        )
+        warn_and_log(msg, DeprecationWarning)
+        return _DEPRECATED[name]
+
+    if name in _DEPRECATED_UTIL and not config._use_future:
+        msg = (
+            "The 'pydicom.pixel_data_handlers' module will be removed "
+            f"in v4.0, please use 'from pydicom.pixels.utils import {name}' instead"
+        )
+        warn_and_log(msg, DeprecationWarning)
+        return _DEPRECATED_UTIL[name]
+
+    if name == "dtype_corrected_for_endianness" and not config._use_future:
+        msg = (
+            "'dtype_corrected_for_endianness' is deprecated and will be "
+            "removed in v4.0"
+        )
+        warn_and_log(msg, DeprecationWarning)
+        return _dtype_corrected_for_endianness
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

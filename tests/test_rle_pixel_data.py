@@ -36,7 +36,7 @@ from pydicom.uid import RLELossless, AllTransferSyntaxes, ExplicitVRLittleEndian
 try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.pixel_data_handlers.util import reshape_pixel_array
+    from pydicom.pixels.utils import reshape_pixel_array
 
     HAVE_NP = NP_HANDLER.HAVE_NP
 except ImportError:

@@ -12,7 +12,10 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+from pydicom import config
+
+with pytest.warns(DeprecationWarning):
+    from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -41,3 +44,96 @@ class TestNumpy_DtypeCorrectedForEndianness:
         """Test that an unset endianness raises exception."""
         with pytest.raises(ValueError, match="attribute 'is_little_endian' has"):
             dtype_corrected_for_endianness(None, None)
+
+
+def test_deprecation_warnings():
+    msg = (
+        "The 'pydicom.pixel_data_handlers' module will be removed in v4.0, "
+        "please use 'from pydicom.pixels import convert_color_space' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers import convert_color_space
+
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers.util import convert_color_space as x
+
+    msg = (
+        "The 'pydicom.pixel_data_handlers' module will be removed in v4.0, "
+        "please use 'from pydicom.pixels.utils import expand_ybr422' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers import expand_ybr422
+
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers.util import expand_ybr422 as y
+
+    msg = (
+        "'dtype_corrected_for_endianness' is deprecated and will be " "removed in v4.0"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+
+
+@pytest.fixture
+def use_future():
+    original = config._use_future
+    config._use_future = True
+    yield
+    config._use_future = original
+
+
+class TestFuture:
+    def test_imports_raise(self, use_future):
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers import apply_color_lut as x
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import apply_color_lut
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import apply_modality_lut
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import apply_voi_lut
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import apply_voi
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import apply_windowing
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import convert_color_space
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers import expand_ybr422 as y
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import expand_ybr422
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import get_expected_length
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import get_image_pixel_ids
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import get_j2k_parameters
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import get_nr_frames
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import pack_bits
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import pixel_dtype
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import reshape_pixel_array
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import unpack_bits
+
+        with pytest.raises(ImportError):
+            from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
