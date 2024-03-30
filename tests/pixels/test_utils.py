@@ -506,7 +506,7 @@ REFERENCE_DTYPE = [
 
 
 @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
-def test_pixel_dtype_raises(self):
+def test_pixel_dtype_raises():
     """Test that pixel_dtype raises exception without numpy."""
     with pytest.raises(ImportError, match="Numpy is required to determine the dtype"):
         pixel_dtype(None)
@@ -707,7 +707,7 @@ if HAVE_NP:
 
 
 @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
-def test_reshape_pixel_array_raises(self):
+def test_reshape_pixel_array_raises():
     """Test that reshape_pixel_array raises exception without numpy."""
     with pytest.raises(ImportError, match="Numpy is required to reshape"):
         reshape_pixel_array(None, None)
