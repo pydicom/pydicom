@@ -12,8 +12,8 @@ Valid Image Pixel Parameters
 ----------------------------
 
 The table below lists the valid :dcm:`Image Pixel<part03/sect_C.7.6.3.html>`
-module parameters for *Pixel Data* encoded using *JPEG-LS Lossless* or *JPEG-LS
-Near-lossless* encoding. For an explanation of each parameter and its relationship
+module parameters for *Pixel Data* encoded using the *JPEG-LS Lossless* or *JPEG-LS
+Near-lossless* transfer syntaxes. For an explanation of each parameter and its relationship
 with the *Pixel Data* see the :doc:`glossary of Image Pixel elements<../glossary>`.
 
 +------------+-----------------------+-----------------+----------------+------------+---------+

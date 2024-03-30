@@ -94,9 +94,9 @@ extlinks = {
 # intersphinx configuration
 intersphinx_mapping = {
     "python": (f"https://docs.python.org/{sys.version_info.major}", None),
-    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "matplotlib": ("https://matplotlib.org", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
 }
 
 sphinx_gallery_conf = {

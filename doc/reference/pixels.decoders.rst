@@ -7,9 +7,9 @@ Pixel Data Decoders (:mod:`pydicom.pixels.decoders`)
 
 :class:`~pydicom.pixels.decoders.base.Decoder` class instances for decoding
 native and compressed (7FE0,0010) *Pixel Data*, (7FE0,0008) *Float Pixel Data* and
-(7FE0,0009) *Double Float Pixel Data*
+(7FE0,0009) *Double Float Pixel Data*.
 
-.. currentmodule:: pydicom.pixels.decoders.base
+.. currentmodule:: pydicom.pixels.decoders
 
 .. autosummary::
    :toctree: generated/
@@ -33,6 +33,8 @@ native and compressed (7FE0,0010) *Pixel Data*, (7FE0,0008) *Float Pixel Data* a
 
 
 Base decoder classes used by all decoders
+
+.. currentmodule:: pydicom.pixels.decoders.base
 
 .. autosummary::
    :toctree: generated/

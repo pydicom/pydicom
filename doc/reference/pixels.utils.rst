@@ -1,10 +1,12 @@
 .. _api_pixel_utils:
 
-Pixel Data Encoders (:mod:`pydicom.pixels.utils`)
-======================================================
+Pixel Data Utilities (:mod:`pydicom.pixels.utils`)
+==================================================
 
 .. module:: pydicom.pixels.utils
 .. currentmodule:: pydicom.pixels.utils
+
+Pixel data related utility functions.
 
 .. autosummary::
    :toctree: generated/

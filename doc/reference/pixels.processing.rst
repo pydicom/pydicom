@@ -1,7 +1,9 @@
 .. _api_pixel_processing:
 
-Pixel Data Encoders (:mod:`pydicom.pixels.processing`)
-======================================================
+Pixel Data Processing (:mod:`pydicom.pixels.processing`)
+========================================================
+
+Functions for applying image processing to pixel data.
 
 .. module:: pydicom.pixels.processing
 .. currentmodule:: pydicom.pixels.processing
