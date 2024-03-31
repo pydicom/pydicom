@@ -31,6 +31,8 @@ from .pixels_reference import (
     J2KR_16_13_1_1_1F_M2_MISMATCH,
     JLSN_08_01_1_0_1F,
     JLSL_08_07_1_0_1F,
+    JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
+    JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
 )
 
 
@@ -193,6 +195,44 @@ class TestDecoding:
                 bits_stored=7,
                 pixel_representation=1,
             )
+
+    def test_rgb_component_ids(self):
+        """Test decoding an incorrect photometric interpretation using cIDs."""
+        decoder = get_decoder(JPEGBaseline8Bit)
+        reference = JPGB_08_08_3_0_1F_RGB
+        msg = (
+            r"The \(0028,0004\) 'Photometric Interpretation' value is "
+            "'YBR_FULL_422' however the encoded image's codestream uses "
+            "component IDs that indicate it should be 'RGB'"
+        )
+        ds = reference.ds
+        ds.PhotometricInterpretation = "YBR_FULL_422"
+        with pytest.warns(UserWarning, match=msg):
+            arr = decoder.as_array(ds, raw=True, decoding_plugin="gdcm")
+
+        reference.test(arr, plugin="pylibjpeg")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    def test_jfif(self):
+        """Test decoding an incorrect photometric interpretation using JFIF."""
+        decoder = get_decoder(JPEGBaseline8Bit)
+        reference = JPGB_08_08_3_0_1F_YBR_FULL
+        msg = (
+            r"The \(0028,0004\) 'Photometric Interpretation' value is "
+            "'RGB' however the encoded image's codestream contains a JFIF APP "
+            "marker which indicates it should be 'YBR_FULL_422'"
+        )
+        ds = reference.ds
+        ds.PhotometricInterpretation = "RGB"
+        with pytest.warns(UserWarning, match=msg):
+            arr = decoder.as_array(ds, raw=True, decoding_plugin="gdcm")
+
+        reference.test(arr, plugin="pylibjpeg")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
 
 
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")

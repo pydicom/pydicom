@@ -35,6 +35,8 @@ from .pixels_reference import (
     JPGE_BAD,
     J2KR_16_13_1_1_1F_M2_MISMATCH,
     JLSN_08_01_1_0_1F,
+    JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
+    JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
 )
 
 
@@ -63,7 +65,15 @@ class TestLibJpegDecoder:
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
         decoder = get_decoder(JPEGBaseline8Bit)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+
+        if reference in (JPGB_08_08_3_0_1F_RGB, JPGB_08_08_3_0_1F_YBR_FULL):
+            with pytest.warns(UserWarning):
+                arr = decoder.as_array(
+                    reference.ds, raw=True, decoding_plugin="pylibjpeg"
+                )
+        else:
+            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -168,6 +178,44 @@ class TestLibJpegDecoder:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
+
+    def test_rgb_component_ids(self):
+        """Test decoding an incorrect photometric interpretation using cIDs."""
+        decoder = get_decoder(JPEGBaseline8Bit)
+        reference = JPGB_08_08_3_0_1F_RGB
+        msg = (
+            r"The \(0028,0004\) 'Photometric Interpretation' value is "
+            "'YBR_FULL_422' however the encoded image's codestream uses "
+            "component IDs that indicate it should be 'RGB'"
+        )
+        ds = reference.ds
+        ds.PhotometricInterpretation = "YBR_FULL_422"
+        with pytest.warns(UserWarning, match=msg):
+            arr = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
+
+        reference.test(arr, plugin="pylibjpeg")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    def test_jfif(self):
+        """Test decoding an incorrect photometric interpretation using JFIF."""
+        decoder = get_decoder(JPEGBaseline8Bit)
+        reference = JPGB_08_08_3_0_1F_YBR_FULL
+        msg = (
+            r"The \(0028,0004\) 'Photometric Interpretation' value is "
+            "'RGB' however the encoded image's codestream contains a JFIF APP "
+            "marker which indicates it should be 'YBR_FULL_422'"
+        )
+        ds = reference.ds
+        ds.PhotometricInterpretation = "RGB"
+        with pytest.warns(UserWarning, match=msg):
+            arr = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
+
+        reference.test(arr, plugin="pylibjpeg")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")

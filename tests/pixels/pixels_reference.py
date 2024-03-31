@@ -1305,6 +1305,7 @@ PIXEL_REFERENCE[RLELossless] = [
 
 # tsyntax, (bits allocated, stored), (frames, rows, cols, planes), VR, PI, pixel repr.
 # 0: JPGB, (8, 8), (1, 3, 3, 3), OB, YBR_FULL, 0
+# Uses a JFIF APP marker
 def test(ref, arr, **kwargs):
     # Pillow, pylibjpeg
     assert tuple(arr[0, 0, :]) == (138, 78, 147)
@@ -1636,6 +1637,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_444 = PixelReference(
 
 
 # JPGB, (8, 8), (1, 100, 100, 3), OB, RGB, 0
+# Uses RGB component IDs
 def test(ref, arr, **kwargs):
     assert tuple(arr[5, 50, :]) == (255, 0, 0)
     assert tuple(arr[15, 50, :]) == (255, 128, 128)
