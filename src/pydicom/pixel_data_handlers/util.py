@@ -994,6 +994,8 @@ def get_expected_length(ds: "Dataset", unit: str = "bytes") -> int:
     +-------------+---------------------------+------+-------------+
     | (0028,0100) | BitsAllocated             | 1    | Required    |
     +-------------+---------------------------+------+-------------+
+    | (7FE0,0010) | PixelData                 | 1C   | Required    |
+    +-------------+---------------------------+------+-------------+
 
     Parameters
     ----------
@@ -1016,27 +1018,29 @@ def get_expected_length(ds: "Dataset", unit: str = "bytes") -> int:
     columns = cast(int, ds.Columns)
     samples_per_pixel = cast(int, ds.SamplesPerPixel)
     bits_allocated = cast(int, ds.BitsAllocated)
+    pixel_data_buffer_length = cast(int, len(ds.PixelData))
 
-    length = rows * columns * samples_per_pixel
-    length *= get_nr_frames(ds)
-
-    if unit == "pixels":
-        return length
+    pixel_count = rows * columns * samples_per_pixel
+    byte_count = pixel_count
 
     # Correct for the number of bytes per pixel
     if bits_allocated == 1:
         # Determine the nearest whole number of bytes needed to contain
         #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
         #   are packed into 12.5 -> 13 bytes
-        length = length // 8 + (length % 8 > 0)
+        byte_count = byte_count // 8 + (byte_count % 8 > 0)
     else:
-        length *= bits_allocated // 8
+        byte_count *= bits_allocated // 8
 
     # DICOM Standard, Part 4, Annex C.7.6.3.1.2
     if ds.PhotometricInterpretation == "YBR_FULL_422":
-        length = length // 3 * 2
+        byte_count = byte_count // 3 * 2
 
-    return length
+    predicted_nr_frames = pixel_data_buffer_length // byte_count
+
+    if unit == "pixels":
+        return pixel_count * get_nr_frames(ds, default=predicted_nr_frames)
+    return byte_count * get_nr_frames(ds, default=predicted_nr_frames)
 
 
 def get_image_pixel_ids(ds: "Dataset") -> dict[str, int]:
@@ -1140,8 +1144,8 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
     return {}
 
 
-def get_nr_frames(ds: "Dataset", warn: bool = True) -> int:
-    """Return NumberOfFrames or 1 if NumberOfFrames is None or 0.
+def get_nr_frames(ds: "Dataset", warn: bool = True, default: int = 1) -> int:
+    """Return NumberOfFrames or default if NumberOfFrames is None or 0.
 
     Parameters
     ----------
@@ -1151,13 +1155,15 @@ def get_nr_frames(ds: "Dataset", warn: bool = True) -> int:
     warn : bool
         If ``True`` (the default), a warning is issued if NumberOfFrames
         has an invalid value.
+    default : int
+        The default return value if NumberOfFrames is undefined. ``1`` is the current default.
 
     Returns
     -------
     int
         An integer for the NumberOfFrames or 1 if NumberOfFrames is None or 0
     """
-    nr_frames: int | None = getattr(ds, "NumberOfFrames", 1)
+    nr_frames: int | None = getattr(ds, "NumberOfFrames", default)
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
     if not nr_frames:  # None or 0
         if warn:
