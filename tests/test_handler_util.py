@@ -1207,6 +1207,35 @@ class TestGetExpectedLength:
 
         assert length[2] == get_expected_length(ds, unit="bytes")
 
+    @pytest.mark.parametrize("shape, bits, length", REFERENCE_LENGTH)
+    def test_length_bytes_multiframe_nonumberofframes(self, shape, bits, length):
+        """Test get_expected_length(ds, unit='bytes') against a multiframe dicom scenario without NumberOfFrames defined."""
+        frames = 3
+        if shape[3] != 3 or bits == 1:
+        ds = Dataset()
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        ds.SamplesPerPixel = shape[3]
+        ds.PixelData = 'a' * (shape[1] * shape[2] * (bits // 8) * shape[3]) * frames
+
+        assert (length[0] * frames) == get_expected_length(ds, unit="bytes")
+
+    @pytest.mark.parametrize("shape, bits, length", REFERENCE_LENGTH)
+    def test_length_in_pixels_multiframe_nonumberofframes(self, shape, bits, length):
+        """Test get_expected_length(ds, unit='pixels') against a multiframe dicom scenario without NumberOfFrames defined."""
+        frames = 3
+        ds = Dataset()
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        ds.SamplesPerPixel = shape[3]
+        ds.PixelData = 'a' * (shape[1] * shape[2] * (bits // 8) * shape[3]) * frames
+
+        assert (length[1] * frames) == get_expected_length(ds, unit="pixels")
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ModalityLUT:
