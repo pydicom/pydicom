@@ -1217,7 +1217,7 @@ class TestGetExpectedLength:
         ds.Columns = shape[2]
         ds.BitsAllocated = bits
         ds.SamplesPerPixel = shape[3]
-        ds.PixelData = 'a' * ((shape[1] * shape[2] * (bits // 8) * shape[3]) * frames)
+        ds.PixelData = "a" * ((shape[1] * shape[2] * (bits // 8) * shape[3]) * frames)
 
         assert (length[0] * frames) == get_expected_length(ds, unit="bytes")
 
@@ -1231,7 +1231,7 @@ class TestGetExpectedLength:
         ds.Columns = shape[2]
         ds.BitsAllocated = bits
         ds.SamplesPerPixel = shape[3]
-        ds.PixelData = 'a' * ((shape[1] * shape[2] * (bits // 8) * shape[3]) * frames)
+        ds.PixelData = "a" * ((shape[1] * shape[2] * (bits // 8) * shape[3]) * frames)
 
         assert (length[1] * frames) == get_expected_length(ds, unit="pixels")
 
