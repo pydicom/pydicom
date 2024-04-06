@@ -7,7 +7,8 @@ import pytest
 
 from pydicom.config import debug
 from pydicom.encaps import get_frame, generate_frames, encapsulate
-from pydicom.pixels import get_decoder, RLELosslessDecoder
+from pydicom.pixels import get_decoder
+from pydicom.pixels.decoders import RLELosslessDecoder
 from pydicom.pixels.decoders.rle import (
     _rle_parse_header,
     _rle_decode_segment,

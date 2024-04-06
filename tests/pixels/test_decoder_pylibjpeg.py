@@ -28,7 +28,7 @@ from pydicom.uid import (
     HTJ2K,
     RLELossless,
 )
-from pydicom.pixel_data_handlers.util import get_j2k_parameters
+from pydicom.pixels.utils import get_j2k_parameters
 
 from .pixels_reference import (
     PIXEL_REFERENCE,

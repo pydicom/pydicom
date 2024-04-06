@@ -13,9 +13,11 @@ except ImportError:
 
 from pydicom import Dataset, examples
 from pydicom.encaps import encapsulate, get_frame
-from pydicom.pixels import (
+from pydicom.pixels.encoders import (
     JPEGLSLosslessEncoder,
     JPEGLSNearLosslessEncoder,
+)
+from pydicom.pixels.decoders import (
     JPEGLSLosslessDecoder,
     JPEGLSNearLosslessDecoder,
 )

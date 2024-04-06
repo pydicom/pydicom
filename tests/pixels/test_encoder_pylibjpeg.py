@@ -15,15 +15,17 @@ except ImportError:
 from pydicom import dcmread, examples
 from pydicom.data import get_testdata_file
 from pydicom.encaps import encapsulate, get_frame
-from pydicom.pixels import (
+from pydicom.pixels.encoders import (
     JPEG2000LosslessEncoder,
     JPEG2000Encoder,
+)
+from pydicom.pixels.decoders import (
     JPEG2000LosslessDecoder,
     JPEG2000Decoder,
 )
 from pydicom.pixels.encoders.pylibjpeg import is_available
 from pydicom.pixels.utils import as_pixel_options
-from pydicom.pixel_data_handlers.util import get_expected_length, get_j2k_parameters
+from pydicom.pixels.utils import get_expected_length, get_j2k_parameters
 from pydicom.uid import RLELossless, JPEG2000
 
 

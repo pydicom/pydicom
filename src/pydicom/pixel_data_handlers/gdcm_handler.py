@@ -33,7 +33,7 @@ from pydicom import config
 from pydicom.encaps import generate_frames, generate_fragmented_frames
 import pydicom.uid
 from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
-from pydicom.pixel_data_handlers.util import (
+from pydicom.pixels.utils import (
     get_expected_length,
     pixel_dtype,
     get_j2k_parameters,

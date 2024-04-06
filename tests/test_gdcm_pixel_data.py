@@ -21,10 +21,8 @@ from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.encaps import get_frame
 from pydicom.pixel_data_handlers import numpy_handler, gdcm_handler
-from pydicom.pixel_data_handlers.util import (
-    _convert_YBR_FULL_to_RGB,
-    get_j2k_parameters,
-)
+from pydicom.pixels.processing import _convert_YBR_FULL_to_RGB
+from pydicom.pixels.utils import get_j2k_parameters
 from pydicom.tag import Tag
 
 try:

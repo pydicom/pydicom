@@ -27,7 +27,7 @@ from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta, FileMetaDataset
 from pydicom.encaps import encapsulate
 from pydicom.filebase import DicomBytesIO
-from pydicom.pixel_data_handlers.util import get_image_pixel_ids
+from pydicom.pixels.utils import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import (

@@ -121,7 +121,7 @@ Compressing using third-party packages
 
 If you need to perform pixel data compression using an encoding method not
 supported by *pydicom* - such as :dcm:`ISO/IEC 10918-1 JPEG
-<part05/sect_8.2.html#sect_8.2.1> - then you'll need to find a third-party
+<part05/sect_8.2.html#sect_8.2.1>` - then you'll need to find a third-party
 package or application to do so. Once you've done that you have to follow the
 requirements for compressed *Pixel Data* in the DICOM Standard:
 

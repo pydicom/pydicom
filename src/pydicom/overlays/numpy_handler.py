@@ -38,7 +38,7 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom.misc import warn_and_log
-from pydicom.pixel_data_handlers import unpack_bits
+from pydicom.pixels.utils import unpack_bits
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

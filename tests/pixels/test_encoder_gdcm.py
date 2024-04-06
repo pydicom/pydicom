@@ -4,11 +4,11 @@ import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.encoders.gdcm import _rle_encode as gdcm_rle_encode
-from pydicom.pixel_data_handlers.rle_handler import _rle_decode_frame
-from pydicom.pixel_data_handlers.util import reshape_pixel_array
+from pydicom.pixels.decoders.rle import _rle_decode_frame
+from pydicom.pixels.utils import reshape_pixel_array
 from pydicom.uid import RLELossless, JPEG2000, ExplicitVRLittleEndian
 
 

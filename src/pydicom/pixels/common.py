@@ -6,11 +6,11 @@ from enum import Enum, unique
 from importlib import import_module
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from pydicom.dataset import Dataset
 from pydicom.pixels.utils import as_pixel_options
 from pydicom.uid import UID
 
 if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
     from pydicom.pixels.decoders.base import DecodeOptions, DecodeFunction
     from pydicom.pixels.encoders.base import EncodeOptions, EncodeFunction
 

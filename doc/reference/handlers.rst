@@ -3,6 +3,11 @@
 Bulk Data Handlers
 ==================
 
+.. deprecated:: 3.0
+
+    The ``pydicom.pixel_data_handlers`` module is deprecated and will be removed
+    in v4.0. Use the :mod:`~pydicom.pixels` module instead.
+
 Functions for handling bulk data elements such as (7FE0,0010) *Pixel Data*
 
 .. toctree::
@@ -10,22 +15,3 @@ Functions for handling bulk data elements such as (7FE0,0010) *Pixel Data*
    :includehidden:
 
    handlers.pixel_data
-
-Pixel Data Utilities
-====================
-
-Functions for manipulating (7FE0,0010) *Pixel Data*.
-
-.. currentmodule:: pydicom.pixel_data_handlers
-
-.. autosummary::
-   :toctree: generated/
-
-   apply_color_lut
-   apply_modality_lut
-   apply_rescale
-   apply_windowing
-   apply_voi
-   apply_voi_lut
-   convert_color_space
-   util

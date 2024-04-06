@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Iterable
 import logging
 import math
 import sys
-from typing import Any, cast
+from typing import Any, cast, TYPE_CHECKING
 
 try:
     import numpy as np
@@ -13,7 +13,6 @@ except ImportError:
     pass
 
 from pydicom import config
-from pydicom.dataset import Dataset
 from pydicom.pixels.common import Buffer, RunnerBase, CoderBase, RunnerOptions
 from pydicom.uid import (
     UID,
@@ -28,6 +27,9 @@ from pydicom.uid import (
     RLELossless,
     JPEGLSTransferSyntaxes,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
 
 
 LOGGER = logging.getLogger(__name__)
@@ -260,6 +262,8 @@ class EncodeRunner(RunnerBase):
               the pixel data and associated group ``0x0028`` elements.
             * If a :class:`numpy.ndarray` then an array containing the image data.
         """
+        from pydicom.dataset import Dataset
+
         if isinstance(src, Dataset):
             self._set_options_ds(src)
             self._src = src.PixelData
