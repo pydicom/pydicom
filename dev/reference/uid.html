@@ -79,7 +79,6 @@
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
@@ -378,8 +377,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="uid-definitions-and-utilities-pydicom-uid">
-<span id="api-uid"></span><h1>UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)<a class="headerlink" href="#uid-definitions-and-utilities-pydicom-uid" title="Link to this heading">¶</a></h1>
+  <section id="module-pydicom.uid">
+<span id="uid-definitions-and-utilities-pydicom-uid"></span><span id="api-uid"></span><h1>UID Definitions and Utilities (<a class="reference internal" href="#module-pydicom.uid" title="pydicom.uid"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code></a>)<a class="headerlink" href="#module-pydicom.uid" title="Link to this heading">¶</a></h1>
 <section id="transfer-syntax-uids">
 <h2>Transfer Syntax UIDs<a class="headerlink" href="#transfer-syntax-uids" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -543,7 +542,7 @@
 <td><p>Return a 64 character UID which starts with <cite>prefix</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.uid.register_transfer_syntax.html#pydicom.uid.register_transfer_syntax" title="pydicom.uid.register_transfer_syntax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_transfer_syntax</span></code></a>(uid[, implicit_vr, ...])</p></td>
-<td><p>Register a private transfer syntax with the <code class="xref py py-mod docutils literal notranslate"><span class="pre">uid</span></code> module so it can be used when reading datasets with <a class="reference internal" href="generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p></td>
+<td><p>Register a private transfer syntax with the <a class="reference internal" href="#module-pydicom.uid" title="pydicom.uid"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uid</span></code></a> module so it can be used when reading datasets with <a class="reference internal" href="generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.uid.PYDICOM_ROOT_UID.html#pydicom.uid.PYDICOM_ROOT_UID" title="pydicom.uid.PYDICOM_ROOT_UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PYDICOM_ROOT_UID</span></code></a></p></td>
 <td><p>pydicom's root UID <code class="docutils literal notranslate"><span class="pre">'1.2.826.0.1.3680043.8.498.'</span></code></p></td>

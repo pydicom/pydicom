@@ -1,6 +1,0 @@
-﻿pydicom.pixels.decoders.base.JPEGExtended12BitDecoder
-=====================================================
-
-.. currentmodule:: pydicom.pixels.decoders.base
-
-.. autodata:: JPEGExtended12BitDecoder

@@ -1,0 +1,6 @@
+﻿pydicom.pixels.apply\_color\_lut
+================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: apply_color_lut

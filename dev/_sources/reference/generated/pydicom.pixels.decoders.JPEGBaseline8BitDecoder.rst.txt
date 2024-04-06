@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.JPEGBaseline8BitDecoder
+===============================================
+
+.. currentmodule:: pydicom.pixels.decoders
+
+.. autodata:: JPEGBaseline8BitDecoder

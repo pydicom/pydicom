@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.get\_image\_pixel\_ids
+===========================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: get_image_pixel_ids

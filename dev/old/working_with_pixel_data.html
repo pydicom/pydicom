@@ -232,7 +232,7 @@ of <code class="docutils literal notranslate"><span class="pre">3</span></code> 
 <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code>, etc).</p>
 <p><em>pydicom</em> offers a limited ability to convert between 8-bits/channel YBR and
 RGB color spaces through the
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a>
+<a class="reference internal" href="../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a>
 function. When changing the color space you should also change the value
 of <em>Photometric Interpretation</em> to match.</p>
 <div class="admonition note">
@@ -248,10 +248,10 @@ information about color spaces.</p>
 (LUT), where the values in <em>Pixel Data</em> are the index to a corresponding
 LUT entry. When a dataset’s (0028,0004) <em>Photometric Interpretation</em> value is
 <code class="docutils literal notranslate"><span class="pre">PALETTE</span> <span class="pre">COLOR</span></code> then the
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_color_lut" title="pydicom.pixel_data_handlers.util.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> function can be used
+<a class="reference internal" href="../reference/generated/pydicom.pixels.processing.apply_color_lut.html#pydicom.pixels.processing.apply_color_lut" title="pydicom.pixels.processing.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> function can be used
 to apply a palette color LUT to the pixel data to produce an RGB image.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.util</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
 
 <span class="c1"># Fetch an example PALETTE COLOR dataset</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">palette_color</span>
@@ -263,7 +263,7 @@ to apply a palette color LUT to the pixel data to produce an RGB image.</p>
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_B.html">well-known color palettes</a> provided the bit-depth
 of the pixel data is 8-bit.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.util</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">palette_color</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
@@ -283,13 +283,13 @@ of the pixel data is 8-bit.</p>
 <p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Modality LUT</a> module
 converts raw pixel data values to a specific (possibly unitless) physical
 quantity, such as Hounsfield units for CT. The
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> function can be
+<a class="reference internal" href="../reference/generated/pydicom.pixels.processing.apply_modality_lut.html#pydicom.pixels.processing.apply_modality_lut" title="pydicom.pixels.processing.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> function can be
 used with an input array of raw values and a dataset containing a Modality LUT
 module to return the converted values. When a dataset requires multiple
 grayscale transformations, the Modality LUT transformation is always applied
 first.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.util</span> <span class="kn">import</span> <span class="n">apply_modality_lut</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_modality_lut</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
@@ -301,7 +301,7 @@ first.</p>
 <h2>VOI LUT or Windowing Operation<a class="headerlink" href="#voi-lut-or-windowing-operation" title="Link to this heading">¶</a></h2>
 <p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT</a> module applies a
 VOI or windowing operation to input values. The
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> function
+<a class="reference internal" href="../reference/generated/pydicom.pixels.processing.apply_voi_lut.html#pydicom.pixels.processing.apply_voi_lut" title="pydicom.pixels.processing.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> function
 can be used with an input array and a dataset containing a VOI LUT module to
 return values with applied VOI LUT or windowing. When a dataset contains
 multiple VOI or windowing views then a particular view can be returned by
@@ -309,7 +309,7 @@ using the <cite>index</cite> keyword parameter.</p>
 <p>When a dataset requires multiple grayscale transformations, then it’s assumed
 that the modality LUT or rescale operation has already been applied.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.util</span> <span class="kn">import</span> <span class="n">apply_voi_lut</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_voi_lut</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">overlay</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>

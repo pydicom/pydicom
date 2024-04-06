@@ -123,18 +123,18 @@ For example:</p>
 </li>
 <li><p>Added a new pixel data handler based on <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> which
 supports all (non-retired) JPEG transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1127">#1127</a>)</p></li>
-<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.apply_rescale.html#pydicom.pixel_data_handlers.apply_rescale" title="pydicom.pixel_data_handlers.apply_rescale"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_rescale()</span></code></a>  alias</p></li>
-<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi" title="pydicom.pixel_data_handlers.util.apply_voi"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi()</span></code></a> and
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_windowing" title="pydicom.pixel_data_handlers.util.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></a></p></li>
+<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">apply_rescale()</span></code>  alias</p></li>
+<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi()</span></code> and
+<code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></p></li>
 <li><p>Added <em>prefer_lut</em> keyword parameter to
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> and handle empty
+<code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code> and handle empty
 VOI LUT module elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1234">#1234</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1237">#1237</a>)</p></li>
 <li><p>Added ability to register external data sources for use with the functions
 in <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1156">#1156</a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__contains__</span></code>, <code class="docutils literal notranslate"><span class="pre">__next__</span></code> and <code class="docutils literal notranslate"><span class="pre">__iter__</span></code> implementations added to
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1103">#1103</a>)</p></li>
 <li><p>Added convenience constants for the MPEG transfer syntaxes to
-<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1155">#1155</a>)</p></li>
+<a class="reference internal" href="../reference/uid.html#module-pydicom.uid" title="pydicom.uid"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1155">#1155</a>)</p></li>
 <li><p>Added support for decoding <em>Waveform Data</em>:</p>
 <ul>
 <li><p>Added <a class="reference internal" href="../reference/waveforms.html#module-pydicom.waveforms" title="pydicom.waveforms"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code></a> module and
@@ -249,7 +249,7 @@ a file-like (<a class="reference external" href="https://github.com/pydicom/pydi
 <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> is called with wrong argument</p></li>
 <li><p>Gracefully handle empty Specific Character Set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1190">#1190</a>)</p></li>
 <li><p>Fixed empty ambiguous VR elements raising an exception (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1193">#1193</a>)</p></li>
-<li><p>Allow <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> to apply VOI
+<li><p>Allow <code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code> to apply VOI
 lookup to an input float array</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.setdefault" title="pydicom.dataset.Dataset.setdefault"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.setdefault()</span></code></a> not
 adding working correctly when the <cite>default</cite> value is <code class="docutils literal notranslate"><span class="pre">None</span></code> and not

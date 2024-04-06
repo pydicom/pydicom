@@ -1,6 +1,0 @@
-﻿pydicom.pixels.decoders.base.HTJ2KLosslessDecoder
-=================================================
-
-.. currentmodule:: pydicom.pixels.decoders.base
-
-.. autodata:: HTJ2KLosslessDecoder

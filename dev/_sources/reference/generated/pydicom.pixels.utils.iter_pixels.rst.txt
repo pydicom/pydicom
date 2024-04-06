@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.iter\_pixels
+=================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: iter_pixels

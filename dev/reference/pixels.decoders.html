@@ -28,8 +28,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html" />
-    <link rel="prev" title="Pixel Data (pydicom.pixels)" href="pixels.html" /> 
+    <link rel="next" title="pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder" href="generated/pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder.html" />
+    <link rel="prev" title="pydicom.pixels.unpack_bits" href="generated/pydicom.pixels.unpack_bits.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -79,16 +79,29 @@
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="pixels.html#sub-modules">Sub-modules</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pixels.processing.html">Pixel Data Processing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.processing</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pixels.html#pixel-data-encoding">Pixel Data Encoding</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
@@ -135,59 +148,59 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pixel-data-decoders-pydicom-pixels-decoders">
-<span id="api-decoders"></span><h1>Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)<a class="headerlink" href="#pixel-data-decoders-pydicom-pixels-decoders" title="Link to this heading">¶</a></h1>
+  <section id="module-pydicom.pixels.decoders">
+<span id="pixel-data-decoders-pydicom-pixels-decoders"></span><span id="api-decoders"></span><h1>Pixel Data Decoders (<a class="reference internal" href="#module-pydicom.pixels.decoders" title="pydicom.pixels.decoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code></a>)<a class="headerlink" href="#module-pydicom.pixels.decoders" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class instances for decoding
 native and compressed (7FE0,0010) <em>Pixel Data</em>, (7FE0,0008) <em>Float Pixel Data</em> and
-(7FE0,0009) <em>Double Float Pixel Data</em></p>
+(7FE0,0009) <em>Double Float Pixel Data</em>.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExplicitVRLittleEndianDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExplicitVRLittleEndianDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>Explicit VR Little Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.1</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.ImplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitVRLittleEndianDecoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.ImplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.ImplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.ImplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitVRLittleEndianDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>Implicit VR Little Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.base.DeflatedExplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeflatedExplicitVRLittleEndianDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.DeflatedExplicitVRLittleEndianDecoder.html#pydicom.pixels.decoders.DeflatedExplicitVRLittleEndianDecoder" title="pydicom.pixels.decoders.DeflatedExplicitVRLittleEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeflatedExplicitVRLittleEndianDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>Deflated Explicit VR Little Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.1.99</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder.html#pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder" title="pydicom.pixels.decoders.base.ExplicitVRBigEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExplicitVRBigEndianDecoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.ExplicitVRBigEndianDecoder.html#pydicom.pixels.decoders.ExplicitVRBigEndianDecoder" title="pydicom.pixels.decoders.ExplicitVRBigEndianDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExplicitVRBigEndianDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>Explicit VR Big Endian</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.2</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder.html#pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder" title="pydicom.pixels.decoders.base.JPEGBaseline8BitDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGBaseline8BitDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEGBaseline8BitDecoder.html#pydicom.pixels.decoders.JPEGBaseline8BitDecoder" title="pydicom.pixels.decoders.JPEGBaseline8BitDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGBaseline8BitDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG Baseline (Process 1)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.50</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEGExtended12BitDecoder.html#pydicom.pixels.decoders.base.JPEGExtended12BitDecoder" title="pydicom.pixels.decoders.base.JPEGExtended12BitDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGExtended12BitDecoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEGExtended12BitDecoder.html#pydicom.pixels.decoders.JPEGExtended12BitDecoder" title="pydicom.pixels.decoders.JPEGExtended12BitDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGExtended12BitDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG Extended (Process 2 and 4)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.51</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEGLosslessDecoder.html#pydicom.pixels.decoders.base.JPEGLosslessDecoder" title="pydicom.pixels.decoders.base.JPEGLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLosslessDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEGLosslessDecoder.html#pydicom.pixels.decoders.JPEGLosslessDecoder" title="pydicom.pixels.decoders.JPEGLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLosslessDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG Lossless, Non-Hierarchical (Process 14)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.57</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder.html#pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder" title="pydicom.pixels.decoders.base.JPEGLosslessSV1Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLosslessSV1Decoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEGLosslessSV1Decoder.html#pydicom.pixels.decoders.JPEGLosslessSV1Decoder" title="pydicom.pixels.decoders.JPEGLosslessSV1Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLosslessSV1Decoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.70</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEGLSLosslessDecoder.html#pydicom.pixels.decoders.base.JPEGLSLosslessDecoder" title="pydicom.pixels.decoders.base.JPEGLSLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLSLosslessDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEGLSLosslessDecoder.html#pydicom.pixels.decoders.JPEGLSLosslessDecoder" title="pydicom.pixels.decoders.JPEGLSLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLSLosslessDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG-LS Lossless Image Compression</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.80</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder.html#pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder" title="pydicom.pixels.decoders.base.JPEGLSNearLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLSNearLosslessDecoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEGLSNearLosslessDecoder.html#pydicom.pixels.decoders.JPEGLSNearLosslessDecoder" title="pydicom.pixels.decoders.JPEGLSNearLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEGLSNearLosslessDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG-LS Lossy (Near-Lossless) Image Compression</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.81</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEG2000LosslessDecoder.html#pydicom.pixels.decoders.base.JPEG2000LosslessDecoder" title="pydicom.pixels.decoders.base.JPEG2000LosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEG2000LosslessDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEG2000LosslessDecoder.html#pydicom.pixels.decoders.JPEG2000LosslessDecoder" title="pydicom.pixels.decoders.JPEG2000LosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEG2000LosslessDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG 2000 Image Compression (Lossless Only)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.90</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.JPEG2000Decoder.html#pydicom.pixels.decoders.base.JPEG2000Decoder" title="pydicom.pixels.decoders.base.JPEG2000Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEG2000Decoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.JPEG2000Decoder.html#pydicom.pixels.decoders.JPEG2000Decoder" title="pydicom.pixels.decoders.JPEG2000Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JPEG2000Decoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>JPEG 2000 Image Compression</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.91</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.HTJ2KLosslessDecoder.html#pydicom.pixels.decoders.base.HTJ2KLosslessDecoder" title="pydicom.pixels.decoders.base.HTJ2KLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTJ2KLosslessDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.HTJ2KLosslessDecoder.html#pydicom.pixels.decoders.HTJ2KLosslessDecoder" title="pydicom.pixels.decoders.HTJ2KLosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTJ2KLosslessDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>High-Throughput JPEG 2000 Image Compression (Lossless Only)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.201</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder.html#pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder" title="pydicom.pixels.decoders.base.HTJ2KLosslessRPCLDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTJ2KLosslessRPCLDecoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.HTJ2KLosslessRPCLDecoder.html#pydicom.pixels.decoders.HTJ2KLosslessRPCLDecoder" title="pydicom.pixels.decoders.HTJ2KLosslessRPCLDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTJ2KLosslessRPCLDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.202</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.HTJ2KDecoder.html#pydicom.pixels.decoders.base.HTJ2KDecoder" title="pydicom.pixels.decoders.base.HTJ2KDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTJ2KDecoder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.HTJ2KDecoder.html#pydicom.pixels.decoders.HTJ2KDecoder" title="pydicom.pixels.decoders.HTJ2KDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTJ2KDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>High-Throughput JPEG 2000 Image Compression</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.203</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.base.RLELosslessDecoder.html#pydicom.pixels.decoders.base.RLELosslessDecoder" title="pydicom.pixels.decoders.base.RLELosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RLELosslessDecoder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decoders.RLELosslessDecoder.html#pydicom.pixels.decoders.RLELosslessDecoder" title="pydicom.pixels.decoders.RLELosslessDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RLELosslessDecoder</span></code></a></p></td>
 <td><p>A pixel data decoder for <em>RLE Lossless</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code></p></td>
 </tr>
 </tbody>
@@ -209,8 +222,8 @@ native and compressed (7FE0,0010) <em>Pixel Data</em>, (7FE0,0008) <em>Float Pix
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pixels.html" class="btn btn-neutral float-left" title="Pixel Data (pydicom.pixels)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generated/pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.decoders.base.ExplicitVRLittleEndianDecoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/pydicom.pixels.unpack_bits.html" class="btn btn-neutral float-left" title="pydicom.pixels.unpack_bits" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder.html" class="btn btn-neutral float-right" title="pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

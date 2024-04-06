@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.reshape\_pixel\_array
+==========================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: reshape_pixel_array

@@ -28,7 +28,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Pixel Data Decoders (pydicom.pixels.decoders)" href="pixels.decoders.html" />
+    <link rel="next" title="pydicom.pixels.apply_color_lut" href="generated/pydicom.pixels.apply_color_lut.html" />
     <link rel="prev" title="pydicom.overlays.numpy_handler" href="generated/pydicom.overlays.numpy_handler.html" /> 
 </head>
 
@@ -79,24 +79,27 @@
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pixel-data-decoding">Pixel Data Decoding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sub-modules">Sub-modules</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pixel-data-encoding">Pixel Data Encoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pixel-data-utilities">Pixel Data Utilities</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pixels.processing.html">Pixel Data Processing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.processing</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a></li>
 </ul>
 </li>
 </ul>
@@ -144,47 +147,67 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pixel-data-pydicom-pixels">
-<span id="api-pixels"></span><h1>Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)<a class="headerlink" href="#pixel-data-pydicom-pixels" title="Link to this heading">¶</a></h1>
-<p>Functions for handling bulk data elements such as(7FE0,0010) <em>Pixel Data</em>,
-(7FE0,0008) <em>Float Pixel Data</em> and (7FE0,0009) <em>Double Float Pixel Data</em></p>
-<section id="pixel-data-decoding">
-<h2>Pixel Data Decoding<a class="headerlink" href="#pixel-data-decoding" title="Link to this heading">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
-</ul>
-</div>
-</section>
-<section id="pixel-data-encoding">
-<h2>Pixel Data Encoding<a class="headerlink" href="#pixel-data-encoding" title="Link to this heading">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
-</ul>
-</div>
-</section>
-<section id="pixel-data-utilities">
-<h2>Pixel Data Utilities<a class="headerlink" href="#pixel-data-utilities" title="Link to this heading">¶</a></h2>
+  <section id="module-pydicom.pixels">
+<span id="pixel-data-pydicom-pixels"></span><span id="api-pixels"></span><h1>Pixel Data (<a class="reference internal" href="#module-pydicom.pixels" title="pydicom.pixels"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code></a>)<a class="headerlink" href="#module-pydicom.pixels" title="Link to this heading">¶</a></h1>
+<p>Image processing functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decoder</span></code></a>(uid)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_color_lut.html#pydicom.pixels.apply_color_lut" title="pydicom.pixels.apply_color_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_color_lut</span></code></a>(arr[, ds, palette])</p></td>
+<td><p>Apply a color palette lookup table to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html#pydicom.pixels.apply_modality_lut" title="pydicom.pixels.apply_modality_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_modality_lut</span></code></a>(arr, ds)</p></td>
+<td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html#pydicom.pixels.apply_voi_lut" title="pydicom.pixels.apply_voi_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi_lut</span></code></a>(arr, ds[, index, prefer_lut])</p></td>
+<td><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html#pydicom.pixels.apply_voi" title="pydicom.pixels.apply_voi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi</span></code></a>(arr, ds[, index])</p></td>
+<td><p>Apply a VOI lookup table to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_windowing</span></code></a>(arr, ds[, index])</p></td>
+<td><p>Apply a windowing operation to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired[, ...])</p></td>
+<td><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Utility functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html#pydicom.pixels.as_pixel_options" title="pydicom.pixels.as_pixel_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_pixel_options</span></code></a>(ds, **kwargs)</p></td>
+<td><p>Return a dict containing the image pixel element values from <cite>ds</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decoder</span></code></a>(uid)</p></td>
 <td><p>Return the pixel data decoder corresponding to <cite>uid</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html#pydicom.pixels.get_encoder" title="pydicom.pixels.get_encoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_encoder</span></code></a>(uid)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html#pydicom.pixels.get_encoder" title="pydicom.pixels.get_encoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_encoder</span></code></a>(uid)</p></td>
 <td><p>Return the pixel data encoder corresponding to <cite>uid</cite>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_array</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
-<td><p>Return decoded pixel data from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> while minimizing memory usage.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_pixels</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
 <td><p>Yield decoded pixel data frames from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> while minimizing memory usage.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html#pydicom.pixels.as_pixel_options" title="pydicom.pixels.as_pixel_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_pixel_options</span></code></a>(ds, **kwargs)</p></td>
-<td><p>Return a dict containing the image pixel element values from <cite>ds</cite>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html#pydicom.pixels.pack_bits" title="pydicom.pixels.pack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack_bits</span></code></a>(arr[, pad])</p></td>
+<td><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_array</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
+<td><p>Return decoded pixel data from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> while minimizing memory usage.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.unpack_bits.html#pydicom.pixels.unpack_bits" title="pydicom.pixels.unpack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_bits</span></code></a>(src[, as_array])</p></td>
+<td><p>Unpack the bit-packed data in <cite>src</cite>.</p></td>
 </tr>
 </tbody>
 </table>
+<section id="sub-modules">
+<h2>Sub-modules<a class="headerlink" href="#sub-modules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixels.processing.html">Pixel Data Processing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.processing</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a></li>
+</ul>
+</div>
 </section>
 </section>
 
@@ -193,7 +216,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="generated/pydicom.overlays.numpy_handler.html" class="btn btn-neutral float-left" title="pydicom.overlays.numpy_handler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pixels.decoders.html" class="btn btn-neutral float-right" title="Pixel Data Decoders (pydicom.pixels.decoders)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/pydicom.pixels.apply_color_lut.html" class="btn btn-neutral float-right" title="pydicom.pixels.apply_color_lut" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -3,43 +3,45 @@
 Pixel Data (:mod:`pydicom.pixels`)
 ==================================
 
-Functions for handling bulk data elements such as(7FE0,0010) *Pixel Data*,
-(7FE0,0008) *Float Pixel Data* and (7FE0,0009) *Double Float Pixel Data*
-
-Pixel Data Decoding
--------------------
-
+.. module:: pydicom.pixels
 .. currentmodule:: pydicom.pixels
+
+
+Image processing functions
+
+.. autosummary::
+  :toctree: generated/
+
+   apply_color_lut
+   apply_modality_lut
+   apply_voi_lut
+   apply_voi
+   apply_windowing
+   convert_color_space
+
+
+Utility functions
+
+.. autosummary::
+   :toctree: generated/
+
+   as_pixel_options
+   get_decoder
+   get_encoder
+   iter_pixels
+   pack_bits
+   pixel_array
+   unpack_bits
+
+
+Sub-modules
+-----------
 
 .. toctree::
    :maxdepth: 1
    :includehidden:
 
    pixels.decoders
-
-
-Pixel Data Encoding
--------------------
-
-.. currentmodule:: pydicom.pixels
-
-.. toctree::
-   :maxdepth: 1
-   :includehidden:
-
    pixels.encoders
-
-
-Pixel Data Utilities
---------------------
-
-.. currentmodule:: pydicom.pixels
-
-.. autosummary::
-   :toctree: generated/
-
-   get_decoder
-   get_encoder
-   pixel_array
-   iter_pixels
-   as_pixel_options
+   pixels.processing
+   pixels.utils

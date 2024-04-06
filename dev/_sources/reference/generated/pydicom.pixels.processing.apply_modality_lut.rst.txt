@@ -1,0 +1,6 @@
+﻿pydicom.pixels.processing.apply\_modality\_lut
+==============================================
+
+.. currentmodule:: pydicom.pixels.processing
+
+.. autofunction:: apply_modality_lut

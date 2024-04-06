@@ -136,8 +136,8 @@ underlying algorithm is based on the
 <section id="valid-image-pixel-parameters">
 <h2>Valid Image Pixel Parameters<a class="headerlink" href="#valid-image-pixel-parameters" title="Link to this heading">¶</a></h2>
 <p>The table below lists the valid <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a>
-module parameters for <em>Pixel Data</em> encoded using <em>RLE Lossless</em> encoding. For
-an explanation of each parameter and its relationship with the
+module parameters for <em>Pixel Data</em> encoded using the <em>RLE Lossless</em> transfer
+syntax. For an explanation of each parameter and its relationship with the
 <em>Pixel Data</em> see the <a class="reference internal" href="../glossary.html"><span class="doc">glossary of Image Pixel elements</span></a>.</p>
 <table class="docutils align-default">
 <thead>
@@ -201,7 +201,7 @@ to the <a class="reference external" href="http://dicom.nema.org/medical/dicom/c
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code></p>
 <ul>
 <li><p>For <em>Bits Allocated</em> and <em>Bits Stored</em> less than or equal to 8: pixel
-data must be <a class="reference internal" href="../../reference/generated/pydicom.pixel_data_handlers.convert_color_space.html#pydicom.pixel_data_handlers.convert_color_space" title="pydicom.pixel_data_handlers.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">YCbCr</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However
+data must be <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">YCbCr</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However
 you should keep in mind that the conversion operation is lossy.</p></li>
 <li><p>For <em>Bits Allocated</em> and <em>Bits Stored</em> between 9 and 16 (inclusive):
 pixel data should be downscaled to 8-bit (with <em>Bits Stored</em>, <em>Bits
@@ -214,7 +214,7 @@ operations are lossy.</p></li>
 <li><p>If your uncompressed pixel data is in <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space:</p>
 <ul>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code> the pixel data must first be
-<a class="reference internal" href="../../reference/generated/pydicom.pixel_data_handlers.convert_color_space.html#pydicom.pixel_data_handlers.convert_color_space" title="pydicom.pixel_data_handlers.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">RGB</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However the conversion
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">RGB</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However the conversion
 operation is lossy.</p></li>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> nothing else is required.</p></li>
 </ul>
@@ -244,7 +244,7 @@ usage of your dataset in mind.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td rowspan="3"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></p></td>
+<tr class="row-odd"><td rowspan="3"><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.RLELosslessEncoder.html#pydicom.pixels.encoders.RLELosslessEncoder" title="pydicom.pixels.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a></p></td>
 <td><p>pydicom</p></td>
 <td></td>
 <td><p>v2.2</p></td>
@@ -304,7 +304,7 @@ usage of your dataset in mind.</p>
 compress in-place. Because the color space has changed we need to generate a
 new <em>SOP Instance UID</em>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers</span> <span class="kn">import</span> <span class="n">convert_color_space</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">convert_color_space</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">generate_uid</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rgb</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>

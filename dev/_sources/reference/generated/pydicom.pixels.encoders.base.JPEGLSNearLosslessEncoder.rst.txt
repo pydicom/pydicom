@@ -1,6 +1,0 @@
-﻿pydicom.pixels.encoders.base.JPEGLSNearLosslessEncoder
-======================================================
-
-.. currentmodule:: pydicom.pixels.encoders.base
-
-.. autodata:: JPEGLSNearLosslessEncoder

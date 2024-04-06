@@ -1,6 +1,0 @@
-﻿pydicom.pixels.encoders.base.RLELosslessEncoder
-===============================================
-
-.. currentmodule:: pydicom.pixels.encoders.base
-
-.. autodata:: RLELosslessEncoder

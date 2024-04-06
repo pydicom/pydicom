@@ -82,17 +82,6 @@
 <li class="toctree-l3"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#pixel-data-utilities">Pixel Data Utilities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_color_lut.html">pydicom.pixel_data_handlers.apply_color_lut</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_modality_lut.html">pydicom.pixel_data_handlers.apply_modality_lut</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_rescale.html">pydicom.pixel_data_handlers.apply_rescale</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_windowing.html">pydicom.pixel_data_handlers.apply_windowing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_voi.html">pydicom.pixel_data_handlers.apply_voi</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_voi_lut.html">pydicom.pixel_data_handlers.apply_voi_lut</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.convert_color_space.html">pydicom.pixel_data_handlers.convert_color_space</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.util.html">pydicom.pixel_data_handlers.util</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
@@ -141,44 +130,16 @@
              
   <section id="bulk-data-handlers">
 <span id="api-handlers"></span><h1>Bulk Data Handlers<a class="headerlink" href="#bulk-data-handlers" title="Link to this heading">¶</a></h1>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 3.0: </span>The <code class="docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code> module is deprecated and will be removed
+in v4.0. Use the <a class="reference internal" href="pixels.html#module-pydicom.pixels" title="pydicom.pixels"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pixels</span></code></a> module instead.</p>
+</div>
 <p>Functions for handling bulk data elements such as (7FE0,0010) <em>Pixel Data</em></p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
 </ul>
 </div>
-</section>
-<section id="pixel-data-utilities">
-<h1>Pixel Data Utilities<a class="headerlink" href="#pixel-data-utilities" title="Link to this heading">¶</a></h1>
-<p>Functions for manipulating (7FE0,0010) <em>Pixel Data</em>.</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_color_lut.html#pydicom.pixel_data_handlers.apply_color_lut" title="pydicom.pixel_data_handlers.apply_color_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_color_lut</span></code></a>(arr[, ds, palette])</p></td>
-<td><p>Apply a color palette lookup table to <cite>arr</cite>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_modality_lut.html#pydicom.pixel_data_handlers.apply_modality_lut" title="pydicom.pixel_data_handlers.apply_modality_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_modality_lut</span></code></a>(arr, ds)</p></td>
-<td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_rescale.html#pydicom.pixel_data_handlers.apply_rescale" title="pydicom.pixel_data_handlers.apply_rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_rescale</span></code></a>(arr, ds)</p></td>
-<td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_windowing.html#pydicom.pixel_data_handlers.apply_windowing" title="pydicom.pixel_data_handlers.apply_windowing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_windowing</span></code></a>(arr, ds[, index])</p></td>
-<td><p>Apply a windowing operation to <cite>arr</cite>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_voi.html#pydicom.pixel_data_handlers.apply_voi" title="pydicom.pixel_data_handlers.apply_voi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi</span></code></a>(arr, ds[, index])</p></td>
-<td><p>Apply a VOI lookup table to <cite>arr</cite>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_voi_lut.html#pydicom.pixel_data_handlers.apply_voi_lut" title="pydicom.pixel_data_handlers.apply_voi_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi_lut</span></code></a>(arr, ds[, index, prefer_lut])</p></td>
-<td><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.convert_color_space.html#pydicom.pixel_data_handlers.convert_color_space" title="pydicom.pixel_data_handlers.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired[, ...])</p></td>
-<td><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixel_data_handlers.util.html#module-pydicom.pixel_data_handlers.util" title="pydicom.pixel_data_handlers.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util</span></code></a></p></td>
-<td><p>Utility functions used in the pixel data handlers.</p></td>
-</tr>
-</tbody>
-</table>
 </section>
 
 

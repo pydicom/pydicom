@@ -1,0 +1,6 @@
+﻿pydicom.pixels.encoders.JPEG2000Encoder
+=======================================
+
+.. currentmodule:: pydicom.pixels.encoders
+
+.. autodata:: JPEG2000Encoder

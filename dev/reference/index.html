@@ -79,7 +79,6 @@
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
@@ -132,7 +131,7 @@
 <dd class="field-odd"><p>3.0.0.dev0</p>
 </dd>
 <dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>Apr 01, 2024</p>
+<dd class="field-even"><p>Apr 06, 2024</p>
 </dd>
 </dl>
 <p id="module-pydicom">This API reference guide details the functions, modules and objects included in
@@ -236,17 +235,6 @@
 <li class="toctree-l2"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_color_lut.html">pydicom.pixel_data_handlers.apply_color_lut</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_modality_lut.html">pydicom.pixel_data_handlers.apply_modality_lut</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_rescale.html">pydicom.pixel_data_handlers.apply_rescale</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_windowing.html">pydicom.pixel_data_handlers.apply_windowing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_voi.html">pydicom.pixel_data_handlers.apply_voi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.apply_voi_lut.html">pydicom.pixel_data_handlers.apply_voi_lut</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.convert_color_space.html">pydicom.pixel_data_handlers.convert_color_space</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.util.html">pydicom.pixel_data_handlers.util</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.misc.is_dicom.html">pydicom.misc.is_dicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.misc.size_in_bytes.html">pydicom.misc.size_in_bytes</a></li>
@@ -257,9 +245,20 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-decoding">Pixel Data Decoding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-encoding">Pixel Data Encoding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pixels.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixels.html#sub-modules">Sub-modules</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a><ul>

@@ -3,6 +3,7 @@
 UID Definitions and Utilities (:mod:`pydicom.uid`)
 ==================================================
 
+.. module:: pydicom.uid
 .. currentmodule:: pydicom.uid
 
 

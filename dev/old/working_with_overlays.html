@@ -182,13 +182,13 @@ the top left pixels are aligned and a value of <code class="docutils literal not
 overlay pixels start 1 row above and 1 row to the left of the image pixels.</p>
 <p>NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be bit-packed (using something like
-<code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code>) and written
+<a class="reference internal" href="../reference/generated/pydicom.pixels.utils.pack_bits.html#pydicom.pixels.utils.pack_bits" title="pydicom.pixels.utils.pack_bits"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code></a>) and written
 back to the correct element:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a line</span>
 <span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Pack the data</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.numpy_handler</span> <span class="kn">import</span> <span class="n">pack_bits</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pack_bits</span>
 <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pack_bits</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
 <span class="c1"># Update the element value</span>

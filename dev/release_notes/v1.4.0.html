@@ -150,9 +150,9 @@ using <a class="reference internal" href="../reference/generated/pydicom.dataset
 <li><p>Tolerate values with multiple and/or incorrect padding bytes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/940">#940</a>)</p></li>
 <li><p>Added support for uncompressed pixel data with (0028,0004) <em>Photometric
 Interpretation</em> of <cite>YBR_FULL_422</cite> to the numpy pixel data handler.</p></li>
-<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_color_lut" title="pydicom.pixel_data_handlers.util.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> function for
+<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code> function for
 applying color palette LUTs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/205">#205</a>)</p></li>
-<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> function
+<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code> function
 for applying modality LUTs.</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.data.get_palette_files.html#pydicom.data.get_palette_files" title="pydicom.data.get_palette_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_palette_files()</span></code></a> for retrieving well-known
 palette color datasets.</p></li>
@@ -164,7 +164,7 @@ unexpected transfer syntax (<a class="reference external" href="https://github.c
 <li><p>Added optional <cite>handler</cite> argument to
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a>. This lets you specify a
 particular handler, rather than following pydicom’s default order (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/537">#537</a>)</p></li>
-<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> function for
+<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code> function for
 applying VOI LUTs or windowing operations.</p></li>
 <li><p>Added support for (7fe0,0008) <em>Float Pixel Data</em> and (7fe0,0009) <em>Double
 Float Pixel Data</em> to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>

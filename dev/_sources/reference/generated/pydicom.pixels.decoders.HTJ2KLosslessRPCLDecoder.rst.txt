@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.HTJ2KLosslessRPCLDecoder
+================================================
+
+.. currentmodule:: pydicom.pixels.decoders
+
+.. autodata:: HTJ2KLosslessRPCLDecoder
