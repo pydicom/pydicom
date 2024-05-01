@@ -15,6 +15,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -100,6 +101,8 @@ These examples illustrate the use of pydicom to read DICOM data.
       <div class="sphx-glr-thumbnail-title">Read a DICOM File-set</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

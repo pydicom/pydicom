@@ -16,6 +16,7 @@ be applied to DICOM images.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -67,6 +68,8 @@ be applied to DICOM images.
       <div class="sphx-glr-thumbnail-title">Load CT slices and plot axial, sagittal and coronal images</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

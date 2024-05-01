@@ -13,6 +13,7 @@ Somewhere to start
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -82,6 +83,8 @@ Somewhere to start
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -108,6 +111,7 @@ be applied to DICOM images.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -160,6 +164,8 @@ be applied to DICOM images.
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -176,6 +182,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -262,6 +269,8 @@ These examples illustrate the use of pydicom to read DICOM data.
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -279,6 +288,7 @@ metadata of DICOM data.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -330,6 +340,8 @@ metadata of DICOM data.
       <div class="sphx-glr-thumbnail-title">Add items to the private DICOM dictionary</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

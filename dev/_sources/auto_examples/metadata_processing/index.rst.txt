@@ -16,6 +16,7 @@ metadata of DICOM data.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -67,6 +68,8 @@ metadata of DICOM data.
       <div class="sphx-glr-thumbnail-title">Add items to the private DICOM dictionary</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
