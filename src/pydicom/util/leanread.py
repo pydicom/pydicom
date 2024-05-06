@@ -174,5 +174,5 @@ def data_element_generator(
                 yield ((group, elem), vr, length, None, value_tell)
             else:
                 raise NotImplementedError(
-                    "This reader does not handle undefined length except " "for SQ"
+                    "This reader does not handle undefined length except for SQ"
                 )

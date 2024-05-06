@@ -1483,7 +1483,7 @@ class TestParseBasicOffsets:
     def test_single_frame(self):
         """Test reading single-frame BOT item"""
         # Little endian
-        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00" b"\xFE\xFF\x00\xE0"
+        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00\xFE\xFF\x00\xE0"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert [0] == parse_basic_offsets(src)
@@ -1491,7 +1491,7 @@ class TestParseBasicOffsets:
         assert src.tell() == 12
 
         # Big endian
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x00\x00\x00\x00" b"\xFF\xFE\xE0\x00"
+        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x00\x00\x00\x00\xFF\xFE\xE0\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert [0] == parse_basic_offsets(src, endianness=">")
@@ -1589,7 +1589,7 @@ class TestParseFragments:
 
     def test_item_invalid(self):
         """Test exception raised if sequence is too short"""
-        buffer = b"\xFE\xFF\x00\xE0" b"\x04\x00\x00"
+        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00"
         msg = (
             "Unable to determine the length of the item at offset 0 as the end "
             "of the data has been reached - the encapsulated pixel data may "
@@ -1600,7 +1600,7 @@ class TestParseFragments:
             with pytest.raises(ValueError, match=msg):
                 parse_fragments(src)
 
-        buffer = b"\xFF\xFE\xE0\x00" b"\x00\x00\x04"
+        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x04"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1816,7 +1816,7 @@ class TestGenerateFragments:
 
     def test_item_invalid(self):
         """Test exception raised if item is invalid"""
-        buffer = b"\xFE\xFF\x00\xE0" b"\x04\x00\x00"
+        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00"
         msg = (
             "Unable to determine the length of the item at offset 0 as the end "
             "of the data has been reached - the encapsulated pixel data may "
@@ -1829,7 +1829,7 @@ class TestGenerateFragments:
                 next(fragments)
             pytest.raises(StopIteration, next, fragments)
 
-        buffer = b"\xFF\xFE\xE0\x00" b"\x00\x00\x04"
+        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x04"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")

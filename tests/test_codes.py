@@ -240,7 +240,7 @@ class TestCodesDict:
         )
 
     def test_cid3263(self):
-        meaning = "12-lead from EASI leads (ES, AS, AI)" " by Dower/EASI transformation"
+        meaning = "12-lead from EASI leads (ES, AS, AI) by Dower/EASI transformation"
         assert (
             codes.cid3263._12LeadFromEASILeadsESASAIByDowerEASITransformation
             == Code(

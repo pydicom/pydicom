@@ -126,7 +126,7 @@ class TestCharset:
         with pytest.warns(
             UserWarning,
             match=(
-                "Unknown encoding 'UNSUPPORTED' " "- using default encoding instead"
+                "Unknown encoding 'UNSUPPORTED' - using default encoding instead"
             ),
         ):
             ds.decode()
@@ -174,7 +174,7 @@ class TestCharset:
         elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2")
 
         with pytest.warns(
-            UserWarning, match="Failed to decode byte string " "with encoding 'UTF8'"
+            UserWarning, match="Failed to decode byte string with encoding 'UTF8'"
         ):
             pydicom.charset.decode_element(elem, ["ISO_IR 192"])
             assert "���������" == elem.value
@@ -209,7 +209,7 @@ class TestCharset:
         """Test warning if stand-alone encodings are used as code extension"""
         with pytest.warns(
             UserWarning,
-            match="Value 'GBK' cannot be used as " "code extension, ignoring it",
+            match="Value 'GBK' cannot be used as code extension, ignoring it",
         ):
             encodings = pydicom.charset.convert_encodings(
                 ["ISO_IR 126", "GBK", "ISO 2022 IR 144", "ISO_IR 192"]
@@ -239,7 +239,7 @@ class TestCharset:
 
         with pytest.warns(
             UserWarning,
-            match="Failed to decode byte string " "with encodings: iso2022_jp_2",
+            match="Failed to decode byte string with encodings: iso2022_jp_2",
         ):
             pydicom.charset.decode_element(elem, ["ISO 2022 IR 159"])
             assert "���������" == elem.value
@@ -267,7 +267,7 @@ class TestCharset:
 
         with pytest.warns(
             UserWarning,
-            match="Found unknown escape sequence " "in encoded string value",
+            match="Found unknown escape sequence in encoded string value",
         ):
             pydicom.charset.decode_element(elem, ["ISO_IR 100"])
             assert "\x1b-FÄéïíõóéïò" == elem.value
@@ -279,7 +279,7 @@ class TestCharset:
             0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
         )
         with pytest.raises(
-            ValueError, match="Found unknown escape sequence " "in encoded string value"
+            ValueError, match="Found unknown escape sequence in encoded string value"
         ):
             pydicom.charset.decode_element(elem, ["ISO_IR 100"])
 
@@ -314,7 +314,7 @@ class TestCharset:
         elem = DataElement(0x00100010, "PN", b"Buc^J\xc3\xa9r\xc3\xb4me")
         with pytest.warns(
             UserWarning,
-            match="Unknown encoding 'ISOIR 192' - " "using default encoding instead",
+            match="Unknown encoding 'ISOIR 192' - using default encoding instead",
         ):
             pydicom.charset.decode_element(elem, ["ISOIR 192"])
 
@@ -328,7 +328,7 @@ class TestCharset:
         elem = DataElement(
             0x00100010,
             "PN",
-            b"Dionysios=\x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
         )
         # correct encoding
         pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 126"])
@@ -344,7 +344,7 @@ class TestCharset:
             elem = DataElement(
                 0x00100010,
                 "PN",
-                b"Dionysios=\x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+                b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
             )
             pydicom.charset.decode_element(elem, ["ISO_2022-IR 100", "ISO 2022 IR 126"])
 
@@ -359,7 +359,7 @@ class TestCharset:
             elem = DataElement(
                 0x00100010,
                 "PN",
-                b"Dionysios=\x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+                b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
             )
             pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO_2022_IR+126"])
             assert "Dionysios=Διονυσιος" == elem.value
@@ -380,7 +380,7 @@ class TestCharset:
         elem = DataElement(
             0x00100010,
             "PN",
-            b"Dionysios=\x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
         )
         pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 126"])
         assert "Dionysios=Διονυσιος" == elem.value
@@ -403,7 +403,7 @@ class TestCharset:
         elem = DataElement(
             0x00081039,
             "LO",
-            b"Dionysios is \x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
         )
         pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 126"])
         assert "Dionysios is Διονυσιος" == elem.value

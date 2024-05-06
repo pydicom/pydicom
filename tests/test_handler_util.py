@@ -68,7 +68,7 @@ def test_deprecation_warnings():
         from pydicom.pixel_data_handlers.util import expand_ybr422 as y
 
     msg = (
-        "'dtype_corrected_for_endianness' is deprecated and will be " "removed in v4.0"
+        "'dtype_corrected_for_endianness' is deprecated and will be removed in v4.0"
     )
     with pytest.warns(DeprecationWarning, match=msg):
         from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness

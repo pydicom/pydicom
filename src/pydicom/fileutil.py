@@ -328,7 +328,7 @@ def _try_read_encapsulated_pixel_data(
 
     length = fp.read(4)
     if length != b"\0\0\0\0":
-        msg = "Expected 4 zero bytes after undefined length delimiter " "at pos {0:04x}"
+        msg = "Expected 4 zero bytes after undefined length delimiter at pos {0:04x}"
         logger.debug(msg.format(fp.tell() - 4))
 
     if defer_size is not None and defer_size <= byte_count:

@@ -1368,7 +1368,7 @@ class TestEncodeRunner_GetFrame:
             runner.set_options(**opts)
             runner.set_source(src_a)
             assert runner.get_frame(None) == (
-                b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
             )
 
             runner.set_option("columns", 3)
@@ -1444,7 +1444,7 @@ class TestEncodeRunner_Encode:
     def test_encoding_exceptions(self):
         """Test an encoding exception occurring in all plugins"""
         msg = (
-            "Unable to encode as exceptions were raised by all available " "plugins:\n"
+            "Unable to encode as exceptions were raised by all available plugins:\n"
         )
         with pytest.raises(RuntimeError, match=msg):
             RLELosslessEncoder.encode(EXPL_16_16_1F.ds, byteorder=">")

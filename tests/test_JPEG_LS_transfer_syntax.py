@@ -7,11 +7,11 @@ import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
 
-pillow_missing_message = "pillow is not available " "in this test environment"
+pillow_missing_message = "pillow is not available in this test environment"
 pillow_present_message = "pillow is being tested"
 gdcm_missing_message = "GDCM is not available in this test environment"
-numpy_missing_message = "numpy is not available " "in this test environment"
-jpeg_ls_missing_message = "jpeg_ls is not available " "in this test environment"
+numpy_missing_message = "numpy is not available in this test environment"
+jpeg_ls_missing_message = "jpeg_ls is not available in this test environment"
 
 
 try:
