@@ -1225,11 +1225,11 @@ class TestReadDataElement:
     def setup_method(self):
         ds = Dataset()
         ds.DoubleFloatPixelData = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
-        )  # OD
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"  # OD
+        )
         ds.SelectorOLValue = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"
-        )  # VR of OL
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"  # VR of OL
+        )
         ds.PotentialReasonsForProcedure = [
             "A",
             "B",

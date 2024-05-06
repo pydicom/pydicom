@@ -64,9 +64,7 @@ class TestConvertAE:
 class TestConvertText:
     def test_single_value(self):
         """Test that encoding can change inside a text string"""
-        bytestring = (
-            b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
-        )
+        bytestring = b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
         encodings = ["latin_1", "iso_ir_126"]
         assert "Dionysios is Διονυσιος" == convert_text(bytestring, encodings)
 

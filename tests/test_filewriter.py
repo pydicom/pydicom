@@ -540,9 +540,7 @@ class TestWriteDataElement:
     def test_write_OD_implicit_little(self):
         """Test writing elements with VR of OD works correctly."""
         # VolumetricCurvePoints
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
         elem = DataElement(0x0070150D, "OD", bytestring)
         encoded_elem = self.encode_element(elem)
         # Tag pair (0070,150D): 70 00 0d 15
@@ -564,9 +562,7 @@ class TestWriteDataElement:
         encoding (see PS3.5 Section 7.1.2).
         """
         # VolumetricCurvePoints
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
         elem = DataElement(0x0070150D, "OD", bytestring)
         encoded_elem = self.encode_element(elem, False, True)
         # Tag pair (0070,150D): 70 00 0d 15
@@ -676,9 +672,7 @@ class TestWriteDataElement:
         # Reserved: \x00\x00
         # Length (4): \x04\x00\x00\x00
         # Value: \x54\x65\x73\x74
-        ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00\x54\x65\x73\x74"
-        )
+        ref_bytes = b"\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00\x54\x65\x73\x74"
         assert ref_bytes == encoded_elem
 
         # VM 1, odd data - padded to even length

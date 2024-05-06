@@ -1443,9 +1443,7 @@ class TestEncodeRunner_Encode:
     @pytest.mark.skipif(not HAVE_NP or HAVE_RLE, reason="Numpy unavailable")
     def test_encoding_exceptions(self):
         """Test an encoding exception occurring in all plugins"""
-        msg = (
-            "Unable to encode as exceptions were raised by all available plugins:\n"
-        )
+        msg = "Unable to encode as exceptions were raised by all available plugins:\n"
         with pytest.raises(RuntimeError, match=msg):
             RLELosslessEncoder.encode(EXPL_16_16_1F.ds, byteorder=">")
 

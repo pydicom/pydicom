@@ -1510,9 +1510,7 @@ class TestApplyVOI:
         item.LUTDescriptor = [4, 0, 16]
         item.LUTData = [0, 127, 32768, 65535]
         arr = np.asarray([0, 1, 2, 3, 255], dtype="float64")
-        msg = (
-            r"Applying a VOI LUT on a float input array may give incorrect results"
-        )
+        msg = r"Applying a VOI LUT on a float input array may give incorrect results"
 
         with pytest.warns(UserWarning, match=msg):
             out = apply_voi(arr, ds)

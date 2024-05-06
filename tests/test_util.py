@@ -352,21 +352,15 @@ class TestHexUtil:
     def test_hex_to_bytes(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
         assert hex2bytes(hexstring) == bytestring
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 A0 B0 C0 D0 E0 F0"
-        bytestring = (
-            b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0"
-        )
+        bytestring = b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0"
         assert hex2bytes(hexstring) == bytestring
 
         hexstring = b"00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
         assert hex2bytes(hexstring) == bytestring
 
         with pytest.raises(TypeError):
@@ -375,15 +369,11 @@ class TestHexUtil:
     def test_bytes_to_hex(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f"
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
         assert bytes2hex(bytestring) == hexstring
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 a0 b0 c0 d0 e0 f0"
-        bytestring = (
-            b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0"
-        )
+        bytestring = b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0"
         assert bytes2hex(bytestring) == hexstring
 
 

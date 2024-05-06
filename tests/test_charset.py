@@ -125,9 +125,7 @@ class TestCharset:
         ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.warns(
             UserWarning,
-            match=(
-                "Unknown encoding 'UNSUPPORTED' - using default encoding instead"
-            ),
+            match=("Unknown encoding 'UNSUPPORTED' - using default encoding instead"),
         ):
             ds.decode()
             assert "CompressedSamples^CT1" == ds.PatientName

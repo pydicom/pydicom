@@ -1212,9 +1212,7 @@ class DSdecimal(Decimal):
                 warn_and_log(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
-                msg = (
-                    f'Value "{str(self)}" is not valid for elements with a VR of DS'
-                )
+                msg = f'Value "{str(self)}" is not valid for elements with a VR of DS'
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
