@@ -37,8 +37,8 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting dataset values...
     Setting file meta information...
-    Writing dataset to: /tmp/tmpqg62vyiy.dcm
-    Load dataset from: /tmp/tmpqg62vyiy.dcm ...
+    Writing dataset to: /tmp/tmpe4sjlh9z.dcm
+    Load dataset from: /tmp/tmpe4sjlh9z.dcm ...
     Dataset.file_meta -------------------------------
     (0002,0000) File Meta Information Group Length  UL: 128
     (0002,0001) File Meta Information Version       OB: b'\x00\x01'
@@ -48,11 +48,11 @@ have to change UIDs to valid values and add all required DICOM data elements.
     (0002,0012) Implementation Class UID            UI: 1.2.3.4
     (0002,0013) Implementation Version Name         SH: 'PYDICOM 3.0.0'
     -------------------------------------------------
-    (0008,0023) Content Date                        DA: '20240501'
-    (0008,0033) Content Time                        TM: '191010.204563'
+    (0008,0023) Content Date                        DA: '20240506'
+    (0008,0033) Content Time                        TM: '215207.634372'
     (0010,0010) Patient's Name                      PN: 'Test^Firstname'
     (0010,0020) Patient ID                          LO: '123456'
-    Deleting file: /tmp/tmpqg62vyiy.dcm ...
+    Deleting file: /tmp/tmpe4sjlh9z.dcm ...
 
 
 
@@ -112,7 +112,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.005 seconds)
+   **Total running time of the script:** (0 minutes 0.004 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:
