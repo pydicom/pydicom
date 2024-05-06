@@ -1149,7 +1149,7 @@ def read_deferred_data_element(
             statinfo = os.stat(filename_or_obj)
             if statinfo.st_mtime != timestamp:
                 warn_and_log(
-                    "Deferred read warning -- file modification time has " "changed"
+                    "Deferred read warning -- file modification time has changed"
                 )
 
     # Open the file, position to the right place

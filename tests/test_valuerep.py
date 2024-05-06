@@ -242,7 +242,7 @@ class TestDT:
         assert str(dt) == "20010101235960"
         assert dt == datetime(2001, 1, 1, 23, 59, 59)
 
-        msg = r"Unable to convert non-conformant value 'a2000,00,00' to 'DT' " r"object"
+        msg = r"Unable to convert non-conformant value 'a2000,00,00' to 'DT' object"
         with pytest.raises(ValueError, match=msg):
             pydicom.valuerep.DT("a2000,00,00")
 

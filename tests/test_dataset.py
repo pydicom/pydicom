@@ -62,9 +62,9 @@ class TestDataset:
         ds.PixelData = "xyzlmnop"
         msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
         msg_from_numpy = (
-            r"'FileMetaDataset' object has no attribute " "'TransferSyntaxUID'"
+            r"'FileMetaDataset' object has no attribute 'TransferSyntaxUID'"
         )
-        msg_from_pillow = r"'Dataset' object has no attribute " "'PixelRepresentation'"
+        msg_from_pillow = r"'Dataset' object has no attribute 'PixelRepresentation'"
         msg = "(" + "|".join([msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
@@ -1281,7 +1281,7 @@ class TestDataset:
         ds.add_new(0x00250011, "LO", "Valid Creator")
         ds.add_new(0x00251007, "UN", "foobar")
         ds.add_new(0x00251107, "UN", "foobaz")
-        msg = r"\(0025,0010\) '\[13975, 13802]' " r"is not a valid private creator"
+        msg = r"\(0025,0010\) '\[13975, 13802]' is not a valid private creator"
         with pytest.warns(UserWarning, match=msg):
             assert (
                 str(ds[0x00251007]) == "(0025,1007) Private tag data"

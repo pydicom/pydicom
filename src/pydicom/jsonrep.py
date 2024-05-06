@@ -161,7 +161,7 @@ class JsonDataElementConverter:
         if self.value_key == "Value":
             if not isinstance(self.value, list):
                 raise TypeError(
-                    f"'{self.value_key}' of data element '{self.tag}' must " "be a list"
+                    f"'{self.value_key}' of data element '{self.tag}' must be a list"
                 )
 
             if not self.value:

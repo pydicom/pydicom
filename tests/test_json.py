@@ -152,7 +152,7 @@ class TestAT:
         )
         with pytest.warns(
             UserWarning,
-            match="Invalid value '000910AG' for " "AT element - ignoring it",
+            match="Invalid value '000910AG' for AT element - ignoring it",
         ):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
@@ -165,7 +165,7 @@ class TestAT:
         )
         with pytest.raises(
             ValueError,
-            match="Data element '000910AG' could " "not be loaded from JSON:",
+            match="Data element '000910AG' could not be loaded from JSON:",
         ):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
@@ -194,10 +194,10 @@ class TestDataSetToJson:
         ds.add_new(
             0x00091005,
             "OD",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07",
         )
         ds.add_new(
-            0x00091006, "OL", b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
+            0x00091006, "OL", b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"
         )
         ds.add_new(0x00091007, "UI", "1.2.3.4.5.6")
         ds.add_new(0x00091008, "DA", "20200101")
@@ -254,8 +254,8 @@ class TestDataSetToJson:
         ds.add_new(0x00100010, "PN", "Jane^Doe")
         # as the order of the keys is not defined, we have to check both
         assert ds.to_json() in (
-            '{"00100010": {"vr": "PN", "Value": [{' '"Alphabetic": "Jane^Doe"}]}}',
-            '{"00100010": {"Value": [{' '"Alphabetic": "Jane^Doe"}], "vr": "PN"}}',
+            '{"00100010": {"vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]}}',
+            '{"00100010": {"Value": [{"Alphabetic": "Jane^Doe"}], "vr": "PN"}}',
         )
 
         assert {
@@ -266,8 +266,8 @@ class TestDataSetToJson:
         element = DataElement(0x00100010, "PN", "Jane^Doe")
         # as the order of the keys is not defined, we have to check both
         assert element.to_json() in (
-            '{"vr": "PN", "Value": [{' '"Alphabetic": "Jane^Doe"}]}',
-            '{"Value": [{' '"Alphabetic": "Jane^Doe"}], "vr": "PN"}',
+            '{"vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]}',
+            '{"Value": [{"Alphabetic": "Jane^Doe"}], "vr": "PN"}',
         )
 
         assert {"vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]} == element.to_json(

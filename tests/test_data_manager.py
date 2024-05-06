@@ -296,9 +296,7 @@ class TestDownload:
     def test_get_testdata_file_network_outage(self, download_failure):
         """Test a network outage when using get_testdata_file."""
         fname = "693_UNCI.dcm"
-        msg = (
-            r"A download failure occurred while attempting to " r"retrieve 693_UNCI.dcm"
-        )
+        msg = r"A download failure occurred while attempting to retrieve 693_UNCI.dcm"
         with pytest.warns(UserWarning, match=msg):
             assert get_testdata_file(fname) is None
 
