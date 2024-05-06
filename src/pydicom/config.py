@@ -91,7 +91,7 @@ def DS_numpy(use_numpy: bool = True) -> None:
 
     if use_DS_decimal and use_numpy:
         raise ValueError(
-            "Cannot use numpy arrays to read DS elementsif `use_DS_decimal` is True"
+            "Cannot use numpy arrays to read DS elements if `use_DS_decimal` is True"
         )
     use_DS_numpy = use_numpy
 
