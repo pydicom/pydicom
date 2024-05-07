@@ -418,7 +418,7 @@ class DecodeRunner(RunnerBase):
         if not as_frame:
             d["number_of_frames"] = self.number_of_frames
 
-        return d
+        return cast(dict[str, str | int], d)
 
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data."""
@@ -951,7 +951,7 @@ class Decoder(CoderBase):
         pixels_per_frame = runner.frame_length(unit="pixels")
         number_of_frames = 1 if index is not None else runner.number_of_frames
 
-         # Preallocate output array
+        # Preallocate output array
         arr = np.empty(pixels_per_frame * number_of_frames, dtype=runner.pixel_dtype)
 
         # Return the specified frame only
@@ -1294,7 +1294,7 @@ class Decoder(CoderBase):
         # Our options are to:
         #   Pad the buffer to match *Bits Allocated* (slow, uses more memory), or
         #   Raise an exception and recommend the use of iter_buffer() instead
-        if len(values := list(set(bits_allocated))) != 1:
+        if len(values := [f"{x}" for x in set(bits_allocated)]) != 1:
             raise ValueError(
                 "Inconsistent pixel bit-depths found during decoding: "
                 f"{', '.join(values)}. Its recommended that you use "

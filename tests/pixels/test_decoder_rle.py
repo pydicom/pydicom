@@ -43,7 +43,9 @@ class TestAsArray:
     @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless using dataset."""
-        arr, _ = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
+        arr, _ = self.decoder.as_array(
+            reference.ds, raw=True, decoding_plugin="pydicom"
+        )
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -86,7 +88,9 @@ class TestAsArray:
         with open(reference.path, "rb") as f:
             file_offset = reference.ds["PixelData"].file_tell
             f.seek(file_offset)
-            arr, _ = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
+            arr, _ = self.decoder.as_array(
+                f, raw=True, decoding_plugin="pydicom", **opts
+            )
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
@@ -224,7 +228,9 @@ class TestAsBuffer:
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         ds = reference.ds
-        arr, _ = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
+        arr, _ = self.decoder.as_array(
+            reference.ds, raw=True, decoding_plugin="pydicom"
+        )
         buffer, meta = self.decoder.as_buffer(reference.ds)
 
         frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
@@ -276,7 +282,9 @@ class TestAsBuffer:
         with open(reference.path, "rb") as f:
             file_offset = reference.ds["PixelData"].file_tell
             f.seek(file_offset)
-            arr, _ = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
+            arr, _ = self.decoder.as_array(
+                f, raw=True, decoding_plugin="pydicom", **opts
+            )
             assert f.tell() == file_offset
             buffer, _ = self.decoder.as_buffer(f, **opts)
             assert f.tell() == file_offset

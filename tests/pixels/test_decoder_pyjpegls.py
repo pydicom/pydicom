@@ -41,7 +41,7 @@ class TestPyJpegLSDecoder:
     def test_jls_lossy(self, reference):
         """Test the decoder with JPEGLSNearLossless."""
         decoder = get_decoder(JPEGLSNearLossless)
-        arr, _  = decoder.as_array(reference.ds, raw=True, decoding_plugin="pyjpegls")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pyjpegls")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype

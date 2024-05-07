@@ -93,9 +93,9 @@ class JsonDataElementConverter:
         vr: str,
         value: JSONValueType,
         value_key: str | None,
-        bulk_data_uri_handler: BulkDataHandlerType
-        | Callable[[str], BulkDataType]
-        | None = None,
+        bulk_data_uri_handler: (
+            BulkDataHandlerType | Callable[[str], BulkDataType] | None
+        ) = None,
     ) -> None:
         """Create a new converter instance.
 

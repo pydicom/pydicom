@@ -16,25 +16,21 @@ Self = TypeVar("Self", bound="DicomIO")
 
 
 class ReadableBuffer(Protocol):
-    def read(self, size: int = ..., /) -> bytes:
-        ...  # pragma: no cover
+    def read(self, size: int = ..., /) -> bytes: ...  # pragma: no cover
 
-    def seek(self, offset: int, whence: int = ..., /) -> int:
-        ...  # pragma: no cover
+    def seek(self, offset: int, whence: int = ..., /) -> int: ...  # pragma: no cover
 
-    def tell(self) -> int:
-        ...  # pragma: no cover
+    def tell(self) -> int: ...  # pragma: no cover
 
 
 class WriteableBuffer(Protocol):
-    def seek(self, offset: int, whence: int = ..., /) -> int:
-        ...  # pragma: no cover
+    def seek(self, offset: int, whence: int = ..., /) -> int: ...  # pragma: no cover
 
-    def tell(self) -> int:
-        ...  # pragma: no cover
+    def tell(self) -> int: ...  # pragma: no cover
 
-    def write(self, b: bytes | bytearray | memoryview, /) -> int:
-        ...  # pragma: no cover
+    def write(
+        self, b: bytes | bytearray | memoryview, /
+    ) -> int: ...  # pragma: no cover
 
 
 class DicomIO:

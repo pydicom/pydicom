@@ -2801,11 +2801,11 @@ class Dataset:
     def from_json(
         cls: type["Dataset"],
         json_dataset: dict[str, Any] | str | bytes | bytearray,
-        bulk_data_uri_handler: Callable[
-            [str, str, str], None | str | int | float | bytes
-        ]
-        | Callable[[str], None | str | int | float | bytes]
-        | None = None,
+        bulk_data_uri_handler: (
+            Callable[[str, str, str], None | str | int | float | bytes]
+            | Callable[[str], None | str | int | float | bytes]
+            | None
+        ) = None,
     ) -> "Dataset":
         """Return a :class:`Dataset` from a DICOM JSON Model object.
 

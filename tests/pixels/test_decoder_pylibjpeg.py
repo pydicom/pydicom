@@ -308,7 +308,9 @@ class TestRleDecoder:
     def test_rle(self, reference):
         """Test the decoder with RLELossless."""
         decoder = get_decoder(RLELossless)
-        arr, meta = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, meta = decoder.as_array(
+            reference.ds, raw=True, decoding_plugin="pylibjpeg"
+        )
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -317,6 +319,8 @@ class TestRleDecoder:
         if meta["samples_per_pixel"] > 1:
             assert meta["planar_configuration"] == 0
 
-        buffer, meta = decoder.as_buffer(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        buffer, meta = decoder.as_buffer(
+            reference.ds, raw=True, decoding_plugin="pylibjpeg"
+        )
         if meta["samples_per_pixel"] > 1:
             assert meta["planar_configuration"] == 1

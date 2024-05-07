@@ -244,9 +244,11 @@ class DataElement:
         vr: str,
         value: Any,
         value_key: str | None,
-        bulk_data_uri_handler: Callable[[str, str, str], BulkDataType]
-        | Callable[[str], BulkDataType]
-        | None = None,
+        bulk_data_uri_handler: (
+            Callable[[str, str, str], BulkDataType]
+            | Callable[[str], BulkDataType]
+            | None
+        ) = None,
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.

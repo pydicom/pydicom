@@ -276,7 +276,9 @@ class TestConvertPN:
             b"\x1b$BG\\<\\\x1b(B^\x1b$BK\\L\\"
         )
         encodings = ["latin_1", "iso2022_jp", "iso_ir_126"]
-        assert ["Buc^Jérôme", "Διονυσιος", "倍尺^本目"] == convert_PN(bytestring, encodings)
+        assert ["Buc^Jérôme", "Διονυσιος", "倍尺^本目"] == convert_PN(
+            bytestring, encodings
+        )
 
 
 def test_all_converters():
