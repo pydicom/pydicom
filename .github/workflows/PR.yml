@@ -7,6 +7,7 @@ on:
 jobs:
   tests:
     strategy:
+      fail-fast: false
       matrix:
         # One Python version per OS, one combo does coverage
         # PyPy only has one line in pydicom (as of 2003-07) so cover in merge only
@@ -20,6 +21,14 @@ jobs:
             python-version: "3.11"
             test-extras: true
             upload-coverage: true
+          - os: windows
+            python-version: "3.11"
+            test-extras: true
+            upload-coverage: true
+          - os: macos
+            python-version: "3.10"
+            test-extras: true
+            upload-coverage: false
     uses: ./.github/workflows/tests_wf.yml
     with:
       os: ${{ matrix.os }}
