@@ -378,7 +378,7 @@ JPEG_MATCHING_DATASETS = [
         ],
     ),
 ]
-JPEG2K_MATCHING_DATASETS = [
+J2KR_MATCHING_DATASETS = [
     # (compressed, reference, fixes)
     pytest.param(
         J2KR_08_08_3_0_1F_YBR_ICT,
@@ -415,6 +415,9 @@ JPEG2K_MATCHING_DATASETS = [
         get_testdata_file("MR_small.dcm"),
         {},
     ),
+]
+J2KI_MATCHING_DATASETS = [
+    # (compressed, reference, fixes)
     pytest.param(
         J2KI_08_08_3_0_1F_RGB,
         get_testdata_file("SC_rgb_gdcm2k_uncompressed.dcm"),
@@ -516,8 +519,8 @@ class TestPillowHandler_JPEG2K:
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
-    @pytest.mark.parametrize("fpath, rpath, fixes", JPEG2K_MATCHING_DATASETS)
-    def test_array(self, fpath, rpath, fixes):
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KR_MATCHING_DATASETS)
+    def test_array_lossless(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
         # May need to correct some element values
@@ -529,6 +532,20 @@ class TestPillowHandler_JPEG2K:
 
         ref = dcmread(rpath).pixel_array
         assert np.array_equal(arr, ref)
+
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KI_MATCHING_DATASETS)
+    def test_array_lossy(self, fpath, rpath, fixes):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        # May need to correct some element values
+        for kw, val in fixes.items():
+            setattr(ds, kw, val)
+        arr = ds.pixel_array
+        if "YBR_FULL" in ds.PhotometricInterpretation:
+            arr = convert_color_space(arr, ds.PhotometricInterpretation, "RGB")
+
+        ref = dcmread(rpath).pixel_array
+        assert np.allclose(arr, ref, atol=1)
 
     def test_warning(self):
         """Test that the precision warning works OK."""
