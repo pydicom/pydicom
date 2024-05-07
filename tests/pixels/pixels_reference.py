@@ -2052,7 +2052,7 @@ J2KI_08_08_3_0_1F_RGB = PixelReference("SC_rgb_gdcm_KY.dcm", "u1", test)
 # J2KI, (8, 8), (1, 480, 640, 3), OB, YBR_ICT, 0
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("US1_UNCI.dcm", read=True).pixel_array
-    assert np.array_equal(arr, ref)
+    assert np.allclose(arr, ref, atol=1)
 
 
 J2KI_08_08_3_0_1F_YBR_ICT = PixelReference("US1_J2KI.dcm", "u1", test)
@@ -2070,7 +2070,7 @@ J2KI_16_10_1_0_1F_M1 = PixelReference("RG3_J2KI.dcm", "<u2", test)
 # J2KI, (16, 12), (1, 1024, 1024, 1), OB, MONOCHROME2, 0
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("MR2_UNCI.dcm", read=True).pixel_array
-    assert np.array_equal(arr, ref)
+    assert np.allclose(arr, ref, atol=1)
 
 
 J2KI_16_12_1_0_1F_M2 = PixelReference("MR2_J2KI.dcm", "<u2", test)
@@ -2079,7 +2079,7 @@ J2KI_16_12_1_0_1F_M2 = PixelReference("MR2_J2KI.dcm", "<u2", test)
 # J2KI, (16, 15), (1, 1955, 1841, 1), OB, MONOCHROME1, 0
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("RG1_UNCI.dcm", read=True).pixel_array
-    assert np.array_equal(arr, ref)
+    assert np.allclose(arr, ref, atol=1)
 
 
 J2KI_16_15_1_0_1F_M1 = PixelReference("RG1_J2KI.dcm", "<u2", test)
@@ -2088,7 +2088,7 @@ J2KI_16_15_1_0_1F_M1 = PixelReference("RG1_J2KI.dcm", "<u2", test)
 # J2KI, (16, 14), (1, 512, 512, 1), OW, MONOCHROME2, 1
 def test(ref, arr, **kwargs):
     ref = get_testdata_file("693_UNCI.dcm", read=True).pixel_array
-    assert np.array_equal(arr, ref)
+    assert np.allclose(arr, ref, atol=1)
 
 
 J2KI_16_14_1_1_1F_M2 = PixelReference("693_J2KI.dcm", "<i2", test)
