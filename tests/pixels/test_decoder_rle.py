@@ -43,14 +43,14 @@ class TestAsArray:
     @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless using dataset."""
-        arr = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
+        arr, _ = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
 
         for index in range(reference.number_of_frames):
-            arr = self.decoder.as_array(
+            arr, meta = self.decoder.as_array(
                 reference.ds, raw=True, index=index, decoding_plugin="pydicom"
             )
             reference.test(arr, index=index)
@@ -61,6 +61,10 @@ class TestAsArray:
                 assert arr.shape == reference.shape
             else:
                 assert arr.shape == reference.shape[1:]
+
+            if reference.ds.SamplesPerPixel > 1:
+                # The returned array is always planar configuration 0
+                assert meta["planar_configuration"] == 0
 
     @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference_binary(self, reference):
@@ -82,14 +86,14 @@ class TestAsArray:
         with open(reference.path, "rb") as f:
             file_offset = reference.ds["PixelData"].file_tell
             f.seek(file_offset)
-            arr = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
+            arr, _ = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
 
             for index in range(reference.number_of_frames):
-                arr = self.decoder.as_array(
+                arr, _ = self.decoder.as_array(
                     f, raw=True, index=index, decoding_plugin="pydicom", **opts
                 )
                 reference.test(arr, index=index)
@@ -107,7 +111,7 @@ class TestAsArray:
         """Test interpreting segment order as little endian."""
         ds = RLE_16_1_1F.ds
 
-        arr = self.decoder.as_array(
+        arr, _ = self.decoder.as_array(
             ds, rle_segment_order="<", decoding_plugin="pydicom"
         )
         assert arr.dtype == RLE_16_1_1F.dtype
@@ -123,7 +127,7 @@ class TestAsArray:
         # Issue 1666
         reference = RLE_16_1_10F
         # Override NumberOfFrames to 9 and try and get the 10th frame
-        arr = self.decoder.as_array(
+        arr, _ = self.decoder.as_array(
             reference.ds, number_of_frames=9, index=9, decoding_plugin="pydicom"
         )
         reference.test(arr, index=9)
@@ -145,7 +149,7 @@ class TestIterArray:
         func = self.decoder.iter_array(
             reference.ds, raw=True, decoding_plugin="pydicom"
         )
-        for index, arr in enumerate(func):
+        for index, (arr, meta) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
@@ -154,6 +158,10 @@ class TestIterArray:
                 assert arr.shape == reference.shape
             else:
                 assert arr.shape == reference.shape[1:]
+
+            if reference.ds.SamplesPerPixel > 1:
+                # The returned array is always planar configuration 0
+                assert meta["planar_configuration"] == 0
 
     @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
     def test_reference_binary(self, reference):
@@ -178,7 +186,7 @@ class TestIterArray:
             func = self.decoder.iter_array(
                 f, raw=True, decoding_plugin="pydicom", **opts
             )
-            for index, arr in enumerate(func):
+            for index, (arr, _) in enumerate(func):
                 reference.test(arr, index=index)
                 assert arr.dtype == reference.dtype
                 assert arr.flags.writeable
@@ -196,7 +204,7 @@ class TestIterArray:
         func = self.decoder.iter_array(
             RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom"
         )
-        for idx, arr in enumerate(func):
+        for idx, (arr, _) in enumerate(func):
             RLE_16_1_10F.test(arr, index=indices[idx])
             assert arr.dtype == RLE_16_1_10F.dtype
             assert arr.flags.writeable
@@ -216,8 +224,8 @@ class TestAsBuffer:
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         ds = reference.ds
-        arr = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
-        buffer = self.decoder.as_buffer(reference.ds)
+        arr, _ = self.decoder.as_array(reference.ds, raw=True, decoding_plugin="pydicom")
+        buffer, meta = self.decoder.as_buffer(reference.ds)
 
         frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
 
@@ -233,6 +241,7 @@ class TestAsBuffer:
             if ds.SamplesPerPixel == 1:
                 assert arr_frame.tobytes() == buffer_frame
             else:
+                assert meta["planar_configuration"] == 1
                 # Red
                 arr_plane = arr_frame[..., 0].tobytes()
                 plane_length = len(arr_plane)
@@ -267,9 +276,9 @@ class TestAsBuffer:
         with open(reference.path, "rb") as f:
             file_offset = reference.ds["PixelData"].file_tell
             f.seek(file_offset)
-            arr = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
+            arr, _ = self.decoder.as_array(f, raw=True, decoding_plugin="pydicom", **opts)
             assert f.tell() == file_offset
-            buffer = self.decoder.as_buffer(f, **opts)
+            buffer, _ = self.decoder.as_buffer(f, **opts)
             assert f.tell() == file_offset
 
             frame_len = (
@@ -307,10 +316,10 @@ class TestAsBuffer:
         """Test by `index` for RLE lossless"""
         ds = reference.ds
         for index in range(reference.number_of_frames):
-            arr = self.decoder.as_array(
+            arr, _ = self.decoder.as_array(
                 reference.ds, raw=True, index=index, decoding_plugin="pydicom"
             )
-            buffer = self.decoder.as_buffer(
+            buffer, _ = self.decoder.as_buffer(
                 reference.ds, index=index, decoding_plugin="pydicom"
             )
 
@@ -352,11 +361,11 @@ class TestAsBuffer:
             file_offset = reference.ds["PixelData"].file_tell
             f.seek(file_offset)
             for index in range(reference.number_of_frames):
-                arr = self.decoder.as_array(
+                arr, _ = self.decoder.as_array(
                     f, raw=True, index=index, decoding_plugin="pydicom", **opts
                 )
                 assert f.tell() == file_offset
-                buffer = self.decoder.as_buffer(
+                buffer, _ = self.decoder.as_buffer(
                     f, index=index, decoding_plugin="pydicom", **opts
                 )
                 assert f.tell() == file_offset
@@ -396,9 +405,10 @@ class TestIterBuffer:
             reference.ds, raw=True, decoding_plugin="pydicom"
         )
 
-        for arr, buf in zip(arr_func, buf_func):
+        for (arr, _), (buf, meta) in zip(arr_func, buf_func):
             if reference.ds.SamplesPerPixel == 3:
                 # If samples per pixel is 3 then bytes are planar configuration 1
+                assert meta["planar_configuration"] == 1
                 # Red
                 arr_frame = arr[..., 0].tobytes()
                 frame_len = len(arr_frame)
@@ -445,7 +455,7 @@ class TestIterBuffer:
             buf_func = self.decoder.iter_buffer(
                 f, raw=True, decoding_plugin="pydicom", **opts
             )
-            for arr, buf in zip(arrays, buf_func):
+            for (arr, _), (buf, _) in zip(arrays, buf_func):
                 if reference.ds.SamplesPerPixel == 3:
                     # If samples per pixel is 3 then bytes are planar configuration 1
                     # Red
@@ -476,7 +486,7 @@ class TestIterBuffer:
         buf_func = self.decoder.iter_buffer(
             RLE_16_1_10F.ds, raw=True, indices=indices, decoding_plugin="pydicom"
         )
-        for idx, (arr, buf) in enumerate(zip(arr_func, buf_func)):
+        for idx, ((arr, _), (buf, _)) in enumerate(zip(arr_func, buf_func)):
             assert arr.tobytes() == buf
 
         assert idx == 2

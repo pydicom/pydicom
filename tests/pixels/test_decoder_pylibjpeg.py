@@ -11,6 +11,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom import dcmread
 from pydicom.encaps import get_frame
 from pydicom.pixels import get_decoder
 from pydicom.pixels.decoders.pylibjpeg import is_available
@@ -65,15 +66,7 @@ class TestLibJpegDecoder:
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
         decoder = get_decoder(JPEGBaseline8Bit)
-
-        if reference in (JPGB_08_08_3_0_1F_RGB, JPGB_08_08_3_0_1F_YBR_FULL):
-            with pytest.warns(UserWarning):
-                arr = decoder.as_array(
-                    reference.ds, raw=True, decoding_plugin="pylibjpeg"
-                )
-        else:
-            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
-
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -87,7 +80,7 @@ class TestLibJpegDecoder:
             return
 
         decoder = get_decoder(JPEGExtended12Bit)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -97,7 +90,7 @@ class TestLibJpegDecoder:
     def test_jpg_lossless(self, reference):
         """Test the decoder with JPEGLossless."""
         decoder = get_decoder(JPEGLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -107,7 +100,7 @@ class TestLibJpegDecoder:
     def test_jpg_lossless_sv1(self, reference):
         """Test the decoder with JPEGLosslessSV1."""
         decoder = get_decoder(JPEGLosslessSV1)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -116,7 +109,7 @@ class TestLibJpegDecoder:
     def test_jls_lossless(self, reference):
         """Test the decoder with JPEGLSLossless."""
         decoder = get_decoder(JPEGLSLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -126,7 +119,7 @@ class TestLibJpegDecoder:
     def test_jls_lossy(self, reference):
         """Test the decoder with JPEGLSNearLossless."""
         decoder = get_decoder(JPEGLSNearLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -150,7 +143,7 @@ class TestLibJpegDecoder:
         # The JPEG-LS codestream uses a precision of 8, so it will return
         #   8-bit values, however the decoding process nominally expects 16-bit
         decoder = get_decoder(JPEGLSNearLossless)
-        arr = decoder.as_array(
+        arr, meta = decoder.as_array(
             JLSN_08_01_1_0_1F.ds,
             raw=True,
             decoding_plugin="pylibjpeg",
@@ -161,12 +154,14 @@ class TestLibJpegDecoder:
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
         assert arr.dtype == np.uint16
         assert arr.flags.writeable
+        assert meta["bits_allocated"] == 16
+        assert meta["bits_stored"] == 8
 
     def test_bits_allocated_mismatch_as_buffer(self):
         """Test the result when bits stored <= 8 and bits allocated 16"""
         decoder = get_decoder(JPEGLSNearLossless)
         ds = JLSN_08_01_1_0_1F.ds
-        buffer = decoder.as_buffer(
+        buffer, meta = decoder.as_buffer(
             ds,
             raw=True,
             decoding_plugin="pylibjpeg",
@@ -178,6 +173,8 @@ class TestLibJpegDecoder:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
+        assert meta["bits_allocated"] == 8
+        assert meta["bits_stored"] == 8
 
     def test_rgb_component_ids(self):
         """Test decoding an incorrect photometric interpretation using cIDs."""
@@ -188,15 +185,16 @@ class TestLibJpegDecoder:
             "'YBR_FULL_422' however the encoded image's codestream uses "
             "component IDs that indicate it should be 'RGB'"
         )
-        ds = reference.ds
+        ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "YBR_FULL_422"
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
 
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "RGB"
 
     def test_jfif(self):
         """Test decoding an incorrect photometric interpretation using JFIF."""
@@ -207,15 +205,16 @@ class TestLibJpegDecoder:
             "'RGB' however the encoded image's codestream contains a JFIF APP "
             "marker which indicates it should be 'YBR_FULL_422'"
         )
-        ds = reference.ds
+        ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
 
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "YBR_FULL_422"
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
@@ -224,7 +223,7 @@ class TestOpenJpegDecoder:
     def test_j2k_lossless(self, reference):
         """Test the decoder with JPEG2000Lossless."""
         decoder = get_decoder(JPEG2000Lossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -234,7 +233,7 @@ class TestOpenJpegDecoder:
     def test_j2k(self, reference):
         """Test the decoder with JPEG2000."""
         decoder = get_decoder(JPEG2000)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -244,7 +243,7 @@ class TestOpenJpegDecoder:
     def test_htj2k_lossless(self, reference):
         """Test the decoder with HTJ2KLossless."""
         decoder = get_decoder(HTJ2KLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -254,7 +253,7 @@ class TestOpenJpegDecoder:
     def test_htj2k_lossless_rpcl(self, reference):
         """Test the decoder with HTJ2KLosslessRPCL."""
         decoder = get_decoder(HTJ2KLosslessRPCL)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -264,7 +263,7 @@ class TestOpenJpegDecoder:
     def test_htj2k(self, reference):
         """Test the decoder with HTJ2K."""
         decoder = get_decoder(HTJ2K)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -278,7 +277,7 @@ class TestOpenJpegDecoder:
         frame_gen = decoder.iter_array(
             reference.ds, raw=True, decoding_plugin="pylibjpeg"
         )
-        for arr in frame_gen:
+        for arr, _ in frame_gen:
             reference.test(arr)
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
@@ -292,7 +291,7 @@ class TestOpenJpegDecoder:
         frame_gen = decoder.iter_array(
             reference.ds, raw=True, decoding_plugin="pylibjpeg", indices=[0]
         )
-        for arr in frame_gen:
+        for arr, _ in frame_gen:
             reference.test(arr)
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
@@ -309,8 +308,15 @@ class TestRleDecoder:
     def test_rle(self, reference):
         """Test the decoder with RLELossless."""
         decoder = get_decoder(RLELossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        arr, meta = decoder.as_array(reference.ds, raw=True, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+
+        if meta["samples_per_pixel"] > 1:
+            assert meta["planar_configuration"] == 0
+
+        buffer, meta = decoder.as_buffer(reference.ds, raw=True, decoding_plugin="pylibjpeg")
+        if meta["samples_per_pixel"] > 1:
+            assert meta["planar_configuration"] == 1

@@ -372,6 +372,54 @@ class DecodeRunner(RunnerBase):
         src.seek(file_offset)
         return buffer
 
+    def image_pixel(self, as_frame: bool = False) -> dict[str, str | int]:
+        """Return a dict containing the :dcm:`Image Pixel
+        <part03/sect_C.7.6.3.html>` module related properties.
+
+        Parameters
+        ----------
+        as_frame : bool, optional
+            If ``True`` then don't include properties that aren't appropriate
+            for a single frame. Default ``False``.
+
+        Returns
+        -------
+        dict[str, str | int]
+            A dict containing the values for 'bits_allocated', 'bits_stored',
+            'columns', 'photometric_interpretation', 'samples_per_pixel',
+            'rows' and optionally 'planar_configuration' (if 'samples_per_pixel'
+            > 1), 'pixel_representation' (if the pixel keyword is
+            ``"PixelData"``) and 'number_of_frames' (if `per_frame` is
+            ``True``).
+
+            The returned values depend on whether or not this method is
+            called before or after decoding the pixel data, as the decoding
+            plugins and image processing functions may update the values as
+            needed to reflect the corresponding decoded data. For example, if
+            the pixel data is converted from the YCbCr to RGB color space then
+            the 'photometric_interpretation' value will be changed to match
+            after the data has been decoded.
+        """
+        d = {
+            "bits_allocated": self.bits_allocated,
+            "bits_stored": self.bits_stored,
+            "columns": self.columns,
+            "photometric_interpretation": self.photometric_interpretation,
+            "rows": self.rows,
+            "samples_per_pixel": self.samples_per_pixel,
+        }
+
+        if self.samples_per_pixel > 1:
+            d["planar_configuration"] = self.planar_configuration
+
+        if self.pixel_keyword == "PixelData":
+            d["pixel_representation"] = self.pixel_representation
+
+        if not as_frame:
+            d["number_of_frames"] = self.number_of_frames
+
+        return d
+
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data."""
         if self.is_binary:
@@ -477,10 +525,10 @@ class DecodeRunner(RunnerBase):
         np.ndarray
             A view of the input `arr` reshaped to:
 
-            * (rows, columns) for single frame, single plane data
-            * (rows, columns, planes) for single frame, multi-plane data
-            * (frames, rows, columns) for multi-frame, single plane data
-            * (frames, rows, columns, planes) for multi-frame, multi-plane data
+            * (rows, columns) for single frame, single sample data
+            * (rows, columns, samples) for single frame, multi-sample data
+            * (frames, rows, columns) for multi-frame, single sample data
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data
         """
         number_of_frames = self.number_of_frames
         samples_per_pixel = self.samples_per_pixel
@@ -488,27 +536,27 @@ class DecodeRunner(RunnerBase):
         columns = self.columns
 
         if not as_frame and number_of_frames > 1:
-            # Multi-frame, single plane
+            # Multi-frame, single sample
             if samples_per_pixel == 1:
                 return arr.reshape(number_of_frames, rows, columns)
 
-            # Multi-frame, multiple planes, planar configuration 0
+            # Multi-frame, multiple samples, planar configuration 0
             if self.planar_configuration == 0:
                 return arr.reshape(number_of_frames, rows, columns, samples_per_pixel)
 
-            # Multi-frame, multiple planes, planar configuration 1
+            # Multi-frame, multiple samples, planar configuration 1
             arr = arr.reshape(number_of_frames, samples_per_pixel, rows, columns)
             return arr.transpose(0, 2, 3, 1)
 
-        # Single frame, single plane
+        # Single frame, single sample
         if samples_per_pixel == 1:
             return arr.reshape(rows, columns)
 
-        # Single frame, multiple planes, planar configuration 0
+        # Single frame, multiple samples, planar configuration 0
         if self.planar_configuration == 0:
             return arr.reshape(rows, columns, samples_per_pixel)
 
-        # Single frame, multiple planes, planar configuration 1
+        # Single frame, multiple samples, planar configuration 1
         arr = arr.reshape(samples_per_pixel, rows, columns)
         return arr.transpose(1, 2, 0)
 
@@ -724,7 +772,7 @@ class Decoder(CoderBase):
         raw: bool = False,
         decoding_plugin: str = "",
         **kwargs: DecodeOptions,
-    ) -> "np.ndarray":
+    ) -> tuple["np.ndarray", dict[str, str | int]]:
         """Return decoded pixel data as :class:`~numpy.ndarray`.
 
         .. warning::
@@ -805,16 +853,26 @@ class Decoder(CoderBase):
         Returns
         -------
         numpy.ndarray
-            The decoded and reshaped pixel data, with shape:
+            One or more frames of decoded pixel data shaped as:
 
-            * (rows, columns) for single frame, single plane data
-            * (rows, columns, planes) for single frame, multi-plane data
-            * (frames, rows, columns) for multi-frame, single plane data
-            * (frames, rows, columns, planes) for multi-frame, multi-plane data
+            * (rows, columns) for single frame, single sample data
+            * (rows, columns, samples) for single frame, multi-sample data
+            * (frames, rows, columns) for multi-frame, single sample data
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data
+
+            The :class:`~numpy.dtype` for the array will have an
+            :attr:`~numpy.dtype.itemsize` sufficient to contain pixels of at
+            least :ref:`bits allocated<bits_allocated>`.
 
             A writeable :class:`~numpy.ndarray` is returned by default. For
             native transfer syntaxes with ``view_only=True``, a read-only
             :class:`~numpy.ndarray` will be returned if `src` is immutable.
+        dict[str, str | int]
+            The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
+            values resulting from the decoding process that describe the array.
+            See :meth:`DecodeRunner.image_pixel()
+            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            possible contents.
         """
         if not HAVE_NP:
             raise ImportError(
@@ -847,22 +905,23 @@ class Decoder(CoderBase):
             func = self._as_array_encapsulated
             as_writeable = True
 
-        arr = runner.reshape(
-            func(runner, index),
-            as_frame=False if index is None else True,
-        )
+        as_frame = index is not None
+        arr = runner.reshape(func(runner, index), as_frame=as_frame)
 
         if runner._test_for("sign_correction"):
             arr = _apply_sign_correction(arr, runner)
 
-        if raw:
-            return arr.copy() if not arr.flags.writeable and as_writeable else arr
+        if not raw:
+            # Processing may give us a new writeable array anyway, so do
+            #   it first to avoid an unnecessary ndarray.copy()
+            arr = runner.process(arr)
 
-        # Processing may give us a new writeable array anyway, so do
-        #   it first to avoid an unnecessary ndarray.copy()
-        arr = runner.process(arr)
+        arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
 
-        return arr.copy() if not arr.flags.writeable and as_writeable else arr
+        # Multi-sample arrays are always returned *Planar Configuration* 0
+        runner.set_option("planar_configuration", 0)
+
+        return arr, runner.image_pixel(as_frame=as_frame)
 
     @staticmethod
     def _as_array_encapsulated(runner: DecodeRunner, index: int | None) -> "np.ndarray":
@@ -881,19 +940,30 @@ class Decoder(CoderBase):
         numpy.ndarray
             A 1D array containing the pixel data.
         """
-        dtype = runner.pixel_dtype
+        # The initial preallocated array uses an itemsize based off the dataset's
+        #   bits allocated value, however each decoded frame may use a smaller
+        #   itemsize (such as bits allocated 16 and JPEG with precision 8 only
+        #   returning 8-bit data rather than 16-bit)
+        # We account for this by interpreting each frame using that decoded size,
+        #   inserting it into the preallocated array, then resetting at the end
+        #   so the returned image pixel dict matches the array
+        original_bits_allocated = runner.bits_allocated
+        pixels_per_frame = runner.frame_length(unit="pixels")
+        number_of_frames = 1 if index is not None else runner.number_of_frames
+
+         # Preallocate output array
+        arr = np.empty(pixels_per_frame * number_of_frames, dtype=runner.pixel_dtype)
 
         # Return the specified frame only
         if index is not None:
-            return np.frombuffer(runner.decode(index=index), dtype=dtype)
+            # The decoding plugin may alter runner.bits_allocated to give a
+            #   different dtype itemsize
+            arr[:] = np.frombuffer(runner.decode(index=index), dtype=runner.pixel_dtype)
+            runner.set_option("bits_allocated", original_bits_allocated)
+
+            return arr
 
         # Return all frames
-        # Preallocate container array for the frames
-        # The preallocated array's dtype itemsize is based off the dataset's
-        #   bits allocated value, however each decoded frame may have a smaller
-        #   itemsize if the bits allocated value is modified during decoding
-        pixels_per_frame = runner.frame_length(unit="pixels")
-        arr = np.empty(pixels_per_frame * runner.number_of_frames, dtype=dtype)
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
@@ -916,6 +986,8 @@ class Decoder(CoderBase):
                 "than expected from the supplied number of frames"
             )
             arr = np.concatenate([arr, *excess])
+
+        runner.set_option("bits_allocated", original_bits_allocated)
 
         return arr
 
@@ -1059,7 +1131,7 @@ class Decoder(CoderBase):
         validate: bool = True,
         decoding_plugin: str = "",
         **kwargs: Any,
-    ) -> Buffer:
+    ) -> tuple[Buffer, dict[str, str | int]]:
         """Return the raw decoded pixel data as a buffer-like.
 
         .. warning::
@@ -1109,8 +1181,8 @@ class Decoder(CoderBase):
 
         Returns
         -------
-        buffer-like
-            The decoded pixel data.
+        bytes | bytearray | memoryview
+            One or more frames of decoded pixel data.
 
             * For natively encoded pixel data when `src` is a buffer-like the
               same type in `src` will be returned, except if `view_only` is
@@ -1119,11 +1191,17 @@ class Decoder(CoderBase):
               :class:`bytes` will always be returned.
             * Encapsulated pixel data will be returned as :class:`bytearray`.
 
-            8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
+            8-bit pixel data encoded as **OW** using *Explicit VR Big Endian* will
             be returned as-is and may need byte-swapping. To facilitate this
             an extra byte before the expected start (for an odd `index`) or after
             the expected end (for an even `index`) is returned if the frame contains
             an odd number of pixels.
+        dict[str, str | int]
+            The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
+            values resulting from the decoding process that describe the
+            decoded pixel data. See :meth:`DecodeRunner.image_pixel()
+            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            possible contents.
         """
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
@@ -1139,9 +1217,11 @@ class Decoder(CoderBase):
             runner.validate()
 
         if self.is_native:
-            return self._as_buffer_native(runner, index)
+            buffer = self._as_buffer_native(runner, index)
+        else:
+            buffer = self._as_buffer_encapsulated(runner, index)
 
-        return self._as_buffer_encapsulated(runner, index)
+        return buffer, runner.image_pixel(as_frame=index is not None)
 
     @staticmethod
     def _as_buffer_encapsulated(
@@ -1177,9 +1257,11 @@ class Decoder(CoderBase):
 
         # Return all frames
         buffer = bytearray()
+        bits_allocated = []
         frame_generator = runner.iter_decode()
         for index in range(runner.number_of_frames):
             frame = next(frame_generator)
+            bits_allocated.append(runner.bits_allocated)
             length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
@@ -1196,6 +1278,7 @@ class Decoder(CoderBase):
             if len(frame) == runner.frame_length(unit="bytes"):
                 excess.extend(frame)
                 runner.set_option("number_of_frames", runner.number_of_frames + 1)
+                bits_allocated.append(runner.bits_allocated)
 
         if excess:
             warn_and_log(
@@ -1203,6 +1286,20 @@ class Decoder(CoderBase):
                 "than expected from the supplied number of frames"
             )
             buffer.extend(excess)
+
+        # Need to check for consistency in frame lengths
+        #   Depending on the encoder each frame may have been encoded using a
+        #   different precision (e.g. frames with 7-bit and 12-bit precisions
+        #   would be decoded as 8-bit and 16-bit respectively)
+        # Our options are to:
+        #   Pad the buffer to match *Bits Allocated* (slow, uses more memory), or
+        #   Raise an exception and recommend the use of iter_buffer() instead
+        if len(values := list(set(bits_allocated))) != 1:
+            raise ValueError(
+                "Inconsistent pixel bit-depths found during decoding: "
+                f"{', '.join(values)}. Its recommended that you use "
+                "'Decoder.iter_buffer()' instead"
+            )
 
         return buffer
 
@@ -1289,7 +1386,7 @@ class Decoder(CoderBase):
         validate: bool = True,
         decoding_plugin: str = "",
         **kwargs: Any,
-    ) -> Iterator["np.ndarray"]:
+    ) -> Iterator[tuple["np.ndarray", dict[str, str | int]]]:
         """Yield pixel data frames as :class:`~numpy.ndarray`.
 
         .. warning::
@@ -1368,14 +1465,24 @@ class Decoder(CoderBase):
         Yields
         ------
         numpy.ndarray
-            The decoded and reshaped pixel data, with shape:
+            A single frame of decoded and reshaped pixel data, with shape:
 
-            * (rows, columns) for single frame, single plane data
-            * (rows, columns, planes) for single frame, multi-plane data
+            * (rows, columns) for single sample data
+            * (rows, columns, samples) for multi-sample data
+
+            The :class:`~numpy.dtype` for the array will have an
+            :attr:`~numpy.dtype.itemsize` sufficient to contain pixels of at
+            least :ref:`bits allocated<bits_allocated>`.
 
             A writeable :class:`~numpy.ndarray` is returned by default. For
             native transfer syntaxes with ``view_only=True`` a read-only
             :class:`~numpy.ndarray` will be yielded if `src` is immutable.
+        dict[str, str | int]
+            The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
+            values resulting from the decoding process that describe the array.
+            See :meth:`DecodeRunner.image_pixel()
+            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            possible contents.
         """
         if not HAVE_NP:
             raise ImportError(
@@ -1412,13 +1519,17 @@ class Decoder(CoderBase):
                 if runner._test_for("sign_correction"):
                     arr = _apply_sign_correction(arr, runner)
 
-                if raw:
-                    yield arr if arr.flags.writeable else arr.copy()
-                    continue
+                if not raw:
+                    # Processing may give us a new writeable array anyway, so do
+                    #   it first to avoid an unnecessary ndarray.copy()
+                    arr = runner.process(arr)
 
-                arr = runner.process(arr)
+                arr = arr if arr.flags.writeable else arr.copy()
 
-                yield arr if arr.flags.writeable else arr.copy()
+                # Multi-sample arrays are always returned *Planar Configuration* 0
+                runner.set_option("planar_configuration", 0)
+
+                yield arr, runner.image_pixel(as_frame=True)
 
             return
 
@@ -1428,15 +1539,13 @@ class Decoder(CoderBase):
             if runner._test_for("sign_correction"):
                 arr = _apply_sign_correction(arr, runner)
 
-            if raw:
-                yield arr.copy() if not arr.flags.writeable and as_writeable else arr
-                continue
+            if not raw:
+                arr = runner.process(arr)
 
-            # Processing may give us a new writeable array anyway, so do
-            #   it first to avoid an unnecessary ndarray.copy()
-            arr = runner.process(arr)
+            arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
+            runner.set_option("planar_configuration", 0)
 
-            yield arr.copy() if not arr.flags.writeable and as_writeable else arr
+            yield arr, runner.image_pixel(as_frame=True)
 
     def iter_buffer(
         self,
@@ -1446,7 +1555,7 @@ class Decoder(CoderBase):
         validate: bool = True,
         decoding_plugin: str = "",
         **kwargs: Any,
-    ) -> Iterator[Buffer]:
+    ) -> Iterator[tuple[Buffer, dict[str, str | int]]]:
         """Yield raw decoded pixel data frames as a buffer-like.
 
         .. warning::
@@ -1494,8 +1603,8 @@ class Decoder(CoderBase):
 
         Yields
         -------
-        buffer-like
-            The decoded pixel data.
+        bytes | bytearray | memoryview
+            A single frame of decoded pixel data.
 
             * For natively encoded pixel data when `src` is a buffer-like the
               same type in `src` will be yielded, except if `view_only` is
@@ -1504,11 +1613,17 @@ class Decoder(CoderBase):
               :class:`bytes` will always be yielded.
             * Encapsulated pixel data will be yielded as :class:`bytearray`.
 
-            8-bit pixel data encoded as **OW** using Explicit VR Big Endian will
+            8-bit pixel data encoded as **OW** using *Explicit VR Big Endian* will
             be yielded as-is and may need byte-swapping. To facilitate this
             an extra byte before the expected start (for an odd `index`) or after
             the expected end (for an even `index`) is yielded if the frame contains
             an odd number of pixels.
+        dict[str, str | int]
+            The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
+            values resulting from the decoding process that describe the
+            decoded frame of pixel data. See :meth:`DecodeRunner.image_pixel()
+            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            possible contents.
         """
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
@@ -1524,7 +1639,8 @@ class Decoder(CoderBase):
             runner.validate()
 
         if self.is_encapsulated and not indices:
-            yield from runner.iter_decode()
+            for buffer in runner.iter_decode():
+                yield buffer, runner.image_pixel(as_frame=True)
 
             return
 
@@ -1535,7 +1651,7 @@ class Decoder(CoderBase):
 
         indices = indices if indices else range(runner.number_of_frames)
         for index in indices:
-            yield func(runner, index)
+            yield func(runner, index), runner.image_pixel(as_frame=True)
 
 
 # Decoder names should be f"{UID.keyword}Decoder"
