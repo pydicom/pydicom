@@ -545,7 +545,6 @@ class TestPillowHandler_JPEG2K:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, "RGB")
 
         ref = dcmread(rpath).pixel_array
-        diff = arr.astype(float) - ref.astype(float)
         assert np.allclose(arr, ref, atol=1)
 
     def test_warning(self):

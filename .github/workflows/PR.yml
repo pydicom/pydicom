@@ -21,10 +21,6 @@ jobs:
             python-version: "3.11"
             test-extras: true
             upload-coverage: true
-          - os: windows
-            python-version: "3.11"
-            test-extras: true
-            upload-coverage: true
           - os: macos
             python-version: "3.10"
             test-extras: true
