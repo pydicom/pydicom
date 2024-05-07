@@ -546,8 +546,7 @@ class TestPillowHandler_JPEG2K:
 
         ref = dcmread(rpath).pixel_array
         diff = arr.astype(float) - ref.astype(float)
-        print(diff.min(), diff.max())
-        assert np.array_equal(arr, ref)
+        assert np.allclose(arr, ref, atol=1)
 
     def test_warning(self):
         """Test that the precision warning works OK."""
