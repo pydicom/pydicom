@@ -78,6 +78,8 @@ jobs:
 
     - name: Send coverage results
       if: success() && inputs.upload-coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         env_vars: inputs.os, inputs.python-version

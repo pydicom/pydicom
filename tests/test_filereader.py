@@ -577,7 +577,7 @@ class TestReader:
         long_specific_char_set_value = ["ISO 2022IR 100"] * 9
         ds.add(DataElement(0x00080005, "CS", long_specific_char_set_value))
 
-        msg = r"Unknown encoding 'ISO 2022IR 100' - using default encoding " r"instead"
+        msg = r"Unknown encoding 'ISO 2022IR 100' - using default encoding instead"
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
@@ -788,7 +788,7 @@ class TestReader:
         )
         fp = BytesIO(bytestream)
         with pytest.raises(
-            InvalidDicomError, match="Expected explicit VR, " "but found implicit VR"
+            InvalidDicomError, match="Expected explicit VR, but found implicit VR"
         ):
             dcmread(fp, force=True)
 
@@ -973,7 +973,7 @@ class TestReader:
             )
 
         assert (
-            "Expected 0x00000000 after delimiter, found 0x1000000, at " "position 0x2A"
+            "Expected 0x00000000 after delimiter, found 0x1000000, at position 0x2A"
         ) in caplog.text
 
     def test_sequence_missing_item_tag(self, enable_debugging, caplog):
@@ -1225,11 +1225,11 @@ class TestReadDataElement:
     def setup_method(self):
         ds = Dataset()
         ds.DoubleFloatPixelData = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07"
-        )  # OD
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"  # OD
+        )
         ds.SelectorOLValue = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
-        )  # VR of OL
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"  # VR of OL
+        )
         ds.PotentialReasonsForProcedure = [
             "A",
             "B",
@@ -1241,7 +1241,7 @@ class TestReadDataElement:
         ds.DestinationAE = "    TEST  12    "  # 16 characters max for AE
         # 8-byte values
         ds.ExtendedOffsetTable = (  # VR of OV
-            b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
+            b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         )
 
         # No public elements with VR of SV or UV yet...
@@ -1297,7 +1297,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x7FE00009,
             "OD",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07",
         )
         assert ref_elem == elem
 
@@ -1308,7 +1308,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x7FE00009,
             "OD",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07",
         )
         assert ref_elem == elem
 
@@ -1319,7 +1319,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x00720075,
             "OL",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03",
         )
         assert ref_elem == elem
 
@@ -1330,7 +1330,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x00720075,
             "OL",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03",
         )
         assert ref_elem == elem
 
@@ -1399,7 +1399,7 @@ class TestReadDataElement:
     def test_read_OV_implicit_little(self):
         """Check reading element with VR of OV encoded as implicit"""
         ds = dcmread(self.fp, force=True)
-        val = b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
+        val = b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         elem = ds["ExtendedOffsetTable"]
         assert "OV" == elem.VR
         assert 0x7FE00001 == elem.tag
@@ -1411,7 +1411,7 @@ class TestReadDataElement:
     def test_read_OV_explicit_little(self):
         """Check reading element with VR of OV encoded as explicit"""
         ds = dcmread(self.fp_ex, force=True)
-        val = b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
+        val = b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         elem = ds["ExtendedOffsetTable"]
         assert "OV" == elem.VR
         assert 0x7FE00001 == elem.tag
@@ -1770,7 +1770,7 @@ class TestDataElementGenerator:
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF
-        bytestream = b"\x10\x00\x10\x00" b"PN" b"\x06\x00" b"ABCDEF"
+        bytestream = b"\x10\x00\x10\x00PN\x06\x00ABCDEF"
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, True)
@@ -1780,7 +1780,7 @@ class TestDataElementGenerator:
     def test_little_endian_implicit(self):
         """Test reading little endian implicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF
-        bytestream = b"\x10\x00\x10\x00" b"\x06\x00\x00\x00" b"ABCDEF"
+        bytestream = b"\x10\x00\x10\x00\x06\x00\x00\x00ABCDEF"
         fp = BytesIO(bytestream)
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
@@ -1789,7 +1789,7 @@ class TestDataElementGenerator:
     def test_big_endian_explicit(self):
         """Test reading big endian explicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF
-        bytestream = b"\x00\x10\x00\x10" b"PN" b"\x00\x06" b"ABCDEF"
+        bytestream = b"\x00\x10\x00\x10PN\x00\x06ABCDEF"
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, False)

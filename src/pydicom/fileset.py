@@ -2055,7 +2055,7 @@ class FileSet:
         """
         if not path and self.path is None:
             raise ValueError(
-                "The path to the root directory is required for a " "new File-set"
+                "The path to the root directory is required for a new File-set"
             )
 
         if path and self.path:

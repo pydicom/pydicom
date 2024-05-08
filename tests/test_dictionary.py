@@ -80,7 +80,7 @@ class TestDict:
 
     def test_add_entry_raises_for_private_tag(self):
         with pytest.raises(
-            ValueError, match="Private tags cannot be " 'added using "add_dict_entries"'
+            ValueError, match='Private tags cannot be added using "add_dict_entries"'
         ):
             add_dict_entry(0x10011101, "DS", "Test One", "Test One")
 
@@ -101,7 +101,7 @@ class TestDict:
             0x10011002: ("DS", "3", "Test Two", "", "TestTwo"),
         }
         with pytest.raises(
-            ValueError, match="Private tags cannot be added " 'using "add_dict_entries"'
+            ValueError, match='Private tags cannot be added using "add_dict_entries"'
         ):
             add_dict_entries(new_dict_items)
 

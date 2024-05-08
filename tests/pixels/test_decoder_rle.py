@@ -645,7 +645,7 @@ class TestDecodeFrame:
 
     def test_16bit_1sample(self):
         """Test decoding 16-bit, 1 sample/pixel."""
-        header = b"\x02\x00\x00\x00" b"\x40\x00\x00\x00" b"\x47\x00\x00\x00"
+        header = b"\x02\x00\x00\x00\x40\x00\x00\x00\x47\x00\x00\x00"
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         data = (
@@ -789,7 +789,7 @@ class TestDecodeSegment:
             b"\x80"
         )
         assert bytes(_rle_decode_segment(data)) == (
-            b"\x01\x02\x03\x04\x05\x06" b"\x01\x01\x01"
+            b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
 
         # data at start, noop middle, data at end
@@ -800,14 +800,14 @@ class TestDecodeSegment:
             b"\x80"
         )
         assert bytes(_rle_decode_segment(data)) == (
-            b"\x01\x02\x03\x04\x05\x06" b"\x01\x01\x01"
+            b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
 
         # data at start, noop end
         # Copy 6 bytes literally, then 3 x 0x01
-        data = b"\x05\x01\x02\x03\x04\x05\x06" b"\xFE\x01" b"\x80"
+        data = b"\x05\x01\x02\x03\x04\x05\x06\xFE\x01\x80"
         assert bytes(_rle_decode_segment(data)) == (
-            b"\x01\x02\x03\x04\x05\x06" b"\x01\x01\x01"
+            b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
 
     def test_literal(self):

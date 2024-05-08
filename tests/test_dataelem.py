@@ -963,7 +963,7 @@ class TestDataElementValidation:
         self.check_invalid_vr("UR", value)
 
     @pytest.mark.parametrize(
-        "value", ("1234.567890.333", "0.0.0", "1234." * 12 + "1234" "", None)
+        "value", ("1234.567890.333", "0.0.0", "1234." * 12 + "1234", None)
     )
     def test_valid_ui(self, value):
         self.check_valid_vr("UI", value)

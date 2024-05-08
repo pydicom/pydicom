@@ -272,7 +272,7 @@ def _rle_parse_header(header: bytes) -> list[int]:
     nr_segments = unpack("<L", header[:4])[0]
     if nr_segments > 15:
         raise ValueError(
-            "The RLE header specifies an invalid number of segments " f"({nr_segments})"
+            f"The RLE header specifies an invalid number of segments ({nr_segments})"
         )
 
     return list(unpack(f"<{nr_segments}L", header[4 : 4 * (nr_segments + 1)]))

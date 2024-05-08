@@ -412,7 +412,7 @@ class TestWriteDataElement:
 
     def test_write_empty_LO(self):
         data_elem = DataElement(0x00080070, "LO", None)
-        expected = b"\x08\x00\x70\x00" b"\x00\x00\x00\x00"  # tag  # length  # value
+        expected = b"\x08\x00\x70\x00\x00\x00\x00\x00"  # tag  # length  # value
         self.check_data_element(data_elem, expected)
 
     def test_write_DA(self):
@@ -517,7 +517,7 @@ class TestWriteDataElement:
         data_elem = DataElement(0x00080062, "UI", b"1.2.3")
         self.check_data_element(data_elem, expected)
 
-        expected = b"\x08\x00\x60\x00" b"\x04\x00\x00\x00" b"REG "  # tag  # length
+        expected = b"\x08\x00\x60\x00\x04\x00\x00\x00REG "  # tag  # length
         data_elem = DataElement(0x00080060, "CS", "REG")
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x00080060, "CS", b"REG")
@@ -540,9 +540,7 @@ class TestWriteDataElement:
     def test_write_OD_implicit_little(self):
         """Test writing elements with VR of OD works correctly."""
         # VolumetricCurvePoints
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
         elem = DataElement(0x0070150D, "OD", bytestring)
         encoded_elem = self.encode_element(elem)
         # Tag pair (0070,150D): 70 00 0d 15
@@ -564,9 +562,7 @@ class TestWriteDataElement:
         encoding (see PS3.5 Section 7.1.2).
         """
         # VolumetricCurvePoints
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"
         elem = DataElement(0x0070150D, "OD", bytestring)
         encoded_elem = self.encode_element(elem, False, True)
         # Tag pair (0070,150D): 70 00 0d 15
@@ -574,7 +570,7 @@ class TestWriteDataElement:
         # Reserved: \x00\x00
         # Length (16): \x10\x00\x00\x00
         #             | Tag          | VR    |
-        ref_bytes = b"\x70\x00\x0d\x15\x4f\x44" b"\x00\x00\x10\x00\x00\x00" + bytestring
+        ref_bytes = b"\x70\x00\x0d\x15\x4f\x44\x00\x00\x10\x00\x00\x00" + bytestring
         #             |Rsrvd |   Length      |    Value ->
         assert ref_bytes == encoded_elem
 
@@ -587,7 +583,7 @@ class TestWriteDataElement:
     def test_write_OL_implicit_little(self):
         """Test writing elements with VR of OL works correctly."""
         # TrackPointIndexList
-        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"
         elem = DataElement(0x00660129, "OL", bytestring)
         encoded_elem = self.encode_element(elem)
         # Tag pair (0066,0129): 66 00 29 01
@@ -609,7 +605,7 @@ class TestWriteDataElement:
         encoding (see PS3.5 Section 7.1.2).
         """
         # TrackPointIndexList
-        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"
         elem = DataElement(0x00660129, "OL", bytestring)
         encoded_elem = self.encode_element(elem, False, True)
         # Tag pair (0066,0129): 66 00 29 01
@@ -617,7 +613,7 @@ class TestWriteDataElement:
         # Reserved: \x00\x00
         # Length (12): 0c 00 00 00
         #             | Tag          | VR    |
-        ref_bytes = b"\x66\x00\x29\x01\x4f\x4c" b"\x00\x00\x0c\x00\x00\x00" + bytestring
+        ref_bytes = b"\x66\x00\x29\x01\x4f\x4c\x00\x00\x0c\x00\x00\x00" + bytestring
         #             |Rsrvd |   Length      |    Value ->
         assert ref_bytes == encoded_elem
 
@@ -676,9 +672,7 @@ class TestWriteDataElement:
         # Reserved: \x00\x00
         # Length (4): \x04\x00\x00\x00
         # Value: \x54\x65\x73\x74
-        ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00" b"\x54\x65\x73\x74"
-        )
+        ref_bytes = b"\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00\x54\x65\x73\x74"
         assert ref_bytes == encoded_elem
 
         # VM 1, odd data - padded to even length
@@ -799,7 +793,7 @@ class TestWriteDataElement:
         elem = DataElement(0x00100010, "ZZ", "Test")
         with pytest.raises(
             NotImplementedError,
-            match="write_data_element: unknown Value " "Representation 'ZZ'",
+            match="write_data_element: unknown Value Representation 'ZZ'",
         ):
             write_data_element(fp, elem)
 
@@ -2188,7 +2182,7 @@ class TestWriteDataset:
         """Test trying to write without an encoding source raises."""
         ds = Dataset()
         fp = DicomBytesIO()
-        msg = "'fp.is_implicit_VR' and 'fp.is_little_endian' attributes are " "required"
+        msg = "'fp.is_implicit_VR' and 'fp.is_little_endian' attributes are required"
         with pytest.raises(AttributeError, match=msg):
             write_dataset(fp, ds)
 
@@ -2729,7 +2723,7 @@ class TestWritePN:
         fp.is_little_endian = True
         encodings = ["latin_1", "iso_ir_126"]
         # data element with encoded value
-        encoded = b"Dionysios=\x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+        encoded = b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
         elem = DataElement(0x00100010, "PN", encoded)
         write_PN(fp, elem)
         assert encoded == fp.getvalue()
@@ -2796,7 +2790,7 @@ class TestWriteText:
         """Test changed encoding inside the string"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        encoded = b"Dionysios=\x1b\x2d\x46" b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+        encoded = b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
         # data element with encoded value
         elem = DataElement(0x00081039, "LO", encoded)
         encodings = ["latin_1", "iso_ir_126"]
@@ -2941,7 +2935,7 @@ class TestWriteUndefinedLengthPixelData:
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\xfe\xff\x00\xe0" b"\x00\x01\x02\x03",
+            b"\xfe\xff\x00\xe0\x00\x01\x02\x03",
             is_undefined_length=True,
         )
         write_data_element(self.fp, pixel_data)
@@ -2963,7 +2957,7 @@ class TestWriteUndefinedLengthPixelData:
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\xff\xfe\xe0\x00" b"\x00\x01\x02\x03",
+            b"\xff\xfe\xe0\x00\x00\x01\x02\x03",
             is_undefined_length=True,
         )
         write_data_element(self.fp, pixel_data)
@@ -2984,7 +2978,7 @@ class TestWriteUndefinedLengthPixelData:
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
+            b"\xff\xff\x00\xe0\x00\x01\x02\x03\xfe\xff\xdd\xe0",
             is_undefined_length=True,
         )
         msg = (
@@ -3001,7 +2995,7 @@ class TestWriteUndefinedLengthPixelData:
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
+            b"\x00\x00\x00\x00\x00\x01\x02\x03\xff\xfe\xe0\xdd",
             is_undefined_length=True,
         )
         msg = (

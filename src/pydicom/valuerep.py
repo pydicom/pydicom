@@ -738,7 +738,7 @@ class DT(_DateTimeBase, datetime.datetime):
             match = cls._regex_dt.match(val)
             if not match or len(val) > 26:
                 raise ValueError(
-                    f"Unable to convert non-conformant value '{val}' to 'DT' " "object"
+                    f"Unable to convert non-conformant value '{val}' to 'DT' object"
                 )
 
             dt_match = match.group(2)
@@ -847,7 +847,7 @@ class TM(_DateTimeBase, datetime.time):
             match = cls._RE_TIME.match(val)
             if not match:
                 raise ValueError(
-                    f"Unable to convert non-conformant value '{val}' to 'TM' " "object"
+                    f"Unable to convert non-conformant value '{val}' to 'TM' object"
                 )
 
             hour = int(match.group("h"))
@@ -1075,7 +1075,7 @@ class DSfloat(float):
             if not is_valid_ds(str(self)):
                 # This will catch nan and inf
                 raise ValueError(
-                    f'Value "{str(self)}" is not valid for elements with a VR ' "of DS"
+                    f'Value "{str(self)}" is not valid for elements with a VR of DS'
                 )
 
     def __eq__(self, other: Any) -> Any:
@@ -1212,9 +1212,7 @@ class DSdecimal(Decimal):
                 warn_and_log(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
-                msg = (
-                    f'Value "{str(self)}" is not valid for elements with a VR ' "of DS"
-                )
+                msg = f'Value "{str(self)}" is not valid for elements with a VR of DS'
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
@@ -1320,7 +1318,7 @@ class ISfloat(float):
         elif isinstance(val, IS | ISfloat) and hasattr(val, "original_string"):
             self.original_string = val.original_string
         if validation_mode:
-            msg = f'Value "{str(self)}" is not valid for elements with a VR ' "of IS"
+            msg = f'Value "{str(self)}" is not valid for elements with a VR of IS'
             if validation_mode == config.WARN:
                 warn_and_log(msg)
             elif validation_mode == config.RAISE:
