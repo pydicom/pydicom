@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.636** total execution time for 15 files **from all galleries**:
+**00:00.675** total execution time for 15 files **from all galleries**:
 
 .. container::
 
@@ -36,13 +36,13 @@ Computation times
      - 00:00.228
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py` (``../examples/input_output/plot_read_fileset.py``)
-     - 00:00.193
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
-     - 00:00.098
+     - 00:00.195
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``../examples/input_output/plot_read_dicom.py``)
-     - 00:00.089
+     - 00:00.127
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
+     - 00:00.097
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``../examples/metadata_processing/plot_anonymize.py``)
      - 00:00.007

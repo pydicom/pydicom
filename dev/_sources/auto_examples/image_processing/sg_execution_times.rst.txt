@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.234** total execution time for 3 files **from auto_examples/image_processing**:
+**00:00.233** total execution time for 3 files **from auto_examples/image_processing**:
 
 .. container::
 
