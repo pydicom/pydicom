@@ -12,7 +12,7 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom import dcmread
-from pydicom.encaps import get_frame
+from pydicom.encaps import get_frame, encapsulate
 from pydicom.pixels import get_decoder
 from pydicom.pixels.decoders.pylibjpeg import is_available
 from pydicom.uid import (
@@ -38,6 +38,8 @@ from .pixels_reference import (
     JLSN_08_01_1_0_1F,
     JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
+    JLSL_08_07_1_0_1F,
+    JLSL_16_15_1_1_1F,
 )
 
 
@@ -215,6 +217,33 @@ class TestLibJpegDecoder:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
         assert meta["photometric_interpretation"] == "YBR_FULL_422"
+
+    def test_mixed_container_sizes(self):
+        """Test mixed decoded pixel container sizes get upscaled."""
+        d8 = get_frame(JLSL_08_07_1_0_1F.ds.PixelData, 0)
+        d16 = get_frame(JLSL_16_15_1_1_1F.ds.PixelData, 0)
+
+        ds = dcmread(JLSL_08_07_1_0_1F.path)
+        ds.PixelData = encapsulate([d8, d16])
+        ds.NumberOfFrames = 2
+        ds.BitsAllocated = 16
+        ds.BitsStored = 16
+        ds.HighBit = 15
+        ds.PixelRepresentation = 1
+
+        decoder = get_decoder(JPEGLSLossless)
+        buffer, meta = decoder.as_buffer(ds, decoding_plugin="pylibjpeg")
+        assert meta["bits_allocated"] == 16
+        arr = np.frombuffer(buffer, dtype="u2")
+        arr = arr.reshape(2, ds.Rows, ds.Columns)
+        JLSL_08_07_1_0_1F.test(arr[0], plugin="pylibjpeg")
+
+        arr = np.frombuffer(buffer, dtype="i2").copy()
+        arr = arr.reshape(2, ds.Rows, ds.Columns)
+        # Needs bit-shifting to convert to signed
+        np.left_shift(arr, 1, out=arr)
+        np.right_shift(arr, 1, out=arr)
+        JLSL_16_15_1_1_1F.test(arr[1], plugin="pylibjpeg")
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")

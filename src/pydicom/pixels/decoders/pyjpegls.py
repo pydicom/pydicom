@@ -39,8 +39,10 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
         else:
             runner.set_option("planar_configuration", 0)
 
-    if runner.bits_allocated == 16:
-        bits_allocated = math.ceil(info["bits_per_sample"] / 8) * 8
-        runner.set_option("bits_allocated", bits_allocated)
+    precision = info["bits_per_sample"]
+    if 0 < precision <= 8:
+        runner.set_option("bits_allocated", 8)
+    elif 8 < precision <= 16:
+        runner.set_option("bits_allocated", 16)
 
     return cast(bytearray, buffer)

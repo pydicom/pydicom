@@ -277,6 +277,7 @@ class DecodeRunner(RunnerBase):
             number_of_frames=self.number_of_frames,
             extended_offsets=self.extended_offsets,
         )
+        self._get_frame_info(src)
 
         return self._decode_frame(src)
 
@@ -293,23 +294,6 @@ class DecodeRunner(RunnerBase):
         bytes | bytearray
             The decoded frame.
         """
-        if self.transfer_syntax in JPEG2000TransferSyntaxes:
-            j2k_info = get_j2k_parameters(src)
-            self.set_option(
-                "j2k_is_signed", j2k_info.get("is_signed", self.pixel_representation)
-            )
-            self.set_option(
-                "j2k_precision", j2k_info.get("precision", self.bits_stored)
-            )
-        elif self.transfer_syntax in JPEGLSTransferSyntaxes:
-            jls_info = _get_jpg_parameters(src)
-            self.set_option(
-                "jls_precision", jls_info.get("precision", self.bits_stored)
-            )
-            self._conform_jpg_colorspace(jls_info)
-        elif self.transfer_syntax in JPEGTransferSyntaxes:
-            jpg_info = _get_jpg_parameters(src)
-            self._conform_jpg_colorspace(jpg_info)
 
         # If self._previous is not set then this is the first frame being decoded
         # If self._previous is set, then the previously successful decoder
@@ -371,6 +355,26 @@ class DecodeRunner(RunnerBase):
         buffer = src.read(length)
         src.seek(file_offset)
         return buffer
+
+    def _get_frame_info(self, src: bytes) -> None:
+        """Parse a frame's codestream for JPEG-related parameters."""
+        if self.transfer_syntax in JPEG2000TransferSyntaxes:
+            j2k_info = get_j2k_parameters(src)
+            self.set_option(
+                "j2k_is_signed", j2k_info.get("is_signed", self.pixel_representation)
+            )
+            self.set_option(
+                "j2k_precision", j2k_info.get("precision", self.bits_stored)
+            )
+        elif self.transfer_syntax in JPEGLSTransferSyntaxes:
+            jls_info = _get_jpg_parameters(src)
+            self.set_option(
+                "jls_precision", jls_info.get("precision", self.bits_stored)
+            )
+            self._conform_jpg_colorspace(jls_info)
+        elif self.transfer_syntax in JPEGTransferSyntaxes:
+            jpg_info = _get_jpg_parameters(src)
+            self._conform_jpg_colorspace(jpg_info)
 
     def image_pixel(self, as_frame: bool = False) -> dict[str, str | int]:
         """Return a dict containing the :dcm:`Image Pixel
@@ -434,6 +438,8 @@ class DecodeRunner(RunnerBase):
             extended_offsets=self.extended_offsets,
         )
         for index, src in enumerate(encoded_frames):
+            self._get_frame_info(src)
+
             # Try the previously successful decoder first (if available)
             name, func = getattr(self, "_previous", (None, None))
             if func:
@@ -1136,10 +1142,12 @@ class Decoder(CoderBase):
 
         .. warning::
 
-            This method may require the installation of additional packages to
-            perform the actual pixel data decoding. See the :doc:`pixel data
+            This method should only be used by advanced users who understand the
+            intricacies of converting raw decoding DICOM pixel data to a usable
+            form. It may also require the installation of additional packages
+            to perform the actual pixel data decoding (see the :doc:`pixel data
             decompression documentation</old/image_data_handlers>` for more
-            information.
+            information).
 
         Parameters
         ----------
@@ -1182,14 +1190,13 @@ class Decoder(CoderBase):
         Returns
         -------
         bytes | bytearray | memoryview
-            One or more frames of decoded pixel data.
+            One or more frames of raw decoded pixel data.
 
-            * For natively encoded pixel data when `src` is a buffer-like the
-              same type in `src` will be returned, except if `view_only` is
-              ``True`` in which case a :class:`memoryview` on the original
-              buffer will be returned instead. If `src` is a file-like then
-              :class:`bytes` will always be returned.
-            * Encapsulated pixel data will be returned as :class:`bytearray`.
+            For natively encoded pixel data when `src` is a buffer-like the
+            same type in `src` will be returned, except if `view_only` is
+            ``True`` in which case a :class:`memoryview` on the original
+            buffer will be returned instead. If `src` is a file-like then
+            :class:`bytes` will always be returned.
 
             8-bit pixel data encoded as **OW** using *Explicit VR Big Endian* will
             be returned as-is and may need byte-swapping. To facilitate this
@@ -1256,27 +1263,27 @@ class Decoder(CoderBase):
             return frame
 
         # Return all frames
-        buffer = bytearray()
+        frames = []
         bits_allocated = []
         frame_generator = runner.iter_decode()
-        for index in range(runner.number_of_frames):
+        for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
             bits_allocated.append(runner.bits_allocated)
             length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
-                    f"{index} ({actual} bytes actual vs {length_bytes} expected)"
+                    f"{idx} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
-            buffer.extend(frame)
+            frames.append(frame)
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
-        excess = bytearray()
+        excess = []
         for frame in frame_generator:
             if len(frame) == runner.frame_length(unit="bytes"):
-                excess.extend(frame)
+                excess.append(frame)
                 runner.set_option("number_of_frames", runner.number_of_frames + 1)
                 bits_allocated.append(runner.bits_allocated)
 
@@ -1285,23 +1292,30 @@ class Decoder(CoderBase):
                 "More frames have been found in the encapsulated pixel data "
                 "than expected from the supplied number of frames"
             )
-            buffer.extend(excess)
+            frames.extend(excess)
 
-        # Need to check for consistency in frame lengths
-        #   Depending on the encoder each frame may have been encoded using a
-        #   different precision (e.g. frames with 7-bit and 12-bit precisions
-        #   would be decoded as 8-bit and 16-bit respectively)
-        # Our options are to:
-        #   Pad the buffer to match *Bits Allocated* (slow, uses more memory), or
-        #   Raise an exception and recommend the use of iter_buffer() instead
-        if len(values := [f"{x}" for x in set(bits_allocated)]) != 1:
-            raise ValueError(
-                "Inconsistent pixel bit-depths found during decoding: "
-                f"{', '.join(values)}. Its recommended that you use "
-                "'Decoder.iter_buffer()' instead"
-            )
+        # Each frame may have been encoded using a different precision. On
+        #   decoding this may result in different container sizes per frame
+        #   (such as 7-bit and 12-bit precisions being decoded as 8-bit and
+        #   16-bit respectively, even if *Bits Stored* is 12). In that case we
+        #   pad to match the largest container size.
+        if len(set(bits_allocated)) != 1:
+            target = max(bits_allocated)
+            target_step = target // 8
+            for idx, (actual, frame) in enumerate(zip(bits_allocated, frames)):
+                if actual != target:
+                    LOGGER.debug(f"Padding frame {idx} from {actual} to {target}-bit")
+                    actual_step = actual // 8
+                    # Preallocate the new buffer and copy from original to new
+                    out = bytearray(len(frame) // actual_step * target_step)
+                    for offset in range(actual_step):
+                        out[offset::target_step] = frame[offset::actual_step]
 
-        return buffer
+                    frames[idx] = out
+
+            runner.set_option("bits_allocated", target)
+
+        return b"".join(b for b in frames)
 
     @staticmethod
     def _as_buffer_native(runner: DecodeRunner, index: int | None) -> Buffer:
@@ -1560,10 +1574,12 @@ class Decoder(CoderBase):
 
         .. warning::
 
-            This method may require the installation of additional packages to
-            perform the actual pixel data decoding. See the :doc:`pixel data
+            This method should only be used by advanced users who understand the
+            intricacies of converting raw decoding DICOM pixel data to a usable
+            form. It may also require the installation of additional packages to
+            perform the actual pixel data decoding (see the :doc:`pixel data
             decompression documentation</old/image_data_handlers>` for more
-            information.
+            information).
 
         Parameters
         ----------
