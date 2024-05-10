@@ -5,7 +5,6 @@
 This module is not intended to be used directly.
 """
 
-import math
 from typing import cast
 
 from pydicom import uid
