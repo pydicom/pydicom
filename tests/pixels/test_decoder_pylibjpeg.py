@@ -238,9 +238,8 @@ class TestLibJpegDecoder:
         arr = arr.reshape(2, ds.Rows, ds.Columns)
         JLSL_08_07_1_0_1F.test(arr[0], plugin="pylibjpeg")
 
-        arr = np.frombuffer(buffer, dtype="i2").copy()
-        arr = arr.reshape(2, ds.Rows, ds.Columns)
-        # Needs bit-shifting to convert to signed
+        arr = arr.astype("i2")
+        # Needs bit-shifting to convert values to signed
         np.left_shift(arr, 1, out=arr)
         np.right_shift(arr, 1, out=arr)
         JLSL_16_15_1_1_1F.test(arr[1], plugin="pylibjpeg")

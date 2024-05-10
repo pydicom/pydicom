@@ -17,6 +17,9 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+        codecov_token:
+            required: true
 
 env:
   PYTEST_ARGS: ""
@@ -80,6 +83,6 @@ jobs:
       if: success() && inputs.upload-coverage
       uses: codecov/codecov-action@v4
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        codecov_token: ${{ secrets.codecov_token }}
       with:
         env_vars: inputs.os, inputs.python-version

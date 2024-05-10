@@ -26,6 +26,8 @@ jobs:
             test-extras: true
             upload-coverage: false
     uses: ./.github/workflows/tests_wf.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
     with:
       os: ${{ matrix.os }}
       python-version:  ${{ matrix.python-version }}
