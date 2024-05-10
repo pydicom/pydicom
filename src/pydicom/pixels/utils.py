@@ -223,6 +223,325 @@ def as_pixel_options(ds: "Dataset", **kwargs: Any) -> dict[str, Any]:
     return opts
 
 
+def compress(
+    ds: "Dataset",
+    transfer_syntax_uid: str,
+    arr: "np.ndarray | None" = None,
+    *,
+    encoding_plugin: str = "",
+    encapsulate_ext: bool = False,
+    jls_error: int | None = None,
+    j2k_cr: list[float] | None = None,
+    j2k_psnr: list[float] | None = None,
+    **kwargs: Any,
+) -> "Dataset":
+    """Compress uncompressed pixel data and update `ds` in-place with the
+    resulting :dcm:`encapsulated<part05/sect_A.4.html>` codestream.
+
+    .. versionadded:: 3.0
+
+    The dataset `ds` must already have the following
+    :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
+    with correct values that correspond to the resulting compressed
+    pixel data:
+
+    * (0028,0002) *Samples per Pixel*
+    * (0028,0004) *Photometric Interpretation*
+    * (0028,0008) *Number of Frames* (if more than 1 frame will be present)
+    * (0028,0010) *Rows*
+    * (0028,0011) *Columns*
+    * (0028,0100) *Bits Allocated*
+    * (0028,0101) *Bits Stored*
+    * (0028,0103) *Pixel Representation*
+
+    If *Samples per Pixel* is greater than 1 then the following element
+    is also required:
+
+    * (0028,0006) *Planar Configuration*
+
+    This method will add the file meta dataset if none is present and add
+    or modify the following elements:
+
+    * (0002,0010) *Transfer Syntax UID*
+    * (7FE0,0010) *Pixel Data*
+
+    If the compressed pixel data is too large for encapsulation using a
+    basic offset table then an :dcm:`extended offset table
+    <part03/sect_C.7.6.3.html>` will also be used, in which case the
+    following elements will also be added:
+
+    * (7FE0,0001) *Extended Offset Table*
+    * (7FE0,0002) *Extended Offset Table Lengths*
+
+    **Supported Transfer Syntax UIDs**
+
+    +-----------------------------------------------+-----------+----------------------------------+
+    | UID                                           |  Plugins  | Encoding Guide                   |
+    +------------------------+----------------------+           |                                  |
+    | Name                   | Value                |           |                                  |
+    +========================+======================+===========+==================================+
+    | *JPEG-LS Lossless*     |1.2.840.10008.1.2.4.80| pyjpegls  | :doc:`JPEG-LS                    |
+    +------------------------+----------------------+           | </guides/encoding/jpeg_ls>`      |
+    | *JPEG-LS Near Lossless*|1.2.840.10008.1.2.4.81|           |                                  |
+    +------------------------+----------------------+-----------+----------------------------------+
+    | *JPEG 2000 Lossless*   |1.2.840.10008.1.2.4.90| pylibjpeg | :doc:`JPEG 2000                  |
+    +------------------------+----------------------+           | </guides/encoding/jpeg_2k>`      |
+    | *JPEG 2000*            |1.2.840.10008.1.2.4.91|           |                                  |
+    +------------------------+----------------------+-----------+----------------------------------+
+    | *RLE Lossless*         | 1.2.840.10008.1.2.5  | pydicom,  | :doc:`RLE Lossless               |
+    |                        |                      | pylibjpeg,| </guides/encoding/rle_lossless>` |
+    |                        |                      | gdcm      |                                  |
+    +------------------------+----------------------+-----------+----------------------------------+
+
+    Examples
+    --------
+
+    Compress the existing uncompressed *Pixel Data* in place:
+
+    >>> from pydicom import examples
+    >>> from pydicom.pixels import compress
+    >>> from pydicom.uid import RLELossless
+    >>> ds = examples.ct
+    >>> compress(ds, RLELossless)
+    >>> ds.save_as("ct_rle_lossless.dcm")
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        The dataset to be compressed.
+    transfer_syntax_uid : pydicom.uid.UID
+        The UID of the :dcm:`transfer syntax<part05/chapter_10.html>` to
+        use when compressing the pixel data.
+    arr : numpy.ndarray, optional
+        Compress the uncompressed pixel data in `arr` and use it
+        to set the *Pixel Data*. If `arr` is not used then the existing
+        uncompressed *Pixel Data* in the dataset will be compressed instead.
+        The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
+        contents of the array should match the dataset.
+    encoding_plugin : str, optional
+        Use the `encoding_plugin` to compress the pixel data. See the
+        :doc:`user guide </old/image_data_compression>` for a list of
+        plugins available for each UID and their dependencies. If not
+        specified then all available plugins will be tried (default).
+    encapsulate_ext : bool, optional
+        If ``True`` then force the addition of an extended offset table.
+        If ``False`` (default) then an extended offset table
+        will be added if needed for large amounts of compressed *Pixel
+        Data*, otherwise just the basic offset table will be used.
+    jls_error : int, optional
+        **JPEG-LS Near Lossless only**. The allowed absolute compression error
+        in the pixel values.
+    j2k_cr : list[float], optional
+        **JPEG 2000 only**. A list of the compression ratios to use for each
+        quality layer. There must be at least one quality layer and the
+        minimum allowable compression ratio is ``1``. When using multiple
+        quality layers they should be ordered in decreasing value from left
+        to right. For example, to use 2 quality layers with 20x and 5x
+        compression ratios then `j2k_cr` should be ``[20, 5]``. Cannot be
+        used with `j2k_psnr`.
+    j2k_psnr : list[float], optional
+        **JPEG 2000 only**. A list of the peak signal-to-noise ratios (in dB)
+        to use for each quality layer. There must be at least one quality
+        layer and when using multiple quality layers they should be ordered
+        in increasing value from left to right. For example, to use 2
+        quality layers with PSNR of 80 and 300 then `j2k_psnr` should be
+        ``[80, 300]``. Cannot be used with `j2k_cr`.
+    **kwargs
+        Optional keyword parameters for the encoding plugin may also be
+        present. See the :doc:`encoding plugins options
+        </guides/encoding/encoder_plugin_options>` for more information.
+    """
+    from pydicom.dataset import FileMetaDataset
+    from pydicom.pixels import get_encoder
+
+    # Disallow overriding the dataset's image pixel module element values
+    for option in _IMAGE_PIXEL.values():
+        kwargs.pop(option, None)
+
+    uid = UID(transfer_syntax_uid)
+    encoder = get_encoder(uid)
+    if not encoder.is_available:
+        missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
+        raise RuntimeError(
+            f"The pixel data encoder for '{uid.name}' is unavailable because its "
+            f"plugins are all missing dependencies:\n{missing}"
+        )
+
+    if uid == JPEGLSNearLossless and jls_error is not None:
+        kwargs["jls_error"] = jls_error
+
+    if uid == JPEG2000:
+        if j2k_cr is not None:
+            kwargs["j2k_cr"] = j2k_cr
+
+        if j2k_psnr is not None:
+            kwargs["j2k_psnr"] = j2k_psnr
+
+    if arr is None:
+        # Encode the current uncompressed *Pixel Data*
+        frame_iterator = encoder.iter_encode(
+            ds, encoding_plugin=encoding_plugin, **kwargs
+        )
+    else:
+        # Encode from an array
+        opts = as_pixel_options(ds, **kwargs)
+        frame_iterator = encoder.iter_encode(
+            arr, encoding_plugin=encoding_plugin, **opts
+        )
+
+    # Encode!
+    encoded = [f for f in frame_iterator]
+
+    # Encapsulate the encoded *Pixel Data*
+    nr_frames = len(encoded)
+    total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
+    if encapsulate_ext or total > 2**32 - 1:
+        (
+            ds.PixelData,
+            ds.ExtendedOffsetTable,
+            ds.ExtendedOffsetTableLengths,
+        ) = encapsulate_extended(encoded)
+    else:
+        ds.PixelData = encapsulate(encoded)
+
+    # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
+    ds["PixelData"].is_undefined_length = True
+    # PS3.5 Section 8.2 and Annex A.4 - encapsulated pixel data uses OB
+    ds["PixelData"].VR = VR.OB
+
+    ds._pixel_array = None if arr is None else arr
+    ds._pixel_id = {} if arr is None else get_image_pixel_ids(ds)
+
+    # Set the correct *Transfer Syntax UID*
+    if not hasattr(ds, "file_meta"):
+        ds.file_meta = FileMetaDataset()
+
+    ds.file_meta.TransferSyntaxUID = uid
+
+    return ds
+
+
+def decompress(
+    ds: "Dataset",
+    *,
+    decoding_plugin: str = "",
+    **kwargs: Any,
+) -> "Dataset":
+    """Decompress a dataset with a compressed *Transfer Syntax UID*.
+
+    * The dataset's *Transfer Syntax UID* will be set to *Explicit
+      VR Little Endian*.
+    * The *Pixel Data* will be decompressed in its entirety and the
+      *Pixel Data* element's value updated with the uncompressed data,
+      padded to an even length.
+    * The *Pixel Data* element's VR will be set to **OB** if *Bits
+      Allocated* <= 8, otherwise it will be set to **OW**.
+    * The :attr:`DataElement.is_undefined_length
+      <pydicom.dataelem.DataElement.is_undefined_length>` attribute for the
+      *Pixel Data* element will be set to ``False``.
+    * Any image pixel module elements may be modified as required to match
+      the uncompressed *Pixel Data*.
+    * The *SOP Instance UID* value will **not** be modified.
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        A dataset containing compressed *Pixel Data* to be decoded and the
+        corresponding *Image Pixel* module elements. The dataset will be
+        modified in-place with the decompressed *Pixel Data*.
+    decoding_plugin : str, optional
+        The name of the decoding plugin to use when decoding compressed
+        pixel data. If no `decoding_plugin` is specified (default) then all
+        available plugins will be tried and the result from the first successful
+        one yielded. For information on the available plugins for each
+        decoder see the :doc:`API documentation</reference/pixels.decoders>`.
+    kwargs : dict[str, Any], optional
+        Optional keyword parameters for the decoding plugin may also be
+        present. See the :doc:`decoding plugins options
+        </guides/encoding/decoder_options>` for more information.
+
+    Returns
+    -------
+    pydicom.dataset.Dataset
+        The decompressed dataset `ds`.
+    """
+    from pydicom.dataset import FileMetaDataset
+    from pydicom.pixels import get_decoder
+
+    file_meta = ds.get("file_meta", {})
+    tsyntax = file_meta.get("TransferSyntaxUID", "")
+    if not tsyntax:
+        raise AttributeError(
+            "The dataset's 'file_meta' attribute has no (0002,0010) 'Transfer "
+            "Syntax UID'"
+        )
+
+    uid = UID(tsyntax)
+    if not uid.is_compressed:
+        raise ValueError("The dataset already uses an uncompressed transfer syntax")
+
+    decoder = get_decoder(uid)
+    if not decoder.is_available:
+        missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
+        raise RuntimeError(
+            f"Unable to decompress the pixel data as the plugins for the '{uid.name}' "
+            f"decoder are all missing dependencies:\n{missing}"
+        )
+
+    # Disallow selective frame decompression
+    kwargs.pop("index", None)
+    buffer_generator = decoder.iter_buffer(
+        ds,
+        decoding_plugin=decoding_plugin,
+        **kwargs,
+    )
+    buffer = []
+    for idx, (b, image_pixel) in enumerate(buffer_generator):
+        # Match *Bits Allocated*
+        buffer.append(
+            _pad_buffer(b, actual=image_pixel["bits_allocated"], target=ds.BitsAllocated)
+        )
+
+    if len(buffer) % 2:
+        buffer += b"\x00"
+
+    # Check the length of the uncompressed data is less than the maximum
+    #   We decode first because there may be excess frames
+    if len(buffer) >= 2**32 - 1:
+        raise ValueError(
+            "Unable to create a decompressed dataset as the length of the "
+            "uncompressed *Pixel Data* will be greater than the maximum allowed "
+            "by the DICOM Standard"
+        )
+
+    elem = ds["PixelData"]
+    elem.value = buffer
+    elem.is_undefined_length = False
+    elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
+
+    # Update the transfer syntax
+    if not hasattr(ds, "file_meta"):
+        ds.file_meta = FileMetaDataset()
+
+    ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    if kwargs.get("use_pdh"):
+        return ds
+
+    # Update the image pixel elements
+    ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
+    if image_pixel["samples_per_pixel"] > 1:
+        ds.PlanarConfiguration = image_pixel["planar_configuration"]
+
+    if "NumberOfFrames" in ds or idx > 0:
+        ds.NumberOfFrames = idx + 1
+
+    # if "NumberOfFrames" in ds or image_pixel["number_of_frames"] > 1:
+    #     ds.NumberOfFrames = image_pixel["number_of_frames"]
+
+    return ds
+
+
 def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
     """Return ``YBR_FULL_422`` data expanded to ``YBR_FULL``.
 
@@ -823,6 +1142,41 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
         return packed + b"\x00" if len(packed) % 2 else packed
 
     return packed
+
+
+def _pad_buffer(src: bytes | bytearray, actual: int, target: int) -> bytes | bytearray:
+    """Return `src` with each pixel padded out to `target` bits.
+
+    Parameters
+    ----------
+    src : bytes | bytearray
+        A buffer containing little-endian ordered pixel data to be padded.
+    actual : int
+        The actual number of bits used to contain each pixel.
+    actual : int
+        The desired number of bits used to contain each pixel.
+
+    Returns
+    -------
+    bytes | bytearray
+        The padded pixel data.
+    """
+    target_bytes = target // 8
+    actual_bytes = actual // 8
+
+    if actual_bytes == target_bytes:
+        return src
+
+    if actual_bytes > target_bytes:
+        raise ValueError(
+            "Unable to pad the pixel data as the "
+        )
+
+    out = bytearray(len(src) // actual_bytes * target_bytes)
+    for offset in range(actual_bytes):
+        out[offset::target_bytes] = src[offset::actual_bytes]
+
+    return out
 
 
 def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -> bool:
