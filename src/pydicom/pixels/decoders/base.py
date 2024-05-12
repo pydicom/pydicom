@@ -501,7 +501,6 @@ class DecodeRunner(RunnerBase):
 
         return cast(dict[str, str | int], d)
 
-
     def process(self, arr: "np.ndarray") -> "np.ndarray":
         """Return `arr` after applying zero or more processing operations.
 
