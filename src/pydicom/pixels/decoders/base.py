@@ -1143,7 +1143,7 @@ class Decoder(CoderBase):
         .. warning::
 
             This method should only be used by advanced users who understand the
-            intricacies of converting raw decoding DICOM pixel data to a usable
+            intricacies of converting raw decoded DICOM pixel data to a usable
             form. It may also require the installation of additional packages
             to perform the actual pixel data decoding (see the :doc:`pixel data
             decompression documentation</old/image_data_handlers>` for more
@@ -1575,7 +1575,7 @@ class Decoder(CoderBase):
         .. warning::
 
             This method should only be used by advanced users who understand the
-            intricacies of converting raw decoding DICOM pixel data to a usable
+            intricacies of converting raw decoded DICOM pixel data to a usable
             form. It may also require the installation of additional packages to
             perform the actual pixel data decoding (see the :doc:`pixel data
             decompression documentation</old/image_data_handlers>` for more
