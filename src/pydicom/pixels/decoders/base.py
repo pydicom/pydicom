@@ -376,54 +376,6 @@ class DecodeRunner(RunnerBase):
             jpg_info = _get_jpg_parameters(src)
             self._conform_jpg_colorspace(jpg_info)
 
-    def image_pixel(self, as_frame: bool = False) -> dict[str, str | int]:
-        """Return a dict containing the :dcm:`Image Pixel
-        <part03/sect_C.7.6.3.html>` module related properties.
-
-        Parameters
-        ----------
-        as_frame : bool, optional
-            If ``True`` then don't include properties that aren't appropriate
-            for a single frame. Default ``False``.
-
-        Returns
-        -------
-        dict[str, str | int]
-            A dict containing the values for 'bits_allocated', 'bits_stored',
-            'columns', 'photometric_interpretation', 'samples_per_pixel',
-            'rows' and optionally 'planar_configuration' (if 'samples_per_pixel'
-            > 1), 'pixel_representation' (if the pixel keyword is
-            ``"PixelData"``) and 'number_of_frames' (if `per_frame` is
-            ``True``).
-
-            The returned values depend on whether or not this method is
-            called before or after decoding the pixel data, as the decoding
-            plugins and image processing functions may update the values as
-            needed to reflect the corresponding decoded data. For example, if
-            the pixel data is converted from the YCbCr to RGB color space then
-            the 'photometric_interpretation' value will be changed to match
-            after the data has been decoded.
-        """
-        d = {
-            "bits_allocated": self.bits_allocated,
-            "bits_stored": self.bits_stored,
-            "columns": self.columns,
-            "photometric_interpretation": self.photometric_interpretation,
-            "rows": self.rows,
-            "samples_per_pixel": self.samples_per_pixel,
-        }
-
-        if self.samples_per_pixel > 1:
-            d["planar_configuration"] = self.planar_configuration
-
-        if self.pixel_keyword == "PixelData":
-            d["pixel_representation"] = self.pixel_representation
-
-        if not as_frame:
-            d["number_of_frames"] = self.number_of_frames
-
-        return cast(dict[str, str | int], d)
-
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data."""
         if self.is_binary:
@@ -500,6 +452,55 @@ class DecodeRunner(RunnerBase):
             dtype = dtype.newbyteorder("S")
 
         return dtype
+
+    def pixel_properties(self, as_frame: bool = False) -> dict[str, str | int]:
+        """Return a dict containing the :dcm:`Image Pixel
+        <part03/sect_C.7.6.3.html>` module related properties.
+
+        Parameters
+        ----------
+        as_frame : bool, optional
+            If ``True`` then don't include properties that aren't appropriate
+            for a single frame. Default ``False``.
+
+        Returns
+        -------
+        dict[str, str | int]
+            A dict containing the values for 'bits_allocated', 'bits_stored',
+            'columns', 'photometric_interpretation', 'samples_per_pixel',
+            'rows' and optionally 'planar_configuration' (if 'samples_per_pixel'
+            > 1), 'pixel_representation' (if the pixel keyword is
+            ``"PixelData"``) and 'number_of_frames' (if `per_frame` is
+            ``True``).
+
+            The returned values depend on whether or not this method is
+            called before or after decoding the pixel data, as the decoding
+            plugins and image processing functions may update the values as
+            needed to reflect the corresponding decoded data. For example, if
+            the pixel data is converted from the YCbCr to RGB color space then
+            the 'photometric_interpretation' value will be changed to match
+            after the data has been decoded.
+        """
+        d = {
+            "bits_allocated": self.bits_allocated,
+            "bits_stored": self.bits_stored,
+            "columns": self.columns,
+            "photometric_interpretation": self.photometric_interpretation,
+            "rows": self.rows,
+            "samples_per_pixel": self.samples_per_pixel,
+        }
+
+        if self.samples_per_pixel > 1:
+            d["planar_configuration"] = self.planar_configuration
+
+        if self.pixel_keyword == "PixelData":
+            d["pixel_representation"] = self.pixel_representation
+
+        if not as_frame:
+            d["number_of_frames"] = self.number_of_frames
+
+        return cast(dict[str, str | int], d)
+
 
     def process(self, arr: "np.ndarray") -> "np.ndarray":
         """Return `arr` after applying zero or more processing operations.
@@ -876,8 +877,8 @@ class Decoder(CoderBase):
         dict[str, str | int]
             The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
             values resulting from the decoding process that describe the array.
-            See :meth:`DecodeRunner.image_pixel()
-            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            See :meth:`DecodeRunner.pixel_properties()
+            <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
         if not HAVE_NP:
@@ -927,7 +928,7 @@ class Decoder(CoderBase):
         # Multi-sample arrays are always returned *Planar Configuration* 0
         runner.set_option("planar_configuration", 0)
 
-        return arr, runner.image_pixel(as_frame=as_frame)
+        return arr, runner.pixel_properties(as_frame=as_frame)
 
     @staticmethod
     def _as_array_encapsulated(runner: DecodeRunner, index: int | None) -> "np.ndarray":
@@ -1206,8 +1207,8 @@ class Decoder(CoderBase):
         dict[str, str | int]
             The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
             values resulting from the decoding process that describe the
-            decoded pixel data. See :meth:`DecodeRunner.image_pixel()
-            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            decoded pixel data. See :meth:`DecodeRunner.pixel_properties()
+            <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
         runner = DecodeRunner(self.UID)
@@ -1228,7 +1229,7 @@ class Decoder(CoderBase):
         else:
             buffer = self._as_buffer_encapsulated(runner, index)
 
-        return buffer, runner.image_pixel(as_frame=index is not None)
+        return buffer, runner.pixel_properties(as_frame=index is not None)
 
     @staticmethod
     def _as_buffer_encapsulated(
@@ -1494,8 +1495,8 @@ class Decoder(CoderBase):
         dict[str, str | int]
             The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
             values resulting from the decoding process that describe the array.
-            See :meth:`DecodeRunner.image_pixel()
-            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            See :meth:`DecodeRunner.pixel_properties()
+            <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
         if not HAVE_NP:
@@ -1543,7 +1544,7 @@ class Decoder(CoderBase):
                 # Multi-sample arrays are always returned *Planar Configuration* 0
                 runner.set_option("planar_configuration", 0)
 
-                yield arr, runner.image_pixel(as_frame=True)
+                yield arr, runner.pixel_properties(as_frame=True)
 
             return
 
@@ -1559,7 +1560,7 @@ class Decoder(CoderBase):
             arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
             runner.set_option("planar_configuration", 0)
 
-            yield arr, runner.image_pixel(as_frame=True)
+            yield arr, runner.pixel_properties(as_frame=True)
 
     def iter_buffer(
         self,
@@ -1637,8 +1638,8 @@ class Decoder(CoderBase):
         dict[str, str | int]
             The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module element
             values resulting from the decoding process that describe the
-            decoded frame of pixel data. See :meth:`DecodeRunner.image_pixel()
-            <pydicom.pixels.decoders.base.DecodeRunner.image_pixel>` for the
+            decoded frame of pixel data. See :meth:`DecodeRunner.pixel_properties()
+            <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
         runner = DecodeRunner(self.UID)
@@ -1656,7 +1657,7 @@ class Decoder(CoderBase):
 
         if self.is_encapsulated and not indices:
             for buffer in runner.iter_decode():
-                yield buffer, runner.image_pixel(as_frame=True)
+                yield buffer, runner.pixel_properties(as_frame=True)
 
             return
 
@@ -1667,7 +1668,7 @@ class Decoder(CoderBase):
 
         indices = indices if indices else range(runner.number_of_frames)
         for index in indices:
-            yield func(runner, index), runner.image_pixel(as_frame=True)
+            yield func(runner, index), runner.pixel_properties(as_frame=True)
 
 
 # Decoder names should be f"{UID.keyword}Decoder"
