@@ -569,7 +569,7 @@ def get_nr_frames(ds: "Dataset", warn: bool = True) -> int:
 
 
 def iter_pixels(
-    src: str | PathLike[str] | BinaryIO,
+    src: "str | PathLike[str] | BinaryIO | Dataset",
     *,
     ds_out: "Dataset | None" = None,
     specific_tags: list[BaseTag | int] | None = None,
@@ -578,12 +578,17 @@ def iter_pixels(
     decoding_plugin: str = "",
     **kwargs: Any,
 ) -> Iterator["np.ndarray"]:
-    """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`
-    while minimizing memory usage.
+    """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
 
     .. warning::
 
         This function requires `NumPy <https://numpy.org/>`_
+
+    **Memory Usage**
+
+    To minimize memory usage `src` should be the path to the dataset
+    or a `file-like object <https://docs.python.org/3/glossary.html#term-file-object>`_
+    containing the dataset.
 
     **Processing**
 
@@ -609,30 +614,47 @@ def iter_pixels(
 
     Examples
     --------
-    Iterate through all the pixel data frames in a dataset::
 
-        for arr in iter_pixels("dataset.dcm"):
+    Read a DICOM dataset then iterate through all the pixel data frames::
+
+        from pydicom import dcmread
+        from pydicom.pixels import iter_pixels
+
+        ds = dcmread("path/to/dataset.dcm")
+        for arr in iter_pixels(ds):
+            print(arr.shape)
+
+    Iterate through all the pixel data frames in a dataset while minimizing
+    memory usage::
+
+        from pydicom.pixels import iter_pixels
+
+        for arr in iter_pixels("path/to/dataset.dcm"):
             print(arr.shape)
 
     Iterate through the even frames for a dataset with 10 frames::
 
-        with open("dataset.dcm", "rb") as f:
+        from pydicom.pixels import iter_pixels
+
+        with open("path/to/dataset.dcm", "rb") as f:
             for arr in iter_pixels(f, indices=range(0, 10, 2)):
                 print(arr.shape)
 
     Parameters
     ----------
-    src : str | PathLike[str] | file-like
+    src : str | PathLike[str] | file-like | pydicom.dataset.Dataset
 
         * :class:`str` | :class:`os.PathLike`: the path to a DICOM dataset
           containing pixel data, or
         * file-like: a `file-like object
           <https://docs.python.org/3/glossary.html#term-file-object>`_ in
           'rb' mode containing the dataset.
+        * :class:`~pydicom.dataset.Dataset`: a dataset instance
     ds_out : pydicom.dataset.Dataset, optional
         A :class:`~pydicom.dataset.Dataset` that will be updated with the
         non-retired group ``0x0028`` image pixel module elements and the group
-        ``0x0002`` file meta information elements from the dataset in `src` .
+        ``0x0002`` file meta information elements from the dataset in `src`.
+        **Only available when `src` is a path or file-like.**
     specific_tags : list[int | pydicom.tag.BaseTag], optional
         A list of additional tags from the dataset in `src` to be added to the
         `ds_out` dataset.
@@ -659,10 +681,10 @@ def iter_pixels(
     Yields
     -------
     numpy.ndarray
-        The decoded and reshaped pixel data, with shape:
+        A single frame of decoded pixel data with shape:
 
-        * (rows, columns) for single plane data
-        * (rows, columns, planes) for multi-plane data
+        * (rows, columns) for single sample data
+        * (rows, columns, samples) for multi-sample data
 
         A writeable :class:`~numpy.ndarray` is yielded by default. For
         native transfer syntaxes with ``view_only=True`` a read-only
@@ -670,6 +692,30 @@ def iter_pixels(
     """
     from pydicom.dataset import Dataset
     from pydicom.pixels import get_decoder
+
+    if isinstance(src, Dataset):
+        ds: Dataset = src
+        file_meta = getattr(ds, "file_meta", {})
+        if not (tsyntax := file_meta.get("TransferSyntaxUID", None)):
+            raise AttributeError(
+                "The dataset's 'file_meta' has no (0002,0010) 'Transfer Syntax "
+                "UID' element"
+            )
+
+        decoder = get_decoder(tsyntax)
+        opts = as_pixel_options(ds, **kwargs)
+        iterator = decoder.iter_array(
+            ds,
+            indices=indices,
+            validate=True,
+            raw=raw,
+            decoding_plugin=decoding_plugin,
+            **opts,
+        )
+        for arr, _ in iterator:
+            yield arr
+
+        return
 
     f: BinaryIO
     if not hasattr(src, "read"):
@@ -694,7 +740,7 @@ def iter_pixels(
             ds_out._dict.update(ds._dict)
 
         decoder = get_decoder(opts["transfer_syntax_uid"])
-        yield from decoder.iter_array(
+        iterator = decoder.iter_array(
             f,
             indices=indices,
             validate=True,
@@ -702,6 +748,9 @@ def iter_pixels(
             decoding_plugin=decoding_plugin,
             **opts,
         )
+        for arr, _ in iterator:
+            yield arr
+
     finally:
         # Close the open file only if we were the ones that opened it
         if not hasattr(src, "read"):
@@ -790,7 +839,7 @@ def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -
 
 
 def pixel_array(
-    src: str | PathLike[str] | BinaryIO,
+    src: "str | PathLike[str] | BinaryIO | Dataset",
     *,
     ds_out: "Dataset | None" = None,
     specific_tags: list[int] | None = None,
@@ -799,12 +848,17 @@ def pixel_array(
     decoding_plugin: str = "",
     **kwargs: Any,
 ) -> "np.ndarray":
-    """Return decoded pixel data from `src` as :class:`~numpy.ndarray` while
-    minimizing memory usage.
+    """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.
 
     .. warning::
 
         This function requires `NumPy <https://numpy.org/>`_
+
+    **Memory Usage**
+
+    To minimize memory usage `src` should be the path to the dataset
+    or a `file-like object <https://docs.python.org/3/glossary.html#term-file-object>`_
+    containing the dataset.
 
     **Processing**
 
@@ -831,28 +885,43 @@ def pixel_array(
     Examples
     --------
 
-    Return the entire pixel data from a dataset::
+     Read a DICOM dataset and return the entire pixel data::
+
+        from pydicom import dcmread
+        from pydicom.pixels import pixel_array
+
+        ds = dcmread("path/to/dataset.dcm")
+        arr = pixel_array(ds)
+
+    Return the entire pixel data from a dataset while minimizing memory usage::
+
+        from pydicom.pixels import pixel_array
 
         arr = pixel_array("path/to/dataset.dcm")
 
-    Return the 3rd frame of a dataset containing at least 3 frames::
+    Return the 3rd frame of a dataset containing at least 3 frames while
+    minimizing memory usage::
+
+        from pydicom.pixels import pixel_array
 
         with open("path/to/dataset.dcm", "rb") as f:
             arr = pixel_array(f, index=2)  # 'index' starts at 0
 
     Parameters
     ----------
-    src : str | PathLike[str] | file-like
+    src : str | PathLike[str] | file-like | pydicom.dataset.Dataset
 
         * :class:`str` | :class:`os.PathLike`: the path to a DICOM dataset
           containing pixel data, or
         * file-like: a `file-like object
           <https://docs.python.org/3/glossary.html#term-file-object>`_ in
           'rb' mode containing the dataset.
+        * :class:`~pydicom.dataset.Dataset`: a dataset instance
     ds_out : pydicom.dataset.Dataset, optional
         A :class:`~pydicom.dataset.Dataset` that will be updated with the
         non-retired group ``0x0028`` image pixel module elements and the group
-        ``0x0002`` file meta information elements from the dataset in `src` .
+        ``0x0002`` file meta information elements from the dataset in `src`.
+        **Only available when `src` is a path or file-like.**
     specific_tags : list[int | pydicom.tag.BaseTag], optional
         A list of additional tags from the dataset in `src` to be added to the
         `ds_out` dataset.
@@ -880,12 +949,12 @@ def pixel_array(
     Returns
     -------
     numpy.ndarray
-        The decoded and reshaped pixel data, with shape:
+         One or more frames of decoded pixel data with shape:
 
-        * (rows, columns) for single frame, single plane data
-        * (rows, columns, planes) for single frame, multi-plane data
-        * (frames, rows, columns) for multi-frame, single plane data
-        * (frames, rows, columns, planes) for multi-frame, multi-plane data
+        * (rows, columns) for single frame, single sample data
+        * (rows, columns, samples) for single frame, multi-sample data
+        * (frames, rows, columns) for multi-frame, single sample data
+        * (frames, rows, columns, samples) for multi-frame, multi-sample data
 
         A writeable :class:`~numpy.ndarray` is returned by default. For
         native transfer syntaxes with ``view_only=True`` a read-only
@@ -893,6 +962,26 @@ def pixel_array(
     """
     from pydicom.dataset import Dataset
     from pydicom.pixels import get_decoder
+
+    if isinstance(src, Dataset):
+        ds: Dataset = src
+        file_meta = getattr(ds, "file_meta", {})
+        if not (tsyntax := file_meta.get("TransferSyntaxUID", None)):
+            raise AttributeError(
+                "The dataset's 'file_meta' has no (0002,0010) 'Transfer Syntax "
+                "UID' element"
+            )
+
+        decoder = get_decoder(tsyntax)
+        opts = as_pixel_options(ds, **kwargs)
+        return decoder.as_array(
+            ds,
+            index=index,
+            validate=True,
+            raw=raw,
+            decoding_plugin=decoding_plugin,
+            **opts,
+        )[0]
 
     f: BinaryIO
     if not hasattr(src, "read"):
@@ -912,7 +1001,7 @@ def pixel_array(
         ds, opts = _array_common(f, list(tags), **kwargs)
 
         decoder = get_decoder(opts["transfer_syntax_uid"])
-        arr = decoder.as_array(
+        arr, _ = decoder.as_array(
             f,
             index=index,
             validate=True,
@@ -1110,9 +1199,9 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
         depends on the contents of the dataset:
 
         * For single frame, single sample data (rows, columns)
-        * For single frame, multi-sample data (rows, columns, planes)
+        * For single frame, multi-sample data (rows, columns, samples)
         * For multi-frame, single sample data (frames, rows, columns)
-        * For multi-frame, multi-sample data (frames, rows, columns, planes)
+        * For multi-frame, multi-sample data (frames, rows, columns, samples)
 
     References
     ----------
@@ -1163,10 +1252,10 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
     if nr_frames > 1:
         # Multi-frame
         if nr_samples == 1:
-            # Single plane
+            # Single sample
             arr = arr.reshape(nr_frames, rows, columns)
         else:
-            # Multiple planes, usually 3
+            # Multiple samples, usually 3
             if planar_configuration == 0:
                 arr = arr.reshape(nr_frames, rows, columns, nr_samples)
             else:
@@ -1175,10 +1264,10 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
     else:
         # Single frame
         if nr_samples == 1:
-            # Single plane
+            # Single sample
             arr = arr.reshape(rows, columns)
         else:
-            # Multiple planes, usually 3
+            # Multiple samples, usually 3
             if planar_configuration == 0:
                 arr = arr.reshape(rows, columns, nr_samples)
             else:

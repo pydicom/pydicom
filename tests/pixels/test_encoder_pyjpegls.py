@@ -86,7 +86,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -125,7 +125,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -145,7 +145,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -185,7 +185,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -224,7 +224,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -244,7 +244,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -283,7 +283,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -322,7 +322,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -364,7 +364,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -408,7 +408,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -428,7 +428,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -472,7 +472,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -516,7 +516,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -536,7 +536,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -580,7 +580,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -624,7 +624,7 @@ class TestJpegLSLossless:
                 if plugin == "gdcm" and bits_stored in (6, 7):
                     continue
 
-                out = JPEGLSLosslessDecoder.as_array(
+                out, _ = JPEGLSLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -716,7 +716,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -759,7 +759,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -782,7 +782,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -824,7 +824,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -867,7 +867,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -890,7 +890,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -934,7 +934,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -983,7 +983,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1032,7 +1032,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1078,7 +1078,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1101,7 +1101,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1146,7 +1146,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1192,7 +1192,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1215,7 +1215,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1262,7 +1262,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1314,7 +1314,7 @@ class TestJpegLSNearLossless:
                 if plugin == "gdcm" and bits_stored < 8:
                     continue
 
-                out = JPEGLSNearLosslessDecoder.as_array(
+                out, _ = JPEGLSNearLosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,

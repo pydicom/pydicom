@@ -12,6 +12,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom import dcmread
 from pydicom.pixels import get_decoder
 from pydicom.pixels.utils import _passes_version_check
 from pydicom.uid import (
@@ -50,7 +51,7 @@ class TestDecoding:
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
         decoder = get_decoder(JPEGBaseline8Bit)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr, plugin="gdcm")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -69,7 +70,7 @@ class TestDecoding:
             with pytest.raises(RuntimeError, match=msg):
                 decoder.as_array(reference.ds, decoding_plugin="gdcm")
         else:
-            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+            arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
@@ -79,7 +80,7 @@ class TestDecoding:
     def test_jpg_lossless(self, reference):
         """Test the decoder with JPEGLossless."""
         decoder = get_decoder(JPEGLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -89,7 +90,7 @@ class TestDecoding:
     def test_jpg_lossless_sv1(self, reference):
         """Test the decoder with JPEGLosslessSV1."""
         decoder = get_decoder(JPEGLosslessSV1)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -107,7 +108,7 @@ class TestDecoding:
             with pytest.raises(RuntimeError, match=msg):
                 decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         else:
-            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+            arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
@@ -117,7 +118,7 @@ class TestDecoding:
     def test_jls_lossy(self, reference):
         """Test the decoder with JPEGLSNearLossless."""
         decoder = get_decoder(JPEGLSNearLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -127,7 +128,7 @@ class TestDecoding:
     def test_j2k_lossless(self, reference):
         """Test the decoder with JPEG2000Lossless."""
         decoder = get_decoder(JPEG2000Lossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -137,7 +138,7 @@ class TestDecoding:
     def test_j2k(self, reference):
         """Test the decoder with JPEG2000."""
         decoder = get_decoder(JPEG2000)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -148,7 +149,7 @@ class TestDecoding:
         # The JPEG-LS codestream uses a precision of 8, so it will return
         #   8-bit values, however the decoding process nominally expects 16-bit
         decoder = get_decoder(JPEGLSNearLossless)
-        arr = decoder.as_array(
+        arr, _ = decoder.as_array(
             JLSN_08_01_1_0_1F.ds,
             raw=True,
             decoding_plugin="gdcm",
@@ -164,7 +165,7 @@ class TestDecoding:
         """Test the result when bits stored <= 8 and bits allocated 16"""
         decoder = get_decoder(JPEGLSNearLossless)
         ds = JLSN_08_01_1_0_1F.ds
-        buffer = decoder.as_buffer(
+        buffer, meta = decoder.as_buffer(
             ds,
             raw=True,
             decoding_plugin="gdcm",
@@ -176,6 +177,7 @@ class TestDecoding:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
+        assert meta["bits_allocated"] == 8
 
     def test_jls_lossy_signed_raises(self):
         """Test decoding JPEG-LS signed with < 8-bits raises."""
@@ -205,15 +207,16 @@ class TestDecoding:
             "'YBR_FULL_422' however the encoded image's codestream uses "
             "component IDs that indicate it should be 'RGB'"
         )
-        ds = reference.ds
+        ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "YBR_FULL_422"
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(ds, raw=True, decoding_plugin="gdcm")
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="gdcm")
 
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "RGB"
 
     def test_jfif(self):
         """Test decoding an incorrect photometric interpretation using JFIF."""
@@ -224,15 +227,16 @@ class TestDecoding:
             "'RGB' however the encoded image's codestream contains a JFIF APP "
             "marker which indicates it should be 'YBR_FULL_422'"
         )
-        ds = reference.ds
+        ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(ds, raw=True, decoding_plugin="gdcm")
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="gdcm")
 
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "YBR_FULL_422"
 
 
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")

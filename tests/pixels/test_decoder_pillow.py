@@ -16,6 +16,7 @@ try:
 except ImportError:
     pass
 
+from pydicom import dcmread
 from pydicom.encaps import get_frame
 from pydicom.pixels import get_decoder
 from pydicom.pixels.decoders.pillow import is_available
@@ -57,12 +58,7 @@ class TestLibJpegDecoder:
     def test_jpg_baseline(self, reference):
         """Test the decoder with JPEGBaseline8Bit."""
         decoder = get_decoder(JPEGBaseline8Bit)
-        if reference in (JPGB_08_08_3_0_1F_RGB, JPGB_08_08_3_0_1F_YBR_FULL):
-            with pytest.warns(UserWarning):
-                arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
-        else:
-            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
-
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
         reference.test(arr, plugin="pillow")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -81,7 +77,7 @@ class TestLibJpegDecoder:
             with pytest.raises(RuntimeError, match=msg):
                 decoder.as_array(reference.ds, decoding_plugin="pillow")
         else:
-            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
+            arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
@@ -96,15 +92,16 @@ class TestLibJpegDecoder:
             "'YBR_FULL_422' however the encoded image's codestream uses "
             "component IDs that indicate it should be 'RGB'"
         )
-        ds = reference.ds
+        ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "YBR_FULL_422"
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
 
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "RGB"
 
     def test_jfif(self):
         """Test decoding an incorrect photometric interpretation using JFIF."""
@@ -115,15 +112,16 @@ class TestLibJpegDecoder:
             "'RGB' however the encoded image's codestream contains a JFIF APP "
             "marker which indicates it should be 'YBR_FULL_422'"
         )
-        ds = reference.ds
+        ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
 
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "YBR_FULL_422"
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
@@ -140,7 +138,7 @@ class TestOpenJpegDecoder:
             with pytest.raises(RuntimeError, match=msg):
                 decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
         else:
-            arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
+            arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
@@ -150,7 +148,7 @@ class TestOpenJpegDecoder:
     def test_j2k(self, reference):
         """Test the decoder with JPEG2000."""
         decoder = get_decoder(JPEG2000)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pillow")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype

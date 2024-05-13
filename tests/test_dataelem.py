@@ -585,7 +585,6 @@ class TestDataElement:
 
 
 class TestRawDataElement:
-
     """Tests for dataelem.RawDataElement."""
 
     def test_invalid_tag_warning(self, allow_reading_invalid_values):

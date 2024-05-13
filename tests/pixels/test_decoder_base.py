@@ -493,6 +493,41 @@ class TestDecodeRunner:
         assert runner.get_data(src, 3, 4) == b"\x03\x04\x05"
         assert src.tell() == 2
 
+    def test_pixel_properties(self):
+        """Test pixel_properties()"""
+        runner = DecodeRunner(RLELossless)
+        opts = {
+            "columns": 9,
+            "rows": 10,
+            "samples_per_pixel": 1,
+            "number_of_frames": 3,
+            "pixel_keyword": "PixelData",
+            "photometric_interpretation": PI.RGB,
+            "pixel_representation": 0,
+            "bits_allocated": 16,
+            "bits_stored": 8,
+        }
+        runner.set_options(**opts)
+        d = runner.pixel_properties()
+        assert d["columns"] == 9
+        assert d["rows"] == 10
+        assert d["samples_per_pixel"] == 1
+        assert d["number_of_frames"] == 3
+        assert d["photometric_interpretation"] == PI.RGB
+        assert d["pixel_representation"] == 0
+        assert d["bits_allocated"] == 16
+        assert d["bits_stored"] == 8
+        assert "planar_configuration" not in d
+
+        assert "number_of_frames" not in runner.pixel_properties(as_frame=True)
+
+        runner.set_option("pixel_keyword", "FloatPixelData")
+        assert "pixel_representation" not in runner.pixel_properties()
+
+        runner.set_option("samples_per_pixel", 3)
+        runner.set_option("planar_configuration", 1)
+        assert runner.pixel_properties()["planar_configuration"] == 1
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestDecodeRunner_Reshape:
@@ -870,10 +905,12 @@ class TestDecoder:
         # Functionality test that numpy isn't required
         decoder = get_decoder(RLELossless)
         reference = RLE_16_1_10F
-        buffer = decoder.as_buffer(reference.ds)
+        buffer, meta = decoder.as_buffer(reference.ds)
         assert isinstance(buffer, bytes | bytearray)
-        for buffer in decoder.iter_buffer(reference.ds):
+        assert isinstance(meta, dict)
+        for buffer, meta in decoder.iter_buffer(reference.ds):
             assert isinstance(buffer, bytes | bytearray)
+            assert isinstance(meta, dict)
 
 
 @pytest.fixture()
@@ -965,11 +1002,12 @@ class TestDecoder_Array:
         decoder = get_decoder(ExplicitVRLittleEndian)
         reference = EXPL_16_1_10F
         for index in [0, 4, 9]:
-            arr = decoder.as_array(reference.ds, index=index)
+            arr, meta = decoder.as_array(reference.ds, index=index)
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
+            assert meta["bits_stored"] == 12
 
     def test_native_view_only(self):
         """Test as_array(view_only=True)"""
@@ -977,12 +1015,13 @@ class TestDecoder_Array:
 
         # Also tests Dataset `src`
         reference = EXPL_8_3_1F_YBR
-        arr = decoder.as_array(reference.ds, view_only=True, raw=True)
+        arr, meta = decoder.as_array(reference.ds, view_only=True, raw=True)
         assert isinstance(reference.ds.PixelData, bytes)  # immutable
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert not arr.flags.writeable  # read-only
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
 
         # Also tests buffer-like `src`
         ds = reference.ds
@@ -999,7 +1038,7 @@ class TestDecoder_Array:
             "pixel_keyword": "PixelData",
         }
 
-        arr = decoder.as_array(
+        arr, _ = decoder.as_array(
             bytearray(ds.PixelData),  # mutable
             raw=True,
             view_only=True,
@@ -1010,7 +1049,7 @@ class TestDecoder_Array:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable  # not read-only
 
-        arr = decoder.as_array(
+        arr, _ = decoder.as_array(
             memoryview(ds.PixelData),  # view of an immutable
             raw=True,
             view_only=True,
@@ -1021,7 +1060,7 @@ class TestDecoder_Array:
         assert arr.dtype == reference.dtype
         assert not arr.flags.writeable  # read-only
 
-        arr = decoder.as_array(
+        arr, _ = decoder.as_array(
             memoryview(bytearray(ds.PixelData)),  # view of a mutable
             raw=True,
             view_only=True,
@@ -1035,7 +1074,7 @@ class TestDecoder_Array:
         # BinaryIO
         with open(reference.path, "rb") as f:
             f.seek(ds["PixelData"].file_tell)
-            arr = decoder.as_array(
+            arr, _ = decoder.as_array(
                 f,
                 raw=True,
                 view_only=True,
@@ -1053,22 +1092,26 @@ class TestDecoder_Array:
 
         reference = RLE_16_1_10F
         for index in [0, 4, 9]:
-            arr = decoder.as_array(reference.ds, index=index, decoding_plugin="pydicom")
+            arr, meta = decoder.as_array(
+                reference.ds, index=index, decoding_plugin="pydicom"
+            )
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
+            assert meta["bits_stored"] == 12
 
     def test_encapsulated_plugin(self):
         """Test `decoding_plugin` with an encapsulated pixel data."""
         decoder = get_decoder(RLELossless)
 
         reference = RLE_16_1_10F
-        arr = decoder.as_array(reference.ds, decoding_plugin="pydicom")
+        arr, meta = decoder.as_array(reference.ds, decoding_plugin="pydicom")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["bits_stored"] == 12
 
     def test_encapsulated_excess_frames(self):
         """Test returning excess frame data"""
@@ -1086,43 +1129,50 @@ class TestDecoder_Array:
             "expected from the supplied number of frames"
         )
         with pytest.warns(UserWarning, match=msg):
-            arr = decoder.as_array(src, **runner.options)
+            arr, meta = decoder.as_array(src, **runner.options)
 
         assert arr.shape == (11, 64, 64)
+        assert meta["number_of_frames"] == 11
 
     def test_processing_colorspace(self):
         """Test the processing colorspace options."""
         decoder = get_decoder(ExplicitVRLittleEndian)
 
         reference = EXPL_8_3_1F_YBR
+        assert reference.ds.PhotometricInterpretation == PI.YBR_FULL
 
         msg = "'force_ybr' and 'force_rgb' cannot both be True"
         with pytest.raises(ValueError, match=msg):
             decoder.as_array(reference.ds, force_rgb=True, force_ybr=True)
 
         # as_rgb (default)
-        arr = decoder.as_array(reference.ds)
+        arr, meta = decoder.as_array(reference.ds)
         reference.test(arr, as_rgb=True)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == PI.RGB
 
         # force_rgb
-        rgb = decoder.as_array(
+        rgb, meta = decoder.as_array(
             reference.ds,
             photometric_interpretation="RGB",
             force_rgb=True,
         )
         reference.test(rgb, as_rgb=True)
+        assert meta["photometric_interpretation"] == PI.RGB
 
         # force_ybr
         # Test ignores as_rgb
-        ybr = decoder.as_array(reference.ds, as_rgb=False, force_ybr=True)
-        ybr2 = decoder.as_array(reference.ds, as_rgb=True, force_ybr=True)
+        ybr, meta = decoder.as_array(reference.ds, as_rgb=False, force_ybr=True)
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
+        ybr2, meta = decoder.as_array(reference.ds, as_rgb=True, force_ybr=True)
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
         assert np.array_equal(ybr, ybr2)
 
         # Test is actually ybr + ybr = ybr`
-        raw = decoder.as_array(reference.ds, raw=True)
+        raw, meta = decoder.as_array(reference.ds, raw=True)
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
         out = convert_color_space(ybr, PI.YBR_FULL, PI.RGB)
         # Lossy conversion, equal to within 1 intensity unit
         assert np.allclose(out, raw, atol=1)
@@ -1171,31 +1221,31 @@ class TestDecoder_Array:
             b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
         )
         # Test by frame - odd-length
-        arr = decoder.as_array(src, **opts, index=0)
+        arr, _ = decoder.as_array(src, **opts, index=0)
         assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        arr = decoder.as_array(src, **opts, index=1)
+        arr, _ = decoder.as_array(src, **opts, index=1)
         assert arr.ravel().tolist() == [9, 10, 11, 12, 13, 14, 15, 16, 17]
-        arr = decoder.as_array(src, **opts, index=2)
+        arr, _ = decoder.as_array(src, **opts, index=2)
         assert arr.ravel().tolist() == [18, 19, 20, 21, 22, 23, 24, 25, 26]
 
         # Test all - odd-length
         opts["number_of_frames"] = 1
-        arr = decoder.as_array(b"\x01\x00\x03\x02\x05\x04\x07\x06\x00\x08", **opts)
+        arr, _ = decoder.as_array(b"\x01\x00\x03\x02\x05\x04\x07\x06\x00\x08", **opts)
         assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
         # Test all - even-length
         opts["rows"] = 5
         opts["columns"] = 2
-        arr = decoder.as_array(b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08", **opts)
+        arr, _ = decoder.as_array(b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08", **opts)
         assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
         # Test by frame - even length
         opts["number_of_frames"] = 3
-        arr = decoder.as_array(src + b"\x1D\x1C", **opts, index=0)
+        arr, _ = decoder.as_array(src + b"\x1D\x1C", **opts, index=0)
         assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        arr = decoder.as_array(src + b"\x1D\x1C", **opts, index=1)
+        arr, _ = decoder.as_array(src + b"\x1D\x1C", **opts, index=1)
         assert arr.ravel().tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-        arr = decoder.as_array(src + b"\x1D\x1C", **opts, index=2)
+        arr, _ = decoder.as_array(src + b"\x1D\x1C", **opts, index=2)
         assert arr.ravel().tolist() == [20, 21, 22, 23, 24, 25, 26, 0, 28, 29]
 
     def test_iter_native_indices(self):
@@ -1205,11 +1255,13 @@ class TestDecoder_Array:
 
         indices = [0, 4, 9]
         func = decoder.iter_array(reference.ds, raw=True, indices=indices)
-        for idx, arr in enumerate(func):
+        for idx, (arr, meta) in enumerate(func):
             reference.test(arr, index=indices[idx])
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
             assert arr.shape == reference.shape[1:]
+            assert meta["bits_stored"] == 12
+            assert "number_of_frames" not in meta
 
         assert idx == 2
 
@@ -1221,7 +1273,7 @@ class TestDecoder_Array:
 
         assert isinstance(ds.PixelData, bytes)  # immutable
         func = decoder.iter_array(ds, view_only=True, raw=True)
-        for index, arr in enumerate(func):
+        for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
@@ -1242,7 +1294,7 @@ class TestDecoder_Array:
             planar_configuration=ds.get("PlanarConfiguration", 0),
             pixel_keyword="PixelData",
         )
-        for index, arr in enumerate(func):
+        for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
@@ -1263,7 +1315,7 @@ class TestDecoder_Array:
             planar_configuration=ds.get("PlanarConfiguration", 0),
             pixel_keyword="PixelData",
         )
-        for index, arr in enumerate(func):
+        for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
@@ -1284,7 +1336,7 @@ class TestDecoder_Array:
             planar_configuration=ds.get("PlanarConfiguration", 0),
             pixel_keyword="PixelData",
         )
-        for index, arr in enumerate(func):
+        for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
@@ -1299,11 +1351,13 @@ class TestDecoder_Array:
         func = decoder.iter_array(
             reference.ds, raw=True, indices=indices, decoding_plugin="pydicom"
         )
-        for idx, arr in enumerate(func):
+        for idx, (arr, meta) in enumerate(func):
             reference.test(arr, index=indices[idx])
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
             assert arr.shape == reference.shape[1:]
+            assert meta["bits_stored"] == 12
+            assert "number_of_frames" not in meta
 
         assert idx == 2
 
@@ -1313,7 +1367,7 @@ class TestDecoder_Array:
 
         reference = RLE_16_1_10F
         func = decoder.iter_array(reference.ds, decoding_plugin="pydicom")
-        for index, arr in enumerate(func):
+        for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable
@@ -1324,6 +1378,7 @@ class TestDecoder_Array:
         decoder = get_decoder(ExplicitVRLittleEndian)
 
         reference = EXPL_8_3_1F_YBR
+        assert reference.ds.PhotometricInterpretation == PI.YBR_FULL
 
         msg = "'force_ybr' and 'force_rgb' cannot both be True"
         with pytest.raises(ValueError, match=msg):
@@ -1331,11 +1386,12 @@ class TestDecoder_Array:
 
         # as_rgb
         func = decoder.iter_array(reference.ds)
-        arr = next(func)
+        arr, meta = next(func)
         reference.test(arr, as_rgb=True)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == PI.RGB
 
         # force_rgb
         func = decoder.iter_array(
@@ -1343,17 +1399,21 @@ class TestDecoder_Array:
             photometric_interpretation="RGB",
             force_rgb=True,
         )
-        rgb = next(func)
+        rgb, meta = next(func)
         reference.test(rgb, as_rgb=True)
+        assert meta["photometric_interpretation"] == PI.RGB
 
         # force_ybr
         # Test ignores as_rgb
-        ybr = next(decoder.iter_array(reference.ds, as_rgb=False, force_ybr=True))
-        ybr2 = next(decoder.iter_array(reference.ds, as_rgb=True, force_ybr=True))
+        ybr, meta = next(decoder.iter_array(reference.ds, as_rgb=False, force_ybr=True))
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
+        ybr2, meta = next(decoder.iter_array(reference.ds, as_rgb=True, force_ybr=True))
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
         assert np.array_equal(ybr, ybr2)
 
         # Test is actually ybr + ybr = ybr`
-        raw = next(decoder.iter_array(reference.ds, raw=True))
+        raw, meta = next(decoder.iter_array(reference.ds, raw=True))
+        assert meta["photometric_interpretation"] == PI.YBR_FULL
         out = convert_color_space(ybr, PI.YBR_FULL, PI.RGB)
         # Lossy conversion, equal to within 1 intensity unit
         assert np.allclose(out, raw, atol=1)
@@ -1371,9 +1431,11 @@ class TestDecoder_Buffer:
 
         reference = EXPL_16_1_10F
         for index in [0, 4, 9]:
-            arr = decoder.as_array(reference.ds, index=index)
-            buffer = decoder.as_buffer(reference.ds, index=index)
+            arr, meta_a = decoder.as_array(reference.ds, index=index)
+            buffer, meta_b = decoder.as_buffer(reference.ds, index=index)
             assert arr.tobytes() == buffer
+            assert meta_a == meta_b
+            assert "number_of_frames" not in meta_b
 
         msg = "There is insufficient pixel data to contain 11 frames"
         with pytest.raises(ValueError, match=msg):
@@ -1386,11 +1448,12 @@ class TestDecoder_Buffer:
         # immutable source buffer
         # Also tests Dataset `src`
         reference = EXPL_8_3_1F_YBR
-        arr = decoder.as_array(reference.ds, view_only=True, raw=True)
-        buffer = decoder.as_buffer(reference.ds, view_only=True, raw=True)
+        arr, meta_a = decoder.as_array(reference.ds, view_only=True, raw=True)
+        buffer, meta_b = decoder.as_buffer(reference.ds, view_only=True, raw=True)
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is reference.ds.PixelData
+        assert meta_a == meta_b
 
         # mutable source buffer
         # Also tests buffer-like `src`
@@ -1409,16 +1472,16 @@ class TestDecoder_Buffer:
             "number_of_frames": 1,
             "pixel_keyword": "PixelData",
         }
-        arr = decoder.as_array(src, **opts)
-        buffer = decoder.as_buffer(src, **opts)
+        arr, _ = decoder.as_array(src, **opts)
+        buffer, _ = decoder.as_buffer(src, **opts)
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
 
         # view of a mutable
         mview = memoryview(src)
-        arr = decoder.as_array(mview, **opts)
-        buffer = decoder.as_buffer(mview, **opts)
+        arr, _ = decoder.as_array(mview, **opts)
+        buffer, _ = decoder.as_buffer(mview, **opts)
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
@@ -1426,8 +1489,8 @@ class TestDecoder_Buffer:
         # view of an immutable
         src = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         mview = memoryview(src)
-        arr = decoder.as_array(mview, **opts)
-        buffer = decoder.as_buffer(mview, **opts)
+        arr, _ = decoder.as_array(mview, **opts)
+        buffer, _ = decoder.as_buffer(mview, **opts)
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
@@ -1438,17 +1501,19 @@ class TestDecoder_Buffer:
 
         reference = RLE_16_1_10F
         for index in [0, 4, 9]:
-            arr = decoder.as_array(reference.ds, index=index)
-            buffer = decoder.as_buffer(reference.ds, index=index)
+            arr, _ = decoder.as_array(reference.ds, index=index)
+            buffer, meta = decoder.as_buffer(reference.ds, index=index)
             assert isinstance(buffer, bytes | bytearray)
             assert arr.tobytes() == buffer
+            assert meta["bits_stored"] == 12
+            assert "number_of_frames" not in meta
 
     def test_encapsulated_plugin(self):
         """Test `decoding_plugin` with an encapsulated pixel data."""
         decoder = get_decoder(RLELossless)
         reference = RLE_16_1_10F
-        arr = decoder.as_array(reference.ds, decoding_plugin="pydicom")
-        buffer = decoder.as_buffer(reference.ds, decoding_plugin="pydicom")
+        arr, _ = decoder.as_array(reference.ds, decoding_plugin="pydicom")
+        buffer, _ = decoder.as_buffer(reference.ds, decoding_plugin="pydicom")
         assert isinstance(buffer, bytes | bytearray)
         assert arr.tobytes() == buffer
 
@@ -1491,9 +1556,10 @@ class TestDecoder_Buffer:
             "expected from the supplied number of frames"
         )
         with pytest.warns(UserWarning, match=msg):
-            buffer = decoder.as_buffer(src, **runner.options)
+            buffer, meta = decoder.as_buffer(src, **runner.options)
 
         assert len(buffer) == 11 * 64 * 64 * 2
+        assert meta["number_of_frames"] == 11
 
     def test_expb_ow_index_invalid_raises(self):
         """Test invalid index with BE swapped OW raises"""
@@ -1527,13 +1593,13 @@ class TestDecoder_Buffer:
             b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
         )
         # Includes +1 at end
-        buffer = decoder.as_buffer(src, **opts, index=0)
+        buffer, _ = decoder.as_buffer(src, **opts, index=0)
         assert buffer == b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
         # Includes -1 at start
-        buffer = decoder.as_buffer(src, **opts, index=1)
+        buffer, _ = decoder.as_buffer(src, **opts, index=1)
         assert buffer == b"\x09\x08\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
         # Includes +1 at end
-        buffer = decoder.as_buffer(src, **opts, index=2)
+        buffer, _ = decoder.as_buffer(src, **opts, index=2)
         assert buffer == b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
 
     def test_iter_native_indices(self):
@@ -1544,7 +1610,7 @@ class TestDecoder_Buffer:
         indices = [0, 4, 9]
         arr_func = decoder.iter_array(reference.ds, indices=indices)
         buf_func = decoder.iter_buffer(reference.ds, indices=indices)
-        for idx, (arr, buffer) in enumerate(zip(arr_func, buf_func)):
+        for idx, ((arr, _), (buffer, _)) in enumerate(zip(arr_func, buf_func)):
             assert isinstance(buffer, bytes | bytearray)
             assert arr.tobytes() == buffer
 
@@ -1557,8 +1623,8 @@ class TestDecoder_Buffer:
         # immutable source buffer
         # Also tests Dataset `src`
         reference = EXPL_8_3_1F_YBR
-        arr = next(decoder.iter_array(reference.ds, view_only=True, raw=True))
-        buffer = next(decoder.iter_buffer(reference.ds, view_only=True, raw=True))
+        arr, _ = next(decoder.iter_array(reference.ds, view_only=True, raw=True))
+        buffer, _ = next(decoder.iter_buffer(reference.ds, view_only=True, raw=True))
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is reference.ds.PixelData
@@ -1580,16 +1646,16 @@ class TestDecoder_Buffer:
             "number_of_frames": 1,
             "pixel_keyword": "PixelData",
         }
-        arr = next(decoder.iter_array(src, **opts))
-        buffer = next(decoder.iter_buffer(src, **opts))
+        arr, _ = next(decoder.iter_array(src, **opts))
+        buffer, _ = next(decoder.iter_buffer(src, **opts))
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
 
         # view of a mutable
         mview = memoryview(src)
-        arr = next(decoder.iter_array(mview, **opts))
-        buffer = next(decoder.iter_buffer(mview, **opts))
+        arr, _ = next(decoder.iter_array(mview, **opts))
+        buffer, _ = next(decoder.iter_buffer(mview, **opts))
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
@@ -1597,8 +1663,8 @@ class TestDecoder_Buffer:
         # view of an immutable
         src = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         mview = memoryview(src)
-        arr = next(decoder.iter_array(mview, **opts))
-        buffer = next(decoder.iter_buffer(mview, **opts))
+        arr, _ = next(decoder.iter_array(mview, **opts))
+        buffer, _ = next(decoder.iter_buffer(mview, **opts))
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
@@ -1610,7 +1676,7 @@ class TestDecoder_Buffer:
         indices = [0, 4, 9]
         arr_func = decoder.iter_array(reference.ds, indices=indices)
         buf_func = decoder.iter_buffer(reference.ds, indices=indices)
-        for idx, (arr, buffer) in enumerate(zip(arr_func, buf_func)):
+        for idx, ((arr, _), (buffer, _)) in enumerate(zip(arr_func, buf_func)):
             assert isinstance(buffer, bytes | bytearray)
             assert arr.tobytes() == buffer
 
@@ -1618,8 +1684,8 @@ class TestDecoder_Buffer:
         """Test `decoding_plugin` with an encapsulated pixel data."""
         decoder = get_decoder(RLELossless)
         reference = RLE_16_1_10F
-        arr = next(decoder.iter_array(reference.ds, decoding_plugin="pydicom"))
-        buffer = next(decoder.iter_buffer(reference.ds, decoding_plugin="pydicom"))
+        arr, _ = next(decoder.iter_array(reference.ds, decoding_plugin="pydicom"))
+        buffer, _ = next(decoder.iter_buffer(reference.ds, decoding_plugin="pydicom"))
         assert isinstance(buffer, bytes | bytearray)
         assert arr.tobytes() == buffer
 

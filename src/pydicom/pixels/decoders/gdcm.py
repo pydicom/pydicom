@@ -5,7 +5,6 @@
 This module is not intended to be used directly.
 """
 
-import math
 from typing import cast
 
 from pydicom import uid
@@ -108,9 +107,10 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         # GDCM always returns JPEG-LS data as color-by-pixel
         runner.set_option("planar_configuration", 0)
         bits_stored = runner.get_option("jls_precision", bits_stored)
-        if runner.bits_allocated == 16:
-            bits_allocated = math.ceil(bits_stored / 8) * 8
-            runner.set_option("bits_allocated", bits_allocated)
+        if 0 < bits_stored <= 8:
+            runner.set_option("bits_allocated", 8)
+        elif 8 < bits_stored <= 16:
+            runner.set_option("bits_allocated", 16)
 
     if tsyntax in uid.JPEG2000TransferSyntaxes:
         # GDCM pixel container size is based on precision

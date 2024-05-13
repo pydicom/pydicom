@@ -157,7 +157,7 @@ class TestJ2KLosslessEncoding:
                 ref, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -198,7 +198,7 @@ class TestJ2KLosslessEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -231,7 +231,7 @@ class TestJ2KLosslessEncoding:
                 ref, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -268,7 +268,7 @@ class TestJ2KLosslessEncoding:
                 ref, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -303,7 +303,7 @@ class TestJ2KLosslessEncoding:
                 ref, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -333,7 +333,7 @@ class TestJ2KLosslessEncoding:
             cs = JPEG2000LosslessEncoder.encode(
                 ref, encoding_plugin="pylibjpeg", **opts
             )
-            out = JPEG2000LosslessDecoder.as_array(
+            out, _ = JPEG2000LosslessDecoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -371,7 +371,7 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -413,7 +413,7 @@ class TestJ2KLosslessEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -448,7 +448,7 @@ class TestJ2KLosslessEncoding:
                 ref, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -487,7 +487,7 @@ class TestJ2KLosslessEncoding:
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -529,7 +529,7 @@ class TestJ2KLosslessEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -561,7 +561,7 @@ class TestJ2KLosslessEncoding:
             cs = JPEG2000LosslessEncoder.encode(
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
-            out = JPEG2000LosslessDecoder.as_array(
+            out, _ = JPEG2000LosslessDecoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -601,7 +601,7 @@ class TestJ2KLosslessEncoding:
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -639,7 +639,7 @@ class TestJ2KLosslessEncoding:
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -672,7 +672,7 @@ class TestJ2KLosslessEncoding:
             cs = JPEG2000LosslessEncoder.encode(
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
-            out = JPEG2000LosslessDecoder.as_array(
+            out, _ = JPEG2000LosslessDecoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -713,7 +713,7 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -757,7 +757,7 @@ class TestJ2KLosslessEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000LosslessDecoder.as_array(
+                out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -790,7 +790,7 @@ class TestJ2KLosslessEncoding:
             cs = JPEG2000LosslessEncoder.encode(
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
-            out = JPEG2000LosslessDecoder.as_array(
+            out, _ = JPEG2000LosslessDecoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -845,7 +845,7 @@ class TestJ2KLosslessEncoding:
         }
 
         cs = JPEG2000LosslessEncoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
-        out = JPEG2000LosslessDecoder.as_array(
+        out, _ = JPEG2000LosslessDecoder.as_array(
             encapsulate([cs]),
             decoding_plugin="pylibjpeg",
             **opts,
@@ -928,7 +928,7 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -969,7 +969,7 @@ class TestJ2KEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1000,7 +1000,7 @@ class TestJ2KEncoding:
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
-            out = JPEG2000Decoder.as_array(
+            out, _ = JPEG2000Decoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -1037,7 +1037,7 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1072,7 +1072,7 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1104,7 +1104,7 @@ class TestJ2KEncoding:
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
-            out = JPEG2000Decoder.as_array(
+            out, _ = JPEG2000Decoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -1142,7 +1142,7 @@ class TestJ2KEncoding:
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1184,7 +1184,7 @@ class TestJ2KEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1217,7 +1217,7 @@ class TestJ2KEncoding:
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
-            out = JPEG2000Decoder.as_array(
+            out, _ = JPEG2000Decoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -1256,7 +1256,7 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1298,7 +1298,7 @@ class TestJ2KEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1333,7 +1333,7 @@ class TestJ2KEncoding:
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
-            out = JPEG2000Decoder.as_array(
+            out, _ = JPEG2000Decoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -1373,7 +1373,7 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1411,7 +1411,7 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1447,7 +1447,7 @@ class TestJ2KEncoding:
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
-            out = JPEG2000Decoder.as_array(
+            out, _ = JPEG2000Decoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -1489,7 +1489,7 @@ class TestJ2KEncoding:
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1533,7 +1533,7 @@ class TestJ2KEncoding:
                 if plugin == "pillow" and bits_stored == 9:
                     continue
 
-                out = JPEG2000Decoder.as_array(
+                out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
@@ -1569,7 +1569,7 @@ class TestJ2KEncoding:
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
-            out = JPEG2000Decoder.as_array(
+            out, _ = JPEG2000Decoder.as_array(
                 encapsulate([cs]),
                 decoding_plugin="pylibjpeg",
                 **opts,
@@ -1595,7 +1595,7 @@ class TestJ2KEncoding:
         }
 
         cs = JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
-        out = JPEG2000Decoder.as_array(
+        out, _ = JPEG2000Decoder.as_array(
             encapsulate([cs]),
             decoding_plugin="pylibjpeg",
             **opts,
@@ -1714,7 +1714,7 @@ class TestJ2KEncoding:
         ds.compress(JPEG2000, j2k_cr=[2], encoding_plugin="pylibjpeg")
         assert ds.file_meta.TransferSyntaxUID == JPEG2000
         opts = as_pixel_options(ds)
-        out = JPEG2000Decoder.as_array(
+        out, _ = JPEG2000Decoder.as_array(
             ds.PixelData,
             decoding_plugin="pylibjpeg",
             **opts,
@@ -1727,7 +1727,7 @@ class TestJ2KEncoding:
         ds.compress(JPEG2000, j2k_psnr=[100], encoding_plugin="pylibjpeg")
         assert ds.file_meta.TransferSyntaxUID == JPEG2000
         opts = as_pixel_options(ds)
-        out = JPEG2000Decoder.as_array(
+        out, _ = JPEG2000Decoder.as_array(
             ds.PixelData,
             decoding_plugin="pylibjpeg",
             **opts,

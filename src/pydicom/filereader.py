@@ -1132,7 +1132,7 @@ def read_deferred_data_element(
         If the VR or tag of `raw_data_elem` does not match the read value.
     """
     if config.debugging:
-        logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
+        logger.debug(f"Reading deferred element {raw_data_elem.tag}")
     # If it wasn't read from a file, then return an error
     if filename_or_obj is None:
         raise OSError("Deferred read -- original filename not stored. Cannot re-open")

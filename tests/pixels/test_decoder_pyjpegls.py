@@ -31,7 +31,7 @@ class TestPyJpegLSDecoder:
     def test_jls_lossless(self, reference):
         """Test the decoder with JPEGLSLossless."""
         decoder = get_decoder(JPEGLSLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pyjpegls")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pyjpegls")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -41,7 +41,7 @@ class TestPyJpegLSDecoder:
     def test_jls_lossy(self, reference):
         """Test the decoder with JPEGLSNearLossless."""
         decoder = get_decoder(JPEGLSNearLossless)
-        arr = decoder.as_array(reference.ds, raw=True, decoding_plugin="pyjpegls")
+        arr, _ = decoder.as_array(reference.ds, raw=True, decoding_plugin="pyjpegls")
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
@@ -52,7 +52,7 @@ class TestPyJpegLSDecoder:
         # The JPEG-LS codestream uses a precision of 8, so it will return
         #   8-bit values, however the decoding process nominally expects 16-bit
         decoder = get_decoder(JPEGLSNearLossless)
-        arr = decoder.as_array(
+        arr, meta = decoder.as_array(
             JLSN_08_01_1_0_1F.ds,
             raw=True,
             decoding_plugin="pyjpegls",
@@ -63,12 +63,14 @@ class TestPyJpegLSDecoder:
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
         assert arr.dtype == np.uint16
         assert arr.flags.writeable
+        assert meta["bits_allocated"] == 16
+        assert meta["bits_stored"] == 8
 
     def test_bits_allocated_mismatch_as_buffer(self):
         """Test the result when bits stored <= 8 and bits allocated 16"""
         decoder = get_decoder(JPEGLSNearLossless)
         ds = JLSN_08_01_1_0_1F.ds
-        buffer = decoder.as_buffer(
+        buffer, meta = decoder.as_buffer(
             ds,
             raw=True,
             decoding_plugin="pyjpegls",
@@ -80,3 +82,6 @@ class TestPyJpegLSDecoder:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
+        # as_buffer() returns container sized to codestream precision
+        assert meta["bits_allocated"] == 8
+        assert meta["bits_stored"] == 8

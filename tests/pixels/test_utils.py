@@ -282,6 +282,23 @@ class TestPixelArray:
         opts = as_pixel_options(ds, **{"extended_offsets": offsets})
         assert opts["extended_offsets"] == offsets
 
+    def test_dataset(self):
+        """Test passing a dataset"""
+        ds = EXPL_16_1_10F.ds
+        arr = pixel_array(ds)
+        EXPL_16_1_10F.test(arr)
+
+    def test_dataset_unknown_tsyntax_raises(self):
+        """Test no transfer syntax raises exception"""
+        ds = dcmread(EXPL_16_1_10F.path)
+        del ds.file_meta.TransferSyntaxUID
+        msg = (
+            r"The dataset's 'file_meta' has no \(0002,0010\) 'Transfer Syntax UID' "
+            "element"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            pixel_array(ds)
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestIterPixels:
@@ -378,6 +395,23 @@ class TestIterPixels:
         pylibjpeg_gen = iter_pixels(RLE_16_1_10F.path, decoding_plugin="pylibjpeg")
         for frame1, frame2 in zip(pydicom_gen, pylibjpeg_gen):
             assert np.array_equal(frame1, frame2)
+
+    def test_dataset(self):
+        """Test passing a dataset"""
+        ds = EXPL_16_1_10F.ds
+        for idx, arr in enumerate(iter_pixels(ds)):
+            EXPL_16_1_10F.test(arr, index=idx)
+
+    def test_dataset_unknown_tsyntax_raises(self):
+        """Test no transfer syntax raises exception"""
+        ds = dcmread(EXPL_16_1_10F.path)
+        del ds.file_meta.TransferSyntaxUID
+        msg = (
+            r"The dataset's 'file_meta' has no \(0002,0010\) 'Transfer Syntax UID' "
+            "element"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            next(iter_pixels(ds))
 
 
 def test_version_check(caplog):
