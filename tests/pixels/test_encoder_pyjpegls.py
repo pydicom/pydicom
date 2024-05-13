@@ -1325,13 +1325,3 @@ class TestJpegLSNearLossless:
                     assert not np.array_equal(out, ref)
 
                 assert np.allclose(out, ref, atol=1)
-
-    def test_dataset_compress(self):
-        """Test that the jls_error kwarg is passed OK."""
-        ds = examples.ct
-        ds.compress(JPEGLSNearLossless, jls_error=3, encoding_plugin="pyjpegls")
-
-        assert ds.file_meta.TransferSyntaxUID == JPEGLSNearLossless
-        frame = get_frame(ds.PixelData, 0)
-        info = _get_jpg_parameters(frame)
-        assert info["lossy_error"] == 3

@@ -493,8 +493,8 @@ class TestDecodeRunner:
         assert runner.get_data(src, 3, 4) == b"\x03\x04\x05"
         assert src.tell() == 2
 
-    def test_image_pixel(self):
-        """Test image_pixel()"""
+    def test_pixel_properties(self):
+        """Test pixel_properties()"""
         runner = DecodeRunner(RLELossless)
         opts = {
             "columns": 9,
@@ -508,7 +508,7 @@ class TestDecodeRunner:
             "bits_stored": 8,
         }
         runner.set_options(**opts)
-        d = runner.image_pixel()
+        d = runner.pixel_properties()
         assert d["columns"] == 9
         assert d["rows"] == 10
         assert d["samples_per_pixel"] == 1
@@ -519,14 +519,14 @@ class TestDecodeRunner:
         assert d["bits_stored"] == 8
         assert "planar_configuration" not in d
 
-        assert "number_of_frames" not in runner.image_pixel(as_frame=True)
+        assert "number_of_frames" not in runner.pixel_properties(as_frame=True)
 
         runner.set_option("pixel_keyword", "FloatPixelData")
-        assert "pixel_representation" not in runner.image_pixel()
+        assert "pixel_representation" not in runner.pixel_properties()
 
         runner.set_option("samples_per_pixel", 3)
         runner.set_option("planar_configuration", 1)
-        assert runner.image_pixel()["planar_configuration"] == 1
+        assert runner.pixel_properties()["planar_configuration"] == 1
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")

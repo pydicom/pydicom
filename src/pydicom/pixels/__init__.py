@@ -12,6 +12,8 @@ from pydicom.pixels.processing import (
 )
 from pydicom.pixels.utils import (
     as_pixel_options,
+    compress,
+    decompress,
     iter_pixels,
     pack_bits,
     pixel_array,

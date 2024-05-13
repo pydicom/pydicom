@@ -4,6 +4,7 @@
 from collections.abc import Iterable, Iterator, ByteString
 import importlib
 import logging
+import math
 from pathlib import Path
 from os import PathLike
 from struct import unpack, Struct
@@ -19,10 +20,15 @@ except ImportError:
 
 from pydicom.charset import default_encoding
 from pydicom._dicom_dict import DicomDictionary
-
+from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.misc import warn_and_log
 from pydicom.tag import BaseTag
-from pydicom.uid import UID
+from pydicom.uid import (
+    UID,
+    JPEGLSNearLossless,
+    JPEG2000,
+)
+from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -172,6 +178,8 @@ def _array_common(
 
 def as_pixel_options(ds: "Dataset", **kwargs: Any) -> dict[str, Any]:
     """Return a dict containing the image pixel element values from `ds`.
+
+    .. versionadded:: 3.0
 
     Parameters
     ----------
@@ -424,10 +432,21 @@ def compress(
 def decompress(
     ds: "Dataset",
     *,
+    as_rgb: bool = True,
     decoding_plugin: str = "",
     **kwargs: Any,
 ) -> "Dataset":
-    """Decompress a dataset with a compressed *Transfer Syntax UID*.
+    """Perform an in-place decompression of a dataset with a compressed *Transfer
+    Syntax UID*.
+
+    .. versionadded:: 3.0
+
+    .. warning::
+
+        This function requires `NumPy <https://numpy.org/>`_ and may require
+        the installation of additional packages to perform the actual pixel
+        data decoding. See the :doc:`pixel data decompression documentation
+        </old/image_data_handlers>` for more information.
 
     * The dataset's *Transfer Syntax UID* will be set to *Explicit
       VR Little Endian*.
@@ -439,16 +458,21 @@ def decompress(
     * The :attr:`DataElement.is_undefined_length
       <pydicom.dataelem.DataElement.is_undefined_length>` attribute for the
       *Pixel Data* element will be set to ``False``.
-    * Any image pixel module elements may be modified as required to match
-      the uncompressed *Pixel Data*.
+    * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
+      modified as required to match the uncompressed *Pixel Data*.
     * The *SOP Instance UID* value will **not** be modified.
 
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
         A dataset containing compressed *Pixel Data* to be decoded and the
-        corresponding *Image Pixel* module elements. The dataset will be
-        modified in-place with the decompressed *Pixel Data*.
+        corresponding *Image Pixel* module elements, along with a
+        :attr:~pydicom.dataset.FileDataset.file_meta` attribute containing a
+        suitable (0002,0010)*Transfer Syntax UID*.
+    as_rgb : bool, optional
+        if ``True`` (default) then convert pixel data with a YCbCr
+        :ref:`photometric interpretation<photometric_interpretation>` such as
+        ``"YBR_FULL_422"`` to RGB.
     decoding_plugin : str, optional
         The name of the decoding plugin to use when decoding compressed
         pixel data. If no `decoding_plugin` is specified (default) then all
@@ -463,7 +487,7 @@ def decompress(
     Returns
     -------
     pydicom.dataset.Dataset
-        The decompressed dataset `ds`.
+        The dataset `ds` decompressed in-place.
     """
     from pydicom.dataset import FileMetaDataset
     from pydicom.pixels import get_decoder
@@ -472,8 +496,8 @@ def decompress(
     tsyntax = file_meta.get("TransferSyntaxUID", "")
     if not tsyntax:
         raise AttributeError(
-            "The dataset's 'file_meta' attribute has no (0002,0010) 'Transfer "
-            "Syntax UID'"
+            "Unable to decompress as the dataset's 'file_meta' attribute has "
+            "no (0002,0010) 'Transfer Syntax UID' element"
         )
 
     uid = UID(tsyntax)
@@ -484,38 +508,37 @@ def decompress(
     if not decoder.is_available:
         missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
         raise RuntimeError(
-            f"Unable to decompress the pixel data as the plugins for the '{uid.name}' "
-            f"decoder are all missing dependencies:\n{missing}"
+            f"Unable to decompress as the plugins for the '{uid.name}' decoder "
+            f"are all missing dependencies:\n{missing}"
         )
 
-    # Disallow selective frame decompression
+    # Disallow decompression of individual frames
     kwargs.pop("index", None)
-    buffer_generator = decoder.iter_buffer(
+    frame_generator = decoder.iter_array(
         ds,
         decoding_plugin=decoding_plugin,
+        as_rgb=as_rgb,
         **kwargs,
     )
-    buffer = []
-    for idx, (b, image_pixel) in enumerate(buffer_generator):
-        # Match *Bits Allocated*
-        buffer.append(
-            _pad_buffer(b, actual=image_pixel["bits_allocated"], target=ds.BitsAllocated)
-        )
+    frames: list[bytes] = []
+    for arr, image_pixel in frame_generator:
+        frames.append(arr.tobytes())
 
-    if len(buffer) % 2:
-        buffer += b"\x00"
-
-    # Check the length of the uncompressed data is less than the maximum
-    #   We decode first because there may be excess frames
-    if len(buffer) >= 2**32 - 1:
+    # Part 5, Section 8.1.1: 32-bit Value Length field
+    value_length = sum(len(frame) for frame in frames)
+    if value_length >= 2**32 - 1:
         raise ValueError(
-            "Unable to create a decompressed dataset as the length of the "
-            "uncompressed *Pixel Data* will be greater than the maximum allowed "
-            "by the DICOM Standard"
+            "Unable to decompress as the length of the uncompressed pixel data "
+            "will be greater than the maximum allowed by the DICOM Standard"
         )
+
+    # Pad with 0x00 if odd length
+    nr_frames = len(frames)
+    if value_length % 2:
+        frames.append(b"\x00")
 
     elem = ds["PixelData"]
-    elem.value = buffer
+    elem.value = b"".join(frame for frame in frames)
     elem.is_undefined_length = False
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
 
@@ -525,19 +548,16 @@ def decompress(
 
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
-    if kwargs.get("use_pdh"):
-        return ds
-
     # Update the image pixel elements
     ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
     if image_pixel["samples_per_pixel"] > 1:
         ds.PlanarConfiguration = image_pixel["planar_configuration"]
 
-    if "NumberOfFrames" in ds or idx > 0:
-        ds.NumberOfFrames = idx + 1
+    if "NumberOfFrames" in ds or nr_frames > 1:
+        ds.NumberOfFrames = nr_frames
 
-    # if "NumberOfFrames" in ds or image_pixel["number_of_frames"] > 1:
-    #     ds.NumberOfFrames = image_pixel["number_of_frames"]
+    ds._pixel_array = None
+    ds._pixel_id = {}
 
     return ds
 
@@ -899,6 +919,8 @@ def iter_pixels(
 ) -> Iterator["np.ndarray"]:
     """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
 
+    .. versionadded:: 3.0
+
     .. warning::
 
         This function requires `NumPy <https://numpy.org/>`_
@@ -1144,41 +1166,6 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     return packed
 
 
-def _pad_buffer(src: bytes | bytearray, actual: int, target: int) -> bytes | bytearray:
-    """Return `src` with each pixel padded out to `target` bits.
-
-    Parameters
-    ----------
-    src : bytes | bytearray
-        A buffer containing little-endian ordered pixel data to be padded.
-    actual : int
-        The actual number of bits used to contain each pixel.
-    actual : int
-        The desired number of bits used to contain each pixel.
-
-    Returns
-    -------
-    bytes | bytearray
-        The padded pixel data.
-    """
-    target_bytes = target // 8
-    actual_bytes = actual // 8
-
-    if actual_bytes == target_bytes:
-        return src
-
-    if actual_bytes > target_bytes:
-        raise ValueError(
-            "Unable to pad the pixel data as the "
-        )
-
-    out = bytearray(len(src) // actual_bytes * target_bytes)
-    for offset in range(actual_bytes):
-        out[offset::target_bytes] = src[offset::actual_bytes]
-
-    return out
-
-
 def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -> bool:
     """Return True if `package_name` is available and its version is greater or
     equal to `minimum_version`
@@ -1203,6 +1190,8 @@ def pixel_array(
     **kwargs: Any,
 ) -> "np.ndarray":
     """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.
+
+    .. versionadded:: 3.0
 
     .. warning::
 

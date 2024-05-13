@@ -1707,34 +1707,6 @@ class TestJ2KEncoding:
         with pytest.raises(RuntimeError, match=msg):
             JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
 
-    def test_dataset_compress(self):
-        """Test that the j2k_cr and j2k_psnr kwargs are passed OK."""
-        ds = examples.ct
-        ref = ds.pixel_array
-        ds.compress(JPEG2000, j2k_cr=[2], encoding_plugin="pylibjpeg")
-        assert ds.file_meta.TransferSyntaxUID == JPEG2000
-        opts = as_pixel_options(ds)
-        out, _ = JPEG2000Decoder.as_array(
-            ds.PixelData,
-            decoding_plugin="pylibjpeg",
-            **opts,
-        )
-        assert not np.array_equal(out, ref)
-        assert np.allclose(out, ref, atol=2)
-
-        ds = examples.ct
-        ref = ds.pixel_array
-        ds.compress(JPEG2000, j2k_psnr=[100], encoding_plugin="pylibjpeg")
-        assert ds.file_meta.TransferSyntaxUID == JPEG2000
-        opts = as_pixel_options(ds)
-        out, _ = JPEG2000Decoder.as_array(
-            ds.PixelData,
-            decoding_plugin="pylibjpeg",
-            **opts,
-        )
-        assert not np.array_equal(out, ref)
-        assert np.allclose(out, ref, atol=3)
-
 
 def test_is_available_unknown_uid():
     """Test is_available() with an unsupported UID."""

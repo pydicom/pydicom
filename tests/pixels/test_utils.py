@@ -34,18 +34,29 @@ from pydicom.pixels.utils import (
     pack_bits,
     unpack_bits,
     expand_ybr422,
+    compress,
+    decompress,
 )
 from pydicom.uid import (
     EnhancedMRImageStorage,
     ExplicitVRLittleEndian,
     ExplicitVRBigEndian,
     UncompressedTransferSyntaxes,
+    RLELossless,
+    JPEG2000Lossless,
+    JPEG2000,
+    JPEG2000MC,
+    JPEGLSNearLossless,
+    JPEGLSLossless,
 )
 
 from .pixels_reference import (
     PIXEL_REFERENCE,
+    RLE_16_1_1F,
     RLE_16_1_10F,
     EXPL_16_1_10F,
+    EXPL_16_16_1F,
+    EXPL_8_3_1F_ODD,
     EXPL_8_3_1F_YBR422,
     IMPL_16_1_1F,
     JPGB_08_08_3_0_1F_RGB_NO_APP14,
@@ -62,8 +73,12 @@ from ..test_helpers import assert_no_warning
 
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_RLE = bool(importlib.util.find_spec("rle"))
+HAVE_JLS = bool(importlib.util.find_spec("jpeg_ls"))
+HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
 
 SKIP_RLE = not (HAVE_NP and HAVE_PYLJ and HAVE_RLE)
+SKIP_JLS = not (HAVE_NP and HAVE_JLS)
+SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
@@ -1349,3 +1364,188 @@ class TestExpandYBR422:
         arr = arr.reshape(100, 100, 3)
         assert (19532, 21845, 65535) == tuple(arr[5, 50, :])
         assert (42662, 27242, 49601) == tuple(arr[15, 50, :])
+
+
+class TestCompressRLE:
+    """Tests for compress() with RLE Lossless"""
+
+    def test_compress(self):
+        """Test compressing a dataset."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OW"
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21370
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+    def test_no_file_meta(self):
+        """Test compressing a dataset."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert ds["PixelData"].VR == "OW"
+        del ds.file_meta
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21370
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_compress_arr(self):
+        """Test compressing using pixel data from an arr."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert hasattr(ds, "file_meta")
+        arr = ds.pixel_array
+        del ds.PixelData
+        del ds.file_meta
+
+        compress(ds, RLELossless, arr, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21370
+
+        assert ds._pixel_array is arr
+        assert ds._pixel_id != {}
+
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
+    def test_encoder_unavailable(self, monkeypatch):
+        """Test the required encoder being unavailable."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        monkeypatch.delitem(RLELosslessEncoder._available, "pydicom")
+        msg = (
+            r"The pixel data encoder for 'RLE Lossless' is unavailable because "
+            r"its plugins are all missing dependencies:\n"
+            r"    gdcm - requires gdcm>=3.0.10\n"
+            r"    pylibjpeg - requires numpy, pylibjpeg>=2.0 and pylibjpeg-rle>=2.0"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            compress(ds, RLELossless)
+
+    def test_uid_not_supported(self):
+        """Test the UID not having any encoders."""
+        ds = dcmread(EXPL_16_16_1F.path)
+
+        msg = (
+            r"No pixel data encoders have been implemented for "
+            r"'JPEG 2000 Part 2 Multi-component Image Compression'"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            compress(ds, JPEG2000MC, encoding_plugin="pydicom")
+
+    def test_encapsulate_extended(self):
+        """Test forcing extended encapsulation."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert "ExtendedOffsetTable" not in ds
+        assert "ExtendedOffsetTableLengths" not in ds
+
+        compress(ds, RLELossless, encapsulate_ext=True, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21366
+        assert ds.ExtendedOffsetTable == b"\x00" * 8
+        assert ds.ExtendedOffsetTableLengths == b"\x66\x53" + b"\x00" * 6
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_round_trip(self):
+        """Test an encoding round-trip"""
+        ds = dcmread(RLE_16_1_1F.path)
+        arr = ds.pixel_array
+        # Setting PixelData to None frees the memory which may
+        #   sometimes be reused, causes the _pixel_id check to fail
+        ds.PixelData = None
+        ds._pixel_array = None
+        compress(ds, RLELossless, arr, encoding_plugin="pydicom")
+        assert ds.PixelData is not None
+        assert np.array_equal(arr, ds.pixel_array)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_cant_override_kwargs(self):
+        """Test we can't override using kwargs."""
+        ds = dcmread(EXPL_8_3_1F_ODD.path)
+        ref = ds.pixel_array
+        assert ds.SamplesPerPixel == 3
+        compress(
+            ds,
+            RLELossless,
+            encoding_plugin="pydicom",
+            samples_per_pixel=1,
+        )
+
+        assert np.array_equal(ref, ds.pixel_array)
+
+
+@pytest.mark.skipif(SKIP_JLS, reason="JPEG-LS plugins unavailable")
+class TestCompressJLS:
+    """Tests for compress() with JPEG-LS"""
+
+    def test_lossless(self):
+        """Test JPEG-LS Lossless."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEGLSLossless, encoding_plugin="pyjpegls")
+
+        assert ds.file_meta.TransferSyntaxUID == JPEGLSLossless
+        frame = get_frame(ds.PixelData, 0)
+        info = _get_jpg_parameters(frame)
+        assert info["lossy_error"] == 0
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    def test_lossy(self):
+        """Test JPEG-LS Near Lossless and the jls_error kwarg."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEGLSNearLossless, jls_error=3, encoding_plugin="pyjpegls")
+
+        assert ds.file_meta.TransferSyntaxUID == JPEGLSNearLossless
+        frame = get_frame(ds.PixelData, 0)
+        info = _get_jpg_parameters(frame)
+        assert info["lossy_error"] == 3
+
+        assert np.allclose(ds.pixel_array, ref, atol=3)
+
+
+@pytest.mark.skipif(SKIP_J2K, reason="JPEG 2000 plugins unavailable")
+class TestCompressJ2K:
+    """Tests for compress() with JPEG 2000"""
+
+    def test_lossless(self):
+        """Test JPEG 2000 Lossless."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEG2000Lossless, encoding_plugin="pylibjpeg")
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000Lossless
+        assert np.array_equal(ds.pixel_array, ref)
+
+    def test_lossy(self):
+        """Test JPEG 2000 and the j2k_cr and j2k_psnr kwargs."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEG2000, j2k_cr=[2], encoding_plugin="pylibjpeg")
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000
+        out = ds.pixel_array
+        assert not np.array_equal(out, ref)
+        assert np.allclose(out, ref, atol=2)
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEG2000, j2k_psnr=[100], encoding_plugin="pylibjpeg")
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000
+        out = ds.pixel_array
+        assert not np.array_equal(out, ref)
+        assert np.allclose(out, ref, atol=3)
+
+
+class TestDecompress:
+    pass
