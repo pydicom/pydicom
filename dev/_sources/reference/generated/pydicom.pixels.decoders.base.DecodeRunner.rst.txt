@@ -20,6 +20,7 @@
       ~DecodeRunner.get_data
       ~DecodeRunner.get_option
       ~DecodeRunner.iter_decode
+      ~DecodeRunner.pixel_properties
       ~DecodeRunner.process
       ~DecodeRunner.reshape
       ~DecodeRunner.set_decoders
