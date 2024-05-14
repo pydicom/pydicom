@@ -1612,7 +1612,7 @@ class TestDecompress:
         with pytest.raises(ValueError, match=msg):
             decompress(ds)
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is available")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
     def test_too_long_raises(self, add_dummy_decoder):
         """Test too much uncompressed data raises"""
         ds = dcmread(RLE_8_3_1F.path)
@@ -1717,6 +1717,28 @@ class TestDecompress:
         assert ds._pixel_id == {}
 
         assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_odd_length_padded(self):
+        """Test odd length Pixel Data gets padded to even length."""
+        ds = dcmread(EXPL_8_3_1F_ODD.path)
+        assert ds.Rows * ds.Columns * ds.SamplesPerPixel % 2 == 1
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        decompress(ds, decoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert len(ds.PixelData) %2 == 0
+
+    @pytest.mark.skipif(not SKIP_J2K, reason="J2K plugin available")
+    def test_no_decoders_raises(self):
+        """Test exception raised if no decoders are available."""
+        ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT.path)
+        msg = (
+            "Unable to decompress as the plugins for the 'JPEG 2000 Image "
+            r"Compression \(Lossless Only\)' decoder are all missing dependencies:"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decompress(ds, decoding_plugin="pylibjpeg")
 
     @pytest.mark.skipif(SKIP_J2K, reason="J2K plugins unavailable")
     def test_j2k_ybr_rct(self):
