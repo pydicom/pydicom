@@ -182,6 +182,8 @@ Enhancements
 * Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
   from a path to a dataset while minimizing memory-usage: :func:`~pydicom.pixels.pixel_array`
   and :func:`~pydicom.pixels.iter_pixels`.
+* Added two functions for compressing and decompressing datasets using the new
+  decoding backend: :func:`~pydicom.pixels.compress` and :func:`~pydicom.pixels.decompress`.
 * Added support for the following transfer syntaxes to :meth:`Dataset.compress()
   <pydicom.dataset.Dataset.compress>` (:issue:`1997`):
 

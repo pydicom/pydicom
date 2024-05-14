@@ -4,7 +4,6 @@
 from collections.abc import Iterable, Iterator, ByteString
 import importlib
 import logging
-import math
 from pathlib import Path
 from os import PathLike
 from struct import unpack, Struct
@@ -27,6 +26,7 @@ from pydicom.uid import (
     UID,
     JPEGLSNearLossless,
     JPEG2000,
+    ExplicitVRLittleEndian,
 )
 from pydicom.valuerep import VR
 
@@ -413,9 +413,10 @@ def compress(
         ds.PixelData = encapsulate(encoded)
 
     # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
-    ds["PixelData"].is_undefined_length = True
+    elem = ds["PixelData"]
+    elem.is_undefined_length = True
     # PS3.5 Section 8.2 and Annex A.4 - encapsulated pixel data uses OB
-    ds["PixelData"].VR = VR.OB
+    elem.VR = VR.OB
 
     ds._pixel_array = None if arr is None else arr
     ds._pixel_id = {} if arr is None else get_image_pixel_ids(ds)
@@ -489,20 +490,24 @@ def decompress(
     pydicom.dataset.Dataset
         The dataset `ds` decompressed in-place.
     """
-    from pydicom.dataset import FileMetaDataset
     from pydicom.pixels import get_decoder
+
+    if "PixelData" not in ds:
+        raise AttributeError(
+            "Unable to decompress as the dataset has no (7FE0,0010) 'Pixel Data' element"
+        )
 
     file_meta = ds.get("file_meta", {})
     tsyntax = file_meta.get("TransferSyntaxUID", "")
     if not tsyntax:
         raise AttributeError(
-            "Unable to decompress as the dataset's 'file_meta' attribute has "
-            "no (0002,0010) 'Transfer Syntax UID' element"
+            "Unable to decompress as there's no (0002,0010) 'Transfer Syntax UID' "
+            f"element in '{type(ds).__name__}.file_meta'"
         )
 
     uid = UID(tsyntax)
     if not uid.is_compressed:
-        raise ValueError("The dataset already uses an uncompressed transfer syntax")
+        raise ValueError("The dataset is already uncompressed")
 
     decoder = get_decoder(uid)
     if not decoder.is_available:
@@ -543,15 +548,12 @@ def decompress(
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
 
     # Update the transfer syntax
-    if not hasattr(ds, "file_meta"):
-        ds.file_meta = FileMetaDataset()
-
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
     # Update the image pixel elements
     ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
-    if image_pixel["samples_per_pixel"] > 1:
-        ds.PlanarConfiguration = image_pixel["planar_configuration"]
+    if cast(int, image_pixel["samples_per_pixel"]) > 1:
+        ds.PlanarConfiguration = cast(int, image_pixel["planar_configuration"])
 
     if "NumberOfFrames" in ds or nr_frames > 1:
         ds.NumberOfFrames = nr_frames
