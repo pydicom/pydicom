@@ -327,7 +327,7 @@ def compress(
         The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
         contents of the array should match the dataset.
     encoding_plugin : str, optional
-        Use the `encoding_plugin` to compress the pixel data. See the
+        Use `encoding_plugin` to compress the pixel data. See the
         :doc:`user guide </old/image_data_compression>` for a list of
         plugins available for each UID and their dependencies. If not
         specified then all available plugins will be tried (default).
@@ -468,8 +468,8 @@ def decompress(
     ds : pydicom.dataset.Dataset
         A dataset containing compressed *Pixel Data* to be decoded and the
         corresponding *Image Pixel* module elements, along with a
-        :attr:~pydicom.dataset.FileDataset.file_meta` attribute containing a
-        suitable (0002,0010)*Transfer Syntax UID*.
+        :attr:`~pydicom.dataset.FileDataset.file_meta` attribute containing a
+        suitable (0002,0010) *Transfer Syntax UID*.
     as_rgb : bool, optional
         if ``True`` (default) then convert pixel data with a YCbCr
         :ref:`photometric interpretation<photometric_interpretation>` such as
@@ -483,7 +483,7 @@ def decompress(
     kwargs : dict[str, Any], optional
         Optional keyword parameters for the decoding plugin may also be
         present. See the :doc:`decoding plugins options
-        </guides/encoding/decoder_options>` for more information.
+        </guides/decoding/decoder_options>` for more information.
 
     Returns
     -------
