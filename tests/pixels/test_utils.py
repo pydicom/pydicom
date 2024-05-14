@@ -1435,7 +1435,7 @@ class TestCompressRLE:
         monkeypatch.delitem(RLELosslessEncoder._available, "pydicom")
         msg = (
             r"The pixel data encoder for 'RLE Lossless' is unavailable because "
-            r"its plugins are all missing dependencies:\n"
+            r"all of its plugins are missing dependencies:\n"
             r"    gdcm - requires gdcm>=3.0.10\n"
             r"    pylibjpeg - requires numpy, pylibjpeg>=2.0 and pylibjpeg-rle>=2.0"
         )
