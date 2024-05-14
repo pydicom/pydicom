@@ -14,8 +14,8 @@ The following applies to the functions and class methods that use the
 * :func:`~pydicom.pixels.decompress`
 * :meth:`Decoder.as_array()<pydicom.pixels.Decoder.as_array>`
 * :meth:`Decoder.as_buffer()<pydicom.pixels.Decoder.as_buffer>`
-* :meth:`Decoder.iter_array()`
-* :meth:`Decoder.iter_buffer()`
+* :meth:`Decoder.iter_array()<pydicom.pixels.Decoder.iter_array>`
+* :meth:`Decoder.iter_buffer()<pydicom.pixels.Decoder.iter_array>`
 
 *Image Pixel* Options
 =====================
@@ -73,8 +73,8 @@ processing applied after decoding using:
 * :func:`~pydicom.pixels.pixel_array`
 * :func:`~pydicom.pixels.iter_pixels`
 * :func:`~pydicom.pixels.decompress`
-* :meth:`Decoder.as_array`
-* :meth:`Decoder.iter_array`
+* :meth:`Decoder.as_array()<pydicom.pixels.Decoder.as_array>`
+* :meth:`Decoder.iter_array()<pydicom.pixels.Decoder.iter_array>`
 
 * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel data with a
   YCbCr :ref:`photometric interpretation<photometric_interpretation>`

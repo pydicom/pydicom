@@ -26,6 +26,8 @@ Utility functions
    :toctree: generated/
 
    as_pixel_options
+   compress
+   decompress
    get_decoder
    get_encoder
    iter_pixels
