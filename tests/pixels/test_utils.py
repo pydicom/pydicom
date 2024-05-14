@@ -1727,7 +1727,7 @@ class TestDecompress:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         decompress(ds, decoding_plugin="pydicom")
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
-        assert len(ds.PixelData) %2 == 0
+        assert len(ds.PixelData) % 2 == 0
 
     @pytest.mark.skipif(not SKIP_J2K, reason="J2K plugin available")
     def test_no_decoders_raises(self):
