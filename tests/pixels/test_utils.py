@@ -1493,6 +1493,21 @@ class TestCompressRLE:
 
         assert np.array_equal(ref, ds.pixel_array)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_instance_uid(self):
+        """Test generating new SOP Instance UID."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        original = ds.SOPInstanceUID
+
+        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=True)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
 
 @pytest.mark.skipif(SKIP_JLS, reason="JPEG-LS plugins unavailable")
 class TestCompressJLS:
@@ -1792,3 +1807,18 @@ class TestDecompress:
         decompress(ds, decoding_plugin="pylibjpeg", as_rgb=False)
         assert ds.PhotometricInterpretation == "YBR_FULL"
         assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_instance_uid(self):
+        """Test generating new SOP Instance UID."""
+        ds = dcmread(RLE_8_3_1F.path)
+        original = ds.SOPInstanceUID
+
+        decompress(ds, decoding_plugin="pydicom", new_instance_uid=True)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(RLE_8_3_1F.path)
+        decompress(ds, decoding_plugin="pydicom", new_instance_uid=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID

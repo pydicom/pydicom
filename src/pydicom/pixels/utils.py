@@ -27,6 +27,7 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000,
     ExplicitVRLittleEndian,
+    generate_uid,
 )
 from pydicom.valuerep import VR
 
@@ -238,6 +239,7 @@ def compress(
     *,
     encoding_plugin: str = "",
     encapsulate_ext: bool = False,
+    new_instance_uid: bool = True,
     jls_error: int | None = None,
     j2k_cr: list[float] | None = None,
     j2k_psnr: list[float] | None = None,
@@ -280,6 +282,9 @@ def compress(
 
     * (7FE0,0001) *Extended Offset Table*
     * (7FE0,0002) *Extended Offset Table Lengths*
+
+    If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+    Instance UID* value will be generated.
 
     **Supported Transfer Syntax UIDs**
 
@@ -336,6 +341,10 @@ def compress(
         If ``False`` (default) then an extended offset table
         will be added if needed for large amounts of compressed *Pixel
         Data*, otherwise just the basic offset table will be used.
+    new_instance_uid : bool, optional
+        If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+        value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+        keep the original value.
     jls_error : int, optional
         **JPEG-LS Near Lossless only**. The allowed absolute compression error
         in the pixel values.
@@ -371,8 +380,8 @@ def compress(
     if not encoder.is_available:
         missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
         raise RuntimeError(
-            f"The pixel data encoder for '{uid.name}' is unavailable because its "
-            f"plugins are all missing dependencies:\n{missing}"
+            f"The pixel data encoder for '{uid.name}' is unavailable because all "
+            f"of its plugins are missing dependencies:\n{missing}"
         )
 
     if uid == JPEGLSNearLossless and jls_error is not None:
@@ -427,6 +436,11 @@ def compress(
 
     ds.file_meta.TransferSyntaxUID = uid
 
+    if new_instance_uid:
+        instance_uid = generate_uid()
+        ds.SOPInstanceUID = instance_uid
+        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
+
     return ds
 
 
@@ -434,6 +448,7 @@ def decompress(
     ds: "Dataset",
     *,
     as_rgb: bool = True,
+    new_instance_uid: bool = True,
     decoding_plugin: str = "",
     **kwargs: Any,
 ) -> "Dataset":
@@ -461,7 +476,8 @@ def decompress(
       *Pixel Data* element will be set to ``False``.
     * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
       modified as required to match the uncompressed *Pixel Data*.
-    * The *SOP Instance UID* value will **not** be modified.
+    * If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+      Instance UID* value will be generated.
 
     Parameters
     ----------
@@ -474,6 +490,10 @@ def decompress(
         if ``True`` (default) then convert pixel data with a YCbCr
         :ref:`photometric interpretation<photometric_interpretation>` such as
         ``"YBR_FULL_422"`` to RGB.
+    new_instance_uid : bool, optional
+        If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+        value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+        keep the original value.
     decoding_plugin : str, optional
         The name of the decoding plugin to use when decoding compressed
         pixel data. If no `decoding_plugin` is specified (default) then all
@@ -549,6 +569,11 @@ def decompress(
 
     # Update the transfer syntax
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    if new_instance_uid:
+        instance_uid = generate_uid()
+        ds.SOPInstanceUID = instance_uid
+        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
 
     # Update the image pixel elements
     ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
