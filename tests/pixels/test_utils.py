@@ -1612,6 +1612,7 @@ class TestDecompress:
         with pytest.raises(ValueError, match=msg):
             decompress(ds)
 
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_too_long_raises(self, add_dummy_decoder):
         """Test too much uncompressed data raises"""
         ds = dcmread(RLE_8_3_1F.path)
