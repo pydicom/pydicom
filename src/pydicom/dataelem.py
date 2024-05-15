@@ -227,7 +227,7 @@ class DataElement:
         else:
             self.value = value  # calls property setter which will convert
         self.file_tell = file_value_tell
-        self.is_undefined_length = is_undefined_length
+        self.is_undefined_length: bool = is_undefined_length
         self.private_creator: str | None = None
 
     def validate(self, value: Any) -> None:

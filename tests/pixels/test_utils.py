@@ -22,6 +22,8 @@ from pydicom import dcmread, config
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.encaps import get_frame
 from pydicom.pixels import pixel_array, iter_pixels, convert_color_space
+from pydicom.pixels.decoders.base import _PIXEL_DATA_DECODERS
+from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.utils import (
     as_pixel_options,
     _passes_version_check,
@@ -34,27 +36,43 @@ from pydicom.pixels.utils import (
     pack_bits,
     unpack_bits,
     expand_ybr422,
+    compress,
+    decompress,
 )
 from pydicom.uid import (
     EnhancedMRImageStorage,
     ExplicitVRLittleEndian,
     ExplicitVRBigEndian,
     UncompressedTransferSyntaxes,
+    RLELossless,
+    JPEG2000Lossless,
+    JPEG2000,
+    JPEG2000MC,
+    JPEGLSNearLossless,
+    JPEGLSLossless,
+    UID,
 )
 
 from .pixels_reference import (
     PIXEL_REFERENCE,
+    RLE_8_3_1F,
+    RLE_16_1_1F,
     RLE_16_1_10F,
+    RLE_32_3_2F,
     EXPL_16_1_10F,
+    EXPL_16_16_1F,
+    EXPL_8_3_1F_ODD,
     EXPL_8_3_1F_YBR422,
     IMPL_16_1_1F,
     JPGB_08_08_3_0_1F_RGB_NO_APP14,
     JPGB_08_08_3_0_1F_RGB_APP14,
     JPGB_08_08_3_0_1F_RGB,
+    JPGB_08_08_3_1F_YBR_FULL,
     JLSL_08_08_3_0_1F_ILV0,
     JLSL_08_08_3_0_1F_ILV1,
     JLSL_08_08_3_0_1F_ILV2,
     JLSN_08_01_1_0_1F,
+    J2KR_08_08_3_0_1F_YBR_RCT,
     EXPL_1_1_3F,
 )
 from ..test_helpers import assert_no_warning
@@ -62,8 +80,14 @@ from ..test_helpers import assert_no_warning
 
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_RLE = bool(importlib.util.find_spec("rle"))
+HAVE_JLS = bool(importlib.util.find_spec("jpeg_ls"))
+HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
+HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
 
 SKIP_RLE = not (HAVE_NP and HAVE_PYLJ and HAVE_RLE)
+SKIP_JPG = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
+SKIP_JLS = not (HAVE_NP and HAVE_JLS)
+SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
@@ -1349,3 +1373,452 @@ class TestExpandYBR422:
         arr = arr.reshape(100, 100, 3)
         assert (19532, 21845, 65535) == tuple(arr[5, 50, :])
         assert (42662, 27242, 49601) == tuple(arr[15, 50, :])
+
+
+class TestCompressRLE:
+    """Tests for compress() with RLE Lossless"""
+
+    def test_compress(self):
+        """Test compressing a dataset."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OW"
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21370
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+    def test_no_file_meta(self):
+        """Test compressing a dataset."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert ds["PixelData"].VR == "OW"
+        del ds.file_meta
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21370
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_compress_arr(self):
+        """Test compressing using pixel data from an arr."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert hasattr(ds, "file_meta")
+        arr = ds.pixel_array
+        del ds.PixelData
+        del ds.file_meta
+
+        compress(ds, RLELossless, arr, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21370
+
+        assert ds._pixel_array is arr
+        assert ds._pixel_id != {}
+
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
+    def test_encoder_unavailable(self, monkeypatch):
+        """Test the required encoder being unavailable."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        monkeypatch.delitem(RLELosslessEncoder._available, "pydicom")
+        msg = (
+            r"The pixel data encoder for 'RLE Lossless' is unavailable because "
+            r"all of its plugins are missing dependencies:\n"
+            r"    gdcm - requires gdcm>=3.0.10\n"
+            r"    pylibjpeg - requires numpy, pylibjpeg>=2.0 and pylibjpeg-rle>=2.0"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            compress(ds, RLELossless)
+
+    def test_uid_not_supported(self):
+        """Test the UID not having any encoders."""
+        ds = dcmread(EXPL_16_16_1F.path)
+
+        msg = (
+            r"No pixel data encoders have been implemented for "
+            r"'JPEG 2000 Part 2 Multi-component Image Compression'"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            compress(ds, JPEG2000MC, encoding_plugin="pydicom")
+
+    def test_encapsulate_extended(self):
+        """Test forcing extended encapsulation."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert "ExtendedOffsetTable" not in ds
+        assert "ExtendedOffsetTableLengths" not in ds
+
+        compress(ds, RLELossless, encapsulate_ext=True, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21366
+        assert ds.ExtendedOffsetTable == b"\x00" * 8
+        assert ds.ExtendedOffsetTableLengths == b"\x66\x53" + b"\x00" * 6
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_round_trip(self):
+        """Test an encoding round-trip"""
+        ds = dcmread(RLE_16_1_1F.path)
+        arr = ds.pixel_array
+        # Setting PixelData to None frees the memory which may
+        #   sometimes be reused, causes the _pixel_id check to fail
+        ds.PixelData = None
+        ds._pixel_array = None
+        compress(ds, RLELossless, arr, encoding_plugin="pydicom")
+        assert ds.PixelData is not None
+        assert np.array_equal(arr, ds.pixel_array)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_cant_override_kwargs(self):
+        """Test we can't override using kwargs."""
+        ds = dcmread(EXPL_8_3_1F_ODD.path)
+        ref = ds.pixel_array
+        assert ds.SamplesPerPixel == 3
+        compress(
+            ds,
+            RLELossless,
+            encoding_plugin="pydicom",
+            samples_per_pixel=1,
+        )
+
+        assert np.array_equal(ref, ds.pixel_array)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_instance_uid(self):
+        """Test generating new SOP Instance UID."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        original = ds.SOPInstanceUID
+
+        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=True)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+
+@pytest.mark.skipif(SKIP_JLS, reason="JPEG-LS plugins unavailable")
+class TestCompressJLS:
+    """Tests for compress() with JPEG-LS"""
+
+    def test_lossless(self):
+        """Test JPEG-LS Lossless."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEGLSLossless, encoding_plugin="pyjpegls")
+
+        assert ds.file_meta.TransferSyntaxUID == JPEGLSLossless
+        frame = get_frame(ds.PixelData, 0)
+        info = _get_jpg_parameters(frame)
+        assert info["lossy_error"] == 0
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    def test_lossy(self):
+        """Test JPEG-LS Near Lossless and the jls_error kwarg."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEGLSNearLossless, jls_error=3, encoding_plugin="pyjpegls")
+
+        assert ds.file_meta.TransferSyntaxUID == JPEGLSNearLossless
+        frame = get_frame(ds.PixelData, 0)
+        info = _get_jpg_parameters(frame)
+        assert info["lossy_error"] == 3
+
+        assert np.allclose(ds.pixel_array, ref, atol=3)
+
+
+@pytest.mark.skipif(SKIP_J2K, reason="JPEG 2000 plugins unavailable")
+class TestCompressJ2K:
+    """Tests for compress() with JPEG 2000"""
+
+    def test_lossless(self):
+        """Test JPEG 2000 Lossless."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEG2000Lossless, encoding_plugin="pylibjpeg")
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000Lossless
+        assert np.array_equal(ds.pixel_array, ref)
+
+    def test_lossy(self):
+        """Test JPEG 2000 and the j2k_cr and j2k_psnr kwargs."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEG2000, j2k_cr=[2], encoding_plugin="pylibjpeg")
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000
+        out = ds.pixel_array
+        assert not np.array_equal(out, ref)
+        assert np.allclose(out, ref, atol=2)
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(ds, JPEG2000, j2k_psnr=[100], encoding_plugin="pylibjpeg")
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000
+        out = ds.pixel_array
+        assert not np.array_equal(out, ref)
+        assert np.allclose(out, ref, atol=3)
+
+
+@pytest.fixture()
+def add_dummy_decoder():
+    """Add a dummy decoder to the pixel data decoders"""
+
+    class DummyDecoder:
+        is_available = True
+
+        def iter_array(self, ds, **kwargs):
+            # Yield a total of 2**32 bytes
+            arr = np.frombuffer(b"\x00" * 2**20, dtype="u1")
+            for _ in range(2**12):
+                yield arr, {}
+
+    _PIXEL_DATA_DECODERS["1.2.3.4"] = [DummyDecoder()]
+    yield
+    del _PIXEL_DATA_DECODERS["1.2.3.4"]
+
+
+class TestDecompress:
+    """Tests for decompress()"""
+
+    def test_no_file_meta_raises(self):
+        """Test exception raised if no file meta or transfer syntax."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        del ds.file_meta.TransferSyntaxUID
+
+        msg = (
+            r"Unable to decompress as there's no \(0002,0010\) 'Transfer Syntax UID' "
+            "element in 'FileDataset.file_meta'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            decompress(ds)
+
+        del ds.file_meta
+        with pytest.raises(AttributeError, match=msg):
+            decompress(ds)
+
+    def test_no_pixel_data_raises(self):
+        """Test exception raised if no pixel data."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        del ds.PixelData
+
+        msg = (
+            r"Unable to decompress as the dataset has no \(7FE0,0010\) 'Pixel "
+            "Data' element"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            decompress(ds)
+
+    def test_uncompressed_raises(self):
+        """Test exception raised if already uncompressed."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        msg = "The dataset is already uncompressed"
+        with pytest.raises(ValueError, match=msg):
+            decompress(ds)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    def test_too_long_raises(self, add_dummy_decoder):
+        """Test too much uncompressed data raises"""
+        ds = dcmread(RLE_8_3_1F.path)
+        uid = UID("1.2.3.4")
+        uid.set_private_encoding(False, True)
+        ds.file_meta.TransferSyntaxUID = uid
+
+        msg = (
+            "Unable to decompress as the length of the uncompressed pixel data "
+            "will be greater than the maximum allowed by the DICOM Standard"
+        )
+        with pytest.raises(ValueError, match=msg):
+            decompress(ds)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_rle_8_1f_3s(self):
+        """Test decoding RLE Lossless - 1 frame, 3 sample (RGB)"""
+        ds = dcmread(RLE_8_3_1F.path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 8
+        assert ds.PhotometricInterpretation == "RGB"
+        decompress(ds, decoding_plugin="pydicom")
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert len(elem.value) == ds.Rows * ds.Columns * (ds.BitsAllocated // 8) * 3
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert "NumberOfFrames" not in ds
+        assert ds.PlanarConfiguration == 0
+        assert ds.PhotometricInterpretation == "RGB"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_rle_16_1f_1s(self):
+        """Test decoding RLE Lossless - 1 frame, 1 sample"""
+        ds = dcmread(RLE_16_1_1F.path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 16
+        decompress(ds, decoding_plugin="pydicom")
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert len(elem.value) == ds.Rows * ds.Columns * (ds.BitsAllocated // 8)
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OW"
+        assert "NumberOfFrames" not in ds
+        assert "PlanarConfiguration" not in ds
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_rle_16_10f_1s(self):
+        """Test decoding RLE Lossless - 10 frame, 1 sample"""
+        ds = dcmread(RLE_16_1_10F.path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 16
+        assert ds.NumberOfFrames == 10
+        # `index` should be ignored
+        decompress(ds, decoding_plugin="pydicom", index=1)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert len(elem.value) == (
+            ds.Rows * ds.Columns * (ds.BitsAllocated // 8) * ds.NumberOfFrames
+        )
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OW"
+        assert "PlanarConfiguration" not in ds
+        assert ds.NumberOfFrames == 10
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_rle_32_2f_3s(self):
+        """Test decoding RLE Lossless - 2 frame, 3 sample (RGB)"""
+        ds = dcmread(RLE_32_3_2F.path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 32
+        assert ds.NumberOfFrames == 2
+        assert ds.PhotometricInterpretation == "RGB"
+        decompress(ds, decoding_plugin="pydicom")
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert len(elem.value) == (
+            ds.Rows * ds.Columns * (ds.BitsAllocated // 8) * ds.NumberOfFrames * 3
+        )
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OW"
+        assert ds.PlanarConfiguration == 0
+        assert ds.PhotometricInterpretation == "RGB"
+        assert ds.NumberOfFrames == 2
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_odd_length_padded(self):
+        """Test odd length Pixel Data gets padded to even length."""
+        ds = dcmread(EXPL_8_3_1F_ODD.path)
+        assert ds.Rows * ds.Columns * ds.SamplesPerPixel % 2 == 1
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        decompress(ds, decoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert len(ds.PixelData) % 2 == 0
+
+    @pytest.mark.skipif(not SKIP_J2K, reason="J2K plugin available")
+    def test_no_decoders_raises(self):
+        """Test exception raised if no decoders are available."""
+        ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT.path)
+        msg = (
+            "Unable to decompress as the plugins for the 'JPEG 2000 Image "
+            r"Compression \(Lossless Only\)' decoder are all missing dependencies:"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decompress(ds, decoding_plugin="pylibjpeg")
+
+    @pytest.mark.skipif(SKIP_J2K, reason="J2K plugins unavailable")
+    def test_j2k_ybr_rct(self):
+        """Test decoding J2K YBR_RCT -> RGB"""
+        ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT.path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 8
+        assert ds.PhotometricInterpretation == "YBR_RCT"
+        # as_rgb will be ignored if YBR_RCT or YBR_ICT
+        decompress(ds, decoding_plugin="pylibjpeg", as_rgb=False)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert len(elem.value) == ds.Rows * ds.Columns * (ds.BitsAllocated // 8) * 3
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert "NumberOfFrames" not in ds
+        assert ds.PlanarConfiguration == 0
+        assert ds.PhotometricInterpretation == "RGB"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_JPG, reason="JPEG plugins unavailable")
+    def test_as_rgb(self):
+        """Test decoding J2K - 1 frame, 3 sample (YBR_RCT)"""
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        ds.convert_pixel_data("pylibjpeg")
+        ref = ds.pixel_array
+
+        assert ds.BitsAllocated == 8
+        assert ds.PhotometricInterpretation == "YBR_FULL"
+        decompress(ds, decoding_plugin="pylibjpeg", as_rgb=True)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert len(elem.value) == ds.Rows * ds.Columns * (ds.BitsAllocated // 8) * 3
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert "NumberOfFrames" not in ds
+        assert ds.PlanarConfiguration == 0
+        assert ds.PhotometricInterpretation == "RGB"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+        assert np.array_equal(
+            ds.pixel_array, convert_color_space(ref, "YBR_FULL", "RGB")
+        )
+
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        decompress(ds, decoding_plugin="pylibjpeg", as_rgb=False)
+        assert ds.PhotometricInterpretation == "YBR_FULL"
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
+    def test_instance_uid(self):
+        """Test generating new SOP Instance UID."""
+        ds = dcmread(RLE_8_3_1F.path)
+        original = ds.SOPInstanceUID
+
+        decompress(ds, decoding_plugin="pydicom", new_instance_uid=True)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(RLE_8_3_1F.path)
+        decompress(ds, decoding_plugin="pydicom", new_instance_uid=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID

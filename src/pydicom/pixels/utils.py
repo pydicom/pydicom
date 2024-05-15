@@ -19,10 +19,17 @@ except ImportError:
 
 from pydicom.charset import default_encoding
 from pydicom._dicom_dict import DicomDictionary
-
+from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.misc import warn_and_log
 from pydicom.tag import BaseTag
-from pydicom.uid import UID
+from pydicom.uid import (
+    UID,
+    JPEGLSNearLossless,
+    JPEG2000,
+    ExplicitVRLittleEndian,
+    generate_uid,
+)
+from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -173,6 +180,8 @@ def _array_common(
 def as_pixel_options(ds: "Dataset", **kwargs: Any) -> dict[str, Any]:
     """Return a dict containing the image pixel element values from `ds`.
 
+    .. versionadded:: 3.0
+
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
@@ -221,6 +230,363 @@ def as_pixel_options(ds: "Dataset", **kwargs: Any) -> dict[str, Any]:
     opts.update(kwargs)
 
     return opts
+
+
+def compress(
+    ds: "Dataset",
+    transfer_syntax_uid: str,
+    arr: "np.ndarray | None" = None,
+    *,
+    encoding_plugin: str = "",
+    encapsulate_ext: bool = False,
+    new_instance_uid: bool = True,
+    jls_error: int | None = None,
+    j2k_cr: list[float] | None = None,
+    j2k_psnr: list[float] | None = None,
+    **kwargs: Any,
+) -> "Dataset":
+    """Compress uncompressed pixel data and update `ds` in-place with the
+    resulting :dcm:`encapsulated<part05/sect_A.4.html>` codestream.
+
+    .. versionadded:: 3.0
+
+    The dataset `ds` must already have the following
+    :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
+    with correct values that correspond to the resulting compressed
+    pixel data:
+
+    * (0028,0002) *Samples per Pixel*
+    * (0028,0004) *Photometric Interpretation*
+    * (0028,0008) *Number of Frames* (if more than 1 frame will be present)
+    * (0028,0010) *Rows*
+    * (0028,0011) *Columns*
+    * (0028,0100) *Bits Allocated*
+    * (0028,0101) *Bits Stored*
+    * (0028,0103) *Pixel Representation*
+
+    If *Samples per Pixel* is greater than 1 then the following element
+    is also required:
+
+    * (0028,0006) *Planar Configuration*
+
+    This method will add the file meta dataset if none is present and add
+    or modify the following elements:
+
+    * (0002,0010) *Transfer Syntax UID*
+    * (7FE0,0010) *Pixel Data*
+
+    If the compressed pixel data is too large for encapsulation using a
+    basic offset table then an :dcm:`extended offset table
+    <part03/sect_C.7.6.3.html>` will also be used, in which case the
+    following elements will also be added:
+
+    * (7FE0,0001) *Extended Offset Table*
+    * (7FE0,0002) *Extended Offset Table Lengths*
+
+    If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+    Instance UID* value will be generated.
+
+    **Supported Transfer Syntax UIDs**
+
+    +-----------------------------------------------+-----------+----------------------------------+
+    | UID                                           |  Plugins  | Encoding Guide                   |
+    +------------------------+----------------------+           |                                  |
+    | Name                   | Value                |           |                                  |
+    +========================+======================+===========+==================================+
+    | *JPEG-LS Lossless*     |1.2.840.10008.1.2.4.80| pyjpegls  | :doc:`JPEG-LS                    |
+    +------------------------+----------------------+           | </guides/encoding/jpeg_ls>`      |
+    | *JPEG-LS Near Lossless*|1.2.840.10008.1.2.4.81|           |                                  |
+    +------------------------+----------------------+-----------+----------------------------------+
+    | *JPEG 2000 Lossless*   |1.2.840.10008.1.2.4.90| pylibjpeg | :doc:`JPEG 2000                  |
+    +------------------------+----------------------+           | </guides/encoding/jpeg_2k>`      |
+    | *JPEG 2000*            |1.2.840.10008.1.2.4.91|           |                                  |
+    +------------------------+----------------------+-----------+----------------------------------+
+    | *RLE Lossless*         | 1.2.840.10008.1.2.5  | pydicom,  | :doc:`RLE Lossless               |
+    |                        |                      | pylibjpeg,| </guides/encoding/rle_lossless>` |
+    |                        |                      | gdcm      |                                  |
+    +------------------------+----------------------+-----------+----------------------------------+
+
+    Examples
+    --------
+
+    Compress the existing uncompressed *Pixel Data* in place:
+
+    >>> from pydicom import examples
+    >>> from pydicom.pixels import compress
+    >>> from pydicom.uid import RLELossless
+    >>> ds = examples.ct
+    >>> compress(ds, RLELossless)
+    >>> ds.save_as("ct_rle_lossless.dcm")
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        The dataset to be compressed.
+    transfer_syntax_uid : pydicom.uid.UID
+        The UID of the :dcm:`transfer syntax<part05/chapter_10.html>` to
+        use when compressing the pixel data.
+    arr : numpy.ndarray, optional
+        Compress the uncompressed pixel data in `arr` and use it
+        to set the *Pixel Data*. If `arr` is not used then the existing
+        uncompressed *Pixel Data* in the dataset will be compressed instead.
+        The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
+        contents of the array should match the dataset.
+    encoding_plugin : str, optional
+        Use `encoding_plugin` to compress the pixel data. See the
+        :doc:`user guide </old/image_data_compression>` for a list of
+        plugins available for each UID and their dependencies. If not
+        specified then all available plugins will be tried (default).
+    encapsulate_ext : bool, optional
+        If ``True`` then force the addition of an extended offset table.
+        If ``False`` (default) then an extended offset table
+        will be added if needed for large amounts of compressed *Pixel
+        Data*, otherwise just the basic offset table will be used.
+    new_instance_uid : bool, optional
+        If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+        value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+        keep the original value.
+    jls_error : int, optional
+        **JPEG-LS Near Lossless only**. The allowed absolute compression error
+        in the pixel values.
+    j2k_cr : list[float], optional
+        **JPEG 2000 only**. A list of the compression ratios to use for each
+        quality layer. There must be at least one quality layer and the
+        minimum allowable compression ratio is ``1``. When using multiple
+        quality layers they should be ordered in decreasing value from left
+        to right. For example, to use 2 quality layers with 20x and 5x
+        compression ratios then `j2k_cr` should be ``[20, 5]``. Cannot be
+        used with `j2k_psnr`.
+    j2k_psnr : list[float], optional
+        **JPEG 2000 only**. A list of the peak signal-to-noise ratios (in dB)
+        to use for each quality layer. There must be at least one quality
+        layer and when using multiple quality layers they should be ordered
+        in increasing value from left to right. For example, to use 2
+        quality layers with PSNR of 80 and 300 then `j2k_psnr` should be
+        ``[80, 300]``. Cannot be used with `j2k_cr`.
+    **kwargs
+        Optional keyword parameters for the encoding plugin may also be
+        present. See the :doc:`encoding plugins options
+        </guides/encoding/encoder_plugin_options>` for more information.
+    """
+    from pydicom.dataset import FileMetaDataset
+    from pydicom.pixels import get_encoder
+
+    # Disallow overriding the dataset's image pixel module element values
+    for option in _IMAGE_PIXEL.values():
+        kwargs.pop(option, None)
+
+    uid = UID(transfer_syntax_uid)
+    encoder = get_encoder(uid)
+    if not encoder.is_available:
+        missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
+        raise RuntimeError(
+            f"The pixel data encoder for '{uid.name}' is unavailable because all "
+            f"of its plugins are missing dependencies:\n{missing}"
+        )
+
+    if uid == JPEGLSNearLossless and jls_error is not None:
+        kwargs["jls_error"] = jls_error
+
+    if uid == JPEG2000:
+        if j2k_cr is not None:
+            kwargs["j2k_cr"] = j2k_cr
+
+        if j2k_psnr is not None:
+            kwargs["j2k_psnr"] = j2k_psnr
+
+    if arr is None:
+        # Encode the current uncompressed *Pixel Data*
+        frame_iterator = encoder.iter_encode(
+            ds, encoding_plugin=encoding_plugin, **kwargs
+        )
+    else:
+        # Encode from an array
+        opts = as_pixel_options(ds, **kwargs)
+        frame_iterator = encoder.iter_encode(
+            arr, encoding_plugin=encoding_plugin, **opts
+        )
+
+    # Encode!
+    encoded = [f for f in frame_iterator]
+
+    # Encapsulate the encoded *Pixel Data*
+    nr_frames = len(encoded)
+    total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
+    if encapsulate_ext or total > 2**32 - 1:
+        (
+            ds.PixelData,
+            ds.ExtendedOffsetTable,
+            ds.ExtendedOffsetTableLengths,
+        ) = encapsulate_extended(encoded)
+    else:
+        ds.PixelData = encapsulate(encoded)
+
+    # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
+    elem = ds["PixelData"]
+    elem.is_undefined_length = True
+    # PS3.5 Section 8.2 and Annex A.4 - encapsulated pixel data uses OB
+    elem.VR = VR.OB
+
+    ds._pixel_array = None if arr is None else arr
+    ds._pixel_id = {} if arr is None else get_image_pixel_ids(ds)
+
+    # Set the correct *Transfer Syntax UID*
+    if not hasattr(ds, "file_meta"):
+        ds.file_meta = FileMetaDataset()
+
+    ds.file_meta.TransferSyntaxUID = uid
+
+    if new_instance_uid:
+        instance_uid = generate_uid()
+        ds.SOPInstanceUID = instance_uid
+        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
+
+    return ds
+
+
+def decompress(
+    ds: "Dataset",
+    *,
+    as_rgb: bool = True,
+    new_instance_uid: bool = True,
+    decoding_plugin: str = "",
+    **kwargs: Any,
+) -> "Dataset":
+    """Perform an in-place decompression of a dataset with a compressed *Transfer
+    Syntax UID*.
+
+    .. versionadded:: 3.0
+
+    .. warning::
+
+        This function requires `NumPy <https://numpy.org/>`_ and may require
+        the installation of additional packages to perform the actual pixel
+        data decoding. See the :doc:`pixel data decompression documentation
+        </old/image_data_handlers>` for more information.
+
+    * The dataset's *Transfer Syntax UID* will be set to *Explicit
+      VR Little Endian*.
+    * The *Pixel Data* will be decompressed in its entirety and the
+      *Pixel Data* element's value updated with the uncompressed data,
+      padded to an even length.
+    * The *Pixel Data* element's VR will be set to **OB** if *Bits
+      Allocated* <= 8, otherwise it will be set to **OW**.
+    * The :attr:`DataElement.is_undefined_length
+      <pydicom.dataelem.DataElement.is_undefined_length>` attribute for the
+      *Pixel Data* element will be set to ``False``.
+    * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
+      modified as required to match the uncompressed *Pixel Data*.
+    * If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+      Instance UID* value will be generated.
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        A dataset containing compressed *Pixel Data* to be decoded and the
+        corresponding *Image Pixel* module elements, along with a
+        :attr:`~pydicom.dataset.FileDataset.file_meta` attribute containing a
+        suitable (0002,0010) *Transfer Syntax UID*.
+    as_rgb : bool, optional
+        if ``True`` (default) then convert pixel data with a YCbCr
+        :ref:`photometric interpretation<photometric_interpretation>` such as
+        ``"YBR_FULL_422"`` to RGB.
+    new_instance_uid : bool, optional
+        If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+        value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+        keep the original value.
+    decoding_plugin : str, optional
+        The name of the decoding plugin to use when decoding compressed
+        pixel data. If no `decoding_plugin` is specified (default) then all
+        available plugins will be tried and the result from the first successful
+        one yielded. For information on the available plugins for each
+        decoder see the :doc:`API documentation</reference/pixels.decoders>`.
+    kwargs : dict[str, Any], optional
+        Optional keyword parameters for the decoding plugin may also be
+        present. See the :doc:`decoding plugins options
+        </guides/decoding/decoder_options>` for more information.
+
+    Returns
+    -------
+    pydicom.dataset.Dataset
+        The dataset `ds` decompressed in-place.
+    """
+    from pydicom.pixels import get_decoder
+
+    if "PixelData" not in ds:
+        raise AttributeError(
+            "Unable to decompress as the dataset has no (7FE0,0010) 'Pixel Data' element"
+        )
+
+    file_meta = ds.get("file_meta", {})
+    tsyntax = file_meta.get("TransferSyntaxUID", "")
+    if not tsyntax:
+        raise AttributeError(
+            "Unable to decompress as there's no (0002,0010) 'Transfer Syntax UID' "
+            f"element in '{type(ds).__name__}.file_meta'"
+        )
+
+    uid = UID(tsyntax)
+    if not uid.is_compressed:
+        raise ValueError("The dataset is already uncompressed")
+
+    decoder = get_decoder(uid)
+    if not decoder.is_available:
+        missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
+        raise RuntimeError(
+            f"Unable to decompress as the plugins for the '{uid.name}' decoder "
+            f"are all missing dependencies:\n{missing}"
+        )
+
+    # Disallow decompression of individual frames
+    kwargs.pop("index", None)
+    frame_generator = decoder.iter_array(
+        ds,
+        decoding_plugin=decoding_plugin,
+        as_rgb=as_rgb,
+        **kwargs,
+    )
+    frames: list[bytes] = []
+    for arr, image_pixel in frame_generator:
+        frames.append(arr.tobytes())
+
+    # Part 5, Section 8.1.1: 32-bit Value Length field
+    value_length = sum(len(frame) for frame in frames)
+    if value_length >= 2**32 - 1:
+        raise ValueError(
+            "Unable to decompress as the length of the uncompressed pixel data "
+            "will be greater than the maximum allowed by the DICOM Standard"
+        )
+
+    # Pad with 0x00 if odd length
+    nr_frames = len(frames)
+    if value_length % 2:
+        frames.append(b"\x00")
+
+    elem = ds["PixelData"]
+    elem.value = b"".join(frame for frame in frames)
+    elem.is_undefined_length = False
+    elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
+
+    # Update the transfer syntax
+    ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    if new_instance_uid:
+        instance_uid = generate_uid()
+        ds.SOPInstanceUID = instance_uid
+        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
+
+    # Update the image pixel elements
+    ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
+    if cast(int, image_pixel["samples_per_pixel"]) > 1:
+        ds.PlanarConfiguration = cast(int, image_pixel["planar_configuration"])
+
+    if "NumberOfFrames" in ds or nr_frames > 1:
+        ds.NumberOfFrames = nr_frames
+
+    ds._pixel_array = None
+    ds._pixel_id = {}
+
+    return ds
 
 
 def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
@@ -580,6 +946,8 @@ def iter_pixels(
 ) -> Iterator["np.ndarray"]:
     """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
 
+    .. versionadded:: 3.0
+
     .. warning::
 
         This function requires `NumPy <https://numpy.org/>`_
@@ -849,6 +1217,8 @@ def pixel_array(
     **kwargs: Any,
 ) -> "np.ndarray":
     """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.
+
+    .. versionadded:: 3.0
 
     .. warning::
 

@@ -12,6 +12,8 @@ Pixel data related utility functions.
    :toctree: generated/
 
    as_pixel_options
+   compress
+   decompress
    expand_ybr422
    get_expected_length
    get_image_pixel_ids

@@ -7,14 +7,15 @@ Pixel Data Decoder Options
 .. currentmodule:: pydicom.pixels.decoders.base
 
 The following applies to the functions and class methods that use the
-:doc:`pixels</reference/pixels>` backend for decoding pixel data. This includes functions
-such as :func:`~pydicom.pixels.pixel_array` and :func:`~pydicom.pixels.iter_pixels`
-as well as the following methods of the :class:`~Decoder` class:
+:doc:`pixels</reference/pixels>` backend for decoding pixel data:
 
-* :meth:`Decoder.as_array`
-* :meth:`Decoder.as_buffer`
-* :meth:`Decoder.iter_array`
-* :meth:`Decoder.iter_buffer`
+* :func:`~pydicom.pixels.pixel_array`
+* :func:`~pydicom.pixels.iter_pixels`
+* :func:`~pydicom.pixels.decompress`
+* :meth:`Decoder.as_array()<pydicom.pixels.Decoder.as_array>`
+* :meth:`Decoder.as_buffer()<pydicom.pixels.Decoder.as_buffer>`
+* :meth:`Decoder.iter_array()<pydicom.pixels.Decoder.iter_array>`
+* :meth:`Decoder.iter_buffer()<pydicom.pixels.Decoder.iter_array>`
 
 *Image Pixel* Options
 =====================
@@ -67,9 +68,13 @@ Image Processing Options
 ========================
 
 The following options may be used with any transfer syntax for controlling the
-processing applied after decoding to a NumPy :class:`~numpy.ndarray` using
-:func:`~pydicom.pixels.pixel_array`, :func:`~pydicom.pixels.iter_pixels`,
-:meth:`Decoder.as_array` or :meth:`Decoder.iter_array`.
+processing applied after decoding using:
+
+* :func:`~pydicom.pixels.pixel_array`
+* :func:`~pydicom.pixels.iter_pixels`
+* :func:`~pydicom.pixels.decompress`
+* :meth:`Decoder.as_array()<pydicom.pixels.Decoder.as_array>`
+* :meth:`Decoder.iter_array()<pydicom.pixels.Decoder.iter_array>`
 
 * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel data with a
   YCbCr :ref:`photometric interpretation<photometric_interpretation>`
