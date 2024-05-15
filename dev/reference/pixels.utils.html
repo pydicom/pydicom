@@ -89,6 +89,8 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
@@ -155,6 +157,12 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.as_pixel_options.html#pydicom.pixels.utils.as_pixel_options" title="pydicom.pixels.utils.as_pixel_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_pixel_options</span></code></a>(ds, **kwargs)</p></td>
 <td><p>Return a dict containing the image pixel element values from <cite>ds</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.compress.html#pydicom.pixels.utils.compress" title="pydicom.pixels.utils.compress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compress</span></code></a>(ds, transfer_syntax_uid[, arr, ...])</p></td>
+<td><p>Compress uncompressed pixel data and update <cite>ds</cite> in-place with the resulting <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a> codestream.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.decompress.html#pydicom.pixels.utils.decompress" title="pydicom.pixels.utils.decompress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code></a>(ds, *[, as_rgb, ...])</p></td>
+<td><p>Perform an in-place decompression of a dataset with a compressed <em>Transfer Syntax UID</em>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.expand_ybr422.html#pydicom.pixels.utils.expand_ybr422" title="pydicom.pixels.utils.expand_ybr422"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_ybr422</span></code></a>(src, bits_allocated)</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> data expanded to <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code>.</p></td>

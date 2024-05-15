@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decompress
+=========================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: decompress

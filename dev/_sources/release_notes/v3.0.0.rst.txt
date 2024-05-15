@@ -182,13 +182,15 @@ Enhancements
 * Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
   from a path to a dataset while minimizing memory-usage: :func:`~pydicom.pixels.pixel_array`
   and :func:`~pydicom.pixels.iter_pixels`.
+* Added two functions for compressing and decompressing datasets using the new
+  decoding backend: :func:`~pydicom.pixels.compress` and :func:`~pydicom.pixels.decompress`.
 * Added support for the following transfer syntaxes to :meth:`Dataset.compress()
   <pydicom.dataset.Dataset.compress>` (:issue:`1997`):
 
-  * *JPEG-LS Lossless* with :attr:`~pydicom.pixels.encoders.base.JPEGLSLosslessEncoder`
-  * *JPEG-LS Near Lossless* with :attr:`~pydicom.pixels.encoders.base.JPEGLSNearLosslessEncoder`
-  * *JPEG 2000 Lossless* with :attr:`~pydicom.pixels.encoders.base.JPEG2000LosslessEncoder`
-  * *JPEG 2000* with :attr:`~pydicom.pixels.encoders.base.JPEG2000Encoder`
+  * *JPEG-LS Lossless* with :attr:`~pydicom.pixels.encoders.JPEGLSLosslessEncoder`
+  * *JPEG-LS Near Lossless* with :attr:`~pydicom.pixels.encoders.JPEGLSNearLosslessEncoder`
+  * *JPEG 2000 Lossless* with :attr:`~pydicom.pixels.encoders.JPEG2000LosslessEncoder`
+  * *JPEG 2000* with :attr:`~pydicom.pixels.encoders.JPEG2000Encoder`
 
   See the :doc:`JPEG-LS</guides/encoding/jpeg_ls>` and :doc:`JPEG 2000
   </guides/encoding/jpeg_2k>` encoding guides for more information.
@@ -285,7 +287,7 @@ Deprecations
       * :func:`~pydicom.pixels.utils.reshape_pixel_array`
       * :func:`~pydicom.pixels.utils.unpack_bits`
 
-    * :func:`~pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness` will be
+    * :func:`pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness` will be
       removed in v4.0.
 
 
