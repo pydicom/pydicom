@@ -26,7 +26,6 @@ jobs:
             test-extras: true
             upload-coverage: false
           - os: windows
-            shell: bash
             python-version: "3.11"
             test-extras: true
             upload-coverage: true

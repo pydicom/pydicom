@@ -63,6 +63,7 @@ jobs:
 
     - name: Test with all optional dependencies
       if: inputs.test-extras
+      shell: bash
       run: |
         python -m pip install .[pixeldata,gpl-license]
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pylibjpeg.py
@@ -70,7 +71,6 @@ jobs:
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_JPEG_LS_transfer_syntax.py tests/test_jpeg_ls_pixel_data.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/pixels/test_encoder_gdcm.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/pixels
-        python -m pip uninstall -y pydicom-data
 
     - name: Test with missing libs
       if: inputs.test-extras
