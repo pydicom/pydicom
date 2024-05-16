@@ -2170,6 +2170,11 @@ class TestFileDataset:
             "__or__",
             "__class_getitem__",
         }
+        if "PyPy" in python_implementation():
+            # __ror__ missing in <= 3.10.13
+            if "__ror__" not in dir(dict):
+                expected_diff.remove("__ror__")
+
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
     def test_copy_filedataset(self):
