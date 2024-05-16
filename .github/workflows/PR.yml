@@ -25,6 +25,11 @@ jobs:
             python-version: "3.10"
             test-extras: true
             upload-coverage: false
+          - os: windows
+            shell: bash
+            python-version: "3.11"
+            test-extras: true
+            upload-coverage: true
     uses: ./.github/workflows/tests_wf.yml
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
