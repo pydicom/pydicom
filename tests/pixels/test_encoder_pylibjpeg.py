@@ -1345,7 +1345,6 @@ class TestJ2KEncoding:
                 decoding_plugin="pylibjpeg",
                 **opts,
             )
-            diff = np.absolute(out.astype("float") - ref.astype("float"))
             assert not np.array_equal(out, ref)
             assert np.allclose(out, ref, atol=atol, rtol=0.05)
 
