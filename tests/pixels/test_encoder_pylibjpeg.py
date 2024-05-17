@@ -1136,8 +1136,8 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 9):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            minimum = -2**(bits_stored - 1)
-            maximum = 2**(bits_stored - 1) - 1
+            minimum = -(2 ** (bits_stored - 1))
+            maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
             ref = ref.astype("int8")
 
@@ -1176,8 +1176,8 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            minimum = -2**(bits_stored - 1)
-            maximum = 2**(bits_stored - 1) - 1
+            minimum = -(2 ** (bits_stored - 1))
+            maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
             ref = ref.astype("int16")
 
@@ -1217,8 +1217,8 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            minimum = -2**(bits_stored - 1)
-            maximum = 2**(bits_stored - 1) - 1
+            minimum = -(2 ** (bits_stored - 1))
+            maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
             ref = ref.astype("int32")
 
@@ -1487,8 +1487,8 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 9):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            minimum = -2**(bits_stored - 1)
-            maximum = 2**(bits_stored - 1) - 1
+            minimum = -(2 ** (bits_stored - 1))
+            maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
             ref = ref.astype("int8")
 
@@ -1530,8 +1530,8 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            minimum = -2**(bits_stored - 1)
-            maximum = 2**(bits_stored - 1) - 1
+            minimum = -(2 ** (bits_stored - 1))
+            maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
             ref = ref.astype("int16")
 
@@ -1573,8 +1573,8 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            minimum = -2**(bits_stored - 1)
-            maximum = 2**(bits_stored - 1) - 1
+            minimum = -(2 ** (bits_stored - 1))
+            maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
             ref = ref.astype("int32")
 
