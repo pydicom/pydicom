@@ -992,7 +992,7 @@ class TestJ2KEncoding:
         }
         atols = [1, 1, 1, 1, 2, 2, 2, 2]
         atols.extend([2, 2, 2, 4, 5, 8, 10, 16])
-        atols.extend([23, 31, 52, 63, 116, 2928854, 7404089, 9687927])
+        atols.extend([23, 31, 52, 63, 116, 2928854, 7404089, 10080970])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
@@ -1005,11 +1005,8 @@ class TestJ2KEncoding:
                 decoding_plugin="pylibjpeg",
                 **opts,
             )
-            if bits_stored == 24:
-                diff = np.absolute(out.astype("float") - ref.astype("float"))
-                print("Difference", diff.max())
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol, rtol=0.05)
+            assert np.allclose(out, ref, atol=atol)
 
     def test_arr_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
@@ -1216,7 +1213,7 @@ class TestJ2KEncoding:
 
         atols = [1, 1, 1, 2, 2, 2, 2, 2]
         atols.extend([2, 2, 2, 4, 5, 9, 11, 16])
-        atols.extend([25, 32, 46, 64, 111, 2928849, 7404094, 9687916])
+        atols.extend([25, 32, 46, 64, 111, 2928849, 7404094, 10080970])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
@@ -1233,7 +1230,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol, rtol=0.05)
+            assert np.allclose(out, ref, atol=atol)
 
     def test_buffer_u1_spp1(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 1"""
@@ -1332,7 +1329,7 @@ class TestJ2KEncoding:
 
         atols = [1, 1, 1, 1, 2, 2, 2, 2]
         atols.extend([2, 2, 2, 4, 5, 8, 10, 16])
-        atols.extend([23, 31, 52, 63, 116, 2928854, 7404089, 9687927])
+        atols.extend([23, 31, 52, 63, 116, 2928854, 7404089, 10080970])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
@@ -1349,7 +1346,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol, rtol=0.05)
+            assert np.allclose(out, ref, atol=atol)
 
     def test_buffer_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
@@ -1571,7 +1568,7 @@ class TestJ2KEncoding:
 
         atols = [1, 1, 1, 2, 2, 2, 2, 2]
         atols.extend([2, 2, 2, 4, 5, 9, 11, 16])
-        atols.extend([25, 32, 46, 64, 111, 2928849, 7404094, 9687916])
+        atols.extend([25, 32, 46, 64, 111, 2928849, 7404094, 10080970])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
@@ -1591,7 +1588,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol, rtol=0.05)
+            assert np.allclose(out, ref, atol=atol)
 
     def test_j2k_psnr(self):
         """Test compression using j2k_psnr"""
