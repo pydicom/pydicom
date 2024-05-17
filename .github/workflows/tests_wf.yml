@@ -34,12 +34,8 @@ jobs:
     - name: Install BLAS on PyPy3.10
       if: startsWith(inputs.python-version, 'pypy')
       run: sudo apt install -y libopenblas-dev
-    - name: Set env variables for ubuntu
-      if: inputs.upload-coverage && startsWith(inputs.os, 'ubuntu')
+    - name: Set env variables
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
-    - name: Set env variables for windows
-      if: inputs.upload-coverage && startsWith(inputs.os, 'windows')
-      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$env:GITHUB_ENV"
     - name: Check-out code
       uses: actions/checkout@v3
       with:
