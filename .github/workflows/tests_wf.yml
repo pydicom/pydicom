@@ -27,6 +27,9 @@ env:
 jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Install BLAS on PyPy3.10
       if: startsWith(inputs.python-version, 'pypy')
@@ -63,7 +66,6 @@ jobs:
 
     - name: Test with all optional dependencies
       if: inputs.test-extras
-      shell: bash
       run: |
         python -m pip install .[pixeldata,gpl-license]
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pylibjpeg.py

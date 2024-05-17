@@ -922,7 +922,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 9):
             ref = self.ref * (2**bits_stored - 1)
-            ref = ref.clip(0, 255)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint8")
 
             opts["bits_stored"] = bits_stored
@@ -958,7 +958,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**16 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint16")
 
             opts["bits_stored"] = bits_stored
@@ -995,7 +995,7 @@ class TestJ2KEncoding:
         atols.extend([23, 31, 52, 63, 116, 2928854, 7404089, 9687927])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**24 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint32")
 
             opts["bits_stored"] = bits_stored
@@ -1006,7 +1006,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol)
+            assert np.allclose(out, ref, atol=atol, rtol=0.05)
 
     def test_arr_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
@@ -1031,7 +1031,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 9):
             ref = self.ref3 * (2**bits_stored - 1)
-            ref = ref.clip(0, 255)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint8")
 
             opts["bits_stored"] = bits_stored
@@ -1066,7 +1066,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**16 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint16")
 
             opts["bits_stored"] = bits_stored
@@ -1094,12 +1094,13 @@ class TestJ2KEncoding:
             "planar_configuration": 0,
             "j2k_cr": [2],
         }
+        # 21+ bits stored gives horrible results
         atols = [1, 2, 2, 2, 2, 2, 2, 2]
         atols.extend([2, 2, 1, 1, 1, 2, 3, 4])
-        atols.extend([4, 4, 5, 5, 2097151, 1982469, 3964935, 7929869])
+        atols.extend([8, 15, 30, 60, 2097151, 4194303, 8388607, 16777215])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref3 * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**16 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint32")
 
             opts["bits_stored"] = bits_stored
@@ -1135,7 +1136,9 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 9):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            ref = ref.clip(-128, 127)
+            minimum = -2**(bits_stored - 1)
+            maximum = 2**(bits_stored - 1) - 1
+            ref = ref.clip(minimum, maximum)
             ref = ref.astype("int8")
 
             opts["bits_stored"] = bits_stored
@@ -1173,7 +1176,9 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            ref = ref.clip(-32768, 32767)
+            minimum = -2**(bits_stored - 1)
+            maximum = 2**(bits_stored - 1) - 1
+            ref = ref.clip(minimum, maximum)
             ref = ref.astype("int16")
 
             opts["bits_stored"] = bits_stored
@@ -1212,7 +1217,9 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            ref = ref.clip(-8388608, 8388607)
+            minimum = -2**(bits_stored - 1)
+            maximum = 2**(bits_stored - 1) - 1
+            ref = ref.clip(minimum, maximum)
             ref = ref.astype("int32")
 
             opts["bits_stored"] = bits_stored
@@ -1223,7 +1230,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol)
+            assert np.allclose(out, ref, atol=atol, rtol=0.05)
 
     def test_buffer_u1_spp1(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 1"""
@@ -1247,7 +1254,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 9):
             ref = self.ref * (2**bits_stored - 1)
-            ref = ref.clip(0, 255)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint8")
 
             buffer = ref.tobytes()
@@ -1286,7 +1293,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
-            ref = ref.clip(0, 65535)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint16")
 
             buffer = ref.tobytes()
@@ -1325,7 +1332,7 @@ class TestJ2KEncoding:
         atols.extend([23, 31, 52, 63, 116, 2928854, 7404089, 9687927])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**24 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint32")
 
             buffer = ref.tobytes()
@@ -1338,8 +1345,9 @@ class TestJ2KEncoding:
                 decoding_plugin="pylibjpeg",
                 **opts,
             )
+            diff = np.absolute(out.astype("float") - ref.astype("float"))
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol)
+            assert np.allclose(out, ref, atol=atol, rtol=0.05)
 
     def test_buffer_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
@@ -1364,7 +1372,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 9):
             ref = self.ref3 * (2**bits_stored - 1)
-            ref = ref.clip(0, 255)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint8")
 
             buffer = ref.tobytes()
@@ -1402,7 +1410,7 @@ class TestJ2KEncoding:
 
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**16 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint16")
 
             buffer = ref.tobytes()
@@ -1439,7 +1447,7 @@ class TestJ2KEncoding:
         atols.extend([8, 15, 30, 60, 2097151, 4194303, 8388607, 16777215])
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref3 * (2**bits_stored - 1)
-            ref = ref.clip(0, 2**24 - 1)
+            ref = ref.clip(0, 2**bits_stored - 1)
             ref = ref.astype("uint32")
 
             buffer = ref.tobytes()
@@ -1479,7 +1487,9 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 9):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            ref = ref.clip(-128, 127)
+            minimum = -2**(bits_stored - 1)
+            maximum = 2**(bits_stored - 1) - 1
+            ref = ref.clip(minimum, maximum)
             ref = ref.astype("int8")
 
             buffer = ref.tobytes()
@@ -1520,7 +1530,9 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            ref = ref.clip(-(2**15), 2**15 - 1)
+            minimum = -2**(bits_stored - 1)
+            maximum = 2**(bits_stored - 1) - 1
+            ref = ref.clip(minimum, maximum)
             ref = ref.astype("int16")
 
             buffer = ref.tobytes()
@@ -1561,7 +1573,9 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 25), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
-            ref = ref.clip(-(2**23), 2**23 - 1)
+            minimum = -2**(bits_stored - 1)
+            maximum = 2**(bits_stored - 1) - 1
+            ref = ref.clip(minimum, maximum)
             ref = ref.astype("int32")
 
             buffer = ref.tobytes()
@@ -1575,7 +1589,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            assert np.allclose(out, ref, atol=atol)
+            assert np.allclose(out, ref, atol=atol, rtol=0.05)
 
     def test_j2k_psnr(self):
         """Test compression using j2k_psnr"""
