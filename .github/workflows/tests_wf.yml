@@ -27,16 +27,15 @@ env:
 jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Install BLAS on PyPy3.10
       if: startsWith(inputs.python-version, 'pypy')
       run: sudo apt install -y libopenblas-dev
-    - name: Set env variables for ubuntu
-      if: inputs.upload-coverage && startsWith(inputs.os, 'ubuntu')
+    - name: Set env variables
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
-    - name: Set env variables for windows
-      if: inputs.upload-coverage && startsWith(inputs.os, 'windows')
-      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$env:GITHUB_ENV"
     - name: Check-out code
       uses: actions/checkout@v3
       with:
@@ -70,7 +69,6 @@ jobs:
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_JPEG_LS_transfer_syntax.py tests/test_jpeg_ls_pixel_data.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/pixels/test_encoder_gdcm.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/pixels
-        python -m pip uninstall -y pydicom-data
 
     - name: Test with missing libs
       if: inputs.test-extras

@@ -1353,7 +1353,7 @@ class TestFileSet:
         assert 0xFFFF == item.RecordInUseFlag
         assert 0 == item.OffsetOfTheNextDirectoryRecord
         assert "ISO_IR 100" == item.SpecificCharacterSet
-        assert 516 == item.OffsetOfReferencedLowerLevelDirectoryEntity
+        assert length + (516 - 398) == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[1]
         assert item.seq_item_tell == length + (516 - 398)
