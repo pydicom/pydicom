@@ -838,6 +838,7 @@ class TestDecodeSegment:
         assert bytes(_rle_decode_segment(data)) == b"\x02" * 128
 
 
+@pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 def test_dataset_decompress():
     """Test Dataset.decompress with RLE Lossless"""
     ds = dcmread(RLE_16_1_1F.path)
