@@ -1129,8 +1129,10 @@ def iter_pixels(
             ds_out.set_original_encoding(*ds.original_encoding)
             ds_out._dict.update(ds._dict)
 
+        tsyntax = opts["transfer_syntax_uid"]
+
         try:
-            decoder = get_decoder(opts["transfer_syntax_uid"])
+            decoder = get_decoder(tsyntax)
         except NotImplementedError:
             raise NotImplementedError(
                 "Unable to decode the pixel data as a (0002,0010) 'Transfer Syntax "
@@ -1405,9 +1407,10 @@ def pixel_array(
 
     try:
         ds, opts = _array_common(f, list(tags), **kwargs)
+        tsyntax = opts["transfer_syntax_uid"]
 
         try:
-            decoder = get_decoder(opts["transfer_syntax_uid"])
+            decoder = get_decoder(tsyntax)
         except NotImplementedError:
             raise NotImplementedError(
                 "Unable to decode the pixel data as a (0002,0010) 'Transfer Syntax "

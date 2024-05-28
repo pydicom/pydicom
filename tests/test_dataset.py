@@ -2736,3 +2736,11 @@ class TestFuture:
         )
         with pytest.raises(TypeError, match=msg):
             Dataset().pixel_array_options(use_v2_backend=True)
+
+    def test_decompress(self, use_future):
+        msg = (
+            r"Dataset.decompress\(\) got an unexpected "
+            "keyword argument 'handler_name'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            Dataset().decompress(handler_name="foo")

@@ -20,7 +20,7 @@ except ImportError:
 
 from pydicom import dcmread, config
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.encaps import get_frame
+from pydicom.encaps import get_frame, encapsulate
 from pydicom.pixels import pixel_array, iter_pixels, convert_color_space
 from pydicom.pixels.decoders.base import _PIXEL_DATA_DECODERS
 from pydicom.pixels.encoders import RLELosslessEncoder
@@ -51,6 +51,7 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEGLSLossless,
     UID,
+    MPEG2MPHLF,
 )
 
 from .pixels_reference import (
@@ -323,6 +324,25 @@ class TestPixelArray:
         with pytest.raises(AttributeError, match=msg):
             pixel_array(ds)
 
+    def test_no_matching_decoder_raises(self):
+        """Test no matching decoding plugin raises exception."""
+        ds = dcmread(EXPL_16_1_10F.path)
+        ds.file_meta.TransferSyntaxUID = MPEG2MPHLF
+        msg = (
+            r"Unable to decode the pixel data as a \(0002,0010\) 'Transfer Syntax "
+            "UID' value of 'Fragmentable MPEG2 Main Profile / High Level' is not "
+            "supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            pixel_array(ds)
+
+        ds.PixelData = encapsulate([ds.PixelData])
+        b = BytesIO()
+        ds.save_as(b)
+        b.seek(0)
+        with pytest.raises(NotImplementedError, match=msg):
+            pixel_array(b)
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestIterPixels:
@@ -436,6 +456,25 @@ class TestIterPixels:
         )
         with pytest.raises(AttributeError, match=msg):
             next(iter_pixels(ds))
+
+    def test_no_matching_decoder_raises(self):
+        """Test no matching decoding plugin raises exception."""
+        ds = dcmread(EXPL_16_1_10F.path)
+        ds.file_meta.TransferSyntaxUID = MPEG2MPHLF
+        msg = (
+            r"Unable to decode the pixel data as a \(0002,0010\) 'Transfer Syntax "
+            "UID' value of 'Fragmentable MPEG2 Main Profile / High Level' is not "
+            "supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            next(iter_pixels(ds))
+
+        ds.PixelData = encapsulate([ds.PixelData])
+        b = BytesIO()
+        ds.save_as(b)
+        b.seek(0)
+        with pytest.raises(NotImplementedError, match=msg):
+            next(iter_pixels(b))
 
 
 def test_version_check(caplog):
