@@ -218,7 +218,13 @@ def as_pixel_options(ds: "Dataset", **kwargs: Any) -> dict[str, Any]:
 
     nr_frames = opts["number_of_frames"]
     nr_frames = int(nr_frames) if isinstance(nr_frames, str) else nr_frames
-    opts["number_of_frames"] = 1 if nr_frames in (None, 0) else nr_frames
+    if nr_frames in (None, 0):
+        warn_and_log(
+            f"A value of '{nr_frames}' for (0028,0008) 'Number of Frames' is invalid"
+        )
+        nr_frames = 1
+
+    opts["number_of_frames"] = nr_frames
 
     # Extended Offset Table
     if 0x7FE00001 in ds._dict and 0x7FE00001 in ds._dict:
@@ -333,7 +339,7 @@ def compress(
         contents of the array should match the dataset.
     encoding_plugin : str, optional
         Use `encoding_plugin` to compress the pixel data. See the
-        :doc:`user guide </old/image_data_compression>` for a list of
+        :doc:`user guide </guides/user/image_data_compression>` for a list of
         plugins available for each UID and their dependencies. If not
         specified then all available plugins will be tried (default).
     encapsulate_ext : bool, optional
@@ -427,8 +433,9 @@ def compress(
     # PS3.5 Section 8.2 and Annex A.4 - encapsulated pixel data uses OB
     elem.VR = VR.OB
 
-    ds._pixel_array = None if arr is None else arr
-    ds._pixel_id = {} if arr is None else get_image_pixel_ids(ds)
+    # Clear `pixel_array` as lossy compression may give different results
+    ds._pixel_array = None
+    ds._pixel_id = {}
 
     # Set the correct *Transfer Syntax UID*
     if not hasattr(ds, "file_meta"):
@@ -462,7 +469,7 @@ def decompress(
         This function requires `NumPy <https://numpy.org/>`_ and may require
         the installation of additional packages to perform the actual pixel
         data decoding. See the :doc:`pixel data decompression documentation
-        </old/image_data_handlers>` for more information.
+        </guides/user/image_data_handlers>` for more information.
 
     * The dataset's *Transfer Syntax UID* will be set to *Explicit
       VR Little Endian*.
@@ -510,6 +517,7 @@ def decompress(
     pydicom.dataset.Dataset
         The dataset `ds` decompressed in-place.
     """
+    # TODO: v4.0 remove support for `pixel_data_handlers` module
     from pydicom.pixels import get_decoder
 
     if "PixelData" not in ds:
@@ -529,25 +537,31 @@ def decompress(
     if not uid.is_compressed:
         raise ValueError("The dataset is already uncompressed")
 
-    decoder = get_decoder(uid)
-    if not decoder.is_available:
-        missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
-        raise RuntimeError(
-            f"Unable to decompress as the plugins for the '{uid.name}' decoder "
-            f"are all missing dependencies:\n{missing}"
-        )
+    use_pdh = kwargs.get("use_pdh", False)
+    frames: list[bytes]
+    if use_pdh:
+        ds.convert_pixel_data(decoding_plugin)
+        frames = [ds.pixel_array.tobytes()]
+    else:
+        decoder = get_decoder(uid)
+        if not decoder.is_available:
+            missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
+            raise RuntimeError(
+                f"Unable to decompress as the plugins for the '{uid.name}' decoder "
+                f"are all missing dependencies:\n{missing}"
+            )
 
-    # Disallow decompression of individual frames
-    kwargs.pop("index", None)
-    frame_generator = decoder.iter_array(
-        ds,
-        decoding_plugin=decoding_plugin,
-        as_rgb=as_rgb,
-        **kwargs,
-    )
-    frames: list[bytes] = []
-    for arr, image_pixel in frame_generator:
-        frames.append(arr.tobytes())
+        # Disallow decompression of individual frames
+        kwargs.pop("index", None)
+        frame_generator = decoder.iter_array(
+            ds,
+            decoding_plugin=decoding_plugin,
+            as_rgb=as_rgb,
+            **kwargs,
+        )
+        frames = []
+        for arr, image_pixel in frame_generator:
+            frames.append(arr.tobytes())
 
     # Part 5, Section 8.1.1: 32-bit Value Length field
     value_length = sum(len(frame) for frame in frames)
@@ -575,16 +589,17 @@ def decompress(
         ds.SOPInstanceUID = instance_uid
         ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
 
-    # Update the image pixel elements
-    ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
-    if cast(int, image_pixel["samples_per_pixel"]) > 1:
-        ds.PlanarConfiguration = cast(int, image_pixel["planar_configuration"])
+    if not use_pdh:
+        # Update the image pixel elements
+        ds.PhotometricInterpretation = image_pixel["photometric_interpretation"]
+        if cast(int, image_pixel["samples_per_pixel"]) > 1:
+            ds.PlanarConfiguration = cast(int, image_pixel["planar_configuration"])
 
-    if "NumberOfFrames" in ds or nr_frames > 1:
-        ds.NumberOfFrames = nr_frames
+        if "NumberOfFrames" in ds or nr_frames > 1:
+            ds.NumberOfFrames = nr_frames
 
-    ds._pixel_array = None
-    ds._pixel_id = {}
+        ds._pixel_array = None
+        ds._pixel_id = {}
 
     return ds
 
@@ -1066,11 +1081,18 @@ def iter_pixels(
         file_meta = getattr(ds, "file_meta", {})
         if not (tsyntax := file_meta.get("TransferSyntaxUID", None)):
             raise AttributeError(
-                "The dataset's 'file_meta' has no (0002,0010) 'Transfer Syntax "
-                "UID' element"
+                "Unable to decode the pixel data as the dataset's 'file_meta' "
+                "has no (0002,0010) 'Transfer Syntax UID' element"
             )
 
-        decoder = get_decoder(tsyntax)
+        try:
+            decoder = get_decoder(tsyntax)
+        except NotImplementedError:
+            raise NotImplementedError(
+                "Unable to decode the pixel data as a (0002,0010) 'Transfer Syntax "
+                f"UID' value of '{tsyntax.name}' is not supported"
+            )
+
         opts = as_pixel_options(ds, **kwargs)
         iterator = decoder.iter_array(
             ds,
@@ -1107,7 +1129,14 @@ def iter_pixels(
             ds_out.set_original_encoding(*ds.original_encoding)
             ds_out._dict.update(ds._dict)
 
-        decoder = get_decoder(opts["transfer_syntax_uid"])
+        try:
+            decoder = get_decoder(opts["transfer_syntax_uid"])
+        except NotImplementedError:
+            raise NotImplementedError(
+                "Unable to decode the pixel data as a (0002,0010) 'Transfer Syntax "
+                f"UID' value of '{tsyntax.name}' is not supported"
+            )
+
         iterator = decoder.iter_array(
             f,
             indices=indices,
@@ -1338,11 +1367,18 @@ def pixel_array(
         file_meta = getattr(ds, "file_meta", {})
         if not (tsyntax := file_meta.get("TransferSyntaxUID", None)):
             raise AttributeError(
-                "The dataset's 'file_meta' has no (0002,0010) 'Transfer Syntax "
-                "UID' element"
+                "Unable to decode the pixel data as the dataset's 'file_meta' "
+                "has no (0002,0010) 'Transfer Syntax UID' element"
             )
 
-        decoder = get_decoder(tsyntax)
+        try:
+            decoder = get_decoder(tsyntax)
+        except NotImplementedError:
+            raise NotImplementedError(
+                "Unable to decode the pixel data as a (0002,0010) 'Transfer Syntax "
+                f"UID' value of '{tsyntax.name}' is not supported"
+            )
+
         opts = as_pixel_options(ds, **kwargs)
         return decoder.as_array(
             ds,
@@ -1370,7 +1406,14 @@ def pixel_array(
     try:
         ds, opts = _array_common(f, list(tags), **kwargs)
 
-        decoder = get_decoder(opts["transfer_syntax_uid"])
+        try:
+            decoder = get_decoder(opts["transfer_syntax_uid"])
+        except NotImplementedError:
+            raise NotImplementedError(
+                "Unable to decode the pixel data as a (0002,0010) 'Transfer Syntax "
+                f"UID' value of '{tsyntax.name}' is not supported"
+            )
+
         arr, _ = decoder.as_array(
             f,
             index=index,

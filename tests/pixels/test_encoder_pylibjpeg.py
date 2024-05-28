@@ -824,8 +824,8 @@ class TestJ2KLosslessEncoding:
         info = parse_j2k(cs)
         assert info["mct"] is True
 
-    def test_lossy_kwargs_ignored(self):
-        """Test that lossy kwargs are ignored for lossless"""
+    def test_lossy_kwargs_raise(self):
+        """Test that lossy kwargs raise an exception"""
         ds = examples.rgb_color
         arr = ds.pixel_array
         opts = {
@@ -844,13 +844,13 @@ class TestJ2KLosslessEncoding:
             "signal_noise_ratios": [80, 200],
         }
 
-        cs = JPEG2000LosslessEncoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
-        out, _ = JPEG2000LosslessDecoder.as_array(
-            encapsulate([cs]),
-            decoding_plugin="pylibjpeg",
-            **opts,
+        msg = (
+            "Unable to encode as exceptions were raised by all available plugins:\n  "
+            "pylibjpeg: A lossy configuration option is being used with a transfer "
+            "syntax of 'JPEG 2000 Lossless' - did you mean to use 'JPEG 2000' instead?"
         )
-        assert np.array_equal(out, arr)
+        with pytest.raises(RuntimeError, match=msg):
+            JPEG2000LosslessEncoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
 
     def test_bits_stored_25_raises(self):
         """Test that bits stored > 24 raises an exception."""
@@ -1664,8 +1664,9 @@ class TestJ2KEncoding:
 
         msg = (
             "Unable to encode as exceptions were raised by all available "
-            "plugins:\n  pylibjpeg: Only one of 'compression_ratios' or "
-            "'signal_noise_ratios' is allowed when performing lossy compression"
+            "plugins:\n  pylibjpeg: Multiple lossy configuration options are "
+            "being used with the 'JPEG 2000' transfer syntax, please specify "
+            "only one"
         )
         with pytest.raises(RuntimeError, match=msg):
             JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)
@@ -1689,7 +1690,7 @@ class TestJ2KEncoding:
         msg = (
             "Unable to encode as exceptions were raised by all available "
             "plugins:\n  pylibjpeg: The 'JPEG 2000' transfer syntax requires "
-            "either the 'j2k_cr' or 'j2k_psnr' parameter"
+            "a lossy configuration option such as 'j2k_cr' or 'j2k_psnr'"
         )
         with pytest.raises(RuntimeError, match=msg):
             JPEG2000Encoder.encode(arr, encoding_plugin="pylibjpeg", **opts)

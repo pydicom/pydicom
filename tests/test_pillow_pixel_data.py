@@ -197,6 +197,7 @@ class TestNoNumpy_NoPillowHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(IMPL)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError, match=f"UID of '{uid}'"):
@@ -204,6 +205,7 @@ class TestNoNumpy_NoPillowHandler:
 
     def test_using_pillow_handler_raises(self):
         ds = dcmread(J2KI_08_08_3_0_1F_RGB)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             "The pixel data handler 'pillow' is not available on your "
             "system. Please refer to the pydicom documentation*"
@@ -482,6 +484,7 @@ class TestPillowHandler_JPEG2K:
         pydicom.config.pixel_data_handlers = [PIL_HANDLER]
 
         ds = dcmread(EXPL)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises((NotImplementedError, RuntimeError)):
@@ -501,6 +504,7 @@ class TestPillowHandler_JPEG2K:
             return
 
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -523,6 +527,7 @@ class TestPillowHandler_JPEG2K:
     def test_array_lossless(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         # May need to correct some element values
         for kw, val in fixes.items():
             setattr(ds, kw, val)
@@ -537,6 +542,7 @@ class TestPillowHandler_JPEG2K:
     def test_array_lossy(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         # May need to correct some element values
         for kw, val in fixes.items():
             setattr(ds, kw, val)
@@ -550,6 +556,7 @@ class TestPillowHandler_JPEG2K:
     def test_warning(self):
         """Test that the precision warning works OK."""
         ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"The \(0028,0101\) 'Bits Stored' value \(16-bit\) doesn't match "
             r"the JPEG 2000 data \(14-bit\). It's recommended that you "
@@ -561,10 +568,13 @@ class TestPillowHandler_JPEG2K:
     def test_decompress_using_pillow(self):
         """Test decompressing JPEG2K with pillow handler succeeds."""
         ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.BitsStored = 14
         ds.decompress(handler_name="pillow")
         arr = ds.pixel_array
+
         ds = dcmread(get_testdata_file("693_UNCR.dcm"))
+        ds.pixel_array_options(use_v2_backend=True)
         ref = ds.pixel_array
         assert np.array_equal(arr, ref)
 
@@ -572,6 +582,7 @@ class TestPillowHandler_JPEG2K:
         """Test changing BitsStored affects the pixel data."""
         pydicom.config.APPLY_J2K_CORRECTIONS = False
         ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         assert 16 == ds.BitsStored
         with pytest.warns(UserWarning):
             arr = ds.pixel_array
@@ -583,6 +594,7 @@ class TestPillowHandler_JPEG2K:
     def test_pixel_rep_mismatch(self):
         """Test mismatched j2k sign and Pixel Representation."""
         ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        ds.pixel_array_options(use_v2_backend=True)
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
@@ -629,6 +641,7 @@ class TestPillowHandler_JPEG:
         pydicom.config.pixel_data_handlers = [PIL_HANDLER]
 
         ds = dcmread(EXPL)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises((NotImplementedError, RuntimeError)):
@@ -638,6 +651,7 @@ class TestPillowHandler_JPEG:
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert data[0] == ds.file_meta.TransferSyntaxUID
         assert data[1] == ds.PatientName
 
@@ -648,6 +662,7 @@ class TestPillowHandler_JPEG:
             return
 
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -663,11 +678,14 @@ class TestPillowHandler_JPEG:
     def test_array(self, fpath, rpath, values):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = ds.pixel_array
         if "YBR" in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, "RGB")
 
-        ref = dcmread(rpath).pixel_array
+        ds2 = dcmread(rpath)
+        ds2.pixel_array_options(use_v2_backend=True)
+        ref = ds2.pixel_array
 
         if values:
             assert tuple(arr[5, 50, :]) == values[0]
@@ -686,6 +704,7 @@ class TestPillowHandler_JPEG:
     def test_color_3d(self):
         """Test decoding JPEG with pillow handler succeeds."""
         ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422)
+        ds.pixel_array_options(use_v2_backend=True)
         assert "YBR_FULL_422" == ds.PhotometricInterpretation
         arr = ds.pixel_array
         assert arr.flags.writeable
@@ -700,6 +719,7 @@ class TestPillowHandler_JPEG:
     def test_JPGE_16bit_raises(self):
         """Test decoding JPEG lossy with pillow handler fails."""
         ds = dcmread(JPGE_16_12_1_0_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) is only "
             r"supported by Pillow if \(0028,0100\) Bits Allocated = 8"
@@ -710,6 +730,7 @@ class TestPillowHandler_JPEG:
     def test_JPGL_raises(self):
         """Test decoding JPEG Lossless with pillow handler fails."""
         ds = dcmread(JPGL_16_16_1_1_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = r"as there are no pixel data handlers available that support it"
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
@@ -717,13 +738,15 @@ class TestPillowHandler_JPEG:
     def test_JPGB_odd_data_size(self):
         """Test decoding JPEG Baseline with pillow handler succeeds."""
         ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
-        pixel_data = ds.pixel_array
-        assert pixel_data.nbytes == 27
-        assert pixel_data.shape == (3, 3, 3)
+        ds.pixel_array_options(use_v2_backend=True)
+        arr = ds.pixel_array
+        assert arr.nbytes == 27
+        assert arr.shape == (3, 3, 3)
 
     def test_frame_multiple_fragments(self):
         """Test a frame split across multiple fragments."""
         ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422)
+        ds.pixel_array_options(use_v2_backend=True)
         ref = ds.pixel_array
         frames = [
             f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)

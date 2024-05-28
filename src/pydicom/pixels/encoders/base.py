@@ -138,7 +138,7 @@ class EncodeRunner(RunnerBase):
 
         # The ndarray containing the pixel data may use a larger container
         #   than is strictly needed: e.g. 32 bits allocated with 7 bits stored.
-        #   However the decoders expect data to be sized appropriately
+        #   However the encoders expect data to be sized appropriately
         #   for the sample precision, so we may need to downscale
         if self.bits_stored <= 8:
             itemsize = 1
@@ -169,7 +169,7 @@ class EncodeRunner(RunnerBase):
         """Return a frame's worth of uncompressed pixel data from buffer-like."""
         # The encoded pixel data may use a larger container than is strictly
         #   needed: e.g. 32 bits allocated with 7 bits stored
-        # However the decoders typically expect data to be sized appropriately
+        # However the encoders typically expect data to be sized appropriately
         # for the sample precision, so we need to downscale to:
         #    0 < precision <=  8: an 8-bit container (char)
         #    8 < precision <= 16: a 16-bit container (short)
@@ -500,7 +500,7 @@ class Encoder(CoderBase):
             With the exception of *RLE Lossless*, this method requires the
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
-            </old/image_data_compression>` for more information.
+            </guides/user/image_data_compression>` for more information.
 
         Parameters
         ----------
@@ -609,7 +609,7 @@ class Encoder(CoderBase):
             With the exception of *RLE Lossless*, this method requires the
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
-            </old/image_data_compression>` for more information.
+            </guides/user/image_data_compression>` for more information.
 
         Parameters
         ----------

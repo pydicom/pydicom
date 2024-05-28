@@ -14,5 +14,6 @@ pydicom:
    decoding/index
    encoding/index
    cli/cli_guide
+   user/index
    glossary
    writing_documentation

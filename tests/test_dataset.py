@@ -46,6 +46,14 @@ class BadRepr:
         raise ValueError("bad repr")
 
 
+@pytest.fixture()
+def clear_pixel_data_handlers():
+    orig_handlers = pydicom.config.pixel_data_handlers
+    pydicom.config.pixel_data_handlers = []
+    yield
+    pydicom.config.pixel_data_handlers = orig_handlers
+
+
 class TestDataset:
     """Tests for dataset.Dataset."""
 
@@ -60,12 +68,10 @@ class TestDataset:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
         ds.PixelData = "xyzlmnop"
-        msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
-        msg_from_numpy = (
-            r"'FileMetaDataset' object has no attribute 'TransferSyntaxUID'"
+        msg = (
+            "Unable to decode the pixel data as the dataset's 'file_meta' has "
+            r"no \(0002,0010\) 'Transfer Syntax UID' element"
         )
-        msg_from_pillow = r"'Dataset' object has no attribute 'PixelRepresentation'"
-        msg = "(" + "|".join([msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
 
@@ -1396,10 +1402,11 @@ class TestDataset:
         fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
         ds.NumberOfFrames = 0
-        with pytest.warns(UserWarning, match=r"value of 0 for \(0028,0008\)"):
+        msg = r"A value of '0' for \(0028,0008\) 'Number of Frames' is invalid"
+        with pytest.warns(UserWarning, match=msg):
             assert ds.pixel_array is not None
 
-    def test_pixel_array_id_changed(self):
+    def test_pixel_array_id_changed(self, clear_pixel_data_handlers):
         """Test that we try to get new pixel data if the id has changed."""
         fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
@@ -1407,13 +1414,17 @@ class TestDataset:
         ds._pixel_id = 1234
         assert id(ds.PixelData) != ds._pixel_id
         ds._pixel_array = "Test Value"
-        # If _pixel_id doesn't match then attempt to get new pixel data
-        orig_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = []
-        with pytest.raises(NotImplementedError):
-            ds.convert_pixel_data()
+        msg = (
+            r"Unable to decode the pixel data as a \(0002,0010\) 'Transfer Syntax UID' "
+            "value of '1.2.3.4' is not supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            ds.pixel_array
 
-        pydicom.config.pixel_data_handlers = orig_handlers
+        ds.pixel_array_options(use_v2_backend=True)
+        msg = "Unable to decode pixel data with a transfer syntax UID of '1.2.3.4'"
+        with pytest.raises(NotImplementedError, match=msg):
+            ds.convert_pixel_data()
 
     def test_pixel_array_id_reset_on_delete(self):
         """Test _pixel_array and _pixel_id reset when deleting pixel data"""
@@ -1465,9 +1476,8 @@ class TestDataset:
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.file_meta.TransferSyntaxUID = "1.2.3.4"
         msg = (
-            r"Unable to decode pixel data with a transfer syntax UID of "
-            r"'1.2.3.4' \(1.2.3.4\) as there are no pixel data handlers "
-            r"available that support it"
+            r"Unable to decode the pixel data as a \(0002,0010\) 'Transfer Syntax UID' "
+            "value of '1.2.3.4' is not supported"
         )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
@@ -1819,8 +1829,9 @@ class TestDatasetSaveAs:
         ds.PixelData = b"\x00\x01\x02\x03\x04\x05\x06"
         ds["PixelData"].VR = "OB"
         msg = (
-            r"Pixel Data has an undefined length indicating "
-            r"that it's compressed, but the data isn't encapsulated"
+            r"The \(7FE0,0010\) 'Pixel Data' element value hasn't been encapsulated "
+            "as required for a compressed transfer syntax - see pydicom.encaps."
+            r"encapsulate\(\) for more information"
         )
         with pytest.raises(ValueError, match=msg):
             ds.save_as(fp)
@@ -2712,3 +2723,16 @@ class TestFuture:
         ds = ds[0x00080001:]
         assert not hasattr(ds, "_is_little_endian")
         assert not hasattr(ds, "_is_implicit_VR")
+
+    def test_convert_pixel_data(self, use_future):
+        msg = "'Dataset' object has no attribute 'convert_pixel_data'"
+        with pytest.raises(AttributeError, match=msg):
+            Dataset().convert_pixel_data()
+
+    def test_pixel_array_options(self, use_future):
+        msg = (
+            r"Dataset.pixel_array_options\(\) got an unexpected "
+            "keyword argument 'use_v2_backend'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            Dataset().pixel_array_options(use_v2_backend=True)

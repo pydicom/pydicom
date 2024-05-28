@@ -37,18 +37,8 @@ def encode_pixel_data(src: bytes, runner: EncodeRunner) -> bytes:
     ----------
     src : bytes
         The raw image frame data to be encoded.
-    **kwargs
-        Required parameters:
-
-        * `rows`: int
-        * `columns`: int
-        * `samples_per_pixel`: int
-        * `number_of_frames`: int
-        * `bits_allocated`: int
-        * `bits_stored`: int
-        * `pixel_representation`: int
-        * `byteorder`: str
-        * `transfer_syntax_uid`: pydicom.uid.UID
+    runner : pydicom.pixels.encoders.base.EncodeRunner
+        The runner managing the encoding process.
 
     Returns
     -------
@@ -69,17 +59,8 @@ def _rle_encode(src: bytes, runner: EncodeRunner) -> bytes:
     ----------
     src : bytes
         The raw image frame data to be encoded.
-    **kwargs
-        Required parameters:
-
-        * `rows`: int
-        * `columns`: int
-        * `samples_per_pixel`: int
-        * `number_of_frames`: int
-        * `bits_allocated`: int
-        * `bits_stored`: int
-        * `pixel_representation`: int
-        * `photometric_interpretation`: str
+    runner : pydicom.pixels.encoders.base.EncodeRunner
+        The runner managing the encoding process.
 
     Returns
     -------

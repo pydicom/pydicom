@@ -2982,8 +2982,9 @@ class TestWriteUndefinedLengthPixelData:
             is_undefined_length=True,
         )
         msg = (
-            r"Pixel Data has an undefined length indicating "
-            r"that it's compressed, but the data isn't encapsulated"
+            r"The \(7FE0,0010\) 'Pixel Data' element value hasn't been encapsulated "
+            "as required for a compressed transfer syntax - see "
+            r"pydicom.encaps.encapsulate\(\) for more information"
         )
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
@@ -2999,8 +3000,9 @@ class TestWriteUndefinedLengthPixelData:
             is_undefined_length=True,
         )
         msg = (
-            r"Pixel Data has an undefined length indicating "
-            r"that it's compressed, but the data isn't encapsulated"
+            r"The \(7FE0,0010\) 'Pixel Data' element value hasn't been encapsulated "
+            "as required for a compressed transfer syntax - see "
+            r"pydicom.encaps.encapsulate\(\) for more information"
         )
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)

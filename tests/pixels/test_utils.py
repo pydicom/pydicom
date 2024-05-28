@@ -317,8 +317,8 @@ class TestPixelArray:
         ds = dcmread(EXPL_16_1_10F.path)
         del ds.file_meta.TransferSyntaxUID
         msg = (
-            r"The dataset's 'file_meta' has no \(0002,0010\) 'Transfer Syntax UID' "
-            "element"
+            "Unable to decode the pixel data as the dataset's 'file_meta' has no "
+            r"\(0002,0010\) 'Transfer Syntax UID' element"
         )
         with pytest.raises(AttributeError, match=msg):
             pixel_array(ds)
@@ -431,8 +431,8 @@ class TestIterPixels:
         ds = dcmread(EXPL_16_1_10F.path)
         del ds.file_meta.TransferSyntaxUID
         msg = (
-            r"The dataset's 'file_meta' has no \(0002,0010\) 'Transfer Syntax UID' "
-            "element"
+            "Unable to decode the pixel data as the dataset's 'file_meta' has no "
+            r"\(0002,0010\) 'Transfer Syntax UID' element"
         )
         with pytest.raises(AttributeError, match=msg):
             next(iter_pixels(ds))
@@ -1343,6 +1343,7 @@ class TestExpandYBR422:
         """Test 8-bit expansion."""
         ds = EXPL_8_3_1F_YBR422.ds
         assert ds.PhotometricInterpretation == "YBR_FULL_422"
+        ds.pixel_array_options(as_rgb=False)
         ref = ds.pixel_array
 
         expanded = expand_ybr422(ds.PixelData, ds.BitsAllocated)
@@ -1425,8 +1426,8 @@ class TestCompressRLE:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert len(ds.PixelData) == 21370
 
-        assert ds._pixel_array is arr
-        assert ds._pixel_id != {}
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_encoder_unavailable(self, monkeypatch):
@@ -1782,8 +1783,8 @@ class TestDecompress:
     def test_as_rgb(self):
         """Test decoding J2K - 1 frame, 3 sample (YBR_RCT)"""
         ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
-        ds.convert_pixel_data("pylibjpeg")
-        ref = ds.pixel_array
+        ds.pixel_array_options(decoding_plugin="pylibjpeg")
+        ref = ds.pixel_array  # YBR -> RGB
 
         assert ds.BitsAllocated == 8
         assert ds.PhotometricInterpretation == "YBR_FULL"
@@ -1799,14 +1800,14 @@ class TestDecompress:
         assert ds.PhotometricInterpretation == "RGB"
         assert ds._pixel_array is None
         assert ds._pixel_id == {}
-        assert np.array_equal(
-            ds.pixel_array, convert_color_space(ref, "YBR_FULL", "RGB")
-        )
+        assert np.array_equal(ds.pixel_array, ref)
 
         ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
         decompress(ds, decoding_plugin="pylibjpeg", as_rgb=False)
         assert ds.PhotometricInterpretation == "YBR_FULL"
-        assert np.array_equal(ds.pixel_array, ref)
+        ds.pixel_array_options(as_rgb=False)
+        rgb = convert_color_space(ds.pixel_array, "YBR_FULL", "RGB")
+        assert np.array_equal(rgb, ref)
 
     @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
     def test_instance_uid(self):

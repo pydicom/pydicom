@@ -53,21 +53,28 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     if runner.photometric_interpretation == PI.RGB:
         opts["use_mct"] = False
 
+    cr = opts.pop("compression_ratios", opts.get("j2k_cr", None))
+    psnr = opts.pop("signal_noise_ratios", opts.get("j2k_psnr", None))
     if tsyntax == uid.JPEG2000Lossless:
-        if "compression_ratios" in opts:
-            del opts["compression_ratios"]
-
-        if "signal_noise_ratios" in opts:
-            del opts["signal_noise_ratios"]
+        if cr or psnr:
+            raise ValueError(
+                "A lossy configuration option is being used with a transfer "
+                "syntax of 'JPEG 2000 Lossless' - did you mean to use 'JPEG "
+                "2000' instead?"
+            )
 
         return cast(bytes, encoder(src, **opts))
 
-    cr = opts.get("j2k_cr", None)
-    psnr = opts.get("j2k_psnr", None)
     if not cr and not psnr:
         raise ValueError(
-            "The 'JPEG 2000' transfer syntax requires either the 'j2k_cr' "
-            "or 'j2k_psnr' parameter"
+            "The 'JPEG 2000' transfer syntax requires a lossy configuration "
+            "option such as 'j2k_cr' or 'j2k_psnr'"
+        )
+
+    if cr and psnr:
+        raise ValueError(
+            "Multiple lossy configuration options are being used with the "
+            "'JPEG 2000' transfer syntax, please specify only one"
         )
 
     cs = encoder(src, **opts, compression_ratios=cr, signal_noise_ratios=psnr)

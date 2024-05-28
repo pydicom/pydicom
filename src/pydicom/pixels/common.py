@@ -6,6 +6,7 @@ from enum import Enum, unique
 from importlib import import_module
 from typing import TYPE_CHECKING, Any, TypedDict
 
+from pydicom.misc import warn_and_log
 from pydicom.pixels.utils import as_pixel_options
 from pydicom.uid import UID
 
@@ -209,6 +210,9 @@ class CoderBase:
             A dict of available {plugin name: decode/encode function} that can
             be used to decode/encode the corresponding pixel data.
         """
+        if self._decoder and not self.UID.is_encapsulated:
+            return {}  # type: ignore[return-value]
+
         if plugin:
             if plugin in self._available:
                 return {plugin: self._available[plugin]}
@@ -223,12 +227,15 @@ class CoderBase:
                     f"missing dependencies - requires {missing}"
                 )
 
-            raise ValueError(
-                f"No plugin named '{plugin}' has been added to '{type(self).__name__}'"
+            msg = (
+                f"No plugin named '{plugin}' has been added to '{self.UID.keyword}"
+                f"{type(self).__name__}'"
             )
+            if self._available:
+                names = [f"'{k}'" for k in self._available.keys()]
+                msg += f", available plugins are: {', '.join(names)}"
 
-        if self._decoder and not self.UID.is_encapsulated:
-            return {}  # type: ignore[return-value]
+            raise ValueError(msg)
 
         if self._available:
             return self._available.copy()
@@ -332,10 +339,7 @@ class RunnerBase:
         """
         return self._opts.get("extended_offsets", None)
 
-    def frame_length(
-        self,
-        unit: str = "bytes",
-    ) -> int:
+    def frame_length(self, unit: str = "bytes") -> int:
         """Return the expected length (in number of bytes or pixels) of each
         frame of pixel data.
 
@@ -488,6 +492,9 @@ class RunnerBase:
         if name == "number_of_frames":
             value = int(value) if isinstance(value, str) else value
             if value in (None, 0):
+                warn_and_log(
+                    f"A value of '{value}' for (0028,0008) 'Number of Frames' is invalid"
+                )
                 value = 1
         elif name == "photometric_interpretation":
             if value == "PALETTE COLOR":

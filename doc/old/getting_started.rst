@@ -59,7 +59,7 @@ data elements in DICOM files with Python code.
 it should run wherever Python runs.
 
 One limitation is that compressed pixel data (e.g. JPEG) can only be
-altered in an intelligent way if :doc:`decompressing <image_data_handlers>`
+altered in an intelligent way if :doc:`decompressing </guides/user/image_data_handlers>`
 it first. Once decompressed, it can be altered and written back to a
 DICOM file the same way as initially uncompressed data.
 
@@ -72,7 +72,7 @@ License
 Installing
 ==========
 
-See the :doc:`installation guide<../tutorials/installation>`.
+See the :doc:`installation guide</tutorials/installation>`.
 
 Using pydicom
 =============
@@ -80,7 +80,7 @@ Using pydicom
 Once installed, the package can be imported at a Python command line or used
 in your own Python program with ``import pydicom``.
 See the :gh:`examples directory <pydicom/tree/main/examples>`
-for both kinds of uses. Also see the :doc:`User Guide <pydicom_user_guide>`
+for both kinds of uses. Also see the :doc:`User Guide </guides/user/index>`
 for more details of how to use the package.
 
 Support
@@ -95,4 +95,4 @@ New versions, major bug fixes, etc. will also be announced through the group.
 Next Steps
 ==========
 
-To start learning how to use *pydicom*, see the :doc:`pydicom_user_guide`.
+To start learning how to use *pydicom*, see the :doc:`/guides/user/index`.

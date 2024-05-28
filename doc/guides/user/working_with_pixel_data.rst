@@ -31,7 +31,7 @@ By default *pydicom* reads in pixel data as the raw bytes found in the file::
 
   >>> from pydicom import dcmread
   >>> from pydicom.data import get_testdata_file
-  >>> path = get_testdata_file("MR_small.dcm")
+  >>> path = get_testdata_file("MR_small.dcm")  # the path to an example dataset
   >>> ds = dcmread(path)
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
@@ -66,7 +66,7 @@ an easy way to get it in a convenient form:
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` returns a
 :class:`numpy.ndarray` containing the pixel data::
 
-  >>> ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
+  >>> arr = ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
   array([[ 905, 1019, 1227, ...,  302,  304,  328],
          [ 628,  770,  907, ...,  298,  331,  355],
          [ 498,  566,  706, ...,  280,  285,  320],
@@ -74,14 +74,13 @@ an easy way to get it in a convenient form:
          [ 334,  400,  431, ..., 1094, 1068, 1083],
          [ 339,  377,  413, ..., 1318, 1346, 1336],
          [ 378,  374,  422, ..., 1369, 1129,  862]], dtype=int16)
-  >>> ds.pixel_array.shape
+  >>> arr.shape
   (64, 64)
 
 If the pixel data is compressed then
 :attr:`~pydicom.dataset.Dataset.pixel_array` will return the uncompressed data,
-provided the dependencies of the required :ref:`pixel data handler
-<api_handlers_pixeldata>` are available. See
-:doc:`handling compressed image data <image_data_handlers>` for more
+provided the dependencies of the required pixel data decoder have been met. See
+:doc:`handling compressed image data </guides/user/image_data_handlers>` for more
 information.
 
 NumPy can be used to modify the data, but if the changes are to be saved,

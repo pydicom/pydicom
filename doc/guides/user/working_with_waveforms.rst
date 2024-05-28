@@ -42,13 +42,13 @@ corresponding (5400,1010) *Waveform Data* element.
 
 .. warning::
 
-   :attr:`Dataset.waveform_array<pydicom.dataset.Dataset.waveform_array>`
+   :attr:`Dataset.waveform_array()<pydicom.dataset.Dataset.waveform_array>`
    requires `NumPy <http://numpy.org/>`_.
 
 The *Waveform Data* element contains the raw bytes exactly as found in the
 file. To get the waveforms in a more useful form you can use the
-:attr:`~pydicom.dataset.Dataset.waveform_array` method to return a
-a :class:`numpy.ndarray` with shape (samples, channels) for the multiplex
+:attr:`Dataset.waveform_array()<pydicom.dataset.Dataset.waveform_array>` method
+to return a :class:`numpy.ndarray` with shape (samples, channels) for the multiplex
 group at `index` in the *Waveform Sequence*.
 
   >>> multiplex_1 = ds.waveform_array(0)

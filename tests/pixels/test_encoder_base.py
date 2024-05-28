@@ -1409,7 +1409,7 @@ class TestEncodeRunner_Encode:
 
     def test_specify_invalid_plugin_raises(self):
         """Test an invalid plugin raises exception"""
-        msg = r"No plugin named 'foo' has been added to 'Encoder'"
+        msg = r"No plugin named 'foo' has been added to 'RLELosslessEncoder'"
         with pytest.raises(ValueError, match=msg):
             RLELosslessEncoder.encode(EXPL_16_16_1F.ds, encoding_plugin="foo")
 
@@ -1717,8 +1717,8 @@ class TestDatasetCompress:
         ds = get_testdata_file("CT_small.dcm", read=True)
         monkeypatch.delitem(RLELosslessEncoder._available, "pydicom")
         msg = (
-            r"The 'RLE Lossless' encoder is unavailable because its encoding "
-            r"plugins are missing dependencies:\n"
+            r"The pixel data encoder for 'RLE Lossless' is unavailable because all "
+            r"of its plugins are missing dependencies:\n"
             r"    gdcm - requires gdcm>=3.0.10\n"
             r"    pylibjpeg - requires numpy, pylibjpeg>=2.0 and pylibjpeg-rle>=2.0"
         )
@@ -1762,21 +1762,18 @@ class TestDatasetCompress:
         assert np.array_equal(arr, ds.pixel_array)
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-    def test_override_kwargs(self):
-        """Test we can override using kwargs."""
+    def test_overriding_kwargs_raises(self):
+        """Test unable to override using kwargs."""
         ds = get_testdata_file("SC_rgb_small_odd.dcm", read=True)
-        ref = ds.pixel_array
-        del ds.PlanarConfiguration
         ds.SamplesPerPixel = 1
-        assert "PlanarConfiguration" not in ds
-        ds.compress(
-            RLELossless,
-            encoding_plugin="pydicom",
-            samples_per_pixel=3,
-            planar_configuration=0,
-        )
-        ds.SamplesPerPixel = 3
-        assert np.array_equal(ref, ds.pixel_array)
+        msg = "One or more of the following values is not valid"
+        with pytest.raises(ValueError, match=msg):
+            ds.compress(
+                RLELossless,
+                encoding_plugin="pydicom",
+                samples_per_pixel=3,
+                planar_configuration=0,
+            )
 
     def test_planar_configuration_rle(self):
         """Test that multi-sample data has correct planar configuration."""
@@ -1785,7 +1782,7 @@ class TestDatasetCompress:
         assert ds.PlanarConfiguration == 0
 
         ds.compress(RLELossless, encoding_plugin="pydicom")
-        assert ds.PlanarConfiguration == 1
+        assert ds.PlanarConfiguration == 0
         assert ds.file_meta.TransferSyntaxUID == RLELossless
 
 

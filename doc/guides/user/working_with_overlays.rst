@@ -20,14 +20,14 @@ include multiple overlays, where the related elements for each overlay use the
 same group number. Because of this, the only way to access a particular
 element from an overlay is to use the ``Dataset[group, elem]`` method::
 
-  >>> import pydicom
-  >>> ds = pydicom.examples.overlay
+  >>> from pydicom import examples
+  >>> ds = examples.overlay
   >>> elem = ds[0x6000, 0x3000]  # returns a DataElement
   >>> print(elem)
   (6000, 3000) Overlay Data                        OW: Array of 29282 elements
 
 
-pydicom tends to be "lazy" in interpreting DICOM data. For example, by default
+*pydicom* tends to be "lazy" in interpreting DICOM data. For example, by default
 it doesn't do anything with overlay data except read in the raw bytes::
 
   >>> elem.value # doctest: +ELLIPSIS
@@ -44,7 +44,7 @@ it doesn't do anything with overlay data except read in the raw bytes::
 The *Overlay Data* element contains the raw bytes exactly as found in the file
 as bit-packed data. To unpack and get an overlay in a more useful form you
 can use the :meth:`~pydicom.dataset.Dataset.overlay_array` method to return a
-:class:`numpy.ndarray`. To use it you simply pass the group number of the
+:class:`numpy.ndarray`. To use it you only need to pass the group number of the
 overlay elements you're interested in::
 
   >>> arr = ds.overlay_array(0x6000) # doctest: +NORMALIZE_WHITESPACE
@@ -67,9 +67,8 @@ the top left pixels are aligned and a value of ``[0, 0]`` indicates that the
 overlay pixels start 1 row above and 1 row to the left of the image pixels.
 
 NumPy can be used to modify the pixels, but if the changes are to be saved,
-they must be bit-packed (using something like
-:func:`~pydicom.pixels.utils.pack_bits`) and written
-back to the correct element:
+they must be bit-packed (using something like :func:`~pydicom.pixels.pack_bits`)
+and written back to the correct element:
 
 .. code-block:: python
 
@@ -85,7 +84,7 @@ back to the correct element:
   ds.save_as("temp.dcm")
 
 Some changes may require other DICOM elements to be modified. For example, if
-the overlay data is reduced (e.g. a 512x512 image is collapsed
-to 256x256) then the corresponding (60xx,0010) *Overlay Rows*
-and (60xx,0011) *Overlay Columns* should be set appropriately. You must
-explicitly set these yourself; pydicom does not do so automatically.
+the overlay data is reduced (e.g. a 512x512 image is resized to 256x256) then
+the corresponding (60xx,0010) *Overlay Rows* and (60xx,0011) *Overlay Columns*
+should be set appropriately. You must explicitly set these yourself as *pydicom*
+does not do so automatically.

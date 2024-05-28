@@ -16,8 +16,7 @@ pydicom documentation
    :hidden:
    :caption: Documentation
 
-   old/pydicom_user_guide
-   old/ref_guide
+   guides/user/index
    tutorials/index
    guides/index
    reference/index
@@ -46,14 +45,14 @@ If you're new to *pydicom* then start here:
 * :doc:`Installation<tutorials/installation>` |
   :doc:`Introduction to pydicom<old/getting_started>` |
   :doc:`What Python types do I use for each VR<guides/element_value_types>`
-* **Basics**: :doc:`Read, access, modify, write</tutorials/dataset_basics>`
+* **Basics**: :doc:`Dataset: read, access, modify, write</tutorials/dataset_basics>`
 * **Intermediate**:
-  :doc:`Compressing Pixel Data </tutorials/pixel_data/compressing>` |
+  :doc:`Compressing Pixel Data</tutorials/pixel_data/compressing>` |
   :doc:`Waveform decoding and encoding </tutorials/waveforms>` |
   :doc:`DICOM File-sets and DICOMDIR</tutorials/filesets>`
 
 
-:doc:`User Guide <old/pydicom_user_guide>`
+:doc:`User Guide <guides/user/index>`
 ==========================================
 
 The main documentation. This contains an in-depth description of all
@@ -64,7 +63,7 @@ core elements of *pydicom* and how to use them.
 =====================================
 
 A set of examples illustrating the use of the different core elements. It
-complements the :doc:`User Guide <old/pydicom_user_guide>`.
+complements the :doc:`User Guide <guides/user/index>`.
 
 
 :doc:`API Reference <reference/index>`

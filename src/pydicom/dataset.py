@@ -34,7 +34,6 @@ from importlib.util import find_spec as have_package
 from itertools import takewhile
 from types import TracebackType
 from typing import (
-    Optional,
     TypeAlias,
     Any,
     AnyStr,
@@ -63,25 +62,13 @@ from pydicom.datadict import (
     get_private_entry,
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
-from pydicom.pixels.processing import convert_color_space
-from pydicom.pixels.utils import (
-    reshape_pixel_array,
-    get_image_pixel_ids,
-    get_nr_frames,
-)
+from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
+from pydicom.pixels.utils import reshape_pixel_array, get_image_pixel_ids
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
-from pydicom.uid import (
-    ExplicitVRLittleEndian,
-    RLELossless,
-    PYDICOM_IMPLEMENTATION_UID,
-    UID,
-    JPEGLSNearLossless,
-    JPEG2000,
-)
+from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
@@ -418,6 +405,7 @@ class Dataset:
         self._private_blocks: dict[tuple[int, str], PrivateBlock] = {}
 
         self._pixel_array: numpy.ndarray | None = None
+        self._pixel_array_opts: dict[str, Any] = {"use_pdh": False}
         self._pixel_id: dict[str, int] = {}
 
         self.file_meta: FileMetaDataset
@@ -1639,20 +1627,34 @@ class Dataset:
     def convert_pixel_data(self, handler_name: str = "") -> None:
         """Convert pixel data to a :class:`numpy.ndarray` internally.
 
+        .. deprecated:: 3.0
+
+            This method will be removed in v4.0, use
+            :attr:`~pydicom.dataset.Dataset.pixel_array_options` instead.
+
         Parameters
         ----------
         handler_name : str, optional
-            The name of the pixel handler that shall be used to
-            decode the data. Supported names are: ``'gdcm'``,
-            ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'`` and
-            ``'pylibjpeg'``. If not used (the default), a matching handler is
-            used from the handlers configured in
-            :attr:`~pydicom.config.pixel_data_handlers`.
+            The name of the pixel handler or decoding plugin to use to decode
+            the dataset's pixel data. Support values are:
+
+            * If using the :mod:`~pydicom.pixel_data_handlers` backend:
+              ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'``
+              and ``'pylibjpeg'``.
+            * If using the :mod:`~pydicom.pixels` backend see the
+              :doc:`documentation for the decoder</reference/pixels.decoders>`
+              corresponding to the dataset's *Transfer Syntax UID*.
+
+            If not used (the default) then all available handlers or plugins
+            will be tried and the data from first successful one will be
+            used.
 
         Returns
         -------
         None
-            Converted pixel data is stored internally in the dataset.
+            Converted pixel data is stored internally in the dataset, it can
+            be accessed with the :attr:`~pydicom.dataset.Dataset.pixel_array`
+            property.
 
         Raises
         ------
@@ -1670,6 +1672,12 @@ class Dataset:
         If the pixel data is in a compressed image format, the data is
         decompressed and any related data elements are changed accordingly.
         """
+        # TODO: Remove in v4.0
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'convert_pixel_data'"
+            )
+
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
@@ -1678,7 +1686,7 @@ class Dataset:
         elif self._pixel_array is None:
             already_have = False
 
-        # Chcking `_pixel_id` may sometimes give a false result if the pixel
+        # Checking `_pixel_id` may sometimes give a false result if the pixel
         #   data memory has been freed (such as with ds.PixelData = None)
         #   prior to setting a new value; Python may reuse that freed memory
         #   for the new value and therefore give the same `id()` value
@@ -1688,15 +1696,25 @@ class Dataset:
         if already_have:
             return
 
-        if handler_name:
-            self._convert_pixel_data_using_handler(handler_name)
+        opts = self._pixel_array_opts.copy()
+        name = handler_name.lower() if handler_name else opts.get("decoding_plugin", "")
+        if not opts["use_pdh"]:
+            # Use 'pydicom.pixels' backend
+            opts["decoding_plugin"] = name
+            self._pixel_array = pixel_array(self, **opts)
+            self._pixel_id = get_image_pixel_ids(self)
         else:
-            self._convert_pixel_data_without_handler()
+            # Use 'pydicom.pixel_data_handlers' backend
+            if name:
+                self._convert_pixel_data_using_handler(name)
+            else:
+                self._convert_pixel_data_without_handler()
 
     def _convert_pixel_data_using_handler(self, name: str) -> None:
         """Convert the pixel data using handler with the given name.
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
+        # TODO: Remove in v4.0
         # handle some variations in name
         handler_name = name.lower()
         if not handler_name.endswith("_handler"):
@@ -1733,6 +1751,7 @@ class Dataset:
         """Convert the pixel data using the first matching handler.
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
+        # TODO: Remove in v4.0
         # Find all possible handlers that support the transfer syntax
         ts = self.file_meta.TransferSyntaxUID
         possible_handlers = [
@@ -1800,7 +1819,7 @@ class Dataset:
 
     def _do_pixel_data_conversion(self, handler: Any) -> None:
         """Do the actual data conversion using the given handler."""
-
+        # TODO: Remove in v4.0
         # Use the handler to get a 1D numpy array of the pixel data
         # Will raise an exception if no pixel data element
         arr = handler.get_pixeldata(self)
@@ -1818,22 +1837,22 @@ class Dataset:
     def compress(
         self,
         transfer_syntax_uid: str,
-        arr: Optional["numpy.ndarray"] = None,
+        arr: "numpy.ndarray | None" = None,
         encoding_plugin: str = "",
-        decoding_plugin: str = "",
         encapsulate_ext: bool = False,
+        new_instance_uid: bool = True,
         *,
         jls_error: int | None = None,
         j2k_cr: list[float] | None = None,
         j2k_psnr: list[float] | None = None,
         **kwargs: Any,
     ) -> None:
-        """Compress and update an uncompressed dataset in-place with the
-        resulting :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
+        """Compress uncompressed pixel data and update `ds` in-place with the
+        resulting :dcm:`encapsulated<part05/sect_A.4.html>` codestream.
 
         .. versionadded:: 2.2
 
-        The dataset must already have the following
+        The dataset `ds` must already have the following
         :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
         with correct values that correspond to the resulting compressed
         pixel data:
@@ -1857,7 +1876,6 @@ class Dataset:
 
         * (0002,0010) *Transfer Syntax UID*
         * (7FE0,0010) *Pixel Data*
-        * (0028,0006) *Planar Configuration*
 
         If the compressed pixel data is too large for encapsulation using a
         basic offset table then an :dcm:`extended offset table
@@ -1866,6 +1884,9 @@ class Dataset:
 
         * (7FE0,0001) *Extended Offset Table*
         * (7FE0,0002) *Extended Offset Table Lengths*
+
+        If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+        Instance UID* value will be generated.
 
         **Supported Transfer Syntax UIDs**
 
@@ -1887,9 +1908,10 @@ class Dataset:
         |                        |                      | gdcm      |                                  |
         +------------------------+----------------------+-----------+----------------------------------+
 
-        .. versionadded:: 3.0
+        .. versionchanged:: 3.0
 
-            Added the `jls_error`, `j2k_cr` and `j2k_psnr` keyword parameters.
+            Added the `jls_error`, `j2k_cr`, `j2k_psnr` and `new_instance_uid`
+            keyword parameters.
 
         Examples
         --------
@@ -1914,17 +1936,19 @@ class Dataset:
             The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
             contents of the array should match the dataset.
         encoding_plugin : str, optional
-            Use the `encoding_plugin` to compress the pixel data. See the
-            :doc:`user guide </old/image_data_compression>` for a list of
+            Use the `encoding_plugin` to use to compress the pixel data. See the
+            :doc:`user guide </guides/user/image_data_compression>` for a list of
             plugins available for each UID and their dependencies. If not
             specified then all available plugins will be tried (default).
-        decoding_plugin : str, optional
-            Placeholder for future functionality.
         encapsulate_ext : bool, optional
             If ``True`` then force the addition of an extended offset table.
             If ``False`` (default) then an extended offset table
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
+        new_instance_uid : bool, optional
+            If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+            value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+            keep the original value.
         jls_error : int, optional
             **JPEG-LS Near Lossless only**. The allowed absolute compression error
             in the pixel values.
@@ -1948,133 +1972,112 @@ class Dataset:
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
         """
-        from pydicom.pixels import get_encoder, as_pixel_options
+        compress(
+            self,
+            transfer_syntax_uid,
+            arr,
+            encoding_plugin=encoding_plugin,
+            encapsulate_ext=encapsulate_ext,
+            new_instance_uid=new_instance_uid,
+            jls_error=jls_error,
+            j2k_cr=j2k_cr,
+            j2k_psnr=j2k_psnr,
+            **kwargs,
+        )
 
-        uid = UID(transfer_syntax_uid)
+    def decompress(
+        self,
+        handler_name: str = "",
+        *,
+        as_rgb: bool = True,
+        new_instance_uid: bool = True,
+        decoding_plugin: str = "",
+        **kwargs: Any,
+    ) -> None:
+        """Perform an in-place decompression of a dataset with a compressed *Transfer
+        Syntax UID*.
 
-        # Raises NotImplementedError if `uid` is not supported
-        encoder = get_encoder(uid)
-        if not encoder.is_available:
-            missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
-            raise RuntimeError(
-                f"The '{uid.name}' encoder is unavailable because its "
-                f"encoding plugins are missing dependencies:\n"
-                f"{missing}"
-            )
+        .. warning::
 
-        if uid == JPEGLSNearLossless and jls_error is not None:
-            kwargs["jls_error"] = jls_error
+            This function requires `NumPy <https://numpy.org/>`_ and may require
+            the installation of additional packages to perform the actual pixel
+            data decoding. See the :doc:`pixel data decompression documentation
+            </guides/user/image_data_handlers>` for more information.
 
-        if uid == JPEG2000:
-            if j2k_cr is not None:
-                kwargs["j2k_cr"] = j2k_cr
+        * The dataset's *Transfer Syntax UID* will be set to *Explicit
+          VR Little Endian*.
+        * The *Pixel Data* will be decompressed in its entirety and the
+          *Pixel Data* element's value updated with the decompressed data,
+          padded to an even length.
+        * The *Pixel Data* element's VR will be set to **OB** if *Bits
+          Allocated* <= 8, otherwise it will be set to **OW**.
+        * The :attr:`DataElement.is_undefined_length
+          <pydicom.dataelem.DataElement.is_undefined_length>` attribute for the
+          *Pixel Data* element will be set to ``False``.
+        * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
+          modified as required to match the uncompressed *Pixel Data*.
+        * If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+          Instance UID* value will be generated.
 
-            if j2k_psnr is not None:
-                kwargs["j2k_psnr"] = j2k_psnr
+        .. versionchanged:: 3.0
 
-        if arr is None:
-            # Encode the current *Pixel Data*
-            frame_iterator = encoder.iter_encode(
-                self, encoding_plugin=encoding_plugin, **kwargs
-            )
-        else:
-            # Encode from an uncompressed pixel data array
-            opts = as_pixel_options(self, **kwargs)
-            frame_iterator = encoder.iter_encode(
-                arr, encoding_plugin=encoding_plugin, **opts
-            )
+            Added the `as_rgb` and `new_instance_uid` keyword parameters.
 
-        # Encode!
-        encoded = [f for f in frame_iterator]
+        .. deprecated:: 3.0
 
-        # Encapsulate the encoded *Pixel Data*
-        nr_frames = get_nr_frames(self)
-        total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
-        if encapsulate_ext or total > 2**32 - 1:
-            (
-                self.PixelData,
-                self.ExtendedOffsetTable,
-                self.ExtendedOffsetTableLengths,
-            ) = encapsulate_extended(encoded)
-        else:
-            self.PixelData = encapsulate(encoded)
-
-        # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
-        self["PixelData"].is_undefined_length = True
-        self["PixelData"].VR = VR_.OB
-        self._pixel_array = None
-        self._pixel_id = {}
-
-        # Set the correct *Transfer Syntax UID*
-        if not hasattr(self, "file_meta"):
-            self.file_meta = FileMetaDataset()
-
-        self.file_meta.TransferSyntaxUID = uid
-
-        # Add or update any other required elements
-        if self.SamplesPerPixel > 1:
-            self.PlanarConfiguration: int = 1 if uid == RLELossless else 0
-
-    def decompress(self, handler_name: str = "") -> None:
-        """Decompresses *Pixel Data* and modifies the :class:`Dataset`
-        in-place.
-
-        If not a compressed transfer syntax, then pixel data is converted
-        to a :class:`numpy.ndarray` internally, but not returned.
-
-        If compressed pixel data, then is decompressed using an image handler,
-        and internal state is updated appropriately:
-
-        - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
-          form
-        - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
-          is ``False`` for the (7FE0,0010) *Pixel Data* element.
+            The `handler_name` parameter will be removed in v4.0, use
+            `decoding_plugin` instead.
 
         Parameters
         ----------
         handler_name : str, optional
-            The name of the pixel handler that shall be used to
-            decode the data. Supported names are: ``'gdcm'``,
-            ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'`` and
-            ``'pylibjpeg'``.
-            If not used (the default), a matching handler is used from the
-            handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
+            Deprecated and will be removed in v4.0, see `decoding_plugin` instead.
+        as_rgb : bool, optional
+            **pixels backend only.** If ``True`` (default) then convert pixel data
+            with a YCbCr :ref:`photometric interpretation<photometric_interpretation>`
+            such as ``"YBR_FULL_422"`` to RGB.
+        new_instance_uid : bool, optional
+            If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+            value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+            keep the original value.
+        decoding_plugin : str, optional
+            The name of the decoding plugin to use when decoding compressed
+            pixel data. If no `decoding_plugin` is specified (default) then all
+            available plugins will be tried and the result from the first successful
+            one yielded.
 
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        NotImplementedError
-            If the pixel data was originally compressed but file is not
-            *Explicit VR Little Endian* as required by the DICOM Standard.
+            * If using the :mod:`~pydicom.pixels` backend (default) then see the
+              :doc:`API documentation</reference/pixels.decoders>` for the available
+              plugins for each *Transfer Syntax UID*.
+            * If using the deprecated :mod`~pydicom.pixel_data_handlers` backend
+              supported plugins are: ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``,
+              ``'rle'``, ``'numpy'`` and ``'pylibjpeg'``.
+        kwargs : dict[str, Any], optional
+            **pixels backend only.** Optional keyword parameters for the decoding
+            plugin may also be present. See the :doc:`decoding plugins options
+            </guides/decoding/decoder_options>` for more information.
         """
-        self.convert_pixel_data(handler_name)
-        self.is_decompressed = True
-        # May have been undefined length pixel data, but won't be now
-        if "PixelData" in self:
-            self[0x7FE00010].is_undefined_length = False
+        # TODO: remove support for pixel_data_handlers module in v4.0
+        if config._use_future and kwargs.get("handler_name", handler_name):
+            raise TypeError(
+                f"{type(self).__name__}.decompress() got an unexpected "
+                "keyword argument 'handler_name'"
+            )
 
-        # Make sure correct Transfer Syntax is set
-        # According to the dicom standard PS3.5 section A.4,
-        # all compressed files must have been explicit VR, little endian
-        # First check if was a compressed file
-        if (
-            hasattr(self, "file_meta")
-            and self.file_meta.TransferSyntaxUID.is_compressed
-        ):
-            # Check that current file as read does match expected
-            if not self.is_little_endian or self.is_implicit_VR:
-                msg = (
-                    "Current dataset does not match expected ExplicitVR "
-                    "LittleEndian transfer syntax from a compressed "
-                    "transfer syntax"
-                )
-                raise NotImplementedError(msg)
+        opts = self._pixel_array_opts.copy()
+        if handler_name:
+            opts["decoding_plugin"] = handler_name
 
-            # All is as expected, updated the Transfer Syntax
-            self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        if decoding_plugin:
+            opts["decoding_plugin"] = decoding_plugin
+
+        opts.update(**kwargs)
+        decompress(
+            self,
+            as_rgb=as_rgb,
+            new_instance_uid=new_instance_uid,
+            **opts,
+        )
 
     def overlay_array(self, group: int) -> "numpy.ndarray":
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
@@ -2109,15 +2112,174 @@ class Dataset:
     def pixel_array(self) -> "numpy.ndarray":
         """Return the pixel data as a :class:`numpy.ndarray`.
 
+        .. warning::
+
+            This property requires `NumPy <https://numpy.org/>`_ and may require
+            the installation of additional packages to perform the actual pixel
+            data decoding. See the :doc:`pixel data decompression documentation
+            </guides/user/image_data_handlers>` for more information.
+
+        .. versionchanged:: 3.0
+
+            The backend used for pixel data decoding has changed from the
+            :mod:`~pydicom.pixel_data_handlers` module to the
+            :mod:`~pydicom.pixels` module. The behavior of the new backend
+            is not backwards compatible with the old one, in particular the
+            default color space should now be RGB when previously YCbCr data
+            was returned.
+
+            To revert to the deprecated :mod:`~pydicom.pixel_data_handlers`
+            backend pass ``use_v2_backend=True`` to the
+            :meth:`~pydicom.dataset.Dataset.pixel_array_options` method::
+
+                >>> from pydicom import examples
+                >>> ds = examples.ct
+                >>> ds.pixel_array_options(use_v2_backend=True)
+                >>> arr = ds.pixel_array
+
+            The :mod:`~pydicom.pixel_data_handlers` module and the
+            `use_v2_backend` keyword argument will be removed in v4.0.
+
         Returns
         -------
         numpy.ndarray
-            The (7FE0,0008) *Float Pixel Data*, (7FE0,0009) *Double Float
-            Pixel Data* or (7FE0,0010) *Pixel Data* converted to a
-            :class:`numpy.ndarray`.
+            The contents of the (7FE0,0008) *Float Pixel Data*, (7FE0,0009)
+            *Double Float Pixel Data* or (7FE0,0010) *Pixel Data* elements
+            converted to a :class:`numpy.ndarray`. The array will be shaped as:
+
+            * (rows, columns) for single frame, single sample data
+            * (rows, columns, samples) for single frame, multi-sample data
+            * (frames, rows, columns) for multi-frame, single sample data
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data
+
+            When using the :mod:`pydicom.pixels` backend the decoding options
+            used with the returned array can be customized via the
+            :meth:`~pydicom.dataset.Dataset.pixel_array_options` method.
+
+        See Also
+        --------
+        pydicom.pixels.pixel_array
+            A function for returning the pixel data from the path to a dataset,
+            a readable file-like containing a dataset or a
+            :class:`~pydicom.dataset.Dataset` instance. Can be used to minimize
+            the memory required to return the pixel data when used with a path
+            or file-like.
+        pydicom.pixels.iter_array
+            Similar to :func:`pydicom.pixels.pixel_array` but returns a generator
+            that iterates through the image frames.
         """
         self.convert_pixel_data()
         return cast("numpy.ndarray", self._pixel_array)
+
+    def pixel_array_options(
+        self,
+        *,
+        index: int | None = None,
+        raw: bool = False,
+        decoding_plugin: str = "",
+        use_v2_backend: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Set the decoding and processing options used by the
+        :attr:`~pydicom.dataset.Dataset.pixel_array` property.
+
+        .. versionadded:: 3.0
+
+        .. deprecated:: 3.0
+
+            The `use_v2_backend` keyword parameter will be removed in v4.0.
+
+        **Processing**
+
+        The following processing operations on the raw pixel data will always
+        be performed:
+
+        * Natively encoded bit-packed pixel data for a :ref:`bits allocated
+          <bits_allocated>` of ``1`` will be unpacked.
+        * Natively encoded pixel data with a :ref:`photometric interpretation
+          <photometric_interpretation>` of ``"YBR_FULL_422"`` will
+          have it's sub-sampling removed.
+        * The output array will be reshaped to the specified dimensions.
+        * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+          expected :ref:`pixel representation<pixel_representation>` will be
+          converted to match.
+
+        With the :mod:`pydicom.pixels` backend, if ``raw = False`` (the
+        default) then the following processing operation will also be performed:
+
+        * Pixel data with a :ref:`photometric interpretation
+          <photometric_interpretation>` of ``"YBR_FULL"`` or ``"YBR_FULL_422"``
+          will be converted to RGB.
+
+        Examples
+        --------
+
+        Convert the *Pixel Data* to an array that's a view on the original buffer::
+
+            >>> from pydicom import examples
+            >>> ds = examples.ct
+            >>> ds.pixel_array_options(view_only=True)
+            >>> arr = ds.pixel_array
+
+        Use the deprecated :mod:`~pydicom.pixel_data_handlers` backend to convert
+        the *Pixel Data* to an array::
+
+            >>> from pydicom import examples
+            >>> ds = examples.ct
+            >>> ds.pixel_array_options(use_v2_backend=True)
+            >>> arr = ds.pixel_array
+
+        Parameters
+        ----------
+        index : int | None, optional
+            If ``None`` (default) then return an array containing all the
+            frames in the pixel data, otherwise return one containing only
+            the frame from the specified `index`, which starts at 0 for the
+            first frame. Only available with the :mod:`~pydicom.pixels` backend.
+        raw : bool, optional
+            If ``True`` then return the decoded pixel data after only
+            minimal processing (see the processing section above). If ``False``
+            (default) then additional processing may be applied to convert the
+            pixel data to it's most commonly used form (such as converting from
+            YCbCr to RGB). Only available with the :mod:`~pydicom.pixels` backend.
+        decoding_plugin : str, optional
+            The name of the decoding plugin to use when decoding compressed
+            pixel data. If no `decoding_plugin` is specified (default) then all
+            available plugins will be tried and the result from the first successful
+            one returned. For information on the available plugins for each
+            *Transfer Syntax UID*:
+
+            * If using the :mod:`~pydicom.pixels` backend see the
+              :doc:`documentation for the decoder</reference/pixels.decoders>`
+              corresponding to the dataset's *Transfer Syntax UID*.
+            * If using the :mod:`~pydicom.pixel_data_handlers` backend supported
+              values are  ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``, ``'rle'``,
+              ``'numpy'`` and ``'pylibjpeg'``.
+        use_v2_backend : bool, optional
+            If ``False`` (default) then use the :mod:`pydicom.pixels` backend
+            to decode the pixel data, otherwise use the deprecated
+            :mod:`pydicom.pixel_data_handlers` backend.
+        **kwargs
+            Optional keyword parameters for controlling decoding with the
+            :mod:`~pydicom.pixels` backend, please see the
+            :doc:`decoding options documentation</guides/decoding/decoder_options>`
+            for more information.
+        """
+        if config._use_future and kwargs.get("use_v2_backend", use_v2_backend):
+            raise TypeError(
+                f"{type(self).__name__}.pixel_array_options() got an unexpected "
+                "keyword argument 'use_v2_backend'"
+            )
+
+        kwargs["index"] = index
+        kwargs["raw"] = raw
+        if decoding_plugin:
+            kwargs["decoding_plugin"] = decoding_plugin.lower()
+        kwargs["use_pdh"] = False if config._use_future else use_v2_backend
+
+        self._pixel_array_opts = kwargs
+        self._pixel_array = None
+        self._pixel_id = {}
 
     def waveform_array(self, index: int) -> "numpy.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
@@ -2527,7 +2689,7 @@ class Dataset:
             # XXX note if user misspells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
-    def _set_file_meta(self, value: Optional["Dataset"]) -> None:
+    def _set_file_meta(self, value: "Dataset | None") -> None:
         """Set the Dataset's File Meta Information attribute."""
         if value is None:
             self.__dict__["file_meta"] = value
@@ -3002,7 +3164,7 @@ class FileDataset(Dataset):
         filename_or_obj: PathType | BinaryIO | ReadableBuffer,
         dataset: _DatasetType,
         preamble: bytes | None = None,
-        file_meta: Optional["FileMetaDataset"] = None,
+        file_meta: "FileMetaDataset | None" = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
     ) -> None:

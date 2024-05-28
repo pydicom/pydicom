@@ -786,7 +786,7 @@ class Decoder(CoderBase):
             This method requires `NumPy <https://numpy.org/>`_ and may require
             the installation of additional packages to perform the actual pixel
             data decoding. See the :doc:`pixel data decompression documentation
-            </old/image_data_handlers>` for more information.
+            </guides/user/image_data_handlers>` for more information.
 
         **Processing**
 
@@ -1146,7 +1146,7 @@ class Decoder(CoderBase):
             intricacies of converting raw decoded DICOM pixel data to a usable
             form. It may also require the installation of additional packages
             to perform the actual pixel data decoding (see the :doc:`pixel data
-            decompression documentation</old/image_data_handlers>` for more
+            decompression documentation</guides/user/image_data_handlers>` for more
             information).
 
         Parameters
@@ -1408,7 +1408,7 @@ class Decoder(CoderBase):
             This method requires `NumPy <https://numpy.org/>`_ and may require
             the installation of additional packages to perform the actual pixel
             data decoding. See the :doc:`pixel data decompression documentation
-            </old/image_data_handlers>` for more information.
+            </guides/user/image_data_handlers>` for more information.
 
         **Processing**
 
@@ -1578,7 +1578,7 @@ class Decoder(CoderBase):
             intricacies of converting raw decoded DICOM pixel data to a usable
             form. It may also require the installation of additional packages to
             perform the actual pixel data decoding (see the :doc:`pixel data
-            decompression documentation</old/image_data_handlers>` for more
+            decompression documentation</guides/user/image_data_handlers>` for more
             information).
 
         Parameters

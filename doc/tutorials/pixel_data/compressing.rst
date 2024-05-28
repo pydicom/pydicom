@@ -211,7 +211,7 @@ The plugins available for each encoder are listed in the
 Implicitly changing the compression on an already compressed dataset is not
 currently supported, however it can still be done explicitly by decompressing
 prior to calling :meth:`~pydicom.dataset.Dataset.compress`. In the example
-below, a matching :doc:`image data handler</old/image_data_handlers>` for the
+below, a matching :doc:`image data handler</guides/user/index>` for the
 original transfer syntax - *JPEG 2000 Lossless* - is required.
 
 .. code-block:: python
