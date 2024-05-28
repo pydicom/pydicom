@@ -43,7 +43,6 @@ Getting Started
 If you're new to *pydicom* then start here:
 
 * :doc:`Installation<tutorials/installation>` |
-  :doc:`Introduction to pydicom<old/getting_started>` |
   :doc:`What Python types do I use for each VR<guides/element_value_types>`
 * **Basics**: :doc:`Dataset: read, access, modify, write</tutorials/dataset_basics>`
 * **Intermediate**:
