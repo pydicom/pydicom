@@ -194,7 +194,7 @@ Enhancements
 
   See the :doc:`JPEG-LS</guides/encoding/jpeg_ls>` and :doc:`JPEG 2000
   </guides/encoding/jpeg_2k>` encoding guides for more information.
-* Added :meth:`Dataset.pixel_array_options<pydicom.dataset.Dataset.pixel_array_options>`
+* Added :meth:`Dataset.pixel_array_options()<pydicom.dataset.Dataset.pixel_array_options>`
   for controlling pixel data decoding when using :attr:`Dataset.pixel_array
   <pydicom.dataset.Dataset.pixel_array>` with the new :mod:`~pydicom.pixels` backend.
 
@@ -231,7 +231,7 @@ Fixes
 * Fixed the *Pixel Data* VR not being set correctly with :func:`Dataset.compress()
   <pydicom.dataset.Dataset.compress>` (:issue:`2013`).
 * Fixed :meth:`Dataset.decompress()<pydicom.dataset.Dataset.decompress>` not updating
-  the *Pixel Data* element value until after saving (:issue`2024`).
+  the *Pixel Data* element value until after saving (:issue:`2024`).
 
 
 Deprecations
@@ -294,7 +294,7 @@ Deprecations
 
     * :func:`pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness` will be
       removed in v4.0.
-* :meth:`Dataset.convert_pixel_data()<pydicom.dataset.Dataset.convert_pixel_data`
+* :meth:`Dataset.convert_pixel_data()<pydicom.dataset.Dataset.convert_pixel_data>`
   will be removed in v4.0, use :meth:`Dataset.pixel_array_options()
   <pydicom.dataset.Dataset.pixel_array_options>` instead.
 

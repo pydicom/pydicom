@@ -64,7 +64,7 @@ text in square brackets, to make it clear it is different from DICOM
 standard descriptors.
 
 You can still access the private data elements using the tag, remembering that
-data elements access by tag number return a full :class:~pydicom.dataelem.DataElement`
+data elements access by tag number return a full :class:`~pydicom.dataelem.DataElement`
 instance, and the `value` attribute is needed to get the value::
 
     >>> ds[0x00091001].value
@@ -98,7 +98,7 @@ convenience functions to manage this::
     (000b, 1001) Private tag data                    SH: 'my value'
     ...
 
-Standard Python operations like `in` and `del` can also be used when working
+Standard Python operations like ``in`` and ``del`` can also be used when working
 with block object::
 
     >>> 0x01 in block

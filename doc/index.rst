@@ -48,7 +48,7 @@ If you're new to *pydicom* then start here:
 * **Basics**: :doc:`Dataset: read, access, modify, write</tutorials/dataset_basics>`
 * **Intermediate**:
   :doc:`Compressing Pixel Data</tutorials/pixel_data/compressing>` |
-  :doc:`Waveform decoding and encoding </tutorials/waveforms>` |
+  :doc:`Waveform decoding and encoding</tutorials/waveforms>` |
   :doc:`DICOM File-sets and DICOMDIR</tutorials/filesets>`
 
 

@@ -1698,10 +1698,9 @@ class TestReadTruncatedFile:
         mr.decode()
         # Need to escape brackets
         msg = (
-            r"The length of the pixel data in the dataset \(8130 bytes\) "
-            r"doesn't match the expected length \(8192 bytes\). "
-            r"The dataset may be corrupted or there may be an issue with "
-            r"the pixel data handler."
+            r"The number of bytes of pixel data is less than expected \(8130 vs 8192 "
+            r"bytes\) - the dataset may be corrupted, have an invalid group 0028 "
+            "element value, or the transfer syntax may be incorrect"
         )
         with pytest.raises(ValueError, match=msg):
             mr.pixel_array

@@ -12,8 +12,8 @@ The following applies to the functions and class methods that use the
 
 When decoding to a NumPy :class:`~numpy.ndarray`:
 
-* The :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` property (via
-  :meth:`Dataset.pixel_array_options()<pydicom.dataset.Dataset.pixel_array_options>`)
+* The :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` property
+  (configurable via :meth:`Dataset.pixel_array_options()<pydicom.dataset.Dataset.pixel_array_options>`)
 * :func:`~pydicom.pixels.pixel_array`
 * :func:`~pydicom.pixels.iter_pixels`
 * :func:`~pydicom.pixels.decompress`

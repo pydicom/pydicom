@@ -912,6 +912,16 @@ class TestDecoder:
             assert isinstance(buffer, bytes | bytearray)
             assert isinstance(meta, dict)
 
+    def test_validate_plugins(self):
+        """Test _validate_plugins() with plugins available"""
+        decoder = get_decoder(RLELossless)
+        msg = (
+            "No plugin named 'foo' has been added to 'RLELosslessDecoder', "
+            "available plugins are"
+        )
+        with pytest.raises(ValueError, match=msg):
+            decoder._validate_plugins("foo")
+
 
 @pytest.fixture()
 def enable_logging():

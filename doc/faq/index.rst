@@ -44,6 +44,7 @@ When manipulating *Pixel Data* it's recommended you install
 
 .. _faq_install_version:
 
+
 What version of Python can I use?
 ---------------------------------
 
@@ -72,3 +73,9 @@ What version of Python can I use?
 +-----------------+------------------+---------------------------+
 | 3.0             | ~September 2024  | 3.10, 3.11, 3.12          |
 +-----------------+------------------+---------------------------+
+
+
+What license does pydicom use?
+==============================
+
+*pydicom* has an MIT-based :gh:`license <pydicom/blob/main/LICENSE>`.

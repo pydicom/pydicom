@@ -11,18 +11,19 @@ Writing DICOM Files
 Introduction
 ------------
 
-Probably the most common use of pydicom is to read an existing DICOM file,
-alter some items, and write it back out again. The first example in
-:doc:`/old/getting_started` shows how to do this.
+Probably the most common use of *pydicom* is to read an existing DICOM file,
+alter some items, and write it back out again. The :doc:`Dataset basics tutorial
+</old/getting_started>` shows how to do this.
 
-If you need to create a DICOM file from scratch, there are a couple of ways
-of going about this: using the ``codify`` script, or creating a
-:class:`~pydicom.dataset.Dataset` directly and populating it.
+If you need to create a DICOM file from scratch then you can either:
+
+* Use the ``codify`` script to create Python code from an existing dataset.
+* Create a new :class:`~pydicom.dataset.Dataset` instance and populate it.
 
 .. Warning::
 
   To be truly DICOM compliant, certain data elements will be required in the
-  file meta information, and in the main dataset. Also, you should create your
+  file meta information and in the main dataset. Also, you should create your
   own UIDs, implementation name, and so on.
 
 
@@ -32,15 +33,14 @@ Using ``codify``
 ----------------
 
 *pydicom* has a command-line utility called ``codify`` that
-takes an existing DICOM file, and produces Python code. The Python code
-uses *pydicom* to produce a copy of the original file again, when the code is
-run.
+takes an existing DICOM file, and produces Python code that can be run to
+produce a copy of the original file.
 
 In other words: *pydicom* has a tool that can automatically generate
 well-designed Python code for you - code that creates DICOM files. The only
 requirement is that you have an existing DICOM file that looks approximately
 like the one you need. You can then use the code as a model to work from. The
-tool is especially useful with Sequences, which can be tricky to code
+tool is especially useful with sequences, which can be tricky to code
 correctly.
 
 .. Warning::

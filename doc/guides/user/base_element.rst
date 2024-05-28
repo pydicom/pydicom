@@ -8,9 +8,9 @@ Dataset
 
 .. currentmodule:: pydicom
 
-The main class in *pydicom* is :class:`~dataset.Dataset`, which emulates the behavior
+The main class in *pydicom* is :class:`~dataset.Dataset` which emulates the behavior
 of a Python :class:`dict` whose keys are DICOM tags (:class:`~pydicom.tag.BaseTag` instances),
-and values are the a corresponding :class:`~dataelem.DataElement` instances.
+and values are the corresponding :class:`~dataelem.DataElement` instances.
 
 .. warning::
 

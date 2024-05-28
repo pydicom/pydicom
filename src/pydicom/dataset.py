@@ -1630,7 +1630,7 @@ class Dataset:
         .. deprecated:: 3.0
 
             This method will be removed in v4.0, use
-            :attr:`~pydicom.dataset.Dataset.pixel_array_options` instead.
+            :meth:`~pydicom.dataset.Dataset.pixel_array_options` instead.
 
         Parameters
         ----------
@@ -1840,8 +1840,8 @@ class Dataset:
         arr: "numpy.ndarray | None" = None,
         encoding_plugin: str = "",
         encapsulate_ext: bool = False,
-        new_instance_uid: bool = True,
         *,
+        new_instance_uid: bool = True,
         jls_error: int | None = None,
         j2k_cr: list[float] | None = None,
         j2k_psnr: list[float] | None = None,
@@ -2031,11 +2031,11 @@ class Dataset:
         Parameters
         ----------
         handler_name : str, optional
-            Deprecated and will be removed in v4.0, see `decoding_plugin` instead.
+            Deprecated and will be removed in v4.0, use `decoding_plugin` instead.
         as_rgb : bool, optional
-            **pixels backend only.** If ``True`` (default) then convert pixel data
-            with a YCbCr :ref:`photometric interpretation<photometric_interpretation>`
-            such as ``"YBR_FULL_422"`` to RGB.
+            :mod:`~pydicom.pixels` **backend only.** If ``True`` (default) then
+            convert pixel data with a YCbCr :ref:`photometric interpretation
+            <photometric_interpretation>` such as ``"YBR_FULL_422"`` to RGB.
         new_instance_uid : bool, optional
             If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
             value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
@@ -2049,13 +2049,13 @@ class Dataset:
             * If using the :mod:`~pydicom.pixels` backend (default) then see the
               :doc:`API documentation</reference/pixels.decoders>` for the available
               plugins for each *Transfer Syntax UID*.
-            * If using the deprecated :mod`~pydicom.pixel_data_handlers` backend
+            * If using the deprecated :mod:`~pydicom.pixel_data_handlers` backend
               supported plugins are: ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``,
               ``'rle'``, ``'numpy'`` and ``'pylibjpeg'``.
         kwargs : dict[str, Any], optional
-            **pixels backend only.** Optional keyword parameters for the decoding
-            plugin may also be present. See the :doc:`decoding plugins options
-            </guides/decoding/decoder_options>` for more information.
+            :mod:`~pydicom.pixels` **backend only.** Optional keyword parameters
+            for the decoding plugin may also be present. See the :doc:`decoding
+            plugins options</guides/decoding/decoder_options>` for more information.
         """
         # TODO: remove support for pixel_data_handlers module in v4.0
         if config._use_future and kwargs.get("handler_name", handler_name):
@@ -2164,7 +2164,7 @@ class Dataset:
             :class:`~pydicom.dataset.Dataset` instance. Can be used to minimize
             the memory required to return the pixel data when used with a path
             or file-like.
-        pydicom.pixels.iter_array
+        pydicom.pixels.iter_pixels
             Similar to :func:`pydicom.pixels.pixel_array` but returns a generator
             that iterates through the image frames.
         """
