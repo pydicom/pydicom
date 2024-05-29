@@ -1936,7 +1936,7 @@ class Dataset:
             The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
             contents of the array should match the dataset.
         encoding_plugin : str, optional
-            Use the `encoding_plugin` to use to compress the pixel data. See the
+            Use the `encoding_plugin` to compress the pixel data. See the
             :doc:`user guide </guides/user/image_data_compression>` for a list of
             plugins available for each UID and their dependencies. If not
             specified then all available plugins will be tried (default).

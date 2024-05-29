@@ -13,7 +13,7 @@ Introduction
 
 Probably the most common use of *pydicom* is to read an existing DICOM file,
 alter some items, and write it back out again. The :doc:`Dataset basics tutorial
-</old/getting_started>` shows how to do this.
+</tutorials/dataset_basics>` shows how to do this.
 
 If you need to create a DICOM file from scratch then you can either:
 

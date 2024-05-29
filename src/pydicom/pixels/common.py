@@ -493,7 +493,8 @@ class RunnerBase:
             value = int(value) if isinstance(value, str) else value
             if value in (None, 0):
                 warn_and_log(
-                    f"A value of '{value}' for (0028,0008) 'Number of Frames' is invalid"
+                    f"A value of '{value}' for (0028,0008) 'Number of Frames' is "
+                    "invalid, assuming 1 frame"
                 )
                 value = 1
         elif name == "photometric_interpretation":

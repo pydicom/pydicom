@@ -220,7 +220,8 @@ def as_pixel_options(ds: "Dataset", **kwargs: Any) -> dict[str, Any]:
     nr_frames = int(nr_frames) if isinstance(nr_frames, str) else nr_frames
     if nr_frames in (None, 0):
         warn_and_log(
-            f"A value of '{nr_frames}' for (0028,0008) 'Number of Frames' is invalid"
+            f"A value of '{nr_frames}' for (0028,0008) 'Number of Frames' is invalid, "
+            "assuming 1 frame"
         )
         nr_frames = 1
 

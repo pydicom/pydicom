@@ -152,7 +152,7 @@ for more information.
 
     # Set the element's VR and use an undefined length
     ds["PixelData"].is_undefined_length = True
-    ds["PixelData"].VR = "OB" if ds.BitsAllocated < 8 else "OW"
+    ds["PixelData"].VR = "OB" if ds.BitsAllocated <= 8 else "OW"
 
     # Save!
     ds.save_as("ct_compressed_basic.dcm")

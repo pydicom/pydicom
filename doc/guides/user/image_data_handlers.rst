@@ -17,7 +17,7 @@ one or more packages that are able to handle the format the data
 is encoded in.
 
 The following packages can be used with *pydicom* and `NumPy <https://numpy.org/>`_ to
-decompress compress *Pixel Data*:
+decompress compressed *Pixel Data*:
 
 * :gh:`pylibjpeg <pylibjpeg>` with the ``pylibjpeg-libjpeg``, ``pylibjpeg-openjpeg``
   and ``pylibjpeg-rle`` plugins. Supports the most commonly used transfer syntaxes.
