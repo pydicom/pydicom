@@ -67,6 +67,7 @@ an easy way to get it in a convenient form:
 :class:`numpy.ndarray` containing the pixel data::
 
   >>> arr = ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
+  >>> arr
   array([[ 905, 1019, 1227, ...,  302,  304,  328],
          [ 628,  770,  907, ...,  298,  331,  355],
          [ 498,  566,  706, ...,  280,  285,  320],
