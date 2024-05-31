@@ -591,5 +591,5 @@ Next steps
 
 Congratulations, you're now familiar with the basics of using *pydicom* to
 read, access, modify and write DICOM datasets. Next up you may be interested
-in looking at our :doc:`User Guide</old/pydicom_user_guide>` or some of our
+in looking at our :doc:`User Guide</guides/user/index>` or some of our
 :doc:`examples</auto_examples/index>`.

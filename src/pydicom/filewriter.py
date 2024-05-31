@@ -635,16 +635,13 @@ def write_data_element(
     # valid pixel data with undefined length shall contain encapsulated
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
     if is_undefined_length and elem.tag == 0x7FE00010:
-        encap_item = b"\xfe\xff\x00\xe0"
-        if not fp.is_little_endian:
-            # Non-conformant endianness
-            encap_item = b"\xff\xfe\xe0\x00"
-        if not cast(bytes, elem.value).startswith(encap_item):
+        # Big endian encapsulation is non-conformant
+        tag = b"\xFE\xFF\x00\xE0" if fp.is_little_endian else b"\xFF\xFE\xE0\x00"
+        if not cast(bytes, elem.value).startswith(tag):
             raise ValueError(
-                "(7FE0,0010) Pixel Data has an undefined length indicating "
-                "that it's compressed, but the data isn't encapsulated as "
-                "required. See pydicom.encaps.encapsulate() for more "
-                "information"
+                "The (7FE0,0010) 'Pixel Data' element value hasn't been "
+                "encapsulated as required for a compressed transfer syntax - "
+                "see pydicom.encaps.encapsulate() for more information"
             )
 
     value_length = buffer.tell()
@@ -1339,24 +1336,6 @@ def dcmwrite(
         #   and native pixel data uses actual length
         if "PixelData" in dataset:
             dataset["PixelData"].is_undefined_length = tsyntax.is_compressed
-
-    tsyntax = cast(UID, tsyntax)
-
-    # Check for decompression, give warnings if inconsistencies
-    # If decompressed, then pixel_array is now used instead of PixelData
-    if dataset.is_decompressed:
-        # Transfer Syntax UID *should* be present if `is_decompressed`
-        if tsyntax.is_compressed:
-            raise ValueError(
-                f"The dataset's Transfer Syntax UID '{tsyntax.name}' is for "
-                "compressed pixel data, but the dataset's pixel data has been "
-                "decompressed. Either re-compress the pixel data or switch to "
-                "an uncompressed transfer syntax such as 'Explicit VR Little "
-                "Endian'."
-            )
-
-        # Force PixelData to the decompressed version
-        dataset.PixelData = dataset.pixel_array.tobytes()
 
     caller_owns_file = True
     # Open file if not already a file object

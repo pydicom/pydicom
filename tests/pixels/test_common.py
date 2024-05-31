@@ -117,13 +117,21 @@ class TestRunnerBase:
         with pytest.raises(AttributeError, match=msg):
             runner.number_of_frames
 
-        runner.set_option("number_of_frames", 0)
+        msg = r"A value of '0' for \(0028,0008\) 'Number of Frames' is invalid"
+        with pytest.warns(UserWarning, match=msg):
+            runner.set_option("number_of_frames", 0)
+
         assert runner.number_of_frames == 1
-        runner.set_option("number_of_frames", None)
+
+        msg = r"A value of 'None' for \(0028,0008\) 'Number of Frames' is invalid"
+        with pytest.warns(UserWarning, match=msg):
+            runner.set_option("number_of_frames", None)
+
         assert runner.number_of_frames == 1
         assert runner.get_option("number_of_frames") == 1
 
         runner.del_option("number_of_frames")
+        msg = "No value for 'number_of_frames' has been set"
         with pytest.raises(AttributeError, match=msg):
             runner.number_of_frames
 
@@ -162,13 +170,22 @@ class TestRunnerBase:
     def test_set_number_of_frames(self):
         """Test setting 'number_of_frames'"""
         runner = RunnerBase(RLELossless)
-        runner.set_option("number_of_frames", None)
+        msg = r"A value of 'None' for \(0028,0008\) 'Number of Frames' is invalid"
+        with pytest.warns(UserWarning, match=msg):
+            runner.set_option("number_of_frames", None)
+
         assert runner.number_of_frames == 1
-        runner.set_option("number_of_frames", 0)
+
+        msg = r"A value of '0' for \(0028,0008\) 'Number of Frames' is invalid"
+        with pytest.warns(UserWarning, match=msg):
+            runner.set_option("number_of_frames", 0)
+
         assert runner.number_of_frames == 1
         runner.set_option("number_of_frames", 10)
         assert runner.number_of_frames == 10
-        runner.set_option("number_of_frames", "0")
+        with pytest.warns(UserWarning, match=msg):
+            runner.set_option("number_of_frames", "0")
+
         assert runner.number_of_frames == 1
         runner.set_option("number_of_frames", "10")
         assert runner.number_of_frames == 10
@@ -568,7 +585,7 @@ class TestCoderBase:
         with pytest.raises(RuntimeError, match=msg):
             coder._validate_plugins()
 
-        msg = "No plugin named 'foo' has been added to 'CoderBase'"
+        msg = "No plugin named 'foo' has been added to 'RLELosslessCoderBase'"
         with pytest.raises(ValueError, match=msg):
             coder._validate_plugins("foo")
 

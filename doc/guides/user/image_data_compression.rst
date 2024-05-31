@@ -70,8 +70,9 @@ you with the specific requirements of the encoding method.
 Compressing with ``Dataset.compress()``
 .......................................
 
-The :meth:`Dataset.compress()<pydicom.dataset.Dataset.compress>` method can
-be used to compress an uncompressed dataset in-place:
+The :meth:`Dataset.compress()<pydicom.dataset.Dataset.compress>` method or
+:func:`~pydicom.pixels.compress` function can be used to compress an uncompressed
+dataset in-place:
 
 .. code-block:: python
 
@@ -93,7 +94,7 @@ A specific encoding plugin can be used by passing the plugin name via the
 
 
 Implicitly changing the compression on an already compressed dataset is not
-currently supported, however it can still be done explicitly by decompressing
+currently supported, however it can still be done by decompressing
 prior to calling :meth:`~pydicom.dataset.Dataset.compress`. In the example
 below, a matching :doc:`image data handler<image_data_handlers>` for the
 original transfer syntax - *JPEG 2000 Lossless* - is required.
@@ -102,18 +103,9 @@ original transfer syntax - *JPEG 2000 Lossless* - is required.
 
     # Requires a JPEG 2000 compatible image data handler
     ds = examples.jpeg2k
-    arr = ds.pixel_array
-    ds.PhotometricInterpretation = 'RGB'
-    ds.compress(RLELossless, arr)
+    ds.decompress()
+    ds.compress(RLELossless)
     ds.save_as("US1_RLE.dcm")
-
-Note that the *Photometric Interpretation* in this case has been changed from
-``'YBR_RCT'``, which is the value for when it's J2K compressed, to ``'RGB'``
-which is the correct value for this particular dataset once the *Pixel Data*
-is RLE compressed. It's up to you to ensure that the the correct *Photometric
-Interpretation* has been set and that the decompressed pixel data is in the
-correct color space prior to actually calling
-:meth:`~pydicom.dataset.Dataset.compress`.
 
 
 Compressing using third-party packages
@@ -160,7 +152,7 @@ for more information.
 
     # Set the element's VR and use an undefined length
     ds["PixelData"].is_undefined_length = True
-    ds["PixelData"].VR = "OB"
+    ds["PixelData"].VR = "OB" if ds.BitsAllocated <= 8 else "OW"
 
     # Save!
     ds.save_as("ct_compressed_basic.dcm")

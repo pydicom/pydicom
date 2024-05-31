@@ -69,9 +69,8 @@ SUPPORTED_HANDLER_NAMES = (
 class TestJPEGLS_no_jpeg_ls:
     def setup_method(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
-        self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.emri_small = dcmread(emri_name)
+        self.jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
@@ -86,10 +85,11 @@ class TestJPEGLS_no_jpeg_ls:
 class TestJPEGLS_JPEG2000_no_jpeg_ls:
     def setup_method(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
-        self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
-        self.mr_small = dcmread(mr_name)
+        self.jpeg_2k.pixel_array_options(use_v2_backend=True)
+
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
-        self.emri_small = dcmread(emri_name)
+        self.emri_jpeg_2k_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
@@ -110,7 +110,11 @@ class TestJPEGLS_JPEG2000_no_jpeg_ls:
 class TestJPEGLS_JPEGlossy_no_jpeg_ls:
     def setup_method(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.jpeg_lossy.pixel_array_options(use_v2_backend=True)
+
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
+        self.color_3d_jpeg.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
@@ -135,6 +139,8 @@ class TestJPEGLS_JPEGlossy_no_jpeg_ls:
 class TestJPEGLS_JPEGlossless_no_jpeg_ls:
     def setup_method(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
+        self.jpeg_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
@@ -160,9 +166,17 @@ class TestJPEGLS_JPEGlossless_no_jpeg_ls:
 class TestJPEGLS_JPEG_LS_with_jpeg_ls:
     def setup_method(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
+        self.jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.mr_small = dcmread(mr_name)
+        self.mr_small.pixel_array_options(use_v2_backend=True)
+
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.emri_small = dcmread(emri_name)
+        self.emri_small.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
@@ -203,10 +217,11 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls:
 class TestJPEGLS_JPEG2000_with_jpeg_ls:
     def setup_method(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
-        self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
-        self.mr_small = dcmread(mr_name)
+        self.jpeg_2k.pixel_array_options(use_v2_backend=True)
+
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
-        self.emri_small = dcmread(emri_name)
+        self.emri_jpeg_2k_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
@@ -226,7 +241,11 @@ class TestJPEGLS_JPEG2000_with_jpeg_ls:
 class TestJPEGLS_JPEGlossy_with_jpeg_ls:
     def setup_method(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.jpeg_lossy.pixel_array_options(use_v2_backend=True)
+
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
+        self.color_3d_jpeg.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
@@ -251,6 +270,8 @@ class TestJPEGLS_JPEGlossy_with_jpeg_ls:
 class TestJPEGLS_JPEGlossless_with_jpeg_ls:
     def setup_method(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
+        self.jpeg_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 

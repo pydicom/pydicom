@@ -422,6 +422,7 @@ class TestHandler:
         pydicom.config.pixel_data_handlers = [LJ_HANDLER]
 
         ds = dcmread(EXPL)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises((NotImplementedError, RuntimeError)):
@@ -431,6 +432,7 @@ class TestHandler:
     def test_no_plugins_raises(self):
         """Test exception raised if required plugin missing."""
         ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-libjpeg' "
             r"plugin is not installed"
@@ -439,6 +441,7 @@ class TestHandler:
             ds.pixel_array
 
         ds = dcmread(J2KI_08_08_3_0_1F_RGB)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-openjpeg' "
             r"plugin is not installed"
@@ -448,6 +451,7 @@ class TestHandler:
 
         # Don't use pydicom decoder
         ds = dcmread(RLE_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-rle' "
             r"plugin is not installed"
@@ -477,6 +481,7 @@ class TestJPEG:
     def test_properties(self, fpath, data):
         """Test dataset and pixel array properties are as expected."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -493,6 +498,7 @@ class TestJPEG:
     def test_array(self, fpath, rpath, val, tol):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = ds.pixel_array
         if "YBR" in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, "RGB")
@@ -518,6 +524,7 @@ class TestJPEG:
     def test_generate_frames(self, fpath, rpath, val, tol):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         frame_generator = generate_frames(ds)
         ref = dcmread(rpath).pixel_array
 
@@ -538,6 +545,7 @@ class TestJPEG:
     def test_bad_file_raises(self):
         """Test a bad JPEG file raises an exception."""
         ds = dcmread(JPGE_BAD)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"libjpeg error code '-1038' returned from Decode\(\): A "
             r"misplaced marker segment was found - scan start must be zero "
@@ -549,6 +557,7 @@ class TestJPEG:
     def test_missing_element_raises(self):
         """Test that missing required element raises exception."""
         ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
+        ds.pixel_array_options(use_v2_backend=True)
         del ds.PixelData
         msg = (
             r"Unable to convert the pixel data as the following required "
@@ -573,6 +582,7 @@ class TestJPEGLS:
     def test_properties(self, fpath, data):
         """Test dataset and pixel array properties are as expected."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -588,6 +598,7 @@ class TestJPEGLS:
     def test_array(self):
         """Test returned array values are OK."""
         ds = dcmread(JPEG_LS_LOSSLESS)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = ds.pixel_array
 
         # Checked against GDCM
@@ -613,6 +624,7 @@ class TestJPEG2K:
         req_fixes = [J2KR_16_16_1_0_10F_M2, J2KR_16_14_1_1_1F_M2, J2KI_16_14_1_1_1F_M2]
 
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -645,19 +657,23 @@ class TestJPEG2K:
     def test_array(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         if fixes:
             with pytest.warns(UserWarning):
                 arr = ds.pixel_array
         else:
             arr = ds.pixel_array
 
-        ref = dcmread(rpath).pixel_array
+        ds2 = dcmread(rpath)
+        ds2.pixel_array_options(use_v2_backend=True)
+        ref = ds2.pixel_array
         assert np.array_equal(arr, ref)
 
     @pytest.mark.parametrize("fpath, rpath, fixes", J2K_MATCHING_DATASETS)
     def test_generate_frames(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         frame_generator = generate_frames(ds)
         ref = dcmread(rpath).pixel_array
 
@@ -681,6 +697,7 @@ class TestJPEG2K:
         """Test the plugin warnings work."""
         # Bits Stored
         ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"The \(0028,0101\) Bits Stored value '16' in the dataset does "
             r"not match the component precision value '14' found in the JPEG "
@@ -702,7 +719,7 @@ class TestJPEG2K:
             ds.pixel_array
 
         # Samples per Pixel
-        ds.PixelRepresentation = 0
+        ds.PixelRepresentation = 1
         ds.SamplesPerPixel = 3
         msg = (
             r"The \(0028,0002\) Samples per Pixel value '3' in the dataset "
@@ -716,6 +733,7 @@ class TestJPEG2K:
 
         # JP2 header
         ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"The \(7FE0,0010\) Pixel Data contains a JPEG 2000 codestream "
             r"with the optional JP2 file format header, which is "
@@ -727,16 +745,19 @@ class TestJPEG2K:
     def test_decompress_using_pylibjpeg(self):
         """Test decompressing JPEG2K with pylibjpeg handler succeeds."""
         ds = dcmread(J2KR_16_12_1_0_1F_M2)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.decompress(handler_name="pylibjpeg")
         arr = ds.pixel_array
 
         ds = dcmread(get_testdata_file("MR2_J2KR.dcm"))
+        ds.pixel_array_options(use_v2_backend=True)
         ref = ds.pixel_array
         assert np.array_equal(arr, ref)
 
     def test_pixel_rep_mismatch(self):
         """Test mismatched j2k sign and Pixel Representation."""
         ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        ds.pixel_array_options(use_v2_backend=True)
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
@@ -800,10 +821,12 @@ class TestRLE:
     def test_decompress_using_pylibjpeg(self):
         """Test decompressing RLE with pylibjpeg handler succeeds."""
         ds = dcmread(RLE_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.decompress(handler_name="pylibjpeg")
         arr = ds.pixel_array
 
         ds = dcmread(get_testdata_file("SC_rgb.dcm"))
+        ds.pixel_array_options(use_v2_backend=True)
         ref = ds.pixel_array
         assert np.array_equal(arr, ref)
 
@@ -811,6 +834,7 @@ class TestRLE:
     def test_properties_as_array(self, fpath, data):
         """Test dataset, pixel_array and as_array() are as expected."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert RLELossless == ds.file_meta.TransferSyntaxUID
         assert ds.BitsAllocated == data[0]
         assert ds.SamplesPerPixel == data[1]
@@ -828,6 +852,7 @@ class TestRLE:
 
         # Check handler's as_array() function
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = as_array(ds)
         assert arr.flags.writeable
         assert data[4] == arr.shape
@@ -837,6 +862,7 @@ class TestRLE:
     def test_array(self, fpath, rpath):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.decompress("pylibjpeg")
         arr = ds.pixel_array
 
@@ -847,6 +873,7 @@ class TestRLE:
     def test_generate_frames(self, fpath, rpath):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         frame_generator = generate_frames(ds)
         ref = dcmread(rpath).pixel_array
 

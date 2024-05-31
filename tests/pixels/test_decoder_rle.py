@@ -5,6 +5,7 @@ from struct import pack, unpack
 
 import pytest
 
+from pydicom import dcmread
 from pydicom.config import debug
 from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.pixels import get_decoder
@@ -14,7 +15,7 @@ from pydicom.pixels.decoders.rle import (
     _rle_decode_segment,
     _rle_decode_frame,
 )
-from pydicom.uid import RLELossless
+from pydicom.uid import RLELossless, ExplicitVRLittleEndian
 
 try:
     import numpy as np
@@ -835,3 +836,21 @@ class TestDecodeSegment:
         # n = 129, copy x128
         data = b"\x81\x02\x80"
         assert bytes(_rle_decode_segment(data)) == b"\x02" * 128
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
+def test_dataset_decompress():
+    """Test Dataset.decompress with RLE Lossless"""
+    ds = dcmread(RLE_16_1_1F.path)
+    ref = ds.pixel_array
+    ds.decompress(decoding_plugin="pydicom")
+
+    assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+    elem = ds["PixelData"]
+    assert len(elem.value) == ds.Rows * ds.Columns * (ds.BitsAllocated // 8)
+    assert elem.is_undefined_length is False
+    assert elem.VR == "OW"
+    assert "NumberOfFrames" not in ds
+    assert ds._pixel_array is None
+    assert ds._pixel_id == {}
+    assert np.array_equal(ds.pixel_array, ref)

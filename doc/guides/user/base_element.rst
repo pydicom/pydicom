@@ -8,14 +8,9 @@ Dataset
 
 .. currentmodule:: pydicom
 
-:class:`~dataset.Dataset` is the main object you will work with
-directly. :class:`~dataset.Dataset` wraps a dictionary, where the key
-is the DICOM tag (as a :class:`~pydicom.tag.BaseTag` object,
-described below), and the value is the corresponding
-:class:`~dataelem.DataElement` instance (also described below).
-It implements most of the methods of :class:`dict`, so that it mostly behaves
-like a wrapped :class:`dict`. This allows direct access to the data elements
-via their tags, as shown below.
+The main class in *pydicom* is :class:`~dataset.Dataset` which emulates the behavior
+of a Python :class:`dict` whose keys are DICOM tags (:class:`~pydicom.tag.BaseTag` instances),
+and values are the corresponding :class:`~dataelem.DataElement` instances.
 
 .. warning::
 
@@ -23,38 +18,39 @@ via their tags, as shown below.
   :class:`~dataelem.DataElement` instances, e.g. the values of the
   dictionary instead of the keys normally yielded by iterating a :class:`dict`.
 
-A :class:`~dataset.Dataset` could be created directly, but you will
-usually get one by reading an existing DICOM dataset from file::
+A :class:`~dataset.Dataset` can be created directly, but you'll
+usually get one by reading an existing DICOM dataset from file using
+:func:`~pydicom.filereader.dcmread`::
 
-  >>> import pydicom
-  >>> from pydicom.data import get_testdata_file
-  >>> # get some test data
-  >>> path = get_testdata_file("rtplan.dcm")
-  >>> path
-  '/path/to/pydicom/data/test_files/rtplan.dcm'
-  >>> ds = pydicom.dcmread(path)
+    >>> import pydicom
+    >>> from pydicom.data import get_testdata_file
+    >>> # Returns the path to one of pydicom's example DICOM datasets
+    >>> path: str = get_testdata_file("rtplan.dcm")
+    >>> print(path)
+    '/path/to/pydicom/data/test_files/rtplan.dcm'
+    >>> # Read the DICOM dataset at `path`
+    >>> ds = pydicom.dcmread(path)
 
-You can display the entire dataset by simply printing its string
-(:class:`str()<str>` or :func:`repr`) value::
+You can display the contents of the entire dataset using ``str(ds)`` or with::
 
-  >>> ds # doctest: +ELLIPSIS
-  Dataset.file_meta -------------------------------
-  (0002, 0000) File Meta Information Group Length  UL: 156
-  (0002, 0001) File Meta Information Version       OB: b'\x00\x01'
-  (0002, 0002) Media Storage SOP Class UID         UI: RT Plan Storage
-  (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023
-  (0002, 0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
-  (0002, 0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8
-  -------------------------------------------------
-  (0008, 0012) Instance Creation Date              DA: '20030903'
-  (0008, 0013) Instance Creation Time              TM: '150031'
-  (0008, 0016) SOP Class UID                       UI: RT Plan Storage
-  (0008, 0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023
-  (0008, 0020) Study Date                          DA: '20030716'
-  (0008, 0030) Study Time                          TM: '153557'
-  (0008, 0050) Accession Number                    SH: ''
-  (0008, 0060) Modality                            CS: 'RTPLAN'
-  ...
+    >>> ds # doctest: +ELLIPSIS
+    Dataset.file_meta -------------------------------
+    (0002,0000) File Meta Information Group Length  UL: 156
+    (0002,0001) File Meta Information Version       OB: b'\x00\x01'
+    (0002,0002) Media Storage SOP Class UID         UI: RT Plan Storage
+    (0002,0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023
+    (0002,0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
+    (0002,0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8
+    -------------------------------------------------
+    (0008,0012) Instance Creation Date              DA: '20030903'
+    (0008,0013) Instance Creation Time              TM: '150031'
+    (0008,0016) SOP Class UID                       UI: RT Plan Storage
+    (0008,0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023
+    (0008,0020) Study Date                          DA: '20030716'
+    (0008,0030) Study Time                          TM: '153557'
+    (0008,0050) Accession Number                    SH: ''
+    (0008,0060) Modality                            CS: 'RTPLAN'
+    ...
 
 .. note::
 
@@ -62,14 +58,14 @@ You can display the entire dataset by simply printing its string
     the example program :gh:`dcm_qt_tree.py
     <contrib-pydicom/blob/master/plotting-visualization/dcm_qt_tree.py>`.
 
-You can access specific elements by their DICOM keyword or tag number::
+You can access specific elements by their DICOM keyword or tag::
 
-  >>> ds.PatientName
-  'Last^First^mid^pre'
-  >>> ds[0x10,0x10].value
-  'Last^First^mid^pre'
+    >>> ds.PatientName  # element keyword
+    'Last^First^mid^pre'
+    >>> ds[0x10, 0x10].value  # element tag
+    'Last^First^mid^pre'
 
-When using the tag number directly a :class:`~dataelem.DataElement`
+When using the element tag directly a :class:`~dataelem.DataElement`
 instance is returned, so :attr:`DataElement.value<dataelem.DataElement.value>`
 must be used to get the value.
 
@@ -83,13 +79,13 @@ must be used to get the value.
 You can also set an element's value by using the element's keyword or tag
 number::
 
-  >>> ds.PatientID = "12345"
-  >>> ds.SeriesNumber = 5
-  >>> ds[0x10,0x10].value = 'Test'
+    >>> ds.PatientID = "12345"
+    >>> ds.SeriesNumber = 5
+    >>> ds[0x10, 0x10].value = 'Test'
 
-The use of names is possible because *pydicom* intercepts requests for member
-variables, and checks if they are in the DICOM dictionary. It translates the
-keyword to a (group,element) tag and returns the corresponding value for
+The use of element keywords is possible because *pydicom* intercepts requests
+for member variables, and checks if they are in the DICOM dictionary. It translates
+the keyword to a (group, element) tag and returns the corresponding value for
 that tag if it exists in the dataset.
 
 See :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` for a
@@ -100,7 +96,7 @@ usage example of data elements removal and assignation.
    To understand using :class:`~sequence.Sequence` in *pydicom*, please refer
    to this object model:
 
-   * :class:`~dataset.Dataset` (wraps a Python :class:`dict`)
+   * :class:`~dataset.Dataset` (emulates a Python :class:`dict`)
 
      * Contains :class:`~dataelem.DataElement` instances, the value of each
        element can be one of:
@@ -133,7 +129,7 @@ can also use the tag numbers directly, such as::
 
   >>> # Same thing with tag numbers - much harder to read:
   >>> # Really should only be used if DICOM keyword not in pydicom dictionary
-  >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
+  >>> ds[0x300a, 0xb0][0][0x300a, 0xc2].value
   'Field 1'
 
 If you don't remember or know the exact element tag or keyword,
@@ -183,7 +179,7 @@ elements) or tag number::
 To see whether the :class:`~dataset.Dataset` contains a particular element, use
 the ``in`` operator with the element's keyword or tag::
 
-  >>> "PatientName" in ds  # or (0x0010,0x0010) in ds
+  >>> "PatientName" in ds  # or (0x0010, 0x0010) in ds
   True
 
 To remove an element from the :class:`~dataset.Dataset`, use the ``del``
@@ -195,7 +191,7 @@ To work with (7FE0,0010) *Pixel Data*, the raw :class:`bytes` are available
 through the `PixelData` keyword::
 
   >>> # example CT dataset with actual pixel data
-  >>> ds = pydicom.examples.ct
+  >>> ds = examples.ct
   >>> pixel_bytes = ds.PixelData
 
 However its much more convenient to use
@@ -242,20 +238,20 @@ Tag
 elements using their keywords as illustrated in sections above.
 
 The :class:`~tag.BaseTag` class is derived from :class:`int`,
-so in effect, it is just a number with some extra behavior:
+so in effect it's just a number with some extra behavior:
 
   * :func:`~tag.Tag` is used to create instances of :class:`~tag.BaseTag` and
-    enforces the expected 4-byte (group,element) structure.
+    enforces the expected 4-byte (group, element) structure.
   * A :class:`~tag.BaseTag` instance can be created from an :class:`int` or a
-    :class:`tuple` containing the (group,element), or from the DICOM keyword::
+    :class:`tuple` containing the (group, element), or from the DICOM keyword::
 
       >>> from pydicom.tag import Tag
       >>> t1 = Tag(0x00100010) # all of these are equivalent
-      >>> t2 = Tag(0x10,0x10)
+      >>> t2 = Tag(0x10, 0x10)
       >>> t3 = Tag((0x10, 0x10))
       >>> t4 = Tag("PatientName")
       >>> t1
-      (0010, 0010)
+      (0010,0010)
       >>> type(t1)
       <class `pydicom.tag.BaseTag`>
       >>> t1==t2, t1==t3, t1==t4

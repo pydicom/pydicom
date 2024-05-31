@@ -42,7 +42,7 @@ For more information, including installation instructions for the development ve
 
 ## Documentation
 
-The *pydicom* [user guide](https://pydicom.github.io/pydicom/stable/old/pydicom_user_guide.html), [tutorials](https://pydicom.github.io/pydicom/stable/tutorials/index.html), [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) and [API reference](https://pydicom.github.io/pydicom/stable/reference/index.html) documentation is available for both the [current release](https://pydicom.github.io/pydicom/stable) and the [development version](https://pydicom.github.io/pydicom/dev) on GitHub Pages.
+The *pydicom* [user guide](https://pydicom.github.io/pydicom/stable/guides/user/index.html), [tutorials](https://pydicom.github.io/pydicom/stable/tutorials/index.html), [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) and [API reference](https://pydicom.github.io/pydicom/stable/reference/index.html) documentation is available for both the [current release](https://pydicom.github.io/pydicom/stable) and the [development version](https://pydicom.github.io/pydicom/dev) on GitHub Pages.
 
 ## *Pixel Data*
 
@@ -79,10 +79,10 @@ array([[175, 180, 166, ..., 203, 207, 216],
 ```
 ### Decompressing *Pixel Data*
 #### JPEG, JPEG-LS and JPEG 2000
-Converting JPEG, JPEG-LS or JPEG 2000 compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/old/image_data_handlers.html#guide-compressed).
+Converting JPEG, JPEG-LS or JPEG 2000 compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/guides/user/image_data_handlers.html#guide-compressed).
 
 #### RLE
-Decompressing RLE *Pixel Data* only requires NumPy, however it can be quite slow. You may want to consider [installing one or more additional Python libraries](https://pydicom.github.io/pydicom/stable/old/image_data_compression.html) to speed up the process.
+Decompressing RLE *Pixel Data* only requires NumPy, however it can be quite slow. You may want to consider [installing one or more additional Python libraries](https://pydicom.github.io/pydicom/stable/guides/user/image_data_compression.html) to speed up the process.
 
 ### Compressing *Pixel Data*
 Information on compressing *Pixel Data* using one of the below formats can be found in the corresponding [encoding guides](https://pydicom.github.io/pydicom/stable/guides/encoding/index.html). These guides cover the specific requirements for each encoding method and we recommend you be familiar with them when performing image compression.
