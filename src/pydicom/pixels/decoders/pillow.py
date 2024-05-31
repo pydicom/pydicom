@@ -85,6 +85,12 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     if 0 < precision <= 8:
         runner.set_option("bits_allocated", 8)
     elif 8 < precision <= 16:
+        # Pillow converts >= 9-bit RGB/YCbCr data to 8-bit
+        if runner.samples_per_pixel > 1:
+            raise ValueError(
+                f"Pillow cannot decode {precision}-bit multi-sample data correctly"
+            )
+
         runner.set_option("bits_allocated", 16)
     else:
         raise ValueError(
