@@ -59,6 +59,8 @@ Changes
 * Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a *Bits Stored* of
   6 or 7 produces incorrect results, so attempting to do so now raises an exception.
   ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
+* Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
+  exception as Pillow cannot decode such data correctly (:issue:`2006`, :issue:`2059`)
 
 
 Removals

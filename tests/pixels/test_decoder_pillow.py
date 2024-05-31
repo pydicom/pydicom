@@ -32,6 +32,7 @@ from .pixels_reference import (
     J2KR_08_08_3_0_1F_YBR_RCT,
     JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
+    J2KR_16_10_1_0_1F_M1,
 )
 
 
@@ -167,4 +168,21 @@ class TestOpenJpegDecoder:
         with pytest.raises(RuntimeError, match=msg):
             decoder.as_array(
                 ds, decoding_plugin="pillow", bits_stored=17, bits_allocated=32
+            )
+
+    def test_multisample_16bit_raises(self):
+        """Test that > 8-bit RGB datasets raise exception"""
+        decoder = get_decoder(JPEG2000Lossless)
+        ds = J2KR_16_10_1_0_1F_M1.ds
+
+        msg = (
+            "Unable to decode as exceptions were raised by all available plugins:\n"
+            r"  pillow: Pillow cannot decode 10-bit multi-sample data correctly"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decoder.as_array(
+                ds,
+                decoding_plugin="pillow",
+                samples_per_pixel=3,
+                planar_configuration=0,
             )
