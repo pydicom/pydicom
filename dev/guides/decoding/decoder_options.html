@@ -58,14 +58,13 @@
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../user/index.html">pydicom User Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Decoding</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Pixel Data Decoder Options</a><ul>
@@ -128,15 +127,21 @@
   <section id="pixel-data-decoder-options">
 <span id="guide-decoder-options"></span><h1>Pixel Data Decoder Options<a class="headerlink" href="#pixel-data-decoder-options" title="Link to this heading">¶</a></h1>
 <p>The following applies to the functions and class methods that use the
-<a class="reference internal" href="../../reference/pixels.html"><span class="doc">pixels</span></a> backend for decoding pixel data:</p>
+<a class="reference internal" href="../../reference/pixels.html"><span class="doc">pixels</span></a> backend for decoding pixel data.</p>
+<p>When decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
+<li><p>The <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property
+(configurable via <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array_options" title="pydicom.dataset.Dataset.pixel_array_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.pixel_array_options()</span></code></a>)</p></li>
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a></p></li>
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a></p></li>
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decompress.html#pydicom.pixels.decompress" title="pydicom.pixels.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_buffer()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_buffer()</span></code></p></li>
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a></p></li>
+</ul>
+<p>When decoding to a buffer (such as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a>):</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_buffer" title="pydicom.pixels.decoders.base.Decoder.as_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_buffer()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_buffer" title="pydicom.pixels.decoders.base.Decoder.iter_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_buffer()</span></code></a></p></li>
 </ul>
 <section id="image-pixel-options">
 <h2><em>Image Pixel</em> Options<a class="headerlink" href="#image-pixel-options" title="Link to this heading">¶</a></h2>
@@ -232,13 +237,8 @@ the pixel data. One of <code class="docutils literal notranslate"><span class="p
 <section id="image-processing-options">
 <h2>Image Processing Options<a class="headerlink" href="#image-processing-options" title="Link to this heading">¶</a></h2>
 <p>The following options may be used with any transfer syntax for controlling the
-processing applied after decoding using:</p>
+processing applied after decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a></p></li>
-<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a></p></li>
-<li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decompress.html#pydicom.pixels.decompress" title="pydicom.pixels.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></p></li>
 <li><p><cite>as_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then convert pixel data with a
 YCbCr <a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">photometric interpretation</span></a>
 such as <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code> to RGB.</p></li>
@@ -251,8 +251,7 @@ conversion on the array (default <code class="docutils literal notranslate"><spa
 <section id="miscellaneous-options">
 <h2>Miscellaneous Options<a class="headerlink" href="#miscellaneous-options" title="Link to this heading">¶</a></h2>
 <p>The following options may be used with native (uncompressed) transfer syntaxes
-when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> using <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>,
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>, <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a>.</p>
+when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>view_only</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> and <cite>src</cite> is a
 <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or buffer-like then make a best effort
@@ -261,9 +260,7 @@ buffer (default <code class="docutils literal notranslate"><span class="pre">Fal
 the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will be read-only.</p></li>
 </ul>
 <p>The following options may be used with encapsulated (compressed) transfer syntaxes
-of the corresponding type when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> using
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>, <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>,
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a>.</p>
+of the corresponding type when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>apply_jls_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
 JPEG-LS compressed pixel data and the pixel representation is 1, then convert

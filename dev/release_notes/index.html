@@ -57,12 +57,10 @@
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/index.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
@@ -456,6 +454,8 @@ decoding backend: <a class="reference internal" href="../reference/generated/pyd
 </ul>
 <p>See the <a class="reference internal" href="../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS</span></a> and <a class="reference internal" href="../guides/encoding/jpeg_2k.html"><span class="doc">JPEG 2000</span></a> encoding guides for more information.</p>
 </li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array_options" title="pydicom.dataset.Dataset.pixel_array_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.pixel_array_options()</span></code></a>
+for controlling pixel data decoding when using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> with the new <a class="reference internal" href="../reference/pixels.html#module-pydicom.pixels" title="pydicom.pixels"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pixels</span></code></a> backend.</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -489,6 +489,8 @@ image data when <em>Bits Stored</em> is less than <em>Bits Allocated</em> (<a cl
 <li><p>Fixed decoding failures for JPEG-LS datasets with <em>Bits Allocated</em> of 16 and
 <em>Bits Stored</em> &lt;= 8 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2010">#2010</a>).</p></li>
 <li><p>Fixed the <em>Pixel Data</em> VR not being set correctly with <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2013">#2013</a>).</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.decompress()</span></code></a> not updating
+the <em>Pixel Data</em> element value until after saving (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2024">#2024</a>).</p></li>
 </ul>
 </section>
 <section id="deprecations">
@@ -559,6 +561,8 @@ removed in v4.0.</p></li>
 </ul>
 </div></blockquote>
 </li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.convert_pixel_data" title="pydicom.dataset.Dataset.convert_pixel_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.convert_pixel_data()</span></code></a>
+will be removed in v4.0, use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array_options" title="pydicom.dataset.Dataset.pixel_array_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.pixel_array_options()</span></code></a> instead.</p></li>
 </ul>
 </section>
 <section id="pydicom-internals">

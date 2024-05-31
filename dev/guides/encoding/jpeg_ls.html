@@ -58,14 +58,13 @@
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../user/index.html">pydicom User Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../decoding/index.html">Pixel Data Decoding</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Pixel Data Encoding</a><ul class="current">
@@ -273,7 +272,7 @@ the use of different interleave modes. While a <em>Planar Configuration</em> of
 more likely to result in downstream issues with decoders that expect the more
 common <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> (interleave mode 2) pixel ordering.</p>
 <p>For either case, if the pixel data being encoded is in an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
-then each frame should be shaped as (rows, columns, planes). If the pixel data
+then each frame should be shaped as (rows, columns, samples). If the pixel data
 being encoded is <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> then with <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> the data
 is ordered as color-by-pixel:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Three 8-bit RGB pixels: (255, 255, 0), (0, 255, 0), (0, 255, 255)</span>

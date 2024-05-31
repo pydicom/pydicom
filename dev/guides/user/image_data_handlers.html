@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Handling of compressed pixel data &mdash; pydicom 3.0.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=ccdb6887"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+        <script src="../../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Compressing Pixel Data" href="image_data_compression.html" />
     <link rel="prev" title="Working with Waveform Data" href="working_with_waveforms.html" /> 
 </head>
@@ -40,15 +40,15 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
+          <a href="../../index.html" class="icon icon-home">
             pydicom
-              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.0.0.dev0
               </div>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -57,19 +57,18 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Handling of compressed pixel data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#preconditions">Preconditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#supported-transfer-syntaxes">Supported Transfer Syntaxes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
@@ -80,23 +79,22 @@
 <li class="toctree-l2"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
 </ul>
 
         </div>
@@ -105,15 +103,15 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">pydicom</a>
+          <a href="../../index.html">pydicom</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pydicom_user_guide.html">pydicom User Guide</a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">pydicom User Guide</a></li>
       <li class="breadcrumb-item active">Handling of compressed pixel data</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -126,29 +124,29 @@
   <section id="handling-of-compressed-pixel-data">
 <span id="guide-compressed"></span><h1>Handling of compressed pixel data<a class="headerlink" href="#handling-of-compressed-pixel-data" title="Link to this heading">¶</a></h1>
 <p class="rubric">How to get compressed pixel data</p>
-<section id="preconditions">
-<h2>Preconditions<a class="headerlink" href="#preconditions" title="Link to this heading">¶</a></h2>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
 <p>To be able to decompress compressed DICOM pixel data, you need to install
 one or more packages that are able to handle the format the data
 is encoded in.</p>
-<p>The following packages can be used with <em>pydicom</em>:</p>
+<p>The following packages can be used with <em>pydicom</em> and <a class="reference external" href="https://numpy.org/">NumPy</a> to
+decompress compressed <em>Pixel Data</em>:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://sourceforge.net/projects/gdcm/">GDCM</a> - this is the package
-that supports most compressed formats</p></li>
-<li><p><a class="reference external" href="https://python-pillow.org/">Pillow</a>, ideally with
-<code class="docutils literal notranslate"><span class="pre">jpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">jpeg2000</span></code> plugins</p></li>
-<li><p><a class="reference external" href="https://github.com/pydicom/pyjpegls">jpeg_ls</a></p></li>
-<li><p><a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a>, with the <code class="docutils literal notranslate"><span class="pre">-libjpeg</span></code>, <code class="docutils literal notranslate"><span class="pre">-openjpeg</span></code> and
-<code class="docutils literal notranslate"><span class="pre">-rle</span></code> plugins</p></li>
+<li><p><a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> with the <code class="docutils literal notranslate"><span class="pre">pylibjpeg-libjpeg</span></code>, <code class="docutils literal notranslate"><span class="pre">pylibjpeg-openjpeg</span></code>
+and <code class="docutils literal notranslate"><span class="pre">pylibjpeg-rle</span></code> plugins. Supports the most commonly used transfer syntaxes.</p></li>
+<li><p><a class="reference external" href="https://github.com/pydicom/pyjpegls">jpeg_ls</a> supports JPEG-LS transfer syntaxes.</p></li>
+<li><p><a class="reference external" href="https://sourceforge.net/projects/gdcm/">GDCM</a> supports the most commonly
+used transfer syntaxes.</p></li>
+<li><p><a class="reference external" href="https://python-pillow.org/">Pillow</a>, ideally with the <code class="docutils literal notranslate"><span class="pre">jpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">jpeg2000</span></code>
+plugins. However we don’t recommend using Pillow as it performs a number of
+undesirable operations on the decoded images which are not always reversible.</p></li>
 </ul>
-<p>Note that you always need the <a class="reference external" href="https://numpy.org/">NumPy</a> package to be able
-to handle pixel data.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>We rely on the data handling capacity of the mentioned
 packages and cannot guarantee the correctness of the generated uncompressed
 pixel data. Be sure to verify the correctness of the output using other
-means before you use them for medical purposes.</p>
+means before you use them.</p>
 </div>
 </section>
 <section id="supported-transfer-syntaxes">
@@ -168,26 +166,14 @@ handled by the given packages:</p>
 <thead>
 <tr class="row-odd"><th class="head" colspan="2"><p>Transfer Syntax</p></th>
 <th class="head" rowspan="2"><p>NumPy</p></th>
-<th class="head" rowspan="2"><div class="line-block">
-<div class="line">NumPy +</div>
-<div class="line">JPEG-LS</div>
-</div>
-</th>
-<th class="head" rowspan="2"><div class="line-block">
-<div class="line">NumPy +</div>
-<div class="line">GDCM</div>
-</div>
-</th>
-<th class="head" rowspan="2"><div class="line-block">
-<div class="line">NumPy +</div>
-<div class="line">Pillow</div>
-</div>
-</th>
-<th class="head" rowspan="2"><div class="line-block">
-<div class="line">NumPy +</div>
-<div class="line">pylibjpeg</div>
-</div>
-</th>
+<th class="head" rowspan="2"><p>NumPy +
+JPEG-LS</p></th>
+<th class="head" rowspan="2"><p>NumPy +
+GDCM</p></th>
+<th class="head" rowspan="2"><p>NumPy +
+Pillow</p></th>
+<th class="head" rowspan="2"><p>NumPy +
+pylibjpeg</p></th>
 </tr>
 <tr class="row-even"><th class="head"><p>Name</p></th>
 <th class="head"><p>UID</p></th>
@@ -282,7 +268,7 @@ handled by the given packages:</p>
 <td></td>
 <td><p>✓<sup>5</sup></p></td>
 </tr>
-<tr class="row-even"><td><p>JPEG2000 Lossless</p></td>
+<tr class="row-even"><td><p>JPEG 2000 Lossless</p></td>
 <td><p>1.2.840.10008.1.2.4.90</p></td>
 <td></td>
 <td></td>
@@ -290,7 +276,7 @@ handled by the given packages:</p>
 <td><p>✓<sup>2</sup></p></td>
 <td><p>✓<sup>6</sup></p></td>
 </tr>
-<tr class="row-odd"><td><p>JPEG2000</p></td>
+<tr class="row-odd"><td><p>JPEG 2000</p></td>
 <td><p>1.2.840.10008.1.2.4.91</p></td>
 <td></td>
 <td></td>
@@ -298,21 +284,29 @@ handled by the given packages:</p>
 <td><p>✓<sup>2</sup></p></td>
 <td><p>✓<sup>6</sup></p></td>
 </tr>
-<tr class="row-even"><td><p>JPEG2000 Multi-component Lossless</p></td>
-<td><p>1.2.840.10008.1.2.4.92</p></td>
+<tr class="row-even"><td><p>High-Throughput JPEG 2000 Lossless</p></td>
+<td><p>1.2.840.10008.1.2.4.201</p></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
-<td></td>
+<td><p>✓<sup>6</sup></p></td>
 </tr>
-<tr class="row-odd"><td><p>JPEG2000 Multi-component</p></td>
-<td><p>1.2.840.10008.1.2.4.93</p></td>
+<tr class="row-odd"><td><p>High-Throughput JPEG 2000 (RPCL) Lossless</p></td>
+<td><p>1.2.840.10008.1.2.4.202</p></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
+<td><p>✓<sup>6</sup></p></td>
+</tr>
+<tr class="row-even"><td><p>High-Throughput JPEG 2000</p></td>
+<td><p>1.2.840.10008.1.2.4.203</p></td>
 <td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>✓<sup>6</sup></p></td>
 </tr>
 </tbody>
 </table>
@@ -320,28 +314,24 @@ handled by the given packages:</p>
 <div class="line"><sup>1</sup> <em>only with JpegImagePlugin</em></div>
 <div class="line"><sup>2</sup> <em>only with Jpeg2KImagePlugin</em></div>
 <div class="line"><sup>3</sup> <em>only if (0028,0100) Bits Allocated = 8</em></div>
-<div class="line"><sup>4</sup> <em>with the pylibjpeg-rle plugin and using the</em> <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> <em>method, 4-5x faster than default</em></div>
+<div class="line"><sup>4</sup> <em>with the pylibjpeg-rle plugin, 4-5x faster than default</em></div>
 <div class="line"><sup>5</sup> <em>with the pylibjpeg-libjpeg plugin</em></div>
 <div class="line"><sup>6</sup> <em>with the pylibjpeg-openjpeg plugin</em></div>
 </div>
 </section>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
-<p>To get uncompressed pixel data you have two options:</p>
+<p>To get uncompressed pixel data as a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> you have a number of options, depending on your requirements:</p>
 <ul class="simple">
-<li><p>use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> on the dataset to convert
-it in-place and work with the pixel data as described before</p></li>
-<li><p>get an uncompressed copy of the pixel data as a NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> using
-<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> without
-changing the original dataset</p></li>
+<li><p>To access the pixel data without modifying the dataset you can use
+the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property, or the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> functions with a
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance.</p></li>
+<li><p>To access the pixel data while minimizing memory usage you can use the <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> or
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> functions with the path to the dataset.</p></li>
+<li><p>To decompress a dataset in-place you can use <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.decompress()</span></code></a> or
+the <a class="reference internal" href="../../reference/generated/pydicom.pixels.decompress.html#pydicom.pixels.decompress" title="pydicom.pixels.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a> function.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> adapts the
-transfer syntax of the data set, but not the <em>Photometric Interpretation</em>.
-The <em>Photometric Interpretation</em> may not match the pixel data, depending on
-the used decompression handler.</p>
-</div>
 </section>
 </section>
 

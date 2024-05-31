@@ -128,7 +128,7 @@ more likely to result in downstream issues with decoders that expect the more
 common *Planar Configuration* ``0`` (interleave mode 2) pixel ordering.
 
 For either case, if the pixel data being encoded is in an :class:`~numpy.ndarray`
-then each frame should be shaped as (rows, columns, planes). If the pixel data
+then each frame should be shaped as (rows, columns, samples). If the pixel data
 being encoded is :class:`bytes` then with *Planar Configuration* ``0`` the data
 is ordered as color-by-pixel::
 

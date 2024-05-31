@@ -37,6 +37,7 @@
       ~Dataset.iterall
       ~Dataset.keys
       ~Dataset.overlay_array
+      ~Dataset.pixel_array_options
       ~Dataset.pop
       ~Dataset.popitem
       ~Dataset.private_block

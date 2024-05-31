@@ -58,12 +58,10 @@
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
@@ -135,7 +133,7 @@
 <p>This tutorial uses packages in addition to <em>pydicom</em> that are not installed
 by default, but are required for <em>RLE Lossless</em> and <em>JPEG-LS Near-lossless</em>
 compression of <em>Pixel Data</em>. For more information on what packages are
-available to compress a given transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html#guide-compression-supported"><span class="std std-ref">image compression
+available to compress a given transfer syntax see the <a class="reference internal" href="../../guides/user/image_data_compression.html#guide-compression-supported"><span class="std std-ref">image compression
 guide</span></a>.</p>
 <p>Installing using pip:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom<span class="w"> </span>numpy<span class="w"> </span>pylibjpeg<span class="w"> </span>pyjpegls
@@ -295,7 +293,7 @@ exception:</p>
 <p>Implicitly changing the compression on an already compressed dataset is not
 currently supported, however it can still be done explicitly by decompressing
 prior to calling <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a>. In the example
-below, a matching <a class="reference internal" href="../../old/image_data_handlers.html"><span class="doc">image data handler</span></a> for the
+below, a matching <a class="reference internal" href="../../guides/user/image_data_handlers.html"><span class="doc">image data handler</span></a> for the
 original transfer syntax - <em>JPEG 2000 Lossless</em> - is required.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span>

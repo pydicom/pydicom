@@ -10,6 +10,7 @@ pydicom:
 .. toctree::
    :maxdepth: 1
 
+   user/index
    element_value_types
    decoding/index
    encoding/index

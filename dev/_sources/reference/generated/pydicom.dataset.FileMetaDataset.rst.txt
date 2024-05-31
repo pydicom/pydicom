@@ -37,6 +37,7 @@
       ~FileMetaDataset.iterall
       ~FileMetaDataset.keys
       ~FileMetaDataset.overlay_array
+      ~FileMetaDataset.pixel_array_options
       ~FileMetaDataset.pop
       ~FileMetaDataset.popitem
       ~FileMetaDataset.private_block

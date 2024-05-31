@@ -7,15 +7,24 @@ Pixel Data Decoder Options
 .. currentmodule:: pydicom.pixels.decoders.base
 
 The following applies to the functions and class methods that use the
-:doc:`pixels</reference/pixels>` backend for decoding pixel data:
+:doc:`pixels</reference/pixels>` backend for decoding pixel data.
 
+
+When decoding to a NumPy :class:`~numpy.ndarray`:
+
+* The :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` property
+  (configurable via :meth:`Dataset.pixel_array_options()<pydicom.dataset.Dataset.pixel_array_options>`)
 * :func:`~pydicom.pixels.pixel_array`
 * :func:`~pydicom.pixels.iter_pixels`
 * :func:`~pydicom.pixels.decompress`
-* :meth:`Decoder.as_array()<pydicom.pixels.Decoder.as_array>`
-* :meth:`Decoder.as_buffer()<pydicom.pixels.Decoder.as_buffer>`
-* :meth:`Decoder.iter_array()<pydicom.pixels.Decoder.iter_array>`
-* :meth:`Decoder.iter_buffer()<pydicom.pixels.Decoder.iter_array>`
+* :meth:`Decoder.as_array()<pydicom.pixels.decoders.base.Decoder.as_array>`
+* :meth:`Decoder.iter_array()<pydicom.pixels.decoders.base.Decoder.iter_array>`
+
+
+When decoding to a buffer (such as :class:`bytes`, :class:`bytearray` or :class:`memoryview`):
+
+* :meth:`Decoder.as_buffer()<pydicom.pixels.decoders.base.Decoder.as_buffer>`
+* :meth:`Decoder.iter_buffer()<pydicom.pixels.decoders.base.Decoder.iter_buffer>`
 
 *Image Pixel* Options
 =====================
@@ -68,13 +77,7 @@ Image Processing Options
 ========================
 
 The following options may be used with any transfer syntax for controlling the
-processing applied after decoding using:
-
-* :func:`~pydicom.pixels.pixel_array`
-* :func:`~pydicom.pixels.iter_pixels`
-* :func:`~pydicom.pixels.decompress`
-* :meth:`Decoder.as_array()<pydicom.pixels.Decoder.as_array>`
-* :meth:`Decoder.iter_array()<pydicom.pixels.Decoder.iter_array>`
+processing applied after decoding to a NumPy :class:`~numpy.ndarray`:
 
 * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel data with a
   YCbCr :ref:`photometric interpretation<photometric_interpretation>`
@@ -89,8 +92,7 @@ Miscellaneous Options
 =====================
 
 The following options may be used with native (uncompressed) transfer syntaxes
-when decoding to a NumPy :class:`~numpy.ndarray` using :func:`~pydicom.pixels.pixel_array`,
-:func:`~pydicom.pixels.iter_pixels`, :meth:`Decoder.as_array` or :meth:`Decoder.iter_array`.
+when decoding to a NumPy :class:`~numpy.ndarray`:
 
 * `view_only`: :class:`bool` - if ``True`` and `src` is a
   :class:`~pydicom.dataset.Dataset` or buffer-like then make a best effort
@@ -100,9 +102,7 @@ when decoding to a NumPy :class:`~numpy.ndarray` using :func:`~pydicom.pixels.pi
   the returned :class:`~numpy.ndarray` will be read-only.
 
 The following options may be used with encapsulated (compressed) transfer syntaxes
-of the corresponding type when decoding to a NumPy :class:`~numpy.ndarray` using
-:func:`~pydicom.pixels.pixel_array`, :func:`~pydicom.pixels.iter_pixels`,
-:meth:`Decoder.as_array` or :meth:`Decoder.iter_array`.
+of the corresponding type when decoding to a NumPy :class:`~numpy.ndarray`:
 
 * `apply_jls_sign_correction`: :class:`bool` - if ``True`` (default), `src` contains
   JPEG-LS compressed pixel data and the pixel representation is 1, then convert
