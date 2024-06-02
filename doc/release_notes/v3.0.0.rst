@@ -176,6 +176,8 @@ Enhancements
     and many others).
   * Returning excess frames for JPEG when there is no Basic or Extended Offset
     Table and the *Number of Frames* is incorrect (:issue:`1666`).
+  * Returning excess frames for native encoding when the *Number of Frames* is
+    incorrect (:issue:`2035`)
   * Returning the decoded pixel data as either a NumPy :class:`~numpy.ndarray` or
     `buffer-like object <https://docs.python.org/3/c-api/buffer.html#bufferobjects>`_.
   * Iterating through either all or specific frames.
