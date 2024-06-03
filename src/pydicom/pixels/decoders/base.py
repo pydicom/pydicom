@@ -69,7 +69,7 @@ class DecodeOptions(RunnerOptions, total=False):
     pixel_vr: str
     # Allow returning/yielding excess frames when found
     allow_excess_frames: bool
-    # (ndarray only) When *Bits Stored* != *Bits Allocated* peform bit shift
+    # (ndarray only) When *Bits Stored* != *Bits Allocated* perform bit shift
     #   operations to avoid using the unused bits
     apply_shift_correction: bool
 
