@@ -1324,7 +1324,7 @@ class TestDecoder_Array:
         func = decoder.iter_array(ds, view_only=True, raw=True)
         msg = (
             "Unable to return an ndarray that's a view on the original buffer when "
-            r"\(0028,0101\) 'Bits Stored' doesn't equal \(0028,0100\) 'Bits Allocated' "
+            "(0028,0101) 'Bits Stored' doesn't equal (0028,0100) 'Bits Allocated' "
             "and 'apply_shift_correction=True'. In most cases you can pass "
             "'apply_shift_correction=False' instead to get a view if the uncorrected "
             "array is equivalent to the corrected one."
@@ -1335,6 +1335,7 @@ class TestDecoder_Array:
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
             assert arr.flags.writeable  # not a view due to bit-shift
+            assert msg in caplog.text
 
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index + 1)
