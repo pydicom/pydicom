@@ -7,7 +7,7 @@ from sys import byteorder
 
 import pytest
 
-from pydicom import config
+from pydicom import config, dcmread
 from pydicom.dataset import Dataset
 from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.pixels import get_decoder
@@ -166,6 +166,7 @@ class TestDecodeRunner:
             "Options\n"
             "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
             "  as_rgb: True\n"
+            "  allow_excess_frames: True\n"
             "  pixel_keyword: PixelData\n"
             "  apply_shift_correction: True\n"
             "Decoders\n"
@@ -1097,6 +1098,33 @@ class TestDecoder_Array:
         assert arr.dtype == reference.dtype
         assert not arr.flags.writeable  # read-only
 
+    def test_native_excess_frames(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        ds = dcmread(EXPL_16_1_10F.path)
+        ds.NumberOfFrames = 9
+
+        msg = (
+            "The number of bytes of pixel data is sufficient to contain 10 frames "
+            r"which is larger than the given \(0028,0008\) 'Number of Frames' "
+            "value of 9. The returned data will include these extra frames and if "
+            "it's correct then you should update 'Number of Frames' accordingly, "
+            "otherwise pass 'allow_excess_frames=False' to return only the first "
+            "9 frames."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr, meta = decoder.as_array(ds)
+
+        assert arr.shape == (10, 64, 64)
+        assert meta["number_of_frames"] == 10
+
+        msg = "contains 8192 bytes of excess padding"
+        with pytest.warns(UserWarning, match=msg):
+            arr, meta = decoder.as_array(ds, allow_excess_frames=False)
+
+        assert arr.shape == (9, 64, 64)
+        assert meta["number_of_frames"] == 9
+
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""
         decoder = get_decoder(RLELossless)
@@ -1136,14 +1164,22 @@ class TestDecoder_Array:
         runner.set_source(reference.ds)
 
         msg = (
-            "More frames have been found in the encapsulated pixel data than "
-            "expected from the supplied number of frames"
+            "11 frames have been found in the encapsulated pixel data, which is "
+            r"larger than the given \(0028,0008\) 'Number of Frames' value of 10. "
+            "The returned data will include these extra frames and if it's correct "
+            "then you should update 'Number of Frames' accordingly, otherwise pass "
+            "'allow_excess_frames=False' to return only the first 10 frames."
         )
         with pytest.warns(UserWarning, match=msg):
             arr, meta = decoder.as_array(src, **runner.options)
 
         assert arr.shape == (11, 64, 64)
         assert meta["number_of_frames"] == 11
+
+        runner.set_option("allow_excess_frames", False)
+        arr, meta = decoder.as_array(src, **runner.options)
+        assert arr.shape == (10, 64, 64)
+        assert meta["number_of_frames"] == 10
 
     def test_processing_colorspace(self):
         """Test the processing colorspace options."""
@@ -1589,14 +1625,22 @@ class TestDecoder_Buffer:
         runner.set_source(reference.ds)
 
         msg = (
-            "More frames have been found in the encapsulated pixel data than "
-            "expected from the supplied number of frames"
+            "11 frames have been found in the encapsulated pixel data, which is "
+            r"larger than the given \(0028,0008\) 'Number of Frames' value of 10. "
+            "The returned data will include these extra frames and if it's correct "
+            "then you should update 'Number of Frames' accordingly, otherwise pass "
+            "'allow_excess_frames=False' to return only the first 10 frames."
         )
         with pytest.warns(UserWarning, match=msg):
             buffer, meta = decoder.as_buffer(src, **runner.options)
 
         assert len(buffer) == 11 * 64 * 64 * 2
         assert meta["number_of_frames"] == 11
+
+        runner.set_option("allow_excess_frames", False)
+        buffer, meta = decoder.as_buffer(src, **runner.options)
+        assert len(buffer) == 10 * 64 * 64 * 2
+        assert meta["number_of_frames"] == 10
 
     def test_expb_ow_index_invalid_raises(self):
         """Test invalid index with BE swapped OW raises"""

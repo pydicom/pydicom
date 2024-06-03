@@ -67,7 +67,9 @@ class DecodeOptions(RunnerOptions, total=False):
 
     # The VR used for the pixel data - may be used with Explicit VR Big Endian
     pixel_vr: str
-    # (ndarray only) When *Bits Stored* !- *Bits Allocated* peform bit shift
+    # Allow returning/yielding excess frames when found
+    allow_excess_frames: bool
+    # (ndarray only) When *Bits Stored* != *Bits Allocated* peform bit shift
     #   operations to avoid using the unused bits
     apply_shift_correction: bool
 
@@ -241,6 +243,7 @@ class DecodeRunner(RunnerBase):
         self._opts: DecodeOptions = {
             "transfer_syntax_uid": tsyntax,
             "as_rgb": True,
+            "allow_excess_frames": True,
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword")
         self._decoders: dict[str, DecodeFunction] = {}
@@ -738,7 +741,8 @@ class DecodeRunner(RunnerBase):
     def _validate_buffer(self) -> None:
         """Validate the supplied buffer data."""
         # Check that the actual length of the pixel data is as expected
-        expected = self.frame_length(unit="bytes") * self.number_of_frames
+        frame_length = self.frame_length(unit="bytes")
+        expected = frame_length * self.number_of_frames
         actual = len(cast(Buffer, self._src))
 
         if self.transfer_syntax.is_encapsulated:
@@ -773,6 +777,22 @@ class DecodeRunner(RunnerBase):
                         "value of 'YBR_FULL_422' is incorrect and may need to be "
                         "changed to either 'RGB' or 'YBR_FULL'"
                     )
+
+            # Determine if there's sufficient padding to contain extra frames
+            elif self.get_option("allow_excess_frames", False):
+                whole_frames = actual // frame_length
+                if whole_frames > self.number_of_frames:
+                    warn_and_log(
+                        "The number of bytes of pixel data is sufficient to contain "
+                        f"{whole_frames} frames which is larger than the given "
+                        f"(0028,0008) 'Number of Frames' value of {self.number_of_frames}. "
+                        "The returned data will include these extra frames and if it's "
+                        "correct then you should update 'Number of Frames' accordingly, "
+                        "otherwise pass 'allow_excess_frames=False' to return only "
+                        f"the first {self.number_of_frames} frames."
+                    )
+                    self.set_option("number_of_frames", whole_frames)
+                    return
 
             # PS 3.5, Section 8.1.1
             warn_and_log(
@@ -1031,18 +1051,25 @@ class Decoder(CoderBase):
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
-        excess = []
-        for frame in frame_generator:
-            if len(frame) == runner.frame_length(unit="bytes"):
-                excess.append(np.frombuffer(frame, runner.pixel_dtype))
-                runner.set_option("number_of_frames", runner.number_of_frames + 1)
+        if runner.get_option("allow_excess_frames", False):
+            excess = []
+            original_nr_frames = runner.number_of_frames
+            for frame in frame_generator:
+                if len(frame) == runner.frame_length(unit="bytes"):
+                    excess.append(np.frombuffer(frame, runner.pixel_dtype))
+                    runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
-        if excess:
-            warn_and_log(
-                "More frames have been found in the encapsulated pixel data "
-                "than expected from the supplied number of frames"
-            )
-            arr = np.concatenate([arr, *excess])
+            if excess:
+                warn_and_log(
+                    f"{len(excess) + original_nr_frames} frames have been found in "
+                    "the encapsulated pixel data, which is larger than the given "
+                    f"(0028,0008) 'Number of Frames' value of {original_nr_frames}. "
+                    "The returned data will include these extra frames and if it's "
+                    "correct then you should update 'Number of Frames' accordingly, "
+                    "otherwise pass 'allow_excess_frames=False' to return only the "
+                    f"first {original_nr_frames} frames."
+                )
+                arr = np.concatenate([arr, *excess])
 
         runner.set_option("bits_allocated", original_bits_allocated)
 
@@ -1331,19 +1358,26 @@ class Decoder(CoderBase):
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
-        excess = []
-        for frame in frame_generator:
-            if len(frame) == runner.frame_length(unit="bytes"):
-                excess.append(frame)
-                runner.set_option("number_of_frames", runner.number_of_frames + 1)
-                bits_allocated.append(runner.bits_allocated)
+        if runner.get_option("allow_excess_frames", False):
+            excess = []
+            original_nr_frames = runner.number_of_frames
+            for frame in frame_generator:
+                if len(frame) == runner.frame_length(unit="bytes"):
+                    excess.append(frame)
+                    runner.set_option("number_of_frames", runner.number_of_frames + 1)
+                    bits_allocated.append(runner.bits_allocated)
 
-        if excess:
-            warn_and_log(
-                "More frames have been found in the encapsulated pixel data "
-                "than expected from the supplied number of frames"
-            )
-            frames.extend(excess)
+            if excess:
+                warn_and_log(
+                    f"{len(excess) + len(frames)} frames have been found in the "
+                    "encapsulated pixel data, which is larger than the given "
+                    f"(0028,0008) 'Number of Frames' value of {original_nr_frames}. "
+                    "The returned data will include these extra frames and if it's "
+                    "correct then you should update 'Number of Frames' accordingly, "
+                    "otherwise pass 'allow_excess_frames=False' to return only the "
+                    f"first {original_nr_frames} frames."
+                )
+                frames.extend(excess)
 
         # Each frame may have been encoded using a different precision. On
         #   decoding this may result in different container sizes per frame
