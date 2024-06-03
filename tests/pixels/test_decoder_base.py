@@ -167,6 +167,7 @@ class TestDecodeRunner:
             "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
             "  as_rgb: True\n"
             "  pixel_keyword: PixelData\n"
+            "  apply_shift_correction: True\n"
             "Decoders\n"
             "  foo"
         )
@@ -1275,14 +1276,39 @@ class TestDecoder_Array:
 
         assert idx == 2
 
-    def test_iter_native_view_only(self):
+    def test_iter_native_view_only(self, caplog):
         """Test as_array(view_only=True)"""
         decoder = get_decoder(ExplicitVRLittleEndian)
         reference = EXPL_16_1_10F
         ds = reference.ds
+        assert ds.BitsAllocated == 16
+        assert ds.BitsStored == 12
 
         assert isinstance(ds.PixelData, bytes)  # immutable
         func = decoder.iter_array(ds, view_only=True, raw=True)
+        msg = (
+            "Unable to return an ndarray that's a view on the original buffer when "
+            r"\(0028,0101\) 'Bits Stored' doesn't equal \(0028,0100\) 'Bits Allocated' "
+            "and 'apply_shift_correction=True'. In most cases you can pass "
+            "'apply_shift_correction=False' instead to get a view if the uncorrected "
+            "array is equivalent to the corrected one."
+        )
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            arr, _ = next(func)
+            reference.test(arr, index=0)
+            assert arr.shape == reference.shape[1:]
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable  # not a view due to bit-shift
+
+        for index, (arr, _) in enumerate(func):
+            reference.test(arr, index=index + 1)
+            assert arr.shape == reference.shape[1:]
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable  # not a view due to bit-shift
+
+        func = decoder.iter_array(
+            ds, view_only=True, raw=True, apply_shift_correction=False
+        )
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
@@ -1324,6 +1350,7 @@ class TestDecoder_Array:
             number_of_frames=ds.get("NumberOfFrames", 1),
             planar_configuration=ds.get("PlanarConfiguration", 0),
             pixel_keyword="PixelData",
+            apply_shift_correction=False,
         )
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
