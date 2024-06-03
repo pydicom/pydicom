@@ -250,6 +250,15 @@ conversion on the array (default <code class="docutils literal notranslate"><spa
 </section>
 <section id="miscellaneous-options">
 <h2>Miscellaneous Options<a class="headerlink" href="#miscellaneous-options" title="Link to this heading">¶</a></h2>
+<p>The following options may be used with both native (uncompressed) and encapsulated
+(compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
+buffer-like object:</p>
+<ul class="simple">
+<li><p><cite>allow_excess_frames</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <cite>src</cite> contains
+more frames of data than given by the value of (0028,0008) <em>Number of Frames</em> then
+include those extra frames in the returned data, otherwise return only the number
+of frames given by <em>Number of Frames</em>.</p></li>
+</ul>
 <p>The following options may be used with native (uncompressed) transfer syntaxes
 when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">

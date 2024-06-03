@@ -60,7 +60,7 @@ Changes
   6 or 7 produces incorrect results, so attempting to do so now raises an exception.
   ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
 * Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
-  exception as Pillow cannot decode such data correctly (:issue:`2006`, :issue:`2059`)
+  exception as Pillow cannot decode such data correctly (:issue:`2006`)
 
 
 Removals
@@ -176,6 +176,8 @@ Enhancements
     and many others).
   * Returning excess frames for JPEG when there is no Basic or Extended Offset
     Table and the *Number of Frames* is incorrect (:issue:`1666`).
+  * Returning excess frames for native encoding when the *Number of Frames* is
+    incorrect (:issue:`2035`)
   * Returning the decoded pixel data as either a NumPy :class:`~numpy.ndarray` or
     `buffer-like object <https://docs.python.org/3/c-api/buffer.html#bufferobjects>`_.
   * Iterating through either all or specific frames.
