@@ -111,7 +111,7 @@ buffer-like object:
 * `allow_excess_frames`: :class:`bool` - if ``True`` (default) and `src` contains
   more frames of data than given by the value of (0028,0008) *Number of Frames* then
   include those extra frames in the returned data, otherwise return only the number
-  eof frames given by *Number of Frames*.
+  of frames given by *Number of Frames*.
 
 The following options may be used with native (uncompressed) transfer syntaxes
 when decoding to a NumPy :class:`~numpy.ndarray`:
