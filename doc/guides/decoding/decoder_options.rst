@@ -94,7 +94,7 @@ Miscellaneous Options
 The following options may be used with both native (uncompressed) and encapsulated
 (compressed) transfer syntaxes when decoding to a NumPy :class:`~numpy.ndarray`:
 
-* `apply_shift_correction`: :class:`bool` if ``True`` (default) and *Bits Stored*
+* `apply_shift_correction`: :class:`bool` - if ``True`` (default) and *Bits Stored*
   doesn't equal *Bits Allocated* then apply bit-shifting operations to correct
   for any misinterpretation due to the unused bits. For example, if *Bits Stored*
   is 5, *Bits Allocated* is 8 and *Pixel Representation* is 1 then the 3 most
