@@ -356,6 +356,9 @@ image data when <em>Bits Stored</em> is less than <em>Bits Allocated</em> (<a cl
 <li><p>Fixed the <em>Pixel Data</em> VR not being set correctly with <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2013">#2013</a>).</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.decompress()</span></code></a> not updating
 the <em>Pixel Data</em> element value until after saving (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2024">#2024</a>).</p></li>
+<li><p>Fixed a rare issue with converting pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> when
+<em>Bits Stored</em> is less than <em>Bits Allocated</em> and the unused bits haven’t been
+set to an appropriate value for correct interpretation of the data.</p></li>
 </ul>
 </section>
 <section id="deprecations">

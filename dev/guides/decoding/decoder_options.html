@@ -251,6 +251,19 @@ conversion on the array (default <code class="docutils literal notranslate"><spa
 <section id="miscellaneous-options">
 <h2>Miscellaneous Options<a class="headerlink" href="#miscellaneous-options" title="Link to this heading">¶</a></h2>
 <p>The following options may be used with both native (uncompressed) and encapsulated
+(compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+<ul class="simple">
+<li><p><cite>correct_unused_bits</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <em>Bits Stored</em>
+doesn’t equal <em>Bits Allocated</em> then apply bit-shifting operations to correct
+for any misinterpretation due to the unused bits. For example, if <em>Bits Stored</em>
+is 5 and <em>Bits Allocated</em> is 8 then the 3 most significant bits are unused.
+A raw value of <code class="docutils literal notranslate"><span class="pre">0b00011001</span></code> with a <em>Pixel Representation</em> of 1 would therefore
+be interpreted as the value 25 if <cite>correct_unused_bits</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code> instead
+of its correct value of -7. However, in most cases this correction shouldn’t
+be necessary as the unused bits are typically filled with values that will
+produce the correct interpretation.</p></li>
+</ul>
+<p>The following options may be used with both native (uncompressed) and encapsulated
 (compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
 buffer-like object:</p>
 <ul class="simple">
