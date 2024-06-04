@@ -236,6 +236,9 @@ Fixes
   <pydicom.dataset.Dataset.compress>` (:issue:`2013`).
 * Fixed :meth:`Dataset.decompress()<pydicom.dataset.Dataset.decompress>` not updating
   the *Pixel Data* element value until after saving (:issue:`2024`).
+* Fixed a rare issue with converting pixel data to an :class:`~numpy.ndarray` when
+  *Bits Stored* is less than *Bits Allocated* and the unused bits haven't been
+  set to an appropriate value for correct interpretation of the data.
 
 
 Deprecations

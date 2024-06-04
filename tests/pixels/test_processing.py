@@ -222,26 +222,25 @@ class TestModalityLUT:
 
     def test_lut_sequence(self):
         """Test the LUT Sequence transform."""
+        # Unused bits don't match interpretation!
         ds = dcmread(MOD_16_SEQ)
+        assert ds.BitsAllocated == 16
+        assert ds.BitsStored == 12
         seq = ds.ModalityLUTSequence[0]
         assert [4096, -2048, 16] == seq.LUTDescriptor
+
         arr = ds.pixel_array
         assert -2048 == arr.min()
-        assert 4095 == arr.max()
-        out = apply_modality_lut(arr, ds)
+        assert 2047 == arr.max()
 
-        # IV > 2047 -> LUT[4095]
-        mapped_pixels = arr > 2047
-        assert seq.LUTData[-1] == out[mapped_pixels][0]
-        assert (seq.LUTData[-1] == out[mapped_pixels]).all()
+        out = apply_modality_lut(arr, ds)
         assert out.flags.writeable
         assert out.dtype == np.uint16
-
-        assert [65535, 65535, 49147, 49147, 65535] == list(out[0, 50:55])
-        assert [65535, 65535, 65535, 65535, 65535] == list(out[50, 50:55])
-        assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
-        assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
-        assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])
+        assert [65535, 0, 0, 65535, 65535] == list(out[50, 50:55])
+        assert [65535, 0, 0, 0, 65535] == list(out[100, 50:55])
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[150, 50:55])
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[200, 50:55])
         assert 39321 == out[185, 340]
         assert 45867 == out[185, 385]
         assert 52428 == out[228, 385]
@@ -288,21 +287,16 @@ class TestModalityLUT:
         seq.LUTData = pack("<4096H", *seq.LUTData)
         arr = ds.pixel_array
         assert -2048 == arr.min()
-        assert 4095 == arr.max()
-        out = apply_modality_lut(arr, ds)
+        assert 2047 == arr.max()
 
-        # IV > 2047 -> LUT[4095]
-        mapped_pixels = arr > 2047
-        assert 65535 == out[mapped_pixels][0]
-        assert (65535 == out[mapped_pixels]).all()
+        out = apply_modality_lut(arr, ds)
         assert out.flags.writeable
         assert out.dtype == np.uint16
-
-        assert [65535, 65535, 49147, 49147, 65535] == list(out[0, 50:55])
-        assert [65535, 65535, 65535, 65535, 65535] == list(out[50, 50:55])
-        assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
-        assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
-        assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])
+        assert [65535, 0, 0, 65535, 65535] == list(out[50, 50:55])
+        assert [65535, 0, 0, 0, 65535] == list(out[100, 50:55])
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[150, 50:55])
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[200, 50:55])
         assert 39321 == out[185, 340]
         assert 45867 == out[185, 385]
         assert 52428 == out[228, 385]
@@ -1247,7 +1241,7 @@ class TestApplyWindowing:
         assert [4096, -2048, 16] == seq.LUTDescriptor
         arr = ds.pixel_array
         assert -2048 == arr.min()
-        assert 4095 == arr.max()
+        assert 2047 == arr.max()
 
         arr = ds.pixel_array
         assert 2047 == arr[16, 60]

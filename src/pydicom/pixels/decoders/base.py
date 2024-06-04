@@ -69,6 +69,9 @@ class DecodeOptions(RunnerOptions, total=False):
     pixel_vr: str
     # Allow returning/yielding excess frames when found
     allow_excess_frames: bool
+    # (ndarray only) When *Bits Stored* != *Bits Allocated* perform bit shift
+    #   operations to avoid using the unused bits
+    correct_unused_bits: bool
 
     ## Native transfer syntax decoding options
     # Return/yield a view of the original buffer where possible
@@ -126,6 +129,42 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     elif to_rgb:
         arr = convert_color_space(arr, PI.YBR_FULL, PI.RGB)
         runner.set_option("photometric_interpretation", PI.RGB)
+
+    return arr
+
+
+def _correct_unused_bits(
+    arr: "np.ndarray", runner: "DecodeRunner", log_warning: bool = True
+) -> "np.ndarray":
+    """Perform a bit-shift correction on `arr` to avoid using any unused bits"""
+    # If *Bits Stored* < *Bits Allocated* then we (technically) always
+    #   need to shift because the values of the unused bits cannot be assumed
+    #   - PS3.5, Section 8.1.1
+    # e.g. For Bits Stored 5, Pixel Representation 1 we may have a signed value:
+    #   0001 1001, however the 3 MSb should be ignored so bit shifting
+    #   (with a signed integer dtype) will give 0001 1001 -> 1100 1000 -> 1111 1001
+    # In practice this isn't usually necessary as most application will fill
+    #   the unused bits with values that produce the correct interpretation
+    if (
+        log_warning
+        and runner.get_option("view_only", False)
+        and not runner.transfer_syntax.is_encapsulated
+        and not arr.flags.writeable
+    ):
+        LOGGER.warning(
+            "Unable to return an ndarray that's a view on the original buffer when "
+            "(0028,0101) 'Bits Stored' doesn't equal (0028,0100) 'Bits Allocated' "
+            "and 'correct_unused_bits=True'. In most cases you can pass "
+            "'correct_unused_bits=False' instead to get a view if the uncorrected "
+            "array is equivalent to the corrected one."
+        )
+
+    if not arr.flags.writeable:
+        arr = arr.copy()
+
+    bit_shift = runner.bits_allocated - runner.bits_stored
+    np.left_shift(arr, bit_shift, out=arr)
+    np.right_shift(arr, bit_shift, out=arr)
 
     return arr
 
@@ -219,6 +258,8 @@ class DecodeRunner(RunnerBase):
             self.set_option("apply_j2k_sign_correction", True)
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
             self.set_option("apply_jls_sign_correction", True)
+        else:
+            self.set_option("correct_unused_bits", True)
 
     def _conform_jpg_colorspace(self, info: dict[str, Any]) -> None:
         """Conform the photometric interpretation to the JPEG/JPEG-LS codestream.
@@ -679,7 +720,15 @@ class DecodeRunner(RunnerBase):
                 and self.pixel_representation == 1
                 and self.get_option("apply_jls_sign_correction", False)
             )
+
             return use_j2k_correction or use_jls_correction
+
+        if test == "shift_correction":
+            return (
+                self.get_option("correct_unused_bits", False)
+                and self.pixel_keyword == "PixelData"
+                and self.bits_allocated > self.bits_stored
+            )
 
         raise ValueError(f"Unknown test '{test}'")
 
@@ -936,6 +985,8 @@ class Decoder(CoderBase):
 
         if runner._test_for("sign_correction"):
             arr = _apply_sign_correction(arr, runner)
+        elif runner._test_for("shift_correction"):
+            arr = _correct_unused_bits(arr, runner)
 
         if not raw:
             # Processing may give us a new writeable array anyway, so do
@@ -1560,12 +1611,16 @@ class Decoder(CoderBase):
             func = self._as_array_encapsulated
             as_writeable = True
 
+        log_warning = True
         if self.is_encapsulated and not indices:
             for frame in runner.iter_decode():
                 arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
                 arr = runner.reshape(arr, as_frame=True)
                 if runner._test_for("sign_correction"):
                     arr = _apply_sign_correction(arr, runner)
+                elif runner._test_for("shift_correction"):
+                    arr = _correct_unused_bits(arr, runner, log_warning=log_warning)
+                    log_warning = False
 
                 if not raw:
                     # Processing may give us a new writeable array anyway, so do
@@ -1586,6 +1641,9 @@ class Decoder(CoderBase):
             arr = runner.reshape(func(runner, index), as_frame=True)
             if runner._test_for("sign_correction"):
                 arr = _apply_sign_correction(arr, runner)
+            elif runner._test_for("shift_correction"):
+                arr = _correct_unused_bits(arr, runner, log_warning=log_warning)
+                log_warning = False
 
             if not raw:
                 arr = runner.process(arr)
