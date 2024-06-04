@@ -168,7 +168,7 @@ class TestDecodeRunner:
             "  as_rgb: True\n"
             "  allow_excess_frames: True\n"
             "  pixel_keyword: PixelData\n"
-            "  apply_shift_correction: True\n"
+            "  correct_unused_bits: True\n"
             "Decoders\n"
             "  foo"
         )
@@ -1325,8 +1325,8 @@ class TestDecoder_Array:
         msg = (
             "Unable to return an ndarray that's a view on the original buffer when "
             "(0028,0101) 'Bits Stored' doesn't equal (0028,0100) 'Bits Allocated' "
-            "and 'apply_shift_correction=True'. In most cases you can pass "
-            "'apply_shift_correction=False' instead to get a view if the uncorrected "
+            "and 'correct_unused_bits=True'. In most cases you can pass "
+            "'correct_unused_bits=False' instead to get a view if the uncorrected "
             "array is equivalent to the corrected one."
         )
         with caplog.at_level(logging.WARNING, logger="pydicom"):
@@ -1344,7 +1344,7 @@ class TestDecoder_Array:
             assert arr.flags.writeable  # not a view due to bit-shift
 
         func = decoder.iter_array(
-            ds, view_only=True, raw=True, apply_shift_correction=False
+            ds, view_only=True, raw=True, correct_unused_bits=False
         )
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
@@ -1387,7 +1387,7 @@ class TestDecoder_Array:
             number_of_frames=ds.get("NumberOfFrames", 1),
             planar_configuration=ds.get("PlanarConfiguration", 0),
             pixel_keyword="PixelData",
-            apply_shift_correction=False,
+            correct_unused_bits=False,
         )
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)

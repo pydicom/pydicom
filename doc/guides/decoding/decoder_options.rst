@@ -94,12 +94,12 @@ Miscellaneous Options
 The following options may be used with both native (uncompressed) and encapsulated
 (compressed) transfer syntaxes when decoding to a NumPy :class:`~numpy.ndarray`:
 
-* `apply_shift_correction`: :class:`bool` - if ``True`` (default) and *Bits Stored*
+* `correct_unused_bits`: :class:`bool` - if ``True`` (default) and *Bits Stored*
   doesn't equal *Bits Allocated* then apply bit-shifting operations to correct
   for any misinterpretation due to the unused bits. For example, if *Bits Stored*
-  is 5, *Bits Allocated* is 8 and *Pixel Representation* is 1 then the 3 most
-  significant bits are unused. A raw value of ``0b00011001`` would be therefore
-  interpreted as the value 25 if `apply_shift_correction` is ``False`` instead
+  is 5 and *Bits Allocated* is 8 then the 3 most significant bits are unused.
+  A raw value of ``0b00011001`` with a *Pixel Representation* of 1 would therefore
+  be interpreted as the value 25 if `correct_unused_bits` is ``False`` instead
   of its correct value of -7. However, in most cases this correction shouldn't
   be necessary as the unused bits are typically filled with values that will
   produce the correct interpretation.

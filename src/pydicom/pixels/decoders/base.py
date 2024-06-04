@@ -71,7 +71,7 @@ class DecodeOptions(RunnerOptions, total=False):
     allow_excess_frames: bool
     # (ndarray only) When *Bits Stored* != *Bits Allocated* perform bit shift
     #   operations to avoid using the unused bits
-    apply_shift_correction: bool
+    correct_unused_bits: bool
 
     ## Native transfer syntax decoding options
     # Return/yield a view of the original buffer where possible
@@ -133,7 +133,7 @@ def _process_color_space(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarr
     return arr
 
 
-def _apply_shift_correction(
+def _correct_unused_bits(
     arr: "np.ndarray", runner: "DecodeRunner", log_warning: bool = True
 ) -> "np.ndarray":
     """Perform a bit-shift correction on `arr` to avoid using any unused bits"""
@@ -154,8 +154,8 @@ def _apply_shift_correction(
         LOGGER.warning(
             "Unable to return an ndarray that's a view on the original buffer when "
             "(0028,0101) 'Bits Stored' doesn't equal (0028,0100) 'Bits Allocated' "
-            "and 'apply_shift_correction=True'. In most cases you can pass "
-            "'apply_shift_correction=False' instead to get a view if the uncorrected "
+            "and 'correct_unused_bits=True'. In most cases you can pass "
+            "'correct_unused_bits=False' instead to get a view if the uncorrected "
             "array is equivalent to the corrected one."
         )
 
@@ -259,7 +259,7 @@ class DecodeRunner(RunnerBase):
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
             self.set_option("apply_jls_sign_correction", True)
         else:
-            self.set_option("apply_shift_correction", True)
+            self.set_option("correct_unused_bits", True)
 
     def _conform_jpg_colorspace(self, info: dict[str, Any]) -> None:
         """Conform the photometric interpretation to the JPEG/JPEG-LS codestream.
@@ -725,7 +725,7 @@ class DecodeRunner(RunnerBase):
 
         if test == "shift_correction":
             return (
-                self.get_option("apply_shift_correction", False)
+                self.get_option("correct_unused_bits", False)
                 and self.pixel_keyword == "PixelData"
                 and self.bits_allocated > self.bits_stored
             )
@@ -986,7 +986,7 @@ class Decoder(CoderBase):
         if runner._test_for("sign_correction"):
             arr = _apply_sign_correction(arr, runner)
         elif runner._test_for("shift_correction"):
-            arr = _apply_shift_correction(arr, runner)
+            arr = _correct_unused_bits(arr, runner)
 
         if not raw:
             # Processing may give us a new writeable array anyway, so do
@@ -1619,7 +1619,7 @@ class Decoder(CoderBase):
                 if runner._test_for("sign_correction"):
                     arr = _apply_sign_correction(arr, runner)
                 elif runner._test_for("shift_correction"):
-                    arr = _apply_shift_correction(arr, runner, log_warning=log_warning)
+                    arr = _correct_unused_bits(arr, runner, log_warning=log_warning)
                     log_warning = False
 
                 if not raw:
@@ -1642,7 +1642,7 @@ class Decoder(CoderBase):
             if runner._test_for("sign_correction"):
                 arr = _apply_sign_correction(arr, runner)
             elif runner._test_for("shift_correction"):
-                arr = _apply_shift_correction(arr, runner, log_warning=log_warning)
+                arr = _correct_unused_bits(arr, runner, log_warning=log_warning)
                 log_warning = False
 
             if not raw:
