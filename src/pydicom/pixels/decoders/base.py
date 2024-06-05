@@ -59,7 +59,9 @@ LOGGER = logging.getLogger(__name__)
 
 
 DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
-ProcessingFunction = Callable[["np.ndarray", "DecodeRunner"], tuple["np.ndarray", dict[str, Any]]]
+ProcessingFunction = Callable[
+    ["np.ndarray", "DecodeRunner", dict[str, str | int]], "np.ndarray"
+]
 
 
 class DecodeOptions(RunnerOptions, total=False):
@@ -98,7 +100,8 @@ class DecodeOptions(RunnerOptions, total=False):
 
 
 def _process_color_space(
-    arr: "np.ndarray", runner: "DecodeRunner") -> tuple["np.ndarray", dict[str, Any]]:
+    arr: "np.ndarray", runner: "DecodeRunner", changes: dict[str, str | int]
+) -> "np.ndarray":
     """Convert `arr` to a given color space, typically RGB."""
     # If force_ybr then always do conversion (ignore as_rgb)
     force_ybr = runner.get_option("force_ybr", False)
@@ -121,17 +124,14 @@ def _process_color_space(
         arr = arr.copy()
 
     # Converting to/from YBR_FULL and YBR_FULL_422 uses the same transformation
-    d = {}
     if force_ybr:
         arr = convert_color_space(arr, PI.RGB, PI.YBR_FULL)
-        d["photometric_interpretation"] = PI.YBR_FULL
-        # runner.set_option("photometric_interpretation", PI.YBR_FULL)
+        changes["photometric_interpretation"] = PI.YBR_FULL
     elif to_rgb:
         arr = convert_color_space(arr, PI.YBR_FULL, PI.RGB)
-        d["photometric_interpretation"] = PI.RGB
-        # runner.set_option("photometric_interpretation", PI.RGB)
+        changes["photometric_interpretation"] = PI.RGB
 
-    return arr, d
+    return arr
 
 
 def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.ndarray":
@@ -508,18 +508,20 @@ class DecodeRunner(RunnerBase):
 
         return cast(dict[str, str | int], d)
 
-    def process(self, arr: "np.ndarray") -> "np.ndarray":
+    def process(self, arr: "np.ndarray") -> tuple["np.ndarray", dict[str, str | int]]:
         """Return `arr` after applying zero or more processing operations.
 
         Returns
         -------
         numpy.ndarray
             The array with the applied processing.
+        dict[str, int | str]
+            A :class:`dict` containing any required changes to the image pixel
+            properties due to the processing.
         """
-        changes = {}
+        changes: dict[str, str | int] = {}
         for func in PROCESSORS:
-            arr, d = func(arr, self)
-            changes.update(d)
+            arr = func(arr, self, changes)
 
         return arr, changes
 
@@ -943,17 +945,21 @@ class Decoder(CoderBase):
         if runner._test_for("sign_correction"):
             arr = _apply_sign_correction(arr, runner)
 
+        overrides: dict[str, str | int] = {}
         if not raw:
             # Processing may give us a new writeable array anyway, so do
             #   it first to avoid an unnecessary ndarray.copy()
-            arr = runner.process(arr)
+            arr, overrides = runner.process(arr)
 
         arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
 
         # Multi-sample arrays are always returned *Planar Configuration* 0
         runner.set_option("planar_configuration", 0)
 
-        return arr, runner.pixel_properties(as_frame=as_frame)
+        pixel_properties = runner.pixel_properties(as_frame=as_frame)
+        pixel_properties.update(overrides)
+
+        return arr, pixel_properties
 
     @staticmethod
     def _as_array_encapsulated(runner: DecodeRunner, index: int | None) -> "np.ndarray":
@@ -1573,21 +1579,21 @@ class Decoder(CoderBase):
                 if runner._test_for("sign_correction"):
                     arr = _apply_sign_correction(arr, runner)
 
-                d = {}
+                overrides: dict[str, str | int] = {}
                 if not raw:
                     # Processing may give us a new writeable array anyway, so do
                     #   it first to avoid an unnecessary ndarray.copy()
-                    arr, d = runner.process(arr)
+                    arr, overrides = runner.process(arr)
 
                 arr = arr if arr.flags.writeable else arr.copy()
 
                 # Multi-sample arrays are always returned *Planar Configuration* 0
                 runner.set_option("planar_configuration", 0)
 
-                image_pixel = runner.pixel_properties(as_frame=True)
-                image_pixel.update(d)
+                pixel_properties = runner.pixel_properties(as_frame=True)
+                pixel_properties.update(overrides)
 
-                yield arr, image_pixel
+                yield arr, pixel_properties
 
             return
 
@@ -1597,17 +1603,17 @@ class Decoder(CoderBase):
             if runner._test_for("sign_correction"):
                 arr = _apply_sign_correction(arr, runner)
 
-            d = {}
+            overrides = {}
             if not raw:
-                arr, d = runner.process(arr)
+                arr, overrides = runner.process(arr)
 
             arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
             runner.set_option("planar_configuration", 0)
 
-            image_pixel = runner.pixel_properties(as_frame=True)
-            image_pixel.update(d)
+            pixel_properties = runner.pixel_properties(as_frame=True)
+            pixel_properties.update(overrides)
 
-            yield arr, image_pixel
+            yield arr, pixel_properties
 
     def iter_buffer(
         self,
