@@ -626,9 +626,9 @@ def convert_color_space(
     Parameters
     ----------
     arr : numpy.ndarray
-        The image(s) as a :class:`numpy.ndarray` with
-        :attr:`~numpy.ndarray.shape` (frames, rows, columns, 3)
-        or (rows, columns, 3).
+        The image(s) as :class:`numpy.ndarray` with :attr:`~numpy.ndarray.shape`
+        (frames, rows, columns, 3) or (rows, columns, 3) and a 'uint8'
+        :class:`~numpy.dtype` (unsigned 8-bit).
     current : str
         The current color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
@@ -639,12 +639,15 @@ def convert_color_space(
         ``'YBR_FULL_422'``.
     per_frame : bool, optional
         If ``True`` and the input array contains multiple frames then process
-        each frame individually to reduce memory usage. Default ``False``.
+        each frame individually and update `arr` in-place to reduce memory
+        usage. Default ``False``.
 
     Returns
     -------
     numpy.ndarray
-        The image(s) converted to the desired color space.
+        The image(s) converted to the desired color space. If `per_frame` is
+        ``False`` (the default) then a new :class:``~numpy.ndarray` will be
+        returned, otherwise `arr` will be updated in-place.
 
     References
     ----------
@@ -655,6 +658,11 @@ def convert_color_space(
       <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
       Section 7
     """
+    if arr.dtype != np.dtype("u1"):
+        raise ValueError(
+            f"Invalid ndarray.dtype '{arr.dtype}' for color space conversion, "
+            "must be 'uint8' or an equivalent"
+        )
 
     def _no_change(arr: "np.ndarray") -> "np.ndarray":
         return arr

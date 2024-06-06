@@ -65,14 +65,14 @@ class TestConvertColourSpace:
         with pytest.raises(
             NotImplementedError, match="Conversion from TEST to RGB is not suppo"
         ):
-            convert_color_space(None, "TEST", "RGB")
+            convert_color_space(np.ones((1, 2), dtype="u1"), "TEST", "RGB")
 
     def test_unknown_desired_raises(self):
         """Test an unknown desdired color space raises exception."""
         with pytest.raises(
             NotImplementedError, match="Conversion from RGB to TEST is not suppo"
         ):
-            convert_color_space(None, "RGB", "TEST")
+            convert_color_space(np.ones((1, 2), dtype="u1"), "RGB", "TEST")
 
     @pytest.mark.parametrize(
         "current, desired",
@@ -86,7 +86,7 @@ class TestConvertColourSpace:
     )
     def test_current_is_desired(self, current, desired):
         """Test that the array is unchanged when current matches desired."""
-        arr = np.ones((2, 3))
+        arr = np.ones((2, 3), dtype="u1")
         assert np.array_equal(arr, convert_color_space(arr, current, desired))
 
     def test_rgb_ybr_rgb_single_frame(self):
@@ -197,6 +197,22 @@ class TestConvertColourSpace:
         assert (191, 128, 128) == tuple(ybr[1, 75, 50, :])
         assert (63, 128, 128) == tuple(ybr[1, 85, 50, :])
         assert (0, 128, 128) == tuple(ybr[1, 95, 50, :])
+
+    def test_unsuitable_dtype_raises(self):
+        """Test that non u1 dtypes raise an exception."""
+        msg = (
+            "Invalid ndarray.dtype 'int8' for color space conversion, "
+            "must be 'uint8' or an equivalent"
+        )
+        with pytest.raises(ValueError, match=msg):
+            convert_color_space(np.ones((2, 3), dtype="i1"), "RGB", "YBR_FULL")
+
+        msg = (
+            "Invalid ndarray.dtype 'uint16' for color space conversion, "
+            "must be 'uint8'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            convert_color_space(np.ones((2, 3), dtype="u2"), "RGB", "YBR_FULL")
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
