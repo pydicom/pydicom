@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.013** total execution time for 3 files **from auto_examples/metadata_processing**:
+**00:00.011** total execution time for 3 files **from auto_examples/metadata_processing**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``plot_anonymize.py``)
-     - 00:00.008
+     - 00:00.007
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``plot_add_dict_entries.py``)
      - 00:00.003
