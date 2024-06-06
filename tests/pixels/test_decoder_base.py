@@ -1492,6 +1492,19 @@ class TestDecoder_Array:
         # Lossy conversion, equal to within 1 intensity unit
         assert np.allclose(out, raw, atol=1)
 
+    def test_iter_ybr_to_rgb(self):
+        """Test conversion from YBR to RGB for multi-framed data."""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+
+        ds = dcmread(EXPL_8_3_1F_YBR.path)
+        ds.PixelData = ds.PixelData * 2
+        ds.NumberOfFrames = 2
+        assert ds.PhotometricInterpretation == PI.YBR_FULL
+
+        for arr, meta in decoder.iter_array(ds):
+            assert meta["photometric_interpretation"] == PI.RGB
+            EXPL_8_3_1F_YBR.test(arr, as_rgb=True)
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestDecoder_Buffer:

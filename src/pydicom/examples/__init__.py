@@ -19,6 +19,7 @@ _DATASETS: dict[str, str] = {
     "rt_plan": cast(str, get_testdata_file("rtplan.dcm")),
     "rt_ss": cast(str, get_testdata_file("rtstruct.dcm")),
     "waveform": cast(str, get_testdata_file("waveform_ecg.dcm")),
+    "ybr_color": cast(str, get_testdata_file("color3d_jpeg_baseline.dcm")),
 }
 
 

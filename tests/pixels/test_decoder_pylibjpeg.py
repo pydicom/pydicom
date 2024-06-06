@@ -40,6 +40,7 @@ from .pixels_reference import (
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
     JLSL_08_07_1_0_1F,
     JLSL_16_15_1_1_1F,
+    JPGB_08_08_3_0_120F_YBR_FULL_422,
 )
 
 
@@ -243,6 +244,20 @@ class TestLibJpegDecoder:
         np.left_shift(arr, 1, out=arr)
         np.right_shift(arr, 1, out=arr)
         JLSL_16_15_1_1_1F.test(arr[1], plugin="pylibjpeg")
+
+    def test_iter_array_ybr_to_rgb(self):
+        """Test conversion from YBR to RGB for multi-framed data."""
+        ds = JPGB_08_08_3_0_120F_YBR_FULL_422.ds
+        assert ds.PhotometricInterpretation == "YBR_FULL_422"
+
+        indices = [0, 60, -1]
+        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
+        func = decoder.iter_array(ds, decoding_plugin="pylibjpeg", indices=indices)
+        for index, (arr, meta) in zip(indices, func):
+            assert meta["photometric_interpretation"] == "RGB"
+            JPGB_08_08_3_0_120F_YBR_FULL_422.test(
+                arr, as_rgb=True, plugin="pylibjpeg", index=index
+            )
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
