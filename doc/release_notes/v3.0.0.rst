@@ -201,7 +201,8 @@ Enhancements
 * Added :meth:`Dataset.pixel_array_options()<pydicom.dataset.Dataset.pixel_array_options>`
   for controlling pixel data decoding when using :attr:`Dataset.pixel_array
   <pydicom.dataset.Dataset.pixel_array>` with the new :mod:`~pydicom.pixels` backend.
-
+* Improve support for reading and resolving inline binary data with `VR=UN` from Json
+  (:issue:`2062`).
 
 Fixes
 -----
