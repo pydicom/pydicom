@@ -286,6 +286,17 @@ class DataElement:
             dataset_class, tag, vr, value, value_key, bulk_data_uri_handler
         )
         elem_value = converter.get_element_values()
+
+        if (
+            vr == VR_.UN
+            and config.replace_un_with_known_vr
+            and isinstance(elem_value, bytes)
+        ):
+            raw = RawDataElement(
+                Tag(tag), vr, len(elem_value), elem_value, 0, True, True
+            )
+            elem_value = DataElement_from_raw(raw).value
+
         try:
             return cls(tag=tag, value=elem_value, VR=vr)
         except Exception as exc:
