@@ -323,13 +323,14 @@ class DataElement:
         if self.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR_.US_SS}:
             if not self.is_empty:
                 binary_value = self.value
-                encoded_value = base64.b64encode(binary_value).decode("utf-8")
-                if (
-                    bulk_data_element_handler is not None
-                    and len(encoded_value) > bulk_data_threshold
+                # Base64 makes the encoded value 1/3 longer.
+                if bulk_data_element_handler is not None and len(binary_value) > (
+                    (bulk_data_threshold // 4) * 3
                 ):
                     json_element["BulkDataURI"] = bulk_data_element_handler(self)
                 else:
+                    # Json is exempt from padding to even length, see DICOM-CP1920
+                    encoded_value = base64.b64encode(binary_value).decode("utf-8")
                     logger.info(f"encode bulk data element '{self.name}' inline")
                     json_element["InlineBinary"] = encoded_value
         elif self.VR == VR_.SQ:
