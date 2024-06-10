@@ -340,6 +340,45 @@ class TestBinary:
         ds1 = Dataset.from_json(ds_json)
         assert ds == ds1
 
+    def test_inline_binary_un_sq(self):
+        # Test unknown VR with inline binary and a sequence
+        seq_item = Dataset()
+        seq_item.update(
+            {
+                "PatientPosition": "HFS",
+                "PatientSetupNumber": "1",
+                "SetupTechniqueDescription": "",
+            }
+        )
+        ds_ref = Dataset()
+        ds_ref.PatientSetupSequence = [seq_item]
+
+        ds_json = {
+            "300A0180": {
+                "vr": "UN",
+                "InlineBinary": "/v8A4B4AAAAYAABRBAAAAEhGUyAKMIIBAgAAADEgCjCyAQAAAAA=",
+            }
+        }
+        ds1 = Dataset.from_json(ds_json)
+        assert "PatientSetupSequence" in ds1
+        assert ds1 == ds_ref
+
+    def test_inline_binary_un_pad(self):
+        # Test unknown VR with inline binary and odd-length values
+        # The value ("HFS") is an odd length.
+        # The value is padded with a space before base64 encoding because
+        # UN uses implicit VR little endian.
+        # When reading back, the padding should be removed.
+        ds_json = {
+            "00185100": {
+                "vr": "UN",
+                "InlineBinary": "SEZTIA==",
+            }
+        }
+        ds1 = Dataset.from_json(ds_json)
+        assert "PatientPosition" in ds1
+        assert ds1.PatientPosition == "HFS"
+
     def test_invalid_inline_binary(self):
         msg = (
             "Invalid attribute value for data element '00091002' - the value "
