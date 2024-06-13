@@ -240,6 +240,8 @@ Fixes
 * Fixed a rare issue with converting pixel data to an :class:`~numpy.ndarray` when
   *Bits Stored* is less than *Bits Allocated* and the unused bits haven't been
   set to an appropriate value for correct interpretation of the data.
+* Fixed a ``RecusionError`` when using :func:`copy.deepcopy` with a dataset containing
+  a private block (:issue:`2025`)
 
 
 Deprecations

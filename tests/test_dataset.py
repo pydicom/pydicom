@@ -1141,6 +1141,35 @@ class TestDataset:
         item = ds.get_private_item(0x0009, 0x02, "Creator 2.0")
         assert 2 == item.value
 
+    def test_private_block_deepcopy(self):
+        """Test deepcopying a private block."""
+        ds = Dataset()
+        ds.add_new(0x00080005, "CS", "ISO_IR 100")
+        ds.add_new(0x00090010, "LO", "Creator 1.0")
+        ds.add_new(0x00091001, "SH", "Version1")
+        ds.add_new(0x00090020, "LO", "Creator 2.0")
+        ds.add_new(0x00092001, "SH", "Version2")
+        ds.add_new(0x00092002, "US", 2)
+        ds.private_block(0x000B, "Foo", create=True)
+
+        ds2 = copy.deepcopy(ds)
+        assert ds2[0x000B0010].value == "Foo"
+
+    def test_private_block_pickle(self):
+        """Test pickling a private block."""
+        ds = Dataset()
+        ds.add_new(0x00080005, "CS", "ISO_IR 100")
+        ds.add_new(0x00090010, "LO", "Creator 1.0")
+        ds.add_new(0x00091001, "SH", "Version1")
+        ds.add_new(0x00090020, "LO", "Creator 2.0")
+        ds.add_new(0x00092001, "SH", "Version2")
+        ds.add_new(0x00092002, "US", 2)
+        ds.private_block(0x000B, "Foo", create=True)
+
+        s = pickle.dumps({"ds": ds})
+        ds2 = pickle.loads(s)["ds"]
+        assert ds2[0x000B0010].value == "Foo"
+
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078
         ct_filename = get_testdata_file("CT_small.dcm")

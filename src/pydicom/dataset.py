@@ -42,6 +42,7 @@ from typing import (
     TypeVar,
     overload,
 )
+import weakref
 
 try:
     import numpy
@@ -115,8 +116,12 @@ class PrivateBlock:
         """
         self.group = key[0]
         self.private_creator = key[1]
-        self.dataset = dataset
         self.block_start = private_creator_element << 8
+        self._dsref = weakref.ref(dataset)
+
+    @property
+    def dataset(self) -> "Dataset":
+        return self._dsref()
 
     def get_tag(self, element_offset: int) -> BaseTag:
         """Return the private tag ID for the given `element_offset`.
@@ -208,6 +213,21 @@ class PrivateBlock:
         tag = self.get_tag(element_offset)
         self.dataset.add_new(tag, VR, value)
         self.dataset[tag].private_creator = self.private_creator
+
+    def __getstate__(self) -> dict[str, Any]:
+        # When pickling convert from a weak to strong reference
+        if self.dataset is not None:
+            s = self.__dict__.copy()
+            s['_dsref'] = s['_dsref']()
+            return s
+
+        return self.__dict__
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        # When unpickling convert from a strong to a weak reference
+        self.__dict__.update(state)
+        if self.__dict__['_dsref'] is not None:
+            self.__dict__['_dsref'] = weakref.ref(self.__dict__['_dsref'])
 
 
 def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
