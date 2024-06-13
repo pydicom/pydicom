@@ -120,7 +120,7 @@ class PrivateBlock:
         self._dsref = weakref.ref(dataset)
 
     @property
-    def dataset(self) -> "Dataset":
+    def dataset(self) -> "Dataset | None":
         return self._dsref()
 
     def get_tag(self, element_offset: int) -> BaseTag:
