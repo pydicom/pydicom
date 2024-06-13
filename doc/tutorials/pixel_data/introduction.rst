@@ -81,6 +81,14 @@ Other things to keep in mind with compressed transfer syntaxes are:
 * The compressed frames are then :func:`encapsulated<pydicom.encaps.encapsulate>`
   and the encapsulated data used to set the *Pixel Data* value
 
+To access the encapsulated frames you can use :func:`~pydicom.encaps.get_frame`
+or the :func:`~pydicom.encaps.generate_frames` iterator::
+
+    >>> from pydicom.encaps import get_frame
+    >>> frame = get_frame(ds.PixelData, 0, number_of_frames=1)
+    >>> print(len(frame))
+    152294
+
 The next example uses an uncompressed *Transfer Syntax UID*::
 
     >>> ds = examples.ct
@@ -383,7 +391,7 @@ describing the corresponding :class:`~numpy.ndarray`.
 
 This is especially useful for non-conformant datasets where the :dcm:`Image Pixel
 <part03/sect_C.7.6.3.html>` module elements have values that don't match the
-actual pixel data (especially for *Number of Frames* and *Photometric Interpretation*).
+actual pixel data (such as *Number of Frames* or *Photometric Interpretation*).
 
 
 Conclusion and next steps

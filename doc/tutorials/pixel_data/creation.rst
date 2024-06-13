@@ -6,7 +6,7 @@
 
 In part 1 of this tutorial you learnt how to :doc:`access the pixel data
 </tutorials/pixel_data/introduction>` as either the raw :class:`bytes` or a NumPy
-:class:`~numpy.ndarray`. In this next part we'll be creating pixel data from
+:class:`~numpy.ndarray`. In this part we'll be creating pixel data from
 scratch and adding it to a :class:`~pydicom.dataset.Dataset`. We'll be creating
 uncompressed datasets with the following types of *Pixel Data*:
 
@@ -168,8 +168,8 @@ The second example uses multi-frame RGB *Pixel Data* with 8-bit unsigned integer
 
 The *Planar Configuration* value is set as ``0``, which means each pixel is encoded
 separately then all the encoded pixels are concatenated together. This matches how
-:meth:`~numpy.ndarray.tobytes()` will encode an array that's ordered as
-(rows, columns, samples) or (frames, rows, columns, samples) as it is here.
+:meth:`ndarray.tobytes()<numpy.ndarray.tobytes>` will encode an array that's ordered as
+(rows, columns, samples) or (frames, rows, columns, samples).
 
 .. code-block:: python
 
