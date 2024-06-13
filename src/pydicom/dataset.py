@@ -154,7 +154,6 @@ class PrivateBlock:
 
         return self.get_tag(element_offset) in self.dataset
 
-
     def __getitem__(self, element_offset: int) -> DataElement:
         """Return the data element in the parent dataset for the given element
         offset.
