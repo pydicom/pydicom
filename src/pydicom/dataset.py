@@ -42,7 +42,6 @@ from typing import (
     TypeVar,
     overload,
 )
-import weakref
 
 try:
     import numpy
