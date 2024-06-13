@@ -163,7 +163,7 @@ Performing lossless compression is straight-forward::
     >>> ds = examples.ct
     >>> ds.compress(JPEGLSLossless)
 
-**Lossy compresion**
+**Lossy compression**
 
 Lossy compression is a bit more complicated, especially when the pixel data
 uses signed integers. First up though, we'll use an example with unsigned pixel data.
