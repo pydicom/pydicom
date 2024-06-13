@@ -1449,6 +1449,7 @@ class TestCompressRLE:
         with pytest.raises(AttributeError, match=msg):
             compress(ds, RLELossless, encoding_plugin="pydicom")
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_already_compressed(self):
         """Test compressing an already compressed dataset."""
         ds = dcmread(RLE_8_3_1F.path)
