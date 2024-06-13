@@ -149,10 +149,11 @@ class PrivateBlock:
         """Return ``True`` if the tag with given `element_offset` is in
         the parent :class:`Dataset`.
         """
-        if self.dataset:
-            return self.get_tag(element_offset) in self.dataset
+        if self.dataset is None:
+            raise RuntimeError("The parent dataset has been deallocated")
 
-        return False
+        return self.get_tag(element_offset) in self.dataset
+
 
     def __getitem__(self, element_offset: int) -> DataElement:
         """Return the data element in the parent dataset for the given element
@@ -175,10 +176,10 @@ class PrivateBlock:
         KeyError
             If no data element exists at that offset.
         """
-        if self.dataset:
-            return self.dataset.__getitem__(self.get_tag(element_offset))
+        if self.dataset is None:
+            raise RuntimeError("The parent dataset has been deallocated")
 
-        raise RuntimeError("The parent dataset has been deallocated")
+        return self.dataset.__getitem__(self.get_tag(element_offset))
 
     def __delitem__(self, element_offset: int) -> None:
         """Delete the tag with the given `element_offset` from the dataset.
@@ -196,8 +197,10 @@ class PrivateBlock:
         KeyError
             If no data element exists at that offset.
         """
-        if self.dataset:
-            del self.dataset[self.get_tag(element_offset)]
+        if self.dataset is None:
+            raise RuntimeError("The parent dataset has been deallocated")
+
+        del self.dataset[self.get_tag(element_offset)]
 
     def add_new(self, element_offset: int, VR: str, value: object) -> None:
         """Add a private element to the parent :class:`Dataset`.
@@ -217,10 +220,12 @@ class PrivateBlock:
             The value of the data element. See :meth:`Dataset.add_new()`
             for a description.
         """
-        if self.dataset:
-            tag = self.get_tag(element_offset)
-            self.dataset.add_new(tag, VR, value)
-            self.dataset[tag].private_creator = self.private_creator
+        if self.dataset is None:
+            raise RuntimeError("The parent dataset has been deallocated")
+
+        tag = self.get_tag(element_offset)
+        self.dataset.add_new(tag, VR, value)
+        self.dataset[tag].private_creator = self.private_creator
 
     def __getstate__(self) -> dict[str, Any]:
         # When pickling convert from a weak to strong reference

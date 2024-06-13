@@ -1169,6 +1169,15 @@ class TestDataset:
         with pytest.raises(RuntimeError, match=msg):
             block[0x000B1005]
 
+        with pytest.raises(RuntimeError, match=msg):
+            block.add_new(0x0006, "CS", "ISO_IR 100")
+
+        with pytest.raises(RuntimeError, match=msg):
+            del block[0x0005]
+
+        with pytest.raises(RuntimeError, match=msg):
+            0x0005 in block
+
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078
         ct_filename = get_testdata_file("CT_small.dcm")
