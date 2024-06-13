@@ -1,188 +1,120 @@
-========================
-Compressing *Pixel Data*
-========================
+====================================================
+*Pixel Data* - Part 3: Compression and decompression
+====================================================
 
 .. currentmodule:: pydicom
 
-This tutorial is about compressing a dataset's *Pixel Data* and covers
 
-* An introduction to compression
-* Using data compressed by third-party packages
-* Compressing data using *pydicom*
-
-It's assumed that you're already familiar with the :doc:`dataset basics
-<../dataset_basics>`.
-
+In part 1 of this tutorial you learnt how to :doc:`access the pixel data
+</tutorials/pixel_data/introduction>` as either the raw :class:`bytes` or a NumPy
+:class:`~numpy.ndarray` and in part 2 you learnt how to :doc:`create new pixel data
+</tutorials/pixel_data/creation>` and add it to a :class:`~pydicom.dataset.Dataset`.
+In this final part you'll learn how to compress and decompress datasets containing
+*Pixel Data*.
 
 **Prerequisites**
-
-This tutorial uses packages in addition to *pydicom* that are not installed
-by default, but are required for *RLE Lossless* and *JPEG-LS Near-lossless*
-compression of *Pixel Data*. For more information on what packages are
-available to compress a given transfer syntax see the :ref:`image compression
-guide <guide_compression_supported>`.
 
 Installing using pip:
 
 .. code-block:: bash
 
-    python -m pip install -U pydicom numpy pylibjpeg pyjpegls
+    python -m pip install -U pydicom numpy matplotlib pylibjpeg[all] pyjpegls
 
 Installing on conda:
 
 .. code-block:: bash
 
-    conda install numpy
+    conda install numpy matplotlib
     conda install -c conda-forge pydicom
-    pip install pylibjpeg pyjpegls
+    pip install pylibjpeg[all] pyjpegls
 
 
-Introduction
-------------
+Compression of *Pixel Data*
+===========================
 
-DICOM conformant applications are usually required to support the
-*Little Endian Implicit VR* transfer syntax, which is an uncompressed (native)
-transfer syntax. This means that datasets using *Little Endian Implicit VR* have
-no compression of their *Pixel Data*. So if applications are required to
-support it, why do we need *Pixel Data* compression?
+*pydicom* can perform dataset compression for the the following transfer syntaxes:
 
-The answer, of course, is file size. A *CT Image* instance
-typically consists of 1024 x 1024 16-bit pixels, and a CT scan may have
-hundreds of instances, giving a total series size of hundreds of megabytes.
-When you factor in other SOP Classes such as *Whole Slide Microscopy* which
-uses even larger full color images, the size of the uncompressed *Pixel Data*
-may get into the gigabyte territory. Being able to compress these images can
-result in significantly reduced file sizes.
+* *JPEG-LS Lossless* and *JPEG-LS Near-lossless* compression with `pyjpegls
+  <https://github.com/pydicom/pyjpegls>`_.
+* *JPEG 2000 Lossless* and *JPEG 2000* compression with `pylibjpeg
+  <https://github.com/pydicom/pylibjpeg>`_ and `pylibjpeg-openjpeg
+  <https://github.com/pydicom/pylibjpeg-openjpeg>`_.
+* *RLE Lossless*, which doesn't need any additional packages but can be sped up
+  if `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ and `pylibjpeg-rle
+  <https://github.com/pydicom/pylibjpeg-rle>`_ are available.
 
-*pydicom* can perform *RLE Lossless* compression without needing to install any
-additional packages, and can perform *JPEG-LS Lossless* and *JPEG-LS
-Near-lossless* compression with the installation of `pyjpegls
-<https://github.com/pydicom/pyjpegls>`_. For all other transfer syntaxes
-it's entirely up to you to compress the *Pixel Data* in a manner conformant to
-the :dcm:`requirements of the DICOM Standard<part05/sect_8.2.html>`.
+For all other transfer syntaxes it's entirely up to you to compress the *Pixel
+Data* in a manner conformant to the :dcm:`requirements of the DICOM Standard
+<part05/sect_8.2.html>`:
 
-.. note::
-
-    We recommend that you use `GDCM
-    <http://gdcm.sourceforge.net/wiki/index.php/Main_Page>`_ for *Pixel Data*
-    compression as it provides support for all the most commonly used
-    *Transfer Syntaxes* and being another DICOM library, should do so in
-    a conformant manner.
-
-The general requirements for compressed *Pixel Data* in the DICOM Standard are:
-
-* Each frame of pixel data must be encoded separately
-* All the encoded frames must then be :dcm:`encapsulated
-  <part05/sect_A.4.html>`.
-* When the amount of encoded frame data is very large
-  then it's recommended (but not required) that an :dcm:`extended offset table
-  <part03/sect_C.7.6.3.html>` also be included with the dataset
-
-Each *Transfer Syntax* has it's own specific requirements, found
-in :dcm:`Part 5 of the DICOM Standard<part05/PS3.5.html>`.
+* Each frame of pixel data must be compressed separately
+* All compressed frames must then be :dcm:`encapsulated<part05/sect_A.4.html>`.
+* The encapsulated byte stream is used to set the *Pixel Data* value
+* When the amount of compressed frame data is very large then it's recommended (but
+  not required) that an :dcm:`extended offset table<part03/sect_C.7.6.3.html>`
+  also be included in the dataset
+* The VR for compressed *Pixel Data* is always **OB**
 
 
-Encapsulating data compressed by third-party packages
------------------------------------------------------
+Compressing a dataset (with *RLE Lossless*)
+-------------------------------------------
 
-Once you've used a third-party package to compress the *Pixel Data*,
-*pydicom* can be used to encapsulate and add it to the
-dataset, with either the :func:`~pydicom.encaps.encapsulate` or
-:func:`~pydicom.encaps.encapsulate_extended` functions:
-
-.. code-block:: python
-
-    from typing import List, Tuple
-
-    from pydicom import examples
-    from pydicom.encaps import encapsulate, encapsulate_extended
-    from pydicom.uid import JPEG2000Lossless
-
-    # Fetch an example dataset
-    ds = examples.ct
-
-    # Use third-party package to compress
-    # Let's assume it compresses to JPEG 2000 (lossless)
-    frames: List[bytes] = third_party_compression_func(...)
-
-    # Set the *Transfer Syntax UID* appropriately
-    ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
-    # For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged
-
-    # Basic encapsulation
-    ds.PixelData = encapsulate(frames)
-    ds.save_as("ct_compressed_basic.dcm")
-
-    # Extended encapsulation
-    result: Tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
-    ds.PixelData = result[0]
-    ds.ExtendedOffsetTable = result[1]
-    ds.ExtendedOffsetTableLength = result[2]
-    ds.save_as("ct_compressed_ext.dcm")
-
-
-Compressing using pydicom
--------------------------
-
-The *RLE Lossless* and *JPEG-LS Lossless* transfer syntaxes are currently
-supported for lossless compression of *Pixel Data* using *pydicom*.
-The easiest compression method is to pass the UID for one of those transfer
-syntaxes to :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>`:
+Compression an existing uncompressed dataset can be performed by passing the *Transfer
+Syntax UID* of the compression method you'd like to use to :meth:`Dataset.compress()
+<pydicom.dataset.Dataset.compress>`, or by using the :func:`~pydicom.pixels.compress`
+function. We'll be using *RLE Lossless* to start with, which is based on the
+`PackBits <https://en.wikipedia.org/wiki/PackBits>`_ compression scheme:
 
 .. code-block:: python
 
     >>> from pydicom import examples
     >>> from pydicom.uid import RLELossless
     >>> ds = examples.ct
+    >>> ds.file_meta.TransferSyntaxUID.is_compressed
+    False
     >>> ds.compress(RLELossless)
-    >>> ds.save_as("ct_rle_lossless.dcm")
 
-This will compress the existing *Pixel Data* and update the *Transfer Syntax
-UID* before saving the dataset to file as  ``ct_rle_lossless.dcm``.
+If you're creating a new dataset, or if you want to update the *Pixel Data* for an
+existing dataset, you can pass an :class:`~numpy.ndarray` along with the *Transfer
+Syntax UID*::
 
-*JPEG-LS Near-lossless* is currently the only transfer syntax that supports
-lossy compression, which works similarly to lossless but requires
-passing one or more keyword parameters to control the image quality. In the
-case of *JPEG-LS Near-lossless* this means the `jls_error` parameter:
+    import numpy as np
+    from pydicom import Dataset
+    from pydicom.uid import RLELossless
+
+    ds = Dataset()
+    ds.Rows = 320
+    ds.Columns = 480
+    ds.BitsAllocated = 8
+    ds.BitsStored = 8
+    ds.HighBit = ds.BitsStored - 1
+    ds.PixelRepresentation = 0
+    ds.SamplesPerPixel = 1
+    ds.PhotometricInterpretation = "MONOCHROME2"
+
+    arr = np.ones((ds.Rows, ds.Columns), dtype="uint8")
+    ds.compress(RLELossless, arr)
+
+    assert ds.file_meta.TransferSyntaxUID == RLELossless
+    assert isinstance(ds.PixelData, bytes)
+
+In both cases this will compress the :class:`~pydicom.dataset.Dataset` in-place:
+
+* The *Pixel Data* will be set with the encapsulated RLE codestream
+* The *Transfer Syntax UID* will be set to *RLE Lossless*
+* A new *SOP Instance UID* value will be also be generated, but this can
+  be disabled by passing ``new_instance_uid=False``.
+
+When using an :class:`~numpy.ndarray` the :attr:`~numpy.ndarray.shape`,
+:class:`~numpy.dtype` and contents of `arr` must match the corresponding
+:dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements in the dataset,
+such as *Rows*, *Columns*, *Samples per Pixel*, etc. If they don't match you'll get an exception:
 
 .. code-block:: python
 
     >>> from pydicom import examples
-    >>> from pydicom.uid import JPEGLSNearLossless
+    >>> from pydicom.uid import RLELossless
     >>> ds = examples.ct
-    >>> ds.compress(JPEGLSNearLossless, jls_error=3)
-
-This will compress the existing *Pixel Data* with an absolute error of no more
-than 3 pixel intensity units.
-
-.. warning::
-
-    *pydicom* makes no recommendations for specifying the image quality for
-    lossy encoding methods. Any examples of lossy encoding are for
-    **illustration purposes only**.
-
-Each supported compression method has a corresponding encoding guide that can be
-used to help you understand it's requirements:
-
-* :doc:`RLE Lossless Encoding Guide</guides/encoding/rle_lossless>`
-* :doc:`JPEG-LS Encoding Guide</guides/encoding/jpeg_ls>`
-
-If you're creating a dataset from scratch you can instead pass a
-:class:`~numpy.ndarray` to be compressed and used as the *Pixel Data*:
-
-.. code-block:: python
-
-    >>> import numpy as np
-    >>> arr = np.zeros((ds.Rows, ds.Columns), dtype='<i2')
-    >>> ds.compress(RLELossless, arr)
-
-Note that the :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and contents
-of `arr` must match the corresponding elements in the dataset, such as *Rows*,
-*Columns*, *Samples per Pixel*, etc. If they don't match you'll get an
-exception:
-
-.. code-block:: python
-
     >>> arr = np.zeros((ds.Rows, ds.Columns + 1), dtype='<i2')
     >>> ds.compress(RLELossless, arr)
     Traceback (most recent call last):
@@ -198,33 +130,296 @@ exception:
         raise ValueError(
       ValueError: Mismatch between the expected ndarray shape (128, 128) and the actual shape (128, 129)
 
-A specific encoding plugin can be used by passing the plugin name via the
-`encoding_plugin` argument:
+When there are multiple plugins available for compressing the given transfer syntax
+a :ref:`specific encoding plugin<guide_encoding_plugins>` can be used by passing
+the plugin name via the `encoding_plugin` argument:
 
 .. code-block:: python
 
     >>> ds.compress(RLELossless, encoding_plugin='pylibjpeg')
 
-The plugins available for each encoder are listed in the
-:doc:`API reference</reference/pixels.encoders>` for the encoder type.
+The RLE compression method is well supported by DICOM applications and can
+compress a wide range of images, however it usually less efficient than the JPEG
+family of compression schemes. More information on performing compression with
+*RLE Lossless* can be found in the :doc:`RLE encoding guide</guides/encoding/rle_lossless>`.
 
-Implicitly changing the compression on an already compressed dataset is not
-currently supported, however it can still be done explicitly by decompressing
-prior to calling :meth:`~pydicom.dataset.Dataset.compress`. In the example
-below, a matching :doc:`image data handler</guides/user/image_data_handlers>` for the
-original transfer syntax - *JPEG 2000 Lossless* - is required.
+
+Compressing with JPEG-LS
+------------------------
+
+The JPEG-LS compression scheme is based on `ISO/IEC
+14495-1 <https://www.iso.org/standard/22397.html>`_/`ITU T.87
+<https://www.itu.int/rec/T-REC-T.87-199806-I>`_. While it can compress 2- to 16-bit
+images and uses a lossy quality specification mechanism that's easy to understand,
+it's not well suited for lossy compression of signed integers and is generally not
+well supported by third-party applications, so keep that in mind if you decide to use it.
+
+**Lossless compression**
+
+Performing lossless compression is straight-forward::
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEGLSLossless
+    >>> ds = examples.ct
+    >>> ds.compress(JPEGLSLossless)
+
+**Lossy compresion**
+
+Lossy compression is a bit more complicated, especially when the pixel data
+uses signed integers. First up though, we'll use an example with unsigned pixel data.
+
+.. warning::
+
+    *pydicom* makes no recommendations for specifying the image quality for
+    lossy encoding methods. Any examples of lossy encoding are for
+    **illustration purposes only**.
 
 .. code-block:: python
 
-    >>> ds = examples.jpeg2k
-    >>> ds.SamplesPerPixel
-    3
-    >>> ds.PhotometricInterpretation
-    'YBR_RCT'
-    >>> ds.PhotometricInterpretation = "RGB"
-    >>> ds.compress(RLELossless)
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEGLSNearLossless
+    >>> ds = examples.rgb_color
+    >>> ds.PixelRepresentation
+    0
+    >>> ds.compress(JPEGLSNearLossless, jls_error=3)
 
-Note that in this case we also needed to change the *Photometric
-Interpretation*, from the original value of ``'YBR_RCT'`` when the dataset
-was using *JPEG 2000 Lossless* compression to ``'RGB'``, which for this dataset
-will be the correct value after recompressing using *RLE Lossless*.
+The `jls_error` parameter is used to control the loss in image quality, and is
+directly related to the JPEG-LS NEAR parameter, which is the absolute allowed error
+in (unsigned) pixel data values. A `jls_error` of ``3`` therefore means that all
+pixels will be within 3 intensity units of the original.
+
+In our second lossy JPEG-LS example we'll use a dataset with 16-bit signed integers,
+which is where the complication starts. The NEAR parameter is defined in terms of
+unsigned integers, so when used with signed values there can potentially be
+compression errors of up to the maximum bit-depth of the pixel data. To avoid this,
+the range of pixel values must be in the `closed interval
+<https://en.wikipedia.org/wiki/Interval_(mathematics)>`_::
+
+    [-2**(ds.BitsStored - 1) + jls_error, 2**(ds.BitsStored - 1) - 1 - jls_error]
+
+For example, with a *Bits Stored* of ``8`` and ``jls_error=3`` the pixels must be in the
+range [-125, 124].
+
+.. code-block:: python
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEGLSNearLossless
+    >>> ds = examples.ct
+    >>> ds.PixelRepresentation
+    1
+    >>> ds.BitsStored
+    16
+    >>> arr = ds.pixel_array
+    >>> arr.min(), arr.max()
+    (128, 2191)
+    >>> ds.compress(JPEGLSNearLossless, jls_error=3)
+
+In this example the pixel values are within the allowed range so we don't
+need to do anything further. If that weren't the case you'd have to rescale
+the values or use a different compression method such as JPEG 2000 (recommended).
+
+More information on performing compression with JPEG-LS can be found in
+the :doc:`JPEG-LS encoding guide</guides/encoding/jpeg_ls>`.
+
+
+Compressing with JPEG 2000
+--------------------------
+
+The JPEG 2000 compression scheme is based on `ISO/IEC 15444-1
+<https://www.iso.org/standard/78321.html>`_/`ITU T.800
+<https://www.itu.int/rec/T-REC-T.800-201511-S/en>`_. The format is fairly well supported
+by third-party applications and it can compress images with a wide variety of
+properties, making it a good choice for compressing datasets.
+
+Two transfer syntaxes are available that use JPEG 2000 compression; *JPEG 2000 Lossless*
+and *JPEG 2000*. While the DICOM Standard allows *JPEG 2000* to be either lossy or
+lossless, when used for compression in *pydicom* it's always treated as being lossy in
+order to simplify its usage.
+
+**Lossless compression**
+
+As with RLE and JPEG-LS, performing lossless compression is straight-forward::
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEG2000Lossless
+    >>> ds = examples.ct
+    >>> ds.compress(JPEG2000Lossless)
+
+For RGB pixel data, JPEG 2000 can perform multiple component transformation
+(MCT) during the encoding process, which should improve the compression efficiency.
+This can be enabled or disabled by setting an appropriate *Photometric Interpretation*
+prior to compression:
+
+* ``"RGB"`` to disable MCT
+* ``"YBR_RCT"`` to enable MCT for *JPEG 2000 Lossless*
+* ``"YBR_ICT"`` to enable MCT for *JPEG 2000*
+
+.. code-block:: python
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEG2000Lossless
+    >>> ds = examples.rgb_color
+    >>> ds.PhotometricInterpretation
+    "RGB"
+    >>> ds.compress(JPEG2000Lossless)  # No MCT applied
+    >>> len(ds.PixelData)
+    334412
+    >>> ds = examples.rgb_color
+    >>> ds.PhotometricInterpretation = "YBR_RCT"
+    >>> ds.compress(JPEG2000Lossless)  # MCT applied
+    >>> len(ds.PixelData)
+    152342
+
+**Lossy compression**
+
+Lossy compression with *JPEG 2000* is both more and less complicated then JPEG-LS;
+you don't have to worry about the pixel values for signed integers, but specifying
+the image quality is less intuitive.
+
+.. warning::
+
+    *pydicom* makes no recommendations for specifying the image quality for
+    lossy encoding methods. Any examples of lossy encoding are for
+    **illustration purposes only**.
+
+.. code-block:: python
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import JPEG2000
+    >>> ds = examples.ct
+    >>> ds.compress(JPEG2000, j2k_cr=[5, 2])  # 2 quality layers
+
+With JPEG 2000 image quality is specified with either the `j2k_cr` or `j2k_psnr`
+parameters:
+
+* `j2k_cr` is a ``list[float]`` of compression ratios to use for each quality layer
+  and is directly related to OpenJPEG's `-r compression ratio
+  <https://github.com/uclouvain/openjpeg/wiki/DocJ2KCodec>`_ option. There must
+  be at least one layer and the minimum allowable compression ratio is ``1``. When
+  using multiple layers they should be ordered in decreasing value from left to right.
+* `j2k_psnr` is a ``list[float]`` of the peak signal-to-noise ratios (in dB) to use
+  for each quality layer and is directly related to OpenJPEG's `-q quality
+  <https://github.com/uclouvain/openjpeg/wiki/DocJ2KCodec>`_ option.
+  There must be at least one layer and when using multiple layers they should
+  be ordered in increasing value from left to right.
+
+Choosing appropriate quality settings for *JPEG 2000* is far beyond the scope of this
+tutorial, but whatever you end up selecting should be thoroughly tested with a
+representative sample of expected pixel data.
+
+More information on performing compression with JPEG 2000 can be found in
+the :doc:`JPEG 2000 encoding guide</guides/encoding/jpeg_2k>`.
+
+
+Encapsulating data compressed by third-party packages
+.....................................................
+
+You can also use *pydicom* with third-party compression packages to encapsulate
+the compressed *Pixel Data*, provided they meet the requirements of the
+corresponding transfer syntax. The :func:`~pydicom.encaps.encapsulate` or
+:func:`~pydicom.encaps.encapsulate_extended` functions are used to encapsulate the
+compressed data.
+
+.. code-block:: python
+
+    from pydicom import examples
+    from pydicom.encaps import encapsulate, encapsulate_extended
+    from pydicom.uid import JPEGBaseline8Bit
+
+    # Fetch an example dataset
+    ds = examples.ct
+
+    # Use third-party package to compress
+    # Let's assume it compresses to JPEG Baseline
+    frames: list[bytes] = third_party_compression_func(...)
+
+    # Set the *Transfer Syntax UID* appropriately
+    ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
+    # For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged
+
+    # Basic encapsulation
+    ds.PixelData = encapsulate(frames)
+    ds["PixelData"].VR = "OB"  # always for encapsulated pixel data
+    ds.save_as("ct_compressed_basic.dcm")
+
+    # Extended encapsulation
+    result: tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
+    ds.PixelData = result[0]
+    ds.ExtendedOffsetTable = result[1]
+    ds.ExtendedOffsetTableLength = result[2]
+    ds.save_as("ct_compressed_ext.dcm")
+
+
+Decompression of *Pixel Data*
+=============================
+
+Datasets with a compressed *Transfer Syntax UID* can be decompressed with
+:meth:`Dataset.decompress()<pydicom.dataset.Dataset.decompress>` or the
+:func:`~pydicom.pixels.decompress` function.
+
+.. code-block:: python
+
+    >>> from pydicom import examples
+    >>> ds = examples.jpeg2k
+    >>> ds.decompress()
+
+This will decompress the :class:`~pydicom.dataset.Dataset` in-place:
+
+* The *Pixel Data* will be set using the uncompressed pixel data.
+* The *Transfer Syntax UID* will be changed to *Explicit VR Little Endian*.
+* The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements will be updated
+  as required to match the uncompressed pixel data.
+* A new *SOP Instance UID* value will be also be generated, but this can
+  be disabled by passing ``new_instance_uid=False``.
+
+Dataset decompression uses the same backend as accessing compressed *Pixel Data*,
+so the same :doc:`customization options</guides/decoding/decoder_options>` of the decoding
+process apply. For example, to use a :doc:`specific plugin</guides/plugin_table>`
+you can pass its name via the `decoding_plugin` argument::
+
+    >>> from pydicom import examples
+    >>> ds = examples.jpeg2k
+    >>> ds.decompress(decoding_plugin="pylibjpeg")
+
+If the dataset's *Pixel Data* is in the YCbCr color space it will also be converted
+to RGB by default. This can be disabled by passing ``as_rgb=False``::
+
+    import numpy as np
+
+    from pydicom import examples
+    from pydicom.pixels import convert_color_space, pixel_array
+    from pydicom.uid import JPEG2000Lossless
+
+    # Original dataset in RGB
+    ds = examples.rgb_color
+    assert ds.PhotometricInterpretation == "RGB"
+
+    # Convert to YCbCr and compress
+    ybr = convert_color_space(ds.pixel_array, "RGB", "YBR_FULL")
+    ds.PhotometricInterpretation = "YBR_FULL"
+    ds.compress(JPEG2000Lossless, ybr)
+    assert ds.PhotometricInterpretation == "YBR_FULL"
+
+    # RGB reference - needed because converting RGB -> YBR -> RGB is lossy
+    rgb = convert_color_space(ybr, "YBR_FULL", "RGB")
+
+    # Decompress with conversion to RGB
+    ds.decompress()
+    assert ds.PhotometricInterpretation == "RGB"
+    assert np.array_equal(rgb, pixel_array(ds, raw=True))
+
+    # Decompress without conversion to RGB
+    ds.PhotometricInterpretation = "YBR_FULL"
+    ds.compress(JPEG2000Lossless, ybr)
+
+    ds.decompress(as_rgb=False)
+    assert ds.PhotometricInterpretation == "YBR_FULL"
+    assert np.array_equal(ybr, pixel_array(ds, raw=True))
+
+Conclusion
+==========
+
+In part 3 of this tutorial you've learnt how to use *pydicom* to compress and decompress
+datasets and how to encapsulate pixel data that has been compressed by third-party
+packages. Having made it to the end of the pixel data tutorial you should now be
+comfortable using *pydicom* to perform pixel data related tasks.

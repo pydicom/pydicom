@@ -646,7 +646,7 @@ def convert_color_space(
     -------
     numpy.ndarray
         The image(s) converted to the desired color space. If `per_frame` is
-        ``False`` (the default) then a new :class:``~numpy.ndarray` will be
+        ``False`` (the default) then a new :class:`~numpy.ndarray` will be
         returned, otherwise `arr` will be updated in-place.
 
     References

@@ -1435,17 +1435,33 @@ class TestCompressRLE:
         assert ds._pixel_array is None
         assert ds._pixel_id == {}
 
-    def test_no_file_meta(self):
-        """Test compressing a dataset."""
+    def test_no_file_meta_raises(self):
+        """Test compressing a dataset with no file meta."""
         ds = dcmread(EXPL_16_16_1F.path)
         assert ds["PixelData"].VR == "OW"
         del ds.file_meta
-        compress(ds, RLELossless, encoding_plugin="pydicom")
 
-        assert ds.SamplesPerPixel == 1
+        msg = (
+            "Unable to determine the initial compression state of the dataset as "
+            r"there's no \(0002,0010\) 'Transfer Syntax UID' element in the dataset's "
+            "'file_meta' attribute"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            compress(ds, RLELossless, encoding_plugin="pydicom")
+
+    def test_already_compressed(self):
+        """Test compressing an already compressed dataset."""
+        ds = dcmread(RLE_8_3_1F.path)
+        arr = ds.pixel_array
+        ds.file_meta.TransferSyntaxUID = JPEG2000
+
+        msg = "Only uncompressed datasets may be compressed"
+        with pytest.raises(ValueError, match=msg):
+            compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        # Skip compression state check if passing arr
+        compress(ds, RLELossless, arr, encoding_plugin="pydicom")
         assert ds.file_meta.TransferSyntaxUID == RLELossless
-        assert len(ds.PixelData) == 21370
-        assert "PlanarConfiguration" not in ds
         assert ds["PixelData"].is_undefined_length
         assert ds["PixelData"].VR == "OB"
 
@@ -1638,8 +1654,9 @@ class TestDecompress:
         del ds.file_meta.TransferSyntaxUID
 
         msg = (
-            r"Unable to decompress as there's no \(0002,0010\) 'Transfer Syntax UID' "
-            "element in 'FileDataset.file_meta'"
+            "Unable to determine the initial compression state as there's no "
+            r"\(0002,0010\) 'Transfer Syntax UID' element in the dataset's 'file_meta' "
+            "attribute"
         )
         with pytest.raises(AttributeError, match=msg):
             decompress(ds)

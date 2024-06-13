@@ -29,7 +29,7 @@ Quick Start
 """
 
 from pydicom.dataelem import DataElement
-from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 import pydicom.examples
 from pydicom.filereader import dcmread
 from pydicom.filewriter import dcmwrite
@@ -42,6 +42,7 @@ __all__ = [
     "DataElement",
     "Dataset",
     "FileDataset",
+    "FileMetaDataset",
     "Sequence",
     "dcmread",
     "dcmwrite",

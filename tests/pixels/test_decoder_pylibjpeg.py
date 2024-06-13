@@ -259,6 +259,16 @@ class TestLibJpegDecoder:
                 arr, as_rgb=True, plugin="pylibjpeg", index=index
             )
 
+    def test_iter_planar_configuration(self):
+        """Test iter_pixels() with planar configuration."""
+        ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422.path)
+        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
+        ds.PlanarConfiguration = 1
+
+        # Always 0 when converting to an ndarray
+        for _, meta in decoder.iter_array(ds, decoding_plugin="pylibjpeg"):
+            assert meta["planar_configuration"] == 0
+
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
 class TestOpenJpegDecoder:

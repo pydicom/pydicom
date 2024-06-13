@@ -130,6 +130,11 @@ class CoderBase:
             self.add_plugin(label, import_path)
 
     @property
+    def available_plugins(self) -> tuple[str, ...]:
+        """Return a tuple containing available plugins."""
+        return tuple(sorted(self._available.keys()))
+
+    @property
     def is_available(self) -> bool:
         """Return ``True`` if plugins are available that can be used to encode or
         decode data, ``False`` otherwise.
@@ -214,7 +219,7 @@ class CoderBase:
             return {}  # type: ignore[return-value]
 
         if plugin:
-            if plugin in self._available:
+            if plugin in self.available_plugins:
                 return {plugin: self._available[plugin]}
 
             if deps := self._unavailable.get(plugin, None):
@@ -222,9 +227,17 @@ class CoderBase:
                 if len(deps) > 1:
                     missing = f"{', '.join(deps[:-1])} and {deps[-1]}"
 
+                if self._decoder:
+                    raise RuntimeError(
+                        f"Unable to decompress '{self.UID.name}' pixel data because "
+                        f"the specified plugin is missing dependencies:\n\t{plugin} "
+                        f"- requires {missing}"
+                    )
+
                 raise RuntimeError(
-                    f"Unable to use the '{plugin}' plugin because it's "
-                    f"missing dependencies - requires {missing}"
+                    f"Unable to compress the pixel data using '{self.UID.name}' because "
+                    f"the specified plugin is missing dependencies:\n\t{plugin} "
+                    f"- requires {missing}"
                 )
 
             msg = (
@@ -232,18 +245,23 @@ class CoderBase:
                 f"{type(self).__name__}'"
             )
             if self._available:
-                names = [f"'{k}'" for k in self._available.keys()]
-                msg += f", available plugins are: {', '.join(names)}"
+                msg += f", available plugins are: {', '.join(self.available_plugins)}"
 
             raise ValueError(msg)
 
         if self._available:
             return self._available.copy()
 
-        verb = "decode" if self._decoder else "encode"
         missing = "\n".join([f"\t{s}" for s in self.missing_dependencies])
+        if self._decoder:
+            raise RuntimeError(
+                f"Unable to decompress '{self.UID.name}' pixel data because all "
+                f"plugins are missing dependencies:\n{missing}"
+            )
+
         raise RuntimeError(
-            f"Unable to {verb} because all plugins are missing dependencies:\n{missing}"
+            f"Unable to compress the pixel data using '{self.UID.name}' because all "
+            f"plugins are missing dependencies:\n{missing}"
         )
 
 

@@ -514,26 +514,32 @@ class DecodeRunner(RunnerBase):
         Returns
         -------
         dict[str, str | int]
-            A dict containing the values for 'bits_allocated', 'bits_stored',
-            'columns', 'photometric_interpretation', 'samples_per_pixel',
-            'rows' and optionally 'planar_configuration' (if 'samples_per_pixel'
-            > 1), 'pixel_representation' (if the pixel keyword is
-            ``"PixelData"``) and 'number_of_frames' (if `per_frame` is
-            ``True``).
+            A dict containing the values for:
+
+            * `bits_allocated`
+            * `bits_stored`
+            * `columns`
+            * `photometric_interpretation`
+            * `samples_per_pixel`
+            * `rows`
+            * `number_of_frames`
+            * `planar_configuration` (if `samples_per_pixel` > 1)
+            * `pixel_representation` (if the pixel keyword is ``"PixelData"``)
 
             The returned values depend on whether or not this method is
             called before or after decoding the pixel data, as the decoding
             plugins and image processing functions may update the values as
             needed to reflect the corresponding decoded data. For example, if
             the pixel data is converted from the YCbCr to RGB color space then
-            the 'photometric_interpretation' value will be changed to match
+            the `photometric_interpretation` value will be changed to match
             after the data has been decoded.
         """
         d = {
             "bits_allocated": self.bits_allocated,
             "bits_stored": self.bits_stored,
             "columns": self.columns,
-            "photometric_interpretation": self.photometric_interpretation,
+            "number_of_frames": self.number_of_frames if not as_frame else 1,
+            "photometric_interpretation": str(self.photometric_interpretation),
             "rows": self.rows,
             "samples_per_pixel": self.samples_per_pixel,
         }
@@ -543,9 +549,6 @@ class DecodeRunner(RunnerBase):
 
         if self.pixel_keyword == "PixelData":
             d["pixel_representation"] = self.pixel_representation
-
-        if not as_frame:
-            d["number_of_frames"] = self.number_of_frames
 
         return cast(dict[str, str | int], d)
 
@@ -1005,7 +1008,8 @@ class Decoder(CoderBase):
         arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
 
         # Multi-sample arrays are always returned *Planar Configuration* 0
-        runner.set_option("planar_configuration", 0)
+        if runner.samples_per_pixel > 1:
+            overrides["planar_configuration"] = 0
 
         pixel_properties = runner.pixel_properties(as_frame=as_frame)
         pixel_properties.update(overrides)
@@ -1643,7 +1647,8 @@ class Decoder(CoderBase):
                 arr = arr if arr.flags.writeable else arr.copy()
 
                 # Multi-sample arrays are always returned *Planar Configuration* 0
-                runner.set_option("planar_configuration", 0)
+                if runner.samples_per_pixel > 1:
+                    overrides["planar_configuration"] = 0
 
                 pixel_properties = runner.pixel_properties(as_frame=True)
                 pixel_properties.update(overrides)
@@ -1666,7 +1671,9 @@ class Decoder(CoderBase):
                 arr, overrides = runner.process(arr)
 
             arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
-            runner.set_option("planar_configuration", 0)
+
+            if runner.samples_per_pixel > 1:
+                overrides["planar_configuration"] = 0
 
             pixel_properties = runner.pixel_properties(as_frame=True)
             pixel_properties.update(overrides)

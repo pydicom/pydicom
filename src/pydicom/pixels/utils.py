@@ -402,12 +402,26 @@ def compress(
             kwargs["j2k_psnr"] = j2k_psnr
 
     if arr is None:
+        # Check the dataset compression state
+        file_meta = ds.get("file_meta", {})
+        tsyntax = file_meta.get("TransferSyntaxUID", "")
+        if not tsyntax:
+            raise AttributeError(
+                "Unable to determine the initial compression state of the dataset "
+                "as there's no (0002,0010) 'Transfer Syntax UID' element in the "
+                "dataset's 'file_meta' attribute"
+            )
+
+        if tsyntax.is_compressed:
+            raise ValueError("Only uncompressed datasets may be compressed")
+
         # Encode the current uncompressed *Pixel Data*
         frame_iterator = encoder.iter_encode(
             ds, encoding_plugin=encoding_plugin, **kwargs
         )
     else:
-        # Encode from an array
+        # Encode from an array - no need to check dataset compression state
+        #   because we'll be using new pixel data
         opts = as_pixel_options(ds, **kwargs)
         frame_iterator = encoder.iter_encode(
             arr, encoding_plugin=encoding_plugin, **opts
@@ -530,8 +544,9 @@ def decompress(
     tsyntax = file_meta.get("TransferSyntaxUID", "")
     if not tsyntax:
         raise AttributeError(
-            "Unable to decompress as there's no (0002,0010) 'Transfer Syntax UID' "
-            f"element in '{type(ds).__name__}.file_meta'"
+            "Unable to determine the initial compression state as there's no "
+            "(0002,0010) 'Transfer Syntax UID' element in the dataset's 'file_meta' "
+            "attribute"
         )
 
     uid = UID(tsyntax)
@@ -966,7 +981,10 @@ def iter_pixels(
 
     .. warning::
 
-        This function requires `NumPy <https://numpy.org/>`_
+        This function requires `NumPy <https://numpy.org/>`_ and may require
+        the installation of additional packages to perform the actual pixel
+        data decompression. See the :doc:`pixel data decompression documentation
+        </guides/user/image_data_handlers>` for more information.
 
     **Memory Usage**
 
@@ -1254,7 +1272,10 @@ def pixel_array(
 
     .. warning::
 
-        This function requires `NumPy <https://numpy.org/>`_
+        This function requires `NumPy <https://numpy.org/>`_ and may require
+        the installation of additional packages to perform the actual pixel
+        data decompression. See the :doc:`pixel data decompression documentation
+        </guides/user/image_data_handlers>` for more information.
 
     **Memory Usage**
 

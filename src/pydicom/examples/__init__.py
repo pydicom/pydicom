@@ -1,6 +1,7 @@
 """Module to support importing the datasets used by the documentation."""
 
 from typing import Any, cast
+from pathlib import Path
 
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
@@ -23,9 +24,22 @@ _DATASETS: dict[str, str] = {
 }
 
 
+def _get_path(name: str) -> Path:
+    """Return the path to the example dataset with the attribute name `name` as
+    :class:`pathlib.Path`.
+    """
+    if name in _DATASETS:
+        return Path(_DATASETS[name])
+
+    raise ValueError(f"No example dataset exists with the name '{name}'")
+
+
 def __getattr__(name: str) -> Any:
     """Return module level attributes."""
     if name in _DATASETS:
         return dcmread(_DATASETS[name], force=True)
+
+    if name == "get_path":
+        return _get_path
 
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")

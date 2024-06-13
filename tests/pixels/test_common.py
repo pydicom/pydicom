@@ -581,7 +581,10 @@ class TestCoderBase:
         assert coder._validate_plugins() == {}
 
         coder = CoderBase(RLELossless, decoder=True)
-        msg = "Unable to decode because all plugins are missing dependencies:"
+        msg = (
+            "Unable to decompress 'RLE Lossless' pixel data because all plugins "
+            "are missing dependencies:"
+        )
         with pytest.raises(RuntimeError, match=msg):
             coder._validate_plugins()
 
@@ -596,8 +599,8 @@ class TestCoderBase:
         coder._available = {}
         coder._unavailable["foo"] = ("numpy", "pylibjpeg", "gdcm")
         msg = (
-            "Unable to use the 'foo' plugin because it's missing "
-            "dependencies - requires numpy, pylibjpeg and gdcm"
+            "Unable to decompress 'RLE Lossless' pixel data because the specified "
+            "plugin is missing dependencies:\n\tfoo - requires numpy, pylibjpeg and gdcm"
         )
         with pytest.raises(RuntimeError, match=msg):
             coder._validate_plugins("foo")
