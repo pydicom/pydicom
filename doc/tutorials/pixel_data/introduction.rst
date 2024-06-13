@@ -397,7 +397,7 @@ actual pixel data (such as *Number of Frames* or *Photometric Interpretation*).
 Conclusion and next steps
 -------------------------
 
-In part 1 of this tutorial you've been introduced to DICOM's pixel data and learnt how to
+In part 1 of this tutorial you've been introduced to DICOM's pixel data and learned how to
 use *pydicom* to access it, convert it to an :class:`~numpy.ndarray` and how to
 control the conversion process. In the next part you'll learn how to
 :doc:`create your own pixel data from scratch</tutorials/pixel_data/creation>`.

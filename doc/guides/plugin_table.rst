@@ -147,8 +147,10 @@ Requires `pyjpegls <https://github.com/pydicom/pyjpegls>`_.
 ``pylibjpeg``
 .............
 
-Requires `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ and
-`pylibjpeg-openjpeg <https://github.com/pydicom/pylibjpeg-openjpeg>`_.
+Requires `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ as well as
+`pylibjpeg-openjpeg <https://github.com/pydicom/pylibjpeg-openjpeg>`_ for JPEG 2000
+compression and `pylibjpeg-rle <https://github.com/pydicom/pylibjpeg-rle>`_ for
+*RLE Lossless*.
 
 **Known limitations**
 

@@ -5,9 +5,9 @@
 .. currentmodule:: pydicom
 
 
-In part 1 of this tutorial you learnt how to :doc:`access the pixel data
+In part 1 of this tutorial you learned how to :doc:`access the pixel data
 </tutorials/pixel_data/introduction>` as either the raw :class:`bytes` or a NumPy
-:class:`~numpy.ndarray` and in part 2 you learnt how to :doc:`create new pixel data
+:class:`~numpy.ndarray` and in part 2 you learned how to :doc:`create new pixel data
 </tutorials/pixel_data/creation>` and add it to a :class:`~pydicom.dataset.Dataset`.
 In this final part you'll learn how to compress and decompress datasets containing
 *Pixel Data*.
@@ -18,13 +18,13 @@ Installing using pip:
 
 .. code-block:: bash
 
-    python -m pip install -U pydicom numpy matplotlib pylibjpeg[all] pyjpegls
+    python -m pip install -U pydicom numpy pylibjpeg[all] pyjpegls
 
 Installing on conda:
 
 .. code-block:: bash
 
-    conda install numpy matplotlib
+    conda install numpy
     conda install -c conda-forge pydicom
     pip install pylibjpeg[all] pyjpegls
 
@@ -139,7 +139,7 @@ the plugin name via the `encoding_plugin` argument:
     >>> ds.compress(RLELossless, encoding_plugin='pylibjpeg')
 
 The RLE compression method is well supported by DICOM applications and can
-compress a wide range of images, however it usually less efficient than the JPEG
+compress a wide range of images, however it's usually less efficient than the JPEG
 family of compression schemes. More information on performing compression with
 *RLE Lossless* can be found in the :doc:`RLE encoding guide</guides/encoding/rle_lossless>`.
 
@@ -156,7 +156,7 @@ well supported by third-party applications, so keep that in mind if you decide t
 
 **Lossless compression**
 
-Performing lossless compression is straight-forward::
+Performing lossless compression is straightforward::
 
     >>> from pydicom import examples
     >>> from pydicom.uid import JPEGLSLossless
@@ -238,7 +238,7 @@ order to simplify its usage.
 
 **Lossless compression**
 
-As with RLE and JPEG-LS, performing lossless compression is straight-forward::
+As with RLE and JPEG-LS, performing lossless compression is straightforward::
 
     >>> from pydicom import examples
     >>> from pydicom.uid import JPEG2000Lossless
@@ -419,7 +419,7 @@ to RGB by default. This can be disabled by passing ``as_rgb=False``::
 Conclusion
 ==========
 
-In part 3 of this tutorial you've learnt how to use *pydicom* to compress and decompress
+In part 3 of this tutorial you've learned how to use *pydicom* to compress and decompress
 datasets and how to encapsulate pixel data that has been compressed by third-party
 packages. Having made it to the end of the pixel data tutorial you should now be
 comfortable using *pydicom* to perform pixel data related tasks.

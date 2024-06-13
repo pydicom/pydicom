@@ -4,7 +4,7 @@
 
 .. currentmodule:: pydicom
 
-In part 1 of this tutorial you learnt how to :doc:`access the pixel data
+In part 1 of this tutorial you learned how to :doc:`access the pixel data
 </tutorials/pixel_data/introduction>` as either the raw :class:`bytes` or a NumPy
 :class:`~numpy.ndarray`. In this part we'll be creating pixel data from
 scratch and adding it to a :class:`~pydicom.dataset.Dataset`. We'll be creating
@@ -325,7 +325,7 @@ The example below demonstrates creating *Float Pixel Data*::
 Conclusion and next steps
 -------------------------
 
-In part 2 of this tutorial you've learnt how to create and add a variety of different pixel
+In part 2 of this tutorial you've learned how to create and add a variety of different pixel
 data to a :class:`~pydicom.dataset.Dataset` using an :class:`~numpy.ndarray`. In the final
 part you'll learn how to :doc:`compress and decompress datasets
 </tutorials/pixel_data/compressing>` containing pixel data.
