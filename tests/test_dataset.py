@@ -1144,12 +1144,6 @@ class TestDataset:
     def test_private_block_deepcopy(self):
         """Test deepcopying a private block."""
         ds = Dataset()
-        ds.add_new(0x00080005, "CS", "ISO_IR 100")
-        ds.add_new(0x00090010, "LO", "Creator 1.0")
-        ds.add_new(0x00091001, "SH", "Version1")
-        ds.add_new(0x00090020, "LO", "Creator 2.0")
-        ds.add_new(0x00092001, "SH", "Version2")
-        ds.add_new(0x00092002, "US", 2)
         ds.private_block(0x000B, "Foo", create=True)
 
         ds2 = copy.deepcopy(ds)
@@ -1158,17 +1152,22 @@ class TestDataset:
     def test_private_block_pickle(self):
         """Test pickling a private block."""
         ds = Dataset()
-        ds.add_new(0x00080005, "CS", "ISO_IR 100")
-        ds.add_new(0x00090010, "LO", "Creator 1.0")
-        ds.add_new(0x00091001, "SH", "Version1")
-        ds.add_new(0x00090020, "LO", "Creator 2.0")
-        ds.add_new(0x00092001, "SH", "Version2")
-        ds.add_new(0x00092002, "US", 2)
         ds.private_block(0x000B, "Foo", create=True)
 
         s = pickle.dumps({"ds": ds})
         ds2 = pickle.loads(s)["ds"]
         assert ds2[0x000B0010].value == "Foo"
+
+    def test_private_block_dealloc(self):
+        """Test a private block when the parent is deallocated."""
+        ds = Dataset()
+        block = ds.private_block(0x000B, "Foo", create=True)
+        block.add_new(0x0005, "CS", "ISO_IR 100")
+        del ds
+
+        msg = "The parent dataset has been deallocated"
+        with pytest.raises(RuntimeError, match=msg):
+            block[0x000B1005]
 
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078
