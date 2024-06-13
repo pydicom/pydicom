@@ -218,7 +218,7 @@ class PrivateBlock:
         # When pickling convert from a weak to strong reference
         if self.dataset is not None:
             s = self.__dict__.copy()
-            s['_dsref'] = s['_dsref']()
+            s["_dsref"] = s["_dsref"]()
             return s
 
         return self.__dict__
@@ -226,8 +226,8 @@ class PrivateBlock:
     def __setstate__(self, state: dict[str, Any]) -> None:
         # When unpickling convert from a strong to a weak reference
         self.__dict__.update(state)
-        if self.__dict__['_dsref'] is not None:
-            self.__dict__['_dsref'] = weakref.ref(self.__dict__['_dsref'])
+        if self.__dict__["_dsref"] is not None:
+            self.__dict__["_dsref"] = weakref.ref(self.__dict__["_dsref"])
 
 
 def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
