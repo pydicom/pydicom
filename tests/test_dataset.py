@@ -1152,31 +1152,11 @@ class TestDataset:
     def test_private_block_pickle(self):
         """Test pickling a private block."""
         ds = Dataset()
-        ds.private_block(0x000B, "Foo", create=True)
+        block = ds.private_block(0x000B, "Foo", create=True)
 
         s = pickle.dumps({"ds": ds})
         ds2 = pickle.loads(s)["ds"]
         assert ds2[0x000B0010].value == "Foo"
-
-    def test_private_block_dealloc(self):
-        """Test a private block when the parent is deallocated."""
-        ds = Dataset()
-        block = ds.private_block(0x000B, "Foo", create=True)
-        block.add_new(0x0005, "CS", "ISO_IR 100")
-        del ds
-
-        msg = "The parent dataset has been deallocated"
-        with pytest.raises(RuntimeError, match=msg):
-            block[0x000B1005]
-
-        with pytest.raises(RuntimeError, match=msg):
-            block.add_new(0x0006, "CS", "ISO_IR 100")
-
-        with pytest.raises(RuntimeError, match=msg):
-            del block[0x0005]
-
-        with pytest.raises(RuntimeError, match=msg):
-            0x0005 in block
 
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078

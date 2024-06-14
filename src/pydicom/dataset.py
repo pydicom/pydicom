@@ -117,11 +117,7 @@ class PrivateBlock:
         self.group = key[0]
         self.private_creator = key[1]
         self.block_start = private_creator_element << 8
-        self._dsref = weakref.ref(dataset)
-
-    @property
-    def dataset(self) -> "Dataset | None":
-        return self._dsref()
+        self.dataset = dataset
 
     def get_tag(self, element_offset: int) -> BaseTag:
         """Return the private tag ID for the given `element_offset`.
@@ -149,9 +145,6 @@ class PrivateBlock:
         """Return ``True`` if the tag with given `element_offset` is in
         the parent :class:`Dataset`.
         """
-        if self.dataset is None:
-            raise RuntimeError("The parent dataset has been deallocated")
-
         return self.get_tag(element_offset) in self.dataset
 
     def __getitem__(self, element_offset: int) -> DataElement:
@@ -175,9 +168,6 @@ class PrivateBlock:
         KeyError
             If no data element exists at that offset.
         """
-        if self.dataset is None:
-            raise RuntimeError("The parent dataset has been deallocated")
-
         return self.dataset.__getitem__(self.get_tag(element_offset))
 
     def __delitem__(self, element_offset: int) -> None:
@@ -196,9 +186,6 @@ class PrivateBlock:
         KeyError
             If no data element exists at that offset.
         """
-        if self.dataset is None:
-            raise RuntimeError("The parent dataset has been deallocated")
-
         del self.dataset[self.get_tag(element_offset)]
 
     def add_new(self, element_offset: int, VR: str, value: object) -> None:
@@ -219,27 +206,19 @@ class PrivateBlock:
             The value of the data element. See :meth:`Dataset.add_new()`
             for a description.
         """
-        if self.dataset is None:
-            raise RuntimeError("The parent dataset has been deallocated")
-
         tag = self.get_tag(element_offset)
         self.dataset.add_new(tag, VR, value)
         self.dataset[tag].private_creator = self.private_creator
 
-    def __getstate__(self) -> dict[str, Any]:
-        # When pickling convert from a weak to strong reference
-        if self.dataset is not None:
-            s = self.__dict__.copy()
-            s["_dsref"] = s["_dsref"]()
-            return s
+    def __deepcopy__(self, memo: Any) -> "PrivateBlock":
+        copied = self.__class__(
+            (self.group, self.private_creator),
+            self.dataset,
+            self.block_start >> 8,
+        )
+        memo[id(self)] = copied
 
-        return self.__dict__
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        # When unpickling convert from a strong to a weak reference
-        self.__dict__.update(state)
-        if self.__dict__["_dsref"] is not None:
-            self.__dict__["_dsref"] = weakref.ref(self.__dict__["_dsref"])
+        return copied
 
 
 def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
