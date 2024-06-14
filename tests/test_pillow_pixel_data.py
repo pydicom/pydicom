@@ -280,7 +280,6 @@ JPEG_MATCHING_DATASETS = [
             (192, 192, 192),
             (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(reason="Resulting image is a bad match"),
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
@@ -313,7 +312,6 @@ JPEG_MATCHING_DATASETS = [
             (192, 192, 192),
             (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(reason="Resulting image is a bad match"),
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422,
@@ -699,7 +697,14 @@ class TestPillowHandler_JPEG:
             assert tuple(arr[85, 50, :]) == values[8]
             assert tuple(arr[95, 50, :]) == values[9]
 
-        assert np.array_equal(arr, ref)
+        close = [
+            JPGB_08_08_3_0_1F_YBR_FULL_422_411,
+            JPGB_08_08_3_0_1F_YBR_FULL_411,
+        ]
+        if fpath in close:
+            assert np.allclose(arr, ref, atol=1)
+        else:
+            assert np.array_equal(arr, ref)
 
     def test_color_3d(self):
         """Test decoding JPEG with pillow handler succeeds."""
