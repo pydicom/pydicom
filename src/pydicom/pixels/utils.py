@@ -778,7 +778,7 @@ def get_image_pixel_ids(ds: "Dataset") -> dict[str, int]:
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
-def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
+def get_j2k_parameters(codestream: bytes) -> dict[str, Any]:
     """Return a dict containing JPEG 2000 component parameters.
 
     .. versionadded:: 2.1
@@ -796,7 +796,7 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
         Available parameters are ``{"precision": int, "is_signed": bool}``.
     """
     offset = 0
-    info = {"jp2": False}
+    info: dict[str, Any] = {"jp2": False}
 
     # Account for the JP2 header (if present)
     # The first box is always 12 bytes long
