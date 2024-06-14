@@ -158,7 +158,11 @@ class TestOpenJpegDecoder:
     def test_u4_raises(self):
         """Test decoding greyscale with bits stored > 16 raises exception."""
         decoder = get_decoder(JPEG2000Lossless)
-        ds = J2KR_08_08_3_0_1F_YBR_RCT.ds
+        ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT.path)
+        # Manually edit the precision in the J2K codestream
+        data = bytearray(ds.PixelData)
+        data[1716:1717] = b"\x10"
+        ds.PixelData = bytes(data)
 
         msg = (
             "Unable to decode as exceptions were raised by all available plugins:\n"
@@ -166,9 +170,7 @@ class TestOpenJpegDecoder:
             "to 16 are supported"
         )
         with pytest.raises(RuntimeError, match=msg):
-            decoder.as_array(
-                ds, decoding_plugin="pillow", bits_stored=17, bits_allocated=32
-            )
+            decoder.as_array(ds, decoding_plugin="pillow")
 
     def test_multisample_16bit_raises(self):
         """Test that > 8-bit RGB datasets raise exception"""

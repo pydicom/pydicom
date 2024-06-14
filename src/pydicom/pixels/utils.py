@@ -795,15 +795,13 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
         JPEG 2000 `codestream`, or an empty dict if unable to parse the data.
         Available parameters are ``{"precision": int, "is_signed": bool}``.
     """
-    # Account for the JP2 header (if present)
     offset = 0
+    info = {"jp2": False}
+
+    # Account for the JP2 header (if present)
     # The first box is always 12 bytes long
     if codestream.startswith(b"\x00\x00\x00\x0C\x6A\x50\x20\x20"):
-        warn_and_log(
-            "The JPEG 2000 encoded pixel data uses a JP2 file format header, which "
-            "is non-conformant. See Annex A.4.4 in Part 5 of the DICOM Standard."
-        )
-
+        info["jp2"] = True
         total_length = len(codestream)
         offset = 12
         # Iterate through the boxes, looking for the jp2c box
@@ -828,9 +826,13 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
         # See 15444-1 A.5.1 for format of the SIZ box and contents
         ssiz = codestream[offset + 42]
         if ssiz & 0x80:
-            return {"precision": (ssiz & 0x7F) + 1, "is_signed": True}
+            info["precision"] = (ssiz & 0x7F) + 1
+            info["is_signed"] = True
+            return info
 
-        return {"precision": ssiz + 1, "is_signed": False}
+        info["precision"] = ssiz + 1
+        info["is_signed"] = False
+        return info
     except (IndexError, TypeError):
         pass
 

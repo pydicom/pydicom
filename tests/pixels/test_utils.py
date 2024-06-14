@@ -1181,12 +1181,14 @@ class TestGetJ2KParameters:
             params = get_j2k_parameters(base + bytes([ii]))
             assert ii - 127 == params["precision"]
             assert params["is_signed"]
+            assert params["jp2"] is False
 
         # Unsigned
         for ii in range(7, 16):
             params = get_j2k_parameters(base + bytes([ii]))
             assert ii + 1 == params["precision"]
             assert not params["is_signed"]
+            assert params["jp2"] is False
 
     def test_not_j2k(self):
         """Test result when no JPEG2K SOF marker present"""
@@ -1206,16 +1208,10 @@ class TestGetJ2KParameters:
     def test_jp2(self):
         """Test result when JP2 file format is used."""
         ds = J2KR_08_08_3_0_1F_YBR_RCT.ds
-
-        msg = (
-            "The JPEG 2000 encoded pixel data uses a JP2 file format header, which "
-            "is non-conformant. See Annex A.4.4 in Part 5 of the DICOM Standard."
-        )
-        with pytest.warns(UserWarning, match=msg):
-            info = get_j2k_parameters(get_frame(ds.PixelData, 0))
-
+        info = get_j2k_parameters(get_frame(ds.PixelData, 0))
         assert info["precision"] == 8
         assert info["is_signed"] is False
+        assert info["jp2"] is True
 
 
 class TestGetNrFrames:
