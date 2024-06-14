@@ -795,17 +795,38 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
         JPEG 2000 `codestream`, or an empty dict if unable to parse the data.
         Available parameters are ``{"precision": int, "is_signed": bool}``.
     """
+    # Account for the JP2 header (if present)
+    offset = 0
+    # The first box is always 12 bytes long
+    if codestream.startswith(b"\x00\x00\x00\x0C\x6A\x50\x20\x20"):
+        warn_and_log(
+            "The JPEG 2000 encoded pixel data uses a JP2 file format header, which "
+            "is non-conformant. See Annex A.4.4 in Part 5 of the DICOM Standard."
+        )
+
+        total_length = len(codestream)
+        offset = 12
+        # Iterate through the boxes, looking for the jp2c box
+        while offset < total_length:
+            length = int.from_bytes(codestream[offset:offset + 4], byteorder="big")
+            if codestream[offset + 4:offset + 8] == b"\x6A\x70\x32\x63":
+                # The offset to the start of the J2K codestream
+                offset += 8
+                break
+
+            offset += length
+
     try:
         # First 2 bytes must be the SOC marker - if not then wrong format
-        if codestream[0:2] != b"\xff\x4f":
+        if codestream[offset: offset + 2] != b"\xff\x4f":
             return {}
 
         # SIZ is required to be the second marker - Figure A-3 in 15444-1
-        if codestream[2:4] != b"\xff\x51":
+        if codestream[offset + 2:offset + 4] != b"\xff\x51":
             return {}
 
         # See 15444-1 A.5.1 for format of the SIZ box and contents
-        ssiz = codestream[42]
+        ssiz = codestream[offset + 42]
         if ssiz & 0x80:
             return {"precision": (ssiz & 0x7F) + 1, "is_signed": True}
 

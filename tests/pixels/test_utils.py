@@ -1203,6 +1203,20 @@ class TestGetJ2KParameters:
         assert {} == get_j2k_parameters(b"")
         assert {} == get_j2k_parameters(b"\xff\x4f\xff\x51" + b"\x00" * 20)
 
+    def test_jp2(self):
+        """Test result when JP2 file format is used."""
+        ds = J2KR_08_08_3_0_1F_YBR_RCT.ds
+
+        msg = (
+            "The JPEG 2000 encoded pixel data uses a JP2 file format header, which "
+            "is non-conformant. See Annex A.4.4 in Part 5 of the DICOM Standard."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            info = get_j2k_parameters(get_frame(ds.PixelData, 0))
+
+        assert info["precision"] == 8
+        assert info["is_signed"] is False
+
 
 class TestGetNrFrames:
     """Tests for get_nr_frames()."""
