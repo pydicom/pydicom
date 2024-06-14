@@ -806,8 +806,8 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
         offset = 12
         # Iterate through the boxes, looking for the jp2c box
         while offset < total_length:
-            length = int.from_bytes(codestream[offset:offset + 4], byteorder="big")
-            if codestream[offset + 4:offset + 8] == b"\x6A\x70\x32\x63":
+            length = int.from_bytes(codestream[offset : offset + 4], byteorder="big")
+            if codestream[offset + 4 : offset + 8] == b"\x6A\x70\x32\x63":
                 # The offset to the start of the J2K codestream
                 offset += 8
                 break
@@ -816,11 +816,11 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
 
     try:
         # First 2 bytes must be the SOC marker - if not then wrong format
-        if codestream[offset: offset + 2] != b"\xff\x4f":
+        if codestream[offset : offset + 2] != b"\xff\x4f":
             return {}
 
         # SIZ is required to be the second marker - Figure A-3 in 15444-1
-        if codestream[offset + 2:offset + 4] != b"\xff\x51":
+        if codestream[offset + 2 : offset + 4] != b"\xff\x51":
             return {}
 
         # See 15444-1 A.5.1 for format of the SIZ box and contents
