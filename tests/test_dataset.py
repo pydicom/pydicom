@@ -1152,7 +1152,7 @@ class TestDataset:
     def test_private_block_pickle(self):
         """Test pickling a private block."""
         ds = Dataset()
-        block = ds.private_block(0x000B, "Foo", create=True)
+        ds.private_block(0x000B, "Foo", create=True)
 
         s = pickle.dumps({"ds": ds})
         ds2 = pickle.loads(s)["ds"]

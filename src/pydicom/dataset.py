@@ -115,8 +115,8 @@ class PrivateBlock:
         """
         self.group = key[0]
         self.private_creator = key[1]
-        self.block_start = private_creator_element << 8
         self.dataset = dataset
+        self.block_start = private_creator_element << 8
 
     def get_tag(self, element_offset: int) -> BaseTag:
         """Return the private tag ID for the given `element_offset`.
