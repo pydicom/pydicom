@@ -81,7 +81,6 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     # The precision from the J2K codestream is more appropriate because the
     #   decoder will use it to create the output integers
     precision = runner.get_option("j2k_precision", runner.bits_stored)
-    print(precision)
     # pillow's pixel container size is based on precision
     if 0 < precision <= 8:
         runner.set_option("bits_allocated", 8)
