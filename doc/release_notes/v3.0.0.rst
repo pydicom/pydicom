@@ -203,6 +203,8 @@ Enhancements
   <pydicom.dataset.Dataset.pixel_array>` with the new :mod:`~pydicom.pixels` backend.
 * Improve support for reading and resolving inline binary data with `VR=UN` from Json
   (:issue:`2062`).
+* :func:`~pydicom.pixels.utils.get_j2k_parameters` now takes into account the JP2 header
+  (if present, although it's non-conformant for it to be) (:issue:`2073`)
 
 Fixes
 -----
