@@ -209,6 +209,16 @@ class PrivateBlock:
         self.dataset.add_new(tag, VR, value)
         self.dataset[tag].private_creator = self.private_creator
 
+    def __deepcopy__(self, memo: Any) -> "PrivateBlock":
+        copied = self.__class__(
+            (self.group, self.private_creator),
+            self.dataset,
+            self.block_start >> 8,
+        )
+        memo[id(self)] = copied
+
+        return copied
+
 
 def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
     """Common method for Dataset.__eq__ and FileDataset.__eq__

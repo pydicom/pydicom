@@ -1141,6 +1141,23 @@ class TestDataset:
         item = ds.get_private_item(0x0009, 0x02, "Creator 2.0")
         assert 2 == item.value
 
+    def test_private_block_deepcopy(self):
+        """Test deepcopying a private block."""
+        ds = Dataset()
+        ds.private_block(0x000B, "Foo", create=True)
+
+        ds2 = copy.deepcopy(ds)
+        assert ds2[0x000B0010].value == "Foo"
+
+    def test_private_block_pickle(self):
+        """Test pickling a private block."""
+        ds = Dataset()
+        ds.private_block(0x000B, "Foo", create=True)
+
+        s = pickle.dumps({"ds": ds})
+        ds2 = pickle.loads(s)["ds"]
+        assert ds2[0x000B0010].value == "Foo"
+
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078
         ct_filename = get_testdata_file("CT_small.dcm")
