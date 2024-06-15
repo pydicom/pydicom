@@ -363,6 +363,8 @@ the <em>Pixel Data</em> element value until after saving (<a class="reference ex
 <li><p>Fixed a rare issue with converting pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> when
 <em>Bits Stored</em> is less than <em>Bits Allocated</em> and the unused bits haven’t been
 set to an appropriate value for correct interpretation of the data.</p></li>
+<li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">RecursionError</span></code> when using <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> with a dataset containing
+a private block (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2025">#2025</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">
