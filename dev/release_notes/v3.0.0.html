@@ -323,6 +323,8 @@ decoding backend: <a class="reference internal" href="../reference/generated/pyd
 for controlling pixel data decoding when using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> with the new <a class="reference internal" href="../reference/pixels.html#module-pydicom.pixels" title="pydicom.pixels"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pixels</span></code></a> backend.</p></li>
 <li><p>Improve support for reading and resolving inline binary data with <cite>VR=UN</cite> from Json
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2062">#2062</a>).</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.utils.get_j2k_parameters.html#pydicom.pixels.utils.get_j2k_parameters" title="pydicom.pixels.utils.get_j2k_parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_j2k_parameters()</span></code></a> now takes into account the JP2 header
+(if present, although it’s non-conformant for it to be) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2073">#2073</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
