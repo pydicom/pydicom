@@ -1422,9 +1422,9 @@ class TestEncodeRunner_Encode:
         enc = RLELosslessEncoder
         assert enc.is_available
         msg = (
-            "Unable to use the 'pylibjpeg' plugin because it's missing "
-            "dependencies - requires numpy, pylibjpeg>=2.0 and "
-            "pylibjpeg-rle>=2.0"
+            "Unable to compress the pixel data using 'RLE Lossless' because the "
+            "specified plugin is missing dependencies:\n\tpylibjpeg - requires numpy, "
+            "pylibjpeg>=2.0 and pylibjpeg-rle>=2.0"
         )
         with pytest.raises(RuntimeError, match=msg):
             enc.encode(EXPL_16_16_1F.ds, encoding_plugin="pylibjpeg")

@@ -221,9 +221,8 @@ def generate_fragmented_frames(
         ``seek()`` methods. If the latter then the final position depends on
         how many fragmented frames have been yielded.
     number_of_frames : int, optional
-        Required for multi-frame data when the Basic Offset Table is empty,
-        the Extended Offset Table has not been supplied and there are
-        multiple frames. This should be the value of (0028,0008) *Number of
+        Required when the Basic Offset Table is empty and the Extended Offset Table
+        has not been supplied. This should be the value of (0028,0008) *Number of
         Frames* or the expected number of frames in the encapsulated data.
     extended_offsets : tuple[list[int], list[int]] or tuple[bytes, bytes], optional
         The (offsets, lengths) of the Extended Offset Table as taken from
@@ -413,10 +412,9 @@ def generate_frames(
         ``seek()`` methods. If the latter then the final offset position depends
         on the number of yielded frames.
     number_of_frames : int, optional
-        Required for multi-frame data when the Basic Offset Table is empty,
-        the Extended Offset Table has not been supplied and there are
-        multiple frames. This should be the value of (0028,0008) *Number of
-        Frames* or the expected number of frames in the encapsulated data.
+        Required when the Basic Offset Table is empty and the Extended Offset
+        Table has not been supplied. This should be the value of (0028,0008) *Number
+        of Frames* or the expected number of frames in the encapsulated data.
     extended_offsets : tuple[list[int], list[int]] or tuple[bytes, bytes], optional
         The (offsets, lengths) of the Extended Offset Table as taken from
         (7FE0,0001) *Extended Offset Table* and (7FE0,0002) *Extended Offset

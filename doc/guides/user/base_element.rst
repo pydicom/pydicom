@@ -22,14 +22,13 @@ A :class:`~dataset.Dataset` can be created directly, but you'll
 usually get one by reading an existing DICOM dataset from file using
 :func:`~pydicom.filereader.dcmread`::
 
-    >>> import pydicom
-    >>> from pydicom.data import get_testdata_file
-    >>> # Returns the path to one of pydicom's example DICOM datasets
-    >>> path: str = get_testdata_file("rtplan.dcm")
+    >>> from pydicom import dcmread, examples
+    >>> # Returns the path to pydicom's examples.rt_plan dataset
+    >>> path = examples.get_path("rt_plan")
     >>> print(path)
-    '/path/to/pydicom/data/test_files/rtplan.dcm'
+    PosixPath('/path/to/pydicom/data/test_files/rtplan.dcm')
     >>> # Read the DICOM dataset at `path`
-    >>> ds = pydicom.dcmread(path)
+    >>> ds = dcmread(path)
 
 You can display the contents of the entire dataset using ``str(ds)`` or with::
 

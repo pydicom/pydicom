@@ -519,9 +519,8 @@ class TestDecodeRunner:
         assert d["pixel_representation"] == 0
         assert d["bits_allocated"] == 16
         assert d["bits_stored"] == 8
+        assert d["number_of_frames"] == 3
         assert "planar_configuration" not in d
-
-        assert "number_of_frames" not in runner.pixel_properties(as_frame=True)
 
         runner.set_option("pixel_keyword", "FloatPixelData")
         assert "pixel_representation" not in runner.pixel_properties()
@@ -1308,7 +1307,7 @@ class TestDecoder_Array:
             assert arr.flags.writeable
             assert arr.shape == reference.shape[1:]
             assert meta["bits_stored"] == 12
-            assert "number_of_frames" not in meta
+            assert meta["number_of_frames"] == 1
 
         assert idx == 2
 
@@ -1431,7 +1430,7 @@ class TestDecoder_Array:
             assert arr.flags.writeable
             assert arr.shape == reference.shape[1:]
             assert meta["bits_stored"] == 12
-            assert "number_of_frames" not in meta
+            assert meta["number_of_frames"] == 1
 
         assert idx == 2
 
@@ -1505,6 +1504,19 @@ class TestDecoder_Array:
             assert meta["photometric_interpretation"] == PI.RGB
             EXPL_8_3_1F_YBR.test(arr, as_rgb=True)
 
+    def test_iter_planar_configuration(self):
+        """Test iter_pixels() with planar configuration."""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+
+        ds = dcmread(EXPL_8_3_1F_YBR.path)
+        ds.PixelData = ds.PixelData * 2
+        ds.NumberOfFrames = 2
+        ds.PlanarConfiguration = 1
+
+        # Always 0 when converting to an ndarray
+        for _, meta in decoder.iter_array(ds):
+            assert meta["planar_configuration"] == 0
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestDecoder_Buffer:
@@ -1522,7 +1534,7 @@ class TestDecoder_Buffer:
             buffer, meta_b = decoder.as_buffer(reference.ds, index=index)
             assert arr.tobytes() == buffer
             assert meta_a == meta_b
-            assert "number_of_frames" not in meta_b
+            assert meta_a["number_of_frames"] == 1
 
         msg = "There is insufficient pixel data to contain 11 frames"
         with pytest.raises(ValueError, match=msg):
@@ -1593,7 +1605,7 @@ class TestDecoder_Buffer:
             assert isinstance(buffer, bytes | bytearray)
             assert arr.tobytes() == buffer
             assert meta["bits_stored"] == 12
-            assert "number_of_frames" not in meta
+            assert meta["number_of_frames"] == 1
 
     def test_encapsulated_plugin(self):
         """Test `decoding_plugin` with an encapsulated pixel data."""

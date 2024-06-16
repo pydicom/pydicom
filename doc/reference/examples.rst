@@ -3,6 +3,7 @@
 Example Datasets (:mod:`pydicom.examples`)
 ==========================================
 
+.. module:: pydicom.examples
 .. currentmodule:: pydicom.examples
 
 The ``examples`` module contains the following DICOM datasets:
@@ -36,6 +37,14 @@ The ``examples`` module contains the following DICOM datasets:
 +-------------------+---------------------------------------+----------------------+
 
 
+As well as the utility function:
+
+.. autosummary::
+   :toctree: generated/
+
+   get_path
+
+
 Usage
 -----
 
@@ -60,3 +69,9 @@ Because of this, best practice is to assign the returned dataset to a local
 variable::
 
    >>> ds = examples.ct
+
+The :func:`~pydicom.examples.get_path` function can be used to return the path
+to an example dataset as a :class:`pathlib.Path` instance::
+
+   >>> examples.get_path("ct")
+   PosixPath('/home/user/pydicom/src/pydicom/data/test_files/CT_small.dcm')
