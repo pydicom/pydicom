@@ -112,8 +112,7 @@ To load an existing File-set just pass a DICOMDIR
 
     >>> from pydicom import dcmread
     >>> from pydicom.fileset import FileSet
-    >>> from pydicom.data import get_testdata_file
-    >>> path = get_testdata_file("DICOMDIR")
+    >>> path = examples.get_path("dicomdir")  # The path to the examples.dicomdir dataset
     >>> ds = dcmread(path)
     >>> fs = FileSet(ds)  # or FileSet(path)
 
@@ -461,7 +460,7 @@ so we don't accidentally modify it:
     >>> from shutil import copytree, copyfile
     >>> t = TemporaryDirectory()
     >>> dst = Path(t.name)
-    >>> src = Path(get_testdata_file("DICOMDIR")).parent
+    >>> src = examples.get_path("dicomdir").parent
     >>> copyfile(src / "DICOMDIR", dst / "DICOMDIR")
     >>> copytree(src / "77654033", dst / "77654033")
     >>> copytree(src / "98892001", dst / "98892001")

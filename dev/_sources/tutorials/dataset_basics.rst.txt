@@ -16,26 +16,25 @@ If you haven't installed *pydicom* yet, follow the instructions in our
 Getting the path to the example dataset
 =======================================
 
-In the tutorial we're going to be using a DICOM dataset included with
+In the tutorial we're going to be using one of the example DICOM datasets included with
 *pydicom*: :gh:`CT_small.dcm<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
-You can get the file path to the dataset by using the :func:`~pydicom.data.get_testdata_file`
-function to return the path as a :class:`str` (your path may vary)::
+You can get the file path to the dataset by using the :func:`~pydicom.examples.get_path`
+function to return the path as a :class:`pathlib.Path` (your path may vary)::
 
-    >>> from pydicom.data import get_testdata_file
-    >>> path = get_testdata_file("CT_small.dcm")
+    >>> from pydicom import examples
+    >>> path = examples.get_path("ct")
     >>> path
-    '/path/to/pydicom/data/test_files/CT_small.dcm'
+    PosixPath('/path/to/pydicom/data/test_files/CT_small.dcm')
 
 Reading
 =======
 
-To read the DICOM dataset at a given file path we use
-:func:`~pydicom.filereader.dcmread`, which returns a
+To read the DICOM dataset at a given file path (as a :class:`str` or :class:`pathlib.Path`)
+we use :func:`~pydicom.filereader.dcmread`, which returns a
 :class:`~pydicom.dataset.FileDataset` instance::
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
-    >>> path = get_testdata_file("CT_small.dcm")
+    >>> from pydicom import dcmread, examples
+    >>> path = get_path("ct")
     >>> ds = dcmread(path)
 
 :func:`~pydicom.filereader.dcmread` can also handle file-likes::
@@ -57,7 +56,7 @@ exception:
 
 .. code-block:: pycon
 
-    >>> no_meta_path = get_testdata_file('no_meta.dcm')
+    >>> no_meta_path = examples.get_path('no_meta')
     >>> ds = dcmread(no_meta_path)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>

@@ -1,0 +1,6 @@
+﻿pydicom.examples.get\_path
+==========================
+
+.. currentmodule:: pydicom.examples
+
+.. autofunction:: get_path

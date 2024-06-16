@@ -29,6 +29,7 @@
    .. autosummary::
    
       ~Encoder.UID
+      ~Encoder.available_plugins
       ~Encoder.is_available
       ~Encoder.is_encapsulated
       ~Encoder.is_native

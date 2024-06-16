@@ -1,0 +1,6 @@
+﻿pydicom.pixels.apply\_rescale
+=============================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: apply_rescale

@@ -28,7 +28,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Bulk Data Encapsulation Utilities (pydicom.encaps)" href="encaps.html" />
+    <link rel="next" title="pydicom.examples.get_path" href="generated/pydicom.examples.get_path.html" />
     <link rel="prev" title="pydicom.valuerep.VR" href="generated/pydicom.valuerep.VR.html" /> 
 </head>
 
@@ -72,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.examples.get_path.html">pydicom.examples.get_path</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
@@ -126,8 +127,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="example-datasets-pydicom-examples">
-<span id="api-examples"></span><h1>Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)<a class="headerlink" href="#example-datasets-pydicom-examples" title="Link to this heading">¶</a></h1>
+  <section id="module-pydicom.examples">
+<span id="example-datasets-pydicom-examples"></span><span id="api-examples"></span><h1>Example Datasets (<a class="reference internal" href="#module-pydicom.examples" title="pydicom.examples"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code></a>)<a class="headerlink" href="#module-pydicom.examples" title="Link to this heading">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">examples</span></code> module contains the following DICOM datasets:</p>
 <table class="docutils align-default">
 <thead>
@@ -187,6 +188,14 @@
 </tr>
 </tbody>
 </table>
+<p>As well as the utility function:</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.examples.get_path.html#pydicom.examples.get_path" title="pydicom.examples.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(name)</p></td>
+<td><p>Return the path to the example dataset with the attribute name <cite>name</cite> as <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
 <p>The module attributes are all normal <a class="reference internal" href="generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>
@@ -211,6 +220,12 @@ variable:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 </pre></div>
 </div>
+<p>The <a class="reference internal" href="generated/pydicom.examples.get_path.html#pydicom.examples.get_path" title="pydicom.examples.get_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_path()</span></code></a> function can be used to return the path
+to an example dataset as a <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
+<span class="go">PosixPath(&#39;/home/user/pydicom/src/pydicom/data/test_files/CT_small.dcm&#39;)</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -219,7 +234,7 @@ variable:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="generated/pydicom.valuerep.VR.html" class="btn btn-neutral float-left" title="pydicom.valuerep.VR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="encaps.html" class="btn btn-neutral float-right" title="Bulk Data Encapsulation Utilities (pydicom.encaps)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/pydicom.examples.get_path.html" class="btn btn-neutral float-right" title="pydicom.examples.get_path" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

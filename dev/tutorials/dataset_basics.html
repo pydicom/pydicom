@@ -28,7 +28,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Compressing Pixel Data" href="pixel_data/compressing.html" />
+    <link rel="next" title="Pixel Data" href="pixel_data/index.html" />
     <link rel="prev" title="Tutorials" href="index.html" /> 
 </head>
 
@@ -83,7 +83,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#next-steps">Next steps</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pixel_data/compressing.html">Compressing <em>Pixel Data</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixel_data/index.html"><em>Pixel Data</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="filesets.html">DICOM File-sets and DICOMDIR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
@@ -146,25 +146,24 @@
 <a class="reference internal" href="installation.html"><span class="doc">installation guide</span></a>.</p>
 <section id="getting-the-path-to-the-example-dataset">
 <h2>Getting the path to the example dataset<a class="headerlink" href="#getting-the-path-to-the-example-dataset" title="Link to this heading">¶</a></h2>
-<p>In the tutorial we’re going to be using a DICOM dataset included with
+<p>In the tutorial we’re going to be using one of the example DICOM datasets included with
 <em>pydicom</em>: <a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm">CT_small.dcm</a>.
-You can get the file path to the dataset by using the <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
-function to return the path as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (your path may vary):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+You can get the file path to the dataset by using the <a class="reference internal" href="../reference/generated/pydicom.examples.get_path.html#pydicom.examples.get_path" title="pydicom.examples.get_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_path()</span></code></a>
+function to return the path as a <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> (your path may vary):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span>
-<span class="go">&#39;/path/to/pydicom/data/test_files/CT_small.dcm&#39;</span>
+<span class="go">PosixPath(&#39;/path/to/pydicom/data/test_files/CT_small.dcm&#39;)</span>
 </pre></div>
 </div>
 </section>
 <section id="reading">
 <h2>Reading<a class="headerlink" href="#reading" title="Link to this heading">¶</a></h2>
-<p>To read the DICOM dataset at a given file path we use
-<a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>, which returns a
+<p>To read the DICOM dataset at a given file path (as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>)
+we use <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>, which returns a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -184,7 +183,7 @@ function to return the path as a <a class="reference external" href="https://doc
 stored in accordance with the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>.
 However, occasionally you may try to read a file that gives you the following
 exception:</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">no_meta_path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s1">&#39;no_meta.dcm&#39;</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">no_meta_path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;no_meta&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">no_meta_path</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
@@ -713,7 +712,7 @@ in looking at our <a class="reference internal" href="../guides/user/index.html"
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pixel_data/compressing.html" class="btn btn-neutral float-right" title="Compressing Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pixel_data/index.html" class="btn btn-neutral float-right" title="Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -82,6 +82,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
@@ -158,16 +159,19 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html#pydicom.pixels.apply_modality_lut" title="pydicom.pixels.apply_modality_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_modality_lut</span></code></a>(arr, ds)</p></td>
 <td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html#pydicom.pixels.apply_voi_lut" title="pydicom.pixels.apply_voi_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi_lut</span></code></a>(arr, ds[, index, prefer_lut])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_rescale.html#pydicom.pixels.apply_rescale" title="pydicom.pixels.apply_rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_rescale</span></code></a>(arr, ds)</p></td>
+<td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_voi_lut.html#pydicom.pixels.apply_voi_lut" title="pydicom.pixels.apply_voi_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi_lut</span></code></a>(arr, ds[, index, prefer_lut])</p></td>
 <td><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html#pydicom.pixels.apply_voi" title="pydicom.pixels.apply_voi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi</span></code></a>(arr, ds[, index])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html#pydicom.pixels.apply_voi" title="pydicom.pixels.apply_voi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi</span></code></a>(arr, ds[, index])</p></td>
 <td><p>Apply a VOI lookup table to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_windowing</span></code></a>(arr, ds[, index])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_windowing</span></code></a>(arr, ds[, index])</p></td>
 <td><p>Apply a windowing operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired[, ...])</p></td>
 <td><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p></td>
 </tr>
 </tbody>

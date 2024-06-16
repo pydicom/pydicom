@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Data - Part 2: Creation of pixel data &mdash; pydicom 3.0.0.dev0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Pixel Data - Part 3: Compression and decompression" href="compressing.html" />
+    <link rel="prev" title="Pixel Data - Part 1: Introduction and accessing" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0.dev0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><em>Pixel Data</em></a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="introduction.html"><em>Pixel Data</em> - Part 1: Introduction and accessing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><em>Pixel Data</em> - Part 2: Creation of pixel data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#creating-pixel-data">Creating <em>Pixel Data</em></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-float-pixel-data-and-double-float-pixel-data">Creating <em>Float Pixel Data</em> and <em>Double Float Pixel Data</em></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#conclusion-and-next-steps">Conclusion and next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compressing.html"><em>Pixel Data</em> - Part 3: Compression and decompression</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../filesets.html">DICOM File-sets and DICOMDIR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
+          <li class="breadcrumb-item"><a href="index.html"><em>Pixel Data</em></a></li>
+      <li class="breadcrumb-item active"><em>Pixel Data</em> - Part 2: Creation of pixel data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pixel-data-part-2-creation-of-pixel-data">
+<h1><em>Pixel Data</em> - Part 2: Creation of pixel data<a class="headerlink" href="#pixel-data-part-2-creation-of-pixel-data" title="Link to this heading">¶</a></h1>
+<p>In part 1 of this tutorial you learned how to <a class="reference internal" href="introduction.html"><span class="doc">access the pixel data</span></a> as either the raw <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or a NumPy
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>. In this part we’ll be creating pixel data from
+scratch and adding it to a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. We’ll be creating
+uncompressed datasets with the following types of <em>Pixel Data</em>:</p>
+<ul class="simple">
+<li><p>Grayscale with 8-bit unsigned integers</p></li>
+<li><p>Multi-frame RGB with 8-bit unsigned integers</p></li>
+<li><p>Grayscale with 12-bit signed integers</p></li>
+<li><p>Grayscale with 32-bit floats (for <em>Float Pixel Data</em>)</p></li>
+</ul>
+<p><strong>Prerequisites</strong></p>
+<p>Installing using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom<span class="w"> </span>numpy<span class="w"> </span>matplotlib<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span>
+</pre></div>
+</div>
+<p>Installing on conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>matplotlib
+conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom
+pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span>
+</pre></div>
+</div>
+<section id="creating-pixel-data">
+<h2>Creating <em>Pixel Data</em><a class="headerlink" href="#creating-pixel-data" title="Link to this heading">¶</a></h2>
+<p>We’ll be using NumPy to create an array containing the pixel data and converting
+it to little-endian ordered <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="(in NumPy v1.26)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ndarray.tobytes()</span></code></a>. This is the function we’ll be using to create the array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">draw_circle</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an ndarray containing a circle.&quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="p">),</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">shape</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rows</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">rows</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="c1"># Create a boolean array where values inside the radius are True</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1"># Convert to the required `dtype` and set the maximum `value`</span>
+    <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> <span class="o">*</span> <span class="n">value</span>
+</pre></div>
+</div>
+<p>The datasets we’ll be creating don’t meet the requirements of any DICOM
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_A.html">IOD</a> and so aren’t conformant DICOM SOP instances, but
+they’re sufficient to demonstrate how to create and add pixel data to a
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> using <em>pydicom</em>. To create pixel data for an
+actual dataset you should check the requirements of the specific IOD you’re working
+with, as many IODs place restrictions on the allowed values for elements such
+as <em>Bits Stored</em>, <em>Photometric Interpretation</em> and others.</p>
+<section id="grayscale-with-8-bit-unsigned-integers">
+<h3>Grayscale with 8-bit unsigned integers<a class="headerlink" href="#grayscale-with-8-bit-unsigned-integers" title="Link to this heading">¶</a></h3>
+<p>The first example uses a single frame of grayscale <em>Pixel Data</em> with 8-bit unsigned integers:</p>
+<ul class="simple">
+<li><p>For 8-bit pixel values <em>Bits Stored</em> is <code class="docutils literal notranslate"><span class="pre">8</span></code></p></li>
+<li><p><em>Bits Allocated</em> must be a multiple of 8 and not less than <em>Bits Stored</em></p></li>
+<li><p>For unsigned integers <em>Pixel Representation</em> must be <code class="docutils literal notranslate"><span class="pre">0</span></code></p></li>
+<li><p>For 8-bit unsigned integers all pixel values must be in the <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_(mathematics)">closed interval</a> [0,  2<sup>8</sup> - 1]</p></li>
+<li><p>For pixel data that uses a single sample per pixel, <em>Samples per Pixel</em> is <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p>The <em>Photometric Interpretation</em> should be appropriate for a single sample per pixel</p></li>
+<li><p>If <em>Bits Allocated</em> is &lt;= 8 then <em>Pixel Data</em> uses a VR of <strong>OB</strong></p></li>
+</ul>
+<p>The <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VR</a> for <em>Pixel Data</em> may be <strong>OB</strong> or <strong>OW</strong> depending
+on the value of <em>Bits Allocated</em>. <em>pydicom</em> will set this automatically when
+writing the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to file as long as <em>Bits Allocated</em> has
+been set, but for completeness we’ll be setting it manually.</p>
+<p>The example has two different sets of <em>Pixel Data</em>; one with an even number of bytes
+and one with an odd number. The <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html">DICOM Standard</a> requires
+odd length <em>Pixel Data</em> have trailing padding sufficient to make it an even length,
+so the latter case demonstrates how to do so.</p>
+<p>Because we’ll be using NumPy to create the data we need an array with a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>
+appropriate for our chosen pixel data properties. For unsigned 8-bit integers
+the obvious choice is <code class="docutils literal notranslate"><span class="pre">uint8</span></code> as it can contain the values with the minimum
+amount of memory usage and can be converted directly to a suitable <em>Pixel Data</em>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> value with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="(in NumPy v1.26)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ndarray.tobytes()</span></code></a>.
+If instead we were to use something like <code class="docutils literal notranslate"><span class="pre">uint16</span></code> we would double the memory usage
+and require either setting <code class="docutils literal notranslate"><span class="pre">ds.BitsAllocated</span> <span class="pre">=</span> <span class="pre">16</span></code> (and roughly doubling the
+final size of the dataset) or keeping <em>Bits Stored</em> as <code class="docutils literal notranslate"><span class="pre">8</span></code> and stripping out the
+unused bytes with <code class="docutils literal notranslate"><span class="pre">ds.PixelData</span> <span class="pre">==</span> <span class="pre">arr.tobytes()[1::2]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 8-bit containers</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 8-bits used</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">HighBit</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># unsigned</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;MONOCHROME2&quot;</span>
+
+<span class="c1">## Even number of bytes</span>
+<span class="c1"># Create a 480 x 320, 8-bit unsigned array</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="c1"># No padding needed</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s2">&quot;OB&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># 320 pixels</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># 480 pixels</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1">## Odd number of bytes</span>
+<span class="c1"># Create a 31 x 63, 8-bit unsigned array</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">63</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+
+<span class="c1"># Trailing padding required to make the length an even number of bytes</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">))</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s2">&quot;OB&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Experimentation</strong></p>
+<p>Modify the example to use the following and see what effects they have on the
+displayed images:</p>
+<ul class="simple">
+<li><p>Set <em>Bits Allocated</em> and <em>Bits Stored</em> to <code class="docutils literal notranslate"><span class="pre">16</span></code> and <code class="docutils literal notranslate"><span class="pre">ds.Columns</span> <span class="pre">=</span> <span class="pre">arr.shape[1]</span> <span class="pre">//</span> <span class="pre">2</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">ds.Rows</span> <span class="pre">=</span> <span class="pre">arr.shape[1]</span></code> and <code class="docutils literal notranslate"><span class="pre">ds.Columns</span> <span class="pre">=</span> <span class="pre">arr.shape[0]</span></code></p></li>
+</ul>
+</section>
+<section id="multi-frame-rgb-with-8-bit-unsigned-integers">
+<h3>Multi-frame RGB with 8-bit unsigned integers<a class="headerlink" href="#multi-frame-rgb-with-8-bit-unsigned-integers" title="Link to this heading">¶</a></h3>
+<p>The second example uses multi-frame RGB <em>Pixel Data</em> with 8-bit unsigned integers:</p>
+<ul class="simple">
+<li><p><em>Samples per Pixel</em> has changed to <code class="docutils literal notranslate"><span class="pre">3</span></code>, because there are 3 channels; R, G and B.</p></li>
+<li><p><em>Photometric Interpretation</em> has changed to <code class="docutils literal notranslate"><span class="pre">&quot;RGB&quot;</span></code> to match the image type</p></li>
+<li><p><em>Planar Configuration</em> has been added as it’s required when <em>Samples per Pixel</em> &gt; 1</p></li>
+<li><p><em>Number of Frames</em> has been added as it’s required when there are multiple frames</p></li>
+</ul>
+<p>The <em>Planar Configuration</em> value is set as <code class="docutils literal notranslate"><span class="pre">0</span></code>, which means each pixel is encoded
+separately then all the encoded pixels are concatenated together. This matches how
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="(in NumPy v1.26)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ndarray.tobytes()</span></code></a> will encode an array that’s ordered as
+(rows, columns, samples) or (frames, rows, columns, samples).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">iter_pixels</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 8-bit containers</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 8-bits used</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">HighBit</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># unsigned</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;RGB&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PlanarConfiguration</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Create 2 frames of 480 x 320 x 3, 8-bit unsigned array</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+<span class="c1"># Frame 1</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Frame 2</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s2">&quot;OB&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># Display the frames</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">iter_pixels</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Experimentation</strong></p>
+<ul class="simple">
+<li><p>A <em>Planar Configuration</em> value of <code class="docutils literal notranslate"><span class="pre">1</span></code> means each color channel is encoded
+separately and then the results concatenated together. Try setting
+<code class="docutils literal notranslate"><span class="pre">ds.PlanarConfiguration</span> <span class="pre">=</span> <span class="pre">1</span></code> and seeing what effect it has.</p></li>
+<li><p>By default <em>pydicom</em> will <a class="reference internal" href="../../guides/decoding/decoder_options.html"><span class="doc">return any extra frames</span></a>
+it finds in the <em>Pixel Data</em>. Set <code class="docutils literal notranslate"><span class="pre">ds.NumberOfFrames</span> <span class="pre">=</span> <span class="pre">1</span></code> and see what effect it has,
+then pass <code class="docutils literal notranslate"><span class="pre">allow_excess_frames=False</span></code> to <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> and compare
+the results.</p></li>
+</ul>
+</section>
+<section id="grayscale-with-12-bit-signed-integers">
+<h3>Grayscale with 12-bit signed integers<a class="headerlink" href="#grayscale-with-12-bit-signed-integers" title="Link to this heading">¶</a></h3>
+<p>The final <em>Pixel Data</em> example uses a single channel of 12-bit signed integers:</p>
+<ul class="simple">
+<li><p>For 12-bit pixel values <em>Bits Stored</em> is <code class="docutils literal notranslate"><span class="pre">12</span></code> and <em>Bits Allocated</em> should be at least <code class="docutils literal notranslate"><span class="pre">16</span></code></p></li>
+<li><p>For signed integers <em>Pixel Representation</em> must be <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p>For 12-bit signed integers all pixels must have values in the <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_(mathematics)">closed interval</a> [-2<sup>11</sup>, 2<sup>11</sup> - 1]</p></li>
+<li><p>If <em>Bits Allocated</em> is &gt; 8 then <em>Pixel Data</em> uses a VR of <strong>OW</strong></p></li>
+</ul>
+<p>We need a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> sufficient for containing 12-bit integers, so
+to minimize memory usage we’ll go with <code class="docutils literal notranslate"><span class="pre">int16</span></code> and use a <em>Bits Allocated</em> value
+of <code class="docutils literal notranslate"><span class="pre">16</span></code> to match.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># 16-bits allocated</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># 12-bits used; interval is [-2048, 2047]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">HighBit</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># signed</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;MONOCHROME2&quot;</span>
+
+<span class="c1"># Create a 480 x 320, 16-bit signed array</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;int16&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">2048</span><span class="p">)</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s2">&quot;OW&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Experimentation</strong></p>
+<p>Set <em>Pixel Representation</em> to 0 and see what effect it has on the value of the
+pixels in the circle.</p>
+</section>
+</section>
+<section id="creating-float-pixel-data-and-double-float-pixel-data">
+<h2>Creating <em>Float Pixel Data</em> and <em>Double Float Pixel Data</em><a class="headerlink" href="#creating-float-pixel-data-and-double-float-pixel-data" title="Link to this heading">¶</a></h2>
+<p>The creation of <em>Float Pixel Data</em> or <em>Double Float Pixel Data</em> is very similar to
+that of <em>Pixel Data</em>, the main differences being:</p>
+<ul class="simple">
+<li><p><em>Bits Allocated</em> and <em>Bits Stored</em> are always 32 for <em>Float Pixel Data</em> and 64
+for <em>Double Float Pixel Data</em></p></li>
+<li><p>The <em>Pixel Representation</em> element should not be present</p></li>
+<li><p>The VR doesn’t need to be set manually</p></li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Element</p></th>
+<th class="head"><p>VR</p></th>
+<th class="head"><p><em>Bits Allocated</em></p></th>
+<th class="head"><p><em>Bits Stored</em></p></th>
+<th class="head"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>Float Pixel Data</em></p></td>
+<td><p><strong>OF</strong></p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float32</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Double Float Pixel Data</em></p></td>
+<td><p><strong>OD</strong></p></td>
+<td><p>64</p></td>
+<td><p>64</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float64</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The example below demonstrates creating <em>Float Pixel Data</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">HighBit</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;MONOCHROME2&quot;</span>
+
+<span class="c1"># Create a 480 x 320, 32-bit float array</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">draw_circle</span><span class="p">((</span><span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="mf">1024.58</span><span class="p">)</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">FloatPixelData</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="conclusion-and-next-steps">
+<h2>Conclusion and next steps<a class="headerlink" href="#conclusion-and-next-steps" title="Link to this heading">¶</a></h2>
+<p>In part 2 of this tutorial you’ve learned how to create and add a variety of different pixel
+data to a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> using an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>. In the final
+part you’ll learn how to <a class="reference internal" href="compressing.html"><span class="doc">compress and decompress datasets</span></a> containing pixel data.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Pixel Data - Part 1: Introduction and accessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compressing.html" class="btn btn-neutral float-right" title="Pixel Data - Part 3: Compression and decompression" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
