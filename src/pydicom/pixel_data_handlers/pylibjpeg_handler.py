@@ -70,11 +70,7 @@ except ImportError:
     HAVE_PYLIBJPEG = False
 
 if HAVE_PYLIBJPEG:
-    try:
-        from pylibjpeg.utils import get_pixel_data_decoders
-    except ImportError:
-        # Old import, deprecated in 1.2, removal in 2.0
-        from pylibjpeg.pydicom.utils import get_pixel_data_decoders
+    from pylibjpeg.utils import get_pixel_data_decoders, Decoder
 
 try:
     import openjpeg  # noqa: F401
@@ -261,7 +257,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
             f"elements are missing from the dataset: {', '.join(missing)}"
         )
 
-    decoder = _DECODERS[tsyntax]
+    decoder = cast(Decoder, _DECODERS[tsyntax])
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
     nr_frames = get_nr_frames(ds, warn=False)
@@ -273,7 +269,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     bits_allocated = cast(int, ds.BitsAllocated)
 
     for frame in frame_generator(ds.PixelData, number_of_frames=nr_frames):
-        arr = decoder(frame, pixel_module)
+        arr = decoder(frame, ds=pixel_module)
 
         if tsyntax in [JPEG2000, JPEG2000Lossless] and config.APPLY_J2K_CORRECTIONS:
             param = get_j2k_parameters(frame)

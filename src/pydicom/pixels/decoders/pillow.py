@@ -27,8 +27,8 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGBaseline8Bit: ("pillow>=10.0"),
-    uid.JPEGExtended12Bit: ("pillow>=10.0"),
+    uid.JPEGBaseline8Bit: ("pillow>=10.0", ),
+    uid.JPEGExtended12Bit: ("pillow>=10.0", ),
     uid.JPEG2000Lossless: ("numpy", "pillow>=10.0"),
     uid.JPEG2000: ("numpy", "pillow>=10.0"),
 }
@@ -45,10 +45,10 @@ def is_available(uid: str) -> bool:
         return False
 
     if uid in _LIBJPEG_SYNTAXES:
-        return bool(features.check_codec("jpg"))
+        return bool(features.check_codec("jpg"))  # type: ignore[no-untyped-call]
 
     if uid in _OPENJPEG_SYNTAXES:
-        return bool(features.check_codec("jpg_2000")) and HAVE_NP
+        return bool(features.check_codec("jpg_2000")) and HAVE_NP  # type: ignore[no-untyped-call]
 
     return False
 
@@ -73,7 +73,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
             # Any color transformations would be inconsistent with the
             #   behavior required by the `raw` flag
             if "adobe_transform" not in image.info:
-                image.draft("YCbCr", image.size)
+                image.draft("YCbCr", image.size)  # type: ignore[no-untyped-call]
 
         return cast(bytes, image.tobytes())
 
@@ -109,12 +109,19 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         is_signed = runner.get_option("j2k_is_signed", is_signed)
 
     if is_signed and runner.pixel_representation == 1:
-        # Re-view the unsigned integers as signed
-        #   e.g. [0, 127, 128, 255] -> [0, 127, -128, -1]
+        # Level-shift to match the unsigned value range [0, 255] to the
+        #   signed integers range [-128, 127], e.g.
+        # Unsigned [0, 127, 128, 255] -> [128, 255, 0, 127]
+        #   is equivalent to:
+        # Signed   [0, 127, -128, -1] -> [-128, -1, 0, 127]
+        print(arr.dtype, arr.min(), arr.max())
         arr = arr.view(dtype)
-        # Level-shift to match the unsigned integers range
-        #   e.g. [0, 127, -128, -1] -> [-128, -1, 0, 127]
+        print(arr.dtype, arr.min(), arr.max())
+        print(2 ** (runner.bits_allocated - 1))
         arr -= 2 ** (runner.bits_allocated - 1)
+        print(arr.dtype, arr.min(), arr.max())
+        # Re-view the unsigned integers as signed
+        #   e.g. [128, 255, 0, 127] -> [0, 127, -128, -1]
 
     if bit_shift := (runner.bits_allocated - precision):
         # Bit shift to undo the upscaling of N-bit to 8- or 16-bit

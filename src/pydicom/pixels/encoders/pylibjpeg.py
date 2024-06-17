@@ -9,7 +9,7 @@ from pydicom.pixels.utils import _passes_version_check
 from pydicom import uid
 
 try:
-    from pylibjpeg.utils import get_pixel_data_encoders
+    from pylibjpeg.utils import get_pixel_data_encoders, Encoder
 
     _ENCODERS = get_pixel_data_encoders()
 except ImportError:
@@ -43,7 +43,7 @@ def is_available(uid: str) -> bool:
 
 def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     """Return `src` as an encoded codestream."""
-    encoder = _ENCODERS[runner.transfer_syntax]
+    encoder = cast(Encoder, _ENCODERS[runner.transfer_syntax])
 
     tsyntax = runner.transfer_syntax
     if tsyntax == uid.RLELossless:
