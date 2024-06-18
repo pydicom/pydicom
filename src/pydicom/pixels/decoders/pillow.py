@@ -27,8 +27,8 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGBaseline8Bit: ("pillow>=10.0", ),
-    uid.JPEGExtended12Bit: ("pillow>=10.0", ),
+    uid.JPEGBaseline8Bit: ("pillow>=10.0",),
+    uid.JPEGExtended12Bit: ("pillow>=10.0",),
     uid.JPEG2000Lossless: ("numpy", "pillow>=10.0"),
     uid.JPEG2000: ("numpy", "pillow>=10.0"),
 }
