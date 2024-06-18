@@ -1347,9 +1347,7 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            diff = ref.astype("float") - out.astype("float")
-            print(bits_stored, diff.min(), diff.max())
-            # assert np.allclose(out, ref, atol=atol)
+            assert np.allclose(out, ref, atol=atol)
 
     def test_buffer_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
