@@ -672,6 +672,7 @@ class TestApplyColorLUT:
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds["RedPaletteColorLookupTableDescriptor"].VR = "SS"
         ds.RedPaletteColorLookupTableDescriptor[1] = -10
+        print(ds.group_dataset(0x0028))
         arr = ds.pixel_array
         rgb = apply_color_lut(arr, ds)
         # All IVs < -10 should be set to LUT[0]
