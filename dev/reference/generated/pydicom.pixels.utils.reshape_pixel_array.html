@@ -154,8 +154,8 @@
 <h1>pydicom.pixels.utils.reshape_pixel_array<a class="headerlink" href="#pydicom-pixels-utils-reshape-pixel-array" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixels.utils.reshape_pixel_array">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.utils.</span></span><span class="sig-name descname"><span class="pre">reshape_pixel_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a8ad1b640/pydicom/pixels/utils.py#L1594"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.utils.reshape_pixel_array" title="Link to this definition">¶</a></dt>
-<dd><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.utils.</span></span><span class="sig-name descname"><span class="pre">reshape_pixel_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/3526d8364/pydicom/pixels/utils.py#L1594"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.utils.reshape_pixel_array" title="Link to this definition">¶</a></dt>
+<dd><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Element</p></th>
@@ -261,7 +261,7 @@ SV1</p></td>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing the Image Pixel module
 corresponding to the data in <cite>arr</cite>.</p></li>
-<li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><em>numpy.ndarray</em></a>) – The 1D array containing the pixel data.</p></li>
+<li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><em>numpy.ndarray</em></a>) – The 1D array containing the pixel data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -276,7 +276,7 @@ depends on the contents of the dataset:</p>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <p class="rubric">References</p>

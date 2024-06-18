@@ -299,13 +299,13 @@ and many others).</p></li>
 Table and the <em>Number of Frames</em> is incorrect (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1666">#1666</a>).</p></li>
 <li><p>Returning excess frames for native encoding when the <em>Number of Frames</em> is
 incorrect (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2035">#2035</a>)</p></li>
-<li><p>Returning the decoded pixel data as either a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
+<li><p>Returning the decoded pixel data as either a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
 <a class="reference external" href="https://docs.python.org/3/c-api/buffer.html#bufferobjects">buffer-like object</a>.</p></li>
 <li><p>Iterating through either all or specific frames.</p></li>
 </ul>
 </li>
 <li><p>Added support for decoding HTJ2K transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1848">#1848</a>).</p></li>
-<li><p>Added two functions for returning pixel data as a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+<li><p>Added two functions for returning pixel data as a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
 from a path to a dataset while minimizing memory-usage: <a class="reference internal" href="../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>
 and <a class="reference internal" href="../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>.</p></li>
 <li><p>Added two functions for compressing and decompressing datasets using the new
@@ -325,6 +325,7 @@ for controlling pixel data decoding when using <a class="reference internal" hre
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2062">#2062</a>).</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.utils.get_j2k_parameters.html#pydicom.pixels.utils.get_j2k_parameters" title="pydicom.pixels.utils.get_j2k_parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_j2k_parameters()</span></code></a> now takes into account the JP2 header
 (if present, although it’s non-conformant for it to be) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2073">#2073</a>)</p></li>
+<li><p>Added support for NumPy v2.0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2075">#2075</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -360,7 +361,7 @@ image data when <em>Bits Stored</em> is less than <em>Bits Allocated</em> (<a cl
 <li><p>Fixed the <em>Pixel Data</em> VR not being set correctly with <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2013">#2013</a>).</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.decompress()</span></code></a> not updating
 the <em>Pixel Data</em> element value until after saving (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2024">#2024</a>).</p></li>
-<li><p>Fixed a rare issue with converting pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> when
+<li><p>Fixed a rare issue with converting pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> when
 <em>Bits Stored</em> is less than <em>Bits Allocated</em> and the unused bits haven’t been
 set to an appropriate value for correct interpretation of the data.</p></li>
 <li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">RecursionError</span></code> when using <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> with a dataset containing
