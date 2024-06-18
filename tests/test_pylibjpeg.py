@@ -611,14 +611,6 @@ class TestJPEGLS:
         ].tolist()
 
 
-def name(arg):
-    if isinstance(arg, str):
-        p = Path(arg)
-        return f"{Path(arg).name}"
-
-    return None
-
-
 @pytest.mark.skipif(not TEST_JPEG2K, reason="no -openjpeg plugin")
 class TestJPEG2K:
     def setup_method(self):
@@ -681,7 +673,7 @@ class TestJPEG2K:
         ref = ds2.pixel_array
         assert np.array_equal(arr, ref)
 
-    @pytest.mark.parametrize("fpath, rpath, fixes", J2KI_MATCHING_DATASETS, ids=name)
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KI_MATCHING_DATASETS)
     def test_array_lossy(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
