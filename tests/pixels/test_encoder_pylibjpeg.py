@@ -1231,8 +1231,6 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            diff = out.astype("float32") - ref.astype("float32")
-            print(bits_stored, diff.min(), diff.max())
             assert np.allclose(out, ref, atol=atol)
 
     def test_buffer_u1_spp1(self):
@@ -1591,8 +1589,6 @@ class TestJ2KEncoding:
                 **opts,
             )
             assert not np.array_equal(out, ref)
-            diff = out.astype("float32") - ref.astype("float32")
-            print(bits_stored, diff.min(), diff.max())
             assert np.allclose(out, ref, atol=atol)
 
     def test_j2k_psnr(self):
