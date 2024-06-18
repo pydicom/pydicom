@@ -205,6 +205,8 @@ Enhancements
   (:issue:`2062`).
 * :func:`~pydicom.pixels.utils.get_j2k_parameters` now takes into account the JP2 header
   (if present, although it's non-conformant for it to be) (:issue:`2073`)
+* Added support for NumPy v2.0 (:issue:`2075`)
+
 
 Fixes
 -----

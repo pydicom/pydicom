@@ -231,14 +231,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
                 if ds.PixelRepresentation == 1:
                     # Pillow converts signed data to unsigned
                     #   so we need to undo this conversion
-                    arr -= 2 ** (bits_allocated - 1)
+                    arr -= numpy.uint32(2 ** (bits_allocated - 1))
 
                 if shift:
                     arr = numpy.right_shift(arr, shift)
         else:
             # Corrections based on dataset elements
             if ds.PixelRepresentation == 1:
-                arr -= 2 ** (bits_allocated - 1)
+                arr -= numpy.uint32(2 ** (bits_allocated - 1))
 
             if shift:
                 arr = numpy.right_shift(arr, shift)

@@ -1,6 +1,8 @@
 # Copyright 2020 pydicom authors. See LICENSE file for details.
 """Tests for the pixel_data_handlers.pylibjpeg_handler module."""
 
+from pathlib import Path
+
 import pytest
 
 import pydicom
@@ -317,7 +319,7 @@ J2K_REFERENCE_DATA = [
     (J2KI_16_14_1_1_1F_M2, (J2KI, 16, 1, 1, 1, (512, 512), "int16")),
     (J2KI_16_16_1_1_1F_M2, (J2KI, 16, 1, 1, 1, (1024, 256), "int16")),
 ]
-J2K_MATCHING_DATASETS = [
+J2KR_MATCHING_DATASETS = [
     # (compressed, reference, fixes)
     pytest.param(
         J2KR_08_08_3_0_1F_YBR_ICT,
@@ -354,6 +356,8 @@ J2K_MATCHING_DATASETS = [
         get_testdata_file("MR_small.dcm"),
         {},
     ),
+]
+J2KI_MATCHING_DATASETS = [
     pytest.param(
         J2KI_08_08_3_0_1F_RGB,
         get_testdata_file("SC_rgb_gdcm2k_uncompressed.dcm"),
@@ -653,8 +657,8 @@ class TestJPEG2K:
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
-    @pytest.mark.parametrize("fpath, rpath, fixes", J2K_MATCHING_DATASETS)
-    def test_array(self, fpath, rpath, fixes):
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KR_MATCHING_DATASETS)
+    def test_array_lossless(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
         ds.pixel_array_options(use_v2_backend=True)
@@ -669,8 +673,24 @@ class TestJPEG2K:
         ref = ds2.pixel_array
         assert np.array_equal(arr, ref)
 
-    @pytest.mark.parametrize("fpath, rpath, fixes", J2K_MATCHING_DATASETS)
-    def test_generate_frames(self, fpath, rpath, fixes):
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KI_MATCHING_DATASETS)
+    def test_array_lossy(self, fpath, rpath, fixes):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
+        if fixes:
+            with pytest.warns(UserWarning):
+                arr = ds.pixel_array
+        else:
+            arr = ds.pixel_array
+
+        ds2 = dcmread(rpath)
+        ds2.pixel_array_options(use_v2_backend=True)
+        ref = ds2.pixel_array
+        assert np.allclose(arr, ref, atol=1)
+
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KR_MATCHING_DATASETS)
+    def test_generate_frames_lossless(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
         ds.pixel_array_options(use_v2_backend=True)
@@ -689,6 +709,30 @@ class TestJPEG2K:
                 assert np.array_equal(arr, ref[ii, ...])
             else:
                 assert np.array_equal(arr, ref)
+
+        with pytest.raises(StopIteration):
+            next(frame_generator)
+
+    @pytest.mark.parametrize("fpath, rpath, fixes", J2KI_MATCHING_DATASETS)
+    def test_generate_frames_lossy(self, fpath, rpath, fixes):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
+        frame_generator = generate_frames(ds)
+        ref = dcmread(rpath).pixel_array
+
+        nr_frames = getattr(ds, "NumberOfFrames", 1)
+        for ii in range(nr_frames):
+            if fixes:
+                with pytest.warns(UserWarning):
+                    arr = next(frame_generator)
+            else:
+                arr = next(frame_generator)
+
+            if nr_frames > 1:
+                assert np.allclose(arr, ref[ii, ...], atol=1)
+            else:
+                assert np.allclose(arr, ref, atol=1)
 
         with pytest.raises(StopIteration):
             next(frame_generator)

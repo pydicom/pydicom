@@ -16,7 +16,9 @@ try:
     from pylibjpeg.utils import get_pixel_data_decoders, Decoder
 
     # {UID: {plugin name: function}}
-    _DECODERS: dict[uid.UID, dict[str, "Decoder"]] = get_pixel_data_decoders(version=2)
+    _DECODERS = cast(
+        dict[uid.UID, dict[str, "Decoder"]], get_pixel_data_decoders(version=2)
+    )
 except ImportError:
     _DECODERS = {}
 

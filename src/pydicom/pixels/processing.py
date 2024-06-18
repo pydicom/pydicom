@@ -199,7 +199,7 @@ def apply_color_lut(
     # IVs >= `first_map` are mapped by the Palette Color LUTs
     # `first_map` may be negative, positive or 0
     mapped_pixels = arr >= first_map
-    clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+    clipped_iv[mapped_pixels] = arr[mapped_pixels] - np.int32(first_map)
     # IVs > number of entries get set to last entry
     np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
