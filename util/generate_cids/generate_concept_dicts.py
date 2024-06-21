@@ -437,14 +437,14 @@ def write_snomed_mapping(snomed_codes: list[tuple[str, str, str]]) -> None:
         f.write("mapping = {}\n")
 
         # Write the SCT -> SRT mapping
-        f.write("\nmapping['SCT'] = {{\n")
+        f.write("\nmapping['SCT'] = {\n")
         for sct, srt, _ in snomed_codes:
             f.write(f"    '{sct}': '{srt}',\n")
 
         f.write("}\n")
 
         # Write the SRT -> SCT mapping
-        f.write("\nmapping['SRT'] = {{\n")
+        f.write("\nmapping['SRT'] = {\n")
         for sct, srt, _ in snomed_codes:
             f.write(f"     '{srt}': '{sct}',\n")
 
