@@ -14,3 +14,10 @@ __version_info__ = tuple(result.group(1).split("."))
 # DICOM Standard version used for:
 #   _dicom_dict.py, _uid_dict.py and uid.py
 __dicom_version__: str = "2023e"
+
+
+# DICOM Standard version used for:
+#   sr/_cid_dict.py
+#   sr/_concepts_dict.py
+#   sr/_snomed_dict.py
+__concepts_version__: str = "2024c"

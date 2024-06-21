@@ -6,24 +6,34 @@ resources.
 
 """
 
+import argparse
 from io import BytesIO
 import json
 import ftplib
-import glob
 import logging
 import os
+from pathlib import Path
 import re
-import sys
-import tempfile
 from pprint import pprint
+import urllib.request as urllib_request
 from xml.etree import ElementTree as ET
+import zipfile
 
-if sys.version_info[0] < 3:
-    import urllib as urllib_request
-else:
-    import urllib.request as urllib_request
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+
+
+PYDICOM_SRC = Path(__file__).parent.parent.parent / "src" / "pydicom"
+SR_DIRECTORY = PYDICOM_SRC / "sr"
+
+FTP_HOST = "medical.nema.org"
+FTP_PATH = "medical/dicom/resources/valuesets/"
+FTP_FHIR_REGEX = re.compile(r".+/DICOM_ValueSets(?P<version>[0-9]{4}[a-z])_release_fhir_json_[0-9]+.zip")
+CID_ID_REGEX = re.compile("^dicom-cid-([0-9]+)-[a-zA-Z]+")
+
+P16_TO1_URL = "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_O.html"
+P16_TD1_URL = "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_D.html"
+
 
 # Example excerpt fhir JSON for reference
 """
@@ -35,13 +45,24 @@ logger = logging.getLogger(__name__)
     "compose":{
         "include":[
             {
+                "system":"http://dicom.nema.org/resources/ontology/DCM",
+                "concept":[
+                    {
+                        "code":"130290",
+                        "display":"Median"
+                    }
+                ]
+            },
+            {
                 "system":"http://snomed.info/sct",
                 "concept":[
                     {
                         "code":"387362001",
                         "display":"Epinephrine"
                     },
-
+                ], ...
+            }, ...
+        ],
 """
 # The list of scheme designators is not complete.
 # For full list see table 8-1 in part 3.16 chapter 8:
@@ -64,6 +85,7 @@ FHIR_SYSTEM_TO_DICOM_SCHEME_DESIGNATOR = {
     "http://www.itis.gov": "ITIS_TSN",
     "http://arxiv.org/abs/1612.07003": "IBSI",
     "http://www.nlm.nih.gov/research/umls/rxnorm": "RXNORM",
+    "http://hl7.org/fhir/sid/icd-10": "I10",
 }
 
 DOC_LINES = [
@@ -131,54 +153,174 @@ def keyword_from_meaning(name):
     return name
 
 
-def download_fhir_value_sets(local_dir):
-    ftp_host = "medical.nema.org"
+def setup_logger(debug=False) -> None:
+    """Setup the logging."""
+    logger = logging.getLogger(__name__)
+    # Ensure only have one StreamHandler
+    LOGGER.handlers = []
+    handler = logging.StreamHandler()
+    level = logging.DEBUG if debug else logging.INFO
+    LOGGER.setLevel(level)
+    formatter = logging.Formatter("%(levelname).1s: %(message)s")
+    handler.setFormatter(formatter)
+    LOGGER.addHandler(handler)
 
-    if not os.path.exists(local_dir):
-        os.makedirs(local_dir)
-    logger.info("storing files in " + local_dir)
-    logger.info(f'log into FTP server "{ftp_host}"')
-    ftp = ftplib.FTP(ftp_host, timeout=60)
+
+def download_fhir_value_sets(local_dir: Path) -> None | str:
+    """Log into the DICOM FTP server and download the zip file containing the
+    FHIR JSON files.
+
+    Parameters
+    ----------
+    local_dir : pathlib.Path
+        The directory where the zip file will be written to, as
+        ``local_dir/version/*.zip``.
+
+    Returns
+    -------
+    str | None
+        If the download failed then returns ``None``, otherwise returns the
+        DICOM version as :class:`str`.
+    """
+    LOGGER.debug(f"  Logging into FTP server: {FTP_HOST}")
+    ftp = ftplib.FTP(FTP_HOST, timeout=60)
     ftp.login("anonymous")
 
-    ftp_path = "medical/dicom/resources/valuesets/fhir/json"
-    logger.info(f'list files in directory "{ftp_path}"')
-    fhir_value_set_files = ftp.nlst(ftp_path)
+    version = None
 
     try:
-        for ftp_filepath in fhir_value_set_files:
-            ftp_filename = os.path.basename(ftp_filepath)
-            logger.info(f'retrieve value set file "{ftp_filename}"')
-            with BytesIO() as fp:
-                ftp.retrbinary(f"RETR {ftp_filepath}", fp.write)
-                content = fp.getvalue()
-            local_filename = os.path.join(local_dir, ftp_filename)
-            with open(local_filename, "wb") as f_local:
-                f_local.write(content)
+        LOGGER.debug(f"  Searching contents of '{FTP_PATH}' for JSON ZIP file")
+        for remote_path in ftp.nlst(FTP_PATH):
+            LOGGER.debug(f"    {remote_path}")
+            match = FTP_FHIR_REGEX.match(remote_path)
+            if match:
+                LOGGER.debug("  Found FHIR JSON ZIP file, downloading...")
+                with BytesIO() as fp:
+                    ftp.retrbinary(f"RETR {remote_path}", fp.write)
+                    data = fp.getvalue()
+
+                version = match.group('version')
+                (local_dir / version).mkdir(parents=True, exist_ok=True)
+                local_path = local_dir / version / Path(remote_path).name
+
+                LOGGER.debug(f"    Writing data to {local_path}")
+                with open(local_path, "wb") as f:
+                    f.write(data)
+
+                break
     finally:
         ftp.quit()
 
+    return version
+
+
+def extract_cid_files(path: Path, version: str, cid_folder="CIDs") -> None:
+    """Extract the JSON files in the downloaded ZIP file to ``path / cid_folder``.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        The base directory.
+    version : str
+        The name of the version subdirectory containing the ZIP file.
+    cid_folder : str, optional
+        The name of the subdirectory the CID files will be extracted to, default
+        ``CIDs``.
+    """
+    files = list((path / version).glob("*.zip"))
+    if not files:
+        raise ValueError(f"No zip files found in {path / version}")
+
+    if len(files) > 1:
+        raise ValueError(f"Multiple zip files found in {path / version}")
+
+    # Create the output directory (if it doesn't already exist)
+    cid_dir = path / cid_folder
+    cid_dir.mkdir(parents=True, exist_ok=True)
+    LOGGER.debug(f"  Extracting CID files to {cid_dir}")
+    with zipfile.ZipFile(files[0]) as z:
+        # Forcibly flatten the ZIP contents into the `cid_folder`
+        for zip_path in (Path(x) for x in z.namelist()):
+            with open(cid_dir / zip_path.name, 'wb') as f:
+                f.write(z.read(str(zip_path)))
+
+
+def extract_table_data(path: Path, version: str, ext: str = "htm") -> list[bytes]:
+    """Extract the table data from the downloaded HTML files.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        The base directory.
+    version : str
+        The name of the version subdirectory containing the HTML files.
+    ext : str, optional
+        The extension of the downloaded HTML files.
+    """
+    files = list((path / version).glob(f"*.{ext}"))
+    if len(files) != 2:
+        raise ValueError(
+            f"The Part 16, Chapter D and O HTML files were not found in {path / version}"
+        )
+
+    # Chapter D
+    # <html xmlns="http://www.w3.org/1999/xhtml">
+    #    <head>
+    #       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    #       <title>D DICOM Controlled Terminology Definitions (Normative)</title>
+
+    # Chapter O
+    # <html xmlns="http://www.w3.org/1999/xhtml">
+    #    <head>
+    #       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    #       <title>O SNOMED Concept ID to SNOMED ID Mapping</title>
+
+    data = [None, None]
+
+    for html_file in files:
+        with open(html_file, "rb") as f:
+            file_data = f.read()
+            root = ET.fromstring(file_data, parser=ET.XMLParser(encoding="utf-8"))
+            for element in root.iter():
+                if element.tag.endswith("title"):
+                    title = element.text
+                    if title.startswith("D"):
+                        data[0] = file_data
+                    elif title.startswith("O"):
+                        data[1] = file_data
+
+                    break
+
+    if None in data:
+        raise ValueError("One or both HTML files do not contain the expected data")
+
+    return data
+
 
 def _parse_html(content):
-    # from lxml import html
-    # doc = html.document_fromstring(content)
     return ET.fromstring(content, parser=ET.XMLParser(encoding="utf-8"))
 
 
 def _download_html(url):
-    response = urllib_request.urlopen(url)
-    return response.read()
+    return urllib_request.urlopen(url).read()
 
 
-def _get_text(element):
-    text = "".join(element.itertext())
-    return text.strip()
+def _get_text(element) -> str:
+    return "".join(element.itertext()).strip()
 
 
-def get_table_o1():
-    logger.info("process Table O1")
-    url = "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_O.html#table_O-1"
-    root = _parse_html(_download_html(url))
+def get_table_o1(data: bytes) -> list[tuple[str, str, str]]:
+    """Return a list of SNOMED-CT to SNOMED RT mappings.
+
+    Returns
+    -------
+    list[tuple[str, str, str]]
+        A list of (SCT, SRT, SNOMED Fully Specified Name) generated from
+        Table O-1 in Part 16 of the DICOM Standard.
+    """
+    LOGGER.info("Download and process SNOMED mappings from Part 16, Table O-1")
+    root = ET.fromstring(data, parser=ET.XMLParser(encoding="utf-8"))
+    # root = _parse_html(_download_html(P16_TO1_URL))
     namespaces = {"w3": root.tag.split("}")[0].strip("{")}
     body = root.find("w3:body", namespaces=namespaces)
     table = body.findall(".//w3:tbody", namespaces=namespaces)[0]
@@ -196,10 +338,17 @@ def get_table_o1():
     return data
 
 
-def get_table_d1():
-    logger.info("process Table D1")
-    url = "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_D.html#table_D-1"
-    root = _parse_html(_download_html(url))
+def get_table_d1(data: bytes) -> list[tuple[str, str]]:
+    """Return a list of DICOM code values to code meaning mappings.
+
+    Returns
+    -------
+    list[tuple[str, str]]
+        A list of (Code Value, Code Meaning) generated from Table D-1 in Part
+        16 of the DICOM Standard.
+    """
+    LOGGER.info("Processing Part 16, Table D-1")
+    root = ET.fromstring(data, parser=ET.XMLParser(encoding="utf-8"))
     namespaces = {"w3": root.tag.split("}")[0].strip("{")}
     body = root.find("w3:body", namespaces=namespaces)
     table = body.findall(".//w3:tbody", namespaces=namespaces)[0]
@@ -213,7 +362,27 @@ def get_table_d1():
     ]
 
 
-def write_concepts(concepts, cid_concepts, cid_lists, name_for_cid):
+def write_concepts(
+    concepts: dict[str, dict[str, dict[str, tuple[str, list[int]]]]],
+    cid_lists: dict[int, dict[str, list[str]]],
+    name_for_cid: dict[int, str],
+) -> None:
+    """Write.
+
+    Parameters
+    ----------
+    concepts : dict[str, dict[str, dict[str, tuple[str, list[int]]]]]
+        A :class:`dict` containing the concept schemes and their contents as
+        ``concepts[scheme_designator][keyword] = {code: (display, [cid, ...])}``
+    cid_lists : dict[int, dict[str, list[str]]]
+        The schemes and code keywords for each CID ID as
+    name_for_cid : dict[int, str]
+        A :class:`dict:` mapping CID IDs their name.
+    """
+    # Write the concepts dict
+    path = SR_DIRECTORY / "_concepts_dict.py"
+    LOGGER.info(f"Writing ... to '{path}'")
+
     lines = DOC_LINES + [
         "# Dict with scheme designator keys; value format is:\n",
         "#   {keyword: {code1: (meaning, cid_list), code2: ...}\n",
@@ -222,12 +391,16 @@ def write_concepts(concepts, cid_concepts, cid_lists, name_for_cid):
         "\n",
     ]
 
-    with open("_concepts_dict.py", "w", encoding="UTF8") as f_concepts:
-        f_concepts.writelines(lines)
-        f_concepts.write("concepts = {}\n")  # start with empty dict
+    with open(path, "w", encoding="UTF8") as f:
+        f.writelines(lines)
+        f.write("concepts = {}\n")  # start with empty dict
         for scheme, value in concepts.items():
-            f_concepts.write(f"\nconcepts['{scheme}'] = \\\n")
-            pprint(value, f_concepts)
+            f.write(f"\nconcepts['{scheme}'] = \\\n")
+            pprint(value, f)
+
+    # Write the CID dict
+    path = SR_DIRECTORY / "_cid_dict.py"
+    LOGGER.info(f"Writing ... to '{path}'")
 
     lines = DOC_LINES + [
         "# Dict with cid number as keys; value format is:\n",
@@ -236,18 +409,22 @@ def write_concepts(concepts, cid_concepts, cid_lists, name_for_cid):
         "\n",
     ]
 
-    with open("_cid_dict.py", "w", encoding="UTF8") as f_cid:
-        f_cid.writelines(lines)
-        f_cid.write("name_for_cid = {}\n")
-        f_cid.write("cid_concepts = {}\n")
+    with open(path, "w", encoding="UTF8") as f:
+        f.writelines(lines)
+        f.write("name_for_cid = {}\n")
+        f.write("cid_concepts = {}\n")
         for cid, value in cid_lists.items():
-            f_cid.write(f"\nname_for_cid[{cid}] = '{name_for_cid[cid]}'\n")
-            f_cid.write(f"cid_concepts[{cid}] = \\\n")
-            pprint(value, f_cid)
+            f.write(f"\nname_for_cid[{cid}] = '{name_for_cid[cid]}'\n")
+            f.write(f"cid_concepts[{cid}] = \\\n")
+            pprint(value, f)
 
 
-def write_snomed_mapping(snomed_codes):
-    with open("_snomed_dict.py", "w", encoding="UTF8") as f_concepts:
+def write_snomed_mapping(snomed_codes: list[tuple[str, str, str]]) -> None:
+    """Write the SNOMED-CT <-> SNOMED RT mapping dict to ``_snomed_dict.py``."""
+    path = SR_DIRECTORY / "_snomed_dict.py"
+    LOGGER.info(f"Writing SNOMED-CT to RT mappings to '{path}'")
+
+    with open(path, "w", encoding="UTF8") as f:
         lines = DOC_LINES + [
             "# Dict with scheme designator keys; value format is:\n",
             "#   {concept_id1: snomed_id1, concept_id2: ...}\n",
@@ -256,128 +433,195 @@ def write_snomed_mapping(snomed_codes):
             "\n",
         ]
 
-        f_concepts.writelines(lines)
-        f_concepts.write("mapping = {}\n")  # start with empty dict
-        f_concepts.write("\nmapping['{}'] = {{\n".format("SCT"))
-        for sct, srt, meaning in snomed_codes:
-            f_concepts.write(f"    '{sct}': '{srt}',\n")
-        f_concepts.write("}\n")
+        f.writelines(lines)
+        f.write("mapping = {}\n")
 
-        f_concepts.write("\nmapping['{}'] = {{\n".format("SRT"))
-        for sct, srt, meaning in snomed_codes:
-            f_concepts.write(f"     '{srt}': '{sct}',\n")
-        f_concepts.write("}")
+        # Write the SCT -> SRT mapping
+        f.write("\nmapping['SCT'] = {{\n")
+        for sct, srt, _ in snomed_codes:
+            f.write(f"    '{sct}': '{srt}',\n")
+
+        f.write("}\n")
+
+        # Write the SRT -> SCT mapping
+        f.write("\nmapping['SRT'] = {{\n")
+        for sct, srt, _ in snomed_codes:
+            f.write(f"     '{srt}': '{sct}',\n")
+
+        f.write("}")
+
+
+def setup_argparse():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Update the sr/ code and concepts dictionaries"
+        ),
+        usage="generate_concept_dicts.py path [options]",
+    )
+
+    opts = parser.add_argument_group("Options")
+    opts.add_argument(
+        "path",
+        help="The path to download the JSON CID files to",
+        type=str,
+    )
+    opts.add_argument(
+        "--download",
+        help="Download the FHIR JSON CID files",
+        action="store_true",
+    )
+    opts.add_argument(
+        "--cid-directory",
+        help="The name of the directory where the CID should be located",
+        type=str,
+        default="CIDs",
+    )
+    opts.add_argument(
+        "--version",
+        help="The version of the downloaded CID ZIP file",
+        type=str,
+    )
+    opts.add_argument(
+        "--debug",
+        help="Set logging to debug mode",
+        action="store_true",
+        default=False,
+    )
+
+    return parser.parse_args()
+
+
+def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
+    LOGGER.info(f"Processing the CID JSON files in {cid_directory}")
+
+    # Mapping of:
+    #   Scheme: Keywords
+    #       Keyword: Codes
+    #           Code: (Display, CIDs containing the code)
+    # concepts[scheme_designator][name] = {code: (display, [cid])}
+    concepts: dict[str, dict[str, dict[str, tuple[str, list[int]]]]] = {}
+
+    # The schemes and code keywords for each CID ID
+    cid_lists: dict[int, dict[str, list[str]]] = {}
+
+    # Mapping of CID ID to CID name
+    name_for_cid: dict[int, str] = {}
+
+    cid_paths = sorted(cid_directory.glob("*.json"), key=lambda x: int(x.name.split("-")[3]))
+    for path in cid_paths:
+        LOGGER.debug(f"  Processing '{path.name}'")
+        with open(path, "rb") as f:
+            data = json.loads(f.read())
+
+        cid = int(CID_ID_REGEX.match(data["id"]).group(1))
+        cid_version = data["version"]
+        name_for_cid[cid] = data["name"]
+
+        # A mapping of scheme to a list of code keywords
+        cid_concepts: dict[str, list[str]] = {}
+        for group in data["compose"]["include"]:
+            system = group["system"]
+            try:
+                scheme_designator = FHIR_SYSTEM_TO_DICOM_SCHEME_DESIGNATOR[system]
+            except KeyError:
+                raise NotImplementedError(
+                    "The DICOM scheme designator for the following FHIR system "
+                    f"has not been specified: {system}"
+                )
+            if scheme_designator not in concepts:
+                concepts[scheme_designator] = {}
+
+            for concept in group["concept"]:
+                code_keyword = keyword_from_meaning(concept["display"])
+                code = concept["code"].strip()
+                display = concept["display"].strip()
+
+                # If new code_keyword under this scheme, start dict of codes/cids that use that code
+                if code_keyword not in concepts[scheme_designator]:
+                    concepts[scheme_designator][code_keyword] = {code: (display, [cid])}
+                else:
+                    prior = concepts[scheme_designator][code_keyword]
+                    if code in prior:
+                        prior[code][1].append(cid)
+                    else:
+                        prior[code] = (display, [cid])
+
+                    if prior[code][0].lower() != display.lower():
+                        # Meanings can only be different by symbols, etc.
+                        #    because converted to same keyword.
+                        #    Nevertheless, print as info
+                        LOGGER.info(
+                            f"'{code_keyword}': Meaning '{display}' in CID{cid}, previously "
+                            f"'{prior[code][0]}' in CIDs {prior[code][1]}"
+                        )
+
+                # Keep track of this cid referencing that code_keyword
+                if scheme_designator not in cid_concepts:
+                    cid_concepts[scheme_designator] = []
+
+                if code_keyword in cid_concepts[scheme_designator]:
+                    LOGGER.warning(
+                        f"'{code_keyword}': Meaning '{concept["display"]}' in CID{cid} is "
+                        "duplicated!"
+                    )
+
+                cid_concepts[scheme_designator].append(code_keyword)
+
+        cid_lists[cid] = cid_concepts
+
+    scheme_designator = "SCT"
+    # snomed_codes = get_table_o1()
+    for code, srt_code, meaning in snomed_mapping:
+        name = keyword_from_meaning(meaning)
+        if name not in concepts[scheme_designator]:
+            concepts[scheme_designator][name] = {code: (meaning, [])}
+        else:
+            prior = concepts[scheme_designator][name]
+            if code not in prior:
+                prior[code] = (meaning, [])
+
+    scheme_designator = "DCM"
+    for code, meaning in dicom_mapping:
+        name = keyword_from_meaning(meaning)
+        if name not in concepts[scheme_designator]:
+            concepts[scheme_designator][name] = {code: (meaning, [])}
+        else:
+            prior = concepts[scheme_designator][name]
+            if code not in prior:
+                prior[code] = (meaning, [])
+
+    write_concepts(concepts, cid_lists, name_for_cid)
+    write_snomed_mapping(snomed_mapping)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
 
-    local_dir = tempfile.gettempdir()
-    fhir_dir = os.path.join(local_dir, "fhir")
+    args = setup_argparse()
+    setup_logger(args.debug)
 
-    if not os.path.exists(fhir_dir) or not os.listdir(fhir_dir):
-        download_fhir_value_sets(fhir_dir)
-    else:
-        msg = "Using locally downloaded files\n"
-        msg += "from directory " + fhir_dir
-        logging.info(msg)
+    path = Path(args.path).resolve()
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+    elif not path.is_dir():
+        raise ValueError("'path' must be a path to a directory")
 
-    fhir_value_set_files = glob.glob(os.path.join(fhir_dir, "*"))
-    cid_pattern = re.compile("^dicom-cid-([0-9]+)-[a-zA-Z]+")
+    if args.download:
+        # Download the ZIP file containing the JSON data
+        LOGGER.info(f"Downloading CID files to {path / args.cid_directory}")
+        version = download_fhir_value_sets(path)
+        if version:
+            extract_cid_files(path, version, args.cid_directory)
+        else:
+            LOGGER.error(f"Failed to download the CID files")
 
-    concepts = dict()
-    cid_lists = dict()
-    name_for_cid = dict()
+        snomed_data = urllib_request.urlopen(P16_TO1_URL).read()
+        dicom_data = urllib_request.urlopen(P16_TD1_URL).read()
+    elif args.version:
+        # Use the already downloaded ZIP file
+        extract_cid_files(path, args.version, args.cid_directory)
+        # Parse the already downloaded HTM files
+        dicom_data, snomed_data = extract_table_data(path, args.version)
 
-    # XXX = 0
-    try:
-        for ftp_filepath in fhir_value_set_files:
-            ftp_filename = os.path.basename(ftp_filepath)
-            logger.info(f'process file "{ftp_filename}"')
-
-            with open(ftp_filepath, "rb") as fp:
-                content = fp.read()
-                value_set = json.loads(content)
-
-            cid_match = cid_pattern.search(value_set["id"])
-            cid = int(cid_match.group(1))  # can take int off to store as string
-
-            name_for_cid[cid] = value_set["name"]
-            cid_concepts = {}
-            for group in value_set["compose"]["include"]:
-                system = group["system"]
-                try:
-                    scheme_designator = FHIR_SYSTEM_TO_DICOM_SCHEME_DESIGNATOR[system]
-                except KeyError:
-                    raise NotImplementedError(
-                        "The DICOM scheme designator for the following FHIR system "
-                        f"has not been specified: {system}"
-                    )
-                if scheme_designator not in concepts:
-                    concepts[scheme_designator] = dict()
-
-                for concept in group["concept"]:
-                    name = keyword_from_meaning(concept["display"])
-                    code = concept["code"].strip()
-                    display = concept["display"].strip()
-
-                    # If new name under this scheme, start dict of codes/cids that use that code
-                    if name not in concepts[scheme_designator]:
-                        concepts[scheme_designator][name] = {code: (display, [cid])}
-                    else:
-                        prior = concepts[scheme_designator][name]
-                        if code in prior:
-                            prior[code][1].append(cid)
-                        else:
-                            prior[code] = (display, [cid])
-
-                        if prior[code][0].lower() != display.lower():
-                            # Meanings can only be different by symbols, etc.
-                            #    because converted to same keyword.
-                            #    Nevertheless, print as info
-                            msg = "'{}': Meaning '{}' in cid_{}, previously '{}' in cids {}"
-                            msg = msg.format(
-                                name, display, cid, prior[code][0], prior[code][1]
-                            )
-                            logger.info(msg)
-
-                    # Keep track of this cid referencing that name
-                    if scheme_designator not in cid_concepts:
-                        cid_concepts[scheme_designator] = []
-                    if name in cid_concepts[scheme_designator]:
-                        msg = "'{}': Meaning '{}' in cid_{} is duplicated!"
-                        msg = msg.format(name, concept["display"], cid)
-                        logger.warning(msg)
-                    cid_concepts[scheme_designator].append(name)
-            cid_lists[cid] = cid_concepts
-            # if XXX > 3:
-            #    break
-            # XXX += 1
-
-        scheme_designator = "SCT"
-        snomed_codes = get_table_o1()
-        for code, srt_code, meaning in snomed_codes:
-            name = keyword_from_meaning(meaning)
-            if name not in concepts[scheme_designator]:
-                concepts[scheme_designator][name] = {code: (meaning, [])}
-            else:
-                prior = concepts[scheme_designator][name]
-                if code not in prior:
-                    prior[code] = (meaning, [])
-
-        scheme_designator = "DCM"
-        dicom_codes = get_table_d1()
-        for code, meaning in dicom_codes:
-            name = keyword_from_meaning(meaning)
-            if name not in concepts[scheme_designator]:
-                concepts[scheme_designator][name] = {code: (meaning, [])}
-            else:
-                prior = concepts[scheme_designator][name]
-                if code not in prior:
-                    prior[code] = (meaning, [])
-
-    finally:
-        # If any error or KeyboardInterrupt, close up and write what we have
-
-        write_concepts(concepts, cid_concepts, cid_lists, name_for_cid)
-        write_snomed_mapping(snomed_codes)
+    snomed_mapping = get_table_o1(snomed_data)
+    dicom_mapping = get_table_d1(dicom_data)
+    process_files(path / args.cid_directory, snomed_mapping, dicom_mapping)

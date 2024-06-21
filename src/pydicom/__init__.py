@@ -36,7 +36,7 @@ from pydicom.filewriter import dcmwrite
 from pydicom.pixels.utils import pixel_array, iter_pixels
 from pydicom.sequence import Sequence
 
-from ._version import __version__, __version_info__, __dicom_version__
+from ._version import __version__, __version_info__, __dicom_version__, __concepts_version__
 
 __all__ = [
     "DataElement",
