@@ -9,6 +9,7 @@ resources.
 import argparse
 from io import BytesIO
 import json
+from keyword import iskeyword
 import ftplib
 import logging
 import os
@@ -119,38 +120,47 @@ def keyword_from_meaning(name):
 
     # singular/plural alternative forms are made plural
     #     e.g., “Physician(s) of Record” becomes “PhysiciansOfRecord”
-    name = name.replace("(s)", "s")
+    print("NAME IS", name)
+    kw = name.replace("(s)", "s")
 
     # “Patient’s Name” -> “PatientName”
     # “Operators’ Name” -> “OperatorsName”
-    name = name.replace("’s ", " ")
-    name = name.replace("'s ", " ")
-    name = name.replace("s’ ", "s ")
-    name = name.replace("s' ", "s ")
+    kw = kw.replace("’s ", " ")
+    kw = kw.replace("'s ", " ")
+    kw = kw.replace("s’ ", "s ")
+    kw = kw.replace("s' ", "s ")
 
     # Mathematical symbols
-    name = name.replace("%", " Percent ")
-    name = name.replace(">", " Greater Than ")
-    name = name.replace("=", " Equals ")
-    name = name.replace("<", " Lesser Than ")
+    kw = kw.replace("%", " Percent ")
+    kw = kw.replace(">", " Greater Than ")
+    kw = kw.replace("=", " Equals ")
+    kw = kw.replace("<", " Lesser Than ")
 
-    name = re.sub(r"([0-9]+)\.([0-9]+)", "\\1 Point \\2", name)
-    name = re.sub(r"\s([0-9.]+)-([0-9.]+)\s", " \\1 To \\2 ", name)
+    kw = kw.replace("_", " ")
 
-    name = re.sub(r"([0-9]+)day", "\\1 Day", name)
-    name = re.sub(r"([0-9]+)y", "\\1 Years", name)
+    kw = re.sub(r"([0-9]+)\.([0-9]+)", "\\1 Point \\2", kw)
+    kw = re.sub(r"\s([0-9.]+)-([0-9.]+)\s", " \\1 To \\2 ", kw)
+
+    kw = re.sub(r"([0-9]+)day", "\\1 Day", kw)
+    kw = re.sub(r"([0-9]+)y", "\\1 Years", kw)
 
     # Remove category modifiers, such as "(specimen)", "(procedure)",
     # "(body structure)", etc.
-    name = re.sub(r"^(.+) \([a-z ]+\)$", "\\1", name)
+    kw = re.sub(r"^(.+) \([a-z ]+\)$", "\\1", kw)
 
-    name = camel_case(name.strip())
+    kw = camel_case(kw.strip())
 
     # Python variables must not begin with a number.
-    if re.match(r"[0-9]", name):
-        name = "_" + name
+    if re.match(r"[0-9]", kw):
+        kw = "_" + kw
 
-    return name
+    if kw == "None":
+        kw = "None_"
+
+    if not kw.isidentifier() or iskeyword(kw):
+        raise ValueError(f"Invalid keyword '{kw}' generated from '{name}'")
+
+    return kw
 
 
 def setup_logger(debug=False) -> None:
@@ -297,14 +307,6 @@ def extract_table_data(path: Path, version: str, ext: str = "htm") -> list[bytes
     return data
 
 
-def _parse_html(content):
-    return ET.fromstring(content, parser=ET.XMLParser(encoding="utf-8"))
-
-
-def _download_html(url):
-    return urllib_request.urlopen(url).read()
-
-
 def _get_text(element) -> str:
     return "".join(element.itertext()).strip()
 
@@ -320,7 +322,6 @@ def get_table_o1(data: bytes) -> list[tuple[str, str, str]]:
     """
     LOGGER.info("Download and process SNOMED mappings from Part 16, Table O-1")
     root = ET.fromstring(data, parser=ET.XMLParser(encoding="utf-8"))
-    # root = _parse_html(_download_html(P16_TO1_URL))
     namespaces = {"w3": root.tag.split("}")[0].strip("{")}
     body = root.find("w3:body", namespaces=namespaces)
     table = body.findall(".//w3:tbody", namespaces=namespaces)[0]
@@ -514,6 +515,9 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
             data = json.loads(f.read())
 
         cid = int(CID_ID_REGEX.match(data["id"]).group(1))
+        # if cid != 12325:
+        #     continue
+
         cid_version = data["version"]
         name_for_cid[cid] = data["name"]
 
@@ -532,6 +536,7 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
                 concepts[scheme_designator] = {}
 
             for concept in group["concept"]:
+                print(concept, concept["code"], concept["display"])
                 code_keyword = keyword_from_meaning(concept["display"])
                 code = concept["code"].strip()
                 display = concept["display"].strip()
