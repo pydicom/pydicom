@@ -1,6 +1,10 @@
 import pytest
 
-from pydicom.sr._cid_dict import cid_concepts as CID_CONCEPTS
+from pydicom.sr._cid_dict import (
+    cid_concepts as CID_CONCEPTS,
+    name_for_cid,
+)
+from pydicom.sr._concepts_dict import concepts as CONCEPTS
 from pydicom.sr.coding import Code
 from pydicom.sr.codedict import codes, _CID_Dict, _CodesDict
 
@@ -14,6 +18,30 @@ def ambiguous_scheme():
     CID_CONCEPTS[cid]["FOO"] = [attr]
     yield attr, cid
     del CID_CONCEPTS[cid]["FOO"]
+
+
+@pytest.fixture()
+def add_nonunique():
+    """Add a non-unique keyword to the concepts dict"""
+    CONCEPTS["TEST"] = {
+        "Foo": {"BAR": ("Test A", [99999999999]), "BAZ": ("Test B", [99999999999])}
+    }
+    yield
+    del CONCEPTS["TEST"]
+
+
+@pytest.fixture()
+def add_nonunique_cid():
+    """Add a non-unique keyword to the CIDs dict"""
+    CONCEPTS["TEST"] = {
+        "Foo": {"BAR": ("Test A", [99999999999]), "BAZ": ("Test B", [99999999999])}
+    }
+    CID_CONCEPTS[99999999999] = {"TEST": ["Foo", "Foo"]}
+    name_for_cid[99999999999] = "Test"
+    yield
+    del CONCEPTS["TEST"]
+    del CID_CONCEPTS[99999999999]
+    del name_for_cid[99999999999]
 
 
 class TestCode:
@@ -143,7 +171,7 @@ class TestCodesDict:
         )
 
     def test_cid301(self):
-        assert codes.cid301.mgcm3 == Code(
+        assert codes.cid301.MilligramsPerCubicCentimeter == Code(
             value="mg/cm3", scheme_designator="UCUM", meaning="mg/cm^3"
         )
 
@@ -234,7 +262,7 @@ class TestCodesDict:
 
     def test_cid3111(self):
         assert codes.cid3111.Tc99mTetrofosmin == Code(
-            value="404707004",
+            value="424118002",
             scheme_designator="SCT",
             meaning="Tc-99m tetrofosmin",
         )
@@ -306,11 +334,10 @@ class TestCodesDict:
         with pytest.raises(AttributeError, match=msg):
             _CodesDict("UCUM").bar
 
-    def test_getattr_nonunique_attr_raises(self):
-        attr = "LeftVentricularInternalDiastolicDimensionBSA"
-        msg = f"Multiple code values for '{attr}' found: 80009-4, 80010-2"
+    def test_getattr_nonunique_attr_raises(self, add_nonunique):
+        msg = "Multiple code values for 'Foo' found: BAR, BAZ"
         with pytest.raises(RuntimeError, match=msg):
-            _CodesDict("LN").LeftVentricularInternalDiastolicDimensionBSA
+            _CodesDict("TEST").Foo
 
 
 class TestCIDDict:
@@ -373,15 +400,12 @@ class TestCIDDict:
         with pytest.raises(AttributeError, match=msg):
             d.XYZ
 
-    def test_getattr_match_multiple_codes_raises(self):
+    def test_getattr_match_multiple_codes_raises(self, add_nonunique_cid):
         # Same attribute for multiple codes
-        d = _CID_Dict(12300)
-        msg = (
-            r"'LeftVentricularInternalDiastolicDimensionBSA' "
-            r"has multiple code matches in CID 12300: '80009-4', '80010-2'"
-        )
+        d = _CID_Dict(99999999999)
+        msg = r"'Foo' has multiple code matches in CID 99999999999: 'BAR', 'BAZ'"
         with pytest.raises(AttributeError, match=msg):
-            d.LeftVentricularInternalDiastolicDimensionBSA
+            d.Foo
 
     def test_getattr_ambiguous_attr_raises(self, ambiguous_scheme):
         attr, cid = ambiguous_scheme

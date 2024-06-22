@@ -29,11 +29,17 @@ SR_DIRECTORY = PYDICOM_SRC / "sr"
 
 FTP_HOST = "medical.nema.org"
 FTP_PATH = "medical/dicom/resources/valuesets/"
-FTP_FHIR_REGEX = re.compile(r".+/DICOM_ValueSets(?P<version>[0-9]{4}[a-z])_release_fhir_json_[0-9]+.zip")
+FTP_FHIR_REGEX = re.compile(
+    r".+/DICOM_ValueSets(?P<version>[0-9]{4}[a-z])_release_fhir_json_[0-9]+.zip"
+)
 CID_ID_REGEX = re.compile("^dicom-cid-([0-9]+)-[a-zA-Z]+")
 
-P16_TO1_URL = "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_O.html"
-P16_TD1_URL = "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_D.html"
+P16_TO1_URL = (
+    "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_O.html"
+)
+P16_TD1_URL = (
+    "http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_D.html"
+)
 
 
 # Example excerpt fhir JSON for reference
@@ -94,6 +100,189 @@ DOC_LINES = [
     "# -*- coding: utf-8 -*-\n",
     "\n",
 ]
+KEYWORD_FIXES = {
+    # scheme: {code: keyword}
+    "SCT": {
+        "399136008": "LeftPosteriorObliqueEmissiveProjection",  # CIDs [26], [501]
+        "399159002": "LateroMedialObliqueEmissiveProjection",  # CIDs [26], [501]
+        "399089007": "ObliqueAxialEmissiveProjection",  # CIDs [26], [501]
+        "399075002": "RightPosteriorObliqueEmissiveProjection",  # CIDs [26], [501]
+        "399061009": "AxialProjection",  # CIDs [26], [501]
+        "399074003": "LeftAnteriorObliqueEmissiveProjection",  # CIDs [26], [501]
+        "399182000": "ObliqueProjection",  # CIDs [26], [501]
+        "399108003": "RightAnteriorObliqueEmissiveProjection",  # CIDs [26], [501]
+        "399273000": "SagittalObliqueAxisEmissiveProjection",  # CIDs [26], [501]
+        "399300004": "LateralMedialEmissiveProjection",  # CIDs [26], [501]
+        "399012007": "MedialLateralEmissiveProjection",  # CIDs [26], [501]
+        "399268006": "MedioLateralObliqueEmissiveProjection",  # CIDs [26], [501]
+        "399067008": "LateralProjection",  # CIDs [2, ...], [501]
+        "32672002": "StructureOfDescendingThoracicAorta",  # [4, ...], [3827, ...]
+        "118378005": "PacemakerPulseGenerator",  # CIDs [1000, ...], [6040, ...]
+        "468115008": "Armrest",  # CIDs [7151], [7151]
+        "430757002": "PulmonaryVeinGreatVessel",  # CIDs [4, ...], [3827, ...]
+        "71836000": "Nasopharyngeal",  # CIDs [4, ...], [7601, 8134]
+        "118645006": "BoneStructureOfPelvis",  # CIDs [4, ...], [7304, ...]
+        "243898001": "AnatomicalReferencePlane",  # CIDs 1217253001 [4, ...], 243898001 [7304, ...]
+        "3138006": "BoneTissue",  # CIDs [645, ...], [6202, ...]
+        "399220000": "TransverseBodyPosition",
+        "62824007": "Transverse",
+        "768763008": "GadoliniumContainingProduct",  # CIDs [12], [13]
+        "62413002": "RadiusBone",  # CIDs [218, ...], [7304, ...]
+        "91727004": "MuscleTissue",  # CIDs [6202, ...], [7151, ...]
+        "164854000": "ECGNormal",  # CIDs [222, ...], [3230]
+        "55603005": "AdiposeTissue",  # CIDs [218, ...], [7151, ...]
+        "399366008": "ObliqueBodyPosition",  # CIDs [6, ...], [21]
+        "44808001": "ConductionDisorderOfTheHeart",  # CIDs [3201, ...], [3700]
+        "81839001": "AnticoagulantAgent",  # CIDs [10], [621]
+        "30492008": "DiureticAgent",  # CIDs [10], [621]
+        "372681003": "HaemostaticAgent",  # CIDs [10], [621]
+        "372806008": "HistomineReceptorAntagonist",  # CIDs [10], [621]
+        "82573000": "LidocaineContainingProduct",  # CIDs [10], [623]
+        "373148008": "ThrombolyticAgentContraindicated",  # CIDs [3740], [3741]
+        "44241007": "HeartValveStenosis",  # CIDs [3711], [3810]
+        "733020007": "SyringeUnit",  # CIDs [68], [69]
+        "37058002": "ForeignBodyGiantCellGranuloma",  # CIDs [6030, ...], [6054]
+        "119406000": "ThalamusPart",  # CIDs [7140], [7151, ...]
+        "19695001": "HypochondriacRegion",  # CIDs [4, ...], [5]
+        "129759000": "VascularCalcificationRadiographicFinding",  # CIDs [3491, ...], [6010]
+        "442726008": "FindingOfDifferenceInLocation",  # CIDs [], []
+        "442714003": "FindingOfDifferenceInSize",  # CIDs [], []
+        "91747007": "LumenOfBloodVessel",  # CIDs [5], [7156]
+        "33252009": "BetaBlockerContainingProduct",  # CIDs [3760], [621]
+        "48698004": "CalciumChannelBlockerContainingProduct",  # CIDs [3760], [621]
+        "118927008": "ThromboticDisorder",  # CIDs [3815], [3805]
+        "354064008": "MethylthioniniumChlorideContainingProduct",  # CIDs [4200], [10]
+        "771928002": "AtropineInOcularDoseForm",  # CIDs [4208], [10]
+        "399368009": "MedioLateralObliqueProjection",  # CIDs [7302], [4014]
+        "422996004": "WolfProjection",  # CIDs [7480], [4012]
+        "122456005": "LaserDevice",  # CIDs [8125], [8, ...]
+        "441950002": "HistopathologyDepartment",  # CIDs [8131], [7030]
+        "13576009": "FetalUmbilicalVein",  # CIDs [12140], [4, ...]
+        "439470001": "ArteriovenousFistulaDisorder",  # CIDs [12293], [3810]
+        "88619007": "VascularResistanceFunction",  # CIDs [12304], [3641]
+        "118538004": "MassQuantity",  # CIDs [12304], [6102, ...]
+    },
+    "MDC": {
+        "2:98": "ChestLeadSymmetricPlacement",  # CID 3001
+        "3:3146": "Grade1AVBlock",  # CID 3415, 3038
+        "3:3148": "Grade2AVBlock",  # CID 3415, 3038
+        "7:756": "MusculusAbductorDigitiMinimiHand",  # CID 3031
+        "7:757": "MusculusAbductorDigitiMinimiHandLeft",  # CID 3031
+        "7:758": "MusculusAbductorDigitiMinimiHandRight",  # CID 3031
+        "7:760": "MusculusFlexorDigitiMinimiBrevisHand",  # CID 3031
+        "7:761": "MusculusFlexorDigitiMinimiBrevisHandLeft",  # CID 3031
+        "7:762": "MusculusFlexorDigitiMinimiBrevisHandRight",  # CID 3031
+        "7:968": "MusculusAdductorHallucis",  # CID 3031
+        "7:969": "MusculusAdductorHallucisLeft",  # CID 3031
+        "7:970": "MusculusAdductorHallucisRight",  # CID 3031
+        "7:972": "MusculusAbductorDigitiMinimiFoot",  # CID 3031
+        "7:973": "MusculusAbductorDigitiMinimiFootLeft",  # CID 3031
+        "7:974": "MusculusAbductorDigitiMinimiFootRight",  # CID 3031
+        "7:976": "MusculusFlexorDigitiMinimiBrevisFoot",  # CID 3031
+        "7:977": "MusculusFlexorDigitiMinimiBrevisFootLeft",  # CID 3031
+        "7:978": "MusculusFlexorDigitiMinimiBrevisFootRight",  # CID 3031
+        "10:8624": "PreExcitationBeat",  # CID 3415, 3335
+        "10:8640": "WolfParkinsonWhiteSyndromeLessSpecific",  # CID 3415, 3335
+        "10:8656": "WolfParkinsonTypeAQRSPositiveInV1V2",  # CID 3415, 3335
+        "10:8672": "WolfParkinsonTypeBQRSNegativeInV1V2",  # CID 3415, 3335
+        "10:8688": "LownGanongLevineSyndromeNormalQRS",  # CID 3415, 3335
+        "10:9264": "SinusTachycardiaRhythm",  # CID 3415, 3038
+        "10:9456": "AtrialFlutterRhythm",  # CID 3415, 3038
+        "10:9472": "AtrialFibrillationRhythm",  # CID 3415, 3038
+        "10:10336": "AsystoleRhythm",  # CID 3415, 3038
+        "10:10352": "IrregularRhythmLowHeartRate",  # CID 3415, 3038
+        "10:10432": "BrachycardiaAny",  # CID 3415, 3038
+    },
+    "DCM": {
+        "109018": "BeatsDetectedAccepted",  # CID 3337
+        "109019": "BeatsDetectedRejected",  # CID 3337
+        "109045": "StartOfAtrialContraction",  # CID 3339
+        "109046": "StartOfAtrialContractionSubsequent",  # CID 3339
+        "110818": "T2StarWeightedDynamicContrastEnhancedMRSignalIntensity",  # CID 218
+        "110806": "T2StarWeightedMRSignalIntensity",  # CID 218
+        "111487": "MammographicCrosshair",  # CID 6058
+        "111488": "MammographicGrid",  # CID 6058
+        "112300": "APPlus45",  # CID 7303
+        "112301": "APMinus45",  # CID 7303
+        "112702": "SlideMicroscopyPathologyImaging",  # CID 8131, 29, 30, 33
+        "113064": "T2Star",  # CID 218
+        "113076": "SegmentationImageDerivation",  # CID 7203, 32, 33
+        "113806": "StationaryAcquisitionCT",  # CID 10013, 10002
+        "113951": "FilmDetectorType",  # CID 10030, 405
+        "126395": "R2Star",  # CID 218
+        "128186": "RTPrescriptionResultForRTTreatmentPlanning",  # CID 9510, 7010, 7023
+        "128304": "OCTAOneSidedRatioLesser",  # CID 4270
+        "128305": "OCTAOneSidedRatioGreater",  # CID 4270
+    },
+    "RADLEX": {
+        "RID50296": "PIRADS1VeryLowLesion",  # CID 6328, 6324, 6325
+        "RID50297": "PIRADS2LowLesion",  # CID 6328 6324 6325
+        "RID50298": "PIRADS3IntermediateLesion",  # CID 6328, 6324, 6325
+        "RID50299": "PIRADS4HighLesion",  # CID 6328, 6324, 6325
+        "RID50300": "PIRADS5VeryHighLesion",  # CID 6328, 6324, 6325
+        "RID50320": "PIRADS_DCENegative",  # CID 6332
+        "RID50321": "PIRADS_DCEPositive",  # CID 6332
+        "RID50323": "PIRADSXInadequateOrAbsentLesion",  # CID 6328, 6324, 6325
+    },
+    "UCUM": {
+        "/cm": "PerCentimeter",  # CIDs 83, 84, 7181
+        "cm": "Centimeter",  # CID 7181
+        "cm2": "SquareCentimeter",  # CID 7181
+        "/s": "PerSecond",
+        "s": "Second",
+        "mgcm3": "MilligramsPerCubicCentimeter",
+        "mmHg": "MillimetersHg",
+        "mm[Hg]": "MillimetersHg",
+        "kPa": "Kilopascal",
+        "mm": "Millimeter",
+        "mm/s": "MillimeterPerSecond",
+        "mg/ml": "MilligramsPerMilliliter",
+        "mg/cm3": "MilligramsPerCubicCentimeter",
+        "m": "Meter",
+        "um": "Micrometer",
+        "um2/s": "SquareMicrometerPerSecond",
+        "cm2/ml": "SquareCentimeterPerMilliliter",
+        "mm2/s": "SquareMillimeterPerSecond",
+        "um2/ms": "SquareMicrometerPerMillisecond",
+        "umol/min/ml": "MicromolePerMinutePerMilliliter",
+        "ml/g": "MilliliterPerGram",
+        "ml/min/g": "MilliliterPerMinutePerGram",
+        "umol/ml": "MicromolePerMilliliter",
+        "mg/min/ml": "MilligramsPerMinutePerMilliliter",
+        "Bq/ml": "BecquerelsPerMilliliter",
+        "Monitor Units/s": "MonitorUnitsPerSecond",
+        "Gy/s": "GrayPerSecond",
+        "rad/s": "RadiansPerSecond",
+        "uV": "Microvolt",
+        "mV": "Millivolt",
+        "dB[mV]": "DecibelsMillivolt",
+        "dB[uV]": "DecibelsMicrovolt",
+        "km/h": "KilometersPerHour",
+        "[mi_i]/h": "MilesPerHour",
+        "[PRU]/m2": "PRUPerSquareMeter",
+        "/min": "PerMinute",
+        "cm/s": "CentimeterPerSecond",
+        "10-6.mm2/s": "_10EMinus6SquareMillimetersPerSecond",
+        "MeV": "MegaElectronVolt",
+        "{MU}/s": "MonitorUnitsPerSecond",
+        "mmol/kg{WetWeight}": "MillimolesPerKilogramWetWeight",
+    },
+    "LN": {
+        "18015-8": "AorticRootAnnuloAorticJunctionDiameter",  # CID 12300, 12212
+        "79967-6": "InferiorVenaCavaDiameterAtEndExpiration",  # CIDs 12300, 12215
+        "79987-4": "LeftPulmonaryArteryDiameterAtEndSystole",  # CID 12300, 12210
+        "80009-4": "LeftVentricularInternalDiastolicDimensionByUSMModeBSA",  # CID 12300
+        "80010-2": "LeftVentricularInternalDiastolicDimensionByUS2DBSA",  # CID 12300
+        "80013-6": "LeftVentricularInternalSystolicDimensionByUSMModeBSA",  # CID 12300
+        "80014-4": "LeftVentricularInternalSystolicDimensionByUS2DBSA",  # CID 12300
+        "80031-8": "LeftVentricularPosteriorWallDiastolicThicknessByUSMMode",  # CID 12300
+        "80032-6": "LeftVentricularPosteriorWallDiastolicThicknessByUS2D",  # CID 12300
+        "80033-4": "LeftVentricularPosteriorWallSystolicThicknessByUSMMode",  # CID 12300
+        "80034-2": "LeftVentricularPosteriorWallSystolicThicknessByUS2D",  # CID 12300
+        "80049-0": "MainPulmonaryArteryDiameterAtEndSystole",  # CID 12300, 12210
+        "80079-7": "RightPulmonaryArteryDiameterAtEndSystole",  # CID 12300, 12210
+    },
+}
 
 
 def camel_case(s):
@@ -117,10 +306,8 @@ def camel_case(s):
 def keyword_from_meaning(name):
     """Return a camel case valid python identifier"""
     # Try to adhere to keyword scheme in DICOM (CP850)
-
     # singular/plural alternative forms are made plural
     #     e.g., “Physician(s) of Record” becomes “PhysiciansOfRecord”
-    print("NAME IS", name)
     kw = name.replace("(s)", "s")
 
     # “Patient’s Name” -> “PatientName”
@@ -163,14 +350,13 @@ def keyword_from_meaning(name):
     return kw
 
 
-def setup_logger(debug=False) -> None:
+def setup_logger(debug_level=logging.INFO) -> None:
     """Setup the logging."""
-    logger = logging.getLogger(__name__)
+    LOGGER = logging.getLogger(__name__)
     # Ensure only have one StreamHandler
     LOGGER.handlers = []
     handler = logging.StreamHandler()
-    level = logging.DEBUG if debug else logging.INFO
-    LOGGER.setLevel(level)
+    LOGGER.setLevel(debug_level)
     formatter = logging.Formatter("%(levelname).1s: %(message)s")
     handler.setFormatter(formatter)
     LOGGER.addHandler(handler)
@@ -209,7 +395,7 @@ def download_fhir_value_sets(local_dir: Path) -> None | str:
                     ftp.retrbinary(f"RETR {remote_path}", fp.write)
                     data = fp.getvalue()
 
-                version = match.group('version')
+                version = match.group("version")
                 (local_dir / version).mkdir(parents=True, exist_ok=True)
                 local_path = local_dir / version / Path(remote_path).name
 
@@ -247,15 +433,17 @@ def extract_cid_files(path: Path, version: str, cid_folder="CIDs") -> None:
     # Create the output directory (if it doesn't already exist)
     cid_dir = path / cid_folder
     cid_dir.mkdir(parents=True, exist_ok=True)
-    LOGGER.debug(f"  Extracting CID files to {cid_dir}")
+    LOGGER.debug(f"  Extracting FHIR JSON files to {cid_dir}")
     with zipfile.ZipFile(files[0]) as z:
         # Forcibly flatten the ZIP contents into the `cid_folder`
         for zip_path in (Path(x) for x in z.namelist()):
-            with open(cid_dir / zip_path.name, 'wb') as f:
+            with open(cid_dir / zip_path.name, "wb") as f:
                 f.write(z.read(str(zip_path)))
 
 
-def extract_table_data(path: Path, version: str, ext: str = "htm") -> list[bytes]:
+def extract_table_data(
+    path: Path, version: str, ext: tuple[str, ...] = (".htm", ".html")
+) -> list[bytes]:
     """Extract the table data from the downloaded HTML files.
 
     Parameters
@@ -267,7 +455,7 @@ def extract_table_data(path: Path, version: str, ext: str = "htm") -> list[bytes
     ext : str, optional
         The extension of the downloaded HTML files.
     """
-    files = list((path / version).glob(f"*.{ext}"))
+    files = [p for p in (path / version).iterdir() if p.suffix in ext]
     if len(files) != 2:
         raise ValueError(
             f"The Part 16, Chapter D and O HTML files were not found in {path / version}"
@@ -382,7 +570,7 @@ def write_concepts(
     """
     # Write the concepts dict
     path = SR_DIRECTORY / "_concepts_dict.py"
-    LOGGER.info(f"Writing ... to '{path}'")
+    LOGGER.info(f"Writing concepts to '{path}'")
 
     lines = DOC_LINES + [
         "# Dict with scheme designator keys; value format is:\n",
@@ -401,7 +589,7 @@ def write_concepts(
 
     # Write the CID dict
     path = SR_DIRECTORY / "_cid_dict.py"
-    LOGGER.info(f"Writing ... to '{path}'")
+    LOGGER.info(f"Writing CIDs to '{path}'")
 
     lines = DOC_LINES + [
         "# Dict with cid number as keys; value format is:\n",
@@ -454,9 +642,7 @@ def write_snomed_mapping(snomed_codes: list[tuple[str, str, str]]) -> None:
 
 def setup_argparse():
     parser = argparse.ArgumentParser(
-        description=(
-            "Update the sr/ code and concepts dictionaries"
-        ),
+        description=("Update the sr/ code and concepts dictionaries"),
         usage="generate_concept_dicts.py path [options]",
     )
 
@@ -498,7 +684,7 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
     # Mapping of:
     #   Scheme: Keywords
     #       Keyword: Codes
-    #           Code: (Display, CIDs containing the code)
+    #           Code: (Display, [CIDs containing the code])
     # concepts[scheme_designator][name] = {code: (display, [cid])}
     concepts: dict[str, dict[str, dict[str, tuple[str, list[int]]]]] = {}
 
@@ -508,17 +694,19 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
     # Mapping of CID ID to CID name
     name_for_cid: dict[int, str] = {}
 
-    cid_paths = sorted(cid_directory.glob("*.json"), key=lambda x: int(x.name.split("-")[3]))
+    # Mapping code <-> keyword(s)
+    # codes_kw = {}
+    kw_codes = {}
+
+    cid_paths = sorted(
+        cid_directory.glob("*.json"), key=lambda x: int(x.name.split("-")[3])
+    )
     for path in cid_paths:
         LOGGER.debug(f"  Processing '{path.name}'")
         with open(path, "rb") as f:
             data = json.loads(f.read())
 
         cid = int(CID_ID_REGEX.match(data["id"]).group(1))
-        # if cid != 12325:
-        #     continue
-
-        cid_version = data["version"]
         name_for_cid[cid] = data["name"]
 
         # A mapping of scheme to a list of code keywords
@@ -535,11 +723,33 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
             if scheme_designator not in concepts:
                 concepts[scheme_designator] = {}
 
+            if scheme_designator not in kw_codes:
+                kw_codes[scheme_designator] = {}
+
             for concept in group["concept"]:
-                print(concept, concept["code"], concept["display"])
-                code_keyword = keyword_from_meaning(concept["display"])
                 code = concept["code"].strip()
                 display = concept["display"].strip()
+                try:
+                    code_keyword = KEYWORD_FIXES[scheme_designator][code]
+                except KeyError:
+                    code_keyword = keyword_from_meaning(concept["display"])
+
+                if not code_keyword.isidentifier() or iskeyword(code_keyword):
+                    raise ValueError(
+                        f"Invalid keyword '{code_keyword}' generated from '{display}'"
+                    )
+
+                # Check each keyword matches only one code in a given scheme
+                codes = kw_codes[scheme_designator].setdefault(code_keyword, [])
+                codes.append(code)
+                if len(set(codes)) > 1:
+                    previous = concepts[scheme_designator][code_keyword]
+                    current = {code: (display, [cid])}
+                    current.update(previous)
+                    LOGGER.error(
+                        f"  {scheme_designator}: keyword '{code_keyword}' is being "
+                        f"used for different codes {current}"
+                    )
 
                 # If new code_keyword under this scheme, start dict of codes/cids that use that code
                 if code_keyword not in concepts[scheme_designator]:
@@ -552,28 +762,30 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
                         prior[code] = (display, [cid])
 
                     if prior[code][0].lower() != display.lower():
-                        # Meanings can only be different by symbols, etc.
-                        #    because converted to same keyword.
-                        #    Nevertheless, print as info
+                        # Multiple 'display' values for the same code found
                         LOGGER.info(
-                            f"'{code_keyword}': Meaning '{display}' in CID{cid}, previously "
-                            f"'{prior[code][0]}' in CIDs {prior[code][1]}"
+                            f"  Found multiple 'display' values for code {code} in "
+                            f"scheme {scheme_designator}: CID{cid}: '{display}', "
+                            f"previously '{prior[code][0]}'"
                         )
 
                 # Keep track of this cid referencing that code_keyword
                 if scheme_designator not in cid_concepts:
                     cid_concepts[scheme_designator] = []
 
+                # Same keyword is being used for different codes in the same scheme
                 if code_keyword in cid_concepts[scheme_designator]:
-                    LOGGER.warning(
-                        f"'{code_keyword}': Meaning '{concept["display"]}' in CID{cid} is "
-                        "duplicated!"
+                    previous = concepts[scheme_designator][code_keyword]
+                    LOGGER.error(
+                        f"  {scheme_designator}: keyword '{code_keyword}' is being "
+                        f"used for different codes {previous}"
                     )
 
                 cid_concepts[scheme_designator].append(code_keyword)
 
         cid_lists[cid] = cid_concepts
 
+    LOGGER.debug("Applying SCT mappings to the concepts")
     scheme_designator = "SCT"
     # snomed_codes = get_table_o1()
     for code, srt_code, meaning in snomed_mapping:
@@ -585,8 +797,13 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
             if code not in prior:
                 prior[code] = (meaning, [])
 
+    LOGGER.debug("Applying DCM mappings to the concepts")
     scheme_designator = "DCM"
     for code, meaning in dicom_mapping:
+        # 2023b has row with ellipses after 113270 for some reason
+        if code == "..." or meaning == "...":
+            continue
+
         name = keyword_from_meaning(meaning)
         if name not in concepts[scheme_designator]:
             concepts[scheme_designator][name] = {code: (meaning, [])}
@@ -595,14 +812,20 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
             if code not in prior:
                 prior[code] = (meaning, [])
 
-    write_concepts(concepts, cid_lists, name_for_cid)
-    write_snomed_mapping(snomed_mapping)
+    for scheme in kw_codes:
+        for codes in kw_codes[scheme].values():
+            if len(set(codes)) != 1:
+                raise ValueError(
+                    "Each keyword must correspond to one and only one code"
+                )
+
+    return concepts, cid_lists, name_for_cid
 
 
 if __name__ == "__main__":
-
     args = setup_argparse()
-    setup_logger(args.debug)
+    level = logging.DEBUG if args.debug else logging.ERROR
+    setup_logger(level)
 
     path = Path(args.path).resolve()
     if not path.exists():
@@ -617,16 +840,30 @@ if __name__ == "__main__":
         if version:
             extract_cid_files(path, version, args.cid_directory)
         else:
-            LOGGER.error(f"Failed to download the CID files")
+            LOGGER.error("Failed to download the CID files")
 
+        LOGGER.info(f"Downloading Part 16, Chapters D and O to {path / version}")
         snomed_data = urllib_request.urlopen(P16_TO1_URL).read()
+        with open(path / version / "Table_O1.html", "wb") as f:
+            f.write(snomed_data)
+
         dicom_data = urllib_request.urlopen(P16_TD1_URL).read()
+        with open(path / version / "Table_D1.html", "wb") as f:
+            f.write(dicom_data)
+
     elif args.version:
         # Use the already downloaded ZIP file
         extract_cid_files(path, args.version, args.cid_directory)
         # Parse the already downloaded HTM files
         dicom_data, snomed_data = extract_table_data(path, args.version)
 
+    # Process the data files
     snomed_mapping = get_table_o1(snomed_data)
     dicom_mapping = get_table_d1(dicom_data)
-    process_files(path / args.cid_directory, snomed_mapping, dicom_mapping)
+    concepts, cid_lists, name_for_cid = process_files(
+        path / args.cid_directory, snomed_mapping, dicom_mapping
+    )
+
+    # Write the results
+    write_concepts(concepts, cid_lists, name_for_cid)
+    write_snomed_mapping(snomed_mapping)
