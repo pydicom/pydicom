@@ -386,7 +386,7 @@ cid_concepts[4] = {
         "Toe",
         "Shoulder",
         "SpinalCord",
-        "VascularGraft",
+        "CardiacSeptumProsthesis",
         "LeftAuricularAppendage",
         "CircleOfWillis",
         "LeftInguinalRegion",
@@ -919,7 +919,7 @@ cid_concepts[26] = {
     "SCT": [
         "MedialLateralEmissiveProjection",
         "SagittalObliqueAxisEmissiveProjection",
-        "LeftLateralProjection",
+        "LeftLateralEmissiveProjection",
         "VerticalLongAxis",
         "HorizontalLongAxis",
         "Sagittal",
@@ -934,7 +934,7 @@ cid_concepts[26] = {
         "ShortAxis",
         "MedioLateralObliqueEmissiveProjection",
         "Lateral",
-        "RightLateralProjection",
+        "RightLateralEmissiveProjection",
         "LateroMedialObliqueEmissiveProjection",
         "Coronal",
         "ObliqueAxialEmissiveProjection",
@@ -1101,7 +1101,7 @@ cid_concepts[32] = {
         "TextureMap",
         "BasicVoiceAudio",
         "RTDose",
-        "Document",
+        "DocumentProducer",
         "StereometricRelationship",
         "RTTreatmentRecord",
         "HardCopy",
@@ -1109,7 +1109,7 @@ cid_concepts[32] = {
         "RTPlan",
         "AutomatedSlideStainer",
         "StructuredReportDocument",
-        "SpatialFiducials",
+        "SpatialFiducialsProducer",
         "ModelFor3DManufacturing",
         "RTStructureSet",
         "Plan",
@@ -1129,7 +1129,7 @@ cid_concepts[33] = {
         "Electrooculography",
         "SlideMicroscopy",
         "StructuredReportDocument",
-        "SpatialFiducials",
+        "SpatialFiducialsProducer",
         "OphthalmicPhotography",
         "Other",
         "KeyObjectSelection",
@@ -1168,7 +1168,7 @@ cid_concepts[33] = {
         "OphthalmicVisualField",
         "DigitalRadiography",
         "OphthalmicTomography",
-        "Document",
+        "DocumentProducer",
         "RTTreatmentRecord",
         "Mammography",
         "Ultrasound",
@@ -1359,7 +1359,7 @@ cid_concepts[65] = {
         "Sufentanil",
         "Methylprednisolone",
         "HydrocortisoneSodiumSuccinate",
-        "DexamethasoneSodiumSulfate",
+        "DexamethasoneSodiumPhosphate_Inactive",
         "Papaverine",
         "Diphenhydramine",
         "MethylprednisoloneSodiumPhosphate",
@@ -2329,7 +2329,7 @@ cid_concepts[501] = {
     "DCM": ["ApicalFourChamberRVFocused", "ApicalFourChamberRVModified"],
     "SCT": [
         "RightPosteriorOblique",
-        "LeftLateralProjection",
+        "LeftLateralEmissiveProjection",
         "ParasternalLongAxisViewOfTheRVOutflowTract",
         "ParasternalShortAxisAtThePapillaryMuscleLevel",
         "Tangential",
@@ -2369,7 +2369,7 @@ cid_concepts[501] = {
         "TransesophagealShortAxisView",
         "Axial",
         "Plantodorsal",
-        "RightLateralProjection",
+        "RightLateralEmissiveProjection",
         "SuprasternalLongAxisViewOfAorticArch",
         "CaudoCranial",
         "TissueSpecimen",
@@ -2419,7 +2419,7 @@ cid_concepts[501] = {
         "SubcostalShortAxisViewAtAorticValveLevel",
         "SagittalObliqueAxial",
         "LateralMedialEmissiveProjection",
-        "MedialLateral",
+        "MedioLateralProjection",
         "ShortAxis",
         "MedioLateralObliqueEmissiveProjection",
         "LateralProjection",
@@ -2643,7 +2643,7 @@ cid_concepts[621] = {
         "Antiarrhythmic",
         "Barbiturate",
         "Benzodiazepine",
-        "Estrogen",
+        "EstrogenReceptorAgonist",
         "Decongestant",
         "SulfonamideAntibiotic",
         "OcularLubricant",
@@ -2684,7 +2684,7 @@ cid_concepts[621] = {
         "NarcoticOpiateAntagonist",
         "LincomycinAntibiotic",
         "NeuromuscularBlockingNMBDepolarizing",
-        "Vasoconstrictor",
+        "Vasopressor",
         "LinezolidAntibiotic",
         "GastrointestinalProkinetic",
         "Analgesic",
@@ -2713,7 +2713,7 @@ cid_concepts[622] = {
         "Antiarrhythmic",
         "Barbiturate",
         "Benzodiazepine",
-        "Estrogen",
+        "EstrogenReceptorAgonist",
         "Decongestant",
         "SulfonamideAntibiotic",
         "OcularLubricant",
@@ -2754,7 +2754,7 @@ cid_concepts[622] = {
         "NarcoticOpiateAntagonist",
         "LincomycinAntibiotic",
         "NeuromuscularBlockingNMBDepolarizing",
-        "Vasoconstrictor",
+        "Vasopressor",
         "LinezolidAntibiotic",
         "GastrointestinalProkinetic",
         "Analgesic",
@@ -4551,10 +4551,10 @@ cid_concepts[3031] = {
         "MusculusFlexorDigitorumLongusRight",
         "MusculusPalmarisBrevis",
         "MusculusAdductorLongusLeft",
-        "MusculusFlexorDigitiMinimiBrevisRight",
+        "MusculusFlexorDigitiMinimiBrevisFootRight",
         "MusculusInfraspinatusRight",
         "MusculusAdductorLongus",
-        "MusculusFlexorDigitiMinimiBrevisFootRight",
+        "MusculusFlexorDigitiMinimiBrevisFootLeft",
         "MusculusInfraspinatusLeft",
         "MusculusExtensorIndicisRight",
         "MusculusFlexorDigitiMinimiBrevisFoot",
@@ -5118,7 +5118,7 @@ cid_concepts[3043] = {"DCM": ["BiquadFilter", "IIRFilter", "CICFilter", "FIRFilt
 name_for_cid[3044] = "WaveformFilterLookupTableInputFrequencyUnit"
 cid_concepts[3044] = {
     "DCM": ["HzAngular", "HzNormalized"],
-    "UCUM": ["RadsPerSecond", "Hz"],
+    "UCUM": ["RadiansPerSecond", "Hz"],
 }
 
 name_for_cid[3045] = "WaveformFilterLookupTableOutputMagnitudeUnit"
@@ -5578,7 +5578,7 @@ cid_concepts[3230] = {
         "VentricularFibrillation",
         "VentricularPreExcitation",
         "AtrialPrematureContraction",
-        "STDepression",
+        "STSegmentDepression",
         "RightBundleBranchBlock",
         "SecondDegreeAtrioventricularBlock",
         "VentricularPrematureContraction",
@@ -5591,7 +5591,7 @@ cid_concepts[3230] = {
         "AtrialFibrillation",
         "BifascicularBlock",
         "VentricularTachycardia",
-        "STElevation",
+        "STSegmentElevation",
         "SupraventricularTachycardia",
         "LeftAnteriorFascicularBlock",
         "IncompleteRightBundleBranchBlock",
@@ -5633,7 +5633,7 @@ cid_concepts[3233] = {
         "STDepressionUpsloping",
         "STDepressionDownsloping",
     ],
-    "SCT": ["STElevation", "STDepression"],
+    "SCT": ["STSegmentElevation", "STSegmentDepression"],
 }
 
 name_for_cid[3234] = "EctopicBeatMorphology"
@@ -6688,9 +6688,9 @@ name_for_cid[3487] = "IntravascularVolumetricRegion"
 cid_concepts[3487] = {
     "DCM": [
         "DistalStentMargin",
-        "EntirePullback",
-        "ProximalStentMargin",
         "StentedRegion",
+        "ProximalStentMargin",
+        "EntirePullback",
     ],
     "SCT": ["Lesion", "MorphologicallyAbnormalStructure", "CulpritLesion"],
 }
@@ -8073,7 +8073,9 @@ cid_concepts[3728] = {
 }
 
 name_for_cid[3729] = "AdmissionStatus"
-cid_concepts[3729] = {"SCT": ["Elective", "EmergencyDepartment", "Transfer"]}
+cid_concepts[3729] = {
+    "SCT": ["HospitalAdmissionElective", "EmergencyDepartment", "Transfer"]
+}
 
 name_for_cid[3730] = "InsurancePayor"
 cid_concepts[3730] = {}
@@ -9164,7 +9166,7 @@ cid_concepts[4010] = {
         "FrontalObliqueAxial",
         "SagittalObliqueAxial",
         "AnteroPosterior",
-        "MedialLateral",
+        "MedioLateralProjection",
         "FrontalOblique",
         "ObliqueAxial",
         "LateralProjection",
@@ -9304,7 +9306,7 @@ cid_concepts[4014] = {
     "SCT": [
         "SuperolateralToInferomedialOblique",
         "TissueSpecimenFromBreast",
-        "MedioLateral",
+        "MedioLateralProjection",
         "CranioCaudalExaggeratedLaterally",
         "MedioLateralObliqueProjection",
         "LateroMedial",
@@ -10846,7 +10848,7 @@ name_for_cid[4200] = "OphthalmicImagingAgent"
 cid_concepts[4200] = {
     "SCT": [
         "IndocyanineGreen",
-        "RoseBengal",
+        "RoseBengalContainingProduct",
         "Fluorescein",
         "TrypanBlue",
         "MethylthioniniumChlorideContainingProduct",
@@ -11115,7 +11117,13 @@ cid_concepts[4230] = {"DCM": ["UltrasoundContact", "UltrasoundImmersion"]}
 
 name_for_cid[4231] = "LensStatus"
 cid_concepts[4231] = {
-    "SCT": ["Pseudophakia", "CrystallineLens", "PiggybackIOL", "Aphakic", "PhakicIOL"]
+    "SCT": [
+        "ArtificialLensPresent",
+        "CrystallineLens",
+        "PiggybackIOL",
+        "Aphakic",
+        "PhakicIOL",
+    ]
 }
 
 name_for_cid[4232] = "VitreousStatus"
@@ -11412,8 +11420,8 @@ cid_concepts[4270] = {
         "OCTACorrelationMapping",
         "OCTASpeckleVariance",
         "DopplerOCTA",
+        "OCTAOneSidedRatioGreater",
         "OCTAOneSidedRatioLesser",
-        "OCTAOneSidedRatio",
         "OCTAComplexVariance",
         "OCTAAmplitudeDecorrelation",
     ]
@@ -12728,7 +12736,7 @@ cid_concepts[6055] = {
         "BloodyNippleDischarge",
         "PeauDOrangeSurfaceOfBreast",
         "DisorderOfBreastImplant",
-        "DisseminatedMalignancyOfUnknownPrimary",
+        "MalignantTumourOfUnknownOrigin",
         "SkinRetractionOfBreast",
         "RadiographicCalcificationFinding",
         "OELymphadenopathy",
@@ -14184,7 +14192,7 @@ cid_concepts[6129] = {
 name_for_cid[6130] = "SeverityDescriptor"
 cid_concepts[6130] = {
     "DCM": ["HyperAcute"],
-    "SCT": ["Moderate", "Mild", "AcuteOnset", "Chronic", "Subacute", "Severe"],
+    "SCT": ["Moderate", "Mild", "SuddenOnset", "Chronic", "Subacute", "Severe"],
 }
 
 name_for_cid[6131] = "ChestTextureDescriptor"
@@ -15263,7 +15271,11 @@ cid_concepts[6331] = {
 
 name_for_cid[6332] = "PIRADS®v2DCELesionAssessmentCategory"
 cid_concepts[6332] = {
-    "RADLEX": ["PIRADS_DCEPositive", "PIRADSDCEVe", "PIRADSXDCEInadequateOrAbsent"]
+    "RADLEX": [
+        "PIRADS_DCENegative",
+        "PIRADS_DCEPositive",
+        "PIRADSXDCEInadequateOrAbsent",
+    ]
 }
 
 name_for_cid[6333] = "mpMRIAssessmentType"
@@ -17158,7 +17170,7 @@ cid_concepts[7151] = {
         "Meninges",
         "Shoulder",
         "TransversusThoracis",
-        "VascularGraft",
+        "CardiacSeptumProsthesis",
         "CerebellarWhiteMatter",
         "InterventricularSeptum",
         "Cingulum",
@@ -17948,7 +17960,7 @@ cid_concepts[7181] = {
         "_10EMinus6SquareMillimetersPerSecond",
         "BecquerelsPerMilliliter",
         "Micrometer",
-        "MillimolesPerkgWetWeight",
+        "MillimolesPerKilogramWetWeight",
         "Gy",
         "MicromolePerMinutePerMilliliter",
         "Decibel",
@@ -18489,7 +18501,7 @@ cid_concepts[7192] = {
         "C3Vertebra",
         "Shoulder",
         "TransversusThoracis",
-        "VascularGraft",
+        "CardiacSeptumProsthesis",
         "CerebellarWhiteMatter",
         "L2L3Disc",
         "InterventricularSeptum",
@@ -23249,7 +23261,7 @@ cid_concepts[7484] = {
         "LaterodorsoproximalMedioplantarodistalOblique",
         "Right45DegreeVentralLeftDorsalOblique",
         "Left45DegreeVentralRightDorsalOblique",
-        "Mediolateral",
+        "MedioLateralProjection",
         "Palmar45DegreeMedialDorsolateral",
         "DorsolateralPlantaromedialOblique",
         "Palmar75DegreeProximalDorsodistalOblique",
@@ -25361,7 +25373,7 @@ cid_concepts[8134] = {
         "TransversusThoracis",
         "SkinOfFoot",
         "SkinOfIntertragalIncisure",
-        "VascularGraft",
+        "CardiacSeptumProsthesis",
         "MidRightAtrium",
         "CerebellarWhiteMatter",
         "InterventricularSeptum",
@@ -25816,11 +25828,11 @@ cid_concepts[8301] = {
         "TG18LN808Pattern",
         "DINResolutionPattern",
         "TG18LN807Pattern",
-        "DINGrayscalePattern",
+        "DINGeometryPatternBild3",
         "TG18LN810Pattern",
         "TG18LN809Pattern",
         "TG18LN806Pattern",
-        "DINGeometryPattern",
+        "DINGrayscalePatternBild2",
         "TG18LN1205Pattern",
         "TG18LN1204Pattern",
         "TG18LN1207Pattern",
@@ -26858,7 +26870,7 @@ cid_concepts[9514] = {
         "C3Vertebra",
         "Shoulder",
         "TransversusThoracis",
-        "VascularGraft",
+        "CardiacSeptumProsthesis",
         "CerebellarWhiteMatter",
         "L2L3Disc",
         "InterventricularSeptum",

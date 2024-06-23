@@ -88,8 +88,8 @@ show = "pydicom.cli.show:add_subparser"
 
 
 [tool.black]
-exclude = ".venv|build|/_.*_dict.py$"
-force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
+# exclude = ".venv|build|/_.*_dict.py$"
+# force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]

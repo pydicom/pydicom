@@ -161,6 +161,87 @@ KEYWORD_FIXES = {
         "439470001": "ArteriovenousFistulaDisorder",  # CIDs [12293], [3810]
         "88619007": "VascularResistanceFunction",  # CIDs [12304], [3641]
         "118538004": "MassQuantity",  # CIDs [12304], [6102, ...]
+        "19130008": "TraumaticAbnormalityMorphologic",  # Inactive
+        "23583003": "InflammationMorphologic",  # Inactive
+        "36060005": "HemangiopericytomaMorphologic",  # Inactive
+        "1052201004": "EstrogenReceptorAgonist",
+        "309523001": "ArtificialLensPresent",  # CID 4231
+        "102874004": "PossiblePregnancy_Inactive",
+        "8715000": "HospitalAdmissionElective",  # CID 3729
+        "133943005": "LeftLumbarRegion_Inactive",
+        "133944004": "RightLumbarRegion_Inactive",
+        "76388001": "STSegmentElevation",  # CID 3230
+        "244089006": "SkinOfSideOfNose_Inactive",
+        "252418006": "TransthoracicEchocardiography_Inactive",
+        "258661006": "Slide_Inactive",
+        "261061003": "Bronchial_Inactive",
+        "399260004": "MedioLateralProjection",  # CID 7484
+        "263816006": "Muscular_Inactive",
+        "255052006": "MalignantTumourOfUnknownOrigin",  # CID 6055
+        "118375008": "CardiacSeptumProsthesis",  # CID 4
+        "870406003": "Vasopressor",  # CID 621
+        "385315009": "SuddenOnset",  # CID 6130
+        "49992008": "DexamethasoneSodiumPhosphate_Inactive",
+        "399118008": "LeftLateralEmissiveProjection",  # CID 26
+        "399297009": "RightLateralEmissiveProjection",  # CID 26
+        "404846007": "GadopentetateDimeglumine_Inactive",
+        "330888007": "RoseBengalContainingProduct",  # CID 4200
+        "409105003": "Yttrium90Microspheres_Inactive",
+        "409586006": "Complaint_Inactive",
+        "26141007": "STSegmentDepression",  # CID 3230
+        "445769006": "IntracorpusCavernosumRoute_Inactive",
+        "707009005": "SupernumeraryDeciduousMaxillaryRightSecondMolarTooth_Inactive",
+        "707010000": "SupernumeraryDeciduousMaxillaryRightFirstMolarTooth_Inactive",
+        "707011001": "SupernumeraryDeciduousMaxillaryRightCanineTooth_Inactive",
+        "707012008": "SupernumeraryDeciduousMaxillaryRightLateralIncisorTooth_Inactive",
+        "707013003": "SupernumeraryDeciduousMaxillaryRightCentralIncisorTooth_Inactive",
+        "707014009": "SupernumeraryDeciduousMaxillaryLeftCentralIncisorTooth_Inactive",
+        "707015005": "SupernumeraryDeciduousMaxillaryLeftLateralIncisorTooth_Inactive",
+        "707016006": "SupernumeraryDeciduousMaxillaryLeftCanineTooth_Inactive",
+        "707017002": "SupernumeraryDeciduousMaxillaryLeftFirstMolarTooth_Inactive",
+        "707018007": "SupernumeraryDeciduousMaxillaryLeftSecondMolarTooth_Inactive",
+        "707021009": "SupernumeraryDeciduousMandibularRightSecondMolarTooth_Inactive",
+        "707022002": "SupernumeraryDeciduousMandibularRightFirstMolarTooth_Inactive",
+        "707023007": "SupernumeraryDeciduousMandibularRightCanineTooth_Inactive",
+        "707024001": "SupernumeraryDeciduousMandibularRightLateralIncisorTooth_Inactive",
+        "707025000": "SupernumeraryDeciduousMandibularRightCentralIncisorTooth_Inactive",
+        "707026004": "SupernumeraryDeciduousMandibularLeftCentralIncisorTooth_Inactive",
+        "707028003": "SupernumeraryDeciduousMandibularLeftLateralIncisorTooth_Inactive",
+        "707029006": "SupernumeraryDeciduousMandibularLeftCanineTooth_Inactive",
+        "707030001": "SupernumeraryDeciduousMandibularLeftFirstMolarTooth_Inactive",
+        "707031002": "SupernumeraryDeciduousMandibularLeftSecondMolarTooth_Inactive",
+        "707032009": "SupernumeraryPermanentMaxillaryRightThirdMolarTooth_Inactive",
+        "707033004": "SupernumeraryPermanentMaxillaryRightSecondMolarTooth_Inactive",
+        "707035006": "SupernumeraryPermanentMaxillaryRightFirstMolarTooth_Inactive",
+        "707036007": "SupernumeraryPermanentMaxillaryRightSecondPremolarTooth_Inactive",
+        "707037003": "SupernumeraryPermanentMaxillaryRightFirstPremolarTooth_Inactive",
+        "707038008": "SupernumeraryPermanentMaxillaryRightCanineTooth_Inactive",
+        "707039000": "SupernumeraryPermanentMaxillaryRightLateralIncisorTooth_Inactive",
+        "707041004": "SupernumeraryPermanentMaxillaryRightCentralIncisorTooth_Inactive",
+        "707042006": "SupernumeraryPermanentMaxillaryLeftCentralIncisorTooth_Inactive",
+        "707043001": "SupernumeraryPermanentMaxillaryLeftLateralIncisorTooth_Inactive",
+        "707044007": "SupernumeraryPermanentMaxillaryLeftCanineTooth_Inactive",
+        "707045008": "SupernumeraryPermanentMaxillaryLeftFirstPremolarTooth_Inactive",
+        "707046009": "SupernumeraryPermanentMaxillaryLeftSecondPremolarTooth_Inactive",
+        "707047000": "SupernumeraryPermanentMaxillaryLeftFirstMolarTooth_Inactive",
+        "707048005": "SupernumeraryPermanentMaxillaryLeftSecondMolarTooth_Inactive",
+        "707049002": "SupernumeraryPermanentMaxillaryLeftThirdMolarTooth_Inactive",
+        "707052005": "SupernumeraryPermanentMandibularLeftThirdMolarTooth_Inactive",
+        "707054006": "SupernumeraryPermanentMandibularLeftSecondMolarTooth_Inactive",
+        "707055007": "SupernumeraryPermanentMandibularLeftFirstMolarTooth_Inactive",
+        "707056008": "SupernumeraryPermanentMandibularLeftSecondPremolarTooth_Inactive",
+        "707057004": "SupernumeraryPermanentMandibularLeftFirstPremolarTooth_Inactive",
+        "707058009": "SupernumeraryPermanentMandibularLeftCanineTooth_Inactive",
+        "707059001": "SupernumeraryPermanentMandibularLeftLateralIncisorTooth_Inactive",
+        "707060006": "SupernumeraryPermanentMandibularLeftCentralIncisorTooth_Inactive",
+        "707061005": "SupernumeraryPermanentMandibularRightCentralIncisorTooth_Inactive",
+        "707062003": "SupernumeraryPermanentMandibularRightLateralIncisorTooth_Inactive",
+        "707063008": "SupernumeraryPermanentMandibularRightCanineTooth_Inactive",
+        "707064002": "SupernumeraryPermanentMandibularRightFirstPremolarTooth_Inactive",
+        "707065001": "SupernumeraryPermanentMandibularRightSecondPremolarTooth_Inactive",
+        "707066000": "SupernumeraryPermanentMandibularRightFirstMolarTooth_Inactive",
+        "707067009": "SupernumeraryPermanentMandibularRightSecondMolarTooth_Inactive",
+        "707068004": "SupernumeraryPermanentMandibularRightThirdMolarTooth_Inactive",
     },
     "MDC": {
         "2:98": "ChestLeadSymmetricPlacement",  # CID 3001
@@ -200,6 +281,11 @@ KEYWORD_FIXES = {
         "109046": "StartOfAtrialContractionSubsequent",  # CID 3339
         "110818": "T2StarWeightedDynamicContrastEnhancedMRSignalIntensity",  # CID 218
         "110806": "T2StarWeightedMRSignalIntensity",  # CID 218
+        "109931": "DINGrayscalePatternBild2",
+        "109932": "DINGeometryPatternBild3",
+        "110012": "TranscriptionOutput",
+        "111103": "Density_Retired",  # -> SCT 129793001
+        "111137": "Ultrasound_Retired",  # -> SCT 16310003
         "111487": "MammographicCrosshair",  # CID 6058
         "111488": "MammographicGrid",  # CID 6058
         "112300": "APPlus45",  # CID 7303
@@ -207,12 +293,25 @@ KEYWORD_FIXES = {
         "112702": "SlideMicroscopyPathologyImaging",  # CID 8131, 29, 30, 33
         "113064": "T2Star",  # CID 218
         "113076": "SegmentationImageDerivation",  # CID 7203, 32, 33
+        "113735": "ExposureTime_Retired",  # -> DCM 113824
         "113806": "StationaryAcquisitionCT",  # CID 10013, 10002
+        "113853": "IrradiationEventUID_Retired",  # -> DCM 113769
         "113951": "FilmDetectorType",  # CID 10030, 405
+        "121201": "AreaOutline_Retired",  # -> DCM 121056
         "126395": "R2Star",  # CID 218
         "128186": "RTPrescriptionResultForRTTreatmentPlanning",  # CID 9510, 7010, 7023
         "128304": "OCTAOneSidedRatioLesser",  # CID 4270
         "128305": "OCTAOneSidedRatioGreater",  # CID 4270
+        "121210": "Path_Retired",  # -> DCM 121055
+        "121213": "PerimeterOutline_Retired",  # -> DCM 121057
+        "121428": "Calculated_Retired",  # -> SCT 258090004
+        "122046": "EquipmentFailure_Retired",  # -> DCM 110501
+        "122383": "EntirePullback",  # Mismatched in CID 3487
+        "122384": "StentedRegion",  # Mismatched in CID 3487
+        "126712": "FlubatineF18_Retired",  # -> DCM 126503
+        "": "",  #
+        "DOC": "DocumentProducer",
+        "FID": "SpatialFiducialsProducer",
     },
     "RADLEX": {
         "RID50296": "PIRADS1VeryLowLesion",  # CID 6328, 6324, 6325
@@ -585,7 +684,7 @@ def write_concepts(
         f.write("concepts = {}\n")  # start with empty dict
         for scheme, value in concepts.items():
             f.write(f"\nconcepts['{scheme}'] = \\\n")
-            pprint(value, f)
+            pprint(value, f, width=200)
 
     # Write the CID dict
     path = SR_DIRECTORY / "_cid_dict.py"
@@ -695,7 +794,6 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
     name_for_cid: dict[int, str] = {}
 
     # Mapping code <-> keyword(s)
-    # codes_kw = {}
     kw_codes = {}
 
     cid_paths = sorted(
@@ -728,6 +826,18 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
 
             for concept in group["concept"]:
                 code = concept["code"].strip()
+
+                # Fix incorrect code in CID4412
+                if cid == 4412 and code == "7539900":
+                    code = "75399008"
+
+                # Fix incorrect code value in CID 6337
+                if cid in (6337, 6335, 6336):
+                    if code == "Focal abnormality":
+                        code = "130591"
+                    elif code == "Non-focal abnormality":
+                        code = "130592"
+
                 display = concept["display"].strip()
                 try:
                     code_keyword = KEYWORD_FIXES[scheme_designator][code]
@@ -785,17 +895,28 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
 
         cid_lists[cid] = cid_concepts
 
+    duplicates = False
+
     LOGGER.debug("Applying SCT mappings to the concepts")
     scheme_designator = "SCT"
     # snomed_codes = get_table_o1()
     for code, srt_code, meaning in snomed_mapping:
-        name = keyword_from_meaning(meaning)
+        try:
+            name = KEYWORD_FIXES[scheme_designator][code]
+        except KeyError:
+            name = keyword_from_meaning(meaning)
+
         if name not in concepts[scheme_designator]:
             concepts[scheme_designator][name] = {code: (meaning, [])}
         else:
-            prior = concepts[scheme_designator][name]
-            if code not in prior:
-                prior[code] = (meaning, [])
+            previous = concepts[scheme_designator][name]
+            if code not in previous:
+                previous[code] = (meaning, [])
+                duplicates = True
+                LOGGER.error(
+                    f"  {scheme_designator}: keyword '{name}' is being "
+                    f"used for different codes {previous}"
+                )
 
     LOGGER.debug("Applying DCM mappings to the concepts")
     scheme_designator = "DCM"
@@ -804,20 +925,30 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
         if code == "..." or meaning == "...":
             continue
 
-        name = keyword_from_meaning(meaning)
+        try:
+            name = KEYWORD_FIXES[scheme_designator][code]
+        except KeyError:
+            name = keyword_from_meaning(meaning)
+
         if name not in concepts[scheme_designator]:
             concepts[scheme_designator][name] = {code: (meaning, [])}
         else:
-            prior = concepts[scheme_designator][name]
-            if code not in prior:
-                prior[code] = (meaning, [])
+            previous = concepts[scheme_designator][name]
+            if code not in previous:
+                previous[code] = (meaning, [])
+                duplicates = True
+                LOGGER.error(
+                    f"  {scheme_designator}: keyword '{name}' is being "
+                    f"used for different codes {previous}"
+                )
 
     for scheme in kw_codes:
         for codes in kw_codes[scheme].values():
             if len(set(codes)) != 1:
-                raise ValueError(
-                    "Each keyword must correspond to one and only one code"
-                )
+                duplicates = True
+
+    if duplicates:
+        raise ValueError("Each keyword must correspond to one and only one code")
 
     return concepts, cid_lists, name_for_cid
 
