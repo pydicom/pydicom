@@ -269,6 +269,7 @@ the maximum allowed length of the <cite>prefix</cite> has been changed to 54 cha
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.VM" title="pydicom.dataelem.DataElement.VM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.VM</span></code></a> always returns <code class="docutils literal notranslate"><span class="pre">1</span></code>
 for <strong>SQ</strong> elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1481">#1481</a>).</p></li>
 <li><p>DICOM dictionary updated to 2023d.</p></li>
+<li><p>Concepts dictionaries updated to 2024c.</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.validate_file_meta.html#pydicom.dataset.validate_file_meta" title="pydicom.dataset.validate_file_meta"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_file_meta()</span></code></a> now checks to ensure required
 Type 1 elements aren’t empty.</p></li>
 <li><p><cite>implicit_vr</cite> and <cite>little_endian</cite> optional arguments added to
@@ -465,6 +466,8 @@ for controlling pixel data decoding when using <a class="reference internal" hre
 <li><p><a class="reference internal" href="../reference/generated/pydicom.pixels.utils.get_j2k_parameters.html#pydicom.pixels.utils.get_j2k_parameters" title="pydicom.pixels.utils.get_j2k_parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_j2k_parameters()</span></code></a> now takes into account the JP2 header
 (if present, although it’s non-conformant for it to be) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2073">#2073</a>)</p></li>
 <li><p>Added support for NumPy v2.0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2075">#2075</a>)</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">pydicom.__concepts_version__</span></code> attribute with the DICOM Standard version used to
+create the concepts dictionaries in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1021">#1021</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -505,6 +508,8 @@ the <em>Pixel Data</em> element value until after saving (<a class="reference ex
 set to an appropriate value for correct interpretation of the data.</p></li>
 <li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">RecursionError</span></code> when using <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> with a dataset containing
 a private block (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2025">#2025</a>)</p></li>
+<li><p>Fixed non-unique keywords for the concept codes in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1388">#1388</a>)</p></li>
+<li><p>Fixed keywords using Python identifiers in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1273">#1273</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">
