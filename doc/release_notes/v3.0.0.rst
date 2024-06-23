@@ -250,7 +250,7 @@ Fixes
 * Fixed a ``RecursionError`` when using :func:`copy.deepcopy` with a dataset containing
   a private block (:issue:`2025`)
 * Fixed non-unique keywords for the concept codes in ``pydicom.sr`` (:issue:`1388`)
-* Fixed keywords using Python indentifiers in ``pydicom.sr`` (:issue:`1273`)
+* Fixed keywords using Python identifiers in ``pydicom.sr`` (:issue:`1273`)
 
 
 Deprecations

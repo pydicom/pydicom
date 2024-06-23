@@ -898,7 +898,6 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
 
     LOGGER.debug("Applying SCT mappings to the concepts")
     scheme_designator = "SCT"
-    # snomed_codes = get_table_o1()
     for code, srt_code, meaning in snomed_mapping:
         try:
             name = KEYWORD_FIXES[scheme_designator][code]
@@ -920,7 +919,7 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
     LOGGER.debug("Applying DCM mappings to the concepts")
     scheme_designator = "DCM"
     for code, meaning in dicom_mapping:
-        # 2023b has row with ellipses after 113270 for some reason
+        # 2024b has row with ellipses after 113270 for some reason
         if code == "..." or meaning == "...":
             continue
 
