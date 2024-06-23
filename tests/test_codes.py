@@ -180,6 +180,13 @@ class TestCollection:
         assert "Transverse" in dir(coll)
         assert "Foo" not in dir(coll)
 
+        coll = Collection("CID4")
+        matches = coll.dir("Thoracic")
+        assert "CervicoThoracicSpine" in matches
+        assert "IntraThoracic" in matches
+        assert "StructureOfDescendingThoracicAorta" in matches
+        assert "ThoracicSpine" in matches
+
         # Check None_
         coll = Collection("CID606")
         assert "None_" in coll
