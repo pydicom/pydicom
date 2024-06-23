@@ -309,7 +309,6 @@ KEYWORD_FIXES = {
         "122383": "EntirePullback",  # Mismatched in CID 3487
         "122384": "StentedRegion",  # Mismatched in CID 3487
         "126712": "FlubatineF18_Retired",  # -> DCM 126503
-        "": "",  #
         "DOC": "DocumentProducer",
         "FID": "SpatialFiducialsProducer",
     },
