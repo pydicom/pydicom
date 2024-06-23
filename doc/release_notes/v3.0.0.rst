@@ -208,7 +208,9 @@ Enhancements
   (if present, although it's non-conformant for it to be) (:issue:`2073`)
 * Added support for NumPy v2.0 (:issue:`2075`)
 * Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
-  create the concepts dictionaries in ``pydicom.sr`` (:issue:`1021`)
+  create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`)
+* Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
+  (:issue:`1454`)
 
 
 Fixes
@@ -249,8 +251,8 @@ Fixes
   set to an appropriate value for correct interpretation of the data.
 * Fixed a ``RecursionError`` when using :func:`copy.deepcopy` with a dataset containing
   a private block (:issue:`2025`)
-* Fixed non-unique keywords for the concept codes in ``pydicom.sr`` (:issue:`1388`)
-* Fixed keywords using Python identifiers in ``pydicom.sr`` (:issue:`1273`)
+* Fixed non-unique keywords for the concept codes in :mod:`pydicom.sr` (:issue:`1388`)
+* Fixed keywords using Python identifiers in :mod:`pydicom.sr` (:issue:`1273`)
 
 
 Deprecations
