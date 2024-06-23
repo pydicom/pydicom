@@ -27,6 +27,7 @@ Changes
 * :attr:`DataElement.VM<pydicom.dataelem.DataElement.VM>` always returns ``1``
   for **SQ** elements (:issue:`1481`).
 * DICOM dictionary updated to 2023d.
+* Concepts dictionaries updated to 2024c.
 * :func:`~pydicom.dataset.validate_file_meta` now checks to ensure required
   Type 1 elements aren't empty.
 * `implicit_vr` and `little_endian` optional arguments added to
@@ -206,6 +207,8 @@ Enhancements
 * :func:`~pydicom.pixels.utils.get_j2k_parameters` now takes into account the JP2 header
   (if present, although it's non-conformant for it to be) (:issue:`2073`)
 * Added support for NumPy v2.0 (:issue:`2075`)
+* Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
+  create the concepts dictionaries in ``pydicom.sr`` (:issue:`1021`)
 
 
 Fixes
@@ -246,6 +249,8 @@ Fixes
   set to an appropriate value for correct interpretation of the data.
 * Fixed a ``RecursionError`` when using :func:`copy.deepcopy` with a dataset containing
   a private block (:issue:`2025`)
+* Fixed non-unique keywords for the concept codes in ``pydicom.sr`` (:issue:`1388`)
+* Fixed keywords using Python identifiers in ``pydicom.sr`` (:issue:`1273`)
 
 
 Deprecations

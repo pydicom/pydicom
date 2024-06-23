@@ -95,8 +95,7 @@ class _CID_Dict:
                 (code, val) for code, val in identifiers.items() if self.cid in val[1]
             ]
             if len(_matches) > 1:
-                # Rare, but multiple codes may end up with the same identifier
-                # See CID 12300 for example
+                # Multiple codes shouldn't have the same keyword, but just in case
                 codes = ", ".join([f"'{v[0]}'" for v in _matches])
                 raise AttributeError(
                     f"'{name}' has multiple code matches in CID {self.cid}: {codes}"
