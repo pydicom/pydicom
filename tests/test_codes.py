@@ -273,9 +273,7 @@ class TestConcepts:
 
     def test_init(self):
         """Test creating a new instance"""
-        colls = Concepts(
-            [Collection("SCT"), Collection("CID2")]
-        )
+        colls = Concepts([Collection("SCT"), Collection("CID2")])
 
         assert list(colls.collections) == ["SCT", "CID2"]
         assert colls.schemes() == ["SCT"]
@@ -283,9 +281,7 @@ class TestConcepts:
 
     def test_getattr(self):
         """Test Concepts.Foo"""
-        colls = Concepts(
-            [Collection("SCT"), Collection("CID2")]
-        )
+        colls = Concepts([Collection("SCT"), Collection("CID2")])
 
         assert isinstance(colls.SCT, Collection)
         assert isinstance(colls.CID2, Collection)

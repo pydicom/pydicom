@@ -3,7 +3,7 @@
 
 from itertools import chain
 import inspect
-from typing import cast, Union, Any
+from typing import cast, Any
 from collections.abc import KeysView, Iterable
 
 from pydicom.sr.coding import Code
