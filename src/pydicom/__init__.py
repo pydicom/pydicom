@@ -56,4 +56,5 @@ __all__ = [
     "__version__",
     "__version_info__",
     "__dicom_version__",
+    "__concepts_version__",
 ]
