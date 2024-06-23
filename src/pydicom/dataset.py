@@ -1487,7 +1487,7 @@ class Dataset:
         for tag in taglist:
             yield self[tag]
 
-    def elements(self) -> Iterator[DataElement]:
+    def elements(self) -> Iterator[DataElement | RawDataElement]:
         """Yield the top-level elements of the :class:`Dataset`.
 
         Examples

@@ -5,6 +5,7 @@ from collections.abc import Sequence, MutableSequence, Iterable
 from copy import deepcopy
 from struct import pack
 from typing import BinaryIO, Any, cast
+from collections.abc import Callable
 import zlib
 
 from pydicom import config
@@ -17,6 +18,7 @@ from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import (
     Tag,
+    BaseTag,
     ItemTag,
     ItemDelimiterTag,
     SequenceDelimiterTag,
@@ -214,11 +216,11 @@ def _correct_ambiguous_vr_element(
 
 
 def correct_ambiguous_vr_element(
-    elem: DataElement,
+    elem: DataElement | RawDataElement,
     ds: Dataset,
     is_little_endian: bool,
     ancestors: list[Dataset] | None = None,
-) -> DataElement:
+) -> DataElement | RawDataElement:
     """Attempt to correct the ambiguous VR element `elem`.
 
     When it's not possible to correct the VR, the element will be returned
@@ -314,10 +316,11 @@ def correct_ambiguous_vr(
     ancestors = [ds] if ancestors is None else ancestors
 
     # Iterate through the elements
-    for elem in ds:
+    for elem in ds.elements():
         # raw data element sequences can be written as they are, because we
         # have ensured that the transfer syntax has not changed at this point
         if elem.VR == VR.SQ:
+            elem = ds[elem.tag]
             for item in cast(MutableSequence["Dataset"], elem.value):
                 ancestors.insert(0, item)
                 correct_ambiguous_vr(item, is_little_endian, ancestors)
@@ -740,6 +743,7 @@ def write_dataset(
             fp_encoding = or_encoding
 
     fp.is_implicit_VR, fp.is_little_endian = cast(tuple[bool, bool], fp_encoding)
+    get_item: Callable[[BaseTag], DataElement | RawDataElement] = dataset.get_item
 
     # This function is doing some heavy lifting:
     #   If implicit -> explicit, runs ambiguous VR correction
@@ -750,6 +754,7 @@ def write_dataset(
         or dataset.original_character_set != dataset._character_set
     ):
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
+        get_item = dataset.__getitem__
 
     dataset_encoding = cast(
         None | str | list[str], dataset.get("SpecificCharacterSet", parent_encoding)
@@ -764,7 +769,7 @@ def write_dataset(
             continue
 
         with tag_in_exception(tag):
-            write_data_element(fp, dataset.get_item(tag), dataset_encoding)
+            write_data_element(fp, get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
 
