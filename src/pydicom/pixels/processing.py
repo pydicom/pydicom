@@ -297,6 +297,67 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     return arr
 
 
+def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
+    """Apply a Presentation LUT to `arr` and return the P-values.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`~numpy.ndarray` to apply the presentation LUT operation to.
+    ds : dataset.Dataset
+        A dataset containing :dcm:`Presentation LUT Module
+        <part03/sect_C.11.4.html>` elements.
+
+    Returns
+    -------
+    numpy.ndarray
+        If a Presentation LUT Module is present in `ds` then returns an array
+        of P-values, otherwise returns `arr` unchanged.
+
+    Notes
+    -----
+    If `ds` contains a Modality LUT and/or VOI LUT then they must be applied
+    before the Presentation LUT.
+    """
+    if "PresentationLUTSequence" in ds:
+        item = ds.PresentationLUTSequence[0]
+        # nr_entries is the number of entries in the LUT
+        # first_map is the first input value mapped and shall always be 0
+        # bit_depth is number of bits for each entry, up to 16
+        nr_entries, first_map, bit_depth = item.LUTDescriptor
+        nr_entries = 2**16 if nr_entries == 0 else nr_entries
+
+        itemsize = 8 if bit_depth <= 8 else 16
+        nr_bytes = nr_entries * (itemsize // 8)
+
+        # P-values to be mapped to the input, always unsigned
+        lut = np.frombuffer(item.LUTData[:nr_bytes], dtype=f"uint{itemsize}")
+        if (bit_shift := itemsize - bit_depth):
+            np.left_shift(lut, bit_shift, out=lut)
+            np.right_shift(lut, bit_shift, out=lut)
+
+        # Linearly scale `arr` to quantize it to `nr_entries` values
+        arr = arr.astype("float32")
+        arr -= arr.min()
+        arr /= arr.max() / (nr_entries - 1)
+        arr = arr.astype("uint16")
+
+        return lut[arr]
+
+    if "PresentationLUTShape" in ds:
+        transform = ds.PresentationLUTShape.strip().upper()
+        if transform not in ("IDENTITY", "INVERSE"):
+            raise NotImplementedError(
+                "A (2050,0020) 'Presentation LUT Shape' value of "
+                f"'{ds.PresentationLUTShape}' is not supported"
+            )
+
+        if transform == "INVERSE":
+            arr = arr.max() - arr
+
+    return arr
+
+
 apply_rescale = apply_modality_lut
 
 

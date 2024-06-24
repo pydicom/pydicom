@@ -209,6 +209,8 @@ Enhancements
 * Added support for NumPy v2.0 (:issue:`2075`)
 * Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
   create the concepts dictionaries in ``pydicom.sr`` (:issue:`1021`)
+* Added :func:`~pydicom.pixels.apply_presentation_lut` for applying a Presentation LUT
+  to an :class:`~numpy.ndarray` (:issue:`1265`)
 
 
 Fixes

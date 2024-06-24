@@ -5,6 +5,7 @@ from pydicom.pixels.encoders.base import get_encoder
 from pydicom.pixels.processing import (
     apply_color_lut,
     apply_modality_lut,
+    apply_presentation_lut,
     apply_rescale,
     apply_voi_lut,
     apply_voi,
