@@ -332,8 +332,9 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
         # P-values to be mapped to the input, always unsigned
         lut = np.frombuffer(item.LUTData[:nr_bytes], dtype=f"uint{itemsize}")
+        # Set any unused bits to an appropriate value
         if (bit_shift := itemsize - bit_depth):
-            np.left_shift(lut, bit_shift, out=lut)
+            lut = lut << bit_shift
             np.right_shift(lut, bit_shift, out=lut)
 
         # Linearly scale `arr` to quantize it to `nr_entries` values
