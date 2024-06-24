@@ -40,7 +40,24 @@ def add_nonunique_cid():
     CONCEPTS["TEST"] = {
         "Foo": {"BAR": ("Test A", [99999999999]), "BAZ": ("Test B", [99999999999])}
     }
-    CID_CONCEPTS[99999999999] = {"TEST": ["Foo", "Foo"]}  # , "TEST2": ["Foo"]}
+    CID_CONCEPTS[99999999999] = {"TEST": ["Foo", "Foo"]}
+    name_for_cid[99999999999] = "Test"
+    yield
+    del CONCEPTS["TEST"]
+    del CID_CONCEPTS[99999999999]
+    del name_for_cid[99999999999]
+
+
+@pytest.fixture()
+def add_multiple_cid():
+    """Add multiple codes for a keyword, but with different CIDs"""
+    CONCEPTS["TEST"] = {
+        "Foo": {
+            "BAR": ("Test A", [99999999999]),
+            "BAZ": ("Test B", [99999999998]),
+        },
+    }
+    CID_CONCEPTS[99999999999] = {"TEST": ["Foo"]}
     name_for_cid[99999999999] = "Test"
     yield
     del CONCEPTS["TEST"]
@@ -170,6 +187,10 @@ class TestCollection:
         assert "Transverse" in coll
         assert "Foo" not in coll
 
+        c = Code("24028007", "SCT", "Right")
+        assert c in codes.CID244
+        assert c in codes.SCT
+
     def test_dir(self):
         """Test dir()"""
         coll = Collection("UCUM")
@@ -216,6 +237,11 @@ class TestCollection:
 
         coll.foo = None
         assert coll.foo is None
+
+    def test_getattr_multiple_cid(self, add_multiple_cid):
+        """Test Collection.Foo for a CID"""
+        coll = Collection("CID99999999999")
+        assert coll.Foo == Code("BAR", scheme_designator="TEST", meaning="Test A")
 
     def test_getattr_multiple_raises(self, add_nonunique):
         """Test non-unique results for the keyword"""
