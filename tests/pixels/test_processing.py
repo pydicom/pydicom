@@ -24,6 +24,7 @@ from pydicom.pixels.processing import (
     apply_voi_lut,
     apply_voi,
     apply_windowing,
+    apply_presentation_lut,
 )
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 
@@ -1683,3 +1684,31 @@ class TestApplyVOILUT:
         ds.WindowWidth = None
         out = apply_voi_lut(arr, ds)
         assert [0, 1, 128, 254, 255] == out.tolist()
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestApplyPresentationLUT:
+    """Tests for apply_presentation_lut()"""
+
+    # Presentation LUT Shape
+    # plut_p01.pre 8/8/0/M2 INVERSE
+    # plut_p02.pre 8/8/0/M1 IDENTITY
+    # plut_p03.pre 16/12/1/M2 IDENTITY
+    # plut_p04.pre 16/12/1/M1 INVERSE
+
+    # X plut_p09.pre 8/8/0/M2 IDENTITY
+
+    # PresentationLUTSequence
+    # plut_p05.pre  8/8/0/M2 256/0/10 [0, 4, ...] US
+
+    # Can mock using p05
+    # X plut_p06.pre  8/8/0/M1 256/0/10 [1023, 1019, ...] US
+
+    # Non-zero first map???
+    # plut_p07.pre  16/12/1/M2 4096/63488/16 [0, 16, ...] US
+    # plut_p08.pre  16/12/1/M2 4096/63488/8 [0, ...] US
+
+    # Can simulate via US -> 'OW' and 'US or OW'
+    # X plut_p10.pre  8/8/0/M2 256/0/8  [0x00ff, 0x00fe, ...] OW
+
+    pass
