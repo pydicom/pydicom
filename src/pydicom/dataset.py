@@ -66,7 +66,9 @@ from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
 from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
-from pydicom.pixels.utils import reshape_pixel_array, get_image_pixel_ids
+from pydicom.pixels.utils import (
+    reshape_pixel_array, get_image_pixel_ids, set_pixel_data
+)
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
@@ -2785,6 +2787,52 @@ class Dataset:
             #   containing RawDataElements are being added to a different
             #   dataset
             self._set_pixel_representation(cast(DataElement, elem))
+
+    def set_pixel_data(
+        self,
+        arr: "numpy.ndarray",
+        photometric_interpretation: str,
+        bits_stored: int,
+    ) -> None:
+        """Use an :class:`~numpy.ndarray` to set the *Pixel Data* and related
+        Image Pixel module elements.
+
+        .. versionadded:: 3.0
+
+        The following :dcm:`Image Pixel<part03/sect_C.7.6.3.3.html#table_C.7-11c>`
+        module elements values will be updated or removed as necessary:
+
+        * (0028,0002) *Samples per Pixel* from `photometric_interpretation`.
+        * (0028,0008) *Number of Frames* from the array :attr:`~numpy.ndarray.shape`,
+          however it will be removed if `arr` only contains a single frame.
+        * (0028,0010) *Rows* and (0028,0011) *Column* from the array
+          :attr:`~numpy.ndarray.shape`.
+        * (0028,0100) *Bits Allocated* from the array :class:`~numpy.dtype`.
+        * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
+        * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
+        * (0028,0006) *Planar Configuration* will be added and set to ``0`` if
+          *Samples per Pixel* is > 1, otherwise it will be removed.
+
+        Parameters
+        ----------
+        arr : numpy.ndarray
+            An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
+            array must be shaped as one of the following:
+
+            * (rows, columns) for a single frame of grayscale data.
+            * (frames, rows, columns) for multi-frame grayscale data.
+            * (rows, columns, samples) for a single frame of multi-sample data
+              such as RGB.
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data.
+        photometric_interpretation : str
+            The value to use for (0028,0103) *Photometric Interpretation*. Valid
+            values are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``,
+            ``"RGB"``, ``"YBR_FULL"``, ``"YBR_FULL_422"``.
+        bits_stored : int
+            The value to use for (0028,0101) *Bits Stored*. Must be no greater than
+            the :attr:`~numpy.dtype.itemsize` of `arr`.
+        """
+        set_pixel_data(self, arr, photometric_interpretation, bits_stored)
 
     def _set_pixel_representation(self, elem: DataElement) -> None:
         """Set the `_pixel_rep` attribute for the current dataset and child
