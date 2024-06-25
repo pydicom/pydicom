@@ -67,7 +67,9 @@ from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
 from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
 from pydicom.pixels.utils import (
-    reshape_pixel_array, get_image_pixel_ids, set_pixel_data
+    reshape_pixel_array,
+    get_image_pixel_ids,
+    set_pixel_data,
 )
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
