@@ -236,7 +236,7 @@ def correct_ambiguous_vr_element(
 
     Parameters
     ----------
-    elem : dataelem.DataElement
+    elem : dataelem.DataElement or dataelem.RawDataElement
         The element with an ambiguous VR.
     ds : dataset.Dataset
         The dataset containing `elem`.
@@ -250,7 +250,7 @@ def correct_ambiguous_vr_element(
 
     Returns
     -------
-    dataelem.DataElement
+    dataelem.DataElement or dataelem.RawDataElement
         The corrected element
     """
     ancestors = [ds] if ancestors is None else ancestors
@@ -754,6 +754,8 @@ def write_dataset(
         or dataset.original_character_set != dataset._character_set
     ):
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
+        # Use __getitem__ instead or get_item to force parsing of RawDataElements into DataElements,
+        # so we can re-encode them with the correct charset and encoding
         get_item = dataset.__getitem__
 
     dataset_encoding = cast(
