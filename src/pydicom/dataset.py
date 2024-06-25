@@ -2825,7 +2825,7 @@ class Dataset:
               such as RGB.
             * (frames, rows, columns, samples) for multi-frame, multi-sample data.
         photometric_interpretation : str
-            The value to use for (0028,0103) *Photometric Interpretation*. Valid
+            The value to use for (0028,0103) *Photometric Interpretation*. Supported
             values are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``,
             ``"RGB"``, ``"YBR_FULL"``, ``"YBR_FULL_422"``.
         bits_stored : int

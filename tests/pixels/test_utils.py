@@ -34,6 +34,7 @@ from pydicom.pixels.utils import (
     get_j2k_parameters,
     get_nr_frames,
     pack_bits,
+    set_pixel_data,
     unpack_bits,
     expand_ybr422,
     compress,
@@ -1890,3 +1891,49 @@ class TestDecompress:
         decompress(ds, decoding_plugin="pydicom", new_instance_uid=False)
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestSetPixelData:
+    """Tests for set_pixel_data()"""
+
+    def test_float_pixel_data_raises(self):
+        """Test exception raised if float pixel data elements present"""
+        ds = Dataset()
+        ds.FloatPixelData = b"\x00\x00"
+        arr = np.zeros((10, 10), dtype="uint8")
+
+        msg = (
+            r"The dataset has \(7FE0,0008\) 'Float Pixel Data' or \(7FE0,0009\) "
+            "'Double Float Pixel Data' elements which must first be deleted"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+    def test_unsupported_dtype_raises(self):
+        """Test exception raised if dtype is unsupported"""
+        ds = Dataset()
+
+        msg = (
+            r"Unsupported ndarray dtype 'uint32', must be int8, int16, uint8 or uint16"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(ds, np.zeros((10, 10), dtype="uint32"), "MONOCHROME1", 8)
+
+        msg = (
+            r"Unsupported ndarray dtype 'float32', must be int8, int16, uint8 or uint16"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(ds, np.zeros((10, 10), dtype="float32"), "MONOCHROME1", 8)
+
+    def test_unsupported_photometric_interpretation_raises(self):
+        """Test exception raised if dtype is unsupported"""
+        ds = Dataset()
+
+        msg = "Unsupported 'photometric_interpretation' value 'YBR_RCT'"
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(ds, np.zeros((10, 10), dtype="int8"), "YBR_RCT", 8)
+
+    def test_unsupported_dimension_raises(self):
+        """Test exception raised if array dimensions are unsupported"""
+        pass
