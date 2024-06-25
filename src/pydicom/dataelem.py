@@ -519,7 +519,7 @@ class DataElement:
         ):
             raise TypeError(
                 "The value for (7FE0,0010) 'Pixel Data' should be set using 'bytes' "
-                "not 'numpy.ndarray'. See the 'Dataset.set_pixel_data()' method for "
+                "not 'numpy.ndarray'. See the Dataset.set_pixel_data() method for "
                 "an alternative that supports ndarrays."
             )
 

@@ -1232,3 +1232,22 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
+
+    @pytest.mark.skipif(not config.have_numpy, reason="Numpy is not available")
+    def test_pixel_data_ndarray_raises(self):
+        """Test exception raised if setting PixelData using ndarray"""
+        import numpy as np
+
+        ds = Dataset()
+        ds.PixelData = b"\x00\x01"
+        assert ds.PixelData == b"\x00\x01"
+
+        msg = (
+            r"The value for \(7FE0,0010\) 'Pixel Data' should be set using 'bytes' "
+            r"not 'numpy.ndarray'. See the Dataset.set_pixel_data\(\) method for "
+            "an alternative that supports ndarrays."
+        )
+        with pytest.raises(TypeError, match=msg):
+            ds.PixelData = np.ones((3, 4), dtype="u1")
+
+        assert ds.PixelData == b"\x00\x01"

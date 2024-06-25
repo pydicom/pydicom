@@ -1784,8 +1784,8 @@ def set_pixel_data(
         The value to use for (0028,0101) *Bits Stored*. Must be no greater than
         the :attr:`~numpy.dtype.itemsize` of `arr`.
     """
+    from pydicom.dataset import FileMetaDataset
     from pydicom.pixels.common import PhotometricInterpretation as PI
-
 
     if "FloatPixelData" in ds or "DoubleFloatPixelData" in ds:
         raise AttributeError(
@@ -1798,7 +1798,7 @@ def set_pixel_data(
     changes: dict[str, tuple[str, Any]] = {}
 
     shape, ndim, dtype = arr.shape, arr.ndim, arr.dtype
-    if dtype.kind not in ('u', 'i') or dtype.itemsize not in (1, 2):
+    if dtype.kind not in ("u", "i") or dtype.itemsize not in (1, 2):
         raise ValueError(
             f"Unsupported ndarray dtype '{dtype}', must be int8, int16, uint8 or "
             "uint16"
@@ -1806,7 +1806,7 @@ def set_pixel_data(
 
     # Use `photometric_interpretation` to determine *Samples Per Pixel*
     # Don't support retired (such as CMYK) or inappropriate values (such as YBR_RCT)
-    interpretations = {
+    interpretations: dict[str, int] = {
         PI.MONOCHROME1: 1,
         PI.MONOCHROME2: 1,
         PI.PALETTE_COLOR: 1,
@@ -1825,8 +1825,8 @@ def set_pixel_data(
     if nr_samples == 1:
         if ndim not in (2, 3):
             raise ValueError(
-                f"Invalid ndarray number of dimensions for grayscale data '{ndim}', "
-                "must be 2 or 3"
+                f"An ndarray with '{photometric_interpretation}' data must have 2 or 3 "
+                f"dimensions, not {ndim}"
             )
 
         # ndim = 3 is (frames, rows, columns), else (rows, columns)
@@ -1836,14 +1836,14 @@ def set_pixel_data(
     else:
         if ndim not in (3, 4):
             raise ValueError(
-                f"Invalid ndarray number of dimensions for multi-sample data '{ndim}', "
-                "must be 3 or 4"
+                f"An ndarray with '{photometric_interpretation}' data must have 3 or 4 "
+                f"dimensions, not {ndim}"
             )
 
         if shape[-1] != nr_samples:
             raise ValueError(
-                f"Mismatch between the array shape {shape} and the "
-                f"'photometric_interpretation' value '{photometric_interpretation}'"
+                f"An ndarray with '{photometric_interpretation}' data must have shape "
+                f"(rows, columns, 3) or (frames, rows, columns, 3), not {shape}"
             )
 
         # ndim = 3 is (rows, columns, samples), else (frames, rows, columns, samples)
@@ -1851,22 +1851,24 @@ def set_pixel_data(
         changes["Rows"] = ("+", shape[0] if ndim == 3 else shape[1])
         changes["Columns"] = ("+", shape[1] if ndim == 3 else shape[2])
 
-    # Check values in `arr` are in the range allowed by `bits_stored`
-    actual_min, actual_max = arr.min(), arr.max()
-    allowed_min = 0 if dtype.kind == "u" else -2**(bits_stored - 1)
-    allowed_max = 2**bits_stored - 1 if dtype.kind == "u" else 2**(bits_stored - 1) - 1
-    if actual_min < allowed_min or actual_max > allowed_max:
-        raise ValueError(
-            f"The range of values in the ndarray [{actual_min}, {actual_max}] is "
-            f"greater than that allowed by the 'bits_stored' value [{allowed_min}, "
-            f"{allowed_max}]"
-        )
-
     if not 0 < bits_stored <= dtype.itemsize * 8:
         raise ValueError(
             f"Invalid 'bits_stored' value '{bits_stored}', must be greater than 0 and "
             "less than or equal to the number of bits for the ndarray's itemsize "
             f"'{arr.dtype.itemsize * 8}'"
+        )
+
+    # Check values in `arr` are in the range allowed by `bits_stored`
+    actual_min, actual_max = arr.min(), arr.max()
+    allowed_min = 0 if dtype.kind == "u" else -(2 ** (bits_stored - 1))
+    allowed_max = (
+        2**bits_stored - 1 if dtype.kind == "u" else 2 ** (bits_stored - 1) - 1
+    )
+    if actual_min < allowed_min or actual_max > allowed_max:
+        raise ValueError(
+            f"The range of values in the ndarray [{actual_min}, {actual_max}] is "
+            f"greater than that allowed by the 'bits_stored' value [{allowed_min}, "
+            f"{allowed_max}]"
         )
 
     changes["SamplesPerPixel"] = ("+", nr_samples)
@@ -1880,24 +1882,25 @@ def set_pixel_data(
     # Update the Image Pixel module elements
     for keyword, (operation, value) in changes.items():
         if operation == "+":
-            ds[keyword] = value
+            setattr(ds, keyword, value)
         elif operation == "-" and keyword in ds:
             del ds[keyword]
 
     # Part 3, C.7.6.3.1.2: YBR_FULL_422 data needs to be downsampled
     if photometric_interpretation == PI.YBR_FULL_422:
         # Y1 B1 R1 Y2 B1 R1 -> Y1 Y2 B1 R1
+        arr = arr.ravel()
         out = np.empty(arr.size // 3 * 2, dtype=dtype)
         out[::4] = arr[::6]  # Y1
         out[1::4] = arr[3::6]  # Y2
-        out[2::4] = out[1::6]  # B
-        out[3::4] = out[2::6]  # R
+        out[2::4] = arr[1::6]  # B
+        out[3::4] = arr[2::6]  # R
         arr = out
 
     # Update the Pixel Data
     data = arr.tobytes()
+    ds.PixelData = data if len(data) % 2 == 0 else b"".join((data, b"\x00"))
     elem = ds["PixelData"]
-    elem.value = data if len(data) % 2 == 0 else b"".join((data, b"\x00"))
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
     elem.is_undefined_length = False
 
