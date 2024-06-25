@@ -212,7 +212,7 @@ Enhancements
 * Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
   create the concepts dictionaries in ``pydicom.sr`` (:issue:`1021`)
 * Added the :meth:`Dataset.set_pixel_data()<pydicom.dataset.Dataset.set_pixel_data>` method
-  and :func:`~pydicom.pixels.utils.set_pixel_data` function for automatically setting a
+  and :func:`~pydicom.pixels.set_pixel_data` function for automatically setting a
   dataset's *Pixel Data* and related Image Pixel module elements using an
   :class:`~numpy.ndarray` (:issue:`50`)
 
