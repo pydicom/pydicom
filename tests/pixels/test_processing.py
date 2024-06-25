@@ -1916,3 +1916,28 @@ class TestApplyPresentationLUT:
         results = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
         for (y, x), result in zip(coords, results):
             assert out[y, x] == result
+
+    def test_sequence_bit_shift(self):
+        """Test bit shifting read-only LUTData"""
+        ds = dcmread(MOD_16_SEQ)
+        assert ds.BitsStored == 12
+        assert ds.PixelRepresentation == 1
+        ds.PresentationLUTSequence = [Dataset()]
+        seq = ds.PresentationLUTSequence
+
+        # 256 entries, 10 bit output
+        seq[0].LUTDescriptor = [256, 0, 10]
+        seq[0].LUTData = [int(round(x * (2**10 - 1) / 255, 0)) for x in range(0, 256)]
+        seq[0].LUTData = b"".join(
+            x.to_bytes(length=2, byteorder="little") for x in seq[0].LUTData
+        )
+        seq[0]["LUTData"].VR = "OW"
+
+        out = apply_presentation_lut(ds.pixel_array, ds)
+        results = [0, 100, 205, 305, 409, 509, 614, 714, 818, 919, 1023]
+        coords = [(335, 130), (285, 130), (235, 130), (185, 130), (185, 180)]
+        coords.extend(
+            [(185, 230), (185, 330), (185, 380), (235, 380), (285, 380), (335, 380)]
+        )
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
