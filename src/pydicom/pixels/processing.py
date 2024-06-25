@@ -318,6 +318,11 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     -----
     If `ds` contains a Modality LUT and/or VOI LUT then they must be applied
     before the Presentation LUT.
+
+    See Also
+    --------
+    :func:`~pydicom.pixels.processing.apply_modality_lut`
+    :func:`~pydicom.pixels.processing.apply_voi_lut`
     """
     if "PresentationLUTSequence" in ds:
         item = ds.PresentationLUTSequence[0]
@@ -333,7 +338,7 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # P-values to be mapped to the input, always unsigned
         # LUTData is (US or OW)
         elem = item["LUTData"]
-        if elem.VR == "US":
+        if elem.VR == VR.US:
             lut = np.asarray(elem.value, dtype="u2")
         else:
             lut = np.frombuffer(item.LUTData[:nr_bytes], dtype=f"uint{itemsize}")
