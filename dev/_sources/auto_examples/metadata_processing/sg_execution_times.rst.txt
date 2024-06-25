@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.012** total execution time for 3 files **from auto_examples/metadata_processing**:
+**00:00.011** total execution time for 3 files **from auto_examples/metadata_processing**:
 
 .. container::
 
@@ -39,5 +39,5 @@ Computation times
      - 00:00.003
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py` (``plot_sequences.py``)
-     - 00:00.002
+     - 00:00.001
      - 0.0
