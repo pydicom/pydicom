@@ -1799,7 +1799,9 @@ class TestApplyPresentationLUT:
         # 4096 entries, 8-bit output, LUTData as 8-bit bytes
         seq[0].LUTDescriptor = [4096, 0, 8]
         seq[0]["LUTData"].VR = "OW"
-        seq[0].LUTData = b"".join(x.to_bytes(length=1) for x in seq[0].LUTData)
+        seq[0].LUTData = b"".join(
+            x.to_bytes(length=1, byteorder="little") for x in seq[0].LUTData
+        )
         out = apply_presentation_lut(arr, ds)
         for (y, x), result in zip(coords, results):
             assert out[y, x] == result
