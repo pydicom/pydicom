@@ -1793,8 +1793,7 @@ def set_pixel_data(
             "'Double Float Pixel Data' elements which must first be deleted "
         )
 
-    # The aim is to minimise the required args while guaranteeing conformance
-    # Make no changes to the dataset until after validation checks have passed
+    # Make no changes to the dataset until after validation checks have passed!
     changes: dict[str, tuple[str, Any]] = {}
 
     shape, ndim, dtype = arr.shape, arr.ndim, arr.dtype
