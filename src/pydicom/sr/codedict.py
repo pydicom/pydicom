@@ -328,7 +328,7 @@ class Concepts:
             return self._collections[name]
 
         raise AttributeError(
-            f"'{type(self).__name__}' object has not attribute '{name}'"
+            f"'{type(self).__name__}' object has no attribute '{name}'"
         )
 
     def schemes(self) -> list[str]:

@@ -322,6 +322,6 @@ class TestConcepts:
         colls.foo = None
         assert colls.foo is None
 
-        msg = "'Concepts' object has not attribute 'Foo'"
+        msg = "'Concepts' object has no attribute 'Foo'"
         with pytest.raises(AttributeError, match=msg):
             colls.Foo
