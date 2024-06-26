@@ -299,7 +299,7 @@ class Concepts:
     """
 
     def __init__(self, collections: list[Collection]) -> None:
-        """Create a new something.
+        """Create a new concepts management class instance.
 
         Parameters
         ----------
@@ -326,6 +326,10 @@ class Concepts:
 
         if name in self._collections:
             return self._collections[name]
+
+        raise AttributeError(
+            f"'{type(self).__name__}' object has not attribute '{name}'"
+        )
 
     def schemes(self) -> list[str]:
         """Return a list of available scheme designations."""
