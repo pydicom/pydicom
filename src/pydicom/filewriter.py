@@ -364,8 +364,8 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
             fp.write(pack(format_string, value))
         else:
             # Some ambiguous VR elements ignore the VR for part of the value
-            # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first value
-            # is always US
+            # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first and
+            #   third values are always US (the third should be <= 16, so SS is OK)
             if struct_format == "h" and elem.tag in _LUT_DESCRIPTOR_TAGS and value:
                 fp.write(pack(f"{endianChar}H", value[0]))
                 value = value[1:]
