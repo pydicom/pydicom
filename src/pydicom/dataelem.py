@@ -527,6 +527,20 @@ class DataElement:
         if len(val) == 1:
             return self._convert(val[0])
 
+        # Some ambiguous VR elements ignore the VR for part of the value
+        # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first value
+        #   is always US
+        if self.tag in _LUT_DESCRIPTOR_TAGS and val:
+
+            def _skip_conversion(val: Any) -> Any:
+                return val
+
+            validate_value(VR_.US, val[0], self.validation_mode)
+            for value in val[1:]:
+                validate_value(self.VR, value, self.validation_mode)
+
+            return MultiValue(_skip_conversion, val)
+
         return MultiValue(self._convert, val)
 
     def _convert(self, val: Any) -> Any:
