@@ -44,6 +44,7 @@ from pydicom.uid import (
     EnhancedMRImageStorage,
     ExplicitVRLittleEndian,
     ExplicitVRBigEndian,
+    ImplicitVRLittleEndian,
     UncompressedTransferSyntaxes,
     RLELossless,
     JPEG2000Lossless,
@@ -2242,6 +2243,23 @@ class TestSetPixelData:
         assert elem.is_undefined_length is False
 
         assert np.array_equal(pixel_array(ds, raw=True), arr)
+
+    def test_transfer_syntax(self):
+        """Test setting the transfer syntax"""
+        ds = Dataset()
+
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+
+        del ds.file_meta.TransferSyntaxUID
+
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
+
+        ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
 
     def test_dataset_set_pixel_data(self):
         """Functionality test for Dataset.set_pixel_data()"""

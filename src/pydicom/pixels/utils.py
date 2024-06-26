@@ -1750,18 +1750,24 @@ def set_pixel_data(
     .. versionadded:: 3.0
 
     The following :dcm:`Image Pixel<part03/sect_C.7.6.3.3.html#table_C.7-11c>`
-    module elements values will be updated or removed as necessary:
+    module elements values will be added, updated or removed as necessary:
 
-    * (0028,0002) *Samples per Pixel* from `photometric_interpretation`.
+    * (0028,0002) *Samples per Pixel* using a value corresponding to
+      `photometric_interpretation`.
+    * (0028,0004) *Photometric Interpretation* from `photometric_interpretation`.
+    * (0028,0006) *Planar Configuration* will be added and set to ``0`` if
+      *Samples per Pixel* is > 1, otherwise it will be removed.
     * (0028,0008) *Number of Frames* from the array :attr:`~numpy.ndarray.shape`,
       however it will be removed if `arr` only contains a single frame.
-    * (0028,0010) *Rows* and (0028,0011) *Column* from the array
+    * (0028,0010) *Rows* and (0028,0011) *Columns* from the array
       :attr:`~numpy.ndarray.shape`.
     * (0028,0100) *Bits Allocated* from the array :class:`~numpy.dtype`.
     * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
     * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
-    * (0028,0006) *Planar Configuration* will be added and set to ``0`` if
-      *Samples per Pixel* is > 1, otherwise it will be removed.
+
+    In addition, the *Transfer Syntax UID* will be set to *Explicit VR Little
+    Endian* if it doesn't already exist or uses a compressed (encapsulated)
+    transfer syntax.
 
     Parameters
     ----------
@@ -1777,12 +1783,12 @@ def set_pixel_data(
           such as RGB.
         * (frames, rows, columns, samples) for multi-frame, multi-sample data.
     photometric_interpretation : str
-        The value to use for (0028,0103) *Photometric Interpretation*. Valid values
+        The value to use for (0028,0004) *Photometric Interpretation*. Valid values
         are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``, ``"RGB"``,
         ``"YBR_FULL"``, ``"YBR_FULL_422"``.
     bits_stored : int
         The value to use for (0028,0101) *Bits Stored*. Must be no greater than
-        the :attr:`~numpy.dtype.itemsize` of `arr`.
+        the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
     """
     from pydicom.dataset import FileMetaDataset
     from pydicom.pixels.common import PhotometricInterpretation as PI
@@ -1909,7 +1915,9 @@ def set_pixel_data(
     if not hasattr(ds, "file_meta"):
         ds.file_meta = FileMetaDataset()
 
-    ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+    tsyntax = ds.file_meta.get("TransferSyntaxUID", None)
+    if not tsyntax or tsyntax.is_compressed:
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
 
 def unpack_bits(src: bytes, as_array: bool = True) -> "np.ndarray | bytes":
