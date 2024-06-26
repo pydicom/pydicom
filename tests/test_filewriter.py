@@ -2683,7 +2683,14 @@ class TestWriteNumbers:
         assert fp.getvalue() == b"\x00\x80\x00\x00\x10\x00"
 
         fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00283002, "SS", [])
+        write_numbers(fp, elem, "h")
+        assert fp.getvalue() == b""
+
+        fp = DicomBytesIO()
         fp.is_little_endian = False
+        elem = DataElement(0x00283002, "SS", [32768, 0, 16])
         write_numbers(fp, elem, "h")
         assert fp.getvalue() == b"\x80\x00\x00\x00\x00\x10"
 
