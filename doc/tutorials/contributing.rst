@@ -16,8 +16,6 @@ out:
   `stackoverflow <https://stackoverflow.com/questions/tagged/pydicom>`_,
   the `Google groups page <https://groups.google.com/forum/#!forum/pydicom>`_,
   or :gh:`GitHub <pydicom/issues>`.
-* Submitting useful scripts, tutorials or plugins to the
-  :gh:`contrib-pydicom <contrib-pydicom>` project
 
 
 If it's your first time contributing to *pydicom* then we have tutorials for:
