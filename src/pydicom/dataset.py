@@ -2795,6 +2795,8 @@ class Dataset:
         arr: "numpy.ndarray",
         photometric_interpretation: str,
         bits_stored: int,
+        *,
+        new_instance_uid: bool = True,
     ) -> None:
         """Use an :class:`~numpy.ndarray` to set the *Pixel Data* and related
         Image Pixel module elements.
@@ -2817,9 +2819,12 @@ class Dataset:
         * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
         * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
 
-        In addition, the *Transfer Syntax UID* will be set to *Explicit VR Little
-        Endian* if it doesn't already exist or uses a compressed (encapsulated)
-        transfer syntax.
+        In addition:
+
+        * The *Transfer Syntax UID* will be set to *Explicit VR Little Endian* if
+          it doesn't already exist or uses a compressed (encapsulated) transfer syntax.
+        * If `new_instance_uid` is ``True`` (default) then the *SOP Instance UID*
+          will be added or updated.
 
         Parameters
         ----------
@@ -2839,8 +2844,22 @@ class Dataset:
         bits_stored : int
             The value to use for (0028,0101) *Bits Stored*. Must be no greater than
             the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+        new_instance_uid : bool, optional
+            If ``True`` (default) then add or update the (0008,0018) *SOP Instance
+            UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
+
+        Raises
+        ------
+        NotImplementedError
+            If the dataset has a big-endian *Transfer Syntax UID*.
         """
-        set_pixel_data(self, arr, photometric_interpretation, bits_stored)
+        set_pixel_data(
+            self,
+            arr,
+            photometric_interpretation,
+            bits_stored,
+            new_instance_uid=new_instance_uid,
+        )
 
     def _set_pixel_representation(self, elem: DataElement) -> None:
         """Set the `_pixel_rep` attribute for the current dataset and child

@@ -1743,6 +1743,8 @@ def set_pixel_data(
     arr: "np.ndarray",
     photometric_interpretation: str,
     bits_stored: int,
+    *,
+    new_instance_uid: bool = True,
 ) -> None:
     """Use an :class:`~numpy.ndarray` to set a dataset's *Pixel Data* and related
     Image Pixel module elements.
@@ -1765,14 +1767,18 @@ def set_pixel_data(
     * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
     * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
 
-    In addition, the *Transfer Syntax UID* will be set to *Explicit VR Little
-    Endian* if it doesn't already exist or uses a compressed (encapsulated)
-    transfer syntax.
+    In addition:
+
+    * The *Transfer Syntax UID* will be set to *Explicit VR Little
+      Endian* if it doesn't already exist or uses a compressed (encapsulated)
+      transfer syntax.
+    * If `new_instance_uid` is ``True`` (default) then the *SOP Instance UID*
+      will be added or updated.
 
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
-        The dataset to modify.
+        The little endian encoded dataset to be modified.
     arr : np.ndarray
         An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
         array must be shaped as one of the following:
@@ -1789,14 +1795,29 @@ def set_pixel_data(
     bits_stored : int
         The value to use for (0028,0101) *Bits Stored*. Must be no greater than
         the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+    new_instance_uid : bool, optional
+        If ``True`` (default) then add or update the (0008,0018) *SOP Instance
+        UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
     """
     from pydicom.dataset import FileMetaDataset
     from pydicom.pixels.common import PhotometricInterpretation as PI
 
-    if "FloatPixelData" in ds or "DoubleFloatPixelData" in ds:
+    if (elem := ds.get(0x7FE00008, None)) or (elem := ds.get(0x7FE00009, None)):
         raise AttributeError(
-            "The dataset has (7FE0,0008) 'Float Pixel Data' or (7FE0,0009) "
-            "'Double Float Pixel Data' elements which must first be deleted "
+            f"The dataset has an existing {elem.tag} '{elem.name}' element which "
+            "indicates the (0008,0016) 'SOP Class UID' value is not suitable for a "
+            f"dataset with 'Pixel Data'. The '{elem.name}' element should be deleted "
+            "and the 'SOP Class UID' changed."
+        )
+
+    if not hasattr(ds, "file_meta"):
+        ds.file_meta = FileMetaDataset()
+
+    tsyntax = ds.file_meta.get("TransferSyntaxUID", None)
+    if tsyntax and not tsyntax.is_little_endian:
+        raise NotImplementedError(
+            f"The dataset's transfer syntax '{tsyntax.name}' is big-endian, "
+            "which is not supported"
         )
 
     # Make no changes to the dataset until after validation checks have passed!
@@ -1912,12 +1933,13 @@ def set_pixel_data(
     ds._pixel_array = None
     ds._pixel_id = {}
 
-    if not hasattr(ds, "file_meta"):
-        ds.file_meta = FileMetaDataset()
-
-    tsyntax = ds.file_meta.get("TransferSyntaxUID", None)
     if not tsyntax or tsyntax.is_compressed:
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    if new_instance_uid:
+        instance_uid = generate_uid()
+        ds.SOPInstanceUID = instance_uid
+        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
 
 
 def unpack_bits(src: bytes, as_array: bool = True) -> "np.ndarray | bytes":

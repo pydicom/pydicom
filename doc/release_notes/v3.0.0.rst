@@ -62,8 +62,8 @@ Changes
   ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
 * Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
   exception as Pillow cannot decode such data correctly (:issue:`2006`)
-* Added an exception if an :class:`~numpy.ndarray` is used to set *Pixel Data*
-  (:issue:`50`)
+* An exception will now be raised if an :class:`~numpy.ndarray` is used to set
+  *Pixel Data* (:issue:`50`)
 
 
 Removals

@@ -1905,9 +1905,18 @@ class TestSetPixelData:
         arr = np.zeros((10, 10), dtype="uint8")
 
         msg = (
-            r"The dataset has \(7FE0,0008\) 'Float Pixel Data' or \(7FE0,0009\) "
-            "'Double Float Pixel Data' elements which must first be deleted"
+            r"The dataset has an existing \(7FE0,0008\) 'Float Pixel Data' element "
+            r"which indicates the \(0008,0016\) 'SOP Class UID' value is not suitable "
+            "for a dataset with 'Pixel Data'. The 'Float Pixel Data' element should "
+            "be deleted and the 'SOP Class UID' changed."
         )
+        with pytest.raises(AttributeError, match=msg):
+            set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+        del ds.FloatPixelData
+        ds.DoubleFloatPixelData = b"\x00\x00"
+
+        msg = r"The dataset has an existing \(7FE0,0009\) 'Double Float Pixel Data'"
         with pytest.raises(AttributeError, match=msg):
             set_pixel_data(ds, arr, "MONOCHROME1", 8)
 
@@ -2049,6 +2058,20 @@ class TestSetPixelData:
             )
             with pytest.raises(ValueError, match=msg):
                 set_pixel_data(Dataset(), arr, "MONOCHROME1", bits_stored)
+
+    def test_big_endian_raises(self):
+        """Test exception raised if big endian transfer syntax"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        arr = np.zeros((10, 10), dtype="uint8")
+
+        msg = (
+            "The dataset's transfer syntax 'Explicit VR Big Endian' is big-endian, "
+            "which is not supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            set_pixel_data(ds, arr, "MONOCHROME1", 8)
 
     def test_grayscale_8bit_unsigned(self):
         """Test setting unsigned 8-bit grayscale pixel data"""
@@ -2281,3 +2304,16 @@ class TestSetPixelData:
         assert ds.PlanarConfiguration == ref.PlanarConfiguration
 
         assert np.array_equal(ds.pixel_array, arr)
+
+    def test_sop_instance(self):
+        """Test new_instance_uid kwarg"""
+        ds = Dataset()
+        ds.SOPInstanceUID = "1.2.3.4"
+
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        uid = ds.SOPInstanceUID
+        assert uid != "1.2.3.4"
+        set_pixel_data(
+            ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8, new_instance_uid=False
+        )
+        assert ds.SOPInstanceUID == uid
