@@ -1568,12 +1568,12 @@ class TestCompressRLE:
         ds = dcmread(EXPL_16_16_1F.path)
         original = ds.SOPInstanceUID
 
-        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=True)
+        compress(ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=True)
         assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(EXPL_16_16_1F.path)
-        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=False)
+        compress(ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=False)
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
@@ -1884,12 +1884,12 @@ class TestDecompress:
         ds = dcmread(RLE_8_3_1F.path)
         original = ds.SOPInstanceUID
 
-        decompress(ds, decoding_plugin="pydicom", new_instance_uid=True)
+        decompress(ds, decoding_plugin="pydicom", generate_instance_uid=True)
         assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(RLE_8_3_1F.path)
-        decompress(ds, decoding_plugin="pydicom", new_instance_uid=False)
+        decompress(ds, decoding_plugin="pydicom", generate_instance_uid=False)
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
@@ -2306,7 +2306,7 @@ class TestSetPixelData:
         assert np.array_equal(ds.pixel_array, arr)
 
     def test_sop_instance(self):
-        """Test new_instance_uid kwarg"""
+        """Test generate_instance_uid kwarg"""
         ds = Dataset()
         ds.SOPInstanceUID = "1.2.3.4"
 
@@ -2314,6 +2314,6 @@ class TestSetPixelData:
         uid = ds.SOPInstanceUID
         assert uid != "1.2.3.4"
         set_pixel_data(
-            ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8, new_instance_uid=False
+            ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8, generate_instance_uid=False
         )
         assert ds.SOPInstanceUID == uid
