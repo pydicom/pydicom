@@ -10,7 +10,12 @@ import zlib
 
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings, encode_string
-from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
+from pydicom.dataelem import (
+    DataElement_from_raw,
+    DataElement,
+    RawDataElement,
+    _LUT_DESCRIPTOR_TAGS,
+)
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
 from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
@@ -345,11 +350,11 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     struct_format : str
         The character format as used by the struct module.
     """
-    endianChar = "><"[fp.is_little_endian]
     value = elem.value
     if value is None or value == "":
         return  # don't need to write anything for no or empty value
 
+    endianChar = "><"[fp.is_little_endian]
     format_string = endianChar + struct_format
     try:
         try:
@@ -358,10 +363,16 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
         except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
-            for val in cast(Iterable[Any], value):
-                fp.write(pack(format_string, val))
-    except Exception as e:
-        raise OSError(f"{str(e)}\nfor data_element:\n{str(elem)}")
+            # Some ambiguous VR elements ignore the VR for part of the value
+            # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first and
+            #   third values are always US (the third should be <= 16, so SS is OK)
+            if struct_format == "h" and elem.tag in _LUT_DESCRIPTOR_TAGS and value:
+                fp.write(pack(f"{endianChar}H", value[0]))
+                value = value[1:]
+
+            fp.write(pack(f"{endianChar}{len(value)}{struct_format}", *value))
+    except Exception as exc:
+        raise OSError(f"{exc}\nfor data_element:\n{elem}")
 
 
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
