@@ -371,6 +371,8 @@ set to an appropriate value for correct interpretation of the data.</p></li>
 a private block (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2025">#2025</a>)</p></li>
 <li><p>Fixed non-unique keywords for the concept codes in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1388">#1388</a>)</p></li>
 <li><p>Fixed keywords using Python identifiers in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1273">#1273</a>)</p></li>
+<li><p>Fixed being unable to write <em>LUT Descriptor</em> when the VR is <strong>SS</strong> and the first
+value is greater than 32767 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2081">#2081</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">
