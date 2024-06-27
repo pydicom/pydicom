@@ -30,5 +30,6 @@ This API reference guide details the functions, modules and objects included in
    misc
    overlays
    pixels
+   sr
    waveforms
    uid
