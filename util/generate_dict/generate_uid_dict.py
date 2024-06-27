@@ -42,12 +42,12 @@ def write_dict(fp, dict_name, attributes):
         List of attributes of the dict entries.
     """
     uid_entry = (
-        "('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}', " "'{UID Keyword}')"
+        "'{UID Value}': ('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}', "
+        "'{UID Keyword}')"
     )
-    entry_format = "'{UID Value}': %s" % (uid_entry)
 
     fp.write(f"\n{dict_name} = {{\n    ")
-    fp.write(",  # noqa\n    ".join(entry_format.format(**attr) for attr in attributes))
+    fp.write(",  # noqa\n    ".join(uid_entry.format(**attr) for attr in attributes))
     fp.write("  # noqa\n}\n")
 
 
