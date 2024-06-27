@@ -1573,7 +1573,9 @@ class TestCompressRLE:
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(EXPL_16_16_1F.path)
-        compress(ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=False)
+        compress(
+            ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=False
+        )
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
