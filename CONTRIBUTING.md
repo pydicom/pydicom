@@ -2,9 +2,9 @@
 Contributing to pydicom
 =======================
 
-This is the guide for contributing code, documentation and tests, and for
-filing issues. Please read it carefully to help make the code review
-process go as smoothly as possible and maximize the likelihood of your
+This is the guide for contributing code, documentation and tests to *pydicom*, as
+well as information on filing issues. Please read it carefully to help make the
+code review process go as smoothly as possible and maximize the likelihood of your
 contribution being merged.
 
 
@@ -20,14 +20,21 @@ GitHub, clone, and develop on a branch. Steps:
    a copy of the code under your GitHub user account. For more details on
    how to fork a repository see [this guide](https://help.github.com/articles/fork-a-repo/).
 
-2. Clone your fork of the pydicom repo from your GitHub account to your local disk:
+2. Clone your fork of the *pydicom* repo from your GitHub account to your local disk:
 
    ```bash
    $ git clone https://github.com/YourUsername/pydicom
    $ cd pydicom/
    ```
 
-3. Create a ``feature`` branch to hold your development changes:
+3. Install [pre-commit](https://pre-commit.com):
+
+    ```bash
+    $ pip install pre-commit
+    $ pre-commit install
+    ```
+
+4. Create a ``feature`` branch to hold your development changes:
 
    ```bash
    $ git checkout -b my-feature
@@ -35,14 +42,14 @@ GitHub, clone, and develop on a branch. Steps:
 
    Always use a ``feature`` branch. It's good practice to never work on the ``main`` branch!
 
-4. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
+5. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
 
    ```bash
    $ git add modified_files
    $ git commit
    ```
 
-5. Add a meaningful commit message. Pull requests are "squash-merged", e.g.
+6. Add a meaningful commit message. Pull requests are "squash-merged", e.g.
    squashed into one commit with all commit messages combined. The commit
    messages can be edited during the merge, but it helps if they are clearly
    and briefly showing what has been done in the commit. Check out the
@@ -65,15 +72,18 @@ GitHub, clone, and develop on a branch. Steps:
    - see #537
    ```
 
-6. To record your changes in Git, push the changes to your GitHub
+   When you run ``git commit`` the pre-commit checks will automatically run, if
+   it finds any errors then they should be fixed before calling ``git commit``
+   again.
+
+7. To record your changes in Git, push the changes to your GitHub
    account with:
 
    ```bash
    $ git push -u origin my-feature
    ```
 
-7. Follow [these instructions](https://help.github.com/articles/creating-a-pull-request-from-a-fork)
-to create a pull request from your fork. This will send an email to the committers.
+8. Follow [these instructions](https://help.github.com/articles/creating-a-pull-request-from-a-fork) to create a pull request from your fork. This will send an email to the committers.
 
 (If any of the above seems like magic to you, please look up the
 [Git documentation](https://git-scm.com/documentation) on the web, or ask a friend or another contributor for help.)
@@ -135,10 +145,18 @@ new lines of code must be covered:
   ```bash
   $ pip install pytest pytest-cov
   $ cd pydicom/
-  $ py.test --cov=pydicom tests/
+  $ pytest --cov=pydicom tests/
   ```
 
--  No type hint errors:
+- The type hints, code syntax, spelling and formatting should be checked:
+
+  ```bash
+  $ pre-commit run
+  ```
+
+Alternatively you can run these checks manually without pre-commit:
+
+-  Check the type hints
 
   ```bash
   $ pip install mypy
@@ -146,7 +164,7 @@ new lines of code must be covered:
   $ mypy
   ```
 
--  No style or code warnings
+-  Check the code style and syntax
 
   ```bash
   $ pip install ruff
@@ -154,7 +172,7 @@ new lines of code must be covered:
   $ ruff check .
   ```
 
-Finally, your contribution should be [blackened](https://github.com/psf/black)::
+- Consistent code formatting
 
   ```bash
   $ pip install black
@@ -163,8 +181,8 @@ Finally, your contribution should be [blackened](https://github.com/psf/black)::
   $ black tests/
   ```
 
-Filing bugs
------------
+Filing issues
+-------------
 We use GitHub issues to track all bugs and feature requests; feel free to
 open an issue if you have found a bug or wish to see a feature implemented.
 

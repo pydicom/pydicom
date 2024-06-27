@@ -18,7 +18,8 @@ out:
   or :gh:`GitHub <pydicom/issues>`.
 
 
-If it's your first time contributing to *pydicom* then we have tutorials for:
+If it's your first time contributing to *pydicom* then we have a general :gh:`guide
+for contributing<pydicom/blob/main/CONTRIBUTING.md>`, as well as tutorials for:
 
 * :doc:`Contributing a source code patch <contributing_code>`
 * :doc:`Contributing a documentation change <contributing_docs>`
