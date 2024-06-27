@@ -489,7 +489,7 @@ def read_dataset(
     except NotImplementedError as details:
         logger.error(details)
 
-    ds = Dataset(raw_data_elements)
+    ds = Dataset(raw_data_elements, parent_encoding=parent_encoding)
 
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:
@@ -674,6 +674,9 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
             fp, is_implicit_VR=False, is_little_endian=True, stop_when=_not_group_0002
         )
     )
+    file_meta.set_original_encoding(
+        is_implicit_vr=False, is_little_endian=True, character_encoding=default_encoding
+    )
     if not file_meta._dict:
         return file_meta
 
@@ -691,6 +694,11 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
                 is_little_endian=True,
                 stop_when=_not_group_0002,
             )
+        )
+        file_meta.set_original_encoding(
+            is_implicit_vr=True,
+            is_little_endian=True,
+            character_encoding=default_encoding,
         )
 
     # Log if the Group Length doesn't match actual length

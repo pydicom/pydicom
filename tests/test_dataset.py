@@ -1343,6 +1343,40 @@ class TestDataset:
         ds.set_original_encoding(True, True, None)
         assert ds.original_character_set == ["latin_1"]
 
+    def test_original_charset_is_equal_to_charset_after_dcmread(self):
+        default_encoding_test_file = get_testdata_file("liver_1frame.dcm")
+        non_default_encoding_test_file = get_testdata_file("CT_small.dcm")
+
+        default_encoding_ds = dcmread(default_encoding_test_file)
+        non_default_encoding_ds = dcmread(non_default_encoding_test_file)
+
+        assert default_encoding_ds.original_character_set == "iso8859"
+        assert (
+            default_encoding_ds.original_character_set
+            == default_encoding_ds._character_set
+        )
+        assert (
+            default_encoding_ds.ReferencedSeriesSequence[0].original_character_set
+            == default_encoding_ds.ReferencedSeriesSequence[0]._character_set
+        )
+        assert (
+            default_encoding_ds.file_meta.original_character_set
+            == default_encoding_ds.file_meta._character_set
+        )
+        assert non_default_encoding_ds.original_character_set == ["latin_1"]
+        assert (
+            non_default_encoding_ds.original_character_set
+            == non_default_encoding_ds._character_set
+        )
+        assert (
+            non_default_encoding_ds.OtherPatientIDsSequence[0].original_character_set
+            == non_default_encoding_ds.OtherPatientIDsSequence[0]._character_set
+        )
+        assert (
+            non_default_encoding_ds.file_meta.original_character_set
+            == non_default_encoding_ds.file_meta._character_set
+        )
+
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""
         ds = Dataset()
