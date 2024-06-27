@@ -5,11 +5,17 @@ from collections.abc import Sequence, MutableSequence, Iterable
 from copy import deepcopy
 from struct import pack
 from typing import BinaryIO, Any, cast
+from collections.abc import Callable
 import zlib
 
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings, encode_string
-from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
+from pydicom.dataelem import (
+    DataElement_from_raw,
+    DataElement,
+    RawDataElement,
+    _LUT_DESCRIPTOR_TAGS,
+)
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
 from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
@@ -17,6 +23,7 @@ from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import (
     Tag,
+    BaseTag,
     ItemTag,
     ItemDelimiterTag,
     SequenceDelimiterTag,
@@ -214,11 +221,11 @@ def _correct_ambiguous_vr_element(
 
 
 def correct_ambiguous_vr_element(
-    elem: DataElement,
+    elem: DataElement | RawDataElement,
     ds: Dataset,
     is_little_endian: bool,
     ancestors: list[Dataset] | None = None,
-) -> DataElement:
+) -> DataElement | RawDataElement:
     """Attempt to correct the ambiguous VR element `elem`.
 
     When it's not possible to correct the VR, the element will be returned
@@ -234,7 +241,7 @@ def correct_ambiguous_vr_element(
 
     Parameters
     ----------
-    elem : dataelem.DataElement
+    elem : dataelem.DataElement or dataelem.RawDataElement
         The element with an ambiguous VR.
     ds : dataset.Dataset
         The dataset containing `elem`.
@@ -248,7 +255,7 @@ def correct_ambiguous_vr_element(
 
     Returns
     -------
-    dataelem.DataElement
+    dataelem.DataElement or dataelem.RawDataElement
         The corrected element
     """
     ancestors = [ds] if ancestors is None else ancestors
@@ -314,10 +321,11 @@ def correct_ambiguous_vr(
     ancestors = [ds] if ancestors is None else ancestors
 
     # Iterate through the elements
-    for elem in ds:
+    for elem in ds.elements():
         # raw data element sequences can be written as they are, because we
         # have ensured that the transfer syntax has not changed at this point
         if elem.VR == VR.SQ:
+            elem = ds[elem.tag]
             for item in cast(MutableSequence["Dataset"], elem.value):
                 ancestors.insert(0, item)
                 correct_ambiguous_vr(item, is_little_endian, ancestors)
@@ -342,11 +350,11 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     struct_format : str
         The character format as used by the struct module.
     """
-    endianChar = "><"[fp.is_little_endian]
     value = elem.value
     if value is None or value == "":
         return  # don't need to write anything for no or empty value
 
+    endianChar = "><"[fp.is_little_endian]
     format_string = endianChar + struct_format
     try:
         try:
@@ -355,10 +363,16 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
         except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
-            for val in cast(Iterable[Any], value):
-                fp.write(pack(format_string, val))
-    except Exception as e:
-        raise OSError(f"{str(e)}\nfor data_element:\n{str(elem)}")
+            # Some ambiguous VR elements ignore the VR for part of the value
+            # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first and
+            #   third values are always US (the third should be <= 16, so SS is OK)
+            if struct_format == "h" and elem.tag in _LUT_DESCRIPTOR_TAGS and value:
+                fp.write(pack(f"{endianChar}H", value[0]))
+                value = value[1:]
+
+            fp.write(pack(f"{endianChar}{len(value)}{struct_format}", *value))
+    except Exception as exc:
+        raise OSError(f"{exc}\nfor data_element:\n{elem}")
 
 
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
@@ -740,6 +754,7 @@ def write_dataset(
             fp_encoding = or_encoding
 
     fp.is_implicit_VR, fp.is_little_endian = cast(tuple[bool, bool], fp_encoding)
+    get_item: Callable[[BaseTag], DataElement | RawDataElement] = dataset.get_item
 
     # This function is doing some heavy lifting:
     #   If implicit -> explicit, runs ambiguous VR correction
@@ -750,6 +765,9 @@ def write_dataset(
         or dataset.original_character_set != dataset._character_set
     ):
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
+        # Use __getitem__ instead or get_item to force parsing of RawDataElements into DataElements,
+        # so we can re-encode them with the correct charset and encoding
+        get_item = dataset.__getitem__
 
     dataset_encoding = cast(
         None | str | list[str], dataset.get("SpecificCharacterSet", parent_encoding)
@@ -764,7 +782,7 @@ def write_dataset(
             continue
 
         with tag_in_exception(tag):
-            write_data_element(fp, dataset.get_item(tag), dataset_encoding)
+            write_data_element(fp, get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
 
