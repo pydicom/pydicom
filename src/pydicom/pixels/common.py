@@ -303,7 +303,7 @@ class RunnerBase:
             decoded.
         """
         # Runner options
-        self._opts: "DecodeOptions" | "EncodeOptions" = {}
+        self._opts: DecodeOptions | EncodeOptions = {}
         self.set_option("transfer_syntax_uid", tsyntax)
         # Runner options that cannot be deleted, only modified
         self._undeletable: tuple[str, ...] = ("transfer_syntax_uid",)

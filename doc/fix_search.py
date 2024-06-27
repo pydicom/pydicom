@@ -3,6 +3,7 @@ A temporary fix for https://github.com/pydicom/pydicom/issues/1965
 while waiting for upstream sphinx_rtd_theme to fix/remove their
 dependency on jQuery.
 """
+
 from pathlib import Path
 import re
 
