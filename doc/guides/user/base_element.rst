@@ -51,11 +51,6 @@ You can display the contents of the entire dataset using ``str(ds)`` or with::
     (0008,0060) Modality                            CS: 'RTPLAN'
     ...
 
-.. note::
-
-    You can also view DICOM files in a collapsible tree using
-    the example program :gh:`dcm_qt_tree.py
-    <contrib-pydicom/blob/master/plotting-visualization/dcm_qt_tree.py>`.
 
 You can access specific elements by their DICOM keyword or tag::
 

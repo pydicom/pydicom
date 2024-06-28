@@ -7,6 +7,7 @@ This examples illustrates how to add private dictionary items to the DICOM
 dictionary dynamically. This allows you to read private tags not present in
 pydicom's private dictionary when loading an existing dataset.
 """
+
 # authors : Darcy Mason and pydicom contributors
 # license : MIT
 

@@ -1218,7 +1218,9 @@ class TestPersonName:
 
     def test_unicode_jp_from_unicode(self):
         """A person name initialized from unicode is already decoded"""
-        pn = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
         assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
         assert "山田^太郎" == pn.ideographic
         assert "やまだ^たろう" == pn.phonetic
@@ -1250,8 +1252,12 @@ class TestPersonName:
         pn3 = PersonName("John^Doe", encodings=default_encoding)
         assert hash(pn1) != hash(pn3)
 
-        pn1 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
-        pn2 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn1 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
+        pn2 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
         assert hash(pn1) == hash(pn2)
 
     def test_next(self):
@@ -1262,7 +1268,9 @@ class TestPersonName:
         assert next(pn1_itr) == "J"
 
         # Test getting multiple characters
-        pn2 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn2 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
         pn2_itr = iter(pn2)
         assert next(pn2_itr) == "Y"
         assert next(pn2_itr) == "a"

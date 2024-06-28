@@ -42,7 +42,7 @@ class PixelReference:
     ) -> None:
         self.name = name
         self.dtype = dtype
-        self._ds: "Dataset"
+        self._ds: Dataset
         self._test = test
 
     @property
