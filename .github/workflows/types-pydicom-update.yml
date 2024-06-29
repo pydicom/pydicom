@@ -15,7 +15,7 @@ jobs:
         if: github.event.workflow_run.conclusion == 'success'
         runs-on: ubuntu-latest
         steps:
-        - name: Trigger types-pydicom's receiver.yml workflow
+        - name: Trigger types-pydicom's update-package.yml workflow
           uses: actions/github-script@v6
           with:
             # Personal Access Token with
@@ -26,6 +26,6 @@ jobs:
               await github.rest.actions.createWorkflowDispatch({
                   owner: 'scaramallion',
                   repo: 'types-pydicom',
-                  workflow_id: 'receiver.yml',
+                  workflow_id: 'update-package.yml',
                   ref: 'main',
               })
