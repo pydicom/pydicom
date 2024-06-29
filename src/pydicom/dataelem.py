@@ -512,6 +512,17 @@ class DataElement:
         Uses the element's VR in order to determine the conversion method and
         resulting type.
         """
+        if (
+            self.tag == 0x7FE00010
+            and config.have_numpy
+            and isinstance(val, numpy.ndarray)
+        ):
+            raise TypeError(
+                "The value for (7FE0,0010) 'Pixel Data' should be set using 'bytes' "
+                "not 'numpy.ndarray'. See the Dataset.set_pixel_data() method for "
+                "an alternative that supports ndarrays."
+            )
+
         if self.VR == VR_.SQ:  # a sequence - leave it alone
             from pydicom.sequence import Sequence
 
@@ -935,7 +946,7 @@ def convert_raw_data_element(
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw`.
 
-    ..versionadded:: 3.0
+    .. versionadded:: 3.0
 
     `raw` may be modified prior to conversion by setting the
     :attr:`~pydicom.config.Settings.raw_data_element_modifiers` attribute to
@@ -983,7 +994,7 @@ def _DataElement_from_raw(
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
-    ..deprecated:: 3.0
+    .. deprecated:: 3.0
 
         ``DataElement_from_raw`` will be removed in v4.0, use
         :func:`~pydicom.dataelem.convert_raw_data_element` instead.

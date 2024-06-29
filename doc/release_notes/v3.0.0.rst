@@ -62,6 +62,10 @@ Changes
   ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
 * Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
   exception as Pillow cannot decode such data correctly (:issue:`2006`)
+* An exception will now be raised if an :class:`~numpy.ndarray` is used to set
+  *Pixel Data* (:issue:`50`)
+* Added :func:`~pydicom.dataelem.convert_raw_data_element` to replace
+  :func:`~pydicom.dataelem.DataElement_from_raw`.
 
 
 Removals
@@ -211,6 +215,16 @@ Enhancements
   create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`)
 * Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
   (:issue:`1454`)
+* Added the :meth:`Dataset.set_pixel_data()<pydicom.dataset.Dataset.set_pixel_data>` method
+  and :func:`~pydicom.pixels.set_pixel_data` function for automatically setting a
+  dataset's *Pixel Data* and related Image Pixel module elements using an
+  :class:`~numpy.ndarray` (:issue:`50`)
+* Added :attr:`config.settings.raw_data_element_modifiers
+  <pydicom.config.Settings.raw_data_element_modifiers>` and
+  :attr:`config.settings.raw_data_element_kwargs
+  <pydicom.config.Settings.raw_data_element_kwargs>` to allow modification
+  of the :class:`~pydicom.dataelem.RawDataElement` prior to conversion to
+  :class:`~pydicom.dataelem.DataElement` (:issue:`1556`)
 
 
 Fixes
@@ -322,7 +336,13 @@ Deprecations
   <pydicom.dataset.Dataset.pixel_array_options>` instead.
 * :func:`~pydicom.dataelem.DataElement_from_raw` will be removed in v4.0, please
   use :func:`~pydicom.dataelem.convert_raw_data_element` instead.
-* config.whatever is deprecated FIXME
+* :attr:`config.data_element_callback<pydicom.config.data_element_callback>` and
+  :attr:`config.data_element_callback_kwargs<pydicom.config.data_element_callback_kwargs>`
+  will be removed in v4.0, please use
+  :attr:`config.settings.raw_data_element_modifiers
+  <pydicom.config.Settings.raw_data_element_modifiers>` and
+  :attr:`config.settings.raw_data_element_kwargs
+  <pydicom.config.Settings.raw_data_element_kwargs>` instead.
 
 
 Pydicom Internals

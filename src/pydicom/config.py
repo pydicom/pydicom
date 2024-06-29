@@ -207,7 +207,7 @@ class Settings:
 
     Attributes
     ----------
-    raw_data_element_modifiers : list[ElementCallback]
+    raw_data_element_modifiers : list[Callable]
         A list of functions to be called prior to the conversion from a
         :class:`~pydicom.dataelem.RawDataElement` to a
         :class:`~pydicom.dataelem.DataElement` by
@@ -224,7 +224,7 @@ class Settings:
         to be modified and `kwargs` is a :class:`dict` containing keyword
         arguments. By default `kwargs` may contain:
 
-        * ``"encodings"`` (str | MutableSequence[str] | None): The character set
+        * ``"encodings"`` (``str | MutableSequence[str] | None``): The character set
           encoding of the raw data.
         * ``"ds"`` (:class:`~pydicom.dataset.Dataset` | None): The dataset the
           raw data element is part of (may be a :class:`~pydicom.sequence.Sequence`
@@ -243,7 +243,7 @@ class Settings:
         before trying to create your own.
     raw_data_element_kwargs : dict[str, Any]
         Additional keyword arguments that will be included in `kwargs` when
-        the `raw_data_element_modifiers` are called.
+        the `raw_data_element_modifiers` functions are called.
     """
 
     def __init__(self) -> None:
