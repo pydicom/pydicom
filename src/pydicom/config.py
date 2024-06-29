@@ -6,8 +6,7 @@
 import logging
 import os
 from contextlib import contextmanager
-from typing import Optional, Any, TYPE_CHECKING
-from collections.abc import Callable
+from typing import Optional, Any, TYPE_CHECKING, Protocol
 from collections.abc import Generator
 
 have_numpy = True
@@ -48,8 +47,9 @@ before it is added to the :class:`~pydicom.dataset.Dataset`.
 
 Default ``None``.
 
-.. deprecated:: 2.3
-    ``data_element_callback`` will be removed in v3.0, use
+.. deprecated:: 3.0
+
+    ``data_element_callback`` will be removed in v4.0, use
     :attr:`Settings.data_element_callbacks` instead.
 """
 
@@ -58,8 +58,9 @@ data_element_callback_kwargs: dict[str, Any] = {}
 
 Default ``{}``.
 
-.. deprecated:: 2.3
-    ``data_element_callback_kwargs`` will be removed in v3.0, use
+.. deprecated:: 3.0
+
+    ``data_element_callback_kwargs`` will be removed in v4.0, use
     :attr:`Settings.data_element_callbacks_kwargs` instead.
 """
 
@@ -67,8 +68,9 @@ Default ``{}``.
 def reset_data_element_callback() -> None:
     """Reset the :func:`data_element_callback` function to the default.
 
-    .. deprecated:: 2.3
-        ``reset_data_element_callback()`` will be removed in v3.0, use
+    .. deprecated:: 3.0
+
+        ``reset_data_element_callback()`` will be removed in v4.0, use
         :meth:`Settings.reset_data_element_callbacks` instead.
     """
     global data_element_callback
@@ -193,9 +195,55 @@ if a value validation error occurs.
 
 class Settings:
     """Collection of several configuration values.
+
     Accessed via the singleton :attr:`settings`.
 
     .. versionadded:: 2.3
+
+    .. versionchanged:: 3.0
+
+        Added the `raw_data_element_modifiers` and `raw_data_element_kwargs`
+        attributes.
+
+    Attributes
+    ----------
+    raw_data_element_modifiers : list[ElementCallback]
+        A list of functions to be called prior to the conversion from a
+        :class:`~pydicom.dataelem.RawDataElement` to a
+        :class:`~pydicom.dataelem.DataElement` by
+        :func:`~pydicom.dataelem.convert_raw_data_element`. Setting this allows
+        you to modify the raw element data as read from the dataset file or buffer
+        prior to conversion so you can fix non-conformance issues or customize the
+        raw data as required.
+
+        The signature for modification functions is:
+
+        ``def func(raw: RawDataElement, **kwargs: dict[str, Any]) -> RawDataElement:``
+
+        Where `raw` is the :class:`~pydicom.dataelem.RawDataElement` instance
+        to be modified and `kwargs` is a :class:`dict` containing keyword
+        arguments. By default `kwargs` may contain:
+
+        * ``"encodings"`` (str | MutableSequence[str] | None): The character set
+          encoding of the raw data.
+        * ``"ds"`` (:class:`~pydicom.dataset.Dataset` | None): The dataset the
+          raw data element is part of (may be a :class:`~pydicom.sequence.Sequence`
+          item).
+
+        Additional `kwargs` can be included by using the `raw_data_element_kwargs`
+        attribute (see below).
+
+        The modification functions should return a
+        :class:`~pydicom.dataelem.RawDataElement` instance, which will be used
+        to create the :class:`~pydicom.dataelem.DataElement` instance.
+
+        The functions will be called in the order they appear in
+        `raw_data_element_converters`, and it's recommended you check the current
+        default modification functions in ``dataelem.RAW_ELEMENT_MODIFIERS``
+        before trying to create your own.
+    raw_data_element_kwargs : dict[str, Any]
+        Additional keyword arguments that will be included in `kwargs` when
+        the `raw_data_element_modifiers` are called.
     """
 
     def __init__(self) -> None:
@@ -203,12 +251,11 @@ class Settings:
         # in future version, writing invalid values will raise by default,
         # currently the default value depends on enforce_valid_values
         self._writing_validation_mode: int | None = RAISE if _use_future else None
-        self.reset_data_element_callbacks()
+        self._infer_sq_for_un_vr: bool = True
 
-    def reset_data_element_callbacks(self) -> None:
-        """Reset the :attr:`data_element_callbacks` function to the default."""
-        self.data_element_callbacks: list[Callable] = []
-        self.data_element_callbacks_kwargs: dict[str, Any] = {}
+        # RawDataElement modification prior to conversion to DataElement
+        self.raw_data_element_modifiers: list[ElementCallback] = []
+        self.raw_data_element_kwargs: dict[str, Any] = {}
 
     @property
     def reading_validation_mode(self) -> int:

@@ -61,7 +61,7 @@ from pydicom.datadict import (
     repeater_has_keyword,
     get_private_entry,
 )
-from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.dataelem import DataElement, convert_raw_data_element, RawDataElement
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
@@ -1060,7 +1060,7 @@ class Dataset:
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(elem, character_set, self)
+            self[tag] = convert_raw_data_element(elem, encoding=character_set, ds=self)
 
             # On initial read of the dataset, propagate the pixel representation
             #   (if any) to child datasets in any sequences.
@@ -2767,7 +2767,9 @@ class Dataset:
             private_creator_tag = Tag(elem_tag.group, private_block)
             if private_creator_tag in self and elem_tag != private_creator_tag:
                 if isinstance(elem, RawDataElement):
-                    elem = DataElement_from_raw(elem, self._character_set, self)
+                    elem = convert_raw_data_element(
+                        elem, encoding=self._character_set, ds=self
+                    )
                 elem.private_creator = self[private_creator_tag].value
 
         # Changing pixel data resets the stored array

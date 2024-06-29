@@ -9,7 +9,7 @@ A DataElement has a tag,
 
 import base64
 import json
-from typing import Optional, Any, TYPE_CHECKING, NamedTuple, cast
+from typing import Any, TYPE_CHECKING, NamedTuple, cast
 from collections.abc import Callable, MutableSequence
 
 from pydicom import config  # don't import datetime_conversion directly
@@ -295,7 +295,7 @@ class DataElement:
             raw = RawDataElement(
                 Tag(tag), vr, len(elem_value), elem_value, 0, True, True
             )
-            elem_value = DataElement_from_raw(raw).value
+            elem_value = convert_raw_data_element(raw).value
 
         try:
             return cls(tag=tag, value=elem_value, VR=vr)
@@ -737,21 +737,14 @@ class RawDataElement(NamedTuple):
     tag: BaseTag
     VR: str | None
     length: int
-    value: bytes | None
+    value: Any
     value_tell: int
     is_implicit_VR: bool
     is_little_endian: bool
     is_raw: bool = True
 
 
-# The first and third values of the following elements are always US
-#   even if the VR is SS (PS3.3 C.7.6.3.1.5, C.11.1, C.11.2).
-# (0028,1101-1103) RGB Palette Color LUT Descriptor
-# (0028,3002) LUT Descriptor
-_LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
-
-
-def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
+def _private_vr_for_tag(ds: "Dataset | None", tag: BaseTag) -> str:
     """Return the VR for a known private tag, otherwise "UN".
 
     Parameters
@@ -785,31 +778,27 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
     return VR_.UN
 
 
-def raw_infer_vr_handler(
-    raw: RawDataElement,
-    dataset: "Dataset | None" = None,
-    **_kwargs: Any,
-) -> tuple[RawDataElement, dict]:
-    """Infer VR from a :class:`RawDataElement` before converting values.
+def _raw_modifier_infer_vr(
+    raw: RawDataElement, ds: "Dataset | None" = None, **kwargs: Any
+) -> RawDataElement:
+    """If `raw` has no VR or a **UN** VR then try and replace it.
 
     Parameters
     ----------
-    raw_data_element : RawDataElement
-        The raw data element with the VR and value to convert.
-    dataset : Dataset, optional
-        If given, used to resolve the VR for known private tags.
+    raw : pydicom.dataelem.RawDataElement
+        The raw element data.
+    ds : pydicom.dataset.Dataset, optional
+        The dataset the element belongs to.
 
     Returns
     -------
-    RawDataElement
-        The raw data element
-    dict
-        Any kwargs to pass into downstream handlers.
+    pydicom.dataelem.RawDataElement
+        The raw element data.
 
     Raises
     ------
     KeyError
-        If `raw_data_element` belongs to an unknown non-private tag and
+        If `raw` belongs to an unknown non-private tag and
         :attr:`~pydicom.config.settings.reading_validation_mode` is set
         to ``RAISE``.
     """
@@ -821,177 +810,221 @@ def raw_infer_vr_handler(
             # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
                 # for VR for private tags see PS3.5, 6.2.2
-                vr = _private_vr_for_tag(dataset, raw.tag)
+                vr = _private_vr_for_tag(ds, raw.tag)
 
             # group length tag implied in versions < 3.0
             elif raw.tag.element == 0:
                 vr = VR_.UL
             else:
-                msg = f"Unknown DICOM tag {str(raw.tag)}"
+                msg = f"VR lookup failed for the raw element with tag {raw.tag}"
                 if config.settings.reading_validation_mode == config.RAISE:
-                    raise KeyError(msg + " can't look up VR")
+                    raise KeyError(msg)
 
                 vr = VR_.UN
                 warn_and_log(f"{msg} - setting VR to 'UN'")
+
     elif vr == VR_.UN and config.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if raw.tag.is_private:
-            vr = _private_vr_for_tag(dataset, raw.tag)
+            vr = _private_vr_for_tag(ds, raw.tag)
         elif raw.value is None or len(raw.value) < 0xFFFF:
             try:
                 vr = dictionary_VR(raw.tag)
             except KeyError:
                 pass
+
     if vr != raw.VR:
-        raw = raw._replace(VR=vr)
-    return raw, {}
+        return raw._replace(VR=vr)
+
+    return raw
 
 
-def raw_convert_exception_handler(
+def _raw_modifier_convert_value(
     raw: RawDataElement,
     encoding: str | MutableSequence[str] | None = None,
     **kwargs: Any,
-) -> tuple[RawDataElement, dict]:
-    """Attempt to convert the raw value to a native type.
+) -> RawDataElement:
+    """Convert the raw element :class:`bytes` value to a native type.
 
     Parameters
     ----------
-    raw_data_element : RawDataElement
-        The raw data element with the VR and value to convert.
-    encoding : str or list of str, optional
+    raw : pydicom.dataelem.RawDataElement
+        The raw element data.
+    encoding : str | list[str], optional
         The character encoding of the raw data.
 
     Returns
     -------
-    RawDataElement
-        The raw data element
-    dict
-        Any kwargs to pass into downstream handlers.
+    raw : pydicom.dataelem.RawDataElement
+        The raw element data.
     """
-    # XXX buried here to avoid circular import
-    # filereader->Dataset->convert_value->filereader
-    # (for SQ parsing)
-
     from pydicom.values import convert_value
 
-    vr = cast(str, raw.VR)
     try:
-        value = convert_value(vr, raw, encoding)
-    except NotImplementedError as e:
-        raise NotImplementedError(f"{str(e)} in tag {raw.tag!r}")
-    except BytesLengthException as e:
-        message = (
-            f"{e} This occurred while trying to parse {raw.tag} according "
-            f"to VR '{vr}'."
+        # `raw.value` should be bytes | None
+        value = convert_value(cast(str, raw.VR), raw, encoding)
+    except NotImplementedError as exc:
+        raise NotImplementedError(f"{exc} in tag {raw.tag}")
+    except BytesLengthException as exc:
+        # Failed conversion, either raise or convert to a UN VR
+        msg = (
+            f"{exc} This occurred while trying to parse {raw.tag} according "
+            f"to VR '{raw.VR}'."
         )
-        if config.convert_wrong_length_to_UN:
-            warn_and_log(f"{message} Setting VR to 'UN'.")
-            vr = VR_.UN
-            value = raw.value
-        else:
+        if not config.convert_wrong_length_to_UN:
             raise BytesLengthException(
-                f"{message} To replace this error with a warning set "
+                f"{msg} To replace this error with a warning set "
                 "pydicom.config.convert_wrong_length_to_UN = True."
             )
-    return raw, {"value": value}
+
+        warn_and_log(f"{msg} Setting VR to 'UN'.")
+
+        return raw._replace(VR=VR_.UN)
+
+    return raw._replace(value=value)
 
 
-def raw_LUT_descriptor_handler(
-    raw: RawDataElement,
-    **kwargs: Any,
-) -> tuple[RawDataElement, dict]:
-    """Handle post-convert_value processing of a :class:`RawDataElement`.
+# The first and third values of the following elements are always US
+#   even if the VR is SS (PS3.3 C.7.6.3.1.5, C.11.1, C.11.2).
+# (0028,1101-1103) RGB Palette Color LUT Descriptor
+# (0028,3002) LUT Descriptor
+_LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
+
+
+def _raw_modifier_lut_descriptor(raw: RawDataElement, **kwargs: Any) -> RawDataElement:
+    """If `raw` is an element like *LUT Descriptor* then ensure the first
+    value is decoded as a **US** VR.
 
     Parameters
     ----------
-    raw_data_element : RawDataElement
-        The raw data element with the VR and value to convert.
+    raw : pydicom.dataelem.RawDataElement
+        The raw element data.
 
     Returns
     -------
-    RawDataElement
-        The raw data element
-    dict
-        Any kwargs to pass into downstream handlers.
+    pydicom.dataelem.RawDataElement
+        The raw element data.
     """
-    if raw.tag in _LUT_DESCRIPTOR_TAGS and raw.value:
-        value = kwargs.get("value", [])
-        # We only fix the first value as the third value is 8 or 16
+    if raw.tag not in _LUT_DESCRIPTOR_TAGS:
+        return raw
+
+    # We only fix the first value as the third value is 8 or 16
+    if raw.value and isinstance(raw.value, list) and raw.value[0] < 0:
+        # A mutable inside an immutable is still mutable
         try:
-            if value[0] < 0:
-                value[0] += 65536
-        except TypeError:
+            raw.value[0] += 65536
+        except Exception:
             pass
-        return raw, {"value": value}
-    return raw, {}
+
+    return raw
 
 
-default_handlers: list[Callable] = [
-    raw_infer_vr_handler,
-    raw_convert_exception_handler,
-    raw_LUT_descriptor_handler,
+RAW_ELEMENT_MODIFIERS: list[Callable] = [
+    _raw_modifier_infer_vr,
+    _raw_modifier_convert_value,
+    _raw_modifier_lut_descriptor,
 ]
 
 
-def DataElement_from_raw(
+def convert_raw_data_element(
+    raw: RawDataElement,
+    *,
+    encoding: str | MutableSequence[str] | None = None,
+    ds: "Dataset | None" = None,
+) -> DataElement:
+    """Return a :class:`DataElement` created from `raw`.
+
+    ..versionadded:: 3.0
+
+    `raw` may be modified prior to conversion by setting the
+    :attr:`~pydicom.config.Settings.raw_data_element_modifiers` attribute to
+    a list of modification functions.
+
+    Parameters
+    ----------
+    raw : pydicom.dataelem.RawDataElement
+        The raw data to convert to a :class:`DataElement`.
+    encoding : str | list[str], optional
+        The character encoding of the raw data.
+    ds : pydicom.dataset.Dataset, optional
+        If given, used to resolve the VR for known private tags.
+
+    Returns
+    -------
+    pydicom.dataelem.DataElement
+        A :class:`~pydicom.dataelem.DataElement` instance created from `raw`.
+    """
+    if config.data_element_callback:
+        modifiers = [config.data_element_callback]
+        modifiers.extend(RAW_ELEMENT_MODIFIERS)
+        kwargs = config.data_element_callback_kwargs
+    else:
+        modifiers = config.settings.raw_data_element_modifiers or RAW_ELEMENT_MODIFIERS
+        kwargs = config.settings.raw_data_element_kwargs
+
+    for func in modifiers:
+        raw = func(raw, encoding=encoding, ds=ds, **kwargs)
+
+    return DataElement(
+        raw.tag,
+        cast(str, raw.VR),
+        raw.value,
+        raw.value_tell,
+        raw.length == 0xFFFFFFFF,
+        already_converted=True,
+    )
+
+
+def _DataElement_from_raw(
     raw_data_element: RawDataElement,
     encoding: str | MutableSequence[str] | None = None,
-    dataset: Optional["Dataset"] = None,
+    dataset: "Dataset | None" = None,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
+
+    ..deprecated:: 3.0
+
+        ``DataElement_from_raw`` will be removed in v4.0, use
+        :func:`~pydicom.dataelem.convert_raw_data_element` instead.
 
     Call the configured data_element_callbacks to do relevant
     pre/post-processing and convert values from raw to native types
 
     Parameters
     ----------
-    raw_data_element : RawDataElement
+    raw : pydicom.dataelem.RawDataElement
         The raw data to convert to a :class:`DataElement`.
-    encoding : str or list of str, optional
+    encoding : str | list[str], optional
         The character encoding of the raw data.
-    dataset : Dataset, optional
+    dataset : pydicom.dataset.Dataset, optional
         If given, used to resolve the VR for known private tags.
 
     Returns
     -------
-    DataElement
-
+    pydicom.dataelem.DataElement
+        A :class:`~pydicom.dataelem.DataElement` instance created from `raw`.
     """
-    raw = raw_data_element
-    # Legacy callbacks if set
-    callback_kwargs: dict[str, Any] = {}
-    if config.data_element_callback:
-        raw = config.data_element_callback(
-            raw_data_element, encoding=encoding, **config.data_element_callback_kwargs
-        )
-        # Use default handlers if legacy callbacks are set
-        cbs = default_handlers
-    else:
-        # Otherwise use those provided in settings, fall back to default if
-        # no handlers are set.
-        cbs = config.settings.data_element_callbacks or default_handlers
-        callback_kwargs = config.settings.data_element_callbacks_kwargs
-    for cb in cbs:
-        assert callable(cb)
-        raw, out_kwargs = cb(raw, encoding=encoding, dataset=dataset, **callback_kwargs)
-        # Update kwargs for next callback.
-        callback_kwargs.update(out_kwargs)
-    # Allow callbacks to override raw.VR
-    VR = cast(str, callback_kwargs.get("VR", raw.VR))
-    # Allow user to specify value in callback, otherwise assume exceptions have
-    # been taken care of in callbacks and just convert.
-    if callback_kwargs.get("value", None):
-        value = callback_kwargs.get("value")
-    else:
-        from pydicom.values import convert_value
-
-        value = convert_value(VR, raw, encoding)
-    return DataElement(
-        raw.tag,
-        VR,
-        value,
-        raw.value_tell,
-        raw.length == 0xFFFFFFFF,
-        already_converted=True,
+    msg = (
+        "'pydicom.dataelem.DataElement_from_raw' is deprecated and will be removed "
+        "in v4.0, please use 'pydicom.dataelem.convert_raw_data_element' instead"
     )
+    warn_and_log(msg, DeprecationWarning)
+
+    return convert_raw_data_element(
+        raw=raw_data_element,
+        encoding=encoding,
+        ds=dataset,
+    )
+
+
+_DEPRECATED = {
+    "DataElement_from_raw": _DataElement_from_raw,
+}
+
+
+def __getattr__(name: str) -> Any:
+    if name in _DEPRECATED and not config._use_future:
+        return _DEPRECATED[name]
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

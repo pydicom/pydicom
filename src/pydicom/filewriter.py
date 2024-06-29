@@ -11,7 +11,7 @@ import zlib
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.dataelem import (
-    DataElement_from_raw,
+    convert_raw_data_element,
     DataElement,
     RawDataElement,
     _LUT_DESCRIPTOR_TAGS,
@@ -263,7 +263,7 @@ def correct_ambiguous_vr_element(
     if elem.VR in AMBIGUOUS_VR:
         # convert raw data elements before handling them
         if isinstance(elem, RawDataElement):
-            elem = DataElement_from_raw(elem, dataset=ds)
+            elem = convert_raw_data_element(elem, ds=ds)
             ds.__setitem__(elem.tag, elem)
 
         try:

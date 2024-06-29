@@ -14,7 +14,7 @@ from pydicom.datadict import add_private_dict_entry
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
-    DataElement_from_raw,
+    convert_raw_data_element,
 )
 from pydicom.dataset import Dataset
 from pydicom.errors import BytesLengthException
@@ -584,6 +584,15 @@ class TestDataElement:
         assert elem.VM == 1
 
 
+@pytest.fixture
+def reset_raw_element_modifiers():
+    mods = config.settings.raw_data_element_modifiers
+    kwargs = config.settings.raw_data_element_kwargs
+    yield
+    config.settings.raw_data_element_modifiers = mods
+    config.settings.raw_data_element_kwargs = kwargs
+
+
 class TestRawDataElement:
     """Tests for dataelem.RawDataElement."""
 
@@ -592,7 +601,7 @@ class TestRawDataElement:
         raw = RawDataElement(Tag(0x88880088), None, 4, b"unknown", 0, True, True)
 
         with pytest.warns(UserWarning, match=r"\(8888,0088\)"):
-            element = DataElement_from_raw(raw)
+            element = convert_raw_data_element(raw)
             assert element.VR == "UN"
 
     def test_key_error(self, enforce_valid_values):
@@ -602,13 +611,14 @@ class TestRawDataElement:
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
         raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
 
-        with pytest.raises(KeyError, match=r"\(8888,0002\)"):
-            DataElement_from_raw(raw)
+        msg = r"VR lookup failed for the raw element with tag \(8888,0002\)"
+        with pytest.raises(KeyError, match=msg):
+            convert_raw_data_element(raw)
 
     def test_valid_tag(self, no_datetime_conversion):
         """RawDataElement: conversion of known tag succeeds..."""
         raw = RawDataElement(Tag(0x00080020), "DA", 8, b"20170101", 0, False, True)
-        element = DataElement_from_raw(raw, default_encoding)
+        element = convert_raw_data_element(raw, encoding=default_encoding)
         assert "Study Date" == element.name
         assert "DA" == element.VR
         assert "20170101" == element.value
@@ -616,7 +626,7 @@ class TestRawDataElement:
         raw = RawDataElement(
             Tag(0x00080000), None, 4, b"\x02\x00\x00\x00", 0, True, True
         )
-        elem = DataElement_from_raw(raw, default_encoding)
+        elem = convert_raw_data_element(raw, encoding=default_encoding)
         assert "UL" == elem.VR
 
     def test_data_element_without_encoding(self):
@@ -624,14 +634,14 @@ class TestRawDataElement:
         raw = RawDataElement(
             Tag(0x00104000), "LT", 23, b"comment\\comment2\\comment3", 0, False, True
         )
-        element = DataElement_from_raw(raw)
+        element = convert_raw_data_element(raw)
         assert "Patient Comments" == element.name
 
     def test_unknown_vr(self):
         """Test converting a raw element with unknown VR"""
         raw = RawDataElement(Tag(0x00080000), "AA", 8, b"20170101", 0, False, True)
         with pytest.raises(NotImplementedError):
-            DataElement_from_raw(raw, default_encoding)
+            convert_raw_data_element(raw, encoding=default_encoding)
 
     @pytest.fixture
     def accept_wrong_length(self, request):
@@ -645,7 +655,7 @@ class TestRawDataElement:
         """Check exception when number of raw bytes is not correct."""
         raw = RawDataElement(Tag(0x00190000), "FD", 1, b"1", 0, False, True)
         with pytest.raises(BytesLengthException):
-            DataElement_from_raw(raw)
+            convert_raw_data_element(raw)
 
     @pytest.mark.parametrize("accept_wrong_length", [True], indirect=True)
     def test_wrong_bytes_length_convert_to_UN(self, accept_wrong_length):
@@ -660,7 +670,7 @@ class TestRawDataElement:
             r"Setting VR to 'UN'."
         )
         with pytest.warns(UserWarning, match=msg):
-            raw_elem = DataElement_from_raw(raw)
+            raw_elem = convert_raw_data_element(raw)
             assert "UN" == raw_elem.VR
             assert value == raw_elem.value
 
@@ -743,6 +753,35 @@ class TestRawDataElement:
             assert elem.VR == "UN"
             assert elem.name == "[Another Number]"
             assert elem.value == b"12345678"
+
+    def test_raw_element_modification(self, reset_raw_element_modifiers):
+        """Test customization of RawDataElement via config.Settings"""
+        raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
+        ds = Dataset()
+        ds.PatientName = "Foo"
+
+        d = {}
+
+        def modifier(raw, **kwargs):
+            d.update(**kwargs)
+            return raw._replace(
+                value=kwargs["value"],
+                VR=kwargs["VR"],
+                tag=kwargs["tag"],
+            )
+
+        config.settings.raw_data_element_modifiers = [modifier]
+        config.settings.raw_data_element_kwargs = {
+            "value": "12345",
+            "tag": Tag(0x00100020),
+            "VR": "LO",
+        }
+        elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
+        assert elem.value == "12345"
+        assert elem.VR == "LO"
+        assert elem.tag == (0x00100020)
+        assert d["encoding"] == default_encoding
+        assert d["ds"] == ds
 
 
 class TestDataElementValidation:
@@ -1232,3 +1271,28 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
+
+
+@pytest.fixture
+def use_future():
+    original = config._use_future
+    config._use_future = True
+    yield
+    config._use_future = original
+
+
+def test_deprecation_warnings():
+    from pydicom.dataelem import DataElement_from_raw
+
+    raw = RawDataElement(Tag(0x00100010), None, 4, b"unknown", 0, True, True)
+    msg = (
+        "'pydicom.dataelem.DataElement_from_raw' is deprecated and will be removed "
+        "in v4.0, please use 'pydicom.dataelem.convert_raw_data_element' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        DataElement_from_raw(raw)
+
+
+def test_import_raises(use_future):
+    with pytest.raises(ImportError):
+        from pydicom.dataelem import DataElement_from_raw

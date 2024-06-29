@@ -320,6 +320,9 @@ Deprecations
 * :meth:`Dataset.convert_pixel_data()<pydicom.dataset.Dataset.convert_pixel_data>`
   will be removed in v4.0, use :meth:`Dataset.pixel_array_options()
   <pydicom.dataset.Dataset.pixel_array_options>` instead.
+* :func:`~pydicom.dataelem.DataElement_from_raw` will be removed in v4.0, please
+  use :func:`~pydicom.dataelem.convert_raw_data_element` instead.
+* config.whatever is deprecated FIXME
 
 
 Pydicom Internals
