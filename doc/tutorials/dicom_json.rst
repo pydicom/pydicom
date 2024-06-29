@@ -2,8 +2,6 @@
 Introduction to JSON support
 ============================
 
-.. versionadded:: 1.3
-
 Starting in *pydicom* version 1.3, some support for converting DICOM data to
 and from JSON format has been added. This support is considered to be in
 beta state, and the API is still subject to change.
@@ -19,9 +17,7 @@ Converting a dataset into JSON format
 and into a deserialized JSON dictionary:
 
   >>> import pydicom
-  >>> from pydicom.data import get_testdata_file
-  >>> filename = get_testdata_file("CT_small.dcm")
-  >>> ds = pydicom.dcmread(filename)
+  >>> ds = pydicom.examples.ct
   >>> ds.to_json()
   '{"00080005": {"Value": ["ISO_IR 100"], "vr": "CS"}, "00080008": {"Value":...
   >>> ds.to_json_dict()
@@ -49,8 +45,7 @@ dictionary. There is only a single function to handle both cases:
 The conversion in both directions is symmetric:
 
   >>> import pydicom
-  >>> filename = pydicom.data.get_testdata_file("CT_small.dcm")
-  >>> ds = pydicom.dcmread(filename)
+  >>> ds = pydicom.examples.ct
   >>> ds_json = ds.to_json()
   >>> ds1 = pydicom.dataset.Dataset.from_json(ds_json)
   >>> assert ds == ds1
@@ -80,8 +75,7 @@ Note that only data greater than ``bulk_data_threshold`` (by default set to
   >>>     uri = store_data_and_return_uri(data_element)
   >>>     return uri
   >>>
-  >>> filename = pydicom.data.get_testdata_file("CT_small.dcm")
-  >>> ds = pydicom.dcmread(filename)
+  >>> ds = pydicom.examples.ct
   >>> ds_json = ds.to_json(bulk_data_element_handler=bulk_data_handler)
 
 On reading JSON data, the handler must be able to retrieve the data using

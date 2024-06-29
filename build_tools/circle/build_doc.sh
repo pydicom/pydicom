@@ -9,7 +9,7 @@ set -e
 # instead of relying on the subsequent rules.
 #
 # We always build the documentation for jobs that are not related to a specific
-# PR (e.g. a merge to master or a maintenance branch).
+# PR (e.g. a merge to main or a maintenance branch).
 #
 # If this is a PR, do a full build if there are some files in this PR that are
 # under the "doc/" or "examples/" folders, otherwise perform a quick build.
@@ -49,8 +49,8 @@ get_build_type() {
         echo BUILD: not a pull request
         return
     fi
-    git_range="origin/master...$CIRCLE_SHA1"
-    git fetch origin master >&2 || (echo QUICK BUILD: failed to get changed filenames for $git_range; return)
+    git_range="origin/main...$CIRCLE_SHA1"
+    git fetch origin main >&2 || (echo QUICK BUILD: failed to get changed filenames for $git_range; return)
     filenames=$(git diff --name-only $git_range)
     if [ -z "$filenames" ]
     then
@@ -72,7 +72,7 @@ then
     exit 0
 fi
 
-if [[ "$CIRCLE_BRANCH" =~ ^master$|^[0-9]+\.[0-9]+\.X$ && -z "$CI_PULL_REQUEST" ]]
+if [[ "$CIRCLE_BRANCH" =~ ^main$|^[0-9]+\.[0-9]+\.X$ && -z "$CI_PULL_REQUEST" ]]
 then
     # PDF linked into HTML
     MAKE_TARGET="dist LATEXMKOPTS=-halt-on-error"
@@ -85,9 +85,9 @@ fi
 
 # Installing required system packages to support the rendering of math
 # notation in the HTML documentation
-sudo -E apt-get -yq update
-sudo -E apt-get -yq remove texlive-binaries --purge
-sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
+apt-get -yq update
+apt-get -yq remove texlive-binaries --purge
+apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
     install dvipng texlive-latex-base texlive-latex-extra \
     texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended\
     latexmk

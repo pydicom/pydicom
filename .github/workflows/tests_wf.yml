@@ -1,0 +1,86 @@
+name: tests_wf
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python-version:
+        required: true
+        type: string
+      test-extras:
+        required: false
+        type: boolean
+        default: false
+      upload-coverage:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+        codecov_token:
+            required: true
+
+env:
+  PYTEST_ARGS: ""
+
+jobs:
+  tests:
+    runs-on: ${{ inputs.os }}-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Install BLAS on PyPy3.10
+      if: startsWith(inputs.python-version, 'pypy')
+      run: sudo apt install -y libopenblas-dev
+    - name: Set env variables
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
+    - name: Check-out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: pip
+        allow-prereleases: true
+
+    - name: Install pydicom and tools  # not 'editable install'
+      run: |
+        python -m pip install .[dev]
+
+    - name: Test without numpy or handlers, incl pydicom-data (in [dev])
+      run: |
+        python -m pytest --cov-reset ${{ env.PYTEST_ARGS }}
+
+    - name: Test with Numpy
+      run: |
+        python -m pip install .[basic]
+        python -m pytest ${{ env.PYTEST_ARGS }}
+
+    - name: Test with all optional dependencies
+      if: inputs.test-extras
+      run: |
+        python -m pip install .[pixeldata,gpl-license]
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pylibjpeg.py
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pillow_pixel_data.py
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_JPEG_LS_transfer_syntax.py tests/test_jpeg_ls_pixel_data.py
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/pixels/test_encoder_gdcm.py
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/pixels
+
+    - name: Test with missing libs
+      if: inputs.test-extras
+      # A small number of tests only run if libs missing
+      run: |
+        python -m pip uninstall -y pydicom_data pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pylibjpeg.py tests/test_data_manager.py
+
+    - name: Send coverage results
+      if: success() && inputs.upload-coverage
+      uses: codecov/codecov-action@v4
+      env:
+        codecov_token: ${{ secrets.codecov_token }}
+      with:
+        env_vars: inputs.os, inputs.python-version

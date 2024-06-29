@@ -4,7 +4,7 @@
 # in .circleci/config.yml. See https://circleci.com/docs/2.0 for more details.
 
 # We have three possible workflows:
-#   If the git branch is 'master' then we want to commit and merge the dev/
+#   If the git branch is 'main' then we want to commit and merge the dev/
 #       docs on gh-pages
 #   If the git branch is [0-9].[0.9].X (i.e. 0.9.X, 1.0.X, 1.2.X, 41.21.X) then
 #        we want to commit and merge the major.minor/ docs on gh-pages
@@ -54,9 +54,9 @@ echo $GIT_AUTHOR_EMAIL
 echo $GIT_AUTHOR_NAME
 
 # Determine which of the three workflows to take
-if [ "$CIRCLE_BRANCH" = "master" ]
+if [ "$CIRCLE_BRANCH" = "main" ]
 then
-    # build of current master
+    # build of current main
     echo "Performing commit and push to $CIRCLE_PROJECT_REPONAME/$DOC_BRANCH for $CIRCLE_BRANCH"
     # Changes are made to dev/ directory
     DIR=dev

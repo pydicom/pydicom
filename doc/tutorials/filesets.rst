@@ -2,7 +2,7 @@
 DICOM File-sets and DICOMDIR
 ============================
 
-This tutorial is about DICOM File-sets and covers
+This tutorial is about DICOM File-sets and covers:
 
 * An introduction to DICOM File-sets and the DICOMDIR file
 * Loading a File-set using the :class:`~pydicom.fileset.FileSet` class and
@@ -38,7 +38,7 @@ The DICOMDIR file
 
     Despite its name, a DICOMDIR file is not a file system directory and
     can be read using :func:`~pydicom.filereader.dcmread` like any other DICOM
-    dataset
+    dataset.
 
 Every File-set must contain a single file with the filename ``DICOMDIR``, the
 location of which is dependent on the type of media used to store the File-set.
@@ -54,16 +54,14 @@ specifies where the DICOMDIR must be located.
     require recalculating the offsets for each directory record. Use the
     :class:`~pydicom.fileset.FileSet` methods (see below) instead.
 
-The DICOMDIR file is used to summarize the contents of the File-set, and is a
+The DICOMDIR file is used to summarize the contents of the File-set and is a
 *Media Storage Directory* instance that follows the
 :dcm:`Basic Directory IOD<part03/chapter_F.html>`.
 
 .. code-block:: python
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
-    >>> path = get_testdata_file("DICOMDIR")
-    >>> ds = dcmread(path)
+    >>> from pydicom import examples
+    >>> ds = examples.dicomdir
     >>> ds.file_meta.MediaStorageSOPClassUID.name
     'Media Storage Directory Storage'
 
@@ -112,8 +110,9 @@ To load an existing File-set just pass a DICOMDIR
 
 .. code-block:: python
 
+    >>> from pydicom import dcmread
     >>> from pydicom.fileset import FileSet
-    >>> path = get_testdata_file("DICOMDIR")
+    >>> path = examples.get_path("dicomdir")  # The path to the examples.dicomdir dataset
     >>> ds = dcmread(path)
     >>> fs = FileSet(ds)  # or FileSet(path)
 
@@ -245,7 +244,7 @@ You can create a new File-set by creating a new
 
 This will create a completely conformant File-set, however it won't contain
 any SOP instances. Since empty File-sets aren't very useful, our next step
-will be to add some.
+will be to add some SOP instances to it.
 
 Modifying a File-set
 --------------------
@@ -268,10 +267,10 @@ This includes changes such as:
 * Changing one of the following properties:
   :attr:`~pydicom.fileset.FileSet.ID`, :attr:`~pydicom.fileset.FileSet.UID`,
   :attr:`~pydicom.fileset.FileSet.descriptor_file_id` and
-  :attr:`~pydicom.fileset.FileSet.descriptor_character_set`.
+  :attr:`~pydicom.fileset.FileSet.descriptor_character_set`
 * When the :class:`~pydicom.fileset.FileSet` class determines it needs to move
   SOP instances from an existing File-set's directory structure to the
-  structure used by *pydicom*.
+  structure used by *pydicom*
 
 You can tell if changes are staged with the
 :attr:`~pydicom.fileset.FileSet.is_staged` property:
@@ -309,19 +308,18 @@ returns the addition as a :class:`~pydicom.fileset.FileInstance`.
 
 To reduce memory usage, instances staged for addition are written to a
 temporary directory and only copied to the File-set itself when
-:meth:`~pydicom.fileset.FileSet.write` is called, however they can still be
+:meth:`~pydicom.fileset.FileSet.write` is called. However, they can still be
 accessed and loaded:
 
 .. code-block:: python
 
-    >>> path = get_testdata_file("CT_small.dcm")
-    >>> instance = fs.add(path)
+    >>> instance = fs.add(examples.ct)
     >>> instance.is_staged
     True
     >>> instance.for_addition
     True
     >>> instance.path
-    '/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322'
+    '/tmp/tmp0aalrzir/86e6b75b-b764-46af-bec3-51698a8366f2'
     >>> type(instance.load())
     <class 'pydicom.dataset.FileDataset'>
 
@@ -332,13 +330,13 @@ use the :meth:`~pydicom.fileset.FileSet.add_custom` method.
 The :meth:`~pydicom.fileset.FileSet.add` method uses *pydicom's* default
 directory record creation functions to create the necessary records based on
 the SOP instance's attributes, such as *SOP Class UID* and *Modality*.
-Occasionally they may fail when an element required by these functions
+Occasionally, they may fail when an element required by these functions
 is empty or missing:
 
 .. code-block:: python
 
-    >>> path = get_testdata_file("rtdose.dcm")
-    >>> fs.add(path)
+    >>> rt_dose = examples.rt_dose
+    >>> fs.add(rt_dose)
     Traceback (most recent call last):
       File ".../pydicom/fileset.py", line 1858, in _recordify
         record = DIRECTORY_RECORDERS[record_type](ds)
@@ -358,21 +356,20 @@ is empty or missing:
         raise ValueError(
     ValueError: Unable to use the default 'RT DOSE' record creator as the instance is missing a required element or value. Either update the instance, define your own record creation function or use 'FileSet.add_custom()' instead
 
-When this occurs you have three choices:
+When this occurs, there are three options:
 
 * Update the instance to include the required element and/or value
 * Override the default record creation functions with your own by modifying
   :attr:`~pydicom.fileset.DIRECTORY_RECORDERS`
 * Use the :meth:`~pydicom.fileset.FileSet.add_custom` method
 
-From the exception message above we've got an empty *Instance Number*, so
-let's update the instance and try adding it again:
+According to the exception message above, the *Instance Number* element is empty.
+Let's update the instance and try adding it again:
 
 .. code-block:: python
 
-    >>> ds = dcmread(path)
-    >>> ds.InstanceNumber = "1"
-    >>> fs.add(ds)
+    >>> rt_dose.InstanceNumber = "1"
+    >>> fs.add(rt_dose)
 
 
 Removing instances
@@ -401,11 +398,11 @@ Let's add a couple of SOP instances back to the File-set:
 
 .. code-block:: python
 
-    >>> fs.add(get_testdata_file("CT_small.dcm"))
-    >>> fs.add(get_testdata_file("MR_small.dcm"))
+    >>> fs.add(examples.ct)
+    >>> fs.add(examples.mr)
 
 To apply the changes we've made to the File-set we use
-:meth:`~pydicom.fileset.FileSet.write`. For new File-sets we have to supply the
+:meth:`~pydicom.fileset.FileSet.write`. For new File-sets, we have to supply the
 path where the File-set root directory will be located:
 
 .. code-block:: python
@@ -450,12 +447,12 @@ as :class:`~pydicom.fileset.FileSet`, calling
 new structure. However, if the only modification you've made is to remove SOP
 instances or change :attr:`~pydicom.fileset.FileSet.ID`,
 :attr:`~pydicom.fileset.FileSet.UID`,
-:attr:`~pydicom.fileset.FileSet.descriptor_file_id` or
+:attr:`~pydicom.fileset.FileSet.descriptor_file_id`, or
 :attr:`~pydicom.fileset.FileSet.descriptor_character_set`, then you can pass
 the *use_existing* keyword parameter to keep the existing directory structure
 and update the DICOMDIR file.
 
-First we need to copy the existing example File-set to a temporary directory
+First, we need to copy the existing example File-set to a temporary directory
 so we don't accidentally modify it:
 
 .. code-block:: python
@@ -463,7 +460,7 @@ so we don't accidentally modify it:
     >>> from shutil import copytree, copyfile
     >>> t = TemporaryDirectory()
     >>> dst = Path(t.name)
-    >>> src = Path(get_testdata_file("DICOMDIR")).parent
+    >>> src = examples.get_path("dicomdir").parent
     >>> copyfile(src / "DICOMDIR", dst / "DICOMDIR")
     >>> copytree(src / "77654033", dst / "77654033")
     >>> copytree(src / "98892001", dst / "98892001")
@@ -492,7 +489,7 @@ structure:
     /tmp/tmpu068kdwp/77654033/CT2/17196
 
 If you'd just called :meth:`~pydicom.fileset.FileSet.write` without
-*use_existing* then it would've moved the SOP instances to the new
+*use_existing*, then it would've moved the SOP instances to the new
 directory structure:
 
 .. code-block:: python

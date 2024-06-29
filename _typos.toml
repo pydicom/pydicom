@@ -1,0 +1,11 @@
+[default.extend-words]
+ba = "ba"
+ot = "ot"
+siz = "siz"
+parm = "parm"
+universite = "universite"
+womens = "womens"
+observ = "observ"
+
+[files]
+extend-exclude = ["**/_*_dict.py"]

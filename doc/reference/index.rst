@@ -19,14 +19,17 @@ This API reference guide details the functions, modules and objects included in
    config
    data
    datadict
-   elem
    dataset
-   handlers
-   encoders
-   fileset
-   dicomdir
+   elem
+   examples
    encaps
    errors
    fileio
+   fileset
+   handlers
    misc
+   overlays
+   pixels
+   sr
+   waveforms
    uid

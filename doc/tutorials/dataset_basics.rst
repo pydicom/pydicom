@@ -13,57 +13,38 @@ If you haven't installed *pydicom* yet, follow the instructions in our
 :doc:`installation guide</tutorials/installation>`.
 
 
-Getting our example dataset
-===========================
+Getting the path to the example dataset
+=======================================
 
-In the tutorial we're going to be using a DICOM dataset included with
-*pydicom*: :gh:`CT_small.dcm
-<pydicom/blob/master/pydicom/data/test_files/CT_small.dcm>`.
-Starting with version 1.4 you can get the path to the file
-by using the :func:`~pydicom.data.get_testdata_file` function to return the
-path as a :class:`str` (your path may vary)::
+In the tutorial we're going to be using one of the example DICOM datasets included with
+*pydicom*: :gh:`CT_small.dcm<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
+You can get the file path to the dataset by using the :func:`~pydicom.examples.get_path`
+function to return the path as a :class:`pathlib.Path` (your path may vary)::
 
-    >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> fpath
-    '/home/user/env/pyd/lib/python3.7/site-packages/pydicom/data/test_files/CT_small.dcm'
-
-If you're using an earlier version then you'll have to use
-:func:`~pydicom.data.get_testdata_files` instead, which returns a list
-containing matching paths::
-
-    >>> from pydicom.data import get_testdata_files
-    >>> fpath = get_testdata_files("CT_small.dcm")[0]
-    >>> fpath
-    '/home/user/env/pyd/lib/python3.7/site-packages/pydicom/data/test_files/CT_small.dcm'
-
-To get the version of *pydicom* you're using you can do the following::
-
-    >>> import pydicom
-    >>> pydicom.__version__
-    '1.3.0'
-
+    >>> from pydicom import examples
+    >>> path = examples.get_path("ct")
+    >>> path
+    PosixPath('/path/to/pydicom/data/test_files/CT_small.dcm')
 
 Reading
 =======
 
-To read the DICOM dataset at a given file path we use
-:func:`~pydicom.filereader.dcmread`, which returns a
+To read the DICOM dataset at a given file path (as a :class:`str` or :class:`pathlib.Path`)
+we use :func:`~pydicom.filereader.dcmread`, which returns a
 :class:`~pydicom.dataset.FileDataset` instance::
 
-    >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(fpath)
+    >>> from pydicom import dcmread, examples
+    >>> path = get_path("ct")
+    >>> ds = dcmread(path)
 
 :func:`~pydicom.filereader.dcmread` can also handle file-likes::
 
-    >>> with open(fpath, 'rb') as infile:
+    >>> with open(path, 'rb') as infile:
     ...     ds = dcmread(infile)
 
 And can even be used as a context manager::
 
-    >>> with dcmread(fpath) as ds:
+    >>> with dcmread(path) as ds:
     ...    type(ds)
     ...
     <class 'pydicom.dataset.FileDataset'>
@@ -75,8 +56,8 @@ exception:
 
 .. code-block:: pycon
 
-    >>> no_meta = get_testdata_file('no_meta.dcm')
-    >>> ds = dcmread(no_meta)
+    >>> no_meta_path = examples.get_path('no_meta')
+    >>> ds = dcmread(no_meta_path)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
       File ".../pydicom/filereader.py", line 887, in dcmread
@@ -95,7 +76,7 @@ This indicates that either:
 If you're sure that the file contains DICOM data then you can use the `force`
 keyword parameter to force reading::
 
-  >>> ds = dcmread(no_meta, force=True)
+  >>> ds = dcmread(no_meta_path, force=True)
 
 A note of caution about using ``force=True``; because *pydicom* uses a
 deferred-read system, **no exceptions** will be raised at the time of reading,
@@ -128,10 +109,12 @@ You'll only run into problems when trying to use the dataset::
 Viewing and accessing
 =====================
 
-Let's go back to our ``CT_small.dcm`` dataset::
+The ``CT_small.dcm`` dataset is also included as an example dataset:
 
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(fpath)
+    >>> from pydicom import examples
+    >>> ds = examples.ct
+    >>> type(ds)
+    <class 'pydicom.dataset.FileDataset'>
 
 You can view the contents of the entire dataset by using :func:`print`::
 
@@ -561,10 +544,10 @@ By default, :meth:`~pydicom.dataset.Dataset.save_as` will write the dataset
 as-is. This means that even if your dataset is not conformant to the
 :dcm:`DICOM File Format<part10/chapter_7.html>` it will
 still be written exactly as given. To be certain you're writing the
-dataset in the DICOM File Format you can use the `write_like_original` keyword
+dataset in the DICOM File Format you can use the `enforce_file_format` keyword
 parameter::
 
-    >>> ds.save_as('out.dcm', write_like_original=False)
+    >>> ds.save_as('out.dcm', enforce_file_format=True)
 
 This will attempt to automatically add in any missing required group
 ``0x0002`` File Meta Information elements and set a blank 128 byte preamble (if
@@ -573,19 +556,17 @@ required). If it's unable to do so then an exception will be raised:
 .. code-block:: pycon
 
     >>> del ds.file_meta
-    >>> ds.save_as('out.dcm', write_like_original=False)
+    >>> ds.save_as('out.dcm', enforce_file_format=True)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-      File ".../pydicom/dataset.py", line 1794, in save_as
-        pydicom.dcmwrite(filename, self, write_like_original)
-      File ".../pydicom/filewriter.py", line 925, in dcmwrite
-        enforce_standard=not write_like_original)
-      File ".../pydicom/filewriter.py", line 712, in write_file_meta_info
-        validate_file_meta(file_meta, enforce_standard)
-      File ".../pydicom/dataset.py", line 2372, in validate_file_meta
-        raise ValueError(msg[:-1])  # Remove final newline
-      ValueError: Missing required File Meta Information elements from 'file_meta':
-	      (0002, 0010) TransferSyntaxUID
+      File ".../pydicom/dataset.py", line 2452, in save_as
+        pydicom.dcmwrite(
+      File ".../pydicom/filewriter.py", line 1311, in dcmwrite
+        validate_file_meta(file_meta, enforce_standard=True)
+      File ".../pydicom/dataset.py", line 3204, in validate_file_meta
+        raise AttributeError(
+    AttributeError: Required File Meta Information elements are either missing
+    or have an empty value: (0002,0010) Transfer Syntax UID
 
 The exception message contains the required element(s) that need to be added,
 usually this will only be the *Transfer Syntax UID*. It's an important element,
@@ -599,7 +580,7 @@ we need to add it back::
 And now we can add our *Transfer Syntax UID* element and save to file::
 
     >>> ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
-    >>> ds.save_as('out.dcm', write_like_original=False)
+    >>> ds.save_as('out.dcm', enforce_file_format=True)
 
 And we're done.
 
@@ -609,5 +590,5 @@ Next steps
 
 Congratulations, you're now familiar with the basics of using *pydicom* to
 read, access, modify and write DICOM datasets. Next up you may be interested
-in looking at our :doc:`User Guide</old/pydicom_user_guide>` or some of our
+in looking at our :doc:`User Guide</guides/user/index>` or some of our
 :doc:`examples</auto_examples/index>`.

@@ -19,7 +19,7 @@ location, building a 3D image and reslicing it in different planes.
    Uses numpy and matplotlib.
 
    Tested using series 2 from here
-   http://www.pcir.org/researchers/54879843_20060101.html
+   https://www.pcir.org/researchers/54879843_20060101.html
 """
 
 import pydicom
@@ -30,23 +30,23 @@ import glob
 
 # load the DICOM files
 files = []
-print('glob: {}'.format(sys.argv[1]))
+print(f"glob: {sys.argv[1]}")
 for fname in glob.glob(sys.argv[1], recursive=False):
-    print("loading: {}".format(fname))
+    print(f"loading: {fname}")
     files.append(pydicom.dcmread(fname))
 
-print("file count: {}".format(len(files)))
+print(f"file count: {len(files)}")
 
 # skip files with no SliceLocation (eg scout views)
 slices = []
 skipcount = 0
 for f in files:
-    if hasattr(f, 'SliceLocation'):
+    if hasattr(f, "SliceLocation"):
         slices.append(f)
     else:
         skipcount = skipcount + 1
 
-print("skipped, no SliceLocation: {}".format(skipcount))
+print(f"skipped, no SliceLocation: {skipcount}")
 
 # ensure they are in the correct order
 slices = sorted(slices, key=lambda s: s.SliceLocation)
@@ -54,9 +54,9 @@ slices = sorted(slices, key=lambda s: s.SliceLocation)
 # pixel aspects, assuming all slices are the same
 ps = slices[0].PixelSpacing
 ss = slices[0].SliceThickness
-ax_aspect = ps[1]/ps[0]
-sag_aspect = ps[1]/ss
-cor_aspect = ss/ps[0]
+ax_aspect = ps[1] / ps[0]
+sag_aspect = ps[1] / ss
+cor_aspect = ss / ps[0]
 
 # create 3D array
 img_shape = list(slices[0].pixel_array.shape)
@@ -70,15 +70,15 @@ for i, s in enumerate(slices):
 
 # plot 3 orthogonal slices
 a1 = plt.subplot(2, 2, 1)
-plt.imshow(img3d[:, :, img_shape[2]//2])
+plt.imshow(img3d[:, :, img_shape[2] // 2])
 a1.set_aspect(ax_aspect)
 
 a2 = plt.subplot(2, 2, 2)
-plt.imshow(img3d[:, img_shape[1]//2, :])
+plt.imshow(img3d[:, img_shape[1] // 2, :])
 a2.set_aspect(sag_aspect)
 
 a3 = plt.subplot(2, 2, 3)
-plt.imshow(img3d[img_shape[0]//2, :, :].T)
+plt.imshow(img3d[img_shape[0] // 2, :, :].T)
 a3.set_aspect(cor_aspect)
 
 plt.show()

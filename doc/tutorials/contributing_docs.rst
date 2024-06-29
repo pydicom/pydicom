@@ -26,20 +26,10 @@ Download the documentation
 
      git clone https://github.com/YourUsername/pydicom.git
 
-4. (Optional) We recommend that you install your development copy of *pydicom*
-   in a virtual environment. See the :doc:`virtual environments<virtualenvs>`
-   tutorial for more information.
-
-   Create a new virtualenv ``pyd-doc``, using a Python 3.X version such
-   as 3.10, then activate it::
-
-   python3.10 -m venv pyd-doc
-   source pyd-doc/bin/activate
-
-5. Install the cloned copy of *pydicom* and the dependencies requires for
+4. Install the cloned copy of *pydicom* and the dependencies requires for
    building the documentation (using ``-e`` for an editable install)::
 
-   pip install -e pydicom[docs]
+     pip install -e pydicom[docs]
 
 
 Build and preview the documentation
@@ -73,7 +63,7 @@ Create a new branch
 ===================
 Create a new branch ``doc-tut`` for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
-it and won't affect the main copy (the ``master`` branch) of
+it and won't affect the main copy (the ``main`` branch) of
 the documentation::
 
   git checkout -b doc-tut
@@ -166,10 +156,10 @@ markup::
 
     >>> from pydicom import dcmread
     >>> from pydicom.data import get_testdata_file
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> fpath
+    >>> path = get_testdata_file("CT_small.dcm")
+    >>> path
     '[path/to]/pydicom/data/test_files/CT_small.dcm'
-    >>> ds = dcmread(fpath)
+    >>> ds = dcmread(path)
 
   Printing an element
   ===================
@@ -247,12 +237,12 @@ What happens next?
 One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
-``master`` branch where they would become part of *pydicom*.
+``main`` branch where they would become part of *pydicom*.
 
 However, because this is just an example, all we're going to do is clean up the
-changes we've made. First we switch back to the ``master`` branch::
+changes we've made. First we switch back to the ``main`` branch::
 
-  git checkout master
+  git checkout main
 
 We delete the local copy of the branch we created::
 

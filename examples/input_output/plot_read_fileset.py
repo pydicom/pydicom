@@ -9,16 +9,14 @@ This example shows how to read and interact with a DICOM File-set.
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import warnings
 
-from pydicom import dcmread
+from pydicom import examples
 from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
 from pydicom.uid import generate_uid
 
-warnings.filterwarnings("ignore")
 
-path = get_testdata_file('DICOMDIR')
+path = get_testdata_file("DICOMDIR")
 # A File-set can be loaded from the path to its DICOMDIR dataset or the
 #   dataset itself
 fs = FileSet(path)  # or fs = FileSet(dcmread(path))
@@ -39,10 +37,7 @@ for patient_id in patient_ids:
     # Returns a list of FileInstance, where each one represents an available
     #   SOP Instance with a matching *Patient ID*
     result = fs.find(PatientID=patient_id)
-    print(
-        f"PatientName={result[0].PatientName}, "
-        f"PatientID={result[0].PatientID}"
-    )
+    print(f"PatientName={result[0].PatientName}, " f"PatientID={result[0].PatientID}")
 
     # Search available studies
     study_uids = fs.find_values("StudyInstanceUID", instances=result)
@@ -59,9 +54,9 @@ for patient_id in patient_ids:
             result = fs.find(
                 PatientID=patient_id,
                 StudyInstanceUID=study_uid,
-                SeriesInstanceUID=series_uid
+                SeriesInstanceUID=series_uid,
             )
-            plural = ['', 's'][len(result) > 1]
+            plural = ["", "s"][len(result) > 1]
 
             print(
                 f"    Modality={result[0].Modality} - "
@@ -85,8 +80,8 @@ print(
 )
 
 # We can remove and add instances to the File-set
-fs.add(get_testdata_file("CT_small.dcm"))
-fs.add(get_testdata_file("MR_small.dcm"))
+fs.add(examples.ct)
+fs.add(examples.mr)
 result = fs.find(StudyDescription="'XR C Spine Comp Min 4 Views'")
 fs.remove(result)
 
@@ -118,6 +113,6 @@ root = Path(new_fileset.path)
 print(f"File-set copied to {root} and contains the following files:")
 # Note how the original File-set directory layout has been changed to
 #   the structure used by pydicom
-for p in sorted(root.glob('**/*')):
+for p in sorted(root.glob("**/*")):
     if p.is_file():
         print(f"  {p.relative_to(root)}")

@@ -15,7 +15,6 @@ Functions for reading DICOM datasets from file-likes.
    dcmread
    read_dataset
    read_deferred_data_element
-   read_dicomdir
    read_file_meta_info
    read_partial
    read_preamble

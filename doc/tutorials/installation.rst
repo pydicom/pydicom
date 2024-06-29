@@ -7,9 +7,7 @@ How to install pydicom
    We recommend installing into a
    `virtual environment <https://docs.python.org/3/tutorial/venv.html>`_,
    which is an isolated Python environment that allows you to install
-   packages without admin privileges. See the
-   :doc:`virtual environments tutorial<virtualenvs>` on how to create and
-   manage virtual environments.
+   packages without admin privileges.
 
 
 .. _tut_install:
@@ -24,7 +22,7 @@ Python is supported, check :ref:`this table<faq_install_version>`.
 Install using pip
 -----------------
 
-*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`_, the
+*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`__, the
 official third-party Python software repository. The simplest way to install
 from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
 
@@ -45,7 +43,7 @@ Install using conda
 -------------------
 
 *pydicom* is also available for `conda <https://docs.conda.io/>`_ at
-`conda-forge <https://anaconda.org/conda-forge/pydicom>`_::
+`conda-forge <https://anaconda.org/conda-forge/pydicom>`__::
 
   conda install -c conda-forge pydicom
 
@@ -97,8 +95,8 @@ Installing Pillow
 that can handle the decompression of some JPEG and JPEG 2000 images.
 
 Using pip; you may need to make sure that the
-`libjpeg <http://libjpeg.sourceforge.net/>`_ (for JPEG) and
-`openjpeg <http://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
+`libjpeg <https://libjpeg.sourceforge.net/>`_ (for JPEG) and
+`openjpeg <https://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
 beforehand::
 
   pip install pillow
@@ -109,22 +107,22 @@ Through conda::
   conda install pillow
 
 
-Installing CharPyLS
+Installing pyjpegls
 -------------------
 
-`CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_ is a Python interface to
+`pyjpegls <https://github.com/pydicom/pyjpegls>`_ is a Python interface to
 the `CharLS <https://github.com/team-charls/charls>`_ C++ library and can
-decompress JPEG-LS images.
+decompress JPEG-LS images. It is a fork of `CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_
+created to provide compatibility with the latest Python versions.
 
 Using pip::
 
-  pip install cython
-  pip install git+https://github.com/Who8MyLunch/CharPyLS
+  pip install pyjpegls
 
 Through conda::
 
   conda install cython
-  pip install git+https://github.com/Who8MyLunch/CharPyLS
+  pip install git+https://github.com/pydicom/pyjpegls
 
 
 .. _tut_install_gdcm:
@@ -132,16 +130,16 @@ Through conda::
 Installing GDCM
 ---------------
 
-`GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
-DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
+`GDCM <https://sourceforge.net/projects/gdcm/>`_ is a C++ library for working
+with DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
-The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`_ are built by the
+The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`__ are built by the
 `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
 versions of Python on Windows, MacOS and Linux, and can be installed using pip::
 
   pip install python-gdcm
 
-The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`_
+The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`__
 tend to be older versions and not as well supported. They're available on conda using::
 
   conda install gdcm -c conda-forge
@@ -166,16 +164,16 @@ Using pip::
 Install the development version
 ===============================
 
-To install a snapshot of the latest code (the ``master`` branch) from
+To install a snapshot of the latest code (the ``main`` branch) from
 :gh:`GitHub <pydicom>`::
 
   pip install git+https://github.com/pydicom/pydicom
 
-The ``master`` branch is under active development and while it is usually
+The ``main`` branch is under active development and while it is usually
 stable, it may have undocumented changes or bugs.
 
 If you want to keep up-to-date with the latest code, make sure you have
-`Git <https://git-scm.com/>`_ installed and then clone the ``master``
+`Git <https://git-scm.com/>`_ installed and then clone the ``main``
 branch (this will create a ``pydicom`` directory in your current directory)::
 
   git clone --depth=1 https://github.com/pydicom/pydicom.git
