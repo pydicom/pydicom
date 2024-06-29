@@ -212,7 +212,7 @@ Enhancements
 * Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
   (:issue:`1454`)
 * Added typing support for :class:`~pydicom.dataset.Dataset` element access using the
-  `types-pydicom<https://github.com/pydicom/types-pydicom>`_ package. (:issue:`1485`)
+  `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package. (:issue:`1485`)
 
 
 Fixes

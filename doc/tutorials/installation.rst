@@ -65,7 +65,7 @@ through :class:`~pydicom.dataset.Dataset`::
     $ mypy foo.py
     Success: no issues found in 1 source file
 
-To add extra type hints for these attributes you can install the `types-pydicom<https://github.com/pydicom/types-pydicom>`_ package::
+To add extra type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
 
     pip install types-pydicom
 
