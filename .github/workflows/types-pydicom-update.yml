@@ -1,0 +1,31 @@
+name: Trigger a types-pydicom package update
+
+on:
+    workflow_run:
+        # This the value of the 'name:' variable for the workflow
+        # For example, if 'name: Trigger Update' then this would be
+        # - 'Trigger Update'
+        workflows:
+          - 'merge'
+        types:
+          - completed
+
+jobs:
+    trigger-workflow:
+        if: github.event.workflow_run.conclusion == 'success'
+        runs-on: ubuntu-latest
+        steps:
+        - name: Trigger types-pydicom's update-package.yml workflow
+          uses: actions/github-script@v6
+          with:
+            # Personal Access Token with
+            # repo: types-pydicom
+            # repo permissions: Actions (RW), Contents (RW), Metadata (R), PR (RW)
+            github-token: ${{ secrets.TRIGGER_TYPES_PYDICOM_UPDATE }}
+            script: |
+              await github.rest.actions.createWorkflowDispatch({
+                  owner: 'scaramallion',
+                  repo: 'types-pydicom',
+                  workflow_id: 'update-package.yml',
+                  ref: 'main',
+              })
