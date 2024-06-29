@@ -66,7 +66,11 @@ from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log
 from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
-from pydicom.pixels.utils import reshape_pixel_array, get_image_pixel_ids
+from pydicom.pixels.utils import (
+    reshape_pixel_array,
+    get_image_pixel_ids,
+    set_pixel_data,
+)
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
@@ -1851,7 +1855,7 @@ class Dataset:
         encoding_plugin: str = "",
         encapsulate_ext: bool = False,
         *,
-        new_instance_uid: bool = True,
+        generate_instance_uid: bool = True,
         jls_error: int | None = None,
         j2k_cr: list[float] | None = None,
         j2k_psnr: list[float] | None = None,
@@ -1895,7 +1899,7 @@ class Dataset:
         * (7FE0,0001) *Extended Offset Table*
         * (7FE0,0002) *Extended Offset Table Lengths*
 
-        If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+        If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
         Instance UID* value will be generated.
 
         **Supported Transfer Syntax UIDs**
@@ -1920,7 +1924,7 @@ class Dataset:
 
         .. versionchanged:: 3.0
 
-            Added the `jls_error`, `j2k_cr`, `j2k_psnr` and `new_instance_uid`
+            Added the `jls_error`, `j2k_cr`, `j2k_psnr` and `generate_instance_uid`
             keyword parameters.
 
         Examples
@@ -1955,7 +1959,7 @@ class Dataset:
             If ``False`` (default) then an extended offset table
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
-        new_instance_uid : bool, optional
+        generate_instance_uid : bool, optional
             If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
             value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
             keep the original value.
@@ -1988,7 +1992,7 @@ class Dataset:
             arr,
             encoding_plugin=encoding_plugin,
             encapsulate_ext=encapsulate_ext,
-            new_instance_uid=new_instance_uid,
+            generate_instance_uid=generate_instance_uid,
             jls_error=jls_error,
             j2k_cr=j2k_cr,
             j2k_psnr=j2k_psnr,
@@ -2000,7 +2004,7 @@ class Dataset:
         handler_name: str = "",
         *,
         as_rgb: bool = True,
-        new_instance_uid: bool = True,
+        generate_instance_uid: bool = True,
         decoding_plugin: str = "",
         **kwargs: Any,
     ) -> None:
@@ -2026,12 +2030,12 @@ class Dataset:
           *Pixel Data* element will be set to ``False``.
         * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
           modified as required to match the uncompressed *Pixel Data*.
-        * If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+        * If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
           Instance UID* value will be generated.
 
         .. versionchanged:: 3.0
 
-            Added the `as_rgb` and `new_instance_uid` keyword parameters.
+            Added the `as_rgb` and `generate_instance_uid` keyword parameters.
 
         .. deprecated:: 3.0
 
@@ -2046,7 +2050,7 @@ class Dataset:
             :mod:`~pydicom.pixels` **backend only.** If ``True`` (default) then
             convert pixel data with a YCbCr :ref:`photometric interpretation
             <photometric_interpretation>` such as ``"YBR_FULL_422"`` to RGB.
-        new_instance_uid : bool, optional
+        generate_instance_uid : bool, optional
             If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
             value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
             keep the original value.
@@ -2085,7 +2089,7 @@ class Dataset:
         decompress(
             self,
             as_rgb=as_rgb,
-            new_instance_uid=new_instance_uid,
+            generate_instance_uid=generate_instance_uid,
             **opts,
         )
 
@@ -2785,6 +2789,77 @@ class Dataset:
             #   containing RawDataElements are being added to a different
             #   dataset
             self._set_pixel_representation(cast(DataElement, elem))
+
+    def set_pixel_data(
+        self,
+        arr: "numpy.ndarray",
+        photometric_interpretation: str,
+        bits_stored: int,
+        *,
+        generate_instance_uid: bool = True,
+    ) -> None:
+        """Use an :class:`~numpy.ndarray` to set the *Pixel Data* and related
+        Image Pixel module elements.
+
+        .. versionadded:: 3.0
+
+        The following :dcm:`Image Pixel<part03/sect_C.7.6.3.3.html#table_C.7-11c>`
+        module elements values will be added, updated or removed as necessary:
+
+        * (0028,0002) *Samples per Pixel* using a value corresponding to
+          `photometric_interpretation`.
+        * (0028,0104) *Photometric Interpretation* from `photometric_interpretation`.
+        * (0028,0006) *Planar Configuration* will be added and set to ``0`` if
+          *Samples per Pixel* is > 1, otherwise it will be removed.
+        * (0028,0008) *Number of Frames* from the array :attr:`~numpy.ndarray.shape`,
+          however it will be removed if `arr` only contains a single frame.
+        * (0028,0010) *Rows* and (0028,0011) *Columns* from the array
+          :attr:`~numpy.ndarray.shape`.
+        * (0028,0100) *Bits Allocated* from the array :class:`~numpy.dtype`.
+        * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
+        * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
+
+        In addition:
+
+        * The *Transfer Syntax UID* will be set to *Explicit VR Little Endian* if
+          it doesn't already exist or uses a compressed (encapsulated) transfer syntax.
+        * If `generate_instance_uid` is ``True`` (default) then the *SOP Instance UID*
+          will be added or updated.
+
+        Parameters
+        ----------
+        arr : numpy.ndarray
+            An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
+            array must be shaped as one of the following:
+
+            * (rows, columns) for a single frame of grayscale data.
+            * (frames, rows, columns) for multi-frame grayscale data.
+            * (rows, columns, samples) for a single frame of multi-sample data
+              such as RGB.
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data.
+        photometric_interpretation : str
+            The value to use for (0028,0004) *Photometric Interpretation*. Valid
+            values are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``,
+            ``"RGB"``, ``"YBR_FULL"``, ``"YBR_FULL_422"``.
+        bits_stored : int
+            The value to use for (0028,0101) *Bits Stored*. Must be no greater than
+            the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+        generate_instance_uid : bool, optional
+            If ``True`` (default) then add or update the (0008,0018) *SOP Instance
+            UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
+
+        Raises
+        ------
+        NotImplementedError
+            If the dataset has a big-endian *Transfer Syntax UID*.
+        """
+        set_pixel_data(
+            self,
+            arr,
+            photometric_interpretation,
+            bits_stored,
+            generate_instance_uid=generate_instance_uid,
+        )
 
     def _set_pixel_representation(self, elem: DataElement) -> None:
         """Set the `_pixel_rep` attribute for the current dataset and child

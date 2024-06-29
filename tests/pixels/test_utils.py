@@ -34,6 +34,7 @@ from pydicom.pixels.utils import (
     get_j2k_parameters,
     get_nr_frames,
     pack_bits,
+    set_pixel_data,
     unpack_bits,
     expand_ybr422,
     compress,
@@ -43,6 +44,7 @@ from pydicom.uid import (
     EnhancedMRImageStorage,
     ExplicitVRLittleEndian,
     ExplicitVRBigEndian,
+    ImplicitVRLittleEndian,
     UncompressedTransferSyntaxes,
     RLELossless,
     JPEG2000Lossless,
@@ -1566,12 +1568,14 @@ class TestCompressRLE:
         ds = dcmread(EXPL_16_16_1F.path)
         original = ds.SOPInstanceUID
 
-        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=True)
+        compress(ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=True)
         assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(EXPL_16_16_1F.path)
-        compress(ds, RLELossless, encoding_plugin="pydicom", new_instance_uid=False)
+        compress(
+            ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=False
+        )
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
@@ -1882,11 +1886,436 @@ class TestDecompress:
         ds = dcmread(RLE_8_3_1F.path)
         original = ds.SOPInstanceUID
 
-        decompress(ds, decoding_plugin="pydicom", new_instance_uid=True)
+        decompress(ds, decoding_plugin="pydicom", generate_instance_uid=True)
         assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(RLE_8_3_1F.path)
-        decompress(ds, decoding_plugin="pydicom", new_instance_uid=False)
+        decompress(ds, decoding_plugin="pydicom", generate_instance_uid=False)
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestSetPixelData:
+    """Tests for set_pixel_data()"""
+
+    def test_float_pixel_data_raises(self):
+        """Test exception raised if float pixel data elements present"""
+        ds = Dataset()
+        ds.FloatPixelData = b"\x00\x00"
+        arr = np.zeros((10, 10), dtype="uint8")
+
+        msg = (
+            r"The dataset has an existing \(7FE0,0008\) 'Float Pixel Data' element "
+            r"which indicates the \(0008,0016\) 'SOP Class UID' value is not suitable "
+            "for a dataset with 'Pixel Data'. The 'Float Pixel Data' element should "
+            "be deleted and the 'SOP Class UID' changed."
+        )
+        with pytest.raises(AttributeError, match=msg):
+            set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+        del ds.FloatPixelData
+        ds.DoubleFloatPixelData = b"\x00\x00"
+
+        msg = r"The dataset has an existing \(7FE0,0009\) 'Double Float Pixel Data'"
+        with pytest.raises(AttributeError, match=msg):
+            set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+    def test_unsupported_dtype_raises(self):
+        """Test exception raised if dtype is unsupported"""
+
+        msg = (
+            r"Unsupported ndarray dtype 'uint32', must be int8, int16, uint8 or uint16"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(
+                Dataset(), np.zeros((10, 10), dtype="uint32"), "MONOCHROME1", 8
+            )
+
+        msg = (
+            r"Unsupported ndarray dtype 'float32', must be int8, int16, uint8 or uint16"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(
+                Dataset(), np.zeros((10, 10), dtype="float32"), "MONOCHROME1", 8
+            )
+
+    def test_unsupported_photometric_interpretation_raises(self):
+        """Test exception raised if dtype is unsupported"""
+
+        msg = "Unsupported 'photometric_interpretation' value 'YBR_RCT'"
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.zeros((10, 10), dtype="int8"), "YBR_RCT", 8)
+
+    def test_unsupported_dimension_raises(self):
+        """Test exception raised if array dimensions are unsupported"""
+
+        msg = "An ndarray with 'MONOCHROME1' data must have 2 or 3 dimensions, not 4"
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(
+                Dataset(), np.zeros((2, 10, 10, 3), dtype="int8"), "MONOCHROME1", 8
+            )
+
+        msg = "An ndarray with 'RGB' data must have 3 or 4 dimensions, not 2"
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.zeros((10, 10), dtype="int8"), "RGB", 8)
+
+    def test_invalid_samples_raises(self):
+        """Test mismatch between array shape and photometric interpretation raises"""
+        msg = (
+            r"An ndarray with 'RGB' data must have shape \(rows, columns, 3\) or "
+            r"\(frames, rows, columns, 3\), not \(10, 10, 10\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.zeros((10, 10, 10), dtype="int8"), "RGB", 8)
+
+    def test_invalid_bits_stored_raises(self):
+        """Test bits_stored outside [1, 16] raises an exception"""
+        msg = (
+            "Invalid 'bits_stored' value '0', must be greater than 0 and "
+            "less than or equal to the number of bits for the ndarray's itemsize "
+            "'8'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.ones((3, 3), dtype="u1"), "MONOCHROME1", 0)
+
+        msg = (
+            "Invalid 'bits_stored' value '9', must be greater than 0 and "
+            "less than or equal to the number of bits for the ndarray's itemsize "
+            "'8'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.ones((3, 3), dtype="u1"), "MONOCHROME1", 9)
+
+        msg = (
+            "Invalid 'bits_stored' value '0', must be greater than 0 and "
+            "less than or equal to the number of bits for the ndarray's itemsize "
+            "'16'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.ones((3, 3), dtype="u2"), "MONOCHROME1", 0)
+
+        msg = (
+            "Invalid 'bits_stored' value '17', must be greater than 0 and "
+            "less than or equal to the number of bits for the ndarray's itemsize "
+            "'16'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(Dataset(), np.ones((3, 3), dtype="u2"), "MONOCHROME1", 17)
+
+    def test_invalid_arr_range_raises(self):
+        """Test the range of values in the array matches bits_stored"""
+        arr = np.zeros((10, 10), dtype="uint8")
+        # The array will overflow 256 -> 0 if bits_stored 8
+        for bits_stored in range(1, 8):
+            amin, amax = 0, 2**bits_stored - 1
+            arr[0, 0] = amax + 1
+
+            msg = (
+                rf"The range of values in the ndarray \[0, {amax + 1}\] is "
+                r"greater than that allowed by the 'bits_stored' value \[0, "
+                rf"{amax}\]"
+            )
+            with pytest.raises(ValueError, match=msg):
+                set_pixel_data(Dataset(), arr, "MONOCHROME1", bits_stored)
+
+        arr = np.zeros((10, 10), dtype="uint16")
+        for bits_stored in range(1, 16):
+            amin, amax = 0, 2**bits_stored - 1
+            arr[0, 0] = amax + 1
+
+            msg = (
+                rf"The range of values in the ndarray \[0, {amax + 1}\] is "
+                r"greater than that allowed by the 'bits_stored' value \[0, "
+                rf"{amax}\]"
+            )
+            with pytest.raises(ValueError, match=msg):
+                set_pixel_data(Dataset(), arr, "MONOCHROME1", bits_stored)
+
+        arr = np.zeros((10, 10), dtype="int8")
+        for bits_stored in range(1, 8):
+            amin, amax = -(2 ** (bits_stored - 1)), 2 ** (bits_stored - 1) - 1
+            arr[0, 0] = amax + 1
+            arr[0, 1] = amin - 1
+
+            msg = (
+                rf"The range of values in the ndarray \[{amin - 1}, {amax + 1}\] is "
+                rf"greater than that allowed by the 'bits_stored' value \[{amin}, "
+                rf"{amax}\]"
+            )
+            with pytest.raises(ValueError, match=msg):
+                set_pixel_data(Dataset(), arr, "MONOCHROME1", bits_stored)
+
+        arr = np.zeros((10, 10), dtype="int16")
+        for bits_stored in range(1, 16):
+            amin, amax = -(2 ** (bits_stored - 1)), 2 ** (bits_stored - 1) - 1
+            arr[0, 0] = amax + 1
+            arr[0, 1] = amin - 1
+
+            msg = (
+                rf"The range of values in the ndarray \[{amin - 1}, {amax + 1}\] is "
+                rf"greater than that allowed by the 'bits_stored' value \[{amin}, "
+                rf"{amax}\]"
+            )
+            with pytest.raises(ValueError, match=msg):
+                set_pixel_data(Dataset(), arr, "MONOCHROME1", bits_stored)
+
+    def test_big_endian_raises(self):
+        """Test exception raised if big endian transfer syntax"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        arr = np.zeros((10, 10), dtype="uint8")
+
+        msg = (
+            "The dataset's transfer syntax 'Explicit VR Big Endian' is big-endian, "
+            "which is not supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+    def test_grayscale_8bit_unsigned(self):
+        """Test setting unsigned 8-bit grayscale pixel data"""
+        ds = Dataset()
+        ds.PlanarConfiguration = 1
+        ds.NumberOfFrames = 2
+
+        arr = np.zeros((3, 5), dtype="u1")
+        arr[0, 0] = 127
+        set_pixel_data(ds, arr, "MONOCHROME1", 7)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 1
+        assert ds.PhotometricInterpretation == "MONOCHROME1"
+        assert ds.PixelRepresentation == 0
+        assert ds.BitsAllocated == 8
+        assert ds.BitsStored == 7
+        assert ds.HighBit == 6
+        assert "NumberOfFrames" not in ds
+        assert "PlanarConfiguration" not in ds
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OB"
+        assert len(elem.value) == 16
+        assert elem.is_undefined_length is False
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_grayscale_8bit_signed(self):
+        """Test setting signed 8-bit grayscale pixel data"""
+        ds = Dataset()
+        ds.PlanarConfiguration = 1
+        ds.NumberOfFrames = 2
+
+        arr = np.zeros((3, 5), dtype="i1")
+        arr[0, 0] = 127
+        arr[0, 1] = -128
+        set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 1
+        assert ds.PhotometricInterpretation == "MONOCHROME1"
+        assert ds.PixelRepresentation == 1
+        assert ds.BitsAllocated == 8
+        assert ds.BitsStored == 8
+        assert ds.HighBit == 7
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OB"
+        assert len(elem.value) == 16
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_grayscale_16bit_unsigned(self):
+        """Test setting unsigned 16-bit grayscale pixel data"""
+        ds = Dataset()
+        ds.PlanarConfiguration = 1
+        ds.NumberOfFrames = 2
+
+        arr = np.zeros((3, 5), dtype="u2")
+        arr[0, 0] = 65535
+        set_pixel_data(ds, arr, "MONOCHROME1", 16)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 1
+        assert ds.PhotometricInterpretation == "MONOCHROME1"
+        assert ds.PixelRepresentation == 0
+        assert ds.BitsAllocated == 16
+        assert ds.BitsStored == 16
+        assert ds.HighBit == 15
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OW"
+        assert len(elem.value) == 30
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_grayscale_16bit_signed(self):
+        """Test setting signed 16-bit grayscale pixel data"""
+        ds = Dataset()
+        ds.PlanarConfiguration = 1
+        ds.NumberOfFrames = 2
+
+        arr = np.zeros((3, 5), dtype="i2")
+        arr[0, 0] = 32767
+        arr[0, 1] = -32768
+        set_pixel_data(ds, arr, "MONOCHROME1", 16)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 1
+        assert ds.PhotometricInterpretation == "MONOCHROME1"
+        assert ds.PixelRepresentation == 1
+        assert ds.BitsAllocated == 16
+        assert ds.BitsStored == 16
+        assert ds.HighBit == 15
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OW"
+        assert len(elem.value) == 30
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_grayscale_multiframe(self):
+        """Test setting multiframe pixel data"""
+        ds = Dataset()
+
+        arr = np.zeros((10, 3, 5), dtype="u1")
+        arr[0, 0, 0] = 127
+        arr[9, 0, 0] = 255
+        set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 1
+        assert ds.PhotometricInterpretation == "MONOCHROME1"
+        assert ds.PixelRepresentation == 0
+        assert ds.BitsAllocated == 8
+        assert ds.BitsStored == 8
+        assert ds.HighBit == 7
+        assert ds.NumberOfFrames == 10
+        assert "PlanarConfiguration" not in ds
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OB"
+        assert len(elem.value) == 150
+        assert elem.is_undefined_length is False
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_rgb_8bit_unsigned(self):
+        """Test setting unsigned 8-bit RGB pixel data"""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+
+        arr = np.zeros((3, 5, 3), dtype="u1")
+        arr[0, 0] = [127, 255, 0]
+        set_pixel_data(ds, arr, "RGB", 8)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 3
+        assert ds.PhotometricInterpretation == "RGB"
+        assert ds.PixelRepresentation == 0
+        assert ds.BitsAllocated == 8
+        assert ds.BitsStored == 8
+        assert ds.HighBit == 7
+        assert ds.PlanarConfiguration == 0
+        assert "NumberOfFrames" not in ds
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OB"
+        assert len(elem.value) == 46
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_rgb_YBR_FULL_422(self):
+        """Test setting multiframe pixel data"""
+        ref = dcmread(EXPL_8_3_1F_YBR422.path)
+        arr = pixel_array(ref, raw=True)
+
+        ds = Dataset()
+        set_pixel_data(ds, arr, "YBR_FULL_422", 8)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == ref.Rows
+        assert ds.Columns == ref.Columns
+        assert ds.SamplesPerPixel == ref.SamplesPerPixel
+        assert ds.PhotometricInterpretation == "YBR_FULL_422"
+        assert ds.PixelRepresentation == ref.PixelRepresentation
+        assert ds.BitsAllocated == ref.BitsAllocated
+        assert ds.BitsStored == ref.BitsStored
+        assert ds.HighBit == ref.HighBit
+        assert ds.PlanarConfiguration == ref.PlanarConfiguration
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OB"
+        assert len(elem.value) == (
+            ds.Rows * ds.Columns * ds.BitsAllocated // 8 * ds.SamplesPerPixel // 3 * 2
+        )
+        assert elem.is_undefined_length is False
+
+        assert np.array_equal(pixel_array(ds, raw=True), arr)
+
+    def test_transfer_syntax(self):
+        """Test setting the transfer syntax"""
+        ds = Dataset()
+
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+
+        del ds.file_meta.TransferSyntaxUID
+
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
+
+        ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+
+    def test_dataset_set_pixel_data(self):
+        """Functionality test for Dataset.set_pixel_data()"""
+        ref = dcmread(EXPL_8_3_1F_YBR422.path)
+        arr = ref.pixel_array
+
+        ds = Dataset()
+        ds.set_pixel_data(arr, "RGB", 8)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == ref.Rows
+        assert ds.Columns == ref.Columns
+        assert ds.SamplesPerPixel == ref.SamplesPerPixel
+        assert ds.PhotometricInterpretation == "RGB"
+        assert ds.PixelRepresentation == ref.PixelRepresentation
+        assert ds.BitsAllocated == ref.BitsAllocated
+        assert ds.BitsStored == ref.BitsStored
+        assert ds.HighBit == ref.HighBit
+        assert ds.PlanarConfiguration == ref.PlanarConfiguration
+
+        assert np.array_equal(ds.pixel_array, arr)
+
+    def test_sop_instance(self):
+        """Test generate_instance_uid kwarg"""
+        ds = Dataset()
+        ds.SOPInstanceUID = "1.2.3.4"
+
+        set_pixel_data(ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8)
+        uid = ds.SOPInstanceUID
+        assert uid != "1.2.3.4"
+        set_pixel_data(
+            ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8, generate_instance_uid=False
+        )
+        assert ds.SOPInstanceUID == uid

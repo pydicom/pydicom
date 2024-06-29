@@ -246,7 +246,7 @@ def compress(
     *,
     encoding_plugin: str = "",
     encapsulate_ext: bool = False,
-    new_instance_uid: bool = True,
+    generate_instance_uid: bool = True,
     jls_error: int | None = None,
     j2k_cr: list[float] | None = None,
     j2k_psnr: list[float] | None = None,
@@ -290,7 +290,7 @@ def compress(
     * (7FE0,0001) *Extended Offset Table*
     * (7FE0,0002) *Extended Offset Table Lengths*
 
-    If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+    If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
     Instance UID* value will be generated.
 
     **Supported Transfer Syntax UIDs**
@@ -348,7 +348,7 @@ def compress(
         If ``False`` (default) then an extended offset table
         will be added if needed for large amounts of compressed *Pixel
         Data*, otherwise just the basic offset table will be used.
-    new_instance_uid : bool, optional
+    generate_instance_uid : bool, optional
         If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
         value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
         keep the original value.
@@ -458,7 +458,7 @@ def compress(
 
     ds.file_meta.TransferSyntaxUID = uid
 
-    if new_instance_uid:
+    if generate_instance_uid:
         instance_uid = generate_uid()
         ds.SOPInstanceUID = instance_uid
         ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
@@ -470,7 +470,7 @@ def decompress(
     ds: "Dataset",
     *,
     as_rgb: bool = True,
-    new_instance_uid: bool = True,
+    generate_instance_uid: bool = True,
     decoding_plugin: str = "",
     **kwargs: Any,
 ) -> "Dataset":
@@ -498,7 +498,7 @@ def decompress(
       *Pixel Data* element will be set to ``False``.
     * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
       modified as required to match the uncompressed *Pixel Data*.
-    * If `new_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+    * If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
       Instance UID* value will be generated.
 
     Parameters
@@ -512,7 +512,7 @@ def decompress(
         if ``True`` (default) then convert pixel data with a YCbCr
         :ref:`photometric interpretation<photometric_interpretation>` such as
         ``"YBR_FULL_422"`` to RGB.
-    new_instance_uid : bool, optional
+    generate_instance_uid : bool, optional
         If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
         value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
         keep the original value.
@@ -600,7 +600,7 @@ def decompress(
     # Update the transfer syntax
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
-    if new_instance_uid:
+    if generate_instance_uid:
         instance_uid = generate_uid()
         ds.SOPInstanceUID = instance_uid
         ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
@@ -1736,6 +1736,210 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
                 arr = arr.transpose(1, 2, 0)
 
     return arr
+
+
+def set_pixel_data(
+    ds: "Dataset",
+    arr: "np.ndarray",
+    photometric_interpretation: str,
+    bits_stored: int,
+    *,
+    generate_instance_uid: bool = True,
+) -> None:
+    """Use an :class:`~numpy.ndarray` to set a dataset's *Pixel Data* and related
+    Image Pixel module elements.
+
+    .. versionadded:: 3.0
+
+    The following :dcm:`Image Pixel<part03/sect_C.7.6.3.3.html#table_C.7-11c>`
+    module elements values will be added, updated or removed as necessary:
+
+    * (0028,0002) *Samples per Pixel* using a value corresponding to
+      `photometric_interpretation`.
+    * (0028,0004) *Photometric Interpretation* from `photometric_interpretation`.
+    * (0028,0006) *Planar Configuration* will be added and set to ``0`` if
+      *Samples per Pixel* is > 1, otherwise it will be removed.
+    * (0028,0008) *Number of Frames* from the array :attr:`~numpy.ndarray.shape`,
+      however it will be removed if `arr` only contains a single frame.
+    * (0028,0010) *Rows* and (0028,0011) *Columns* from the array
+      :attr:`~numpy.ndarray.shape`.
+    * (0028,0100) *Bits Allocated* from the array :class:`~numpy.dtype`.
+    * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
+    * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
+
+    In addition:
+
+    * The *Transfer Syntax UID* will be set to *Explicit VR Little
+      Endian* if it doesn't already exist or uses a compressed (encapsulated)
+      transfer syntax.
+    * If `generate_instance_uid` is ``True`` (default) then the *SOP Instance UID*
+      will be added or updated.
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        The little endian encoded dataset to be modified.
+    arr : np.ndarray
+        An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
+        array must be shaped as one of the following:
+
+        * (rows, columns) for a single frame of grayscale data.
+        * (frames, rows, columns) for multi-frame grayscale data.
+        * (rows, columns, samples) for a single frame of multi-sample data
+          such as RGB.
+        * (frames, rows, columns, samples) for multi-frame, multi-sample data.
+    photometric_interpretation : str
+        The value to use for (0028,0004) *Photometric Interpretation*. Valid values
+        are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``, ``"RGB"``,
+        ``"YBR_FULL"``, ``"YBR_FULL_422"``.
+    bits_stored : int
+        The value to use for (0028,0101) *Bits Stored*. Must be no greater than
+        the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+    generate_instance_uid : bool, optional
+        If ``True`` (default) then add or update the (0008,0018) *SOP Instance
+        UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
+    """
+    from pydicom.dataset import FileMetaDataset
+    from pydicom.pixels.common import PhotometricInterpretation as PI
+
+    if (elem := ds.get(0x7FE00008, None)) or (elem := ds.get(0x7FE00009, None)):
+        raise AttributeError(
+            f"The dataset has an existing {elem.tag} '{elem.name}' element which "
+            "indicates the (0008,0016) 'SOP Class UID' value is not suitable for a "
+            f"dataset with 'Pixel Data'. The '{elem.name}' element should be deleted "
+            "and the 'SOP Class UID' changed."
+        )
+
+    if not hasattr(ds, "file_meta"):
+        ds.file_meta = FileMetaDataset()
+
+    tsyntax = ds.file_meta.get("TransferSyntaxUID", None)
+    if tsyntax and not tsyntax.is_little_endian:
+        raise NotImplementedError(
+            f"The dataset's transfer syntax '{tsyntax.name}' is big-endian, "
+            "which is not supported"
+        )
+
+    # Make no changes to the dataset until after validation checks have passed!
+    changes: dict[str, tuple[str, Any]] = {}
+
+    shape, ndim, dtype = arr.shape, arr.ndim, arr.dtype
+    if dtype.kind not in ("u", "i") or dtype.itemsize not in (1, 2):
+        raise ValueError(
+            f"Unsupported ndarray dtype '{dtype}', must be int8, int16, uint8 or "
+            "uint16"
+        )
+
+    # Use `photometric_interpretation` to determine *Samples Per Pixel*
+    # Don't support retired (such as CMYK) or inappropriate values (such as YBR_RCT)
+    interpretations: dict[str, int] = {
+        PI.MONOCHROME1: 1,
+        PI.MONOCHROME2: 1,
+        PI.PALETTE_COLOR: 1,
+        PI.RGB: 3,
+        PI.YBR_FULL: 3,
+        PI.YBR_FULL_422: 3,
+    }
+    try:
+        nr_samples = interpretations[photometric_interpretation]
+    except KeyError:
+        raise ValueError(
+            "Unsupported 'photometric_interpretation' value "
+            f"'{photometric_interpretation}'"
+        )
+
+    if nr_samples == 1:
+        if ndim not in (2, 3):
+            raise ValueError(
+                f"An ndarray with '{photometric_interpretation}' data must have 2 or 3 "
+                f"dimensions, not {ndim}"
+            )
+
+        # ndim = 3 is (frames, rows, columns), else (rows, columns)
+        changes["NumberOfFrames"] = ("+", shape[0]) if ndim == 3 else ("-", None)
+        changes["Rows"] = ("+", shape[1] if ndim == 3 else shape[0])
+        changes["Columns"] = ("+", shape[2] if ndim == 3 else shape[1])
+    else:
+        if ndim not in (3, 4):
+            raise ValueError(
+                f"An ndarray with '{photometric_interpretation}' data must have 3 or 4 "
+                f"dimensions, not {ndim}"
+            )
+
+        if shape[-1] != nr_samples:
+            raise ValueError(
+                f"An ndarray with '{photometric_interpretation}' data must have shape "
+                f"(rows, columns, 3) or (frames, rows, columns, 3), not {shape}"
+            )
+
+        # ndim = 3 is (rows, columns, samples), else (frames, rows, columns, samples)
+        changes["NumberOfFrames"] = ("-", None) if ndim == 3 else ("+", shape[0])
+        changes["Rows"] = ("+", shape[0] if ndim == 3 else shape[1])
+        changes["Columns"] = ("+", shape[1] if ndim == 3 else shape[2])
+
+    if not 0 < bits_stored <= dtype.itemsize * 8:
+        raise ValueError(
+            f"Invalid 'bits_stored' value '{bits_stored}', must be greater than 0 and "
+            "less than or equal to the number of bits for the ndarray's itemsize "
+            f"'{arr.dtype.itemsize * 8}'"
+        )
+
+    # Check values in `arr` are in the range allowed by `bits_stored`
+    actual_min, actual_max = arr.min(), arr.max()
+    allowed_min = 0 if dtype.kind == "u" else -(2 ** (bits_stored - 1))
+    allowed_max = (
+        2**bits_stored - 1 if dtype.kind == "u" else 2 ** (bits_stored - 1) - 1
+    )
+    if actual_min < allowed_min or actual_max > allowed_max:
+        raise ValueError(
+            f"The range of values in the ndarray [{actual_min}, {actual_max}] is "
+            f"greater than that allowed by the 'bits_stored' value [{allowed_min}, "
+            f"{allowed_max}]"
+        )
+
+    changes["SamplesPerPixel"] = ("+", nr_samples)
+    changes["PlanarConfiguration"] = ("+", 0) if nr_samples > 1 else ("-", None)
+    changes["PhotometricInterpretation"] = ("+", photometric_interpretation)
+    changes["BitsAllocated"] = ("+", dtype.itemsize * 8)
+    changes["BitsStored"] = ("+", bits_stored)
+    changes["HighBit"] = ("+", bits_stored - 1)
+    changes["PixelRepresentation"] = ("+", 0 if dtype.kind == "u" else 1)
+
+    # Update the Image Pixel module elements
+    for keyword, (operation, value) in changes.items():
+        if operation == "+":
+            setattr(ds, keyword, value)
+        elif operation == "-" and keyword in ds:
+            del ds[keyword]
+
+    # Part 3, C.7.6.3.1.2: YBR_FULL_422 data needs to be downsampled
+    if photometric_interpretation == PI.YBR_FULL_422:
+        # Y1 B1 R1 Y2 B1 R1 -> Y1 Y2 B1 R1
+        arr = arr.ravel()
+        out = np.empty(arr.size // 3 * 2, dtype=dtype)
+        out[::4] = arr[::6]  # Y1
+        out[1::4] = arr[3::6]  # Y2
+        out[2::4] = arr[1::6]  # B
+        out[3::4] = arr[2::6]  # R
+        arr = out
+
+    # Update the Pixel Data
+    data = arr.tobytes()
+    ds.PixelData = data if len(data) % 2 == 0 else b"".join((data, b"\x00"))
+    elem = ds["PixelData"]
+    elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
+    elem.is_undefined_length = False
+
+    ds._pixel_array = None
+    ds._pixel_id = {}
+
+    if not tsyntax or tsyntax.is_compressed:
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    if generate_instance_uid:
+        instance_uid = generate_uid()
+        ds.SOPInstanceUID = instance_uid
+        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
 
 
 def unpack_bits(src: bytes, as_array: bool = True) -> "np.ndarray | bytes":
