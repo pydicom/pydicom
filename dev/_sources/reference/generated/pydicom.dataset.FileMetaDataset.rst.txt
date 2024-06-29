@@ -45,6 +45,7 @@
       ~FileMetaDataset.remove_private_tags
       ~FileMetaDataset.save_as
       ~FileMetaDataset.set_original_encoding
+      ~FileMetaDataset.set_pixel_data
       ~FileMetaDataset.setdefault
       ~FileMetaDataset.to_json
       ~FileMetaDataset.to_json_dict

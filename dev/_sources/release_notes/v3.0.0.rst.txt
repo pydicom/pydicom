@@ -62,6 +62,8 @@ Changes
   ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
 * Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
   exception as Pillow cannot decode such data correctly (:issue:`2006`)
+* An exception will now be raised if an :class:`~numpy.ndarray` is used to set
+  *Pixel Data* (:issue:`50`)
 
 
 Removals
@@ -211,6 +213,10 @@ Enhancements
   create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`)
 * Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
   (:issue:`1454`)
+* Added the :meth:`Dataset.set_pixel_data()<pydicom.dataset.Dataset.set_pixel_data>` method
+  and :func:`~pydicom.pixels.set_pixel_data` function for automatically setting a
+  dataset's *Pixel Data* and related Image Pixel module elements using an
+  :class:`~numpy.ndarray` (:issue:`50`)
 
 
 Fixes

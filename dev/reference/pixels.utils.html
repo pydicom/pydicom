@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.set_pixel_data.html">pydicom.pixels.set_pixel_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="pixels.html#sub-modules">Sub-modules</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
@@ -194,7 +195,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.reshape_pixel_array.html#pydicom.pixels.utils.reshape_pixel_array" title="pydicom.pixels.utils.reshape_pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reshape_pixel_array</span></code></a>(ds, arr)</p></td>
 <td><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.unpack_bits.html#pydicom.pixels.utils.unpack_bits" title="pydicom.pixels.utils.unpack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_bits</span></code></a>(src[, as_array])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.set_pixel_data.html#pydicom.pixels.utils.set_pixel_data" title="pydicom.pixels.utils.set_pixel_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_pixel_data</span></code></a>(ds, arr, ...[, ...])</p></td>
+<td><p>Use an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to set a dataset's <em>Pixel Data</em> and related Image Pixel module elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.unpack_bits.html#pydicom.pixels.utils.unpack_bits" title="pydicom.pixels.utils.unpack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_bits</span></code></a>(src[, as_array])</p></td>
 <td><p>Unpack the bit-packed data in <cite>src</cite>.</p></td>
 </tr>
 </tbody>

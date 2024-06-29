@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Concepts and Context Groups (pydicom.sr)" href="../sr.html" />
-    <link rel="prev" title="pydicom.pixels.utils.reshape_pixel_array" href="pydicom.pixels.utils.reshape_pixel_array.html" /> 
+    <link rel="prev" title="pydicom.pixels.utils.set_pixel_data" href="pydicom.pixels.utils.set_pixel_data.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.set_pixel_data.html">pydicom.pixels.set_pixel_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../pixels.html#sub-modules">Sub-modules</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
@@ -155,7 +156,7 @@
 <h1>pydicom.pixels.utils.unpack_bits<a class="headerlink" href="#pydicom-pixels-utils-unpack-bits" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixels.utils.unpack_bits">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.utils.</span></span><span class="sig-name descname"><span class="pre">unpack_bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59285ceeb/pydicom/pixels/utils.py#L1741"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.utils.unpack_bits" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.utils.</span></span><span class="sig-name descname"><span class="pre">unpack_bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e91ef3721/pydicom/pixels/utils.py#L1945"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.utils.unpack_bits" title="Link to this definition">¶</a></dt>
 <dd><p>Unpack the bit-packed data in <cite>src</cite>.</p>
 <p>Suitable for use when (0028,0011) <em>Bits Allocated</em> or (60xx,0100) <em>Overlay
 Bits Allocated</em> is 1.</p>
@@ -197,7 +198,7 @@ and <code class="docutils literal notranslate"><span class="pre">as_array</span>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pydicom.pixels.utils.reshape_pixel_array.html" class="btn btn-neutral float-left" title="pydicom.pixels.utils.reshape_pixel_array" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.pixels.utils.set_pixel_data.html" class="btn btn-neutral float-left" title="pydicom.pixels.utils.set_pixel_data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../sr.html" class="btn btn-neutral float-right" title="Concepts and Context Groups (pydicom.sr)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

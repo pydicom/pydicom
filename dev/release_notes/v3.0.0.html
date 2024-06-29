@@ -166,6 +166,8 @@ inherits from it.</p></li>
 <code class="docutils literal notranslate"><span class="pre">pyjpegls</span></code> or <code class="docutils literal notranslate"><span class="pre">pylibjpeg</span></code> with <code class="docutils literal notranslate"><span class="pre">pylibjpeg-libjpeg</span></code> can be used instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2008">#2008</a>).</p></li>
 <li><p>Using Pillow with JPEG 2000 encoded &gt; 8-bit multi-sample data (such as RGB) now raises an
 exception as Pillow cannot decode such data correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2006">#2006</a>)</p></li>
+<li><p>An exception will now be raised if an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> is used to set
+<em>Pixel Data</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/50">#50</a>)</p></li>
 </ul>
 <section id="removals">
 <h3>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h3>
@@ -331,6 +333,10 @@ for controlling pixel data decoding when using <a class="reference internal" hre
 create the concepts dictionaries in <a class="reference internal" href="../reference/sr.html#module-pydicom.sr" title="pydicom.sr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1021">#1021</a>)</p></li>
 <li><p>Refactored the interface for the concepts in <a class="reference internal" href="../reference/sr.html#module-pydicom.sr" title="pydicom.sr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code></a> to simplify the access types
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1454">#1454</a>)</p></li>
+<li><p>Added the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.set_pixel_data" title="pydicom.dataset.Dataset.set_pixel_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.set_pixel_data()</span></code></a> method
+and <a class="reference internal" href="../reference/generated/pydicom.pixels.set_pixel_data.html#pydicom.pixels.set_pixel_data" title="pydicom.pixels.set_pixel_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_pixel_data()</span></code></a> function for automatically setting a
+dataset’s <em>Pixel Data</em> and related Image Pixel module elements using an
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/50">#50</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">

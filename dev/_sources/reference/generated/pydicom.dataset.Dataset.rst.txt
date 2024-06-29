@@ -45,6 +45,7 @@
       ~Dataset.remove_private_tags
       ~Dataset.save_as
       ~Dataset.set_original_encoding
+      ~Dataset.set_pixel_data
       ~Dataset.setdefault
       ~Dataset.to_json
       ~Dataset.to_json_dict
