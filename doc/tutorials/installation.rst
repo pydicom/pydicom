@@ -48,6 +48,34 @@ Install using conda
   conda install -c conda-forge pydicom
 
 
+Additional type hints
+---------------------
+
+The default *pydicom* type hinting doesn't cover standard element keywords accessed
+through :class:`~pydicom.dataset.Dataset`::
+
+    # foo.py
+    from pydicom import Dataset
+
+    ds = Dataset()
+    ds.PatientName = 1234
+
+.. code-block:: shell
+
+    $ mypy foo.py
+    Success: no issues found in 1 source file
+
+To add extra type hints for these attributes you can install the `types-pydicom<https://github.com/pydicom/types-pydicom>` package::
+
+    pip install types-pydicom
+
+.. code-block:: shell
+
+    $ mypy foo.py
+    foo.py:5: error: Incompatible types in assignment (expression has type "int", variable has type "str | PersonName | None")  [assignment]
+    Found 1 error in 1 file (checked 1 source file)
+
+
 Downloading example/test DICOM files
 ------------------------------------
 
@@ -56,11 +84,11 @@ distributed with *pydicom* and are instead kept in the
 :gh:`pydicom-data <pydicom-data>` repository. To get the complete set of
 testing and example files you can either install the *pydicom-data* repository::
 
-  pip install git+https://github.com/pydicom/pydicom-data
+    pip install git+https://github.com/pydicom/pydicom-data
 
 Or download the missing files to the local cache (after installing *pydicom*)::
 
-  python -c "import pydicom; pydicom.data.fetch_data_files()"
+    python -c "import pydicom; pydicom.data.fetch_data_files()"
 
 
 .. _tut_install_libs:
