@@ -909,9 +909,9 @@ def convert_raw_data_element(
     modifiers = config.settings.raw_data_element_modifiers
     kwargs = config.settings.raw_data_element_kwargs
 
-    d: dict[str, Any] = {}
+    d: dict[str, Any] = {"encoding": encoding, "ds": ds}
     for func in modifiers:
-        d = func(raw, encoding=encoding, ds=ds, **kwargs)
+        d = func(raw, **kwargs)
         kwargs.update(d)
 
     return DataElement(
