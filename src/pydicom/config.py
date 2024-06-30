@@ -6,7 +6,8 @@
 import logging
 import os
 from contextlib import contextmanager
-from typing import Optional, Any, TYPE_CHECKING, Protocol
+from typing import Optional, Any, TYPE_CHECKING
+from collections.abc import Callable
 from collections.abc import Generator
 
 have_numpy = True
@@ -211,18 +212,17 @@ class Settings:
         A list of functions to be called prior to the conversion from a
         :class:`~pydicom.dataelem.RawDataElement` to a
         :class:`~pydicom.dataelem.DataElement` by
-        :func:`~pydicom.dataelem.convert_raw_data_element`. Setting this allows
-        you to modify the raw element data as read from the dataset file or buffer
-        prior to conversion so you can fix non-conformance issues or customize the
-        raw data as required.
+        :func:`~pydicom.dataelem.convert_raw_data_element`. Setting this completely
+        replaces the default raw data element conversion, so it's recommended
+        you understand the default implementation before trying to write your own.
 
         The signature for modification functions is:
 
-        ``def func(raw: RawDataElement, **kwargs: dict[str, Any]) -> RawDataElement:``
+        ``def func(raw: RawDataElement, **kwargs: dict[str, Any]) -> dict[str, Any]:``
 
         Where `raw` is the :class:`~pydicom.dataelem.RawDataElement` instance
         to be modified and `kwargs` is a :class:`dict` containing keyword
-        arguments. By default `kwargs` may contain:
+        arguments, which may or may not contain:
 
         * ``"encodings"`` (``str | MutableSequence[str] | None``): The character set
           encoding of the raw data.
@@ -233,14 +233,11 @@ class Settings:
         Additional `kwargs` can be included by using the `raw_data_element_kwargs`
         attribute (see below).
 
-        The modification functions should return a
-        :class:`~pydicom.dataelem.RawDataElement` instance, which will be used
-        to create the :class:`~pydicom.dataelem.DataElement` instance.
-
-        The functions will be called in the order they appear in
-        `raw_data_element_converters`, and it's recommended you check the current
-        default modification functions in ``dataelem.RAW_ELEMENT_MODIFIERS``
-        before trying to create your own.
+        The modification functions should return a :class:`dict` with keys matching
+        the attributes of `raw` (such as ``"value"``, ``"VR"``) which will be used
+        to update `kwargs`. The ``dict`` returned by the final modifier function
+        will used to create the :class:`~pydicom.dataelem.DataElement` with `raw`
+        used as a fallback for missing attributes.
     raw_data_element_kwargs : dict[str, Any]
         Additional keyword arguments that will be included in `kwargs` when
         the `raw_data_element_modifiers` functions are called.
@@ -254,7 +251,7 @@ class Settings:
         self._infer_sq_for_un_vr: bool = True
 
         # RawDataElement modification prior to conversion to DataElement
-        self.raw_data_element_modifiers: list[ElementCallback] = []
+        self.raw_data_element_modifiers: list[Callable] = []
         self.raw_data_element_kwargs: dict[str, Any] = {}
 
     @property

@@ -783,6 +783,12 @@ class TestRawDataElement:
         assert d["encoding"] == default_encoding
         assert d["ds"] == ds
 
+    def test_lut_descriptor_modifier_invalid(self):
+        """Test fixing value for LUT Descriptor if value is not an int"""
+        raw = RawDataElement(Tag(0x00283002), None, 4, ["a", 0, 1], 0, True, True)
+        elem = convert_raw_data_element(raw)
+        assert elem.value == ["a", 0, 1]
+
 
 class TestDataElementValidation:
     @staticmethod
