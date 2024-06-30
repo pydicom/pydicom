@@ -1762,9 +1762,7 @@ class TestApplyPresentationLUT:
 
         # 4096 entries, 16-bit output
         seq[0].LUTDescriptor = [4096, 0, 16]
-        seq[0].LUTData = [
-            int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)
-        ]
+        seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
         out = apply_presentation_lut(arr, ds)
         assert out.dtype == "uint16"
         assert (out.min(), out.max()) == (0, 65535)
@@ -1787,9 +1785,7 @@ class TestApplyPresentationLUT:
 
         # 4096 entries, 8-bit output
         seq[0].LUTDescriptor = [4096, 0, 8]
-        seq[0].LUTData = [
-            int(round(x * (2**8 - 1) / 4095, 0)) for x in range(0, 4096)
-        ]
+        seq[0].LUTData = [int(round(x * (2**8 - 1) / 4095, 0)) for x in range(0, 4096)]
         out = apply_presentation_lut(arr, ds)
 
         results = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
@@ -1809,9 +1805,7 @@ class TestApplyPresentationLUT:
         # 4096 entries, 8-bit output, LUTData as 16-bit bytes
         seq[0].LUTDescriptor = [4096, 0, 16]
         seq[0]["LUTData"].VR = "OW"
-        seq[0].LUTData = [
-            int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)
-        ]
+        seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
         seq[0].LUTData = b"".join(
             x.to_bytes(length=2, byteorder="little") for x in seq[0].LUTData
         )
@@ -1883,9 +1877,7 @@ class TestApplyPresentationLUT:
 
         # 4096 entries, 16-bit output
         seq[0].LUTDescriptor = [4096, 0, 16]
-        seq[0].LUTData = [
-            int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)
-        ]
+        seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
         out = apply_presentation_lut(arr, ds)
         assert out.dtype == "uint16"
         assert (out.min(), out.max()) == (0, 65535)
@@ -1908,9 +1900,7 @@ class TestApplyPresentationLUT:
 
         # 4096 entries, 8-bit output
         seq[0].LUTDescriptor = [4096, 0, 8]
-        seq[0].LUTData = [
-            int(round(x * (2**8 - 1) / 4095, 0)) for x in range(0, 4096)
-        ]
+        seq[0].LUTData = [int(round(x * (2**8 - 1) / 4095, 0)) for x in range(0, 4096)]
         out = apply_presentation_lut(arr, ds)
 
         results = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
