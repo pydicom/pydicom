@@ -979,7 +979,7 @@ def __getattr__(name: str) -> Any:
 
 
 # Convenience functions for RawDataElement modification
-# They're slower than the default convert_raw_data_element()
+# They're slower than the default implementation of convert_raw_data_element()
 def raw_modifier_infer_vr(
     raw: RawDataElement, ds: "Dataset | None" = None, **kwargs: Any
 ) -> dict[str, Any]:  # pragma: no cover

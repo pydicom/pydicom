@@ -785,6 +785,14 @@ class TestRawDataElement:
         elem = convert_raw_data_element(raw)
         assert elem.value == ["a", 0, 1]
 
+    def test_UN_unknown_public_tag(self):
+        """Test converting a UN element with unknown public tag"""
+        raw = RawDataElement(Tag(0x88883002), "UN", 4, b"\x02\x04", 0, True, True)
+        elem = convert_raw_data_element(raw)
+        assert elem.value == b"\x02\x04"
+        assert elem.tag == 0x88883002
+        assert elem.VR == "UN"
+
 
 class TestDataElementValidation:
     @staticmethod
