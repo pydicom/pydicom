@@ -209,12 +209,14 @@ class Settings:
     Attributes
     ----------
     raw_data_element_modifiers : list[Callable]
-        A list of functions to be called prior to the conversion from a
-        :class:`~pydicom.dataelem.RawDataElement` to a
-        :class:`~pydicom.dataelem.DataElement` by
-        :func:`~pydicom.dataelem.convert_raw_data_element`. Setting this completely
-        replaces the default raw data element conversion, so it's recommended
-        you understand the default implementation before trying to write your own.
+        A list of functions to be called prior to the creation of a
+        :class:`~pydicom.dataelem.DataElement` from a
+        :class:`~pydicom.dataelem.RawDataElement`, allowing the customization
+        of the raw element data to fix non-conformance issues or to modify
+        it as required. These modification functions will completely replace
+        the default raw data element conversion, so it's recommended you understand
+        the default implementation of :func:`~pydicom.dataelem.convert_raw_data_element`
+        before trying to write your own.
 
         The signature for modification functions is:
 
@@ -222,7 +224,7 @@ class Settings:
 
         Where `raw` is the :class:`~pydicom.dataelem.RawDataElement` instance
         to be modified and `kwargs` is a :class:`dict` containing keyword
-        arguments, which may or may not contain:
+        arguments, which should contain:
 
         * ``"encodings"`` (``str | MutableSequence[str] | None``): The character set
           encoding of the raw data.
@@ -233,11 +235,12 @@ class Settings:
         Additional `kwargs` can be included by using the `raw_data_element_kwargs`
         attribute (see below).
 
-        The modification functions should return a :class:`dict` with keys matching
+        The modification function(s) should return a :class:`dict` with keys matching
         the attributes of `raw` (such as ``"value"``, ``"VR"``) which will be used
-        to update `kwargs`. The ``dict`` returned by the final modifier function
-        will used to create the :class:`~pydicom.dataelem.DataElement` with `raw`
-        used as a fallback for missing attributes.
+        to update the `kwargs` passed to the next modifier function. The ``dict``
+        returned  by the final modifier function will used to create the
+        :class:`~pydicom.dataelem.DataElement` with `raw` used as a fallback for
+        missing attributes.
     raw_data_element_kwargs : dict[str, Any]
         Additional keyword arguments that will be included in `kwargs` when
         the `raw_data_element_modifiers` functions are called.

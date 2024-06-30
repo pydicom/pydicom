@@ -222,9 +222,9 @@ Enhancements
 * Added :attr:`config.settings.raw_data_element_modifiers
   <pydicom.config.Settings.raw_data_element_modifiers>` and
   :attr:`config.settings.raw_data_element_kwargs
-  <pydicom.config.Settings.raw_data_element_kwargs>` to allow modification
-  of the :class:`~pydicom.dataelem.RawDataElement` prior to conversion to
-  :class:`~pydicom.dataelem.DataElement` (:issue:`1556`)
+  <pydicom.config.Settings.raw_data_element_kwargs>` to allow customization of the
+  creation of a :class:`~pydicom.dataelem.DataElement` from
+  :class:`~pydicom.dataelem.RawDataElement` (:issue:`1556`)
 
 
 Fixes
