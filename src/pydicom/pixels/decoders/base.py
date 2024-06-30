@@ -466,7 +466,7 @@ class DecodeRunner(RunnerBase):
         if not HAVE_NP:
             raise ImportError("NumPy is required for 'DecodeRunner.pixel_dtype'")
 
-        dtype: "np.dtype"
+        dtype: np.dtype
         pixel_keyword = self.pixel_keyword
         if pixel_keyword == "FloatPixelData":
             dtype = np.dtype("float32")

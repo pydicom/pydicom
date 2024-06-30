@@ -24,4 +24,5 @@ Pixel data related utility functions.
    pixel_array
    pixel_dtype
    reshape_pixel_array
+   set_pixel_data
    unpack_bits

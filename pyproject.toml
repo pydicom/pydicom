@@ -51,7 +51,8 @@ dev = [
     "pytest",
     "pytest-cov",
     "ruff==0.4.7",
-    "types-requests"
+    "types-requests",
+    "pre-commit",
 ]
 
 basic = ["numpy"]

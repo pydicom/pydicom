@@ -35,6 +35,7 @@ Utility functions
    iter_pixels
    pack_bits
    pixel_array
+   set_pixel_data
    unpack_bits
 
 
