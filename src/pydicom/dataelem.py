@@ -885,6 +885,7 @@ def convert_raw_data_element(
 
             warn_and_log(f"{msg} Setting VR to 'UN'.")
             vr = VR_.UN
+            value = raw.value
 
         if raw.tag in _LUT_DESCRIPTOR_TAGS:
             # We only fix the first value as the third value is 8 or 16

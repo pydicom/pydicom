@@ -763,12 +763,8 @@ class TestRawDataElement:
         d = {}
 
         def modifier(raw, **kwargs):
-            d.update(**kwargs)
-            return raw._replace(
-                value=kwargs["value"],
-                VR=kwargs["VR"],
-                tag=kwargs["tag"],
-            )
+            d.update(kwargs)
+            return kwargs
 
         config.settings.raw_data_element_modifiers = [modifier]
         config.settings.raw_data_element_kwargs = {
