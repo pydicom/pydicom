@@ -24,6 +24,7 @@ from pydicom.pixels.processing import (
     apply_voi_lut,
     apply_voi,
     apply_windowing,
+    apply_presentation_lut,
 )
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 
@@ -1683,3 +1684,250 @@ class TestApplyVOILUT:
         ds.WindowWidth = None
         out = apply_voi_lut(arr, ds)
         assert [0, 1, 128, 254, 255] == out.tolist()
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestApplyPresentationLUT:
+    """Tests for apply_presentation_lut()"""
+
+    def test_shape(self):
+        """Test Presentation LUT Shape"""
+        ds = dcmread(VOI_08_1F)
+        ds.PresentationLUTShape = "IDENTITY"
+        arr = ds.pixel_array
+
+        out = apply_presentation_lut(arr, ds)
+        assert arr is out
+
+        ds.PresentationLUTShape = "INVERSE"
+        out = apply_presentation_lut(arr, ds)
+
+        arr = arr.max() - arr
+        assert np.array_equal(out, arr)
+
+    def test_shape_unknown_raises(self):
+        """Test an unknown Presentation LUT Shape raises an exception"""
+        ds = dcmread(VOI_08_1F)
+        ds.PresentationLUTShape = "FOO"
+
+        msg = (
+            r"A \(2050,0020\) 'Presentation LUT Shape' value of 'FOO' is not supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_presentation_lut(ds.pixel_array, ds)
+
+    def test_sequence_8bit_unsigned(self):
+        """Test Presentation LUT Sequence with 8-bit unsigned input"""
+        # 8 bit unsigned input
+        ds = dcmread(VOI_08_1F)
+        assert ds.BitsStored == 8
+        assert ds.PixelRepresentation == 0
+        ds.PresentationLUTSequence = [Dataset()]
+        seq = ds.PresentationLUTSequence
+
+        # 256 entries, 10 bit output
+        seq[0].LUTDescriptor = [256, 0, 10]
+        seq[0].LUTData = [int(round(x * (2**10 - 1) / 255, 0)) for x in range(0, 256)]
+        seq[0]["LUTData"].VR = "US"
+
+        arr = ds.pixel_array
+        assert (arr.min(), arr.max()) == (0, 255)
+
+        coords = [(335, 130), (285, 130), (235, 130), (185, 130), (185, 180)]
+        coords.extend(
+            [(185, 230), (185, 330), (185, 380), (235, 380), (285, 380), (335, 380)]
+        )
+
+        results = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
+        for (y, x), result in zip(coords, results):
+            assert arr[y, x] == result
+
+        out = apply_presentation_lut(arr, ds)
+        assert out.dtype == "uint16"
+        assert (out.min(), out.max()) == (0, 1023)
+
+        results = [0, 100, 205, 305, 409, 509, 614, 714, 818, 919, 1023]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # Reversed output
+        seq[0].LUTData.reverse()
+        out = apply_presentation_lut(arr, ds)
+        assert out.dtype == "uint16"
+        assert (out.min(), out.max()) == (0, 1023)
+
+        results = [1023, 923, 818, 718, 614, 514, 409, 309, 205, 104, 0]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 16-bit output
+        seq[0].LUTDescriptor = [4096, 0, 16]
+        seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
+        out = apply_presentation_lut(arr, ds)
+        assert out.dtype == "uint16"
+        assert (out.min(), out.max()) == (0, 65535)
+
+        results = [
+            0,
+            6417,
+            13107,
+            19524,
+            26214,
+            32631,
+            39321,
+            45738,
+            52428,
+            58845,
+            65535,
+        ]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 8-bit output
+        seq[0].LUTDescriptor = [4096, 0, 8]
+        seq[0].LUTData = [int(round(x * (2**8 - 1) / 4095, 0)) for x in range(0, 4096)]
+        out = apply_presentation_lut(arr, ds)
+
+        results = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 8-bit output, LUTData as 8-bit bytes
+        seq[0].LUTDescriptor = [4096, 0, 8]
+        seq[0]["LUTData"].VR = "OW"
+        seq[0].LUTData = b"".join(
+            x.to_bytes(length=1, byteorder="little") for x in seq[0].LUTData
+        )
+        out = apply_presentation_lut(arr, ds)
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 8-bit output, LUTData as 16-bit bytes
+        seq[0].LUTDescriptor = [4096, 0, 16]
+        seq[0]["LUTData"].VR = "OW"
+        seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
+        seq[0].LUTData = b"".join(
+            x.to_bytes(length=2, byteorder="little") for x in seq[0].LUTData
+        )
+        out = apply_presentation_lut(arr, ds)
+        results = [
+            0,
+            6417,
+            13107,
+            19524,
+            26214,
+            32631,
+            39321,
+            45738,
+            52428,
+            58845,
+            65535,
+        ]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 8-bit output, LUTData ambiguous
+        seq[0]["LUTData"].VR = "US or OW"
+        out = apply_presentation_lut(arr, ds)
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+    def test_sequence_12bit_signed(self):
+        """Test Presentation LUT Sequence with 12-bit signed input."""
+        ds = dcmread(MOD_16_SEQ)
+        assert ds.BitsStored == 12
+        assert ds.PixelRepresentation == 1
+        ds.PresentationLUTSequence = [Dataset()]
+        seq = ds.PresentationLUTSequence
+
+        # 256 entries, 10 bit output
+        seq[0].LUTDescriptor = [256, 0, 10]
+        seq[0].LUTData = [int(round(x * (2**10 - 1) / 255, 0)) for x in range(0, 256)]
+        seq[0]["LUTData"].VR = "US"
+
+        arr = ds.pixel_array
+        assert (arr.min(), arr.max()) == (-2048, 2047)
+
+        coords = [(335, 130), (285, 130), (235, 130), (185, 130), (185, 180)]
+        coords.extend(
+            [(185, 230), (185, 330), (185, 380), (235, 380), (285, 380), (335, 380)]
+        )
+
+        results = [-2048, -1639, -1229, -820, -410, -1, 409, 818, 1228, 1637, 2047]
+        for (y, x), result in zip(coords, results):
+            assert arr[y, x] == result
+
+        out = apply_presentation_lut(arr, ds)
+        assert out.dtype == "uint16"
+        assert (out.min(), out.max()) == (0, 1023)
+
+        results = [0, 100, 205, 305, 409, 509, 614, 714, 818, 919, 1023]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # Reversed output
+        seq[0].LUTData.reverse()
+        out = apply_presentation_lut(arr, ds)
+        assert out.dtype == "uint16"
+        assert (out.min(), out.max()) == (0, 1023)
+
+        results = [1023, 923, 818, 718, 614, 514, 409, 309, 205, 104, 0]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 16-bit output
+        seq[0].LUTDescriptor = [4096, 0, 16]
+        seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
+        out = apply_presentation_lut(arr, ds)
+        assert out.dtype == "uint16"
+        assert (out.min(), out.max()) == (0, 65535)
+
+        results = [
+            0,
+            6545,
+            13107,
+            19652,
+            26214,
+            32759,
+            39321,
+            45866,
+            52428,
+            58973,
+            65535,
+        ]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+        # 4096 entries, 8-bit output
+        seq[0].LUTDescriptor = [4096, 0, 8]
+        seq[0].LUTData = [int(round(x * (2**8 - 1) / 4095, 0)) for x in range(0, 4096)]
+        out = apply_presentation_lut(arr, ds)
+
+        results = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
+
+    def test_sequence_bit_shift(self):
+        """Test bit shifting read-only LUTData"""
+        ds = dcmread(MOD_16_SEQ)
+        assert ds.BitsStored == 12
+        assert ds.PixelRepresentation == 1
+        ds.PresentationLUTSequence = [Dataset()]
+        seq = ds.PresentationLUTSequence
+
+        # 256 entries, 10 bit output
+        seq[0].LUTDescriptor = [256, 0, 10]
+        seq[0].LUTData = [int(round(x * (2**10 - 1) / 255, 0)) for x in range(0, 256)]
+        seq[0].LUTData = b"".join(
+            x.to_bytes(length=2, byteorder="little") for x in seq[0].LUTData
+        )
+        seq[0]["LUTData"].VR = "OW"
+
+        out = apply_presentation_lut(ds.pixel_array, ds)
+        results = [0, 100, 205, 305, 409, 509, 614, 714, 818, 919, 1023]
+        coords = [(335, 130), (285, 130), (235, 130), (185, 130), (185, 180)]
+        coords.extend(
+            [(185, 230), (185, 330), (185, 380), (235, 380), (285, 380), (335, 380)]
+        )
+        for (y, x), result in zip(coords, results):
+            assert out[y, x] == result
