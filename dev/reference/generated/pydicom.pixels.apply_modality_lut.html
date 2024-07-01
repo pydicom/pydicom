@@ -28,7 +28,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.pixels.apply_rescale" href="pydicom.pixels.apply_rescale.html" />
+    <link rel="next" title="pydicom.pixels.apply_presentation_lut" href="pydicom.pixels.apply_presentation_lut.html" />
     <link rel="prev" title="pydicom.pixels.apply_color_lut" href="pydicom.pixels.apply_color_lut.html" /> 
 </head>
 
@@ -85,6 +85,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#pydicom.pixels.apply_modality_lut"><code class="docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_presentation_lut.html">pydicom.pixels.apply_presentation_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
@@ -152,7 +153,7 @@
 <h1>pydicom.pixels.apply_modality_lut<a class="headerlink" href="#pydicom-pixels-apply-modality-lut" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixels.apply_modality_lut">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.</span></span><span class="sig-name descname"><span class="pre">apply_modality_lut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e91ef3721/pydicom/pixels/processing.py#L214"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.apply_modality_lut" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.</span></span><span class="sig-name descname"><span class="pre">apply_modality_lut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ccd74f837/pydicom/pixels/processing.py#L214"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.apply_modality_lut" title="Link to this definition">¶</a></dt>
 <dd><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -195,7 +196,7 @@ max. pixel value are determined from (0028,0101) <em>Bits Stored</em> and
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="pydicom.pixels.apply_color_lut.html" class="btn btn-neutral float-left" title="pydicom.pixels.apply_color_lut" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pydicom.pixels.apply_rescale.html" class="btn btn-neutral float-right" title="pydicom.pixels.apply_rescale" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.pixels.apply_presentation_lut.html" class="btn btn-neutral float-right" title="pydicom.pixels.apply_presentation_lut" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

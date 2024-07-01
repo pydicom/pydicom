@@ -13,6 +13,7 @@ Functions for applying image processing to pixel data.
 
    apply_color_lut
    apply_modality_lut
+   apply_presentation_lut
    apply_rescale
    apply_voi_lut
    apply_voi

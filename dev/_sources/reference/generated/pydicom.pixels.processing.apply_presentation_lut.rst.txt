@@ -1,0 +1,6 @@
+﻿pydicom.pixels.processing.apply\_presentation\_lut
+==================================================
+
+.. currentmodule:: pydicom.pixels.processing
+
+.. autofunction:: apply_presentation_lut
