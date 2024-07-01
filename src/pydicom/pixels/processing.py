@@ -316,8 +316,8 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
     Notes
     -----
-    If `ds` contains a Modality LUT and/or VOI LUT then they must be applied
-    before the Presentation LUT.
+    If the dataset the *Pixel Data* originated from contains a Modality LUT
+    and/or VOI LUT then they must be applied before the Presentation LUT.
 
     See Also
     --------
