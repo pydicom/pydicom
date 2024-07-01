@@ -766,7 +766,7 @@ def convert_raw_data_element(
 
     **Customization Hooks**
 
-    All :class:`hooks<pydicom.hooks.Hooks>` for :func:`convert_raw_data_element`
+    All callback functions for :func:`convert_raw_data_element`
     use the function signature::
 
         def func(
@@ -775,20 +775,26 @@ def convert_raw_data_element(
             *,
             encoding: str | MutableSequence[str] | None = None,
             ds: pydicom.dataset.Dataset | None = None,
+            **kwargs: dict[str, Any],
         ) -> None:
             ...
 
-    Where `raw`, `encoding` and `ds` are the objects passed to this function and
-    `data` is a :class:`dict` that's persistent for each raw element and used to
-    stores the results of the hook functions.
+    Where `raw`, `encoding` and `ds` are the objects passed to this function,
+    `data` is a :class:`dict` that's persistent for each raw element and is used
+    to store the results of the corresponding callback functions, and `kwargs`
+    are keyword arguments passed by setting the ``"raw_element_kwargs"`` hook
+    via :meth:`~pydicom.hooks.Hooks.register_kwargs`.
 
-    Available hooks are (in order of execution):
+    Available :class:`hooks<pydicom.hooks.Hooks>` are (in order of execution):
 
-    * ``raw_element_vr``: Perform the VR lookup for the raw element,
+    * ``"raw_element_vr"``: a function to perform the VR lookup for the raw element,
       required to add ``{"VR": str}`` to `data`.
-    * ``raw_element_value``: Perform the conversion of the raw element
-      :class`bytes` value to an appropriate type (such as :class:`int` for VR
+    * ``"raw_element_value"``: a function to perform the conversion of the raw element
+      :class:`bytes` value to an appropriate type (such as :class:`int` for VR
       **US**), required to add ``{"value": Any}`` to `data`.
+
+    :meth:`~pydicom.hooks.Hooks.register_callback` is used to set the callback
+    function for a given hook.
 
     Parameters
     ----------

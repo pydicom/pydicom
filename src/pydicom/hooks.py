@@ -28,38 +28,38 @@ if TYPE_CHECKING:
 
 
 class Hooks:
-    """Management class for hook functions.
+    """Management class for callback functions.
 
     .. versionadded:: 3.0
 
-    Available hooks are:
+    **Available Hooks**
 
-    * For conversion of raw element data to :class:`~pydicom.dataelem.DataElement`
-      using the calling function :func:`~pydicom.dataelem.convert_raw_data_element`:
+    For conversion of raw element data to :class:`~pydicom.dataelem.DataElement`
+    using :func:`~pydicom.dataelem.convert_raw_data_element`:
 
-       * ``raw_element_vr``: function to perform VR lookups for raw elements,
-         default :func:`raw_element_vr`.
-       * ``raw_element_value``: function to convert raw element values to types
-         appropriate for the VR, default :func:`raw_element_value`.
-       * ``raw_element_kwargs``: `kwargs` :class:`dict` passed to the ``raw_element_vr``
-         and ``raw_element_value`` functions.
+    * ``"raw_element_vr"``: function to perform VR lookups for raw elements,
+      default :func:`raw_element_vr`.
+    * ``"raw_element_value"``: function to convert raw element values to types
+      appropriate for the VR, default :func:`raw_element_value`.
+    * ``"raw_element_kwargs"``: `kwargs` :class:`dict` passed to the callback
+      functions.
     """
 
     def __init__(self) -> None:
-        """Initialize the ``Hooks`` singleton."""
+        """Initialize the ``Hooks`` instance."""
         self.raw_element_value: RawDataHook = raw_element_value
         self.raw_element_vr: RawDataHook = raw_element_vr
         self.raw_element_kwargs: dict[str, Any] = {}
 
-    def register_hook(self, hook: str, func: Callable) -> None:
-        """Register a hook function.
+    def register_callback(self, hook: str, func: Callable) -> None:
+        """Register the callback function `func` to a hook.
 
         Parameters
         ----------
         hook : str
             The name of the hook to register the function to.
         func : Callable
-            The function to use with the hook. For details on the required
+            The callback function to use with the hook. For details on the required
             function signatures please see the documentation for the corresponding
             calling function.
         """
@@ -74,15 +74,16 @@ class Hooks:
             raise ValueError(f"Unknown hook '{hook}'")
 
     def register_kwargs(self, hook: str, kwargs: dict[str, Any]) -> None:
-        """Register a kwargs :class:`dict` to be used with a hook function.
+        """Register a `kwargs` :class:`dict` to be passed to the corresponding
+        callback function(s).
 
         Parameters
         ----------
         hook : str
-            The name of the hook to register the function to.
+            The name of the hook to register `kwargs` to.
         kwargs : dict[str, Any]
             A :class:`dict` containing keyword arguments to be passed to the
-            corresponding hook function(s).
+            hook's corresponding callback function(s).
         """
         if not isinstance(kwargs, dict):
             raise TypeError(f"'kwargs' must be a dict, not '{type(kwargs).__name__}'")
@@ -91,6 +92,12 @@ class Hooks:
             self.raw_element_kwargs = kwargs
         else:
             raise ValueError(f"Unknown hook '{hook}'")
+
+    def reset(self) -> None:
+        """Reset all callbacks back to their defaults."""
+        self.raw_element_value = raw_element_value
+        self.raw_element_vr = raw_element_vr
+        self.raw_element_kwargs = {}
 
 
 def _private_vr_for_tag(ds: "Dataset | None", tag: BaseTag) -> str:
@@ -133,11 +140,13 @@ def raw_element_vr(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """Determine the VR to use for `raw`.
 
-    Default function for the ``raw_element_vr`` hook.
+    .. versionadded:: 3.0
+
+    Default callback function for the ``"raw_element_vr"`` hook.
 
     Parameters
     ----------
@@ -190,14 +199,16 @@ def raw_element_value(
     data: dict[str, Any],
     *,
     encoding: str | MutableSequence[str] | None = None,
-    ds: "Dataset | None",
-    **kwargs,
+    ds: "Dataset | None" = None,
+    **kwargs: Any,
 ) -> None:
     """Convert the encoded value for `raw` to an appropriate type.
 
+    .. versionadded:: 3.0
+
     Will set the VR to **UN** if unable to convert the value.
 
-    Default function for the ``raw_element_value`` hook.
+    Default callback function for the ``"raw_element_value"`` hook.
 
     Parameters
     ----------
@@ -256,9 +267,11 @@ def raw_element_value_fix_separator(
     target_VRs: tuple[str, ...] | None = None,
     **kwargs: Any,
 ) -> None:
-    """Convenience function to fix invalid multivalue separator characters.
+    """Convenience function to fix values with an invalid multivalue separator.
 
-    Function for the ``raw_element_value`` hook.
+    .. versionadded:: 3.0
+
+    Alternative callback function for the ``"raw_element_value"`` hook.
 
     Example
     -------
@@ -269,7 +282,7 @@ def raw_element_value_fix_separator(
         from pydicom import dcmread
         from pydicom.hooks import hooks, raw_element_value_fix_separator
 
-        hooks.register_hook(
+        hooks.register_callback(
             "raw_element_value",
             raw_element_value_fix_separator,
         )
@@ -302,7 +315,7 @@ def raw_element_value_fix_separator(
         if isinstance(separator, str):
             separator = separator.encode("ascii")
 
-        raw._replace("value", raw.value.replace(separator, b"\x5C"))
+        raw = raw._replace(value=raw.value.replace(separator, b"\x5C"))
 
     raw_element_value(raw, data, encoding=encoding, ds=ds, **kwargs)
 
@@ -318,7 +331,9 @@ def raw_element_value_retry(
 ) -> None:
     """Convenience function to retry value conversion using a different VR.
 
-    Function for the ``raw_element_value`` hook.
+    .. versionadded:: 3.0
+
+    Alternative callback function for the ``"raw_element_value"`` hook.
 
     Example
     -------
@@ -328,7 +343,7 @@ def raw_element_value_retry(
         from pydicom import dcmread
         from pydicom.hooks import hooks, raw_element_value_retry
 
-        hooks.register_hook(
+        hooks.register_callback(
             "raw_element_value",
             raw_element_value_retry,
         )
@@ -371,8 +386,8 @@ def raw_element_value_retry(
         raise exc
 
 
-hooks = Hooks()
-"""The global :class:`Hooks` management instance.
+hooks: Hooks = Hooks()
+"""The global :class:`Hooks` singleton.
 
 .. versionadded:: 3.0
 """

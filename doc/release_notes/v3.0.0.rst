@@ -64,8 +64,6 @@ Changes
   exception as Pillow cannot decode such data correctly (:issue:`2006`)
 * An exception will now be raised if an :class:`~numpy.ndarray` is used to set
   *Pixel Data* (:issue:`50`)
-* Added :func:`~pydicom.dataelem.convert_raw_data_element` to replace
-  :func:`~pydicom.dataelem.DataElement_from_raw`.
 
 
 Removals
@@ -209,23 +207,22 @@ Enhancements
 * Improve support for reading and resolving inline binary data with `VR=UN` from Json
   (:issue:`2062`).
 * :func:`~pydicom.pixels.utils.get_j2k_parameters` now takes into account the JP2 header
-  (if present, although it's non-conformant for it to be) (:issue:`2073`)
-* Added support for NumPy v2.0 (:issue:`2075`)
+  (if present, although it's non-conformant for it to be) (:issue:`2073`).
+* Added support for NumPy v2.0 (:issue:`2075`).
 * Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
-  create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`)
+  create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`).
 * Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
-  (:issue:`1454`)
+  (:issue:`1454`).
 * Added the :meth:`Dataset.set_pixel_data()<pydicom.dataset.Dataset.set_pixel_data>` method
   and :func:`~pydicom.pixels.set_pixel_data` function for automatically setting a
   dataset's *Pixel Data* and related Image Pixel module elements using an
-  :class:`~numpy.ndarray` (:issue:`50`)
-* Added :attr:`config.settings.raw_data_element_modifiers
-  <pydicom.config.Settings.raw_data_element_modifiers>` and
-  :attr:`config.settings.raw_data_element_kwargs
-  <pydicom.config.Settings.raw_data_element_kwargs>` to allow customization of the
-  creation of a :class:`~pydicom.dataelem.DataElement` from
-  :class:`~pydicom.dataelem.RawDataElement` (:issue:`1556`)
-
+  :class:`~numpy.ndarray` (:issue:`50`).
+* Added :func:`~pydicom.dataelem.convert_raw_data_element` for converting raw element data to
+  :class:`~pydicom.dataelem.DataElement` instances.
+* Added the :mod:`~pydicom.hooks` module which contains an interface for adding callback
+  functions via the :class:`~pydicom.hooks.Hooks` singleton, as well as default and
+  alternative convenience callbacks for :func:`~pydicom.dataelem.convert_raw_data_element`
+  (:issue:`1556`).
 
 Fixes
 -----
@@ -338,11 +335,11 @@ Deprecations
   use :func:`~pydicom.dataelem.convert_raw_data_element` instead.
 * :attr:`config.data_element_callback<pydicom.config.data_element_callback>` and
   :attr:`config.data_element_callback_kwargs<pydicom.config.data_element_callback_kwargs>`
-  will be removed in v4.0, please use
-  :attr:`config.settings.raw_data_element_modifiers
-  <pydicom.config.Settings.raw_data_element_modifiers>` and
-  :attr:`config.settings.raw_data_element_kwargs
-  <pydicom.config.Settings.raw_data_element_kwargs>` instead.
+  will be removed in v4.0, please use the hooks for
+  :func:`~pydicom.dataelem.convert_raw_data_element` instead.
+* The ``pydicom.utils.fixers`` submodule will be removed in v4.0, please use the
+  alternative callbacks for :func:`~pydicom.dataelem.convert_raw_data_element`
+  in the :mod:`~pydicom.hooks` module instead.
 
 
 Pydicom Internals

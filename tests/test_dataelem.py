@@ -19,7 +19,11 @@ from pydicom.dataelem import (
 from pydicom.dataset import Dataset
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
-from pydicom.hooks import hooks
+from pydicom.hooks import (
+    hooks,
+    raw_element_value_retry,
+    raw_element_value_fix_separator,
+)
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from .test_util import save_private_dict
@@ -585,21 +589,6 @@ class TestDataElement:
         assert elem.VM == 1
 
 
-@pytest.fixture
-def reset_raw_element_hooks():
-    original = (
-        hooks.raw_element_init,
-        hooks.raw_element_value_conversion,
-        hooks.raw_element_vr_lookup,
-    )
-    yield
-    (
-        hooks.raw_element_init,
-        hooks.raw_element_value_conversion,
-        hooks.raw_element_vr_lookup,
-    ) = original
-
-
 class TestRawDataElement:
     """Tests for dataelem.RawDataElement."""
 
@@ -761,29 +750,6 @@ class TestRawDataElement:
             assert elem.name == "[Another Number]"
             assert elem.value == b"12345678"
 
-    def test_raw_element_hooks(self, reset_raw_element_hooks):
-        """Test customization of RawDataElement conversion via hooks.Hooks"""
-        raw = RawDataElement(Tag(0x00100020), None, 4, b"unknown", 0, True, True)
-        ds = Dataset()
-        ds.PatientName = "Foo"
-
-        d = {}
-
-        def func(raw, data, **kwargs):
-            data["value"] = "12345"
-            data["VR"] = "LO"
-            d.update(kwargs)
-
-        hooks.register_hook("raw_element_value", func)
-
-        elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
-        assert elem.value == "12345"
-        assert elem.VR == "LO"
-        assert elem.tag == (0x00100020)
-
-        assert d["encoding"] == default_encoding
-        assert d["ds"] == ds
-
     def test_lut_descriptor_modifier_invalid(self):
         """Test fixing value for LUT Descriptor if value is not an int"""
         raw = RawDataElement(Tag(0x00283002), None, 4, ["a", 0, 1], 0, True, True)
@@ -797,6 +763,137 @@ class TestRawDataElement:
         assert elem.value == b"\x02\x04"
         assert elem.tag == 0x88883002
         assert elem.VR == "UN"
+
+
+@pytest.fixture
+def reset_hooks():
+    original = (
+        hooks.raw_element_vr,
+        hooks.raw_element_value,
+        hooks.raw_element_kwargs,
+    )
+    yield
+    (
+        hooks.raw_element_vr,
+        hooks.raw_element_value,
+        hooks.raw_element_kwargs,
+    ) = original
+
+
+class TestConvertRawDataElementHooks:
+    """Tests for the hooks in convert_raw_data_element()"""
+
+    def test_vr(self, reset_hooks):
+        """Test the 'raw_element_vr' hook"""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        raw = RawDataElement(Tag(0x00100020), None, 4, b"unknown", 0, True, True)
+
+        d = {}
+
+        def func(raw, data, **kwargs):
+            data["VR"] = "LO"
+            d.update(kwargs)
+
+        kwargs = {"a": 1, "b": []}
+
+        hooks.register_callback("raw_element_vr", func)
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
+        assert elem.value == "unknown"
+        assert elem.VR == "LO"
+        assert elem.tag == (0x00100020)
+
+        assert d["encoding"] == default_encoding
+        assert d["ds"] == ds
+        assert d["a"] == 1
+        assert d["b"] == []
+
+    def test_value(self, reset_hooks):
+        """Test the 'raw_element_vr' hook"""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        raw = RawDataElement(Tag(0x00100020), "LO", 4, b"unknown", 0, True, True)
+
+        d = {}
+
+        def func(raw, data, **kwargs):
+            data["value"] = "12345"
+            d.update(kwargs)
+
+        kwargs = {"c": 3, "d": None}
+
+        hooks.register_callback("raw_element_value", func)
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
+        assert elem.value == "12345"
+        assert elem.VR == "LO"
+        assert elem.tag == (0x00100020)
+
+        assert d["encoding"] == default_encoding
+        assert d["ds"] == ds
+        assert d["c"] == 3
+        assert d["d"] is None
+
+    def test_value_retry(self, reset_hooks):
+        """Test the 'raw_element_value_retry' function"""
+        raw = RawDataElement(Tag(0x00000903), None, 4, b"12345", 0, True, True)
+
+        # Original function raises and exception
+        msg = "Expected total bytes to be an even multiple of bytes per value"
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(raw)
+
+        # No target_VRs set, no change
+        hooks.register_callback("raw_element_value", raw_element_value_retry)
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(raw)
+
+        kwargs = {"target_VRs": {"US": ("SS", "SH")}}
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        # Test candidate VRs to see if they can be used instead
+        #   in this case SS will fail and SH will succeed
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "12345"
+        assert elem.VR == "SH"
+
+        # If unable to convert then raise original exception
+        kwargs["target_VRs"]["US"] = ("SS",)
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(raw)
+
+    def test_value_fix_separator(self, reset_hooks):
+        """Test the 'raw_element_value_fix_separator' function"""
+        raw = RawDataElement(
+            Tag(0x00000902), None, 4, b"\x41\x42\x2C\x43\x44\x2C\x45\x46", 0, True, True
+        )
+
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "AB,CD,EF"
+
+        hooks.register_callback("raw_element_value", raw_element_value_fix_separator)
+
+        # No target_VRs set, no change
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "AB,CD,EF"
+
+        kwargs = {"target_VRs": ("LO",)}
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        elem = convert_raw_data_element(raw)
+        assert elem.value == ["AB", "CD", "EF"]
+
+        kwargs["separator"] = ":"
+        raw = raw._replace(value=raw.value.replace(b"\x2C", b":"))
+        elem = convert_raw_data_element(raw)
+        assert elem.value == ["AB", "CD", "EF"]
+
+        raw = raw._replace(VR="SH")
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "AB:CD:EF"
 
 
 class TestDataElementValidation:
