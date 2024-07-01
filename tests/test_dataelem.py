@@ -19,6 +19,7 @@ from pydicom.dataelem import (
 from pydicom.dataset import Dataset
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
+from pydicom.hooks import hooks
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from .test_util import save_private_dict
@@ -585,12 +586,18 @@ class TestDataElement:
 
 
 @pytest.fixture
-def reset_raw_element_modifiers():
-    mods = config.settings.raw_data_element_modifiers
-    kwargs = config.settings.raw_data_element_kwargs
+def reset_raw_element_hooks():
+    original = (
+        hooks.raw_element_init,
+        hooks.raw_element_value_conversion,
+        hooks.raw_element_vr_lookup,
+    )
     yield
-    config.settings.raw_data_element_modifiers = mods
-    config.settings.raw_data_element_kwargs = kwargs
+    (
+        hooks.raw_element_init,
+        hooks.raw_element_value_conversion,
+        hooks.raw_element_vr_lookup,
+    ) = original
 
 
 class TestRawDataElement:
@@ -754,28 +761,26 @@ class TestRawDataElement:
             assert elem.name == "[Another Number]"
             assert elem.value == b"12345678"
 
-    def test_raw_element_modification(self, reset_raw_element_modifiers):
-        """Test customization of RawDataElement via config.Settings"""
-        raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
+    def test_raw_element_hooks(self, reset_raw_element_hooks):
+        """Test customization of RawDataElement conversion via hooks.Hooks"""
+        raw = RawDataElement(Tag(0x00100020), None, 4, b"unknown", 0, True, True)
         ds = Dataset()
         ds.PatientName = "Foo"
 
         d = {}
 
-        def modifier(raw, **kwargs):
+        def func(raw, data, **kwargs):
+            data["value"] = "12345"
+            data["VR"] = "LO"
             d.update(kwargs)
-            return kwargs
 
-        config.settings.raw_data_element_modifiers = [modifier]
-        config.settings.raw_data_element_kwargs = {
-            "value": "12345",
-            "tag": Tag(0x00100020),
-            "VR": "LO",
-        }
+        hooks.register_hook("raw_element_value", func)
+
         elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
         assert elem.value == "12345"
         assert elem.VR == "LO"
         assert elem.tag == (0x00100020)
+
         assert d["encoding"] == default_encoding
         assert d["ds"] == ds
 

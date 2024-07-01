@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Define the DataElement class.
 
 A DataElement has a tag,
@@ -9,7 +9,7 @@ A DataElement has a tag,
 
 import base64
 import json
-from typing import Any, TYPE_CHECKING, NamedTuple, cast
+from typing import Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
 
 from pydicom import config  # don't import datetime_conversion directly
@@ -22,13 +22,12 @@ from pydicom.datadict import (
     private_dictionary_description,
     dictionary_VR,
     repeater_has_tag,
-    private_dictionary_VR,
 )
-from pydicom.errors import BytesLengthException
+from pydicom.hooks import hooks
 from pydicom.jsonrep import JsonDataElementConverter, BulkDataType
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag, BaseTag, _LUT_DESCRIPTOR_TAGS
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -755,47 +754,6 @@ class RawDataElement(NamedTuple):
     is_raw: bool = True
 
 
-def _private_vr_for_tag(ds: "Dataset | None", tag: BaseTag) -> str:
-    """Return the VR for a known private tag, otherwise "UN".
-
-    Parameters
-    ----------
-    ds : Dataset, optional
-        The dataset needed for the private creator lookup.
-        If not given, "UN" is returned.
-    tag : BaseTag
-        The private tag to lookup. The caller has to ensure that the
-        tag is private.
-
-    Returns
-    -------
-    str
-        "LO" if the tag is a private creator, the VR of the private tag if
-        found in the private dictionary, or "UN".
-    """
-    if tag.is_private_creator:
-        return VR_.LO
-
-    # invalid private tags are handled as UN
-    if ds is not None and (tag.element & 0xFF00):
-        private_creator_tag = tag.group << 16 | (tag.element >> 8)
-        private_creator = ds.get(private_creator_tag, "")
-        if private_creator:
-            try:
-                return private_dictionary_VR(tag, private_creator.value)
-            except KeyError:
-                pass
-
-    return VR_.UN
-
-
-# The first and third values of the following elements are always US
-#   even if the VR is SS (PS3.3 C.7.6.3.1.5, C.11.1, C.11.2).
-# (0028,1101-1103) RGB Palette Color LUT Descriptor
-# (0028,3002) LUT Descriptor
-_LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
-
-
 def convert_raw_data_element(
     raw: RawDataElement,
     *,
@@ -806,121 +764,68 @@ def convert_raw_data_element(
 
     .. versionadded:: 3.0
 
-    `raw` may be modified prior to conversion by setting the
-    :attr:`~pydicom.config.Settings.raw_data_element_modifiers` attribute to
-    a list of modification functions.
+    **Customization Hooks**
+
+    All :class:`hooks<pydicom.hooks.Hooks>` for :func:`convert_raw_data_element`
+    use the function signature::
+
+        def func(
+            raw: RawDataElement,
+            data: dict[str, Any],
+            *,
+            encoding: str | MutableSequence[str] | None = None,
+            ds: pydicom.dataset.Dataset | None = None,
+        ) -> None:
+            ...
+
+    Where `raw`, `encoding` and `ds` are the objects passed to this function and
+    `data` is a :class:`dict` that's persistent for each raw element and used to
+    stores the results of the hook functions.
+
+    Available hooks are (in order of execution):
+
+    * ``raw_element_vr``: Perform the VR lookup for the raw element,
+      required to add ``{"VR": str}`` to `data`.
+    * ``raw_element_value``: Perform the conversion of the raw element
+      :class`bytes` value to an appropriate type (such as :class:`int` for VR
+      **US**), required to add ``{"value": Any}`` to `data`.
 
     Parameters
     ----------
     raw : pydicom.dataelem.RawDataElement
         The raw data to convert to a :class:`DataElement`.
-    encoding : str | list[str], optional
-        The character encoding of the raw data.
-    ds : pydicom.dataset.Dataset, optional
-        If given, used to resolve the VR for known private tags.
+    encoding : str | MutableSequence[str] | None
+        The character set encodings for the raw data element.
+    ds : pydicom.dataset.Dataset | None
+        The parent dataset of `raw`.
 
     Returns
     -------
     pydicom.dataelem.DataElement
         A :class:`~pydicom.dataelem.DataElement` instance created from `raw`.
     """
-    from pydicom.values import convert_value
+    data: dict[str, Any] = {}
+    if config.data_element_callback:
+        raw = config.data_element_callback(raw, **config.data_element_callback_kwargs)
 
-    if not config.settings.raw_data_element_modifiers:
-        if config.data_element_callback:
-            raw = config.data_element_callback(
-                raw,
-                encoding=encoding,
-                **config.data_element_callback_kwargs,
-            )
-
-        vr = raw.VR
-        if vr is None:  # Can be if was implicit VR
-            try:
-                vr = dictionary_VR(raw.tag)
-            except KeyError:
-                # just read the bytes, no way to know what they mean
-                if raw.tag.is_private:
-                    # for VR for private tags see PS3.5, 6.2.2
-                    vr = _private_vr_for_tag(ds, raw.tag)
-
-                # group length tag implied in versions < 3.0
-                elif raw.tag.element == 0:
-                    vr = VR_.UL
-                else:
-                    msg = f"VR lookup failed for the raw element with tag {raw.tag}"
-                    if config.settings.reading_validation_mode == config.RAISE:
-                        raise KeyError(msg)
-
-                    vr = VR_.UN
-                    warn_and_log(f"{msg} - setting VR to 'UN'")
-
-        elif vr == VR_.UN and config.replace_un_with_known_vr:
-            # handle rare case of incorrectly set 'UN' in explicit encoding
-            # see also DataElement.__init__()
-            if raw.tag.is_private:
-                vr = _private_vr_for_tag(ds, raw.tag)
-            elif raw.value is None or len(raw.value) < 0xFFFF:
-                try:
-                    vr = dictionary_VR(raw.tag)
-                except KeyError:
-                    pass
-
-        vr = cast(str, vr)
-        try:
-            value = convert_value(vr, raw, encoding)
-        except NotImplementedError as exc:
-            raise NotImplementedError(f"{exc} in tag {raw.tag}")
-        except BytesLengthException as exc:
-            # Failed conversion, either raise or convert to a UN VR
-            msg = (
-                f"{exc} This occurred while trying to parse {raw.tag} according "
-                f"to VR '{raw.VR}'."
-            )
-            if not config.convert_wrong_length_to_UN:
-                raise BytesLengthException(
-                    f"{msg} To replace this error with a warning set "
-                    "pydicom.config.convert_wrong_length_to_UN = True."
-                )
-
-            warn_and_log(f"{msg} Setting VR to 'UN'.")
-            vr = VR_.UN
-            value = raw.value
-
-        if raw.tag in _LUT_DESCRIPTOR_TAGS:
-            # We only fix the first value as the third value is 8 or 16
-            if value and isinstance(value, list):
-                try:
-                    if value[0] < 0:
-                        value[0] += 65536
-                except Exception:
-                    pass
-
-        return DataElement(
-            raw.tag,
-            vr,
-            value,
-            raw.value_tell,
-            raw.length == 0xFFFFFFFF,
-            already_converted=True,
+    # Initializing **kwargs for each hook is a bit expensive, so avoid it if we can
+    if hooks.raw_element_kwargs:
+        hooks.raw_element_vr(
+            raw, data, encoding=encoding, ds=ds, **hooks.raw_element_kwargs
         )
-
-    # Custom conversion to DataElement
-    modifiers = config.settings.raw_data_element_modifiers
-    kwargs = config.settings.raw_data_element_kwargs
-    kwargs.update({"encoding": encoding, "ds": ds})
-
-    d: dict[str, Any] = {}
-    for func in modifiers:
-        d = func(raw, **kwargs)
-        kwargs.update(d)
+        hooks.raw_element_value(
+            raw, data, encoding=encoding, ds=ds, **hooks.raw_element_kwargs
+        )
+    else:
+        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds)
+        hooks.raw_element_value(raw, data, encoding=encoding, ds=ds)
 
     return DataElement(
-        d.get("tag", raw.tag),
-        d.get("VR", raw.VR),
-        d.get("value", raw.value),
-        d.get("value_tell", raw.value_tell),
-        d.get("length", raw.length) == 0xFFFFFFFF,
+        raw.tag,
+        data["VR"],
+        data["value"],
+        raw.value_tell,
+        raw.length == 0xFFFFFFFF,
         already_converted=True,
     )
 
