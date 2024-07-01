@@ -11,7 +11,7 @@ from pydicom.tag import BaseTag, _LUT_DESCRIPTOR_TAGS
 from pydicom.valuerep import VR
 
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
     from pydicom.dataelem import RawDataElement
 
@@ -245,7 +245,7 @@ def raw_element_value(
         data["VR"] = VR.UN
         value = raw.value
 
-    if vr == VR.SS and raw.tag in _LUT_DESCRIPTOR_TAGS:
+    if raw.tag in _LUT_DESCRIPTOR_TAGS:
         # We only fix the first value as the third value is 8 or 16
         if value and isinstance(value, list):
             try:
