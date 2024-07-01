@@ -7,7 +7,6 @@ import logging
 import os
 from contextlib import contextmanager
 from typing import Optional, Any, TYPE_CHECKING
-from collections.abc import Callable
 from collections.abc import Generator
 
 have_numpy = True
@@ -51,7 +50,7 @@ Default ``None``.
 .. deprecated:: 3.0
 
     ``data_element_callback`` will be removed in v4.0, use
-    :attr:`Settings.data_element_callbacks` instead.
+    :meth:`~pydicom.hooks.Hooks.register_callback` instead.
 """
 
 data_element_callback_kwargs: dict[str, Any] = {}
@@ -62,7 +61,7 @@ Default ``{}``.
 .. deprecated:: 3.0
 
     ``data_element_callback_kwargs`` will be removed in v4.0, use
-    :attr:`Settings.data_element_callbacks_kwargs` instead.
+    :meth:`~pydicom.hooks.Hooks.register_kwargs` instead.
 """
 
 
@@ -72,7 +71,7 @@ def reset_data_element_callback() -> None:
     .. deprecated:: 3.0
 
         ``reset_data_element_callback()`` will be removed in v4.0, use
-        :meth:`Settings.reset_data_element_callbacks` instead.
+        :meth:`pydicom.hooks.Hooks.reset` instead.
     """
     global data_element_callback
     global data_element_callback_kwargs
@@ -196,7 +195,6 @@ if a value validation error occurs.
 
 class Settings:
     """Collection of several configuration values.
-
     Accessed via the singleton :attr:`settings`.
 
     .. versionadded:: 2.3
@@ -208,10 +206,6 @@ class Settings:
         # currently the default value depends on enforce_valid_values
         self._writing_validation_mode: int | None = RAISE if _use_future else None
         self._infer_sq_for_un_vr: bool = True
-
-        # RawDataElement modification prior to conversion to DataElement
-        self.raw_data_element_modifiers: list[Callable] = []
-        self.raw_data_element_kwargs: dict[str, Any] = {}
 
     @property
     def reading_validation_mode(self) -> int:

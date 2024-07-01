@@ -853,16 +853,16 @@ def _DataElement_from_raw(
 
     Parameters
     ----------
-    raw : pydicom.dataelem.RawDataElement
+    raw_data_element : pydicom.dataelem.RawDataElement
         The raw data to convert to a :class:`DataElement`.
-    encoding : str | list[str], optional
+    encoding : str | list[str] | None
         The character encoding of the raw data.
-    dataset : pydicom.dataset.Dataset, optional
+    dataset : pydicom.dataset.Dataset | None
         If given, used to resolve the VR for known private tags.
 
     Returns
     -------
-    pydicom.dataelem.DataElement
+    DataElement
         A :class:`~pydicom.dataelem.DataElement` instance created from `raw`.
     """
     msg = (

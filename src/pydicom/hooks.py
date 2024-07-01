@@ -28,9 +28,12 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Hooks:
-    """Management class for callback functions.
+    """Management class for callback functions
 
     .. versionadded:: 3.0
+
+    New instances of this class should not be created, instead use the instance
+    imported with ``from pydicom.hooks import hooks``.
 
     **Available Hooks**
 
@@ -46,13 +49,29 @@ class Hooks:
     """
 
     def __init__(self) -> None:
-        """Initialize the ``Hooks`` instance."""
+        """Initialize a new ``Hooks`` instance."""
         self.raw_element_value: RawDataHook = raw_element_value
         self.raw_element_vr: RawDataHook = raw_element_vr
         self.raw_element_kwargs: dict[str, Any] = {}
 
     def register_callback(self, hook: str, func: Callable) -> None:
         """Register the callback function `func` to a hook.
+
+        Example
+        -------
+
+        .. code-block:: python
+
+            from pydicom import dcmread
+            from pyicom.hooks import hooks, raw_element_value_fix_separator
+
+            hooks.register_callback(
+                "raw_element_value", raw_element_value_fix_separator
+            )
+            kwargs = {"target_VRs": ("DS", "IS")}
+            hooks.register_kwargs("raw_element_kwags", kwargs)
+
+            ds = dcmread("path/to/dataset.dcm")
 
         Parameters
         ----------
