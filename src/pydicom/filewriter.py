@@ -11,10 +11,9 @@ import zlib
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.dataelem import (
-    DataElement_from_raw,
+    convert_raw_data_element,
     DataElement,
     RawDataElement,
-    _LUT_DESCRIPTOR_TAGS,
 )
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
 from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
@@ -28,6 +27,7 @@ from pydicom.tag import (
     ItemDelimiterTag,
     SequenceDelimiterTag,
     tag_in_exception,
+    _LUT_DESCRIPTOR_TAGS,
 )
 from pydicom.uid import (
     DeflatedExplicitVRLittleEndian,
@@ -51,7 +51,6 @@ from pydicom.values import convert_numbers
 
 if config.have_numpy:
     import numpy
-
 
 # Ambiguous VR Correction
 # (0018,9810) Zero Velocity Pixel Value
@@ -263,7 +262,7 @@ def correct_ambiguous_vr_element(
     if elem.VR in AMBIGUOUS_VR:
         # convert raw data elements before handling them
         if isinstance(elem, RawDataElement):
-            elem = DataElement_from_raw(elem, dataset=ds)
+            elem = convert_raw_data_element(elem, ds=ds)
             ds.__setitem__(elem.tag, elem)
 
         try:

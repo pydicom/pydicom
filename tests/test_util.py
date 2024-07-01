@@ -404,8 +404,7 @@ class TestDataElementCallbackTests:
             getattr(contour, "ContourData")
 
     def test_impl_vr_comma(self):
-        """util.fix_separator:
-        Able to replace comma in Implicit VR dataset.."""
+        """util.fix_separator: Able to replace comma in Implicit VR dataset.."""
         fixer.fix_separator(b",", for_VRs=["DS", "IS"], process_unknown_VRs=False)
         ds = filereader.read_dataset(
             self.bytesio, is_little_endian=True, is_implicit_VR=True
@@ -455,16 +454,28 @@ class TestDataElementCallbackTests:
         ds = filereader.read_dataset(
             BytesIO(bad_vr_bytes), is_little_endian=True, is_implicit_VR=True
         )
-        got = ds.get((0x0900, 0x0010))
-        assert got.value == b"1\\2 "
+
+        msg = (
+            r"VR lookup failed for the raw element with tag \(0900,0010\) - setting "
+            "VR to 'UN'"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            got = ds.get((0x0900, 0x0010))
+            assert got.value == b"1\\2 "
 
         # with process_unknown_VRs=False, unknown VR separator is not replaced
         fixer.fix_separator(b",", for_VRs=["DS", "IS"], process_unknown_VRs=False)
         ds = filereader.read_dataset(
             BytesIO(bad_vr_bytes), is_little_endian=True, is_implicit_VR=True
         )
-        got = ds.get((0x0900, 0x0010))
-        assert got.value == b"1,2 "
+
+        msg = (
+            r"VR lookup failed for the raw element with tag \(0900,0010\) - setting "
+            "VR to 'UN'"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            got = ds.get((0x0900, 0x0010))
+            assert got.value == b"1,2 "
 
 
 class TestLeanRead:
