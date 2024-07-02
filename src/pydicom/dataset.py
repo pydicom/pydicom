@@ -1056,7 +1056,10 @@ class Dataset:
                 from pydicom.filereader import read_deferred_data_element
 
                 elem = read_deferred_data_element(
-                    self.fileobj_type, self.filename, self.timestamp, elem
+                    self.fileobj_type,
+                    self.filename or self.buffer,
+                    self.timestamp,
+                    elem,
                 )
 
             if tag != BaseTag(0x00080005):
@@ -3223,23 +3226,29 @@ class FileDataset(Dataset):
     """An extension of :class:`Dataset` to make reading and writing to
     file-like easier.
 
+    .. versionchanged:: 3.0
+
+        Added the `buffer` attribute and the `filename` attribute has been changed to
+        only contain the filename the dataset was read from (if any).
+
     Attributes
     ----------
-    preamble : str or bytes or None
+    preamble : str | bytes | None
         The optional DICOM preamble prepended to the :class:`FileDataset`, if
         available.
-    file_meta : FileMetaDataset or None
-        The Dataset's file meta information as a :class:`FileMetaDataset`,
-        if available (``None`` if not present).
-        Consists of group ``0x0002`` elements.
-    filename : str or None
-        The filename that the :class:`FileDataset` was read from (if read from
-        file) or ``None`` if the filename is not available (if read from a
-        :class:`io.BytesIO` or  similar).
+    file_meta : FileMetaDataset | None
+        The Dataset's file meta information as a :class:`FileMetaDataset`, if
+        available (``None`` if not present). Consists of group ``0x0002`` elements.
+    filename : str | None
+        The filename associated with the :class:`FileDataset` if read from
+        a file or file-like, or ``None`` if the dataset has been read from a
+        buffer-like object.
+    buffer : ReadableBuffer | None
+        The buffer-like object the :class:`FileDataset` was read from, or
+        ``None`` if the dataset has not been read from a file or file-like.
     fileobj_type
-        The object type of the file-like the :class:`FileDataset` was read
-        from.
-    timestamp : float or None
+        The type of object the :class:`FileDataset` was read from.
+    timestamp : float | None
         The modification time of the file the :class:`FileDataset` was read
         from, ``None`` if the modification time is not available.
     """
@@ -3252,6 +3261,7 @@ class FileDataset(Dataset):
         file_meta: "FileMetaDataset | None" = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
+        path: PathType = "",
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
@@ -3293,88 +3303,68 @@ class FileDataset(Dataset):
         self._read_implicit: bool = is_implicit_VR
         self._read_little: bool = is_little_endian
 
-        filename: str | None = None
-        filename_or_obj = path_from_pathlike(filename_or_obj)
         self.fileobj_type: Any = None
-        self.filename: PathType | BinaryIO = ""
+        self.filename: PathType | None = None
+        self.buffer: ReadableBuffer | None = None
 
+        filename_or_obj = path_from_pathlike(filename_or_obj)
         if isinstance(filename_or_obj, str):
             # Path to the dataset file
-            filename = filename_or_obj
+            self.filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):
             # File-like in "rb" mode such as open(..., "rb")
-            filename = filename_or_obj.name
+            self.filename = filename_or_obj.name
             # This is the appropriate constructor for io.BufferedReader
             self.fileobj_type = open
         else:
             # Readable buffer with read(), seek() and tell() methods
+            self.buffer = filename_or_obj
             self.fileobj_type = type(filename_or_obj)
-            if hasattr(filename_or_obj, "name"):
-                filename = filename_or_obj.name
-            elif hasattr(filename_or_obj, "filename"):
-                filename = filename_or_obj.filename
-            else:
-                self.filename = filename_or_obj
+            if getattr(filename_or_obj, "name", None):
+                self.filename = filename_or_obj.name
+            elif getattr(filename_or_obj, "filename", None):
+                self.filename = filename_or_obj.filename  # type: ignore[attr-defined]
 
         self.timestamp = None
-        if filename:
-            self.filename = filename
-            if os.path.exists(filename):
-                statinfo = os.stat(filename)
-                self.timestamp = statinfo.st_mtime
+        if self.filename and os.path.exists(self.filename):
+            self.timestamp = os.stat(self.filename).st_mtime
 
-    def _copy_implementation(self, copy_function: Callable) -> "FileDataset":
-        """Implementation of ``__copy__`` and ``__deepcopy__``.
-        Sets the filename to ``None`` if it isn't a string,
-        and copies all other attributes using `copy_function`.
+    def __deepcopy__(self, memo: dict[int, Any] | None) -> "FileDataset":
+        """Return a deep copy of the file dataset.
+
+        Sets the `buffer` to ``None`` if it's been closed or is otherwise not copyable.
+
+        Returns
+        -------
+        FileDataset
+            A deep copy of the file dataset.
         """
         copied = self.__class__(
-            self.filename,
+            self.filename,  # type: ignore[arg-type]
             self,
             self.preamble,
             self.file_meta,
             self.is_implicit_VR,  # type: ignore[arg-type]
             self.is_little_endian,  # type: ignore[arg-type]
         )
-        filename = self.filename
-        if filename is not None and not isinstance(filename, str):
-            warn_and_log(
-                "The 'filename' attribute of the dataset is a "
-                "file-like object and will be set to None "
-                "in the copied object"
-            )
-            self.filename = None  # type: ignore[assignment]
-        for k, v in self.__dict__.items():
-            copied.__dict__[k] = copy_function(v)
 
-        self.filename = filename
+        for k, v in self.__dict__.items():
+            if k == "buffer":
+                try:
+                    copied.__dict__[k] = copy.deepcopy(v)
+                except Exception as exc:
+                    warn_and_log(
+                        f"The {type(exc).__name__} exception '{exc}' occurred "
+                        "trying to deepcopy the buffer-like the dataset was read "
+                        "from, the 'buffer' attribute will be set to 'None' in the "
+                        "copied object"
+                    )
+                    copied.__dict__[k] = None
+            else:
+                copied.__dict__[k] = copy.deepcopy(v)
 
         return copied
-
-    def __copy__(self) -> "FileDataset":
-        """Return a shallow copy of the file dataset.
-        Make sure that the filename is not copied in case it is a file-like
-        object.
-
-        Returns
-        -------
-        FileDataset
-            A shallow copy of the file data set.
-        """
-        return self._copy_implementation(copy.copy)
-
-    def __deepcopy__(self, _: dict[int, Any] | None) -> "FileDataset":
-        """Return a deep copy of the file dataset.
-        Make sure that the filename is not copied in case it is a file-like
-        object.
-
-        Returns
-        -------
-        FileDataset
-            A deep copy of the file data set.
-        """
-        return self._copy_implementation(copy.deepcopy)
 
 
 def validate_file_meta(

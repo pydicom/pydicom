@@ -61,9 +61,12 @@ Changes
   6 or 7 produces incorrect results, so attempting to do so now raises an exception.
   ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
 * Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
-  exception as Pillow cannot decode such data correctly (:issue:`2006`)
+  exception as Pillow cannot decode such data correctly (:issue:`2006`).
 * An exception will now be raised if an :class:`~numpy.ndarray` is used to set
-  *Pixel Data* (:issue:`50`)
+  *Pixel Data* (:issue:`50`).
+* Added :attr:`FileDataset.buffer<pydicom.dataset.FileDataset.buffer>` and changed
+  :attr:`FileDataset.filename<pydicom.dataset.FileDataset.filename>` to only be the
+  filename the dataset was read from (if any) (:issue:`1937`).
 
 
 Removals
@@ -258,11 +261,13 @@ Fixes
   *Bits Stored* is less than *Bits Allocated* and the unused bits haven't been
   set to an appropriate value for correct interpretation of the data.
 * Fixed a ``RecursionError`` when using :func:`copy.deepcopy` with a dataset containing
-  a private block (:issue:`2025`)
-* Fixed non-unique keywords for the concept codes in ``pydicom.sr`` (:issue:`1388`)
-* Fixed keywords using Python identifiers in ``pydicom.sr`` (:issue:`1273`)
+  a private block (:issue:`2025`).
+* Fixed non-unique keywords for the concept codes in ``pydicom.sr`` (:issue:`1388`).
+* Fixed keywords using Python identifiers in ``pydicom.sr`` (:issue:`1273`).
 * Fixed being unable to write *LUT Descriptor* when the VR is **SS** and the first
-  value is greater than 32767 (:issue:`2081`)
+  value is greater than 32767 (:issue:`2081`).
+* Fixed *Deflated Explicit VR Little Endian* datasets not working correctly with ``codify``
+  (:issue:`1937`).
 
 
 Deprecations

@@ -285,6 +285,8 @@ class TestReader:
         # If we can read anything else, the decompression must have been ok.
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert ds.filename == deflate_name
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR

@@ -487,9 +487,9 @@ def do_codify(args: argparse.Namespace) -> None:
         save_as_filename = args.save_as
     else:
         base, _ = os.path.splitext(filename)
-        save_as_filename = base + "_from_codify" + ".dcm"
-    save_line = f"\nds.save_as(r'{save_as_filename}', enforce_file_format=True)"
-    code_str += save_line
+        save_as_filename = f"{base}_from_codify.dcm"
+
+    code_str += f"\nds.save_as(r'{save_as_filename}', enforce_file_format=True)"
 
     # Write the code lines to specified file or to standard output
     # For test_util, captured output .name throws error, ignore it:

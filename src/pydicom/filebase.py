@@ -75,6 +75,9 @@ class DicomIO:
         # The buffer-like object being wrapped
         self._buffer = buffer
 
+        # The filename associated with the buffer-like
+        self._name: str | None = getattr(self._buffer, "name", None)
+
         # It's more efficient to replace the existing class methods
         #   instead of wrapping them
         if hasattr(buffer, "read"):
@@ -147,11 +150,15 @@ class DicomIO:
         self._implicit_vr = value
 
     @property
-    def name(self) -> str:
+    def name(self) -> str | None:
         """Return the value of the :attr:`~pydicom.filebase.DicomIO.parent`'s
-        ``name`` attribute, or ``"<no filename>"`` if no such attribute.
+        ``name`` attribute, or ``None`` if no such attribute.
         """
-        return getattr(self._buffer, "name", "<no filename>")
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
 
     @property
     def parent(self) -> ReadableBuffer | WriteableBuffer:
