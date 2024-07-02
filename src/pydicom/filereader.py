@@ -3,7 +3,6 @@
 
 
 # Need zlib and io.BytesIO for deflate-compressed file
-from io import BytesIO
 import os
 from struct import Struct, unpack
 from typing import BinaryIO, Any, cast
@@ -22,7 +21,7 @@ from pydicom.dataelem import (
 )
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import ReadableBuffer
+from pydicom.filebase import ReadableBuffer, DicomBytesIO
 from pydicom.fileutil import (
     read_undefined_length_value,
     path_from_pathlike,
@@ -897,10 +896,14 @@ def read_partial(
         #  All that is needed here is to decompress and then
         #     use as normal in a file-like object
         zipped = fileobj.read()
+        name = getattr(fileobj, "name", None)
+
         # -MAX_WBITS part is from comp.lang.python answer:
         # groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
         unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-        fileobj = BytesIO(unzipped)  # a file-like object
+        buffer = DicomBytesIO(unzipped)
+        buffer.name = name
+        fileobj = cast(BinaryIO, buffer)  # a file-like object
         is_implicit_VR = False
     elif transfer_syntax in pydicom.uid.PrivateTransferSyntaxes:
         # Replace with the registered UID as it has the encoding information

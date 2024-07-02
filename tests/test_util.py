@@ -28,6 +28,7 @@ from pydicom.util.codify import (
     code_dataelem,
     code_dataset,
     main as codify_main,
+    code_file_from_dataset,
 )
 from pydicom.util.dump import (
     print_character,
@@ -94,10 +95,10 @@ class TestCodify:
 
     def test_code_imports(self):
         """Test utils.codify.code_imports"""
-        out = "import pydicom\n"
-        out += "from pydicom.dataset import Dataset, FileMetaDataset\n"
-        out += "from pydicom.sequence import Sequence"
-        assert out == code_imports()
+        out = ["import pydicom"]
+        out.append("from pydicom.dataset import Dataset, FileMetaDataset")
+        out.append("from pydicom.sequence import Sequence")
+        assert "\n".join(out) == code_imports()
 
     def test_code_dataelem_standard(self):
         """Test utils.codify.code_dataelem for standard element"""
@@ -205,10 +206,26 @@ class TestCodify:
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""
         filename = get_testdata_file("rtplan.dcm")
+        args = [filename]
+        codify_main(100, args)
+        out, err = capsys.readouterr()
+        assert r"rtplan_from_codify.dcm" in out
+
+    def test_code_file_save_as(self, capsys):
+        """Test utils.codify.code_file"""
+        filename = get_testdata_file("rtplan.dcm")
         args = ["--save-as", r"c:\temp\testout.dcm", filename]
         codify_main(100, args)
         out, err = capsys.readouterr()
         assert r"c:\temp\testout.dcm" in out
+
+    def test_code_file_deflated(self, capsys):
+        """Test utils.codify.code_file with a deflated dataset"""
+        filename = get_testdata_file("image_dfl.dcm")
+        args = [filename]
+        codify_main(100, args)
+        out, err = capsys.readouterr()
+        assert r"image_dfl_from_codify.dcm" in out
 
     def test_code_relative_filename(self, capsys):
         """Test utils.codify.code_file with a relative path that doesn't exist"""
@@ -324,26 +341,6 @@ class TestDump:
             "(FFFC,FFFC) Data Set Trailing Padding           OB: Array of "
             "126 elements"
         ) in s
-
-
-class TestFixer:
-    """Test the utils.fixer module"""
-
-    def test_fix_separator_callback(self):
-        """Test utils.fixer.fix_separator_callback"""
-        pass
-
-    def test_fix_separator(self):
-        """Test utils.fixer.fix_separator"""
-        pass
-
-    def test_mismatch_callback(self):
-        """Test utils.fixer.mismatch_callback"""
-        pass
-
-    def test_fix_mismatch(self):
-        """Test utils.fixer.fix_mismatch"""
-        pass
 
 
 class TestHexUtil:
