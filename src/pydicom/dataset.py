@@ -1055,11 +1055,12 @@ class Dataset:
             if elem.value is None and elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
 
+                src = self.filename or self.buffer
+                if self.filename and self.buffer:
+                    src = self.buffer
+
                 elem = read_deferred_data_element(
-                    self.fileobj_type,
-                    self.filename or self.buffer,
-                    self.timestamp,
-                    elem,
+                    self.fileobj_type, src, self.timestamp, elem
                 )
 
             if tag != BaseTag(0x00080005):
@@ -3245,7 +3246,7 @@ class FileDataset(Dataset):
         buffer-like object.
     buffer : ReadableBuffer | None
         The buffer-like object the :class:`FileDataset` was read from, or
-        ``None`` if the dataset has not been read from a file or file-like.
+        ``None`` if the dataset has been read from a file or file-like.
     fileobj_type
         The type of object the :class:`FileDataset` was read from.
     timestamp : float | None
@@ -3261,7 +3262,6 @@ class FileDataset(Dataset):
         file_meta: "FileMetaDataset | None" = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
-        path: PathType = "",
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
