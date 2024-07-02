@@ -315,7 +315,7 @@ class TestDataSetToJson:
             assert "00082128" not in ds_json
 
         assert (
-            "Error while processing tag 00082127: Invalid value for VR IS: '5.25'"
+            "Error while processing tag 00082128: Invalid value for VR IS: '5.25'"
         ) in caplog.text
 
 
