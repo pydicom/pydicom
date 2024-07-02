@@ -307,6 +307,8 @@ inherits from it.</p></li>
 exception as Pillow cannot decode such data correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2006">#2006</a>)</p></li>
 <li><p>An exception will now be raised if an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> is used to set
 <em>Pixel Data</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/50">#50</a>)</p></li>
+<li><p>Logging of errors when converting elements using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_json_dict()</span></code></a> have been made more verbose and now use
+<code class="docutils literal notranslate"><span class="pre">logging.WARNING</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1909">#1909</a>).</p></li>
 </ul>
 <section id="removals">
 <h4>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h4>
