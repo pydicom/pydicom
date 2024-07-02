@@ -1,5 +1,6 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
+import logging
 from unittest import mock
 
 import pytest
@@ -300,7 +301,7 @@ class TestDataSetToJson:
 
         assert "00100010" not in ds_json
 
-    def test_suppress_invalid_tags_with_failed_dataelement(self):
+    def test_suppress_invalid_tags_with_failed_dataelement(self, caplog):
         """Test tags that raise exceptions don't if suppress_invalid_tags True."""
         ds = Dataset()
         # we have to add a RawDataElement as creating a DataElement would
@@ -309,8 +310,13 @@ class TestDataSetToJson:
             Tag(0x00082128), "IS", 4, b"5.25", 0, True, True
         )
 
-        ds_json = ds.to_json_dict(suppress_invalid_tags=True)
-        assert "00082128" not in ds_json
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            ds_json = ds.to_json_dict(suppress_invalid_tags=True)
+            assert "00082128" not in ds_json
+
+        assert (
+            "Error while processing tag 00082127: Invalid value for VR IS: '5.25'"
+        ) in caplog.text
 
 
 class TestSequence:
