@@ -3153,9 +3153,11 @@ class Dataset:
                         bulk_data_threshold=bulk_data_threshold,
                     )
                 except Exception as exc:
-                    logger.error(f"Error while processing tag {json_key}")
                     if not suppress_invalid_tags:
+                        logger.error(f"Error while processing tag {json_key}")
                         raise exc
+
+                    logger.warning(f"Error while processing tag {json_key}: {exc}")
 
         return json_dataset
 

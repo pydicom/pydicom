@@ -64,6 +64,9 @@ Changes
   exception as Pillow cannot decode such data correctly (:issue:`2006`).
 * An exception will now be raised if an :class:`~numpy.ndarray` is used to set
   *Pixel Data* (:issue:`50`).
+* Logging of errors when converting elements using :meth:`Dataset.to_json_dict()
+  <pydicom.dataset.Dataset.to_json_dict>` have been made more verbose and now use
+  ``logging.WARNING`` (:issue:`1909`).
 * Added :attr:`FileDataset.buffer<pydicom.dataset.FileDataset.buffer>` and changed
   :attr:`FileDataset.filename<pydicom.dataset.FileDataset.filename>` to only be the
   filename the dataset was read from (if any) (:issue:`1937`).
