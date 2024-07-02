@@ -65,7 +65,7 @@ Changes
 * An exception will now be raised if an :class:`~numpy.ndarray` is used to set
   *Pixel Data* (:issue:`50`)
 * Logging of errors when converting elements using :meth:`Dataset.to_json_dict()
-  <pydicom.dataset.dataset.to_json_dict>` have been made more verbose and now use
+  <pydicom.dataset.Dataset.to_json_dict>` have been made more verbose and now use
   ``logging.WARNING`` (:issue:`1909`).
 
 
