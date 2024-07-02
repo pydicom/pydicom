@@ -1056,7 +1056,11 @@ class Dataset:
                 from pydicom.filereader import read_deferred_data_element
 
                 src = self.filename or self.buffer
-                if self.filename and self.buffer:
+                if (
+                    self.filename
+                    and self.buffer
+                    and not getattr(self.buffer, "closed", False)
+                ):
                     src = self.buffer
 
                 elem = read_deferred_data_element(
