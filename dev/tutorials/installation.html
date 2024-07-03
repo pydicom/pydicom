@@ -61,6 +61,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#install-the-official-release">Install the official release</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-using-pip">Install using pip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#install-using-conda">Install using conda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-type-hints">Additional type hints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#downloading-example-test-dicom-files">Downloading example/test DICOM files</a></li>
 </ul>
 </li>
@@ -83,6 +84,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#install-the-official-release">Install the official release</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#install-using-pip">Install using pip</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#install-using-conda">Install using conda</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#additional-type-hints">Additional type hints</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#downloading-example-test-dicom-files">Downloading example/test DICOM files</a></li>
 </ul>
 </li>
@@ -183,6 +185,31 @@ one of the release <code class="docutils literal notranslate"><span class="pre">
 <p><em>pydicom</em> is also available for <a class="reference external" href="https://docs.conda.io/">conda</a> at
 <a class="reference external" href="https://anaconda.org/conda-forge/pydicom">conda-forge</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">pydicom</span>
+</pre></div>
+</div>
+</section>
+<section id="additional-type-hints">
+<h3>Additional type hints<a class="headerlink" href="#additional-type-hints" title="Link to this heading">¶</a></h3>
+<p>The default <em>pydicom</em> type hinting doesn’t cover standard element keywords accessed
+through <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># foo.py</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="mi">1234</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mypy<span class="w"> </span>foo.py
+Success:<span class="w"> </span>no<span class="w"> </span>issues<span class="w"> </span>found<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>file
+</pre></div>
+</div>
+<p>To add extra type hints for these attributes you can install the <a class="reference external" href="https://github.com/pydicom/types-pydicom">types-pydicom</a> package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">types</span><span class="o">-</span><span class="n">pydicom</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mypy<span class="w"> </span>foo.py
+foo.py:5:<span class="w"> </span>error:<span class="w"> </span>Incompatible<span class="w"> </span>types<span class="w"> </span><span class="k">in</span><span class="w"> </span>assignment<span class="w"> </span><span class="o">(</span>expression<span class="w"> </span>has<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s2">&quot;int&quot;</span>,<span class="w"> </span>variable<span class="w"> </span>has<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s2">&quot;str | PersonName | None&quot;</span><span class="o">)</span><span class="w">  </span><span class="o">[</span>assignment<span class="o">]</span>
+Found<span class="w"> </span><span class="m">1</span><span class="w"> </span>error<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span><span class="o">(</span>checked<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>file<span class="o">)</span>
 </pre></div>
 </div>
 </section>
