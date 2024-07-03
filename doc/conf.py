@@ -97,6 +97,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
+    "pillow": ("https://pillow.readthedocs.io/en/stable", None),
 }
 
 sphinx_gallery_conf = {
