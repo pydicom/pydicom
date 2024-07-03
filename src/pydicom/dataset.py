@@ -3215,6 +3215,71 @@ class Dataset:
             )
         )
 
+    def update_raw_element(
+        self, tag: TagType, *, vr: str | None = None, value: bytes | None = None
+    ) -> None:
+        """Modify the VR or value for the raw element with `tag`.
+
+        When a :class:`Dataset` is created most of it's elements are in their
+        :class:`~pydicom.dataelem.RawDataElement` form, and only upon trying to access
+        the element is it converted to a :class:`~pydicom.dataelem.DataElement`.
+        When this conversion fails due to non-conformance issues, this method can be
+        used to modify the raw element data prior to conversion in order to fix any
+        issues.
+
+        Example
+        -------
+
+        Change the VR for the element with tag (0029,1026) before conversion to
+        :class:`~pydicom.dataelem.DataElement`.
+
+            >>> from pydicom import examples
+            >>> ds = examples.ct
+            >>> ds.update_raw_element(0x00291026, vr="US")
+            >>> elem = ds[0x00291026]  # conversion to DataElement occurs here
+            >>> type(elem)
+            <class 'pydicom.dataelem.DataElement'>
+            >>> elem.VR
+            "US"
+
+        Parameters
+        ----------
+        tag : int | str | tuple[int, int] | BaseTag
+            The tag for a :class:`~pydicom.dataelem.RawDataElement` in the dataset.
+        vr : str, optional
+            Required if `value` is not used, the value to use for the modified
+            element's VR, if not used then the existing VR will be kept.
+        value : bytes, optional
+            Required if `vr` is not used, the value to use for the modified element's
+            raw encoded value, if not used then the existing value will be kept.
+        """
+        if vr is None and value is None:
+            raise ValueError("Either or both of 'vr' and 'value' are required")
+
+        if vr is not None:
+            try:
+                VR_[vr]
+            except KeyError:
+                raise ValueError(f"Invalid VR value '{vr}'")
+
+        if value is not None and not isinstance(value, bytes):
+            raise TypeError(f"'value' must be bytes, not '{type(value).__name__}'")
+
+        tag = Tag(tag)
+        raw = self.get_item(tag)
+        if raw is None:
+            raise KeyError(f"No element with tag {tag} was found")
+
+        if not isinstance(raw, RawDataElement):
+            raise TypeError(
+                f"The element with tag {tag} has already been converted to a "
+                "'DataElement' instance, this method must be called earlier"
+            )
+
+        vr = vr if vr is not None else raw.VR
+        value = value if value is not None else raw.value
+        self._dict[tag] = raw._replace(VR=vr, value=value)
+
     __repr__ = __str__
 
 
