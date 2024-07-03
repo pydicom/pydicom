@@ -304,11 +304,14 @@ inherits from it.</p></li>
 6 or 7 produces incorrect results, so attempting to do so now raises an exception.
 <code class="docutils literal notranslate"><span class="pre">pyjpegls</span></code> or <code class="docutils literal notranslate"><span class="pre">pylibjpeg</span></code> with <code class="docutils literal notranslate"><span class="pre">pylibjpeg-libjpeg</span></code> can be used instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2008">#2008</a>).</p></li>
 <li><p>Using Pillow with JPEG 2000 encoded &gt; 8-bit multi-sample data (such as RGB) now raises an
-exception as Pillow cannot decode such data correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2006">#2006</a>)</p></li>
+exception as Pillow cannot decode such data correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2006">#2006</a>).</p></li>
 <li><p>An exception will now be raised if an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> is used to set
-<em>Pixel Data</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/50">#50</a>)</p></li>
+<em>Pixel Data</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/50">#50</a>).</p></li>
 <li><p>Logging of errors when converting elements using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_json_dict()</span></code></a> have been made more verbose and now use
 <code class="docutils literal notranslate"><span class="pre">logging.WARNING</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1909">#1909</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.buffer" title="pydicom.dataset.FileDataset.buffer"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FileDataset.buffer</span></code></a> and changed
+<a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.filename" title="pydicom.dataset.FileDataset.filename"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FileDataset.filename</span></code></a> to only be the
+filename the dataset was read from (if any) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1937">#1937</a>).</p></li>
 </ul>
 <section id="removals">
 <h4>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h4>
@@ -521,11 +524,13 @@ the <em>Pixel Data</em> element value until after saving (<a class="reference ex
 <em>Bits Stored</em> is less than <em>Bits Allocated</em> and the unused bits haven’t been
 set to an appropriate value for correct interpretation of the data.</p></li>
 <li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">RecursionError</span></code> when using <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> with a dataset containing
-a private block (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2025">#2025</a>)</p></li>
-<li><p>Fixed non-unique keywords for the concept codes in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1388">#1388</a>)</p></li>
-<li><p>Fixed keywords using Python identifiers in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1273">#1273</a>)</p></li>
+a private block (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2025">#2025</a>).</p></li>
+<li><p>Fixed non-unique keywords for the concept codes in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1388">#1388</a>).</p></li>
+<li><p>Fixed keywords using Python identifiers in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1273">#1273</a>).</p></li>
 <li><p>Fixed being unable to write <em>LUT Descriptor</em> when the VR is <strong>SS</strong> and the first
-value is greater than 32767 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2081">#2081</a>)</p></li>
+value is greater than 32767 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/2081">#2081</a>).</p></li>
+<li><p>Fixed <em>Deflated Explicit VR Little Endian</em> datasets not working correctly with <code class="docutils literal notranslate"><span class="pre">codify</span></code>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1937">#1937</a>).</p></li>
 </ul>
 </section>
 <section id="deprecations">
