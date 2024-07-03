@@ -81,6 +81,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_icc_profile.html">pydicom.pixels.apply_icc_profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_presentation_lut.html">pydicom.pixels.apply_presentation_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
@@ -88,6 +89,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.create_icc_transform.html">pydicom.pixels.create_icc_transform</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
@@ -157,7 +159,7 @@
 <h1>pydicom.pixels.decoders.JPEGExtended12BitDecoder<a class="headerlink" href="#pydicom-pixels-decoders-jpegextended12bitdecoder" title="Link to this heading">¶</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.pixels.decoders.JPEGExtended12BitDecoder">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.decoders.</span></span><span class="sig-name descname"><span class="pre">JPEGExtended12BitDecoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.pixels.decoders.base.Decoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d67cd9538/pydicom/pixels/decoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.decoders.JPEGExtended12BitDecoder" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.decoders.</span></span><span class="sig-name descname"><span class="pre">JPEGExtended12BitDecoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.pixels.decoders.base.Decoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/884aed6ba/pydicom/pixels/decoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.decoders.JPEGExtended12BitDecoder" title="Link to this definition">¶</a></dt>
 <dd><p>A pixel data decoder for <em>JPEG Extended (Process 2 and 4)</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.51</span></code></p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 3.0.</span></p>

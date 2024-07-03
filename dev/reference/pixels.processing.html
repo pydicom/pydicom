@@ -81,6 +81,7 @@
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_icc_profile.html">pydicom.pixels.apply_icc_profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_presentation_lut.html">pydicom.pixels.apply_presentation_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
@@ -88,6 +89,7 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.create_icc_transform.html">pydicom.pixels.create_icc_transform</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
@@ -160,26 +162,32 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_color_lut.html#pydicom.pixels.processing.apply_color_lut" title="pydicom.pixels.processing.apply_color_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_color_lut</span></code></a>(arr[, ds, palette])</p></td>
 <td><p>Apply a color palette lookup table to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_modality_lut.html#pydicom.pixels.processing.apply_modality_lut" title="pydicom.pixels.processing.apply_modality_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_modality_lut</span></code></a>(arr, ds)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_icc_profile.html#pydicom.pixels.processing.apply_icc_profile" title="pydicom.pixels.processing.apply_icc_profile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_icc_profile</span></code></a>(arr[, ds, transform, ...])</p></td>
+<td><p>Apply an <a class="reference external" href="https://www.color.org/iccprofile.xalter">ICC Profile</a> to <cite>arr</cite>, either from the dataset <cite>ds</cite> or an existing Pillow color transformation object <cite>transform</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_modality_lut.html#pydicom.pixels.processing.apply_modality_lut" title="pydicom.pixels.processing.apply_modality_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_modality_lut</span></code></a>(arr, ds)</p></td>
 <td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_presentation_lut.html#pydicom.pixels.processing.apply_presentation_lut" title="pydicom.pixels.processing.apply_presentation_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_presentation_lut</span></code></a>(arr, ds)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_presentation_lut.html#pydicom.pixels.processing.apply_presentation_lut" title="pydicom.pixels.processing.apply_presentation_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_presentation_lut</span></code></a>(arr, ds)</p></td>
 <td><p>Apply a Presentation LUT to <cite>arr</cite> and return the P-values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_rescale.html#pydicom.pixels.processing.apply_rescale" title="pydicom.pixels.processing.apply_rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_rescale</span></code></a>(arr, ds)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_rescale.html#pydicom.pixels.processing.apply_rescale" title="pydicom.pixels.processing.apply_rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_rescale</span></code></a>(arr, ds)</p></td>
 <td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_voi_lut.html#pydicom.pixels.processing.apply_voi_lut" title="pydicom.pixels.processing.apply_voi_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi_lut</span></code></a>(arr, ds[, index, prefer_lut])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_voi_lut.html#pydicom.pixels.processing.apply_voi_lut" title="pydicom.pixels.processing.apply_voi_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi_lut</span></code></a>(arr, ds[, index, prefer_lut])</p></td>
 <td><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_voi.html#pydicom.pixels.processing.apply_voi" title="pydicom.pixels.processing.apply_voi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi</span></code></a>(arr, ds[, index])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_voi.html#pydicom.pixels.processing.apply_voi" title="pydicom.pixels.processing.apply_voi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_voi</span></code></a>(arr, ds[, index])</p></td>
 <td><p>Apply a VOI lookup table to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_windowing.html#pydicom.pixels.processing.apply_windowing" title="pydicom.pixels.processing.apply_windowing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_windowing</span></code></a>(arr, ds[, index])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.apply_windowing.html#pydicom.pixels.processing.apply_windowing" title="pydicom.pixels.processing.apply_windowing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_windowing</span></code></a>(arr, ds[, index])</p></td>
 <td><p>Apply a windowing operation to <cite>arr</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired[, ...])</p></td>
 <td><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.processing.create_icc_transform.html#pydicom.pixels.processing.create_icc_transform" title="pydicom.pixels.processing.create_icc_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_icc_transform</span></code></a>([ds, icc_profile, ...])</p></td>
+<td><p>Return a Pillow color transformation object from either the dataset <cite>ds</cite> or an ICC profile <cite>icc_profile</cite>.</p></td>
 </tr>
 </tbody>
 </table>

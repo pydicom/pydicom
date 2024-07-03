@@ -1,0 +1,6 @@
+﻿pydicom.pixels.apply\_icc\_profile
+==================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: apply_icc_profile
