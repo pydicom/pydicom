@@ -2052,11 +2052,11 @@ class TestApplyICCProfile:
         assert out is arr_copy
 
 
-@pytest.mark.skipif(TEST_CMS, reason="Numpy or PIL are available")
+@pytest.mark.skipif(not HAVE_NP or HAVE_PIL, reason="Numpy missing PIL not")
 def test_apply_icc_profile_no_pillow_raises():
     """Test exception raised if PIL is missing."""
     msg = "Pillow is required to apply an ICC profile to an ndarray"
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(ImportError, match=msg):
         apply_icc_profile(np.empty((3, 3)))
 
 
@@ -2132,5 +2132,5 @@ class TestCreateICCTransform:
 def test_create_icc_transform_no_pillow_raises():
     """Test exception raised if PIL is missing."""
     msg = "Pillow is required to create a color transformation object"
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(ImportError, match=msg):
         create_icc_transform()
