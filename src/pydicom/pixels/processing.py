@@ -1,6 +1,7 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Pixel data processing functions."""
 
+from io import BytesIO
 from struct import unpack, unpack_from
 from typing import TYPE_CHECKING, cast
 from collections.abc import Iterable
@@ -12,6 +13,14 @@ try:
 except ImportError:
     HAVE_NP = False
 
+try:
+    import PIL
+    from PIL import ImageCms
+
+    HAVE_PIL = True
+except ImportError:
+    HAVE_PIL = False
+
 from pydicom.data import get_palette_files
 from pydicom.misc import warn_and_log
 from pydicom.uid import UID
@@ -19,6 +28,15 @@ from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
+
+
+_CMS_COLOR_SPACES = {"SRGB": "sRGB", "XYZ": "XYZ", "LAB": "LAB"}
+_CMS_INTENTS = {
+    0: "procedural",
+    1: "relative colorimetric",
+    2: "saturation",
+    3: "absolute colorimetric",
+}
 
 
 def apply_color_lut(
@@ -211,6 +229,105 @@ def apply_color_lut(
     return out
 
 
+def apply_icc_profile(
+    arr: "np.ndarray",
+    ds: "Dataset | None" = None,
+    transform: "PIL.ImageCms.ImageCmsTransform | None" = None,
+    intent: int | None = None,
+    color_space: str | None = None,
+) -> "np.ndarray":
+    """Apply an `ICC Profile <https://www.color.org/iccprofile.xalter>`_ to `arr`,
+    either from the dataset `ds` or an existing Pillow color transformation object
+    `transform`.
+
+    .. versionadded:: 3.0
+
+    .. warning::
+
+        This function requires `NumPy <https://numpy.org/>`_ and `Pillow
+        <https://pillow.readthedocs.io/en/stable/>`_.
+
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        8-bit RGB pixel data to apply an ICC profile to, shaped as either (rows,
+        columns, samples) or (frames, rows, columns, samples).
+    ds : pydicom.dataset.Dataset, optional
+        Required if `transform` is not supplied, a :class:`~pydicom.dataset.Dataset`
+        containing elements from the :dcm:`ICC Profile<part03/sect_C.11.15.html>`
+        module.
+    transform : PIL.ImageCms.ImageCmsTransform, optional
+        An :class:`~PIL.ImageCms.ImageCmsTransform` instance such as is returned by
+        the :func:`create_icc_transform` function. Required if `ds` is not used and
+        recommended when the same ICC profile is to be re-used on multiple ndarrays.
+    intent : int, optional
+        If `transform` is not supplied this is the rendering intent of the
+        transformation that will be created from `ds`, one of:
+
+        * ``0``: perceptual
+        * ``1``: relative colorimetric
+        * ``2``: saturation
+        * ``3``: absolute colorimetric
+
+        If no `intent` is specified then the default rendering intent in the ICC
+        profile will be used.
+    color_space : str, optional
+        If `transform` is not supplied this is the output color space to use
+        for the transformation created from `ds`. If not used then defaults to the
+        (0028,2002) *Color Space* value if its present in `ds`, otherwise defaults to
+        ``"sRGB"``. If used then it will override the (0028,2002) *Color Space* element
+        value (if present). Must be one of the :func:`supported Pillow color spaces
+        <PIL.ImageCms.createProfile>`, although in practice only ``"sRGB"`` is likely
+        to be used.
+
+    Returns
+    -------
+    np.ndarray
+        The input ndarray with the color transformation applied in-place.
+    """
+    if not HAVE_PIL:
+        raise ImportError("Pillow is required to apply an ICC profile to an ndarray")
+
+    # One of 'ds' or 'transform', but not both
+    if ds is None and not transform:
+        raise ValueError("Either 'ds' or 'transform' must be supplied")
+
+    if ds is not None and transform:
+        raise ValueError("Only one of 'ds' and 'transform' should be used, not both")
+
+    if arr.ndim not in (3, 4):
+        raise ValueError(f"The ndarray must have 3 or 4 dimensions, not {arr.ndim}")
+
+    if arr.shape[-1] != 3:
+        raise ValueError(
+            "Invalid ndarray shape, must be (rows, columns, 3) or (frames, rows, "
+            f"columns, 3), not {arr.shape}"
+        )
+
+    if not transform:
+        transform = create_icc_transform(
+            ds=ds,
+            intent=intent,
+            color_space=color_space,
+        )
+
+    if arr.ndim == 4:
+        for idx, frame in enumerate(arr):
+            im = PIL.Image.fromarray(frame)  # type: ignore[no-untyped-call]
+            ImageCms.applyTransform(im, transform, inPlace=True)
+            arr[idx] = np.array(im)
+
+        return arr
+
+    im = PIL.Image.fromarray(arr)  # type: ignore[no-untyped-call]
+    ImageCms.applyTransform(im, transform, inPlace=True)
+
+    arr[...] = np.array(im)
+
+    return arr
+
+
 def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     """Apply a modality lookup table or rescale operation to `arr`.
 
@@ -357,7 +474,7 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         arr /= arr.max() / (nr_entries - 1)
         arr = arr.astype("uint16")
 
-        return lut[arr]
+        return cast("np.ndarray", lut[arr])
 
     if "PresentationLUTShape" in ds:
         transform = ds.PresentationLUTShape.strip().upper()
@@ -863,6 +980,99 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
     np.clip(arr, 0, 255, out=arr)
 
     return arr.astype(orig_dtype)
+
+
+def create_icc_transform(
+    ds: "Dataset | None" = None,
+    icc_profile: bytes = b"",
+    intent: int | None = None,
+    color_space: str | None = None,
+) -> "PIL.ImageCms.ImageCmsTransform":
+    """Return a Pillow color transformation object from either the dataset `ds` or an
+    ICC profile `icc_profile`.
+
+    .. versionadded:: 3.0
+
+    .. warning::
+
+        This function requires `NumPy <https://numpy.org/>`_ and `Pillow
+        <https://pillow.readthedocs.io/en/stable/>`_.
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset, optional
+        Required if `icc_profile` is not supplied, a :class:`~pydicom.dataset.Dataset`
+        containing elements from the :dcm:`ICC Profile<part03/sect_C.11.15.html>` module.
+    icc_profile : bytes, optional
+        Required if `ds` is not supplied, an ICC profile encoded as :class:`bytes`.
+    intent : int, optional
+        The rendering intent of the transformation, one of:
+
+        * ``0``: perceptual
+        * ``1``: relative colorimetric
+        * ``2``: saturation
+        * ``3``: absolute colorimetric
+
+        If no `intent` is specified then the default rendering intent in the ICC
+        profile will be used.
+    color_space : str, optional
+        The output color space to use for the transformation created from `ds`. If not
+        used then defaults to the (0028,2002) *Color Space* value if its present in
+        `ds`, otherwise defaults to ``"sRGB"``. If used then it will override the
+        (0028,2002) *Color Space* element value (if present). Must be one of the
+        :func:`supported Pillow color spaces<PIL.ImageCms.createProfile>`, although in
+        practice only ``"sRGB"`` is likely to be used.
+
+    Returns
+    -------
+    PIL.ImageCms.ImageCmsTransform
+        A color transformation object that can be used with :func:`apply_icc_profile`.
+    """
+    if not HAVE_PIL:
+        raise ImportError("Pillow is required to create a color transformation object")
+
+    if ds is None and not icc_profile:
+        raise ValueError("Either 'ds' or 'icc_profile' must be supplied")
+
+    if ds and icc_profile:
+        raise ValueError("Only one of 'ds' and 'icc_profile' should be used, not both")
+
+    icc_profile = getattr(ds, "ICCProfile", icc_profile)
+    if not icc_profile:
+        raise ValueError("No (0028,2000) 'ICC Profile' element was found in 'ds'")
+
+    # If ColorSpace is in `ds` try and use that, but allow override via `color_space`
+    cs = color_space if color_space else getattr(ds, "ColorSpace", "sRGB")
+    if cs and cs.upper() not in _CMS_COLOR_SPACES:
+        if not color_space:
+            msg = (
+                f"The (0028,2002) 'Color Space' value '{cs}' is not supported by "
+                "Pillow, please use the 'color_space' argument to specify a "
+                "supported value"
+            )
+        else:
+            msg = (
+                f"Unsupported 'color_space' value '{cs}', must be 'sRGB', 'LAB' or "
+                "'XYZ'"
+            )
+
+        raise ValueError(msg)
+
+    # Conform the supplied color space to the value required by Pillow
+    cs = _CMS_COLOR_SPACES[cs.upper()]
+
+    profile = ImageCms.ImageCmsProfile(BytesIO(icc_profile))
+    intent = intent if intent else ImageCms.getDefaultIntent(profile)
+    if intent not in _CMS_INTENTS:
+        raise ValueError(f"Invalid 'intent' value '{intent}', must be 0, 1, 2 or 3")
+
+    return ImageCms.buildTransform(
+        outputProfile=ImageCms.createProfile(cs),  # type: ignore[arg-type]
+        inputProfile=profile,
+        inMode="RGB",
+        outMode="RGB",
+        renderingIntent=ImageCms.Intent(intent),
+    )
 
 
 def _expand_segmented_lut(
