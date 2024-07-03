@@ -837,6 +837,8 @@ def DataElement_from_raw(
             raw_data_element, encoding=encoding, **config.data_element_callback_kwargs
         )
 
+    print(raw)
+
     vr = raw.VR
     if vr is None:  # Can be if was implicit VR
         try:
@@ -858,10 +860,13 @@ def DataElement_from_raw(
                 vr = VR_.UN
                 warn_and_log(f"{msg} - setting VR to 'UN'")
     elif vr == VR_.UN and config.replace_un_with_known_vr:
+        print("Converting!")
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if raw.tag.is_private:
+            print("is private!")
             vr = _private_vr_for_tag(dataset, raw.tag)
+            print("is private!", vr)
         elif raw.value is None or len(raw.value) < 0xFFFF:
             try:
                 vr = dictionary_VR(raw.tag)
@@ -902,3 +907,44 @@ def DataElement_from_raw(
         raw.length == 0xFFFFFFFF,
         already_converted=True,
     )
+
+
+def update_raw_element(
+    ds: "Dataset",
+    tag: BaseTag,
+    vr: str | None = None,
+    value: bytes | None = None
+) -> None:
+    """Modify an attribute for a raw element in `ds`.
+
+    Example
+    -------
+
+    Change the private element (01F1,1027) to use the VR **FD**::
+
+        >>> ds = dcmread("path/to/dataset.dcm")
+        >>> update_raw_element(ds, (0x01F11027), vr="FD")
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        The parent dataset of the raw element to be modified.
+    tag : BaseTag
+        The tag of the element to be modified.
+    vr : str, optional
+        The value to use for the modified element's VR, if not used then the existing
+        VR will be kept.
+    vr : bytes, optional
+        The value to use for the modified element's raw encoded value, if not used then
+        the existing value will be kept.
+    """
+    raw = ds.get_element(tag)
+    if not isinstance(raw, RawDataElement):
+        raise TypeError(
+            "The element has already been converted to a 'DataElement' instance, "
+            "call this function earlier or see 'pydicom.hooks' for an alternative"
+        )
+
+    vr = vr if vr is not None else raw.VR
+    value = value if value is not None else raw.value
+    ds._dict[tag] = raw._replace(VR=vr, value=value)
