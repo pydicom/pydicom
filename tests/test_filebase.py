@@ -256,7 +256,9 @@ class TestDicomIO:
             DicomIO(Reader()).write(b"")
 
         fp = DicomIO(Reader())
-        assert fp.name == "<no filename>"
+        assert fp.name is None
+        fp.name = "foo"
+        assert fp.name == "foo"
         fp.close()  # no exceptions
 
     def test_init_good_buffer(self):
