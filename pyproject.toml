@@ -55,7 +55,7 @@ dev = [
     "pre-commit",
 ]
 
-basic = ["numpy"]
+basic = ["numpy", "types-pydicom"]
 
 pixeldata = [
     "numpy",
