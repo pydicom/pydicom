@@ -1,5 +1,9 @@
-# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
+
+from collections.abc import Generator, Iterator
+from contextlib import contextmanager
+from io import BufferedIOBase
 import os
 from struct import pack, unpack
 from typing import BinaryIO, cast
@@ -443,3 +447,102 @@ def path_from_pathlike(
 
 def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
     return TupleTag(cast(tuple[int, int], unpack(f"{endianness}HH", b)))
+
+
+def check_buffer(buffer: BufferedIOBase) -> bool:
+    """Return ``True`` if `buffer` is usable, ``False`` otherwise.
+
+    Parameters
+    ----------
+    buffer : io.BufferedIOBase
+        The buffer to check, must have `read()`, `seek()` and `tell()` methods.
+    """
+    attr = [hasattr(buffer, m) for m in ("read", "seek", "tell")]
+    if all(attr) and not getattr(buffer, "closed", False):
+        return True
+
+    return False
+
+
+@contextmanager
+def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
+    """Yields the initial position of the buffer and return to that position on exiting
+    the context.
+
+    Parameters
+    ----------
+    buffer : io.BufferedIOBase
+        The buffer to use.
+
+    Yields
+    ------
+    int
+        The initial position of the buffer.
+    """
+    if not check_buffer(buffer):
+        raise IOError("The buffer is a bad buffer")
+
+    initial_offset = buffer.tell()
+    yield initial_offset
+
+    buffer.seek(initial_offset)
+
+
+def read_buffer(buffer: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[bytes]:
+    """Consume data from a buffered value. The value must be a buffer, the buffer must be
+    readable, the buffer must be seekable, and the buffer must not be closed.
+
+    NOTE: The buffer is NOT returned to its starting position.
+
+    Parameters
+    ----------
+    buffer : io.BufferedIOBase
+        The buffer to read from. It must meet the required pre-conditions.
+    chunk_size : int, optional
+        The amount of bytes to read at a time. Less bytes may be read if there are less
+        than the specified amount of bytes in the stream. Must be > 0. Default is 8192.
+
+    Yields
+    -------
+    bytes
+        Data read from the buffer of length up to the specified chunk_size.
+
+    Raises
+    ------
+    AssertionError
+        If the buffer is not seekable, readable, or is closed.
+    """
+    if chunk_size <= 0:
+        raise ValueError(
+            f"Invalid 'chunk_size' value '{chunk_size}', must be greater than 0"
+        )
+
+    if not check_buffer(buffer):
+        raise ValueError("bad buffer")
+
+    if buffer_length(buffer) == 0:
+        yield b""
+        return
+
+    while chunk := buffer.read(chunk_size):
+        if chunk:
+            yield chunk
+
+
+def buffer_length(buffer: BufferedIOBase) -> int:
+    """Return the remaining length of the buffer with respect to the current position.
+
+    Parameters
+    ----------
+    buffer : io.BufferedIOBase
+        The buffer to return the remaining length for.
+
+    Returns
+    -------
+    int
+        The remaining length of the buffer from the current position.
+    """
+    with reset_buffer_position(buffer) as current_offset:
+        # Go to the end of the stream
+        buffer.seek(0, os.SEEK_END)
+        return buffer.tell() - current_offset

@@ -32,7 +32,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
-from pydicom.util.buffers import buffer_assertions
+from pydicom.fileutil import check_buffer
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
     BUFFERABLE_VRS,
@@ -454,12 +454,14 @@ class DataElement:
         if isinstance(val, BufferedIOBase):
             if self.VR not in BUFFERABLE_VRS:
                 raise ValueError(
-                    f"Invalid VR: {self.VR}. Only the following VRs support buffers: {BUFFERABLE_VRS}."
+                    f"Elements with a VR of '{self.VR}' cannot be used with buffered "
+                    f"values, supported VRs are: {BUFFERABLE_VRS}."
                 )
 
-            # ensure pre-conditions are met - we will check these when reading the value as well
-            # but better to fail early if possible
-            buffer_assertions(val)
+            # Ensure pre-conditions are met - we will check these when reading the
+            #   value as well but better to fail early if possible
+            if not check_buffer(val):
+                raise ValueError("FIXME")
 
             self._value = val
             return
@@ -474,6 +476,7 @@ class DataElement:
 
     @property
     def is_buffered(self) -> bool:
+        """Return ``True`` if the element's value is a buffer."""
         return isinstance(self._value, BufferedIOBase)
 
     @property

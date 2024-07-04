@@ -3007,7 +3007,7 @@ class TestWriteUndefinedLengthPixelData:
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            data[0],
+            data,
             is_undefined_length=True,
         )
         msg = (
@@ -3032,7 +3032,7 @@ class TestWriteUndefinedLengthPixelData:
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            data[0],
+            data,
             is_undefined_length=True,
         )
         msg = (
