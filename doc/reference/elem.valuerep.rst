@@ -20,7 +20,6 @@ or TM and utilities.
    DT
    IS
    ISfloat
-   MultiString
    PersonName
    TM
    VR

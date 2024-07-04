@@ -2,12 +2,9 @@
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
 import hashlib
-import os
-import random
 import re
-import sys
+import secrets
 import uuid
-from typing import Any
 
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary
@@ -18,22 +15,41 @@ from pydicom.valuerep import STR_VR_REGEXES, validate_value
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
+    **Private Transfer Syntaxes**
+
+    If creating a private transfer syntax UID, then you must also use
+    :meth:`~pydicom.UID.set_private_encoding` to set the corresponding
+    dataset encoding.
+
     Examples
     --------
 
-    >>> from pydicom.uid import UID
-    >>> uid = UID('1.2.840.10008.1.2.4.50')
-    >>> uid
-    '1.2.840.10008.1.2.4.50'
-    >>> uid.is_implicit_VR
-    False
-    >>> uid.is_little_endian
-    True
-    >>> uid.is_transfer_syntax
-    True
-    >>> uid.name
-    'JPEG Baseline (Process 1)'
+    General usage::
+
+      >>> from pydicom.uid import UID
+      >>> uid = UID('1.2.840.10008.1.2.4.50')
+      >>> uid
+      '1.2.840.10008.1.2.4.50'
+      >>> uid.is_implicit_VR
+      False
+      >>> uid.is_little_endian
+      True
+      >>> uid.is_transfer_syntax
+      True
+      >>> uid.name
+      'JPEG Baseline (Process 1)'
+      >>> uid.keyword
+      JPEGBaseline8Bit
+
+    Setting the encoding to explicit VR little endian for a private transfer
+    syntax::
+
+      >>> uid = UID("1.2.3.4")
+      >>> uid.set_private_encoding(False, True)
+
     """
+
+    _PRIVATE_TS_ENCODING: tuple[bool, bool]
 
     def __new__(
         cls: type["UID"], val: str, validation_mode: int | None = None
@@ -57,7 +73,12 @@ class UID(str):
             if validation_mode is None:
                 validation_mode = config.settings.reading_validation_mode
             validate_value("UI", val, validation_mode)
-            return super().__new__(cls, val.strip())
+
+            uid = super().__new__(cls, val.strip())
+            if hasattr(val, "_PRIVATE_TS_ENCODING"):
+                uid._PRIVATE_TS_ENCODING = val._PRIVATE_TS_ENCODING
+
+            return uid
 
         raise TypeError("A UID must be created from a string")
 
@@ -65,15 +86,18 @@ class UID(str):
     def is_implicit_VR(self) -> bool:
         """Return ``True`` if an implicit VR transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Implicit VR Little Endian
-            if self == "1.2.840.10008.1.2":
-                return True
+            if not self.is_private:
+                # Implicit VR Little Endian
+                if self == "1.2.840.10008.1.2":
+                    return True
 
-            # Explicit VR Little Endian
-            # Explicit VR Big Endian
-            # Deflated Explicit VR Little Endian
-            # All encapsulated transfer syntaxes
-            return False
+                # Explicit VR Little Endian
+                # Explicit VR Big Endian
+                # Deflated Explicit VR Little Endian
+                # All encapsulated transfer syntaxes
+                return False
+
+            return self._PRIVATE_TS_ENCODING[0]
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -81,15 +105,18 @@ class UID(str):
     def is_little_endian(self) -> bool:
         """Return ``True`` if a little endian transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Explicit VR Big Endian
-            if self == "1.2.840.10008.1.2.2":
-                return False
+            if not self.is_private:
+                # Explicit VR Big Endian
+                if self == "1.2.840.10008.1.2.2":
+                    return False
 
-            # Explicit VR Little Endian
-            # Implicit VR Little Endian
-            # Deflated Explicit VR Little Endian
-            # All encapsulated transfer syntaxes
-            return True
+                # Explicit VR Little Endian
+                # Implicit VR Little Endian
+                # Deflated Explicit VR Little Endian
+                # All encapsulated transfer syntaxes
+                return True
+
+            return self._PRIVATE_TS_ENCODING[1]
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -99,7 +126,7 @@ class UID(str):
         if not self.is_private:
             return self.type == "Transfer Syntax"
 
-        raise ValueError("Can't determine UID type for private UIDs.")
+        return hasattr(self, "_PRIVATE_TS_ENCODING")
 
     @property
     def is_deflated(self) -> bool:
@@ -201,6 +228,23 @@ class UID(str):
 
         return False
 
+    def set_private_encoding(self, implicit_vr: bool, little_endian: bool) -> None:
+        """Set the corresponding dataset encoding for a privately defined transfer
+        syntax.
+
+        .. versionadded:: 3.0
+
+        Parameters
+        ----------
+        implicit_vr : bool
+            ``True`` if the corresponding dataset encoding uses implicit VR,
+            ``False`` for explicit VR.
+        little_endian : bool
+            ``True`` if the corresponding dataset encoding uses little endian
+            byte order, ``False`` for big endian byte order.
+        """
+        self._PRIVATE_TS_ENCODING = (implicit_vr, little_endian)
+
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (https://www.medicalconnections.co.uk/FreeUID.html)
@@ -282,6 +326,16 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.107"""
     HEVCM10P51 = UID("1.2.840.10008.1.2.4.108")
     """1.2.840.10008.1.2.4.108"""
+    HTJ2KLossless = UID("1.2.840.10008.1.2.4.201")
+    """1.2.840.10008.1.2.4.201"""
+    HTJ2KLosslessRPCL = UID("1.2.840.10008.1.2.4.202")
+    """1.2.840.10008.1.2.4.202"""
+    HTJ2K = UID("1.2.840.10008.1.2.4.203")
+    """1.2.840.10008.1.2.4.203"""
+    JPIPHTJ2KReferenced = UID("1.2.840.10008.1.2.4.204")
+    """1.2.840.10008.1.2.4.204"""
+    JPIPHTJ2KReferencedDeflate = UID("1.2.840.10008.1.2.4.205")
+    """1.2.840.10008.1.2.4.205"""
     RLELossless = UID("1.2.840.10008.1.2.5")
     """1.2.840.10008.1.2.5"""
     SMPTEST211020UncompressedProgressiveActiveVideo = UID("1.2.840.10008.1.2.7.1")
@@ -322,6 +376,11 @@ AllTransferSyntaxes = [
     MPEG4HP42STEREOF,
     HEVCMP51,
     HEVCM10P51,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    HTJ2K,
+    JPIPHTJ2KReferenced,
+    JPIPHTJ2KReferencedDeflate,
     RLELossless,
     SMPTEST211020UncompressedProgressiveActiveVideo,
     SMPTEST211020UncompressedInterlacedActiveVideo,
@@ -340,7 +399,15 @@ JPEGTransferSyntaxes = [
 JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
 """JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
 
-JPEG2000TransferSyntaxes = [JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC]
+JPEG2000TransferSyntaxes = [
+    JPEG2000Lossless,
+    JPEG2000,
+    JPEG2000MCLossless,
+    JPEG2000MC,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    HTJ2K,
+]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
 MPEGTransferSyntaxes = [
@@ -374,6 +441,60 @@ UncompressedTransferSyntaxes = [
 ]
 """Uncompressed (native) transfer syntaxes."""
 
+PrivateTransferSyntaxes = []
+"""Private transfer syntaxes added using the
+:func:`~pydicom.uid.register_transfer_syntax` function.
+"""
+
+
+def register_transfer_syntax(
+    uid: str | UID,
+    implicit_vr: bool | None = None,
+    little_endian: bool | None = None,
+) -> UID:
+    """Register a private transfer syntax with the :mod:`~pydicom.uid` module
+    so it can be used when reading datasets with :func:`~pydicom.filereader.dcmread`.
+
+    .. versionadded: 3.0
+
+    Parameters
+    ----------
+    uid : str | pydicom.uid.UID
+        A UID which may or may not have had the corresponding dataset encoding
+        set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+    implicit_vr : bool, optional
+        If ``True`` then the transfer syntax uses implicit VR encoding, otherwise
+        if ``False`` then it uses explicit VR encoding. Required when `uid` has
+        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+    little_endian : bool, optional
+        If ``True`` then the transfer syntax uses little endian encoding, otherwise
+        if ``False`` then it uses big endian encoding. Required when `uid` has
+        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+
+    Returns
+    -------
+    pydicom.uid.UID
+        The registered UID.
+    """
+    uid = UID(uid)
+
+    if None in (implicit_vr, little_endian) and not uid.is_transfer_syntax:
+        raise ValueError(
+            "The corresponding dataset encoding for 'uid' must be set using "
+            "the 'implicit_vr' and 'little_endian' arguments"
+        )
+
+    if implicit_vr is not None and little_endian is not None:
+        uid.set_private_encoding(implicit_vr, little_endian)
+
+    if uid not in PrivateTransferSyntaxes:
+        PrivateTransferSyntaxes.append(uid)
+
+    return uid
+
+
+_MAX_PREFIX_LENGTH = 54
+
 
 def generate_uid(
     prefix: str | None = PYDICOM_ROOT_UID,
@@ -381,24 +502,26 @@ def generate_uid(
 ) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 
-    .. versionchanged:: 1.3
+    .. versionchanged:: 3.0
 
-       When `prefix` is ``None`` a conformant UUID suffix of up to
-       39 characters will be used instead of a hashed value.
+       * When `entropy_srcs` is ``None`` the suffix is now generated using
+         :func:`~secrets.randbelow`
+       * The maximum length of `prefix` is now 54 characters
 
     Parameters
     ----------
     prefix : str or None, optional
         The UID prefix to use when creating the UID. Default is the *pydicom*
-        root UID ``'1.2.826.0.1.3680043.8.498.'``. If not used then a prefix of
-        ``'2.25.'`` will be used with the integer form of a UUID generated
-        using the :func:`uuid.uuid4` algorithm.
+        root UID ``'1.2.826.0.1.3680043.8.498.'``. If `prefix` is ``None`` then
+        a prefix of ``'2.25.'`` will be used with the integer form of a UUID
+        generated using the :func:`uuid.uuid4` algorithm.
     entropy_srcs : list of str, optional
         If `prefix` is used then the `prefix` will be appended with a
         SHA512 hash of the supplied :class:`list` which means the result is
         deterministic and should make the original data unrecoverable. If
-        `entropy_srcs` isn't used then random data will be appended instead
-        (default). If `prefix` is not used then `entropy_srcs` has no effect.
+        `entropy_srcs` isn't used then a random number from
+        :func:`secrets.randbelow` will be appended to the `prefix`. If `prefix`
+        is ``None`` then `entropy_srcs` has no effect.
 
     Returns
     -------
@@ -408,7 +531,7 @@ def generate_uid(
     Raises
     ------
     ValueError
-        If `prefix` is invalid or greater than 63 characters.
+        If `prefix` is invalid or greater than 54 characters.
 
     Examples
     --------
@@ -422,31 +545,39 @@ def generate_uid(
     1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463
     >>> generate_uid(entropy_srcs=['lorem', 'ipsum'])
     1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463
+
+    References
+    ----------
+
+    * DICOM Standard, Part 5, :dcm:`Chapters 9<part05/chapter_9.html>` and
+      :dcm:`Annex B<part05/chapter_B.html>`
+    * ISO/IEC 9834-8/`ITU-T X.667 <https://www.itu.int/rec/T-REC-X.667-201210-I/en>`_
     """
     if prefix is None:
         # UUID -> as 128-bit int -> max 39 characters long
         return UID(f"2.25.{uuid.uuid4().int}")
 
-    max_uid_len = 64
-    if len(prefix) > max_uid_len - 1:
-        raise ValueError("The prefix must be less than 63 chars")
-    if not re.match(RE_VALID_UID_PREFIX, prefix):
-        raise ValueError("The prefix is not in a valid format")
+    if len(prefix) > _MAX_PREFIX_LENGTH:
+        raise ValueError(
+            f"The 'prefix' should be no more than {_MAX_PREFIX_LENGTH} characters long"
+        )
 
-    avail_digits = max_uid_len - len(prefix)
+    if not re.match(RE_VALID_UID_PREFIX, prefix):
+        raise ValueError(
+            "The 'prefix' is not valid for use with a UID, see Part 5, Section "
+            "9.1 of the DICOM Standard"
+        )
 
     if entropy_srcs is None:
-        entropy_srcs = [
-            str(uuid.uuid1()),  # 128-bit from MAC/time/randomness
-            str(os.getpid()),  # Current process ID
-            hex(random.getrandbits(64)),  # 64 bits randomness
-        ]
+        maximum = 10 ** (64 - len(prefix))
+        # randbelow is in [0, maximum)
+        # {prefix}.0, and {prefix}0 are both valid
+        return UID(f"{prefix}{secrets.randbelow(maximum)}"[:64])
+
     hash_val = hashlib.sha512("".join(entropy_srcs).encode("utf-8"))
 
     # Convert this to an int with the maximum available digits
-    dicom_uid = prefix + str(int(hash_val.hexdigest(), 16))[:avail_digits]
-
-    return UID(dicom_uid)
+    return UID(f"{prefix}{int(hash_val.hexdigest(), 16)}"[:64])
 
 
 # Only auto-generated Storage SOP Class UIDs below - do not edit manually
@@ -496,6 +627,10 @@ MultipleVolumeRenderingVolumetricPresentationStateStorage = UID(
     "1.2.840.10008.5.1.4.1.1.11.11"
 )  # noqa
 """1.2.840.10008.5.1.4.1.1.11.11"""
+VariableModalityLUTSoftcopyPresentationStateStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.11.12"
+)  # noqa
+"""1.2.840.10008.5.1.4.1.1.11.12"""
 ColorSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.11.2"""
 PseudoColorSoftcopyPresentationStateStorage = UID(
@@ -578,6 +713,8 @@ XADefinedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.7"""
 XAPerformedProcedureProtocolStorage = UID("1.2.840.10008.5.1.4.1.1.200.8")  # noqa
 """1.2.840.10008.5.1.4.1.1.200.8"""
+InventoryStorage = UID("1.2.840.10008.5.1.4.1.1.201.1")  # noqa
+"""1.2.840.10008.5.1.4.1.1.201.1"""
 UltrasoundMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.3.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.3.1"""
 ParametricMapStorage = UID("1.2.840.10008.5.1.4.1.1.30")  # noqa
@@ -622,6 +759,14 @@ RTRadiationSetDeliveryInstructionStorage = UID("1.2.840.10008.5.1.4.1.1.481.21")
 """1.2.840.10008.5.1.4.1.1.481.21"""
 RTTreatmentPreparationStorage = UID("1.2.840.10008.5.1.4.1.1.481.22")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.22"""
+EnhancedRTImageStorage = UID("1.2.840.10008.5.1.4.1.1.481.23")  # noqa
+"""1.2.840.10008.5.1.4.1.1.481.23"""
+EnhancedContinuousRTImageStorage = UID("1.2.840.10008.5.1.4.1.1.481.24")  # noqa
+"""1.2.840.10008.5.1.4.1.1.481.24"""
+RTPatientPositionAcquisitionInstructionStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.481.25"
+)  # noqa
+"""1.2.840.10008.5.1.4.1.1.481.25"""
 RTStructureSetStorage = UID("1.2.840.10008.5.1.4.1.1.481.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.481.3"""
 RTBeamsTreatmentRecordStorage = UID("1.2.840.10008.5.1.4.1.1.481.4")  # noqa
@@ -658,6 +803,8 @@ UltrasoundImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.6.1"""
 EnhancedUSVolumeStorage = UID("1.2.840.10008.5.1.4.1.1.6.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.6.2"""
+PhotoacousticImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.3")  # noqa
+"""1.2.840.10008.5.1.4.1.1.6.3"""
 EddyCurrentImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.601.1"""
 EddyCurrentMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.2")  # noqa
@@ -744,6 +891,12 @@ VLWholeSlideMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.6")  # no
 """1.2.840.10008.5.1.4.1.1.77.1.6"""
 DermoscopicPhotographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.7")  # noqa
 """1.2.840.10008.5.1.4.1.1.77.1.7"""
+ConfocalMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.8")  # noqa
+"""1.2.840.10008.5.1.4.1.1.77.1.8"""
+ConfocalMicroscopyTiledPyramidalImageStorage = UID(
+    "1.2.840.10008.5.1.4.1.1.77.1.9"
+)  # noqa
+"""1.2.840.10008.5.1.4.1.1.77.1.9"""
 LensometryMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.78.1"""
 AutorefractionMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.2")  # noqa
@@ -818,6 +971,8 @@ GeneralECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.2")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.2"""
 AmbulatoryECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.3")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.1.3"""
+General32bitECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.4")  # noqa
+"""1.2.840.10008.5.1.4.1.1.9.1.4"""
 HemodynamicWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.2.1")  # noqa
 """1.2.840.10008.5.1.4.1.1.9.2.1"""
 CardiacElectrophysiologyWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.3.1")  # noqa

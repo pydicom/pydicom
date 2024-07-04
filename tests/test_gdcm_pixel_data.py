@@ -19,12 +19,10 @@ except ImportError:
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data
+from pydicom.encaps import get_frame
 from pydicom.pixel_data_handlers import numpy_handler, gdcm_handler
-from pydicom.pixel_data_handlers.util import (
-    _convert_YBR_FULL_to_RGB,
-    get_j2k_parameters,
-)
+from pydicom.pixels.processing import _convert_YBR_FULL_to_RGB
+from pydicom.pixels.utils import get_j2k_parameters
 from pydicom.tag import Tag
 
 try:
@@ -91,18 +89,17 @@ save_dir = os.getcwd()
 
 class TestGDCM_JPEG_LS_no_gdcm:
     def setup_method(self):
-        self.unicode_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
-        shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
-        self.jpeg_ls_lossless = dcmread(self.unicode_filename)
-        self.mr_small = dcmread(mr_name)
+        self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
+        self.jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.emri_small = dcmread(emri_name)
+        self.emri_jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
     def teardown_method(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
-        os.remove(self.unicode_filename)
 
     def test_JPEG_LS_PixelArray(self):
         with pytest.raises(NotImplementedError):
@@ -116,11 +113,16 @@ class TestGDCM_JPEG_LS_no_gdcm:
 class TestGDCM_JPEG2000_no_gdcm:
     def setup_method(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
+
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
-        self.mr_small = dcmread(mr_name)
+        self.jpeg_2k_lossless.pixel_array_options(use_v2_backend=True)
+
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
-        self.emri_small = dcmread(emri_name)
+        self.emri_jpeg_2k_lossless.pixel_array_options(use_v2_backend=True)
+
         self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
+        self.sc_rgb_jpeg2k_gdcm_KY.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
@@ -154,7 +156,11 @@ class TestGDCM_JPEG2000_no_gdcm:
 class TestGDCM_JPEGlossy_no_gdcm:
     def setup_method(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.jpeg_lossy.pixel_array_options(use_v2_backend=True)
+
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
+        self.color_3d_jpeg.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
@@ -179,6 +185,8 @@ class TestGDCM_JPEGlossy_no_gdcm:
 class TestGDCM_JPEGlossless_no_gdcm:
     def setup_method(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
+        self.jpeg_lossless.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
@@ -343,43 +351,63 @@ class TestsWithGDCM:
 
     @pytest.fixture
     def jpeg_2k(self):
-        return dcmread(jpeg2000_name)
+        ds = dcmread(jpeg2000_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def jpeg_2k_lossless(self):
-        return dcmread(jpeg2000_lossless_name)
+        ds = dcmread(jpeg2000_lossless_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture(scope="class")
     def mr_small(self):
-        return dcmread(mr_name)
+        ds = dcmread(mr_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture(scope="class")
     def emri_small(self):
-        return dcmread(emri_name)
+        ds = dcmread(emri_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def emri_jpeg_ls_lossless(self):
-        return dcmread(emri_jpeg_ls_lossless)
+        ds = dcmread(emri_jpeg_ls_lossless)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def emri_jpeg_2k_lossless(self):
-        return dcmread(emri_jpeg_2k_lossless)
+        ds = dcmread(emri_jpeg_2k_lossless)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def color_3d_jpeg(self):
-        return dcmread(color_3d_jpeg_baseline)
+        ds = dcmread(color_3d_jpeg_baseline)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def jpeg_lossy(self):
-        return dcmread(jpeg_lossy_name)
+        ds = dcmread(jpeg_lossy_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def jpeg_lossless(self):
-        return dcmread(jpeg_lossless_name)
+        ds = dcmread(jpeg_lossless_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     @pytest.fixture
     def jpeg_lossless_odd_data_size(self):
-        return dcmread(jpeg_lossless_odd_data_size_name)
+        ds = dcmread(jpeg_lossless_odd_data_size_name)
+        ds.pixel_array_options(use_v2_backend=True)
+        return ds
 
     def test_JPEG_LS_PixelArray(self, jpeg_ls_lossless, mr_small):
         a = jpeg_ls_lossless.pixel_array
@@ -478,6 +506,7 @@ class TestsWithGDCM:
     def test_PI_RGB(self, image, pi, results, convert_yuv_to_rgb):
         t = dcmread(image)
         assert t.PhotometricInterpretation == pi
+        t.pixel_array_options(use_v2_backend=True)
         a = t.pixel_array
 
         assert a.flags.writeable
@@ -504,6 +533,7 @@ class TestsWithGDCM:
             bs = BytesIO(f.read())
 
         ds = dcmread(bs)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = ds.pixel_array
         assert (1024, 256) == arr.shape
         assert arr.flags.writeable
@@ -511,10 +541,11 @@ class TestsWithGDCM:
     def test_pixel_rep_mismatch(self):
         """Test mismatched j2k sign and Pixel Representation."""
         ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        ds.pixel_array_options(use_v2_backend=True)
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
-        bs = defragment_data(ds.PixelData)
+        bs = get_frame(ds.PixelData, 0)
         params = get_j2k_parameters(bs)
         assert 13 == params["precision"]
         assert not params["is_signed"]

@@ -1,15 +1,12 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Access dicom dictionary information"""
-import warnings
-
-from pydicom.tag import Tag, BaseTag, TagType
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
-from pydicom._dicom_dict import DicomDictionary
-
 # those with tags like "(50xx,0005)"
-from pydicom._dicom_dict import RepeatersDictionary
+from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
+from pydicom.misc import warn_and_log
 from pydicom._private_dict import private_dictionaries
+from pydicom.tag import Tag, BaseTag, TagType
 
 
 # Generate mask dict for checking repeating groups etc.
@@ -156,8 +153,6 @@ def add_private_dict_entry(
 ) -> None:
     """Update the private DICOM dictionary with a new entry.
 
-    .. versionadded:: 1.3
-
     Parameters
     ----------
     private_creator : str
@@ -194,8 +189,6 @@ def add_private_dict_entries(
     private_creator: str, new_entries_dict: dict[int, tuple[str, str, str, str]]
 ) -> None:
     """Update pydicom's private DICOM tag dictionary with new entries.
-
-    .. versionadded:: 1.3
 
     Parameters
     ----------
@@ -330,6 +323,20 @@ def dictionary_VR(tag: TagType) -> str:
         If the tag is not present in the DICOM data dictionary.
     """
     return get_entry(tag)[0]
+
+
+def _dictionary_vr_fast(tag: int) -> str:
+    """Return the VR corresponding to `tag`"""
+    # Faster implementation of `dictionary_VR`
+    try:
+        return DicomDictionary[tag][0]
+    except KeyError:
+        if not tag >> 16 % 2 == 1:
+            mask_x = mask_match(tag)
+            if mask_x:
+                return RepeatersDictionary[mask_x][0]
+
+        raise KeyError(f"Tag {Tag(tag)} not found in DICOM dictionary")
 
 
 def dictionary_VM(tag: TagType) -> str:
@@ -550,7 +557,7 @@ def get_private_entry(tag: TagType, private_creator: str) -> tuple[str, str, str
             f"{tag.private_creator} '{private_creator}' "
             f"is not a valid private creator"
         )
-        warnings.warn(msg)
+        warn_and_log(msg)
         raise KeyError(msg) from exc
 
     # private elements are usually agnostic for

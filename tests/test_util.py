@@ -2,7 +2,8 @@
 """Test suite for util functions"""
 import copy
 from contextlib import contextmanager
-from pathlib import Path
+from io import BytesIO
+import os
 
 import pytest
 
@@ -27,8 +28,15 @@ from pydicom.util.codify import (
     code_dataelem,
     code_dataset,
     main as codify_main,
+    code_file_from_dataset,
 )
-from pydicom.util.dump import *
+from pydicom.util.dump import (
+    print_character,
+    filedump,
+    datadump,
+    hexdump,
+    pretty_print,
+)
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.util.leanread import dicomfile
 
@@ -87,10 +95,10 @@ class TestCodify:
 
     def test_code_imports(self):
         """Test utils.codify.code_imports"""
-        out = "import pydicom\n"
-        out += "from pydicom.dataset import Dataset, FileMetaDataset\n"
-        out += "from pydicom.sequence import Sequence"
-        assert out == code_imports()
+        out = ["import pydicom"]
+        out.append("from pydicom.dataset import Dataset, FileMetaDataset")
+        out.append("from pydicom.sequence import Sequence")
+        assert "\n".join(out) == code_imports()
 
     def test_code_dataelem_standard(self):
         """Test utils.codify.code_dataelem for standard element"""
@@ -198,10 +206,26 @@ class TestCodify:
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""
         filename = get_testdata_file("rtplan.dcm")
+        args = [filename]
+        codify_main(100, args)
+        out, err = capsys.readouterr()
+        assert r"rtplan_from_codify.dcm" in out
+
+    def test_code_file_save_as(self, capsys):
+        """Test utils.codify.code_file"""
+        filename = get_testdata_file("rtplan.dcm")
         args = ["--save-as", r"c:\temp\testout.dcm", filename]
         codify_main(100, args)
         out, err = capsys.readouterr()
         assert r"c:\temp\testout.dcm" in out
+
+    def test_code_file_deflated(self, capsys):
+        """Test utils.codify.code_file with a deflated dataset"""
+        filename = get_testdata_file("image_dfl.dcm")
+        args = [filename]
+        codify_main(100, args)
+        out, err = capsys.readouterr()
+        assert r"image_dfl_from_codify.dcm" in out
 
     def test_code_relative_filename(self, capsys):
         """Test utils.codify.code_file with a relative path that doesn't exist"""
@@ -237,10 +261,10 @@ class TestDump:
         s = filedump(p, start_address=500, stop_address=1000)
 
         assert (
-            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  " "II*.T..........."
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  II*.T..........."
         ) not in s
         assert (
-            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  " ".1.1.1.1.2004011"
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  .1.1.1.1.2004011"
         ) in s
 
     def test_datadump(self):
@@ -250,7 +274,7 @@ class TestDump:
             s = datadump(f.read(), 500, 1000)
 
         assert (
-            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  " ".1.1.1.1.2004011"
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  .1.1.1.1.2004011"
         ) in s
 
     def test_hexdump(self):
@@ -261,10 +285,10 @@ class TestDump:
             s = hexdump(f)
 
         assert (
-            "0000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  " "II*.T..........."
+            "0000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  II*.T..........."
         ) in s
         assert (
-            "0170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  " "AL.PRIMARY.AXIAL"
+            "0170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  AL.PRIMARY.AXIAL"
         ) in s
         assert ("9920  08 00 00 00 00 00                                ......") in s
 
@@ -273,10 +297,10 @@ class TestDump:
             s = hexdump(f, stop_address=1000)
 
         assert (
-            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  " "II*.T..........."
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  II*.T..........."
         ) in s
         assert (
-            "170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  " "AL.PRIMARY.AXIAL"
+            "170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  AL.PRIMARY.AXIAL"
         ) in s
         assert (
             "9920  08 00 00 00 00 00                                ......"
@@ -287,10 +311,10 @@ class TestDump:
             s = hexdump(f, show_address=False, stop_address=1000)
 
         assert (
-            "49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  " "II*.T..........."
+            "49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  II*.T..........."
         ) in s
         assert (
-            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  " "II*.T..........."
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  II*.T..........."
         ) not in s
 
         # `start_address` parameter
@@ -298,10 +322,10 @@ class TestDump:
             s = hexdump(f, start_address=500, stop_address=1000)
 
         assert (
-            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  " "II*.T..........."
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  II*.T..........."
         ) not in s
         assert (
-            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  " ".1.1.1.1.2004011"
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  .1.1.1.1.2004011"
         ) in s
 
     def test_pretty_print(self, capsys):
@@ -319,47 +343,21 @@ class TestDump:
         ) in s
 
 
-class TestFixer:
-    """Test the utils.fixer module"""
-
-    def test_fix_separator_callback(self):
-        """Test utils.fixer.fix_separator_callback"""
-        pass
-
-    def test_fix_separator(self):
-        """Test utils.fixer.fix_separator"""
-        pass
-
-    def test_mismatch_callback(self):
-        """Test utils.fixer.mismatch_callback"""
-        pass
-
-    def test_fix_mismatch(self):
-        """Test utils.fixer.fix_mismatch"""
-        pass
-
-
 class TestHexUtil:
     """Test the utils.hexutil module"""
 
     def test_hex_to_bytes(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09" b"\x0A\x0B\x0C\x0D\x0E\x0F"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
         assert hex2bytes(hexstring) == bytestring
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 A0 B0 C0 D0 E0 F0"
-        bytestring = (
-            b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90" b"\xA0\xB0\xC0\xD0\xE0\xF0"
-        )
+        bytestring = b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0"
         assert hex2bytes(hexstring) == bytestring
 
         hexstring = b"00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09" b"\x0A\x0B\x0C\x0D\x0E\x0F"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
         assert hex2bytes(hexstring) == bytestring
 
         with pytest.raises(TypeError):
@@ -368,15 +366,11 @@ class TestHexUtil:
     def test_bytes_to_hex(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f"
-        bytestring = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09" b"\x0A\x0B\x0C\x0D\x0E\x0F"
-        )
+        bytestring = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
         assert bytes2hex(bytestring) == hexstring
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 a0 b0 c0 d0 e0 f0"
-        bytestring = (
-            b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90" b"\xA0\xB0\xC0\xD0\xE0\xF0"
-        )
+        bytestring = b"\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0"
         assert bytes2hex(bytestring) == hexstring
 
 
@@ -453,7 +447,7 @@ class TestDataElementCallbackTests:
     def test_process_unknown_vr(self):
         bad_vr_bytes = self.ds_bytes
         # tag (0900,0010), length 4, value "1,2"
-        bad_vr_bytes += b"\x00\x09\x10\x00" b"\x04\x00\x00\x00" b"\x31\x2c\x32\x20"
+        bad_vr_bytes += b"\x00\x09\x10\x00\x04\x00\x00\x00\x31\x2c\x32\x20"
         fixer.fix_separator(b",", for_VRs=["DS", "IS"], process_unknown_VRs=True)
         ds = filereader.read_dataset(
             BytesIO(bad_vr_bytes), is_little_endian=True, is_implicit_VR=True

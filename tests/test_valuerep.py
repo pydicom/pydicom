@@ -8,8 +8,6 @@ from itertools import chain
 from io import BytesIO
 import pickle
 import math
-import sys
-from typing import Union
 
 import pytest
 
@@ -244,7 +242,7 @@ class TestDT:
         assert str(dt) == "20010101235960"
         assert dt == datetime(2001, 1, 1, 23, 59, 59)
 
-        msg = r"Unable to convert non-conformant value 'a2000,00,00' to 'DT' " r"object"
+        msg = r"Unable to convert non-conformant value 'a2000,00,00' to 'DT' object"
         with pytest.raises(ValueError, match=msg):
             pydicom.valuerep.DT("a2000,00,00")
 
@@ -762,7 +760,7 @@ class TestDSdecimal:
             "characters long. Use a smaller string, *"
         )
         with pytest.warns(UserWarning, match=msg):
-            x = DSdecimal(Decimal(math.pi), auto_format=False)
+            DSdecimal(Decimal(math.pi), auto_format=False)
 
     def test_string_too_long_raises(self, enforce_valid_values):
         msg = (
@@ -770,7 +768,7 @@ class TestDSdecimal:
             "characters long. Use a smaller string, *"
         )
         with pytest.raises(OverflowError, match=msg):
-            x = DSdecimal(Decimal(math.pi), auto_format=False)
+            DSdecimal(Decimal(math.pi), auto_format=False)
 
     def test_auto_format(self, enforce_valid_both_fixture):
         """Test truncating decimal"""
@@ -917,7 +915,8 @@ class TestIS:
         bin_elem = b"\x18\x00\x52\x11\x04\x00\x00\x0014.5"
         with BytesIO(bin_elem) as bio:
             ds = read_dataset(bio, True, True)
-        assert isinstance(ds.Exposure, ISfloat)
+        with pytest.warns(UserWarning, match="Invalid value for VR IS"):
+            assert isinstance(ds.Exposure, ISfloat)
         assert ds.Exposure == 14.5
 
         # Strict checking raises an error
@@ -929,7 +928,8 @@ class TestIS:
     def test_float_init(self):
         """New ISfloat created from another behaves correctly"""
         is1 = IS("14.5", validation_mode=config.IGNORE)
-        is2 = IS(is1)
+        with pytest.warns(UserWarning, match='Value "14.5" is not valid'):
+            is2 = IS(is1)
         assert is1 == is2
         assert is2.original_string == is1.original_string
 
@@ -1218,7 +1218,9 @@ class TestPersonName:
 
     def test_unicode_jp_from_unicode(self):
         """A person name initialized from unicode is already decoded"""
-        pn = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
         assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
         assert "山田^太郎" == pn.ideographic
         assert "やまだ^たろう" == pn.phonetic
@@ -1250,8 +1252,12 @@ class TestPersonName:
         pn3 = PersonName("John^Doe", encodings=default_encoding)
         assert hash(pn1) != hash(pn3)
 
-        pn1 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
-        pn2 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn1 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
+        pn2 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
         assert hash(pn1) == hash(pn2)
 
     def test_next(self):
@@ -1262,7 +1268,9 @@ class TestPersonName:
         assert next(pn1_itr) == "J"
 
         # Test getting multiple characters
-        pn2 = PersonName("Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"])
+        pn2 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
         pn2_itr = iter(pn2)
         assert next(pn2_itr) == "Y"
         assert next(pn2_itr) == "a"

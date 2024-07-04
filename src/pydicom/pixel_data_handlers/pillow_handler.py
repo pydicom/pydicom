@@ -6,7 +6,6 @@ to decode *Pixel Data*.
 import io
 import logging
 from typing import TYPE_CHECKING, cast
-import warnings
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -30,8 +29,9 @@ except ImportError:
     HAVE_JPEG2K = False
 
 from pydicom import config
-from pydicom.encaps import defragment_data, decode_data_sequence
-from pydicom.pixel_data_handlers.util import (
+from pydicom.encaps import generate_frames
+from pydicom.misc import warn_and_log
+from pydicom.pixels.utils import (
     pixel_dtype,
     get_j2k_parameters,
     get_nr_frames,
@@ -180,8 +180,8 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     if transfer_syntax == JPEGExtended12Bit and ds.BitsAllocated != 8:
         raise NotImplementedError(
-            f"{JPEGExtended12Bit} - {JPEGExtended12Bit.name} only supported "
-            "by Pillow if Bits Allocated = 8"
+            f"{JPEGExtended12Bit} - {JPEGExtended12Bit.name} is only supported "
+            "by Pillow if (0028,0100) Bits Allocated = 8"
         )
 
     photometric_interpretation = cast(str, ds.PhotometricInterpretation)
@@ -189,38 +189,22 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     columns = cast(int, ds.Columns)
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
-    nr_frames = get_nr_frames(ds)
+    nr_frames = get_nr_frames(ds, warn=False)
 
     pixel_bytes = bytearray()
-    if nr_frames > 1:
-        j2k_precision, j2k_sign = None, None
-        # multiple compressed frames
-        for frame in decode_data_sequence(ds.PixelData):
-            im = _decompress_single_frame(
-                frame, transfer_syntax, photometric_interpretation
-            )
-            if "YBR" in photometric_interpretation:
-                im.draft("YCbCr", (rows, columns))
-            pixel_bytes.extend(im.tobytes())
-
-            if not j2k_precision:
-                params = get_j2k_parameters(frame)
-                j2k_precision = cast(int, params.setdefault("precision", bits_stored))
-                j2k_sign = params.setdefault("is_signed", None)
-
-    else:
-        # single compressed frame
-        pixel_data = defragment_data(ds.PixelData)
+    j2k_precision, j2k_sign = None, None
+    for frame in generate_frames(ds.PixelData, number_of_frames=nr_frames):
         im = _decompress_single_frame(
-            pixel_data, transfer_syntax, photometric_interpretation
+            frame, transfer_syntax, photometric_interpretation
         )
         if "YBR" in photometric_interpretation:
             im.draft("YCbCr", (rows, columns))
         pixel_bytes.extend(im.tobytes())
 
-        params = get_j2k_parameters(pixel_data)
-        j2k_precision = cast(int, params.setdefault("precision", bits_stored))
-        j2k_sign = params.setdefault("is_signed", None)
+        if not j2k_precision:
+            params = get_j2k_parameters(frame)
+            j2k_precision = cast(int, params.setdefault("precision", bits_stored))
+            j2k_sign = params.setdefault("is_signed", None)
 
     logger.debug(f"Successfully read {len(pixel_bytes)} pixel bytes")
 
@@ -231,7 +215,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         # See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
         shift = bits_allocated - bits_stored
         if j2k_precision and j2k_precision != bits_stored:
-            warnings.warn(
+            warn_and_log(
                 f"The (0028,0101) 'Bits Stored' value ({bits_stored}-bit) "
                 f"doesn't match the JPEG 2000 data ({j2k_precision}-bit). "
                 f"It's recommended that you change the 'Bits Stored' value"
@@ -247,14 +231,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
                 if ds.PixelRepresentation == 1:
                     # Pillow converts signed data to unsigned
                     #   so we need to undo this conversion
-                    arr -= 2 ** (bits_allocated - 1)
+                    arr -= numpy.uint32(2 ** (bits_allocated - 1))
 
                 if shift:
                     arr = numpy.right_shift(arr, shift)
         else:
             # Corrections based on dataset elements
             if ds.PixelRepresentation == 1:
-                arr -= 2 ** (bits_allocated - 1)
+                arr -= numpy.uint32(2 ** (bits_allocated - 1))
 
             if shift:
                 arr = numpy.right_shift(arr, shift)

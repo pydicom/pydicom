@@ -9,7 +9,7 @@ stored as a single number and separated to (group, element) as required.
 #       element
 from contextlib import contextmanager
 import traceback
-from typing import Union, Any, TypeAlias
+from typing import Any, TypeAlias
 from collections.abc import Iterator
 
 
@@ -48,10 +48,6 @@ def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
     * ``Tag((0x10, 0x50))``
     * ``Tag(0x0010, 0x0015)``
     * ``Tag("PatientName")``
-
-    .. versionchanged:: 1.3
-
-        Added support for creating a :class:`!BaseTag` using an element keyword
 
     Parameters
     ----------
@@ -225,10 +221,7 @@ class BaseTag(int):
 
     @property
     def is_private_creator(self) -> bool:
-        """Return ``True`` if the tag is a private creator.
-
-        .. versionadded:: 1.1
-        """
+        """Return ``True`` if the tag is a private creator."""
         return self.is_private and 0x0010 <= self.element < 0x0100
 
     @property
@@ -260,3 +253,8 @@ ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D))
 
 # end of Sequence of undefined length
 SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))
+
+# (0028,0103) *Pixel Representation*
+TAG_PIXREP = BaseTag(0x00280103)
+# (0008,0005) *Specific Character Set*
+TAG_CHARSET = BaseTag(0x00080005)

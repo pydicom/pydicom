@@ -49,8 +49,7 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from typing import Union, TYPE_CHECKING
-import warnings
+from typing import TYPE_CHECKING
 
 from pydicom.data.download import (
     data_path_with_download,
@@ -59,6 +58,7 @@ from pydicom.data.download import (
     get_url_map,
     get_data_dir,
 )
+from pydicom.misc import warn_and_log
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom import Dataset
@@ -174,7 +174,7 @@ def fetch_data_files() -> None:
 
     if error:
         raise RuntimeError(
-            "An error occurred downloading the following files: " f"{', '.join(error)}"
+            f"An error occurred downloading the following files: {', '.join(error)}"
         )
 
 
@@ -250,7 +250,7 @@ def get_files(
     files += real_online_file_paths
 
     if download_error:
-        warnings.warn(
+        warn_and_log(
             "One or more download failures occurred, the list of matching "
             "file paths may be incomplete"
         )
@@ -261,8 +261,6 @@ def get_files(
 def get_palette_files(pattern: str = "**/*") -> list[str]:
     """Return a list of absolute paths to palettes with filenames matching
     `pattern`.
-
-    .. versionadded:: 1.4
 
     Parameters
     ----------
@@ -289,9 +287,7 @@ def get_testdata_file(
     download: bool = True,
 ) -> "str | Dataset | None":
     """Return an absolute path to the first matching dataset with filename
-    `name`.
-
-    .. versionadded:: 1.4
+    `name` that is found in a local or external pydicom datastore.
 
     First searches the local *pydicom* data store, then any locally available
     external sources, and finally the files available in the
@@ -326,7 +322,18 @@ def get_testdata_file(
     str, pydicom.dataset.Dataset or None
         The absolute path of the file if found, the dataset itself if `read` is
         ``True``, or ``None`` if the file is not found.
+
+    Raises
+    ______
+    ValueError
+        If `name` is an absolute path.
     """
+    if os.path.isabs(name):
+        raise ValueError(
+            f"'get_testdata_file' does not support absolute paths, as it only works"
+            f" with internal pydicom test data - did you mean 'dcmread(\"{name}\")'?"
+        )
+
     path = _get_testdata_file(name=name, download=download)
     if read and path is not None:
         from pydicom.filereader import dcmread
@@ -365,7 +372,7 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
             try:
                 return os.fspath(data_path_with_download(filename))
             except Exception:
-                warnings.warn(
+                warn_and_log(
                     f"A download failure occurred while attempting to "
                     f"retrieve {name}"
                 )
@@ -387,7 +394,17 @@ def get_testdata_files(pattern: str = "**/*") -> list[str]:
     -------
     list of str
         A list of absolute paths to matching files.
+
+    Raises
+    ______
+    ValueError
+        If `pattern` matches an absolute path.
     """
+    if os.path.isabs(pattern):
+        raise ValueError(
+            "'get_testdata_files' does not support absolute paths, as it only works"
+            " with internal pydicom test data."
+        )
     data_path = Path(DATA_ROOT) / "test_files"
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.DATASET)

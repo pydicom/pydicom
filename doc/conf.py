@@ -28,7 +28,7 @@ import pydicom
 
 # Try to override the matplotlib configuration as early as possible
 try:
-    import gen_rst
+    import gen_rst  # noqa: F401
 except ImportError:
     pass
 # -- General configuration ------------------------------------------------
@@ -39,7 +39,7 @@ except ImportError:
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.insert(0, os.path.abspath("../build_tools/sphinx"))  # noqa
-from github_link import make_linkcode_resolve
+from github_link import make_linkcode_resolve  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -74,7 +74,7 @@ autosummary_generate = True
 
 autodoc_default_options = {
     "members": None,
-    "no-inherited-members": None,
+    "inherited-members": True,
 }
 
 # copybutton conf
@@ -94,9 +94,10 @@ extlinks = {
 # intersphinx configuration
 intersphinx_mapping = {
     "python": (f"https://docs.python.org/{sys.version_info.major}", None),
-    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "matplotlib": ("https://matplotlib.org", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
+    "pillow": ("https://pillow.readthedocs.io/en/stable", None),
 }
 
 sphinx_gallery_conf = {
@@ -297,7 +298,7 @@ latex_documents = [
 def generate_example_rst(app, what, name, obj, options, lines):
     # generate empty examples files, so that we don't get
     # inclusion errors if there are no examples for a class / module
-    examples_path = os.path.join(app.srcdir, "generated", "%s.examples" % name)
+    examples_path = os.path.join(app.srcdir, "generated", f"{name}.examples")
     if not os.path.exists(examples_path):
         # touch file
         open(examples_path, "w").close()

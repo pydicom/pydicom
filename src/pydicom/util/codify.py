@@ -413,8 +413,9 @@ def code_file_from_dataset(
     # Add the file meta to the dataset, and set transfer syntax
     if hasattr(ds, "file_meta"):
         lines.append("ds.file_meta = file_meta")
-    lines.append("ds.is_implicit_VR = " + str(ds.is_implicit_VR))
-    lines.append("ds.is_little_endian = " + str(ds.is_little_endian))
+
+    implicit_vr, little_endian = ds.original_encoding
+    lines.append(f"ds.set_original_encoding({implicit_vr}, {little_endian})")
 
     # Return the complete code string
     return line_term.join(lines)
@@ -487,7 +488,7 @@ def do_codify(args: argparse.Namespace) -> None:
     else:
         base, _ = os.path.splitext(filename)
         save_as_filename = base + "_from_codify" + ".dcm"
-    save_line = f"\nds.save_as(r'{save_as_filename}', write_like_original=False)"
+    save_line = f"\nds.save_as(r'{save_as_filename}', enforce_file_format=True)"
     code_str += save_line
 
     # Write the code lines to specified file or to standard output

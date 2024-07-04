@@ -26,7 +26,6 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
-from copy import deepcopy
 
 import pytest
 
@@ -34,7 +33,7 @@ from pydicom import config
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixels.processing import convert_color_space
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -229,6 +228,7 @@ class TestNoNumpy_NoNumpyHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError, match=f"UID of '{uid}'"):
@@ -236,11 +236,9 @@ class TestNoNumpy_NoNumpyHandler:
 
     def test_using_numpy_handler_raises(self):
         ds = dcmread(EXPL_16_1_1F)
-        msg = (
-            "The pixel data handler 'numpy' is not available on your "
-            "system. Please refer to the pydicom documentation*"
-        )
-        with pytest.raises(RuntimeError, match=msg):
+        ds.pixel_array_options(use_v2_backend=True)
+        msg = "The dataset is already uncompressed"
+        with pytest.raises(ValueError, match=msg):
             ds.decompress("numpy")
 
 
@@ -295,6 +293,7 @@ class TestNoNumpy_NumpyHandler:
     def test_unsupported_pixel_array_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError, match=f"UID of '{uid}'"):
@@ -303,6 +302,7 @@ class TestNoNumpy_NumpyHandler:
     def test_supported_pixel_array_raises(self):
         """Test pixel_array raises exception for supported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -366,6 +366,7 @@ class TestNumpy_NoNumpyHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises((NotImplementedError, RuntimeError)):
@@ -434,6 +435,7 @@ class TestNumpy_NumpyHandler:
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
 
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
@@ -443,6 +445,7 @@ class TestNumpy_NumpyHandler:
     def test_dataset_pixel_array_handler_needs_convert(self):
         """Test Dataset.pixel_array when converting to RGB."""
         ds = dcmread(EXPL_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         # Convert to YBR first
         arr = ds.pixel_array
         assert (255, 0, 0) == tuple(arr[5, 50, :])
@@ -471,6 +474,7 @@ class TestNumpy_NumpyHandler:
     def test_dataset_pixel_array_no_pixels(self):
         """Test good exception message if no pixel data in dataset."""
         ds = dcmread(NO_PIXEL)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = (
             r"Unable to convert the pixel data: one of Pixel Data, Float "
             r"Pixel Data or Double Float Pixel Data must be present in the "
@@ -489,6 +493,7 @@ class TestNumpy_NumpyHandler:
     def test_pixel_array_8bit_un_signed(self):
         """Test pixel_array for 8-bit unsigned -> signed data."""
         ds = dcmread(EXPL_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
         ds.PixelRepresentation = 1
@@ -505,15 +510,13 @@ class TestNumpy_NumpyHandler:
     def test_decompress_using_handler(self, handler_name):
         """Test different possibilities for the numpy handler name."""
         ds = dcmread(EXPL_8_1_1F)
-        ds.decompress(handler_name)
-        assert (600, 800) == ds.pixel_array.shape
-        assert 244 == ds.pixel_array[0].min() == ds.pixel_array[0].max()
-        assert (1, 246, 1) == tuple(ds.pixel_array[300, 491:494])
-        assert 0 == ds.pixel_array[-1].min() == ds.pixel_array[-1].max()
+        with pytest.raises(ValueError, match="The dataset is already uncompressed"):
+            ds.decompress(handler_name)
 
     def test_pixel_array_16bit_un_signed(self):
         """Test pixel_array for 16-bit unsigned -> signed."""
         ds = dcmread(EXPL_16_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
         ds.PixelRepresentation = 1
@@ -528,6 +531,7 @@ class TestNumpy_NumpyHandler:
     def test_pixel_array_32bit_un_signed(self):
         """Test pixel_array for 32-bit unsigned -> signed."""
         ds = dcmread(EXPL_32_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
         ds.PixelRepresentation = 1
@@ -544,6 +548,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
         # Check supported syntaxes
         ds = dcmread(EXPL_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -559,6 +564,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
         # Check supported syntaxes
         ds = dcmread(EXPL_8_1_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -577,9 +583,11 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for odd sized (3x3) pixel data."""
         # Check supported syntaxes
         ds = dcmread(EXPL_8_3_1F_ODD)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
+            ds._pixel_id = {}
+            ds._pixel_array = None
 
             assert ds.pixel_array[0].tolist() == [
                 [166, 141, 52],
@@ -600,6 +608,7 @@ class TestNumpy_NumpyHandler:
     def test_8bit_3sample_1frame_ybr422(self):
         """Test pixel_array for YBR_FULL_422 pixel data."""
         ds = dcmread(EXPL_8_3_1F_YBR422)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.PhotometricInterpretation == "YBR_FULL_422"
         arr = ds.pixel_array
 
@@ -623,6 +632,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
         # Check supported syntaxes
         ds = dcmread(EXPL_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -644,6 +654,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
         # Check supported syntaxes
         ds = dcmread(EXPL_8_3_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -670,6 +681,7 @@ class TestNumpy_NumpyHandler:
     def test_properties(self, fpath, data):
         """Test dataset and pixel array properties are as expected."""
         ds = dcmread(fpath)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -698,6 +710,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -716,6 +729,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_3F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -755,28 +769,11 @@ class TestNumpy_NumpyHandler:
             assert (1, 0, 0, 1, 0) == tuple(arr[2, 364, 152:157])
             assert 0 == arr[2, 364, 157:].max()
 
-    @pytest.mark.skip(reason="No suitable dataset available")
-    def test_little_1bit_3sample_1frame(self):
-        """Test pixel_array for little 1-bit, 3 sample/pixel, 1 frame."""
-        # Check all little endian syntaxes
-        ds = dcmread(None)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-    @pytest.mark.skip(reason="No suitable dataset available")
-    def test_little_1bit_3sample_10frame(self):
-        """Test pixel_array for little 1-bit, 3 sample/pixel, 10 frame."""
-        # Check all little endian syntaxes
-        ds = dcmread(None)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
     def test_little_16bit_1sample_1frame(self):
         """Test pixel_array for little 16-bit, 1 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -792,6 +789,7 @@ class TestNumpy_NumpyHandler:
     def test_little_16bit_1sample_1frame_padded(self):
         """Test with padded little 16-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(EXPL_16_1_1F_PAD)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -827,6 +825,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 16-bit, 1 sample/pixel, 10 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_16_1_10F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -850,6 +849,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 16-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_16_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -871,6 +871,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 16-bit, 3 sample/pixel, 2 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_16_3_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -895,6 +896,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 32-bit, 1 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(IMPL_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -909,6 +911,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 32-bit, 1 sample/pixel, 15 frame."""
         # Check all little endian syntaxes
         ds = dcmread(IMPL_32_1_15F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -932,6 +935,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 32-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_32_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             ar = ds.pixel_array
@@ -953,6 +957,7 @@ class TestNumpy_NumpyHandler:
         """Test pixel_array for little 32-bit, 3 sample/pixel, 10 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_32_3_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -976,6 +981,7 @@ class TestNumpy_NumpyHandler:
     def test_little_32bit_float_1frame(self):
         """Test pixel_array for float pixel data, 1 frame."""
         ds = dcmread(IMPL_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.FloatPixelData = ds.PixelData
         del ds.PixelData
         for uid in SUPPORTED_SYNTAXES[:3]:
@@ -992,6 +998,7 @@ class TestNumpy_NumpyHandler:
     def test_little_32bit_float_15frame(self):
         """Test pixel_array for float pixel data, 15 frames."""
         ds = dcmread(IMPL_32_1_15F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.FloatPixelData = ds.PixelData
         del ds.PixelData
         for uid in SUPPORTED_SYNTAXES[:3]:
@@ -1008,6 +1015,7 @@ class TestNumpy_NumpyHandler:
     def test_little_64bit_float_1frame(self):
         """Test pixel_array for double float pixel data, 1 frame."""
         ds = dcmread(IMPL_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
         del ds.PixelData
         ds.BitsAllocated = 64
@@ -1025,6 +1033,7 @@ class TestNumpy_NumpyHandler:
     def test_little_64bit_float_15frame(self):
         """Test pixel_array for double float pixel data, 15 frames."""
         ds = dcmread(IMPL_32_1_15F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
         del ds.PixelData
         ds.BitsAllocated = 64
@@ -1044,8 +1053,10 @@ class TestNumpy_NumpyHandler:
     def test_big_endian_datasets(self, little, big):
         """Test pixel_array for big endian matches little."""
         ds = dcmread(big)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
         ref = dcmread(little)
+        ref.pixel_array_options(use_v2_backend=True)
         assert ref.file_meta.TransferSyntaxUID != ExplicitVRBigEndian
         assert np.array_equal(ds.pixel_array, ref.pixel_array)
 
@@ -1053,6 +1064,7 @@ class TestNumpy_NumpyHandler:
     def test_endianness_not_set(self):
         """Test for #704, Dataset.is_little_endian unset."""
         ds = Dataset()
+        ds.pixel_array_options(use_v2_backend=True)
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds.Rows = 10
@@ -1070,6 +1082,7 @@ class TestNumpy_NumpyHandler:
     def test_read_only(self):
         """Test for #717, returned array read-only."""
         ds = dcmread(EXPL_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = ds.pixel_array
         assert 0 != arr[0, 0]
         arr[0, 0] = 0
@@ -1085,6 +1098,7 @@ class TestNumpy_GetPixelData:
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         del ds.PixelData
         assert "PixelData" not in ds
         assert "FloatPixelData" not in ds
@@ -1110,6 +1124,7 @@ class TestNumpy_GetPixelData:
         )
         for attr in required_attrs:
             ds = dcmread(EXPL_16_1_1F)
+            ds.pixel_array_options(use_v2_backend=True)
             delattr(ds, attr)
             msg = (
                 r"Unable to convert the pixel data as the following required "
@@ -1121,6 +1136,7 @@ class TestNumpy_GetPixelData:
     def test_missing_required_elem_pixel_data_color(self):
         """Tet get_pixeldata raises if dataset missing required element."""
         ds = dcmread(EXPL_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         del ds.Rows
         del ds.Columns
         msg = (
@@ -1133,6 +1149,7 @@ class TestNumpy_GetPixelData:
     def test_missing_conditionally_required_elem_pixel_data_color(self):
         """Tet get_pixeldata raises if dataset missing required element."""
         ds = dcmread(EXPL_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         del ds.PlanarConfiguration
         msg = (
             r"Unable to convert the pixel data as the following conditionally "
@@ -1145,6 +1162,7 @@ class TestNumpy_GetPixelData:
     def test_missing_required_elem_float_pixel_data_monochrome(self):
         """Tet get_pixeldata raises if dataset missing required element."""
         ds = dcmread(IMPL_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.FloatPixelData = ds.PixelData
         del ds.PixelData
         del ds.Rows
@@ -1158,6 +1176,7 @@ class TestNumpy_GetPixelData:
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.PixelRepresentation = 2
         with pytest.raises(ValueError, match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
@@ -1165,6 +1184,7 @@ class TestNumpy_GetPixelData:
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.4.50"
         with pytest.raises(
             NotImplementedError, match=" the transfer syntax is not supported"
@@ -1174,6 +1194,7 @@ class TestNumpy_GetPixelData:
     def test_bad_length_raises(self):
         """Test bad pixel data length raises exception."""
         ds = dcmread(EXPL_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         # Too short
         ds.PixelData = ds.PixelData[:-1]
         msg = (
@@ -1188,6 +1209,7 @@ class TestNumpy_GetPixelData:
     def test_missing_padding_warns(self):
         """A warning shall be issued if the padding for odd data is missing."""
         ds = dcmread(EXPL_8_3_1F_ODD)
+        ds.pixel_array_options(use_v2_backend=True)
         # remove the padding byte
         ds.PixelData = ds.PixelData[:-1]
         msg = r"The odd length pixel data is missing a trailing padding byte"
@@ -1203,6 +1225,7 @@ class TestNumpy_GetPixelData:
 
         # Test default
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.PhotometricInterpretation == "MONOCHROME2"
 
         get_pixeldata(ds)
@@ -1220,6 +1243,7 @@ class TestNumpy_GetPixelData:
     def test_array_read_only(self):
         """Test returning a read only array for BitsAllocated > 8."""
         ds = dcmread(EXPL_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = get_pixeldata(ds, read_only=False)
         assert arr.flags.writeable
         assert 0 != arr[10]
@@ -1234,6 +1258,7 @@ class TestNumpy_GetPixelData:
     def test_array_read_only_bit_packed(self):
         """Test returning a read only array for BitsAllocated = 1."""
         ds = dcmread(EXPL_1_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         arr = get_pixeldata(ds, read_only=False)
         assert arr.flags.writeable
 
@@ -1243,6 +1268,7 @@ class TestNumpy_GetPixelData:
     def test_ybr422_excess_padding(self):
         """Test YBR data with excess padding."""
         ds = dcmread(EXPL_8_3_1F_YBR422)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.PhotometricInterpretation == "YBR_FULL_422"
         ds.PixelData += b"\x00\x00\x00\x00"
         msg = (
@@ -1267,6 +1293,7 @@ class TestNumpy_GetPixelData:
     def test_ybr422_wrong_interpretation(self):
         """Test YBR data with wrong Photometric Interpretation."""
         ds = dcmread(EXPL_8_3_1F_YBR)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.PhotometricInterpretation == "YBR_FULL"
         assert len(ds.PixelData) == 30000
         ds.PhotometricInterpretation = "YBR_FULL_422"
@@ -1281,6 +1308,7 @@ class TestNumpy_GetPixelData:
         """Test handling of Float Pixel Data."""
         # Only 1 sample per pixel allowed
         ds = dcmread(IMPL_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.FloatPixelData = ds.PixelData
         del ds.PixelData
         assert 32 == ds.BitsAllocated
@@ -1291,6 +1319,7 @@ class TestNumpy_GetPixelData:
         """Test handling of Double Float Pixel Data."""
         # Only 1 sample per pixel allowed
         ds = dcmread(IMPL_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
         del ds.PixelData
         ds.BitsAllocated = 64
@@ -1301,8 +1330,10 @@ class TestNumpy_GetPixelData:
         """RGB data encoded as OW in Big Endian transfer syntax shall
         yield the same data as if encoded in Little Endian."""
         ds1 = dcmread(EXPL_8_3_1F_ODD)
+        ds1.pixel_array_options(use_v2_backend=True)
         data1 = ds1.pixel_array
         ds2 = dcmread(EXPL_8_3_1F_ODD_BIGE)
+        ds2.pixel_array_options(use_v2_backend=True)
         data2 = ds2.pixel_array
         assert len(data1) == len(data2)
         assert (data1 == data2).all()

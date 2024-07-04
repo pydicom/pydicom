@@ -3,7 +3,9 @@
 UID Definitions and Utilities (:mod:`pydicom.uid`)
 ==================================================
 
+.. module:: pydicom.uid
 .. currentmodule:: pydicom.uid
+
 
 Transfer Syntax UIDs
 --------------------
@@ -42,6 +44,11 @@ Transfer Syntax UIDs
    HEVCMP51
    HEVCM10P51
    RLELossless
+   HTJ2KLossless
+   HTJ2KLosslessRPCL
+   HTJ2K
+   JPIPHTJ2KReferenced
+   JPIPHTJ2KReferencedDeflate
    SMPTEST211020UncompressedProgressiveActiveVideo
    SMPTEST211020UncompressedInterlacedActiveVideo
    SMPTEST211030PCMDigitalAudio
@@ -60,6 +67,7 @@ Transfer Syntax Lists
    MPEGTransferSyntaxes
    RLETransferSyntaxes
    UncompressedTransferSyntaxes
+   PrivateTransferSyntaxes
 
 
 UID Utilities
@@ -69,6 +77,7 @@ UID Utilities
    :toctree: generated/
 
    generate_uid
+   register_transfer_syntax
    PYDICOM_ROOT_UID
    PYDICOM_IMPLEMENTATION_UID
    RE_VALID_UID
@@ -108,6 +117,8 @@ Storage SOP Class UIDs
    Comprehensive3DSRStorage
    ComprehensiveSRStorage
    ComputedRadiographyImageStorage
+   ConfocalMicroscopyImageStorage
+   ConfocalMicroscopyTiledPyramidalImageStorage
    ContentAssessmentResultsStorage
    CornealTopographyMapStorage
    DICOS2DAITStorage
@@ -135,15 +146,18 @@ Storage SOP Class UIDs
    EncapsulatedPDFStorage
    EncapsulatedSTLStorage
    EnhancedCTImageStorage
+   EnhancedContinuousRTImageStorage
    EnhancedMRColorImageStorage
    EnhancedMRImageStorage
    EnhancedPETImageStorage
+   EnhancedRTImageStorage
    EnhancedSRStorage
    EnhancedUSVolumeStorage
    EnhancedXAImageStorage
    EnhancedXRFImageStorage
    EnhancedXRayRadiationDoseSRStorage
    ExtensibleSRStorage
+   General32bitECGWaveformStorage
    GeneralAudioWaveformStorage
    GeneralECGWaveformStorage
    GenericImplantTemplateStorage
@@ -157,6 +171,7 @@ Storage SOP Class UIDs
    IntraocularLensCalculationsStorage
    IntravascularOpticalCoherenceTomographyImageStorageForPresentation
    IntravascularOpticalCoherenceTomographyImageStorageForProcessing
+   InventoryStorage
    KeratometryMeasurementsStorage
    KeyObjectSelectionDocumentStorage
    LegacyConvertedEnhancedCTImageStorage
@@ -187,6 +202,7 @@ Storage SOP Class UIDs
    ParametricMapStorage
    PatientRadiationDoseSRStorage
    PerformedImagingAgentAdministrationSRStorage
+   PhotoacousticImageStorage
    PlannedImagingAgentAdministrationSRStorage
    PositronEmissionTomographyImageStorage
    ProcedureLogStorage
@@ -200,6 +216,7 @@ Storage SOP Class UIDs
    RTImageStorage
    RTIonBeamsTreatmentRecordStorage
    RTIonPlanStorage
+   RTPatientPositionAcquisitionInstructionStorage
    RTPhysicianIntentStorage
    RTPlanStorage
    RTRadiationRecordSetStorage
@@ -241,6 +258,7 @@ Storage SOP Class UIDs
    VLPhotographicImageStorage
    VLSlideCoordinatesMicroscopicImageStorage
    VLWholeSlideMicroscopyImageStorage
+   VariableModalityLUTSoftcopyPresentationStateStorage
    VideoEndoscopicImageStorage
    VideoMicroscopicImageStorage
    VideoPhotographicImageStorage

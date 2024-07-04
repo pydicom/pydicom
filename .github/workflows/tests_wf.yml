@@ -17,6 +17,9 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+        codecov_token:
+            required: true
 
 env:
   PYTEST_ARGS: ""
@@ -24,16 +27,15 @@ env:
 jobs:
   tests:
     runs-on: ${{ inputs.os }}-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Install BLAS on PyPy3.10
       if: startsWith(inputs.python-version, 'pypy')
       run: sudo apt install -y libopenblas-dev
-    - name: Set env variables for ubuntu
-      if: inputs.upload-coverage && startsWith(inputs.os, 'ubuntu')
+    - name: Set env variables
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
-    - name: Set env variables for windows
-      if: inputs.upload-coverage && startsWith(inputs.os, 'windows')
-      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$env:GITHUB_ENV"
     - name: Check-out code
       uses: actions/checkout@v3
       with:
@@ -65,8 +67,8 @@ jobs:
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pylibjpeg.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_pillow_pixel_data.py
         python -m pytest ${{ env.PYTEST_ARGS }} tests/test_JPEG_LS_transfer_syntax.py tests/test_jpeg_ls_pixel_data.py
-        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/test_encoders_gdcm.py
-        python -m pip uninstall -y pydicom-data
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/test_gdcm_pixel_data.py tests/pixels/test_encoder_gdcm.py
+        python -m pytest ${{ env.PYTEST_ARGS }} tests/pixels
 
     - name: Test with missing libs
       if: inputs.test-extras
@@ -77,6 +79,8 @@ jobs:
 
     - name: Send coverage results
       if: success() && inputs.upload-coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        codecov_token: ${{ secrets.codecov_token }}
       with:
         env_vars: inputs.os, inputs.python-version

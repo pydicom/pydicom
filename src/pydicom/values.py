@@ -6,8 +6,8 @@
 import re
 from io import BytesIO
 from struct import unpack, calcsize
-from typing import Union, cast, Any
-from collections.abc import MutableSequence
+from typing import Union, cast, Any, TypeVar
+from collections.abc import MutableSequence, Callable
 
 # don't import datetime_conversion directly
 from pydicom import config
@@ -22,7 +22,6 @@ from pydicom.tag import Tag, TupleTag, BaseTag
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    MultiString,
     DA,
     DT,
     TM,
@@ -33,14 +32,42 @@ from pydicom.valuerep import (
     validate_value,
 )
 
-try:
+if have_numpy:
     import numpy
 
-    have_numpy = True
-except ImportError:
-    have_numpy = False
 
 from pydicom.valuerep import PersonName
+
+
+_T = TypeVar("_T")
+
+
+def multi_string(
+    val: str, valtype: Callable[[str], _T] | None = None
+) -> _T | MutableSequence[_T]:
+    """Split a string by delimiters if there are any
+
+    Parameters
+    ----------
+    val : str
+        The string to split up.
+    valtype : type or callable, optional
+        Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
+        overwrite to a specific type.
+
+    Returns
+    -------
+    valtype or MultiValue[valtype]
+        The split value as `valtype` or a :class:`~pydicom.multival.MultiValue`
+        of `valtype`.
+    """
+    if valtype is None:
+        valtype = cast(Callable[[str], _T], str)
+
+    # Remove trailing padding and null bytes
+    items = val.rstrip(" \x00").split("\\")
+
+    return valtype(items[0]) if len(items) == 1 else MultiValue(valtype, items)
 
 
 def convert_tag(byte_string: bytes, is_little_endian: bool, offset: int = 0) -> BaseTag:
@@ -129,7 +156,7 @@ def convert_ATvalue(
     # length > 4
     if length % 4 != 0:
         logger.warning(
-            "Expected length to be multiple of 4 for VR 'AT', " f"got length {length}"
+            f"Expected length to be multiple of 4 for VR 'AT', got length {length}"
         )
         length -= length % 4
     return MultiValue(
@@ -245,7 +272,7 @@ def convert_DS_string(
 
         return value
 
-    return MultiString(num_string.strip(), valtype=pydicom.valuerep.DSclass)
+    return multi_string(num_string.strip(), valtype=pydicom.valuerep.DSclass)
 
 
 def _DT_from_str(value: str) -> DT:
@@ -345,7 +372,7 @@ def convert_IS_string(
 
         return cast("numpy.ndarray", value)
 
-    return MultiString(num_string, valtype=pydicom.valuerep.IS)
+    return multi_string(num_string, valtype=pydicom.valuerep.IS)
 
 
 def convert_numbers(
@@ -431,8 +458,6 @@ def convert_OVvalue(
 ) -> bytes:
     """Return the encoded 'OV' value as :class:`bytes`.
 
-    .. versionadded:: 1.4
-
     No byte swapping will be performed.
     """
     # for now, Maybe later will have own routine
@@ -496,7 +521,7 @@ def convert_string(
     str or MultiValue of str
         The decoded value(s).
     """
-    return MultiString(byte_string.decode(default_encoding))
+    return multi_string(byte_string.decode(default_encoding))
 
 
 def convert_text(
@@ -532,9 +557,7 @@ def convert_text(
     as_strings = [handle_value(value) for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
-    return MultiValue(
-        str, as_strings, validation_mode=config.settings.reading_validation_mode
-    )
+    return MultiValue(str, as_strings)
 
 
 def convert_single_string(
@@ -665,7 +688,7 @@ def convert_UI(
     """
     # Convert to str and remove any trailing nulls or spaces
     value = byte_string.decode(default_encoding)
-    return MultiString(value.rstrip("\0 "), pydicom.uid.UID)
+    return multi_string(value.rstrip("\0 "), pydicom.uid.UID)
 
 
 def convert_UN(

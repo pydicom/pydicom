@@ -8,13 +8,10 @@ A DataElement has a tag,
 """
 
 import base64
-import copy
-from dataclasses import dataclass
 from io import BufferedIOBase
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
 from collections.abc import Callable, MutableSequence
-import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
@@ -30,6 +27,7 @@ from pydicom.datadict import (
 )
 from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter, BulkDataType
+from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
@@ -60,8 +58,6 @@ def empty_value_for_VR(
     VR: str | None, raw: bool = False
 ) -> bytes | list[str] | str | None | PersonName:
     """Return the value for an empty element for `VR`.
-
-    .. versionadded:: 1.4
 
     The behavior of this property depends on the setting of
     :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
@@ -236,9 +232,8 @@ class DataElement:
             self.value = value  # calls property setter which will convert
 
         self.file_tell = file_value_tell
-        self.is_undefined_length = is_undefined_length
+        self.is_undefined_length: bool = is_undefined_length
         self.private_creator: str | None = None
-        self.parent: Dataset | None = None
 
     def validate(self, value: Any) -> None:
         """Validate the current value against the DICOM standard.
@@ -254,14 +249,14 @@ class DataElement:
         vr: str,
         value: Any,
         value_key: str | None,
-        bulk_data_uri_handler: Callable[[str, str, str], BulkDataType]
-        | Callable[[str], BulkDataType]
-        | None = None,
+        bulk_data_uri_handler: (
+            Callable[[str, str, str], BulkDataType]
+            | Callable[[str], BulkDataType]
+            | None
+        ) = None,
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
-
-        .. versionadded:: 1.3
 
         Parameters
         ----------
@@ -296,11 +291,22 @@ class DataElement:
             dataset_class, tag, vr, value, value_key, bulk_data_uri_handler
         )
         elem_value = converter.get_element_values()
+
+        if (
+            vr == VR_.UN
+            and config.replace_un_with_known_vr
+            and isinstance(elem_value, bytes)
+        ):
+            raw = RawDataElement(
+                Tag(tag), vr, len(elem_value), elem_value, 0, True, True
+            )
+            elem_value = DataElement_from_raw(raw).value
+
         try:
             return cls(tag=tag, value=elem_value, VR=vr)
         except Exception as exc:
             raise ValueError(
-                f"Data element '{tag}' could not be loaded from JSON: " f"{elem_value}"
+                f"Data element '{tag}' could not be loaded from JSON: {elem_value}"
             ) from exc
 
     def to_json_dict(
@@ -311,8 +317,6 @@ class DataElement:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
-
-        .. versionadded:: 1.4
 
         Parameters
         ----------
@@ -335,13 +339,14 @@ class DataElement:
         if self.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR_.US_SS}:
             if not self.is_empty:
                 binary_value = self.value
-                encoded_value = base64.b64encode(binary_value).decode("utf-8")
-                if (
-                    bulk_data_element_handler is not None
-                    and len(encoded_value) > bulk_data_threshold
+                # Base64 makes the encoded value 1/3 longer.
+                if bulk_data_element_handler is not None and len(binary_value) > (
+                    (bulk_data_threshold // 4) * 3
                 ):
                     json_element["BulkDataURI"] = bulk_data_element_handler(self)
                 else:
+                    # Json is exempt from padding to even length, see DICOM-CP1920
+                    encoded_value = base64.b64encode(binary_value).decode("utf-8")
                     logger.info(f"encode bulk data element '{self.name}' inline")
                     json_element["InlineBinary"] = encoded_value
         elif self.VR == VR_.SQ:
@@ -396,8 +401,6 @@ class DataElement:
         dump_handler: Callable[[dict[str, Any]], str] | None = None,
     ) -> str:
         """Return a JSON representation of the :class:`DataElement`.
-
-        .. versionadded:: 1.3
 
         Parameters
         ----------
@@ -475,30 +478,39 @@ class DataElement:
 
     @property
     def VM(self) -> int:
-        """Return the value multiplicity of the element as :class:`int`."""
+        """Return the value multiplicity of the element as :class:`int`.
+
+        .. versionchanged:: 3.0
+
+            **SQ** elements now always return a VM of ``1``.
+        """
+        if self.VR == VR_.SQ:
+            return 1
+
         if self.value is None:
             return 0
+
         if isinstance(self.value, str | bytes | PersonName | BufferedIOBase):
             return 1 if self.value else 0
+
         try:
             iter(self.value)
         except TypeError:
             return 1
+
         return len(self.value)
 
     @property
     def is_empty(self) -> bool:
-        """Return ``True`` if the element has no value.
+        """Return ``True`` if the element has no value."""
+        if self.VR == VR_.SQ:
+            return not bool(self.value)
 
-        .. versionadded:: 1.4
-        """
         return self.VM == 0
 
     @property
     def empty_value(self) -> bytes | list[str] | None | str | PersonName:
         """Return the value for an empty element.
-
-        .. versionadded:: 1.4
 
         See :func:`empty_value_for_VR` for more information.
 
@@ -512,8 +524,6 @@ class DataElement:
     def clear(self) -> None:
         """Clears the value, e.g. sets it to the configured empty value.
 
-        .. versionadded:: 1.4
-
         See :func:`empty_value_for_VR`.
         """
         self._value = self.empty_value
@@ -524,6 +534,17 @@ class DataElement:
         Uses the element's VR in order to determine the conversion method and
         resulting type.
         """
+        if (
+            self.tag == 0x7FE00010
+            and config.have_numpy
+            and isinstance(val, numpy.ndarray)
+        ):
+            raise TypeError(
+                "The value for (7FE0,0010) 'Pixel Data' should be set using 'bytes' "
+                "not 'numpy.ndarray'. See the Dataset.set_pixel_data() method for "
+                "an alternative that supports ndarrays."
+            )
+
         if self.VR == VR_.SQ:  # a sequence - leave it alone
             from pydicom.sequence import Sequence
 
@@ -533,13 +554,27 @@ class DataElement:
             return Sequence(val)
 
         # if the value is a list, convert each element
-        try:
-            val.append
-        except AttributeError:  # not a list
+        if not hasattr(val, "append"):
             return self._convert(val)
+
         if len(val) == 1:
             return self._convert(val[0])
-        return MultiValue(self._convert, val, validation_mode=self.validation_mode)
+
+        # Some ambiguous VR elements ignore the VR for part of the value
+        # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first and
+        #   third values are always US (the third should be <= 16, so SS is OK)
+        if self.tag in _LUT_DESCRIPTOR_TAGS and val:
+
+            def _skip_conversion(val: Any) -> Any:
+                return val
+
+            validate_value(VR_.US, val[0], self.validation_mode)
+            for value in val[1:]:
+                validate_value(self.VR, value, self.validation_mode)
+
+            return MultiValue(_skip_conversion, val)
+
+        return MultiValue(self._convert, val)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
@@ -574,18 +609,6 @@ class DataElement:
 
         self.validate(val)
         return val
-
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "DataElement":
-        cls = self.__class__
-        copied = cls.__new__(cls)
-        if memo:
-            memo[id(self)] = copied
-
-        # Fix for #1816: don't deepcopy the parent!
-        for key in (k for k in self.__dict__ if k != "parent"):
-            copied.__dict__[key] = copy.deepcopy(self.__dict__[key], memo)
-
-        return copied
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
@@ -743,7 +766,7 @@ class DataElement:
 
     def __repr__(self) -> str:
         """Return the representation of the element."""
-        return repr(self.value) if self.VR == VR_.SQ else str(self)
+        return str(self)
 
 
 class RawDataElement(NamedTuple):
@@ -861,7 +884,7 @@ def DataElement_from_raw(
                     raise KeyError(msg + " can't look up VR")
 
                 vr = VR_.UN
-                warnings.warn(msg + " - setting VR to 'UN'")
+                warn_and_log(f"{msg} - setting VR to 'UN'")
     elif vr == VR_.UN and config.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
@@ -882,7 +905,7 @@ def DataElement_from_raw(
             f"to VR '{vr}'."
         )
         if config.convert_wrong_length_to_UN:
-            warnings.warn(f"{message} Setting VR to 'UN'.")
+            warn_and_log(f"{message} Setting VR to 'UN'.")
             vr = VR_.UN
             value = raw.value
         else:

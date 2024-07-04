@@ -2,7 +2,6 @@
 """Unit tests for the pydicom.sequence module."""
 
 import copy
-import weakref
 
 import pytest
 
@@ -98,14 +97,10 @@ class TestSequence:
         parent.PatientName = "Parent"
 
         seq = Sequence()
-        seq.parent_dataset = parent
-        assert isinstance(seq.parent_dataset, weakref.ReferenceType)
         seq.append(ds_a)
         seq.append(ds_c)
         seq.insert(1, ds_b)
         assert 3 == len(seq)
-        for ds in seq:
-            assert isinstance(ds.parent_seq, weakref.ReferenceType)
 
         seq[1] = ds_e
         assert ds_e == seq[1]
@@ -114,8 +109,6 @@ class TestSequence:
         assert [ds_a, ds_d, ds_e, ds_c] == seq
         seq[1:2] = [ds_c, ds_e]
         assert [ds_a, ds_c, ds_e, ds_e, ds_c] == seq
-        for ds in seq:
-            assert isinstance(ds.parent_seq, weakref.ReferenceType)
 
         msg = r"Can only assign an iterable of 'Dataset'"
         with pytest.raises(TypeError, match=msg):
@@ -138,8 +131,6 @@ class TestSequence:
         parent.PatientName = "Parent"
 
         seq = Sequence()
-        seq.parent_dataset = parent
-        assert isinstance(seq.parent_dataset, weakref.ReferenceType)
         seq.extend([ds_a, ds_b, ds_c])
         assert [ds_a, ds_b, ds_c] == seq
 
@@ -150,8 +141,6 @@ class TestSequence:
 
         seq.extend([ds_d, ds_e])
         assert [ds_a, ds_b, ds_c, ds_d, ds_e] == seq
-        for ds in seq:
-            assert isinstance(ds.parent_seq, weakref.ReferenceType)
 
     def test_iadd(self):
         """Test Sequence() += [Dataset()]."""
@@ -170,8 +159,6 @@ class TestSequence:
         parent.PatientName = "Parent"
 
         seq = Sequence()
-        seq.parent_dataset = parent
-        assert isinstance(seq.parent_dataset, weakref.ReferenceType)
         seq += [ds_a, ds_b, ds_c]
         assert [ds_a, ds_b, ds_c] == seq
 
@@ -182,9 +169,6 @@ class TestSequence:
 
         seq += [ds_d, ds_e]
         assert [ds_a, ds_b, ds_c, ds_d, ds_e] == seq
-
-        for ds in seq:
-            assert isinstance(ds.parent_seq, weakref.ReferenceType)
 
     def test_deepcopy_sequence_subclass(self):
         """Regression test for #1813."""

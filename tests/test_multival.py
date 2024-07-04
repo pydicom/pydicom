@@ -4,8 +4,8 @@
 import pytest
 
 from pydicom import config
-from pydicom.multival import MultiValue
-from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
+from pydicom.multival import MultiValue, ConstrainedList
+from pydicom.valuerep import DS, DSfloat, DSdecimal, IS, ISfloat
 from copy import deepcopy
 
 import sys
@@ -15,13 +15,13 @@ python_version = sys.version_info
 
 class TestMultiValue:
     def testMultiDS(self):
-        """MultiValue: Multi-valued data elements can be created........"""
+        """MultiValue: Multi-valued data elements can be created"""
         multival = MultiValue(DS, ["11.1", "22.2", "33.3"])
         for val in multival:
             assert isinstance(val, DSfloat | DSdecimal)
 
     def testEmptyElements(self):
-        """MultiValue: Empty number string elements are not converted..."""
+        """MultiValue: Empty number string elements are not converted"""
         multival = MultiValue(DSfloat, ["1.0", ""])
         assert 1.0 == multival[0]
         assert "" == multival[1]
@@ -36,14 +36,8 @@ class TestMultiValue:
         assert not multival
         assert 0 == len(multival)
 
-    def testLimits(self):
-        """MultiValue: Raise error if any item outside DICOM limits...."""
-        with pytest.raises(OverflowError):
-            MultiValue(IS, [1, -(2**31) - 1], validation_mode=config.RAISE)
-        # Overflow error not raised for IS out of DICOM valid range
-
     def testAppend(self):
-        """MultiValue: Append of item converts it to required type..."""
+        """MultiValue: Append of item converts it to required type"""
         multival = MultiValue(IS, [1, 5, 10])
         multival.append("5")
         assert isinstance(multival[-1], IS)
@@ -57,20 +51,24 @@ class TestMultiValue:
         assert 7 == multival[1]
 
     def testDeleteIndex(self):
-        """MultiValue: Deleting item at index behaves as expected..."""
+        """MultiValue: Deleting item at index behaves as expected"""
         multival = MultiValue(IS, [1, 5, 10])
         del multival[1]
         assert 2 == len(multival)
         assert 1 == multival[0]
         assert 10 == multival[1]
 
-    def testExtend(self):
+    def test_extend(self):
         """MultiValue: Extending a list converts all to required type"""
         multival = MultiValue(IS, [1, 5, 10])
         multival.extend(["7", 42])
         assert isinstance(multival[-2], IS)
         assert isinstance(multival[-1], IS)
         assert 7 == multival[-2]
+
+        msg = "An iterable is required"
+        with pytest.raises(TypeError, match=msg):
+            multival.extend(None)
 
     def testSlice(self):
         """MultiValue: Setting slice converts items to required type."""
@@ -154,3 +152,40 @@ class TestMultiValue:
         assert [1, 5, 6, 2, 3] == mv
         mv[1:3] = [7, 8]
         assert [1, 7, 8, 2, 3] == mv
+
+    def test_iadd(self):
+        """Test += [T, .]"""
+        multival = MultiValue(IS, [1, 5, 10])
+        multival += ["7", 42]
+        assert isinstance(multival[-2], IS)
+        assert isinstance(multival[-1], IS)
+        assert 7 == multival[-2]
+
+        msg = "An iterable is required"
+        with pytest.raises(TypeError, match=msg):
+            multival += None
+
+    def test_IS_str(self):
+        """Test IS works OK with empty str"""
+        multival = MultiValue(ISfloat, [1, 2, "", 3, 4])
+        assert multival == [1, 2, "", 3, 4]
+        multival = MultiValue(IS, [1, 2, "", 3, 4])
+        assert multival == [1, 2, "", 3, 4]
+
+    def test_DS_str(self):
+        """Test DS works OK with empty str"""
+        multival = MultiValue(DSfloat, [1, 2, "", 3, 4])
+        assert multival == [1, 2, "", 3, 4]
+        multival = MultiValue(DSdecimal, [1, 2, "", 3, 4])
+        assert multival == [1, 2, "", 3, 4]
+
+
+def test_constrained_list_raises():
+    """Test ConstrainedList raises if no _validate() override."""
+
+    class Foo(ConstrainedList):
+        pass
+
+    msg = r"'Foo._validate\(\)' must be implemented"
+    with pytest.raises(NotImplementedError, match=msg):
+        Foo([1, 2, 3, 4])

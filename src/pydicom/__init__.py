@@ -29,22 +29,32 @@ Quick Start
 """
 
 from pydicom.dataelem import DataElement
-from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 import pydicom.examples
 from pydicom.filereader import dcmread
 from pydicom.filewriter import dcmwrite
+from pydicom.pixels.utils import pixel_array, iter_pixels
 from pydicom.sequence import Sequence
 
-from ._version import __version__, __version_info__, __dicom_version__
+from ._version import (
+    __version__,
+    __version_info__,
+    __dicom_version__,
+    __concepts_version__,
+)
 
 __all__ = [
     "DataElement",
     "Dataset",
     "FileDataset",
+    "FileMetaDataset",
     "Sequence",
     "dcmread",
     "dcmwrite",
+    "pixel_array",
+    "iter_pixels",
     "__version__",
     "__version_info__",
     "__dicom_version__",
+    "__concepts_version__",
 ]

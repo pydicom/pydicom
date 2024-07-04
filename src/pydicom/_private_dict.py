@@ -2664,7 +2664,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0011xx40': ('SL', '1', 'Pasting Overlap', ''),  # noqa
         '0011xx41': ('IS', '24', 'Sub-image Collimator Vertices', ''),  # noqa
         '0011xx42': ('LO', '1', 'View IP', ''),  # noqa
-        '0011xx43': ('IS', '24', 'Key-stone Co-ordinates', ''),  # noqa
+        '0011xx43': ('IS', '24', 'Key-stone Coordinates', ''),  # noqa
         '0011xx44': ('CS', '1', 'Receptor Type', ''),  # noqa
         '0011xx46': ('LO', '1-n', 'Unknown', ''),  # noqa
         '0011xx47': ('DS', '1', 'Unknown', ''),  # noqa

@@ -10,18 +10,18 @@
 
 *pydicom* is a pure Python package for working with [DICOM](https://www.dicomstandard.org/) files.
 It lets you read, modify and write DICOM data in an easy "pythonic" way. As a pure Python package,
-*pydicom* can run anywhere Python runs without any other requirements, although if you're working 
+*pydicom* can run anywhere Python runs without any other requirements, although if you're working
 with *Pixel Data* then we recommend you also install [NumPy](https://numpy.org).
 
-Note that *pydicom* is a general-purpose DICOM framework concerned with 
-reading and writing DICOM datasets. In order to keep the 
+Note that *pydicom* is a general-purpose DICOM framework concerned with
+reading and writing DICOM datasets. In order to keep the
 project manageable, it does not handle the specifics of individual SOP classes
 or other aspects of DICOM. Other libraries both inside and outside the
-[pydicom organization](https://github.com/pydicom) are based on *pydicom* 
-and provide support for other aspects of DICOM, and for more 
+[pydicom organization](https://github.com/pydicom) are based on *pydicom*
+and provide support for other aspects of DICOM, and for more
 specific applications.
 
-Examples are [pynetdicom](https://github.com/pydicom/pynetdicom), which 
+Examples are [pynetdicom](https://github.com/pydicom/pynetdicom), which
 is a Python library for DICOM networking, and [deid](https://github.com/pydicom/deid),
 which supports the anonymization of DICOM files.
 
@@ -42,7 +42,7 @@ For more information, including installation instructions for the development ve
 
 ## Documentation
 
-The *pydicom* [user guide](https://pydicom.github.io/pydicom/stable/old/pydicom_user_guide.html), [tutorials](https://pydicom.github.io/pydicom/stable/tutorials/index.html), [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) and [API reference](https://pydicom.github.io/pydicom/stable/reference/index.html) documentation is available for both the [current release](https://pydicom.github.io/pydicom/stable) and the [development version](https://pydicom.github.io/pydicom/dev) on GitHub Pages.
+The *pydicom* [user guide](https://pydicom.github.io/pydicom/stable/guides/user/index.html), [tutorials](https://pydicom.github.io/pydicom/stable/tutorials/index.html), [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) and [API reference](https://pydicom.github.io/pydicom/stable/reference/index.html) documentation is available for both the [current release](https://pydicom.github.io/pydicom/stable) and the [development version](https://pydicom.github.io/pydicom/dev) on GitHub Pages.
 
 ## *Pixel Data*
 
@@ -77,16 +77,25 @@ array([[175, 180, 166, ..., 203, 207, 216],
        [914, 954, 938, ..., 942, 925, 905],
        [959, 955, 916, ..., 911, 904, 909]], dtype=int16)
 ```
-### Compressed *Pixel Data*
+### Decompressing *Pixel Data*
 #### JPEG, JPEG-LS and JPEG 2000
-Converting JPEG compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/old/image_data_handlers.html#guide-compressed).
-
-Compressing data into one of the JPEG formats is not currently supported.
+Converting JPEG, JPEG-LS or JPEG 2000 compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/guides/user/image_data_handlers.html#guide-compressed).
 
 #### RLE
-Encoding and decoding RLE *Pixel Data* only requires NumPy, however it can
-be quite slow. You may want to consider [installing one or more additional
-Python libraries](https://pydicom.github.io/pydicom/stable/old/image_data_compression.html) to speed up the process.
+Decompressing RLE *Pixel Data* only requires NumPy, however it can be quite slow. You may want to consider [installing one or more additional Python libraries](https://pydicom.github.io/pydicom/stable/guides/user/image_data_compression.html) to speed up the process.
+
+### Compressing *Pixel Data*
+Information on compressing *Pixel Data* using one of the below formats can be found in the corresponding [encoding guides](https://pydicom.github.io/pydicom/stable/guides/encoding/index.html). These guides cover the specific requirements for each encoding method and we recommend you be familiar with them when performing image compression.
+
+#### JPEG-LS, JPEG 2000
+Compressing image data from an ``ndarray`` or ``bytes`` object to JPEG-LS or JPEG 2000 requires installing the following:
+
+* JPEG-LS requires [pyjpegls](https://github.com/pydicom/pyjpegls)
+* JPEG 2000 requires [pylibjpeg](https://github.com/pydicom/pylibjpeg) and the [pylibjpeg-openjpeg](https://github.com/pydicom/pylibjpeg-openjpeg) plugin
+
+#### RLE
+Compressing using RLE requires no additional packages but can be quite slow. It can be sped up by installing [pylibjpeg](https://github.com/pydicom/pylibjpeg) with the [pylibjpeg-rle](https://github.com/pydicom/pylibjpeg-rle) plugin, or [gdcm](https://github.com/tfmoraes/python-gdcm).
+
 
 ## Examples
 More [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) are available in the documentation.
@@ -121,12 +130,12 @@ plt.show()
 
 ## Contributing
 
-We are all volunteers working on *pydicom* in our free time. As our 
-resources are limited, we very much value your contributions, be it bug fixes, new 
+We are all volunteers working on *pydicom* in our free time. As our
+resources are limited, we very much value your contributions, be it bug fixes, new
 core features, or documentation improvements. For more information, please
 read our [contribution guide](https://github.com/pydicom/pydicom/blob/main/CONTRIBUTING.md).
 
-If you have examples or extensions of *pydicom* that don't belong with the 
-core software, but that you deem useful to others, you can add them to our 
+If you have examples or extensions of *pydicom* that don't belong with the
+core software, but that you deem useful to others, you can add them to our
 contribution repository:
 [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).

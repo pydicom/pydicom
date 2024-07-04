@@ -22,6 +22,7 @@ There are the following possibilities:
 * NumberOfFrames (1, 2, ...)
 """
 
+from io import BytesIO
 from struct import pack, unpack
 
 import pytest
@@ -29,13 +30,13 @@ import pytest
 from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_file
-from pydicom.encaps import defragment_data
-from pydicom.uid import RLELossless, AllTransferSyntaxes
+from pydicom.encaps import get_frame, generate_frames, encapsulate
+from pydicom.uid import RLELossless, AllTransferSyntaxes, ExplicitVRLittleEndian
 
 try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.pixel_data_handlers.util import reshape_pixel_array
+    from pydicom.pixels.utils import reshape_pixel_array
 
     HAVE_NP = NP_HANDLER.HAVE_NP
 except ImportError:
@@ -155,6 +156,7 @@ def _get_pixel_array(fpath):
     pydicom.config.pixel_data_handlers = [NP_HANDLER]
 
     ds = dcmread(fpath)
+    ds.pixel_array_options(use_v2_backend=True)
     arr = ds.pixel_array
 
     pydicom.config.pixel_data_handlers = original_handlers
@@ -214,6 +216,7 @@ class TestNoNumpy_NoRLEHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -260,6 +263,7 @@ class TestNoNumpy_RLEHandler:
     def test_unsupported_pixel_array_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -272,6 +276,7 @@ class TestNoNumpy_RLEHandler:
     def test_supported_pixel_array_raises(self):
         """Test pixel_array raises exception for supported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -319,6 +324,7 @@ class TestNumpy_NoRLEHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -351,6 +357,7 @@ class TestNumpy_RLEHandler:
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             msg = (
@@ -359,6 +366,10 @@ class TestNumpy_RLEHandler:
             )
             with pytest.raises(NotImplementedError, match=msg):
                 ds.pixel_array
+
+            if not uid.is_compressed:
+                continue
+
             with pytest.raises(NotImplementedError, match=msg):
                 ds.decompress(handler_name="rle")
 
@@ -373,6 +384,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_signed(self):
         """Test pixel_array for unsigned -> signed data."""
         ds = dcmread(RLE_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
         ds.PixelRepresentation = 1
@@ -388,6 +400,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_1bit_raises(self):
         """Test pixel_array for 1-bit raises exception."""
         ds = dcmread(RLE_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.BitsAllocated = 1
         msg = r"Bits Allocated' value of 1"
         with pytest.raises(NotImplementedError, match=msg):
@@ -396,6 +409,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_8bit_1sample_1f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(RLE_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
@@ -414,13 +428,16 @@ class TestNumpy_RLEHandler:
     def test_decompress_with_handler(self):
         """Test that decompress works with the correct handler."""
         ds = dcmread(RLE_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = r"'zip' is not a known handler name"
         with pytest.raises(ValueError, match=msg):
             ds.decompress(handler_name="zip")
+
         with pytest.raises(NotImplementedError, match="Unable to decode*"):
             ds.decompress(handler_name="numpy")
 
         ds.decompress(handler_name="rle")
+        pydicom.config.pixel_data_handlers.append(NP_HANDLER)
         assert hasattr(ds, "_pixel_array")
         arr = ds.pixel_array
         assert arr.shape == (600, 800)
@@ -431,6 +448,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_8bit_1sample_2f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
         ds = dcmread(RLE_8_1_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
@@ -452,6 +470,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_8bit_3sample_1f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(RLE_8_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
@@ -477,6 +496,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_8bit_3sample_2f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
         ds = dcmread(RLE_8_3_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
@@ -507,6 +527,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_16bit_1sample_1f(self):
         """Test pixel_array for 16-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(RLE_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -526,6 +547,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_16bit_1sample_10f(self):
         """Test pixel_array for 16-bit, 1, sample/pixel, 10 frame."""
         ds = dcmread(RLE_16_1_10F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -557,6 +579,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_16bit_3sample_1f(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(RLE_16_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
@@ -583,6 +606,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_16bit_3sample_2f(self):
         """Test pixel_array for 16-bit, 3, sample/pixel, 10 frame."""
         ds = dcmread(RLE_16_3_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
@@ -614,6 +638,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_32bit_1sample_1f(self):
         """Test pixel_array for 32-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(RLE_32_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
@@ -634,6 +659,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_32bit_1sample_15f(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
         ds = dcmread(RLE_32_1_15F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
@@ -665,6 +691,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_32bit_3sample_1f(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(RLE_32_3_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
@@ -691,6 +718,7 @@ class TestNumpy_RLEHandler:
     def test_pixel_array_32bit_3sample_2f(self):
         """Test pixel_array for 32-bit, 3, sample/pixel, 2 frame."""
         ds = dcmread(RLE_32_3_2F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
@@ -718,6 +746,41 @@ class TestNumpy_RLEHandler:
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
+    def test_frame_multiple_fragments(self):
+        """Test a frame split across multiple fragments."""
+        ds = dcmread(RLE_8_1_2F)
+        ds.pixel_array_options(use_v2_backend=True)
+        ref = ds.pixel_array
+
+        frames = [
+            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
+        ds.PixelData = encapsulate(frames, fragments_per_frame=4)
+        assert np.array_equal(ds.pixel_array, ref)
+
+    def test_writing_decompressed(self):
+        """Test writing a decompressed dataset."""
+        ds = dcmread(RLE_8_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
+        ds.decompress()
+        ds.file_meta.TransferSyntaxUID = RLELossless
+
+        msg = (
+            r"The \(7FE0,0010\) 'Pixel Data' element value hasn't been "
+            "encapsulated as required for a compressed transfer syntax - "
+            r"see pydicom.encaps.encapsulate\(\) for more information"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(BytesIO())
+
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        b = BytesIO()
+        ds.save_as(b)
+        b.seek(0)
+        arr = _get_pixel_array(b)
+        ref = _get_pixel_array(EXPL_8_1_1F)
+        assert np.array_equal(arr, ref)
+
 
 # Tests for rle_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -727,6 +790,7 @@ class TestNumpy_GetPixelData:
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
         ds = dcmread(RLE_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         del ds.PixelData
         assert "PixelData" not in ds
         with pytest.raises(AttributeError, match=" dataset: PixelData"):
@@ -735,6 +799,7 @@ class TestNumpy_GetPixelData:
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if invalid PixelRepresentation."""
         ds = dcmread(RLE_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         ds.PixelRepresentation = 2
         with pytest.raises(ValueError, match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
@@ -742,6 +807,7 @@ class TestNumpy_GetPixelData:
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
         ds = dcmread(EXPL_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         msg = r"syntax is not supported by the RLE pixel"
         with pytest.raises(NotImplementedError, match=msg):
             get_pixeldata(ds)
@@ -755,6 +821,7 @@ class TestNumpy_GetPixelData:
 
         # Test default
         ds = dcmread(RLE_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.PhotometricInterpretation == "MONOCHROME2"
 
         get_pixeldata(ds)
@@ -772,6 +839,7 @@ class TestNumpy_GetPixelData:
     def test_little_endian_segment_order(self):
         """Test interpreting segment order as little endian."""
         ds = dcmread(RLE_16_1_1F)
+        ds.pixel_array_options(use_v2_backend=True)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -888,7 +956,7 @@ class TestNumpy_RLEDecodeFrame:
     def test_invalid_segment_data_raises(self):
         """Test invalid segment data raises exception"""
         ds = dcmread(RLE_16_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
+        pixel_data = get_frame(ds.PixelData, 0)
         msg = r"amount \(4095 vs. 4096 bytes\)"
         with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(
@@ -902,13 +970,13 @@ class TestNumpy_RLEDecodeFrame:
     def test_nonconf_segment_padding_warns(self):
         """Test non-conformant segment padding warns"""
         ds = dcmread(RLE_16_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
+        pixel_data = get_frame(ds.PixelData, 0)
         msg = (
             r"The decoded RLE segment contains non-conformant padding - 4097 "
             r"vs. 4096 bytes expected"
         )
         with pytest.warns(UserWarning, match=msg):
-            frame = _rle_decode_frame(
+            _rle_decode_frame(
                 pixel_data + b"\x00\x01", 4096, 1, ds.SamplesPerPixel, ds.BitsAllocated
             )
 
@@ -948,7 +1016,7 @@ class TestNumpy_RLEDecodeFrame:
 
     def test_16bit_1sample(self):
         """Test decoding 16-bit, 1 sample/pixel."""
-        header = b"\x02\x00\x00\x00" b"\x40\x00\x00\x00" b"\x47\x00\x00\x00"
+        header = b"\x02\x00\x00\x00\x40\x00\x00\x00\x47\x00\x00\x00"
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         data = (
@@ -1093,7 +1161,7 @@ class TestNumpy_RLEDecodeSegment:
             b"\x80"
         )
         assert bytes(_rle_decode_segment(data)) == (
-            b"\x01\x02\x03\x04\x05\x06" b"\x01\x01\x01"
+            b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
 
         # data at start, noop middle, data at end
@@ -1104,14 +1172,14 @@ class TestNumpy_RLEDecodeSegment:
             b"\x80"
         )
         assert bytes(_rle_decode_segment(data)) == (
-            b"\x01\x02\x03\x04\x05\x06" b"\x01\x01\x01"
+            b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
 
         # data at start, noop end
         # Copy 6 bytes literally, then 3 x 0x01
-        data = b"\x05\x01\x02\x03\x04\x05\x06" b"\xFE\x01" b"\x80"
+        data = b"\x05\x01\x02\x03\x04\x05\x06\xFE\x01\x80"
         assert bytes(_rle_decode_segment(data)) == (
-            b"\x01\x02\x03\x04\x05\x06" b"\x01\x01\x01"
+            b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
 
     def test_literal(self):

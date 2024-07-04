@@ -20,8 +20,6 @@ import json
 import os
 import os.path
 import re
-import warnings
-import weakref
 from bisect import bisect_left
 from collections.abc import (
     ValuesView,
@@ -36,7 +34,6 @@ from importlib.util import find_spec as have_package
 from itertools import takewhile
 from types import TracebackType
 from typing import (
-    Optional,
     TypeAlias,
     Any,
     AnyStr,
@@ -44,10 +41,7 @@ from typing import (
     BinaryIO,
     TypeVar,
     overload,
-    TYPE_CHECKING,
 )
-
-from pydicom.filebase import DicomFileLike
 
 try:
     import numpy
@@ -60,6 +54,7 @@ from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
 from pydicom.datadict import (
+    dictionary_description,
     dictionary_VR,
     tag_for_keyword,
     keyword_for_tag,
@@ -67,35 +62,27 @@ from pydicom.datadict import (
     get_private_entry,
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.encaps import encapsulate, encapsulate_extended
+from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
-from pydicom.pixel_data_handlers.util import (
-    convert_color_space,
+from pydicom.misc import warn_and_log
+from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
+from pydicom.pixels.utils import (
     reshape_pixel_array,
     get_image_pixel_ids,
-    get_nr_frames,
+    set_pixel_data,
 )
-from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType
-from pydicom.uid import (
-    ExplicitVRLittleEndian,
-    ImplicitVRLittleEndian,
-    ExplicitVRBigEndian,
-    RLELossless,
-    PYDICOM_IMPLEMENTATION_UID,
-    UID,
-)
+from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
+from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
-if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.sequence import Sequence
+# FloatPixelData, DoubleFloatPixelData, PixelData
+PIXEL_KEYWORDS = {0x7FE00008, 0x7FE00009, 0x7FE00010}
 
 
 class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
-
-    .. versionadded:: 1.3
 
     See the DICOM Standard, Part 5,
     :dcm:`Section 7.8.1<part05/sect_7.8.html#sect_7.8.1>` - Private Data
@@ -225,6 +212,16 @@ class PrivateBlock:
         tag = self.get_tag(element_offset)
         self.dataset.add_new(tag, VR, value)
         self.dataset[tag].private_creator = self.private_creator
+
+    def __deepcopy__(self, memo: Any) -> "PrivateBlock":
+        copied = self.__class__(
+            (self.group, self.private_creator),
+            self.dataset,
+            self.block_start >> 8,
+        )
+        memo[id(self)] = copied
+
+        return copied
 
 
 def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
@@ -380,23 +377,13 @@ class Dataset:
     indent_chars : str
         For string display, the characters used to indent nested Sequences.
         Default is ``"   "``.
-    is_little_endian : bool
-        Shall be set before writing with ``write_like_original=False``.
-        The :class:`Dataset` (excluding the pixel data) will be written using
-        the given endianness.
-    is_implicit_VR : bool
-        Shall be set before writing with ``write_like_original=False``.
-        The :class:`Dataset` will be written using the transfer syntax with
-        the given VR handling, e.g *Little Endian Implicit VR* if ``True``,
-        and *Little Endian Explicit VR* or *Big Endian Explicit VR* (depending
-        on ``Dataset.is_little_endian``) if ``False``.
     """
 
     indent_chars = "   "
 
     def __init__(self, *args: _DatasetType, **kwargs: Any) -> None:
         """Create a new :class:`Dataset` instance."""
-        self._parent_encoding: list[str] = kwargs.get(
+        self._parent_encoding: str | list[str] = kwargs.get(
             "parent_encoding", default_encoding
         )
 
@@ -413,63 +400,36 @@ class Dataset:
         # the following read_XXX attributes are used internally to store
         # the properties of the dataset after read from a file
         # set depending on the endianness of the read dataset
-        self.read_little_endian: bool | None = None
+        self._read_little: bool | None = None
         # set depending on the VR handling of the read dataset
-        self.read_implicit_vr: bool | None = None
+        self._read_implicit: bool | None = None
         # The dataset's original character set encoding
-        self.read_encoding: None | str | MutableSequence[str] = None
+        self._read_charset: str | MutableSequence[str] = ""
 
-        self.is_little_endian: bool | None = None
-        self.is_implicit_VR: bool | None = None
+        # TODO: v4.0
+        #   Remove is_little_endian and is_implicit_VR
+        if not config._use_future:
+            self._is_little_endian: bool | None = None
+            self._is_implicit_VR: bool | None = None
 
         # True if the dataset is a sequence item with undefined length
         self.is_undefined_length_sequence_item = False
-
-        # the parent data set, if this dataset is a sequence item
-        self._parent_seq: weakref.ReferenceType[Sequence] | None = None
 
         # known private creator blocks
         self._private_blocks: dict[tuple[int, str], PrivateBlock] = {}
 
         self._pixel_array: numpy.ndarray | None = None
+        self._pixel_array_opts: dict[str, Any] = {"use_pdh": False}
         self._pixel_id: dict[str, int] = {}
 
         self.file_meta: FileMetaDataset
 
-    @property
-    def parent_seq(self) -> "weakref.ReferenceType[Sequence] | None":
-        """Return a weak reference to the parent
-        :class:`~pydicom.sequence.Sequence`.
-
-        .. versionadded:: 2.4
-
-            Returned value is a weak reference to the parent ``Sequence``.
-        """
-        return self._parent_seq
-
-    @parent_seq.setter
-    def parent_seq(self, value: "Sequence") -> None:
-        """Set the parent :class:`~pydicom.sequence.Sequence`
-
-        .. versionadded:: 2.4
-        """
-        if value != self._parent_seq:
-            self._parent_seq = weakref.ref(value)
-
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "Dataset":
-        cls = self.__class__
-        copied = cls.__new__(cls)
-        if memo:
-            memo[id(self)] = copied  # add the new class to the memo
-        # Insert a deepcopy of all instance attributes
-        copied.__dict__.update(copy.deepcopy(self.__dict__, memo))
-        # Manually update the weakref to be correct
-        for elem in copied:  # DICOM elements
-            if elem.VR == VR_.SQ:
-                elem.value.parent_dataset = copied  # setter does weakref
-                elem.parent = copied
-
-        return copied
+        # Used after reading an implicit dataset to help determine the VR of
+        #   ambiguous US or SS elements that depend on the value of (0028,0103)
+        #   *Pixel Representation*
+        # It gets set by __getitem__() and __setitem()__ and is used by the
+        #   ambiguous VR correction function
+        self._pixel_rep: int
 
     def __enter__(self) -> "Dataset":
         """Method invoked on entry to a with statement."""
@@ -626,7 +586,7 @@ class Dataset:
                 )
 
             if config.INVALID_KEY_BEHAVIOR == "WARN":
-                warnings.warn(msg)
+                warn_and_log(msg)
             elif config.INVALID_KEY_BEHAVIOR == "RAISE":
                 raise ValueError(msg) from exc
 
@@ -695,6 +655,11 @@ class Dataset:
         tag = cast(BaseTag, tag_for_keyword(name))
         if tag is not None and tag in self._dict:
             del self._dict[tag]
+
+            # Deleting pixel data resets the stored array
+            if tag in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -741,16 +706,30 @@ class Dataset:
                 # deleted - will be re-created on next access
                 if self._private_blocks and BaseTag(tag).is_private_creator:
                     self._private_blocks = {}
+
+                if tag in PIXEL_KEYWORDS:
+                    self._pixel_array = None
+                    self._pixel_id = {}
         elif isinstance(key, BaseTag):
             del self._dict[key]
             if self._private_blocks and key.is_private_creator:
                 self._private_blocks = {}
+
+            # Deleting pixel data resets the stored array
+            if key in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
         else:
             # If not a standard tag, than convert to Tag and try again
             tag = Tag(key)
             del self._dict[tag]
             if self._private_blocks and tag.is_private_creator:
                 self._private_blocks = {}
+
+            # Deleting pixel data resets the stored array
+            if tag in PIXEL_KEYWORDS:
+                self._pixel_array = None
+                self._pixel_id = {}
 
     def __dir__(self) -> list[str]:
         """Return a list of methods, properties, attributes and element
@@ -939,13 +918,68 @@ class Dataset:
         return object.__getattribute__(self, name)
 
     @property
-    def _character_set(self) -> list[str]:
+    def _character_set(self) -> str | list[str]:
         """The character set used to encode text values."""
         char_set = self.get(BaseTag(0x00080005), None)
         if not char_set:
             return self._parent_encoding
 
         return convert_encodings(char_set.value)
+
+    @property
+    def original_character_set(self) -> str | MutableSequence[str]:
+        """Return the original character set encoding for a dataset decoded
+        from a file or buffer.
+
+        Returns
+        -------
+        str | MutableSequence[str]
+            The original character set encoding of the dataset as given by
+            the (0008,0005) *Specific Character Set*, or `iso8859
+            <https://docs.python.org/3/library/codecs.html#standard-encodings>`_
+            if the dataset has been created from scratch.
+        """
+        return self._read_charset
+
+    @property
+    def read_encoding(self) -> str | MutableSequence[str]:
+        """Return the original character set encoding for a decoded dataset.
+
+        .. deprecated:: 3.0
+
+            ``read_encoding`` will be removed in v4.0, use
+            :attr:`~pydicom.dataset.Dataset.original_character_set` instead.
+
+        """
+        name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'read_encoding'")
+
+        warn_and_log(
+            (
+                f"'{name}.read_encoding' will be removed in v4.0, use "
+                f"'{name}.original_character_set' instead"
+            ),
+            DeprecationWarning,
+        )
+
+        return self.original_character_set
+
+    @read_encoding.setter
+    def read_encoding(self, value: str | MutableSequence[str]) -> None:
+        name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'read_encoding'")
+
+        warn_and_log(
+            (
+                f"'{name}.read_encoding' will be removed in v4.0, use "
+                f"'{name}.original_character_set' instead"
+            ),
+            DeprecationWarning,
+        )
+
+        self._read_charset = value
 
     @overload
     def __getitem__(self, key: slice) -> "Dataset":
@@ -1021,16 +1055,30 @@ class Dataset:
             if elem.value is None and elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
 
+                src = self.filename or self.buffer
+                if (
+                    self.filename
+                    and self.buffer
+                    and not getattr(self.buffer, "closed", False)
+                ):
+                    src = self.buffer
+
                 elem = read_deferred_data_element(
-                    self.fileobj_type, self.filename, self.timestamp, elem
+                    self.fileobj_type, src, self.timestamp, elem
                 )
 
             if tag != BaseTag(0x00080005):
-                character_set = self.read_encoding or self._character_set
+                character_set = self.original_character_set or self._character_set
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(elem, character_set, self)
+
+            # On initial read of the dataset, propagate the pixel representation
+            #   (if any) to child datasets in any sequences.
+            # This is used as part of the ambiguous VR correction for US or SS
+            if self[tag].VR == VR_.SQ:
+                self._set_pixel_representation(self[tag])
 
             # If the Element has an ambiguous VR, try to correct it
             if self[tag].VR in AMBIGUOUS_VR:
@@ -1044,8 +1092,6 @@ class Dataset:
         self, group: int, private_creator: str, create: bool = False
     ) -> PrivateBlock:
         """Return the block for the given tag `group` and `private_creator`.
-
-        .. versionadded:: 1.3
 
         If `create` is ``True`` and the `private_creator` does not exist,
         the private creator tag is added.
@@ -1118,8 +1164,6 @@ class Dataset:
     def private_creators(self, group: int) -> list[str]:
         """Return a list of private creator names in the given group.
 
-        .. versionadded:: 1.3
-
         Examples
         --------
         This can be used to check if a given private creator exists in
@@ -1155,8 +1199,6 @@ class Dataset:
     ) -> DataElement:
         """Return the data element for the given private tag `group`.
 
-        .. versionadded:: 1.3
-
         This is analogous to ``Dataset.__getitem__()``, but only for private
         tags. This allows to find the private tag for the correct private
         creator without the need to add the tag to the private dictionary
@@ -1190,21 +1232,28 @@ class Dataset:
         return self.__getitem__(block.get_tag(element_offset))
 
     @overload
-    def get_item(self, key: slice) -> "Dataset":
+    def get_item(self, key: slice, *, keep_deferred: bool = ...) -> "Dataset":
         pass  # pragma: no cover
 
     @overload
-    def get_item(self, key: TagType) -> DataElement:
+    def get_item(self, key: TagType, *, keep_deferred: bool = ...) -> DataElement:
         pass  # pragma: no cover
 
     def get_item(
-        self, key: "slice | TagType"
+        self,
+        key: "slice | TagType",
+        *,
+        keep_deferred: bool = False,
     ) -> "Dataset | DataElement | RawDataElement | None":
         """Return the raw data element if possible.
 
         It will be raw if the user has never accessed the value, or set their
         own value. Note if the data element is a deferred-read element,
         then it is read and converted before being returned.
+
+        .. versionchanged: 3.0
+
+            Added the `keep_deferred` keyword argument.
 
         Parameters
         ----------
@@ -1213,10 +1262,14 @@ class Dataset:
             :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
             made up of DICOM tags.
+        keep_deferred : bool, optional
+            If ``True`` then when returning :class:`~pydicom.dataelem.RawDataElement`
+            do not perform the deferred read of the element's value (accessing
+            the value will return ``None`` instead). Default ``False``.
 
         Returns
         -------
-        dataelem.DataElement
+        dataelem.DataElement | dataelem.RawDataElement
             The corresponding element.
         """
         if isinstance(key, slice):
@@ -1224,7 +1277,11 @@ class Dataset:
 
         elem = self._dict.get(Tag(key))
         # If a deferred read, return using __getitem__ to read and convert it
-        if isinstance(elem, RawDataElement) and elem.value is None:
+        if (
+            isinstance(elem, RawDataElement)
+            and not keep_deferred
+            and elem.value is None
+        ):
             return self[key]
 
         return elem
@@ -1238,47 +1295,164 @@ class Dataset:
         """
         tags = self._slice_dataset(slce.start, slce.stop, slce.step)
         ds = Dataset({tag: self.get_item(tag) for tag in tags})
-        ds.is_little_endian = self.is_little_endian
-        ds.is_implicit_VR = self.is_implicit_VR
-        ds.set_original_encoding(
-            self.read_implicit_vr, self.read_little_endian, self.read_encoding
-        )
+        is_implicit, is_little = self.original_encoding
+        ds.set_original_encoding(is_implicit, is_little, self.original_character_set)
+        if not config._use_future:
+            ds._is_little_endian = self.is_little_endian
+            ds._is_implicit_VR = self.is_implicit_VR
+
         return ds
+
+    @property
+    def is_implicit_VR(self) -> bool | None:
+        """Get/set the VR method used when encoding the dataset.
+
+        .. deprecated:: 3.0
+
+            ``is_implicit_VR`` will be removed in v4.0, set the *Transfer
+            Syntax UID* or use the `implicit_vr` argument with
+            :meth:`~pydicom.dataset.Dataset.save_as` or
+            :func:`~pydicom.filewriter.dcmwrite` instead.
+
+        Returns
+        -------
+        bool | None
+            If the dataset has been created from scratch then returns ``None``,
+            otherwise returns the VR encoding method used by the decoded
+            dataset.
+        """
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'is_implicit_VR'"
+            )
+
+        return self._is_implicit_VR
+
+    @is_implicit_VR.setter
+    def is_implicit_VR(self, value: bool | None) -> None:
+        name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'is_implicit_VR'")
+
+        warn_and_log(
+            (
+                f"'{name}.is_implicit_VR' will be removed in v4.0, set the "
+                "Transfer Syntax UID or use the 'implicit_vr' argument with "
+                f"{name}.save_as() or dcmwrite() instead"
+            ),
+            DeprecationWarning,
+        )
+        self._is_implicit_VR = value
+
+    @property
+    def is_little_endian(self) -> bool | None:
+        """Get/set the endianness used when encoding the dataset.
+
+        .. deprecated:: 3.0
+
+            ``is_little_endian`` will be removed in v4.0, set the *Transfer
+            Syntax UID* or use the `little_endian` argument with
+            :meth:`~pydicom.dataset.Dataset.save_as` or
+            :func:`~pydicom.filewriter.dcmwrite` instead.
+
+        Returns
+        -------
+        bool | None
+            If the dataset has been created from scratch then returns ``None``,
+            otherwise returns the endianness of the encoding used by the
+            decoded dataset.
+        """
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'is_little_endian'"
+            )
+
+        return self._is_little_endian
+
+    @is_little_endian.setter
+    def is_little_endian(self, value: bool | None) -> None:
+        name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'is_little_endian'")
+
+        warn_and_log(
+            (
+                f"'{name}.is_little_endian' will be removed in v4.0, set the "
+                "Transfer Syntax UID or use the 'little_endian' argument with "
+                f"{name}.save_as() or dcmwrite() instead"
+            ),
+            DeprecationWarning,
+        )
+        self._is_little_endian = value
 
     @property
     def is_original_encoding(self) -> bool:
         """Return ``True`` if the encoding to be used for writing is set and
         is the same as that used to originally encode the  :class:`Dataset`.
 
-        .. versionadded:: 1.1
-
         This includes properties related to endianness, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
+        if config._use_future:
+            return self.original_character_set == self._character_set
+
+        current_encoding = (self.is_implicit_VR, self.is_little_endian)
         return (
-            self.is_implicit_VR is not None
-            and self.is_little_endian is not None
-            and self.read_implicit_vr == self.is_implicit_VR
-            and self.read_little_endian == self.is_little_endian
-            and self.read_encoding == self._character_set
+            None not in current_encoding
+            and self.original_encoding == current_encoding
+            and self.original_character_set == self._character_set
+        )
+
+    @property
+    def original_encoding(self) -> tuple[bool, bool] | tuple[None, None]:
+        """Return the original encoding used for a dataset decoded from a file
+        or buffer.
+
+        Returns
+        -------
+        tuple[bool, bool] | tuple[None, None]
+            For a dataset decoded from a file or buffer this is whether
+            the encoding used implicit/explicit VR and little/big endian
+            as ``(encoded as implicit VR, encoded as little endian)``. Returns
+            ``(None, None)`` for a dataset created from scratch.
+        """
+        return cast(
+            tuple[bool, bool] | tuple[None, None],
+            (self._read_implicit, self._read_little),
         )
 
     def set_original_encoding(
         self,
         is_implicit_vr: bool | None,
         is_little_endian: bool | None,
-        character_encoding: None | str | MutableSequence[str],
+        character_encoding: str | MutableSequence[str] | None = None,
     ) -> None:
-        """Set the values for the original transfer syntax and encoding.
-
-        .. versionadded:: 1.2
+        """Set the values for the original dataset encoding.
 
         Can be used for a :class:`Dataset` with raw data elements to enable
         optimized writing (e.g. without decoding the data elements).
+
+        .. versionchanged:: 3.0
+
+            `character_encoding` is now optional
+
+        Parameters
+        ----------
+        is_implicit_vr : bool | None
+            The the original VR encoding of the dataset, ``True`` for implicit
+            VR, ``False`` for explicit VR or ``None`` to reset.
+        is_little_endian : bool | None
+            Set the original endianness of the dataset, ``True`` for little
+            endian, ``False`` for big or ``None`` to reset.
+        character_encoding : str | MutableSequence[str], optional
+            Set the original character set encoding of the dataset. If ``None``
+            then no changes will be made to the original character set
+            encoding.
         """
-        self.read_implicit_vr = is_implicit_vr
-        self.read_little_endian = is_little_endian
-        self.read_encoding = character_encoding
+        self._read_implicit = is_implicit_vr
+        self._read_little = is_little_endian
+        if character_encoding is not None:
+            self._read_charset = character_encoding
 
     def group_dataset(self, group: int) -> "Dataset":
         """Return a :class:`Dataset` containing only elements of a certain
@@ -1325,10 +1499,8 @@ class Dataset:
         for tag in taglist:
             yield self[tag]
 
-    def elements(self) -> Iterator[DataElement]:
+    def elements(self) -> Iterator[DataElement | RawDataElement]:
         """Yield the top-level elements of the :class:`Dataset`.
-
-        .. versionadded:: 1.1
 
         Examples
         --------
@@ -1466,7 +1638,7 @@ class Dataset:
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN
-                    warnings.warn(f"Unknown DICOM tag {tag} - setting VR to 'UN'")
+                    warn_and_log(f"Unknown DICOM tag {tag} - setting VR to 'UN'")
 
             default = DataElement(tag, vr, default)
 
@@ -1477,20 +1649,34 @@ class Dataset:
     def convert_pixel_data(self, handler_name: str = "") -> None:
         """Convert pixel data to a :class:`numpy.ndarray` internally.
 
+        .. deprecated:: 3.0
+
+            This method will be removed in v4.0, use
+            :meth:`~pydicom.dataset.Dataset.pixel_array_options` instead.
+
         Parameters
         ----------
         handler_name : str, optional
-            The name of the pixel handler that shall be used to
-            decode the data. Supported names are: ``'gdcm'``,
-            ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'`` and
-            ``'pylibjpeg'``. If not used (the default), a matching handler is
-            used from the handlers configured in
-            :attr:`~pydicom.config.pixel_data_handlers`.
+            The name of the pixel handler or decoding plugin to use to decode
+            the dataset's pixel data. Support values are:
+
+            * If using the :mod:`~pydicom.pixel_data_handlers` backend:
+              ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'``
+              and ``'pylibjpeg'``.
+            * If using the :mod:`~pydicom.pixels` backend see the
+              :doc:`documentation for the decoder</reference/pixels.decoders>`
+              corresponding to the dataset's *Transfer Syntax UID*.
+
+            If not used (the default) then all available handlers or plugins
+            will be tried and the data from first successful one will be
+            used.
 
         Returns
         -------
         None
-            Converted pixel data is stored internally in the dataset.
+            Converted pixel data is stored internally in the dataset, it can
+            be accessed with the :attr:`~pydicom.dataset.Dataset.pixel_array`
+            property.
 
         Raises
         ------
@@ -1508,26 +1694,49 @@ class Dataset:
         If the pixel data is in a compressed image format, the data is
         decompressed and any related data elements are changed accordingly.
         """
+        # TODO: Remove in v4.0
+        if config._use_future:
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute 'convert_pixel_data'"
+            )
+
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != get_image_pixel_ids(self):
+        elif self._pixel_array is None:
+            already_have = False
+
+        # Checking `_pixel_id` may sometimes give a false result if the pixel
+        #   data memory has been freed (such as with ds.PixelData = None)
+        #   prior to setting a new value; Python may reuse that freed memory
+        #   for the new value and therefore give the same `id()` value
+        if self._pixel_id != get_image_pixel_ids(self):
             already_have = False
 
         if already_have:
             return
 
-        if handler_name:
-            self._convert_pixel_data_using_handler(handler_name)
+        opts = self._pixel_array_opts.copy()
+        name = handler_name.lower() if handler_name else opts.get("decoding_plugin", "")
+        if not opts["use_pdh"]:
+            # Use 'pydicom.pixels' backend
+            opts["decoding_plugin"] = name
+            self._pixel_array = pixel_array(self, **opts)
+            self._pixel_id = get_image_pixel_ids(self)
         else:
-            self._convert_pixel_data_without_handler()
+            # Use 'pydicom.pixel_data_handlers' backend
+            if name:
+                self._convert_pixel_data_using_handler(name)
+            else:
+                self._convert_pixel_data_without_handler()
 
     def _convert_pixel_data_using_handler(self, name: str) -> None:
         """Convert the pixel data using handler with the given name.
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
+        # TODO: Remove in v4.0
         # handle some variations in name
         handler_name = name.lower()
         if not handler_name.endswith("_handler"):
@@ -1564,6 +1773,7 @@ class Dataset:
         """Convert the pixel data using the first matching handler.
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
+        # TODO: Remove in v4.0
         # Find all possible handlers that support the transfer syntax
         ts = self.file_meta.TransferSyntaxUID
         possible_handlers = [
@@ -1601,7 +1811,7 @@ class Dataset:
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
+                pkg_msg.append(f"{hh.HANDLER_NAME} (req. {', '.join(names)})")
 
             raise RuntimeError(msg + ", ".join(pkg_msg))
 
@@ -1631,7 +1841,7 @@ class Dataset:
 
     def _do_pixel_data_conversion(self, handler: Any) -> None:
         """Do the actual data conversion using the given handler."""
-
+        # TODO: Remove in v4.0
         # Use the handler to get a 1D numpy array of the pixel data
         # Will raise an exception if no pixel data element
         arr = handler.get_pixeldata(self)
@@ -1649,18 +1859,22 @@ class Dataset:
     def compress(
         self,
         transfer_syntax_uid: str,
-        arr: Optional["numpy.ndarray"] = None,
+        arr: "numpy.ndarray | None" = None,
         encoding_plugin: str = "",
-        decoding_plugin: str = "",
         encapsulate_ext: bool = False,
+        *,
+        generate_instance_uid: bool = True,
+        jls_error: int | None = None,
+        j2k_cr: list[float] | None = None,
+        j2k_psnr: list[float] | None = None,
         **kwargs: Any,
     ) -> None:
-        """Compress and update an uncompressed dataset in-place with the
-        resulting :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
+        """Compress uncompressed pixel data and update `ds` in-place with the
+        resulting :dcm:`encapsulated<part05/sect_A.4.html>` codestream.
 
         .. versionadded:: 2.2
 
-        The dataset must already have the following
+        The dataset `ds` must already have the following
         :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
         with correct values that correspond to the resulting compressed
         pixel data:
@@ -1674,16 +1888,16 @@ class Dataset:
         * (0028,0101) *Bits Stored*
         * (0028,0103) *Pixel Representation*
 
+        If *Samples per Pixel* is greater than 1 then the following element
+        is also required:
+
+        * (0028,0006) *Planar Configuration*
+
         This method will add the file meta dataset if none is present and add
         or modify the following elements:
 
         * (0002,0010) *Transfer Syntax UID*
         * (7FE0,0010) *Pixel Data*
-
-        If *Samples per Pixel* is greater than 1 then the following element
-        will also be added:
-
-        * (0028,0006) *Planar Configuration*
 
         If the compressed pixel data is too large for encapsulation using a
         basic offset table then an :dcm:`extended offset table
@@ -1693,15 +1907,33 @@ class Dataset:
         * (7FE0,0001) *Extended Offset Table*
         * (7FE0,0002) *Extended Offset Table Lengths*
 
+        If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+        Instance UID* value will be generated.
+
         **Supported Transfer Syntax UIDs**
 
-        +----------------------+----------+----------------------------------+
-        | UID                  | Plugins  | Encoding Guide                   |
-        +======================+==========+==================================+
-        | *RLE Lossless* -     |pydicom,  | :doc:`RLE Lossless               |
-        | 1.2.840.10008.1.2.5  |pylibjpeg,| </guides/encoding/rle_lossless>` |
-        |                      |gdcm      |                                  |
-        +----------------------+----------+----------------------------------+
+        +-----------------------------------------------+-----------+----------------------------------+
+        | UID                                           |  Plugins  | Encoding Guide                   |
+        +------------------------+----------------------+           |                                  |
+        | Name                   | Value                |           |                                  |
+        +========================+======================+===========+==================================+
+        |*JPEG-LS Lossless*      |1.2.840.10008.1.2.4.80| pyjpegls  | :doc:`JPEG-LS                    |
+        +------------------------+----------------------+           | </guides/encoding/jpeg_ls>`      |
+        | *JPEG-LS Near Lossless*|1.2.840.10008.1.2.4.81|           |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
+        | *JPEG 2000 Lossless*   |1.2.840.10008.1.2.4.90| pylibjpeg | :doc:`JPEG 2000                  |
+        +------------------------+----------------------+           | </guides/encoding/jpeg_2k>`      |
+        | *JPEG 2000*            |1.2.840.10008.1.2.4.91|           |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
+        | *RLE Lossless*         | 1.2.840.10008.1.2.5  | pydicom,  | :doc:`RLE Lossless               |
+        |                        |                      | pylibjpeg,| </guides/encoding/rle_lossless>` |
+        |                        |                      | gdcm      |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
+
+        .. versionchanged:: 3.0
+
+            Added the `jls_error`, `j2k_cr`, `j2k_psnr` and `generate_instance_uid`
+            keyword parameters.
 
         Examples
         --------
@@ -1727,155 +1959,150 @@ class Dataset:
             contents of the array should match the dataset.
         encoding_plugin : str, optional
             Use the `encoding_plugin` to compress the pixel data. See the
-            :doc:`user guide </old/image_data_compression>` for a list of
+            :doc:`user guide </guides/user/image_data_compression>` for a list of
             plugins available for each UID and their dependencies. If not
             specified then all available plugins will be tried (default).
-        decoding_plugin : str, optional
-            Placeholder for future functionality.
         encapsulate_ext : bool, optional
             If ``True`` then force the addition of an extended offset table.
             If ``False`` (default) then an extended offset table
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
+        generate_instance_uid : bool, optional
+            If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+            value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+            keep the original value.
+        jls_error : int, optional
+            **JPEG-LS Near Lossless only**. The allowed absolute compression error
+            in the pixel values.
+        j2k_cr : list[float], optional
+            **JPEG 2000 only**. A list of the compression ratios to use for each
+            quality layer. There must be at least one quality layer and the
+            minimum allowable compression ratio is ``1``. When using multiple
+            quality layers they should be ordered in decreasing value from left
+            to right. For example, to use 2 quality layers with 20x and 5x
+            compression ratios then `j2k_cr` should be ``[20, 5]``. Cannot be
+            used with `j2k_psnr`.
+        j2k_psnr : list[float], optional
+            **JPEG 2000 only**. A list of the peak signal-to-noise ratios (in dB)
+            to use for each quality layer. There must be at least one quality
+            layer and when using multiple quality layers they should be ordered
+            in increasing value from left to right. For example, to use 2
+            quality layers with PSNR of 80 and 300 then `j2k_psnr` should be
+            ``[80, 300]``. Cannot be used with `j2k_cr`.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
         """
-        from pydicom.encoders import get_encoder
+        compress(
+            self,
+            transfer_syntax_uid,
+            arr,
+            encoding_plugin=encoding_plugin,
+            encapsulate_ext=encapsulate_ext,
+            generate_instance_uid=generate_instance_uid,
+            jls_error=jls_error,
+            j2k_cr=j2k_cr,
+            j2k_psnr=j2k_psnr,
+            **kwargs,
+        )
 
-        uid = UID(transfer_syntax_uid)
+    def decompress(
+        self,
+        handler_name: str = "",
+        *,
+        as_rgb: bool = True,
+        generate_instance_uid: bool = True,
+        decoding_plugin: str = "",
+        **kwargs: Any,
+    ) -> None:
+        """Perform an in-place decompression of a dataset with a compressed *Transfer
+        Syntax UID*.
 
-        # Raises NotImplementedError if `uid` is not supported
-        encoder = get_encoder(uid)
-        if not encoder.is_available:
-            missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
-            raise RuntimeError(
-                f"The '{uid.name}' encoder is unavailable because its "
-                f"encoding plugins are missing dependencies:\n"
-                f"{missing}"
-            )
+        .. warning::
 
-        if arr is None:
-            # Encode the current *Pixel Data*
-            frame_iterator = encoder.iter_encode(
-                self,
-                encoding_plugin=encoding_plugin,
-                decoding_plugin=decoding_plugin,
-                **kwargs,
-            )
-        else:
-            # Encode from an uncompressed pixel data array
-            kwargs.update(encoder.kwargs_from_ds(self))
-            frame_iterator = encoder.iter_encode(
-                arr, encoding_plugin=encoding_plugin, **kwargs
-            )
+            This function requires `NumPy <https://numpy.org/>`_ and may require
+            the installation of additional packages to perform the actual pixel
+            data decoding. See the :doc:`pixel data decompression documentation
+            </guides/user/image_data_handlers>` for more information.
 
-        # Encode!
-        encoded = [f for f in frame_iterator]
+        * The dataset's *Transfer Syntax UID* will be set to *Explicit
+          VR Little Endian*.
+        * The *Pixel Data* will be decompressed in its entirety and the
+          *Pixel Data* element's value updated with the decompressed data,
+          padded to an even length.
+        * The *Pixel Data* element's VR will be set to **OB** if *Bits
+          Allocated* <= 8, otherwise it will be set to **OW**.
+        * The :attr:`DataElement.is_undefined_length
+          <pydicom.dataelem.DataElement.is_undefined_length>` attribute for the
+          *Pixel Data* element will be set to ``False``.
+        * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
+          modified as required to match the uncompressed *Pixel Data*.
+        * If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
+          Instance UID* value will be generated.
 
-        # Encapsulate the encoded *Pixel Data*
-        nr_frames = get_nr_frames(self)
-        total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
-        if encapsulate_ext or total > 2**32 - 1:
-            (
-                self.PixelData,
-                self.ExtendedOffsetTable,
-                self.ExtendedOffsetTableLengths,
-            ) = encapsulate_extended(encoded)
-        else:
-            self.PixelData = encapsulate(encoded)
+        .. versionchanged:: 3.0
 
-        # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
-        self["PixelData"].is_undefined_length = True
+            Added the `as_rgb` and `generate_instance_uid` keyword parameters.
 
-        # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
-        self.is_implicit_VR = False
-        self.is_little_endian = True
+        .. deprecated:: 3.0
 
-        # Set the correct *Transfer Syntax UID*
-        if not hasattr(self, "file_meta"):
-            self.file_meta = FileMetaDataset()
-
-        self.file_meta.TransferSyntaxUID = uid
-
-        # Add or update any other required elements
-        if self.SamplesPerPixel > 1:
-            self.PlanarConfiguration: int = 1 if uid == RLELossless else 0
-
-    def decompress(self, handler_name: str = "") -> None:
-        """Decompresses *Pixel Data* and modifies the :class:`Dataset`
-        in-place.
-
-        .. versionadded:: 1.4
-
-            The `handler_name` keyword argument was added
-
-        If not a compressed transfer syntax, then pixel data is converted
-        to a :class:`numpy.ndarray` internally, but not returned.
-
-        If compressed pixel data, then is decompressed using an image handler,
-        and internal state is updated appropriately:
-
-        - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
-          form
-        - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
-          is ``False`` for the (7FE0,0010) *Pixel Data* element.
-
-        .. versionchanged:: 1.4
-
-            The `handler_name` keyword argument was added
+            The `handler_name` parameter will be removed in v4.0, use
+            `decoding_plugin` instead.
 
         Parameters
         ----------
         handler_name : str, optional
-            The name of the pixel handler that shall be used to
-            decode the data. Supported names are: ``'gdcm'``,
-            ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'`` and
-            ``'pylibjpeg'``.
-            If not used (the default), a matching handler is used from the
-            handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
+            Deprecated and will be removed in v4.0, use `decoding_plugin` instead.
+        as_rgb : bool, optional
+            :mod:`~pydicom.pixels` **backend only.** If ``True`` (default) then
+            convert pixel data with a YCbCr :ref:`photometric interpretation
+            <photometric_interpretation>` such as ``"YBR_FULL_422"`` to RGB.
+        generate_instance_uid : bool, optional
+            If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
+            value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
+            keep the original value.
+        decoding_plugin : str, optional
+            The name of the decoding plugin to use when decoding compressed
+            pixel data. If no `decoding_plugin` is specified (default) then all
+            available plugins will be tried and the result from the first successful
+            one yielded.
 
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        NotImplementedError
-            If the pixel data was originally compressed but file is not
-            *Explicit VR Little Endian* as required by the DICOM Standard.
+            * If using the :mod:`~pydicom.pixels` backend (default) then see the
+              :doc:`API documentation</reference/pixels.decoders>` for the available
+              plugins for each *Transfer Syntax UID*.
+            * If using the deprecated :mod:`~pydicom.pixel_data_handlers` backend
+              supported plugins are: ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``,
+              ``'rle'``, ``'numpy'`` and ``'pylibjpeg'``.
+        kwargs : dict[str, Any], optional
+            :mod:`~pydicom.pixels` **backend only.** Optional keyword parameters
+            for the decoding plugin may also be present. See the :doc:`decoding
+            plugins options</guides/decoding/decoder_options>` for more information.
         """
-        self.convert_pixel_data(handler_name)
-        self.is_decompressed = True
-        # May have been undefined length pixel data, but won't be now
-        if "PixelData" in self:
-            self[0x7FE00010].is_undefined_length = False
+        # TODO: remove support for pixel_data_handlers module in v4.0
+        if config._use_future and kwargs.get("handler_name", handler_name):
+            raise TypeError(
+                f"{type(self).__name__}.decompress() got an unexpected "
+                "keyword argument 'handler_name'"
+            )
 
-        # Make sure correct Transfer Syntax is set
-        # According to the dicom standard PS3.5 section A.4,
-        # all compressed files must have been explicit VR, little endian
-        # First check if was a compressed file
-        if (
-            hasattr(self, "file_meta")
-            and self.file_meta.TransferSyntaxUID.is_compressed
-        ):
-            # Check that current file as read does match expected
-            if not self.is_little_endian or self.is_implicit_VR:
-                msg = (
-                    "Current dataset does not match expected ExplicitVR "
-                    "LittleEndian transfer syntax from a compressed "
-                    "transfer syntax"
-                )
-                raise NotImplementedError(msg)
+        opts = self._pixel_array_opts.copy()
+        if handler_name:
+            opts["decoding_plugin"] = handler_name
 
-            # All is as expected, updated the Transfer Syntax
-            self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        if decoding_plugin:
+            opts["decoding_plugin"] = decoding_plugin
+
+        opts.update(**kwargs)
+        decompress(
+            self,
+            as_rgb=as_rgb,
+            generate_instance_uid=generate_instance_uid,
+            **opts,
+        )
 
     def overlay_array(self, group: int) -> "numpy.ndarray":
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
-
-        .. versionadded:: 1.4
 
         Parameters
         ----------
@@ -1894,65 +2121,187 @@ class Dataset:
                 "between 0x6000 and 0x60FF (inclusive)"
             )
 
-        from pydicom.config import overlay_data_handlers
-
-        available_handlers = [hh for hh in overlay_data_handlers if hh.is_available()]
-        if not available_handlers:
-            # For each of the handlers we want to find which
-            #   dependencies are missing
-            msg = (
-                "The following handlers are available to decode the overlay "
-                "data however they are missing required dependencies: "
+        if not config.have_numpy:
+            raise ImportError(
+                f"NumPy is required for {type(self).__name__}.overlay_array()"
             )
-            pkg_msg = []
-            for hh in overlay_data_handlers:
-                hh_deps = hh.DEPENDENCIES
-                # Missing packages
-                missing = [dd for dd in hh_deps if have_package(dd) is None]
-                # Package names
-                names = [hh_deps[name][1] for name in missing]
-                pkg_msg.append(f"{hh.HANDLER_NAME} " f"(req. {', '.join(names)})")
 
-            raise RuntimeError(msg + ", ".join(pkg_msg))
+        from pydicom.overlays import get_overlay_array
 
-        last_exception = None
-        for handler in available_handlers:
-            try:
-                # Use the handler to get an ndarray of the pixel data
-                func = handler.get_overlay_array
-                return cast("numpy.ndarray", func(self, group))
-            except Exception as exc:
-                logger.debug("Exception raised by overlay data handler", exc_info=exc)
-                last_exception = exc
-
-        logger.info(
-            "Unable to decode the overlay data using the following handlers: "
-            "{}. Please see the list of supported Transfer Syntaxes in the "
-            "pydicom documentation for alternative packages that might "
-            "be able to decode the data".format(
-                ", ".join([str(hh) for hh in available_handlers])
-            )
-        )
-
-        raise last_exception  # type: ignore[misc]
+        return get_overlay_array(self, group)
 
     @property
     def pixel_array(self) -> "numpy.ndarray":
         """Return the pixel data as a :class:`numpy.ndarray`.
 
-        .. versionchanged:: 1.4
+        .. warning::
 
-            Added support for *Float Pixel Data* and *Double Float Pixel Data*
+            This property requires `NumPy <https://numpy.org/>`_ and may require
+            the installation of additional packages to perform the actual pixel
+            data decoding. See the :doc:`pixel data decompression documentation
+            </guides/user/image_data_handlers>` for more information.
+
+        .. versionchanged:: 3.0
+
+            The backend used for pixel data decoding has changed from the
+            :mod:`~pydicom.pixel_data_handlers` module to the
+            :mod:`~pydicom.pixels` module. The behavior of the new backend
+            is not backwards compatible with the old one, in particular the
+            default color space should now be RGB when previously YCbCr data
+            was returned.
+
+            To revert to the deprecated :mod:`~pydicom.pixel_data_handlers`
+            backend pass ``use_v2_backend=True`` to the
+            :meth:`~pydicom.dataset.Dataset.pixel_array_options` method::
+
+                >>> from pydicom import examples
+                >>> ds = examples.ct
+                >>> ds.pixel_array_options(use_v2_backend=True)
+                >>> arr = ds.pixel_array
+
+            The :mod:`~pydicom.pixel_data_handlers` module and the
+            `use_v2_backend` keyword argument will be removed in v4.0.
 
         Returns
         -------
         numpy.ndarray
-            The (7FE0,0008) *Float Pixel Data*, (7FE0,0009) *Double Float
-            Pixel Data* or (7FE0,0010) *Pixel Data* converted to a
-            :class:`numpy.ndarray`.
+            The contents of the (7FE0,0008) *Float Pixel Data*, (7FE0,0009)
+            *Double Float Pixel Data* or (7FE0,0010) *Pixel Data* elements
+            converted to a :class:`numpy.ndarray`. The array will be shaped as:
+
+            * (rows, columns) for single frame, single sample data
+            * (rows, columns, samples) for single frame, multi-sample data
+            * (frames, rows, columns) for multi-frame, single sample data
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data
+
+            When using the :mod:`pydicom.pixels` backend the decoding options
+            used with the returned array can be customized via the
+            :meth:`~pydicom.dataset.Dataset.pixel_array_options` method.
+
+        See Also
+        --------
+        pydicom.pixels.pixel_array
+            A function for returning the pixel data from the path to a dataset,
+            a readable file-like containing a dataset or a
+            :class:`~pydicom.dataset.Dataset` instance. Can be used to minimize
+            the memory required to return the pixel data when used with a path
+            or file-like.
+        pydicom.pixels.iter_pixels
+            Similar to :func:`pydicom.pixels.pixel_array` but returns a generator
+            that iterates through the image frames.
         """
         self.convert_pixel_data()
         return cast("numpy.ndarray", self._pixel_array)
+
+    def pixel_array_options(
+        self,
+        *,
+        index: int | None = None,
+        raw: bool = False,
+        decoding_plugin: str = "",
+        use_v2_backend: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Set the decoding and processing options used by the
+        :attr:`~pydicom.dataset.Dataset.pixel_array` property.
+
+        .. versionadded:: 3.0
+
+        .. deprecated:: 3.0
+
+            The `use_v2_backend` keyword parameter will be removed in v4.0.
+
+        **Processing**
+
+        The following processing operations on the raw pixel data will always
+        be performed:
+
+        * Natively encoded bit-packed pixel data for a :ref:`bits allocated
+          <bits_allocated>` of ``1`` will be unpacked.
+        * Natively encoded pixel data with a :ref:`photometric interpretation
+          <photometric_interpretation>` of ``"YBR_FULL_422"`` will
+          have it's sub-sampling removed.
+        * The output array will be reshaped to the specified dimensions.
+        * JPEG-LS or JPEG 2000 encoded data whose signedness doesn't match the
+          expected :ref:`pixel representation<pixel_representation>` will be
+          converted to match.
+
+        With the :mod:`pydicom.pixels` backend, if ``raw = False`` (the
+        default) then the following processing operation will also be performed:
+
+        * Pixel data with a :ref:`photometric interpretation
+          <photometric_interpretation>` of ``"YBR_FULL"`` or ``"YBR_FULL_422"``
+          will be converted to RGB.
+
+        Examples
+        --------
+
+        Convert the *Pixel Data* to an array that's a view on the original buffer::
+
+            >>> from pydicom import examples
+            >>> ds = examples.ct
+            >>> ds.pixel_array_options(view_only=True)
+            >>> arr = ds.pixel_array
+
+        Use the deprecated :mod:`~pydicom.pixel_data_handlers` backend to convert
+        the *Pixel Data* to an array::
+
+            >>> from pydicom import examples
+            >>> ds = examples.ct
+            >>> ds.pixel_array_options(use_v2_backend=True)
+            >>> arr = ds.pixel_array
+
+        Parameters
+        ----------
+        index : int | None, optional
+            If ``None`` (default) then return an array containing all the
+            frames in the pixel data, otherwise return one containing only
+            the frame from the specified `index`, which starts at 0 for the
+            first frame. Only available with the :mod:`~pydicom.pixels` backend.
+        raw : bool, optional
+            If ``True`` then return the decoded pixel data after only
+            minimal processing (see the processing section above). If ``False``
+            (default) then additional processing may be applied to convert the
+            pixel data to it's most commonly used form (such as converting from
+            YCbCr to RGB). Only available with the :mod:`~pydicom.pixels` backend.
+        decoding_plugin : str, optional
+            The name of the decoding plugin to use when decoding compressed
+            pixel data. If no `decoding_plugin` is specified (default) then all
+            available plugins will be tried and the result from the first successful
+            one returned. For information on the available plugins for each
+            *Transfer Syntax UID*:
+
+            * If using the :mod:`~pydicom.pixels` backend see the
+              :doc:`documentation for the decoder</reference/pixels.decoders>`
+              corresponding to the dataset's *Transfer Syntax UID*.
+            * If using the :mod:`~pydicom.pixel_data_handlers` backend supported
+              values are  ``'gdcm'``, ``'pillow'``, ``'jpeg_ls'``, ``'rle'``,
+              ``'numpy'`` and ``'pylibjpeg'``.
+        use_v2_backend : bool, optional
+            If ``False`` (default) then use the :mod:`pydicom.pixels` backend
+            to decode the pixel data, otherwise use the deprecated
+            :mod:`pydicom.pixel_data_handlers` backend.
+        **kwargs
+            Optional keyword parameters for controlling decoding with the
+            :mod:`~pydicom.pixels` backend, please see the
+            :doc:`decoding options documentation</guides/decoding/decoder_options>`
+            for more information.
+        """
+        if config._use_future and kwargs.get("use_v2_backend", use_v2_backend):
+            raise TypeError(
+                f"{type(self).__name__}.pixel_array_options() got an unexpected "
+                "keyword argument 'use_v2_backend'"
+            )
+
+        kwargs["index"] = index
+        kwargs["raw"] = raw
+        if decoding_plugin:
+            kwargs["decoding_plugin"] = decoding_plugin.lower()
+        kwargs["use_pdh"] = False if config._use_future else use_v2_backend
+
+        self._pixel_array_opts = kwargs
+        self._pixel_array = None
+        self._pixel_id = {}
 
     def waveform_array(self, index: int) -> "numpy.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
@@ -2105,6 +2454,67 @@ class Dataset:
                     strings.append(indent_str + repr(elem))
         return "\n".join(strings)
 
+    @property
+    def read_implicit_vr(self) -> bool | None:
+        """Get the VR method used by the original encoding of the dataset.
+
+        .. deprecated:: 3.0
+
+            ``read_implicit_vr`` will be removed in v4.0, , use
+            :attr:`~pydicom.dataset.Dataset.original_encoding` instead.
+
+        Returns
+        -------
+        bool | None
+            Returns ``None`` if the dataset has been created from scratch,
+            otherwise returns ``True`` if the dataset was decoded from file
+            or buffer and used implicit VR, ``False`` if it used explicit VR.
+        """
+        name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(f"'{name}' object has no attribute 'read_implicit_vr'")
+
+        warn_and_log(
+            (
+                f"'{name}.read_implicit_vr' will be removed in v4.0, use "
+                f"'{name}.original_encoding[0]' instead"
+            ),
+            DeprecationWarning,
+        )
+        return self._read_implicit
+
+    @property
+    def read_little_endian(self) -> bool | None:
+        """Get the endianness used by the original encoding of the dataset.
+
+        .. deprecated:: 3.0
+
+            ``read_little_endian`` will be removed in v4.0, use
+            :attr:`~pydicom.dataset.Dataset.original_encoding` instead.
+
+        Returns
+        -------
+        bool | None
+            Returns ``None`` if the dataset has been created from scratch,
+            otherwise returns ``True`` if the dataset was decoded from file
+            or buffer and used little endian encoding, ``False`` for big
+            endian.
+        """
+        name = type(self).__name__
+        if config._use_future:
+            raise AttributeError(
+                f"'{name}' object has no attribute 'read_little_endian'"
+            )
+
+        warn_and_log(
+            (
+                f"'{name}.read_little_endian' will be removed in v4.0, use "
+                f"'{name}.original_encoding[1]' instead"
+            ),
+            DeprecationWarning,
+        )
+        return self._read_little
+
     def remove_private_tags(self) -> None:
         """Remove all private elements from the :class:`Dataset`."""
 
@@ -2118,65 +2528,128 @@ class Dataset:
 
     def save_as(
         self,
-        filename: "str | os.PathLike[AnyStr] | BinaryIO",
-        write_like_original: bool = True,
+        filename: str | os.PathLike[AnyStr] | BinaryIO | WriteableBuffer,
+        /,
+        __write_like_original: bool | None = None,
+        *,
+        implicit_vr: bool | None = None,
+        little_endian: bool | None = None,
+        enforce_file_format: bool = False,
+        **kwargs: Any,
     ) -> None:
-        """Write the :class:`Dataset` to `filename`.
+        """Encode the current :class:`Dataset` and write it to `filename`.
 
-        Wrapper for pydicom.filewriter.dcmwrite, passing this dataset to it.
-        See documentation for that function for details.
+        See the documentation for :func:`~pydicom.filewriter.dcmwrite` for
+        more detailed information.
+
+        .. warning::
+
+            Encoding a dataset with ``little_endian=False`` (i.e. as big
+            endian) is not recommended. Big endian encoding was retired from
+            the DICOM Standard in 2006.
+
+        .. warning::
+
+            This function cannot be used to convert a decoded dataset to an
+            encoding that uses a different endianness, such as from big to
+            little endian. :func:`~pydicom.filewriter.dcmwrite()` must be used
+            instead, however the process is not automatic. See the
+            documentation of :func:`~pydicom.filewriter.dcmwrite()` for
+            details.
+
+        .. versionchanged:: 3.0
+
+            Added `implicit_vr`, `little_endian` and `enforce_file_format`
+
+        .. deprecated:: 3.0
+
+            `write_like_original` will be removed in v4.0, please use
+            `enforce_file_format` instead
+
+        Parameters
+        ----------
+        filename : str | PathLike | BinaryIO
+            The path, file-like or writeable buffer to write the encoded
+            dataset to. If using a buffer it must have ``write()``, ``seek()``
+            and ``tell()`` methods.
+        write_like_original : bool, optional
+            If ``True`` (default) then write the dataset as-is, otherwise
+            ensure that the dataset is written in the DICOM File Format or
+            raise an exception is that isn't possible. This parameter is
+            deprecated, please use `enforce_file_format` instead.
+        implicit_vr : bool, optional
+            Required if the dataset has no valid public *Transfer Syntax UID*
+            set in the file meta and
+            :attr:`~pydicom.dataset.Dataset.is_implicit_VR` or
+            :attr:`~pydicom.dataset.Dataset.original_encoding` are ``None``. If
+            ``True`` then encode using implicit VR, otherwise use explicit VR.
+        little_endian : bool, optional
+            Required if the dataset has no valid public *Transfer Syntax UID*
+            set in the file meta and
+            :attr:`~pydicom.dataset.Dataset.is_little_endian` or
+            :attr:`~pydicom.dataset.Dataset.original_encoding` are ``None``. If
+            ``True`` (default) then use little endian byte order when encoding,
+            otherwise use big endian (not recommended).
+        enforce_file_format : bool, optional
+            If ``True`` then ensure the dataset is written in the DICOM File
+            Format or raise an exception if that isn't possible. If ``False``
+            (default) then write the dataset as-is, preserving the following -
+            which may result in a non-conformant file:
+
+            - ``Dataset.preamble``: if the dataset has no preamble then none
+              will be written
+            - ``Dataset.file_meta``: if the dataset is missing any required
+              *File Meta Information Group* elements then they will not be
+              added or written
 
         See Also
         --------
         pydicom.filewriter.dcmwrite
-            Write a DICOM file from a :class:`FileDataset` instance.
+            Encode a :class:`Dataset` and write it to a file or buffer.
         """
-        pydicom.dcmwrite(filename, self, write_like_original)
+        # The default for little_endian is `None` so we can detect conversion
+        #   between little and big endian, but we actually default it to `True`
+        #   when `implicit_vr` is used
+        if implicit_vr is not None and little_endian is None:
+            little_endian = True
+
+        # Disallow conversion between little and big endian encoding
+        if self.original_encoding[1] is not None:
+            file_meta = getattr(self, "file_meta", {})
+            syntax = file_meta.get("TransferSyntaxUID", None)
+
+            use_little: bool | None = None
+            try:
+                use_little = syntax.is_little_endian
+            except (AttributeError, ValueError):
+                if little_endian is not None:
+                    use_little = little_endian
+                elif not config._use_future:
+                    use_little = self.is_little_endian
+
+            if use_little is not None and self.original_encoding[1] != use_little:
+                raise ValueError(
+                    f"'{type(self).__name__}.save_as()' cannot be used to "
+                    "convert between little and big endian encoding. Please "
+                    "read the documentation for filewriter.dcmwrite() if this "
+                    "is what you really want to do"
+                )
+
+        pydicom.dcmwrite(
+            filename,
+            self,
+            __write_like_original,
+            implicit_vr=implicit_vr,
+            little_endian=little_endian,
+            enforce_file_format=enforce_file_format,
+            **kwargs,
+        )
 
     def ensure_file_meta(self) -> None:
-        """Create an empty ``Dataset.file_meta`` if none exists.
-
-        .. versionadded:: 1.2
-        """
+        """Create an empty ``Dataset.file_meta`` if none exists."""
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
-
-    def fix_meta_info(self, enforce_standard: bool = True) -> None:
-        """Ensure the file meta info exists and has the correct values
-        for transfer syntax and media storage UIDs.
-
-        .. versionadded:: 1.2
-
-        .. warning::
-
-            The transfer syntax for ``is_implicit_VR = False`` and
-            ``is_little_endian = True`` is ambiguous and will therefore not
-            be set.
-
-        Parameters
-        ----------
-        enforce_standard : bool, optional
-            If ``True``, a check for incorrect and missing elements is
-            performed (see :func:`~validate_file_meta`).
-        """
-        self.ensure_file_meta()
-
-        if self.is_little_endian and self.is_implicit_VR:
-            self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        elif not self.is_little_endian and not self.is_implicit_VR:
-            self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-        elif not self.is_little_endian and self.is_implicit_VR:
-            raise NotImplementedError(
-                "Implicit VR Big Endian is not a " "supported Transfer Syntax."
-            )
-
-        if "SOPClassUID" in self:
-            self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
-        if "SOPInstanceUID" in self:
-            self.file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
-        if enforce_standard:
-            validate_file_meta(self.file_meta, enforce_standard=True)
 
     def __setattr__(self, name: str, value: Any) -> None:
         """Intercept any attempts to set a value for an instance attribute.
@@ -2208,18 +2681,13 @@ class Dataset:
             if tag not in self:
                 # don't have this tag yet->create the data_element instance
                 vr = dictionary_VR(tag)
-                data_element = DataElement(tag, vr, value)
-                if vr == VR_.SQ:
-                    # let a sequence know its parent dataset to pass it
-                    # to its items, who may need parent dataset tags
-                    # to resolve ambiguous tags
-                    data_element.parent = self
+                elem = DataElement(tag, vr, value)
             else:
                 # already have this data_element, just changing its value
-                data_element = self[tag]
-                data_element.value = value
+                elem = self[tag]
+                elem.value = value
             # Now have data_element - store it in this dict
-            self[tag] = data_element
+            self[tag] = elem
         elif repeater_has_keyword(name):
             # Check if `name` is repeaters element
             raise ValueError(
@@ -2234,7 +2702,7 @@ class Dataset:
                     "element keyword data dictionary"
                 )
                 if config.INVALID_KEYWORD_BEHAVIOR == "WARN":
-                    warnings.warn(msg)
+                    warn_and_log(msg)
                 elif config.INVALID_KEYWORD_BEHAVIOR == "RAISE":
                     raise ValueError(msg)
 
@@ -2243,7 +2711,7 @@ class Dataset:
             # XXX note if user misspells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
-    def _set_file_meta(self, value: Optional["Dataset"]) -> None:
+    def _set_file_meta(self, value: "Dataset | None") -> None:
         """Set the Dataset's File Meta Information attribute."""
         if value is None:
             self.__dict__["file_meta"] = value
@@ -2301,7 +2769,7 @@ class Dataset:
 
         if key != elem_tag:
             raise ValueError(
-                f"The key '{key}' doesn't match the 'DataElement' tag " f"'{elem_tag}'"
+                f"The key '{key}' doesn't match the 'DataElement' tag '{elem_tag}'"
             )
 
         if elem_tag.is_private:
@@ -2314,15 +2782,124 @@ class Dataset:
                     elem = DataElement_from_raw(elem, self._character_set, self)
                 elem.private_creator = self[private_creator_tag].value
 
+        # Changing pixel data resets the stored array
+        if elem_tag in PIXEL_KEYWORDS:
+            self._pixel_array = None
+            self._pixel_id = {}
+
         self._dict[elem_tag] = elem
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
             if not isinstance(elem.value, pydicom.Sequence):
                 elem.value = pydicom.Sequence(elem.value)  # type: ignore
-            if elem.value is not None:
-                # let a sequence know its parent dataset, as sequence items
-                # may need parent dataset tags to resolve ambiguous tags
-                elem.value.parent_dataset = self  # type:ignore
+
+            # Update the `_pixel_rep` attribute when nested sequences
+            #   containing RawDataElements are being added to a different
+            #   dataset
+            self._set_pixel_representation(cast(DataElement, elem))
+
+    def set_pixel_data(
+        self,
+        arr: "numpy.ndarray",
+        photometric_interpretation: str,
+        bits_stored: int,
+        *,
+        generate_instance_uid: bool = True,
+    ) -> None:
+        """Use an :class:`~numpy.ndarray` to set the *Pixel Data* and related
+        Image Pixel module elements.
+
+        .. versionadded:: 3.0
+
+        The following :dcm:`Image Pixel<part03/sect_C.7.6.3.3.html#table_C.7-11c>`
+        module elements values will be added, updated or removed as necessary:
+
+        * (0028,0002) *Samples per Pixel* using a value corresponding to
+          `photometric_interpretation`.
+        * (0028,0104) *Photometric Interpretation* from `photometric_interpretation`.
+        * (0028,0006) *Planar Configuration* will be added and set to ``0`` if
+          *Samples per Pixel* is > 1, otherwise it will be removed.
+        * (0028,0008) *Number of Frames* from the array :attr:`~numpy.ndarray.shape`,
+          however it will be removed if `arr` only contains a single frame.
+        * (0028,0010) *Rows* and (0028,0011) *Columns* from the array
+          :attr:`~numpy.ndarray.shape`.
+        * (0028,0100) *Bits Allocated* from the array :class:`~numpy.dtype`.
+        * (0028,0101) *Bits Stored* and (0028,0102) *High Bit* from `bits_stored`.
+        * (0028,0103) *Pixel Representation* from the array :class:`~numpy.dtype`.
+
+        In addition:
+
+        * The *Transfer Syntax UID* will be set to *Explicit VR Little Endian* if
+          it doesn't already exist or uses a compressed (encapsulated) transfer syntax.
+        * If `generate_instance_uid` is ``True`` (default) then the *SOP Instance UID*
+          will be added or updated.
+
+        Parameters
+        ----------
+        arr : numpy.ndarray
+            An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
+            array must be shaped as one of the following:
+
+            * (rows, columns) for a single frame of grayscale data.
+            * (frames, rows, columns) for multi-frame grayscale data.
+            * (rows, columns, samples) for a single frame of multi-sample data
+              such as RGB.
+            * (frames, rows, columns, samples) for multi-frame, multi-sample data.
+        photometric_interpretation : str
+            The value to use for (0028,0004) *Photometric Interpretation*. Valid
+            values are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``,
+            ``"RGB"``, ``"YBR_FULL"``, ``"YBR_FULL_422"``.
+        bits_stored : int
+            The value to use for (0028,0101) *Bits Stored*. Must be no greater than
+            the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+        generate_instance_uid : bool, optional
+            If ``True`` (default) then add or update the (0008,0018) *SOP Instance
+            UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
+
+        Raises
+        ------
+        NotImplementedError
+            If the dataset has a big-endian *Transfer Syntax UID*.
+        """
+        set_pixel_data(
+            self,
+            arr,
+            photometric_interpretation,
+            bits_stored,
+            generate_instance_uid=generate_instance_uid,
+        )
+
+    def _set_pixel_representation(self, elem: DataElement) -> None:
+        """Set the `_pixel_rep` attribute for the current dataset and child
+        datasets of the sequence element `elem`."""
+        # `TAG_PIXREP` is (0028,0103) *Pixel Representation*
+        # May be DataElement or RawDataElement, also value may be None
+        pr: int | bytes | None = None
+        if TAG_PIXREP in self._dict:
+            pr = self[TAG_PIXREP].value
+        elif hasattr(self, "_pixel_rep"):  # Must be second conditional
+            pr = self._pixel_rep
+
+        if pr is not None:
+            self._pixel_rep = int(b"\x01" in pr) if isinstance(pr, bytes) else pr
+
+        if elem.VR != VR_.SQ:
+            return
+
+        # Note that the value of `_pixel_rep` gets updated as we move
+        #   down the tree - the value used to correct ambiguous
+        #   elements will be from the closest dataset to that element
+        for item in elem.value:
+            if TAG_PIXREP in item._dict:
+                pr = item._dict[TAG_PIXREP].value
+                if pr is not None:
+                    item._pixel_rep = (
+                        int(b"\x01" in pr) if isinstance(pr, bytes) else pr
+                    )
+                elif hasattr(self, "_pixel_rep"):
+                    item._pixel_rep = self._pixel_rep
+            elif hasattr(self, "_pixel_rep"):
+                item._pixel_rep = self._pixel_rep
 
     def _slice_dataset(
         self, start: "TagType | None", stop: "TagType | None", step: int | None
@@ -2414,8 +2991,6 @@ class Dataset:
                 setattr(self, key, value)
             else:
                 self[Tag(cast(int, key))] = value
-                if getattr(value, "parent", None):
-                    value.parent = self  # type: ignore[union-attr]
 
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.
@@ -2481,15 +3056,13 @@ class Dataset:
     def from_json(
         cls: type["Dataset"],
         json_dataset: dict[str, Any] | str | bytes | bytearray,
-        bulk_data_uri_handler: Callable[
-            [str, str, str], None | str | int | float | bytes
-        ]
-        | Callable[[str], None | str | int | float | bytes]
-        | None = None,
+        bulk_data_uri_handler: (
+            Callable[[str, str, str], None | str | int | float | bytes]
+            | Callable[[str], None | str | int | float | bytes]
+            | None
+        ) = None,
     ) -> "Dataset":
         """Return a :class:`Dataset` from a DICOM JSON Model object.
-
-        .. versionadded:: 1.3
 
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
@@ -2548,8 +3121,6 @@ class Dataset:
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
-        .. versionadded:: 1.4
-
         Parameters
         ----------
         bulk_data_threshold : int, optional
@@ -2582,9 +3153,11 @@ class Dataset:
                         bulk_data_threshold=bulk_data_threshold,
                     )
                 except Exception as exc:
-                    logger.error(f"Error while processing tag {json_key}")
                     if not suppress_invalid_tags:
+                        logger.error(f"Error while processing tag {json_key}")
                         raise exc
+
+                    logger.warning(f"Error while processing tag {json_key}: {exc}")
 
         return json_dataset
 
@@ -2596,8 +3169,6 @@ class Dataset:
         suppress_invalid_tags: bool = False,
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
-
-        .. versionadded:: 1.3
 
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
@@ -2652,21 +3223,6 @@ class Dataset:
             )
         )
 
-    # For Pickle, need to make weakref a strong reference
-    # Adapted from https://stackoverflow.com/a/45588812/1987276
-    def __getstate__(self) -> dict[str, Any]:
-        if self.parent_seq is not None:
-            s = self.__dict__.copy()
-            s["_parent_seq"] = s["_parent_seq"]()
-            return s
-        return self.__dict__
-
-    # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        if self.__dict__["_parent_seq"] is not None:
-            self.__dict__["_parent_seq"] = weakref.ref(self.__dict__["_parent_seq"])
-
     __repr__ = __str__
 
 
@@ -2677,38 +3233,39 @@ class FileDataset(Dataset):
     """An extension of :class:`Dataset` to make reading and writing to
     file-like easier.
 
+    .. versionchanged:: 3.0
+
+        Added the `buffer` attribute and the `filename` attribute has been changed to
+        only contain the filename the dataset was read from (if any).
+
     Attributes
     ----------
-    preamble : str or bytes or None
+    preamble : str | bytes | None
         The optional DICOM preamble prepended to the :class:`FileDataset`, if
         available.
-    file_meta : FileMetaDataset or None
-        The Dataset's file meta information as a :class:`FileMetaDataset`,
-        if available (``None`` if not present).
-        Consists of group ``0x0002`` elements.
-    filename : str or None
-        The filename that the :class:`FileDataset` was read from (if read from
-        file) or ``None`` if the filename is not available (if read from a
-        :class:`io.BytesIO` or  similar).
+    file_meta : FileMetaDataset | None
+        The Dataset's file meta information as a :class:`FileMetaDataset`, if
+        available (``None`` if not present). Consists of group ``0x0002`` elements.
+    filename : str | None
+        The filename associated with the :class:`FileDataset` if read from
+        a file or file-like, or ``None`` if the dataset has been read from a
+        buffer-like object.
+    buffer : ReadableBuffer | None
+        The buffer-like object the :class:`FileDataset` was read from, or
+        ``None`` if the dataset has been read from a file or file-like.
     fileobj_type
-        The object type of the file-like the :class:`FileDataset` was read
-        from.
-    is_implicit_VR : bool
-        ``True`` if the dataset encoding is implicit VR, ``False`` otherwise.
-    is_little_endian : bool
-        ``True`` if the dataset encoding is little endian byte ordering,
-        ``False`` otherwise.
-    timestamp : float or None
+        The type of object the :class:`FileDataset` was read from.
+    timestamp : float | None
         The modification time of the file the :class:`FileDataset` was read
         from, ``None`` if the modification time is not available.
     """
 
     def __init__(
         self,
-        filename_or_obj: PathType | BinaryIO | DicomFileLike,
+        filename_or_obj: PathType | BinaryIO | ReadableBuffer,
         dataset: _DatasetType,
         preamble: bytes | None = None,
-        file_meta: Optional["FileMetaDataset"] = None,
+        file_meta: "FileMetaDataset | None" = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
     ) -> None:
@@ -2716,9 +3273,12 @@ class FileDataset(Dataset):
 
         Parameters
         ----------
-        filename_or_obj : str or PathLike or BytesIO or None
-            Full path and filename to the file, memory buffer object, or
-            ``None`` if is a :class:`io.BytesIO`.
+        filename_or_obj : str, PathLike, file-like or readable buffer
+
+            * :class:`str` or path: the full path to the dataset file
+            * file-like: a file-like object in "rb" mode
+            * readable buffer: an object with ``read()``, ``tell()`` and
+              ``seek()`` methods such as :class:`io.BytesIO`.
         dataset : Dataset or dict
             Some form of dictionary, usually a :class:`Dataset` returned from
             :func:`~pydicom.filereader.dcmread`.
@@ -2741,101 +3301,82 @@ class FileDataset(Dataset):
         self.file_meta: FileMetaDataset = (
             file_meta if file_meta is not None else FileMetaDataset()
         )
-        self.is_implicit_VR: bool = is_implicit_VR
-        self.is_little_endian: bool = is_little_endian
+        # TODO: Remove in v4.0
+        if not config._use_future:
+            self._is_implicit_VR: bool = is_implicit_VR
+            self._is_little_endian: bool = is_little_endian
 
-        filename: str | None = None
-        filename_or_obj = path_from_pathlike(filename_or_obj)
+        self._read_implicit: bool = is_implicit_VR
+        self._read_little: bool = is_little_endian
+
         self.fileobj_type: Any = None
-        self.filename: PathType | BinaryIO = ""
+        self.filename: PathType | None = None
+        self.buffer: ReadableBuffer | None = None
 
+        filename_or_obj = path_from_pathlike(filename_or_obj)
         if isinstance(filename_or_obj, str):
-            filename = filename_or_obj
+            # Path to the dataset file
+            self.filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):
-            filename = filename_or_obj.name
+            # File-like in "rb" mode such as open(..., "rb")
+            self.filename = filename_or_obj.name
             # This is the appropriate constructor for io.BufferedReader
             self.fileobj_type = open
         else:
-            # use __class__ python <2.7?;
-            # https://docs.python.org/3/reference/datamodel.html
-            self.fileobj_type = filename_or_obj.__class__
-            if hasattr(filename_or_obj, "name"):
-                filename = filename_or_obj.name
-            elif hasattr(filename_or_obj, "filename"):
-                filename = filename_or_obj.filename
-            else:
-                # e.g. came from BytesIO or something file-like
-                self.filename = filename_or_obj
+            # Readable buffer with read(), seek() and tell() methods
+            self.buffer = filename_or_obj
+            self.fileobj_type = type(filename_or_obj)
+            if getattr(filename_or_obj, "name", None):
+                self.filename = filename_or_obj.name
+            elif getattr(filename_or_obj, "filename", None):
+                self.filename = filename_or_obj.filename  # type: ignore[attr-defined]
 
         self.timestamp = None
-        if filename:
-            self.filename = filename
-            if os.path.exists(filename):
-                statinfo = os.stat(filename)
-                self.timestamp = statinfo.st_mtime
+        if self.filename and os.path.exists(self.filename):
+            self.timestamp = os.stat(self.filename).st_mtime
 
-    def _copy_implementation(self, copy_function: Callable) -> "FileDataset":
-        """Implementation of ``__copy__`` and ``__deepcopy__``.
-        Sets the filename to ``None`` if it isn't a string,
-        and copies all other attributes using `copy_function`.
+    def __deepcopy__(self, memo: dict[int, Any] | None) -> "FileDataset":
+        """Return a deep copy of the file dataset.
+
+        Sets the `buffer` to ``None`` if it's been closed or is otherwise not copyable.
+
+        Returns
+        -------
+        FileDataset
+            A deep copy of the file dataset.
         """
         copied = self.__class__(
-            self.filename,
+            self.filename,  # type: ignore[arg-type]
             self,
             self.preamble,
             self.file_meta,
-            self.is_implicit_VR,
-            self.is_little_endian,
+            self.is_implicit_VR,  # type: ignore[arg-type]
+            self.is_little_endian,  # type: ignore[arg-type]
         )
-        filename = self.filename
-        if filename is not None and not isinstance(filename, str):
-            warnings.warn(
-                "The 'filename' attribute of the dataset is a "
-                "file-like object and will be set to None "
-                "in the copied object"
-            )
-            self.filename = None  # type: ignore[assignment]
-        for k, v in self.__dict__.items():
-            copied.__dict__[k] = copy_function(v)
 
-        self.filename = filename
+        for k, v in self.__dict__.items():
+            if k == "buffer":
+                try:
+                    copied.__dict__[k] = copy.deepcopy(v)
+                except Exception as exc:
+                    warn_and_log(
+                        f"The {type(exc).__name__} exception '{exc}' occurred "
+                        "trying to deepcopy the buffer-like the dataset was read "
+                        "from, the 'buffer' attribute will be set to 'None' in the "
+                        "copied object"
+                    )
+                    copied.__dict__[k] = None
+            else:
+                copied.__dict__[k] = copy.deepcopy(v)
 
         return copied
-
-    def __copy__(self) -> "FileDataset":
-        """Return a shallow copy of the file dataset.
-        Make sure that the filename is not copied in case it is a file-like
-        object.
-
-        Returns
-        -------
-        FileDataset
-            A shallow copy of the file data set.
-        """
-        return self._copy_implementation(copy.copy)
-
-    def __deepcopy__(self, _: dict[int, Any] | None) -> "FileDataset":
-        """Return a deep copy of the file dataset.
-        Make sure that the filename is not copied in case it is a file-like
-        object.
-
-        Returns
-        -------
-        FileDataset
-            A deep copy of the file data set.
-        """
-        return self._copy_implementation(copy.deepcopy)
 
 
 def validate_file_meta(
     file_meta: "FileMetaDataset", enforce_standard: bool = True
 ) -> None:
     """Validate the *File Meta Information* elements in `file_meta`.
-
-    .. versionchanged:: 1.2
-
-        Moved from :mod:`pydicom.filewriter`.
 
     Parameters
     ----------
@@ -2844,23 +3385,24 @@ def validate_file_meta(
     enforce_standard : bool, optional
         If ``False``, then only a check for invalid elements is performed.
         If ``True`` (default), the following elements will be added if not
-        already present:
+        already present and the Type 1 elements given a value if empty:
 
-        * (0002,0001) *File Meta Information Version*
-        * (0002,0012) *Implementation Class UID*
-        * (0002,0013) *Implementation Version Name*
+        * (0002,0001) *File Meta Information Version*, Type 1
+        * (0002,0012) *Implementation Class UID*, Type 1
+        * (0002,0013) *Implementation Version Name*, Type 3
 
-        and the following elements will be checked:
+        and the following elements will be checked to ensure they're present
+        and have a non-empty value:
 
-        * (0002,0002) *Media Storage SOP Class UID*
-        * (0002,0003) *Media Storage SOP Instance UID*
-        * (0002,0010) *Transfer Syntax UID*
+        * (0002,0002) *Media Storage SOP Class UID*, Type 1
+        * (0002,0003) *Media Storage SOP Instance UID*, Type 1
+        * (0002,0010) *Transfer Syntax UID*, Type 1
 
     Raises
     ------
     ValueError
-        If `enforce_standard` is ``True`` and any of the checked *File Meta
-        Information* elements are missing from `file_meta`.
+        If `enforce_standard` is ``True`` and any of the Type 1 *File Meta
+        Information* elements are missing from `file_meta` or have no value.
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
@@ -2868,34 +3410,38 @@ def validate_file_meta(
     for elem in file_meta.elements():
         if elem.tag.group != 0x0002:
             raise ValueError(
-                "Only File Meta Information Group (0002,eeee) "
-                "elements must be present in 'file_meta'."
+                "Only File Meta Information group (0002,eeee) elements may be "
+                "present in 'file_meta'."
             )
 
     if enforce_standard:
-        if "FileMetaInformationVersion" not in file_meta:
+        if (
+            "FileMetaInformationVersion" not in file_meta
+            or file_meta["FileMetaInformationVersion"].is_empty
+        ):
             file_meta.FileMetaInformationVersion = b"\x00\x01"
 
-        if "ImplementationClassUID" not in file_meta:
+        if (
+            "ImplementationClassUID" not in file_meta
+            or file_meta["ImplementationClassUID"].is_empty
+        ):
             file_meta.ImplementationClassUID = UID(PYDICOM_IMPLEMENTATION_UID)
 
         if "ImplementationVersionName" not in file_meta:
-            file_meta.ImplementationVersionName = "PYDICOM " + ".".join(
-                str(x) for x in __version_info__
+            file_meta.ImplementationVersionName = (
+                f"PYDICOM {'.'.join(__version_info__)}"
             )
 
-        # Check that required File Meta Information elements are present
-        missing = []
-        for element in [0x0002, 0x0003, 0x0010]:
-            if Tag(0x0002, element) not in file_meta:
-                missing.append(Tag(0x0002, element))
-        if missing:
-            msg = (
-                "Missing required File Meta Information elements from " "'file_meta':\n"
+        invalid = []
+        for tag in [0x00020002, 0x00020003, 0x00020010]:
+            if tag not in file_meta or file_meta[tag].is_empty:
+                invalid.append(f"{Tag(tag)} {dictionary_description(tag)}")
+
+        if invalid:
+            raise AttributeError(
+                "Required File Meta Information elements are either missing "
+                f"or have an empty value: {', '.join(invalid)}"
             )
-            for tag in missing:
-                msg += f"\t{tag} {keyword_for_tag(tag)}\n"
-            raise ValueError(msg[:-1])  # Remove final newline
 
 
 class FileMetaDataset(Dataset):
@@ -2997,6 +3543,22 @@ class FileMetaDataset(Dataset):
             )
 
         super().__setitem__(key, value)
+
+    @property
+    def _tsyntax_encoding(self) -> tuple[bool, bool] | tuple[None, None]:
+        """Return the transfer syntax encoding method (if any)
+
+        Returns
+        -------
+        tuple[bool, bool] | tuple[None, None]
+            If the file meta has a valid public Transfer Syntax UID then
+            returns (is implicit, is little), otherwise returns (None, None).
+        """
+        tsyntax = self.get("TransferSyntaxUID", None)
+        if not tsyntax or tsyntax.is_private or not tsyntax.is_transfer_syntax:
+            return (None, None)
+
+        return (tsyntax.is_implicit_VR, tsyntax.is_little_endian)
 
 
 _RE_CAMEL_CASE = re.compile(

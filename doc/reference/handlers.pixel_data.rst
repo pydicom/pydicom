@@ -3,6 +3,11 @@
 Pixel Data Handlers (:mod:`pydicom.pixel_data_handlers`)
 ========================================================
 
+.. deprecated:: 3.0
+
+    The ``pydicom.pixel_data_handlers`` module is deprecated and will be removed
+    in v4.0. Use the :mod:`~pydicom.pixels` module instead.
+
 .. currentmodule:: pydicom.pixel_data_handlers
 
 .. autosummary::

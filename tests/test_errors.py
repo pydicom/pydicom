@@ -23,6 +23,6 @@ def test_no_message():
         raise InvalidDicomError
 
     with pytest.raises(
-        InvalidDicomError, match="The specified file is not a valid DICOM " "file."
+        InvalidDicomError, match="The specified file is not a valid DICOM file."
     ):
         _test()

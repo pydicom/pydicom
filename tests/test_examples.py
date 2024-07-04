@@ -1,5 +1,7 @@
 """Tests for the examples module."""
 
+from pathlib import Path
+
 import pytest
 
 import pydicom
@@ -40,3 +42,13 @@ class TestExamples:
         assert ct is ct  # noqa
         assert isinstance(ct, FileDataset)
         assert ct.PatientName == "CompressedSamples^CT1"
+
+    def test_get_path(self):
+        """Test get_path()"""
+        path = examples.get_path("ct")
+        assert isinstance(path, Path)
+        assert path.name == "CT_small.dcm"
+
+        msg = "No example dataset exists with the name 'foo'"
+        with pytest.raises(ValueError, match=msg):
+            examples.get_path("foo")

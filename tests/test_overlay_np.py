@@ -25,8 +25,6 @@ There are the following possibilities:
 * OverlayColumns
 """
 
-from importlib import reload
-import typing
 
 import pytest
 
@@ -70,27 +68,6 @@ EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
 class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
-    def setup_method(self):
-        """Setup the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = [NP_HANDLER]
-
-    def teardown_method(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert not HAVE_NP
-        assert NP_HANDLER is not None
-
-    def test_overlay_array_raises(self):
-        """Test overlay_array raises exception"""
-        ds = dcmread(EXPL_1_1_1F)
-        msg = r"The following handlers are available to decode"
-        with pytest.raises(RuntimeError, match=msg):
-            ds.overlay_array(0x6000)
-
     def test_get_overlay_array_raises(self):
         """Test get_overlay_array raises exception"""
         ds = dcmread(EXPL_1_1_1F)
@@ -120,20 +97,6 @@ REFERENCE_DATA_LITTLE = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_NumpyHandler:
     """Tests for handling Overlay Data with the handler."""
-
-    def setup_method(self):
-        """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = [NP_HANDLER]
-
-    def teardown_method(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert HAVE_NP
-        assert NP_HANDLER is not None
 
     # Little endian datasets
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_LITTLE)
@@ -166,12 +129,6 @@ class TestNumpy_NumpyHandler:
         assert arr.max() == 1
         assert arr.min() == 0
         assert 29 == sum(arr[422, 393:422])
-
-    @pytest.mark.skip(reason="No dataset available")
-    def test_little_1bit_1sample_3frame(self):
-        """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
-        ds = dcmread(EXPL_1_1_3F)
-        arr = ds.overlay_array(0x6000)
 
     def test_read_only(self):
         """Test for #717, returned array read-only."""

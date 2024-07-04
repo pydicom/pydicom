@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from pydicom import config, dcmread
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filebase import DicomBytesIO
@@ -23,7 +23,7 @@ from pydicom.fileset import (
     _PREFIXES,
 )
 from pydicom.filewriter import write_dataset
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag
 from pydicom.uid import (
     ExplicitVRLittleEndian,
     generate_uid,
@@ -149,7 +149,7 @@ def private(dicomdir):
         fp.is_little_endian = True
         write_dataset(fp, ds)
 
-        return fp.parent.getvalue()
+        return fp.getvalue()
 
     def private_record():
         record = Dataset()
@@ -181,7 +181,7 @@ def private(dicomdir):
 
     len_top = len(write_record(top))  # 112
     len_middle = len(write_record(middle))  # 112
-    len_bottom = len(write_record(bottom))  # 238
+    len(write_record(bottom))  # 238
     len_last = len(write_record(ds.DirectoryRecordSequence[-1]))  # 248
 
     records = {}
@@ -716,8 +716,8 @@ class TestRecordNode:
         """Test group element not added when encoding."""
         fs = FileSet(private)
         node = fs._instances[0].node
-        fs._instances[0].node._record.add_new(0x00080000, "UL", 128)
-        fs._instances[0].node._record.PatientSex = "F"
+        node._record.add_new(0x00080000, "UL", 128)
+        node._record.PatientSex = "F"
         fs, ds, paths = copy_fs(fs, tdir.name)
         item = ds.DirectoryRecordSequence[3]
         assert 0x00080000 not in item
@@ -1118,7 +1118,7 @@ class TestFileSet:
 
         s = str(fs)
         assert "DICOM File-set" in s
-        assert f"Root directory: (no value available)" not in s
+        assert "Root directory: (no value available)" not in s
         assert "File-set ID: (no value available)" in s
         assert f"File-set UID: {fs.UID}" in s
         assert "Managed instances" not in s
@@ -1321,9 +1321,7 @@ class TestFileSet:
 
         s = str(fs)
         assert "Managed instances" in s
-        assert (
-            "PATIENT: PatientID='1CT1', " "PatientName='CompressedSamples^CT1'"
-        ) in s
+        assert ("PATIENT: PatientID='1CT1', PatientName='CompressedSamples^CT1'") in s
         assert (
             "STUDY: StudyDate=20040119, StudyTime=072730, "
             "StudyDescription='e+1'" in s
@@ -1338,24 +1336,27 @@ class TestFileSet:
         assert 1 == len(fs)
 
         # Test the DICOMDIR
-        assert 398 == (ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity)
-        assert 398 == (ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity)
+        # If uid_len is odd then actual length in dataset is uid_len + 1
+        uid_len = len(ds.file_meta.MediaStorageSOPInstanceUID)
+        length = 398 - 64 + uid_len + uid_len % 2
+        assert length == ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
+        assert length == ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
 
         seq = ds.DirectoryRecordSequence
         assert 4 == len(seq)
 
         item = seq[0]
-        assert item.seq_item_tell == 398
+        assert item.seq_item_tell == length
         assert "PATIENT" == item.DirectoryRecordType
         assert ct.PatientName == item.PatientName
         assert ct.PatientID == item.PatientID
         assert 0xFFFF == item.RecordInUseFlag
         assert 0 == item.OffsetOfTheNextDirectoryRecord
         assert "ISO_IR 100" == item.SpecificCharacterSet
-        assert 516 == item.OffsetOfReferencedLowerLevelDirectoryEntity
+        assert length + (516 - 398) == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[1]
-        assert item.seq_item_tell == 516
+        assert item.seq_item_tell == length + (516 - 398)
         assert "STUDY" == item.DirectoryRecordType
         assert ct.StudyDate == item.StudyDate
         assert ct.StudyTime == item.StudyTime
@@ -1365,10 +1366,10 @@ class TestFileSet:
         assert 0xFFFF == item.RecordInUseFlag
         assert 0 == item.OffsetOfTheNextDirectoryRecord
         assert "ISO_IR 100" == item.SpecificCharacterSet
-        assert 704 == item.OffsetOfReferencedLowerLevelDirectoryEntity
+        assert length + (704 - 398) == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[2]
-        assert item.seq_item_tell == 704
+        assert item.seq_item_tell == length + (704 - 398)
         assert "SERIES" == item.DirectoryRecordType
         assert ct.Modality == item.Modality
         assert ct.SeriesInstanceUID == item.SeriesInstanceUID
@@ -1376,10 +1377,10 @@ class TestFileSet:
         assert 0xFFFF == item.RecordInUseFlag
         assert 0 == item.OffsetOfTheNextDirectoryRecord
         assert "ISO_IR 100" == item.SpecificCharacterSet
-        assert 852 == item.OffsetOfReferencedLowerLevelDirectoryEntity
+        assert length + (852 - 398) == item.OffsetOfReferencedLowerLevelDirectoryEntity
 
         item = seq[3]
-        assert item.seq_item_tell == 852
+        assert item.seq_item_tell == length + (852 - 398)
         assert "IMAGE" == item.DirectoryRecordType
         assert ["PT000000", "ST000000", "SE000000", "IM000000"] == (
             item.ReferencedFileID
@@ -1727,7 +1728,13 @@ class TestFileSet:
         """Test str(FileSet) with empty + additions."""
         fs = FileSet()
         fs.add(ct)
-        fs.add(get_testdata_file("MR_small.dcm"))
+        mr = get_testdata_file("MR_small.dcm", read=True)
+        # mr.SeriesDescription = "TEST_DESC"
+        fs.add(mr)
+        # Hack to add description because pydicom.fileset._define_series doesn't copy
+        # optional attribute "Series Description".
+        _mr_series_record = fs._tree.children[-1].children[-1].children[-1]._record
+        _mr_series_record.SeriesDescription = "TEST_DESC"
 
         for p in list(Path(TINY_ALPHA_FILESET).parent.glob("**/*"))[::2]:
             if p.is_file() and p.name not in ["DICOMDIR", "README"]:
@@ -1771,7 +1778,7 @@ class TestFileSet:
             "    PATIENT: PatientID='4MR1', "
             "PatientName='CompressedSamples^MR1'\n"
             "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
             "          IMAGE: 1 SOP Instance (1 addition)\n"
             "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
             "      STUDY: StudyDate=20200913, StudyTime=161900, "
@@ -1803,7 +1810,7 @@ class TestFileSet:
             "    PATIENT: PatientID='4MR1', "
             "PatientName='CompressedSamples^MR1'\n"
             "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
             "          IMAGE: 1 SOP Instance\n"
             "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
             "      STUDY: StudyDate=20200913, StudyTime=161900, "
@@ -1842,7 +1849,7 @@ class TestFileSet:
             "    PATIENT: PatientID='4MR1', "
             "PatientName='CompressedSamples^MR1'\n"
             "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
             "          IMAGE: 0 SOP Instances (1 initial, 1 removal)\n"
             "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
             "      STUDY: StudyDate=20200913, StudyTime=161900, "
@@ -1861,7 +1868,7 @@ class TestFileSet:
         """Test that the update structure comment appears."""
         fs = FileSet(dicomdir)
         assert (
-            "Changes staged for write(): DICOMDIR update, directory " "structure update"
+            "Changes staged for write(): DICOMDIR update, directory structure update"
         ) in str(fs)
 
 
@@ -1901,7 +1908,7 @@ class TestFileSet_Load:
             r"not a 'Media Storage Directory' instance"
         )
         with pytest.raises(ValueError, match=msg):
-            fs = FileSet(dicomdir)
+            FileSet(dicomdir)
 
     def test_bad_filename_raises(self, dicomdir):
         """Test loading with a bad path."""
@@ -2459,7 +2466,6 @@ class TestFileSet_Modify:
     def test_write_undefined_length(self, dicomdir_copy):
         """Test writing with undefined length items"""
         t, ds = dicomdir_copy
-        elem = ds["DirectoryRecordSequence"]
         ds["DirectoryRecordSequence"].is_undefined_length = True
         for item in ds.DirectoryRecordSequence:
             item.is_undefined_length_sequence_item = True
@@ -2518,8 +2524,7 @@ class TestFileSet_Copy:
             assert ref.SOPInstanceUID == instance.SOPInstanceUID
 
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
-        assert not ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding == (False, True)
         assert not cp.is_staged
         assert "NEW ID" == cp.ID
         assert uid == cp.UID
@@ -2557,8 +2562,7 @@ class TestFileSet_Copy:
             assert ref.SOPInstanceUID == instance.SOPInstanceUID
 
         assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
-        assert ds.is_implicit_VR
-        assert ds.is_little_endian
+        assert ds.original_encoding == (True, True)
 
     def test_file_id(self, tiny, tdir):
         """Test that the File IDs character sets switch correctly."""

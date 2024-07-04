@@ -63,43 +63,39 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    import pylibjpeg
+    import pylibjpeg  # noqa: F401
 
     HAVE_PYLIBJPEG = True
 except ImportError:
     HAVE_PYLIBJPEG = False
 
 if HAVE_PYLIBJPEG:
-    try:
-        from pylibjpeg.utils import get_pixel_data_decoders
-    except ImportError:
-        # Old import, deprecated in 1.2, removal in 2.0
-        from pylibjpeg.pydicom.utils import get_pixel_data_decoders
+    from pylibjpeg.utils import get_pixel_data_decoders, Decoder
 
 try:
-    import openjpeg
+    import openjpeg  # noqa: F401
 
     HAVE_OPENJPEG = True
 except ImportError:
     HAVE_OPENJPEG = False
 
 try:
-    import libjpeg
+    import libjpeg  # noqa: F401
 
     HAVE_LIBJPEG = True
 except ImportError:
     HAVE_LIBJPEG = False
 
 try:
-    import rle
+    import rle  # noqa: F401
 
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
 
 from pydicom import config
-from pydicom.encaps import generate_pixel_data_frame
-from pydicom.pixel_data_handlers.util import (
+from pydicom.encaps import generate_frames as frame_generator
+from pydicom.pixels.utils import (
     pixel_dtype,
     get_expected_length,
     reshape_pixel_array,
@@ -258,10 +254,10 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     if missing:
         raise AttributeError(
             "Unable to convert the pixel data as the following required "
-            "elements are missing from the dataset: " + ", ".join(missing)
+            f"elements are missing from the dataset: {', '.join(missing)}"
         )
 
-    decoder = _DECODERS[tsyntax]
+    decoder = cast(Decoder, _DECODERS[tsyntax])
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
     nr_frames = get_nr_frames(ds, warn=False)
@@ -272,8 +268,8 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> Iterable["np.ndarray
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
 
-    for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
-        arr = decoder(frame, pixel_module)
+    for frame in frame_generator(ds.PixelData, number_of_frames=nr_frames):
+        arr = decoder(frame, ds=pixel_module)
 
         if tsyntax in [JPEG2000, JPEG2000Lossless] and config.APPLY_J2K_CORRECTIONS:
             param = get_j2k_parameters(frame)

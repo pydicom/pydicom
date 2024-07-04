@@ -49,6 +49,11 @@ UID_dictionary = {
     '1.2.840.10008.1.2.4.106.1': ('Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2', 'Transfer Syntax', '', '', 'MPEG4HP42STEREOF'),  # noqa
     '1.2.840.10008.1.2.4.107': ('HEVC/H.265 Main Profile / Level 5.1', 'Transfer Syntax', '', '', 'HEVCMP51'),  # noqa
     '1.2.840.10008.1.2.4.108': ('HEVC/H.265 Main 10 Profile / Level 5.1', 'Transfer Syntax', '', '', 'HEVCM10P51'),  # noqa
+    '1.2.840.10008.1.2.4.201': ('High-Throughput JPEG 2000 Image Compression (Lossless Only)', 'Transfer Syntax', '', '', 'HTJ2KLossless'),  # noqa
+    '1.2.840.10008.1.2.4.202': ('High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)', 'Transfer Syntax', '', '', 'HTJ2KLosslessRPCL'),  # noqa
+    '1.2.840.10008.1.2.4.203': ('High-Throughput JPEG 2000 Image Compression', 'Transfer Syntax', '', '', 'HTJ2K'),  # noqa
+    '1.2.840.10008.1.2.4.204': ('JPIP HTJ2K Referenced', 'Transfer Syntax', '', '', 'JPIPHTJ2KReferenced'),  # noqa
+    '1.2.840.10008.1.2.4.205': ('JPIP HTJ2K Referenced Deflate', 'Transfer Syntax', '', '', 'JPIPHTJ2KReferencedDeflate'),  # noqa
     '1.2.840.10008.1.2.5': ('RLE Lossless', 'Transfer Syntax', '', '', 'RLELossless'),  # noqa
     '1.2.840.10008.1.2.6.1': ('RFC 2557 MIME encapsulation', 'Transfer Syntax', '', 'Retired', 'RFC2557MIMEEncapsulation'),  # noqa
     '1.2.840.10008.1.2.6.2': ('XML Encoding', 'Transfer Syntax', '', 'Retired', 'XMLEncoding'),  # noqa
@@ -154,6 +159,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.6': ('Ultrasound Image Storage', 'SOP Class', '', 'Retired', 'UltrasoundImageStorageRetired'),  # noqa
     '1.2.840.10008.5.1.4.1.1.6.1': ('Ultrasound Image Storage', 'SOP Class', '', '', 'UltrasoundImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.6.2': ('Enhanced US Volume Storage', 'SOP Class', '', '', 'EnhancedUSVolumeStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.6.3': ('Photoacoustic Image Storage', 'SOP Class', '', '', 'PhotoacousticImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.7': ('Secondary Capture Image Storage', 'SOP Class', '', '', 'SecondaryCaptureImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.7.1': ('Multi-frame Single Bit Secondary Capture Image Storage', 'SOP Class', '', '', 'MultiFrameSingleBitSecondaryCaptureImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.7.2': ('Multi-frame Grayscale Byte Secondary Capture Image Storage', 'SOP Class', '', '', 'MultiFrameGrayscaleByteSecondaryCaptureImageStorage'),  # noqa
@@ -165,6 +171,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.9.1.1': ('12-lead ECG Waveform Storage', 'SOP Class', '', '', 'TwelveLeadECGWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.1.2': ('General ECG Waveform Storage', 'SOP Class', '', '', 'GeneralECGWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.1.3': ('Ambulatory ECG Waveform Storage', 'SOP Class', '', '', 'AmbulatoryECGWaveformStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.1.4': ('General 32-bit ECG Waveform Storage', 'SOP Class', '', '', 'General32bitECGWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.2.1': ('Hemodynamic Waveform Storage', 'SOP Class', '', '', 'HemodynamicWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.3.1': ('Cardiac Electrophysiology Waveform Storage', 'SOP Class', '', '', 'CardiacElectrophysiologyWaveformStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.4.1': ('Basic Voice Audio Waveform Storage', 'SOP Class', '', '', 'BasicVoiceAudioWaveformStorage'),  # noqa
@@ -190,7 +197,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.11.9': ('Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'VolumeRenderingVolumetricPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.10': ('Segmented Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'SegmentedVolumeRenderingVolumetricPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.11': ('Multiple Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'MultipleVolumeRenderingVolumetricPresentationStateStorage'),  # noqa
-    '1.2.840.10008.5.1.4.1.1.11.12': ('Variable Modality LUT Softcopy Presentation State Storage', 'SOP Class', '', '', 'VariableModalityLUTPresentationStateStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.11.12': ('Variable Modality LUT Softcopy Presentation State Storage', 'SOP Class', '', '', 'VariableModalityLUTSoftcopyPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.1': ('X-Ray Angiographic Image Storage', 'SOP Class', '', '', 'XRayAngiographicImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.1.1': ('Enhanced XA Image Storage', 'SOP Class', '', '', 'EnhancedXAImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.2': ('X-Ray Radiofluoroscopic Image Storage', 'SOP Class', '', '', 'XRayRadiofluoroscopicImageStorage'),  # noqa
@@ -236,6 +243,8 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.77.1.5.8': ('Ophthalmic Optical Coherence Tomography B-scan Volume Analysis Storage', 'SOP Class', '', '', 'OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.77.1.6': ('VL Whole Slide Microscopy Image Storage', 'SOP Class', '', '', 'VLWholeSlideMicroscopyImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.77.1.7': ('Dermoscopic Photography Image Storage', 'SOP Class', '', '', 'DermoscopicPhotographyImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.77.1.8': ('Confocal Microscopy Image Storage', 'SOP Class', '', '', 'ConfocalMicroscopyImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.77.1.9': ('Confocal Microscopy Tiled Pyramidal Image Storage', 'SOP Class', '', '', 'ConfocalMicroscopyTiledPyramidalImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.1': ('Lensometry Measurements Storage', 'SOP Class', '', '', 'LensometryMeasurementsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.2': ('Autorefraction Measurements Storage', 'SOP Class', '', '', 'AutorefractionMeasurementsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.3': ('Keratometry Measurements Storage', 'SOP Class', '', '', 'KeratometryMeasurementsStorage'),  # noqa

@@ -7,11 +7,11 @@ import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
 
-pillow_missing_message = "pillow is not available " "in this test environment"
+pillow_missing_message = "pillow is not available in this test environment"
 pillow_present_message = "pillow is being tested"
 gdcm_missing_message = "GDCM is not available in this test environment"
-numpy_missing_message = "numpy is not available " "in this test environment"
-jpeg_ls_missing_message = "jpeg_ls is not available " "in this test environment"
+numpy_missing_message = "numpy is not available in this test environment"
+jpeg_ls_missing_message = "jpeg_ls is not available in this test environment"
 
 
 try:
@@ -61,9 +61,17 @@ save_dir = os.getcwd()
 class Test_JPEG_LS_Lossless_transfer_syntax:
     def setup_method(self, method):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
+        self.jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.mr_small = dcmread(mr_name)
+        self.mr_small.pixel_array_options(use_v2_backend=True)
+
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_jpeg_ls_lossless.pixel_array_options(use_v2_backend=True)
+
         self.emri_small = dcmread(emri_name)
+        self.emri_small.pixel_array_options(use_v2_backend=True)
+
         self.original_handlers = pydicom.config.pixel_data_handlers
 
     def teardown_method(self, method):

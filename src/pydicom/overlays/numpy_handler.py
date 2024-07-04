@@ -28,8 +28,7 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING, cast, Any, Optional
-import warnings
+from typing import TYPE_CHECKING, cast, Any
 
 try:
     import numpy as np
@@ -38,7 +37,8 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.pixel_data_handlers import unpack_bits
+from pydicom.misc import warn_and_log
+from pydicom.pixels.utils import unpack_bits
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -50,18 +50,13 @@ DEPENDENCIES = {"numpy": ("https://numpy.org/", "NumPy")}
 
 
 def is_available() -> bool:
-    """Return ``True`` if the handler has its dependencies met.
-
-    .. versionadded:: 1.4
-    """
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP
 
 
 def get_expected_length(elem: dict[str, Any], unit: str = "bytes") -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
-
-    .. versionadded:: 1.4
 
     +------------------------------------------------+-------------+
     | Element                                        | Required or |
@@ -107,8 +102,6 @@ def get_expected_length(elem: dict[str, Any], unit: str = "bytes") -> int:
 
 def reshape_overlay_array(elem: dict[str, Any], arr: "np.ndarray") -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
-
-    .. versionadded:: 1.4
 
     +------------------------------------------------+--------------+
     | Element                                        | Supported    |
@@ -168,8 +161,6 @@ def reshape_overlay_array(elem: dict[str, Any], arr: "np.ndarray") -> "np.ndarra
 
 def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the *Overlay Data*.
-
-    .. versionadded:: 1.4
 
     Parameters
     ----------
@@ -232,7 +223,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
-            warnings.warn("The overlay data length is odd and misses a padding byte.")
+            warn_and_log("The overlay data length is odd and misses a padding byte.")
         else:
             raise ValueError(
                 "The length of the overlay data in the dataset "
@@ -242,7 +233,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
             )
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
-        warnings.warn(
+        warn_and_log(
             f"The length of the overlay data in the dataset ({actual_length} "
             "bytes) indicates it contains excess padding. "
             f"{actual_length - expected_len} bytes will be removed "

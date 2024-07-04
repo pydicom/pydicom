@@ -51,7 +51,6 @@ table below.
 """
 
 from typing import TYPE_CHECKING, cast
-import warnings
 
 try:
     import numpy as np
@@ -60,7 +59,8 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.pixel_data_handlers.util import (
+from pydicom.misc import warn_and_log
+from pydicom.pixels.utils import (
     pixel_dtype,
     get_expected_length,
     unpack_bits,
@@ -121,13 +121,6 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
 def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the pixel data.
-
-    .. versionchanged:: 1.4
-
-        * Added support for uncompressed pixel data with a *Photometric
-          Interpretation* of ``YBR_FULL_422``.
-        * Added support for *Float Pixel Data* and *Double Float Pixel Data*
-
 
     Parameters
     ----------
@@ -220,9 +213,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
-            warnings.warn(
-                "The odd length pixel data is missing a trailing padding byte"
-            )
+            warn_and_log("The odd length pixel data is missing a trailing padding byte")
         else:
             raise ValueError(
                 f"The length of the pixel data in the dataset ({actual_length} bytes) "
@@ -251,7 +242,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
                     "need to change the Photometric Interpretation to "
                     "the correct value."
                 )
-        warnings.warn(msg)
+        warn_and_log(msg)
 
     # Unpack the pixel data into a 1D ndarray
     if ds.BitsAllocated == 1:
@@ -262,7 +253,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         # Skip the trailing padding byte(s) if present
         dtype = pixel_dtype(ds, as_float=("Float" in px_keyword[0]))
         if (
-            not ds.is_little_endian
+            not ds.original_encoding[1]
             and dtype.itemsize == 1
             and px_keyword[0] == "PixelData"
             and ds[0x7FE00010].VR == "OW"

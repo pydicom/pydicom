@@ -4,6 +4,7 @@
 import gzip
 import io
 from io import BytesIO
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -14,7 +15,7 @@ import tempfile
 import pytest
 
 import pydicom.config
-from pydicom import config
+from pydicom import config, dicomio
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
@@ -22,6 +23,7 @@ from pydicom.filereader import (
     dcmread,
     read_dataset,
     data_element_generator,
+    read_file_meta_info,
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
@@ -29,7 +31,14 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
-from pydicom.uid import ImplicitVRLittleEndian
+import pydicom.uid
+from pydicom.uid import (
+    ImplicitVRLittleEndian,
+    ExplicitVRLittleEndian,
+    UID,
+    register_transfer_syntax,
+    PrivateTransferSyntaxes,
+)
 import pydicom.valuerep
 from pydicom import values
 
@@ -97,7 +106,15 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
+def test_dicomio():
+    assert dicomio.dcmread is pydicom.dcmread
+    assert dicomio.dcmwrite is pydicom.dcmwrite
+
+
 class TestReader:
+    def teardown_method(self):
+        pydicom.uid.PrivateTransferSyntaxes = []
+
     def test_empty_numbers_tag(self):
         """Test that an empty tag with a number VR (FL, UL, SL, US,
         SS, FL, FD, OF) reads as ``None``."""
@@ -268,6 +285,8 @@ class TestReader:
         # If we can read anything else, the decompression must have been ok.
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert ds.filename == deflate_name
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR
@@ -315,9 +334,7 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
-        file_ds.save_as(fp, write_like_original=True)
+        file_ds.save_as(fp, implicit_vr=True)
 
         test_ds = dcmread(fp, force=True, stop_before_pixels=True)
         ds_tags = sorted(ds.keys())
@@ -509,9 +526,7 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
-        file_ds.save_as(fp, write_like_original=True)
+        file_ds.save_as(fp, implicit_vr=True)
 
         ds = dcmread(fp, force=True)
         assert "US" == ds[0x00280108].VR
@@ -526,9 +541,7 @@ class TestReader:
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = False
-        file_ds.is_little_endian = True
-        file_ds.save_as(fp, write_like_original=True)
+        file_ds.save_as(fp, implicit_vr=False)
 
         ds = dcmread(fp, force=True)
         assert "US" == ds[0x00280108].VR
@@ -540,9 +553,7 @@ class TestReader:
         ds = dcmread(jpeg_lossless_name)
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
-        file_ds.save_as(fp, write_like_original=True)
+        file_ds.save_as(fp)
 
         ds = dcmread(fp, force=True)
         assert "OB" == ds[0x7FE00010].VR
@@ -568,12 +579,12 @@ class TestReader:
         long_specific_char_set_value = ["ISO 2022IR 100"] * 9
         ds.add(DataElement(0x00080005, "CS", long_specific_char_set_value))
 
-        msg = r"Unknown encoding 'ISO 2022IR 100' - using default encoding " r"instead"
+        msg = r"Unknown encoding 'ISO 2022IR 100' - using default encoding instead"
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
         with pytest.warns(UserWarning, match=msg):
-            file_ds.save_as(fp, write_like_original=True)
+            file_ds.save_as(fp)
 
         with pytest.warns(UserWarning, match=msg):
             ds = dcmread(fp, defer_size=65, force=True)
@@ -588,7 +599,7 @@ class TestReader:
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
         with pytest.raises(LookupError, match="Unknown encoding 'ISO 2022IR 100'"):
-            file_ds.save_as(fp, write_like_original=True)
+            file_ds.save_as(fp)
 
     def test_no_preamble_file_meta_dataset(self):
         """Test correct read of group 2 elements with no preamble."""
@@ -779,7 +790,7 @@ class TestReader:
         )
         fp = BytesIO(bytestream)
         with pytest.raises(
-            InvalidDicomError, match="Expected explicit VR, " "but found implicit VR"
+            InvalidDicomError, match="Expected explicit VR, but found implicit VR"
         ):
             dcmread(fp, force=True)
 
@@ -806,12 +817,18 @@ class TestReader:
             dcmread("InvalidFilePath")
         with pytest.raises(
             TypeError,
-            match="dcmread: Expected a file path or " "a file-like, but got None",
+            match=(
+                "dcmread: Expected a file path, file-like or readable "
+                "buffer, but got NoneType"
+            ),
         ):
             dcmread(None)
         with pytest.raises(
             TypeError,
-            match="dcmread: Expected a file path or " "a file-like, but got int",
+            match=(
+                "dcmread: Expected a file path, file-like or readable "
+                "buffer, but got int"
+            ),
         ):
             dcmread(42)
 
@@ -819,14 +836,19 @@ class TestReader:
         """Test that an empty Specific Character Set is handled correctly.
         Regression test for #1038"""
         ds = dcmread(get_testdata_file("empty_charset_LEI.dcm"))
-        assert ds.read_encoding == ["iso8859"]
+        msg = (
+            "'FileDataset.read_encoding' will be removed in v4.0, use "
+            "'FileDataset.original_character_set' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            assert ds.read_encoding == ["iso8859"]
 
     def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.
         Regression test for #358."""
         ds = dcmread(mr_name)
         fp = DicomBytesIO()
-        ds.save_as(fp, write_like_original=True)
+        ds.save_as(fp)
         fp.seek(0)
         de_gen = data_element_generator(fp, False, True)
         try:
@@ -897,16 +919,113 @@ class TestReader:
         """Test correct type for an empty PN element."""
         # Test for 1338
         ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
         ds.PatientName = ""
         assert isinstance(ds.PatientName, pydicom.valuerep.PersonName)
 
         bs = DicomBytesIO()
-        ds.save_as(bs)
+        ds.save_as(bs, implicit_vr=True)
 
-        out = dcmread(bs, force=True)
+        dcmread(bs, force=True)
         assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
+
+    def test_explicit_undefined_length_logged(self, enable_debugging, caplog):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00OB\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
+                ),
+                False,
+                True,
+            )
+        assert "Undefined length (FFFFFFFF)" in caplog.text
+        assert "Reading undefined length data element" in caplog.text
+
+    def test_sequence_undefined_length_logged(self, enable_debugging, caplog):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00SQ\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
+                ),
+                False,
+                True,
+            )
+        assert "0000001E: Reading/parsing undefined length sequence" in caplog.text
+        assert (
+            "00000022: fe ff 00 e0 00 00 00 00  Found Item tag (start of item)"
+        ) in caplog.text
+        assert "Finished sequence item" in caplog.text
+
+    def test_sequence_delimiter_with_length(self, enable_debugging, caplog):
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00SQ\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x01"
+                ),
+                False,
+                True,
+            )
+
+        assert (
+            "Expected 0x00000000 after delimiter, found 0x1000000, at position 0x2A"
+        ) in caplog.text
+
+    def test_sequence_missing_item_tag(self, enable_debugging, caplog):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00SQ\x00\x00\xFF\xFF\xFF\xFF"
+                    b"\x10\x00\x10\x00\x00\x00\x00\x00"
+                    b"\xFE\xFF\xDD\xE0\x00\x00\x00\x01"
+                ),
+                False,
+                True,
+            )
+
+        assert (
+            "Expected sequence item with tag (FFFE,E000) at file position 0x22"
+        ) in caplog.text
+
+    def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
+        """Test reading a dataset with a registered private transfer syntax"""
+        uid = UID("1.2.3.4")
+        uid.set_private_encoding(True, True)
+
+        ds = dcmread(ct_name)
+        assert ds.original_encoding == (False, True)
+        buffer = BytesIO()
+        ds.file_meta.TransferSyntaxUID = uid
+        assert ds.file_meta.TransferSyntaxUID.is_implicit_VR
+        assert ds.file_meta.TransferSyntaxUID.is_little_endian
+        ds.save_as(buffer)
+
+        buffer.seek(0)
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            msg = "Expected explicit VR, but found implicit VR"
+            with pytest.warns(UserWarning, match=msg):
+                dcmread(buffer)
+
+            assert msg in caplog.text
+
+        caplog.clear()
+        register_transfer_syntax(uid)
+
+        buffer.seek(0)
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            ds = dcmread(buffer)
+            assert "Expected explicit VR, but found implicit VR" not in caplog.text
+
+        assert ds.file_meta.TransferSyntaxUID == uid
+        assert ds.original_encoding == (True, True)
 
 
 class TestIncorrectVR:
@@ -970,8 +1089,7 @@ class TestIncorrectVR:
         ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = "1.1.1"
         ds.file_meta.MediaStorageSOPInstanceUID = "2.2.2"
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds.SOPClassUID = "9.9.9"  # First item group 8 in top-level dataset
         seq = Sequence()
         seq_ds = Dataset()
@@ -980,7 +1098,7 @@ class TestIncorrectVR:
         ds.ReferencedImageSequence = seq
 
         dbio = DicomBytesIO()
-        ds.save_as(dbio, write_like_original=False)
+        ds.save_as(dbio, enforce_file_format=True)
 
         # Now read the constructed dataset back in
         # In original issue, shows warning that has detected what appears
@@ -988,6 +1106,25 @@ class TestIncorrectVR:
         dbio.seek(0)
         ds = dcmread(dbio)
         ds.remove_private_tags()  # forces it to actually parse SQ
+
+
+@pytest.fixture
+def enable_debugging():
+    original_debug = config.debugging
+    config.debugging = True
+    yield
+    config.debugging = original_debug
+
+
+@pytest.fixture
+def enable_debugging_and_implicit():
+    original_debug = config.debugging
+    original_switch = config.assume_implicit_vr_switch
+    config.debugging = True
+    config.assume_implicit_vr_switch = True
+    yield
+    config.debugging = original_debug
+    config.assume_implicit_vr_switch = original_switch
 
 
 class TestUnknownVR:
@@ -1057,16 +1194,44 @@ class TestUnknownVR:
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
 
+    def test_unknown_explicit(self, enable_debugging, caplog):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00XX\x00\x00\x00\x08\x00\x49"
+                ),
+                False,
+                True,
+            )
+
+        assert (
+            "Unknown VR 'XX' assuming explicit VR encoding with 2-byte length"
+        ) in caplog.text
+
+    def test_unknown_implicit(self, enable_debugging_and_implicit, caplog):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            read_dataset(
+                BytesIO(
+                    b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    b"\x08\x00\x06\x00xx\x00\x00\x00\x08\x00\x49"
+                ),
+                False,
+                True,
+            )
+
+        assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
+
 
 class TestReadDataElement:
     def setup_method(self):
         ds = Dataset()
         ds.DoubleFloatPixelData = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07"
-        )  # OD
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07"  # OD
+        )
         ds.SelectorOLValue = (
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
-        )  # VR of OL
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"  # VR of OL
+        )
         ds.PotentialReasonsForProcedure = [
             "A",
             "B",
@@ -1078,7 +1243,7 @@ class TestReadDataElement:
         ds.DestinationAE = "    TEST  12    "  # 16 characters max for AE
         # 8-byte values
         ds.ExtendedOffsetTable = (  # VR of OV
-            b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
+            b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         )
 
         # No public elements with VR of SV or UV yet...
@@ -1121,15 +1286,11 @@ class TestReadDataElement:
 
         self.fp = BytesIO()  # Implicit little
         file_ds = FileDataset(self.fp, ds)
-        file_ds.is_implicit_VR = True
-        file_ds.is_little_endian = True
-        file_ds.save_as(self.fp, write_like_original=True)
+        file_ds.save_as(self.fp, implicit_vr=True)
 
         self.fp_ex = BytesIO()  # Explicit little
         file_ds = FileDataset(self.fp_ex, ds)
-        file_ds.is_implicit_VR = False
-        file_ds.is_little_endian = True
-        file_ds.save_as(self.fp_ex, write_like_original=True)
+        file_ds.save_as(self.fp_ex, implicit_vr=False)
 
     def test_read_OD_implicit_little(self):
         """Check creation of OD DataElement from byte data works correctly."""
@@ -1138,7 +1299,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x7FE00009,
             "OD",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07",
         )
         assert ref_elem == elem
 
@@ -1149,7 +1310,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x7FE00009,
             "OD",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07",
         )
         assert ref_elem == elem
 
@@ -1160,7 +1321,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x00720075,
             "OL",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03",
         )
         assert ref_elem == elem
 
@@ -1171,7 +1332,7 @@ class TestReadDataElement:
         elem = DataElement(
             0x00720075,
             "OL",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03",
         )
         assert ref_elem == elem
 
@@ -1232,7 +1393,7 @@ class TestReadDataElement:
         ds.DestinationAE = ["TEST  12  ", "  TEST2", "   TEST 3  "]
 
         fp = BytesIO()
-        ds.save_as(fp, write_like_original=True)
+        ds.save_as(fp)
         fp.seek(0)
         ds = dcmread(fp, force=True)
         assert ["TEST  12", "TEST2", "TEST 3"] == ds.DestinationAE
@@ -1240,7 +1401,7 @@ class TestReadDataElement:
     def test_read_OV_implicit_little(self):
         """Check reading element with VR of OV encoded as implicit"""
         ds = dcmread(self.fp, force=True)
-        val = b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
+        val = b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         elem = ds["ExtendedOffsetTable"]
         assert "OV" == elem.VR
         assert 0x7FE00001 == elem.tag
@@ -1252,7 +1413,7 @@ class TestReadDataElement:
     def test_read_OV_explicit_little(self):
         """Check reading element with VR of OV encoded as explicit"""
         ds = dcmread(self.fp_ex, force=True)
-        val = b"\x00\x00\x00\x00\x00\x00\x00\x00" b"\x01\x02\x03\x04\x05\x06\x07\x08"
+        val = b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         elem = ds["ExtendedOffsetTable"]
         assert "OV" == elem.VR
         assert 0x7FE00001 == elem.tag
@@ -1475,10 +1636,12 @@ class TestDeferredRead:
         with pytest.raises(OSError):
             ds.PixelData
 
-    def test_values_identical(self):
+    def test_values_identical(self, enable_debugging, caplog):
         """Deferred values exactly matches normal read."""
         ds_norm = dcmread(self.testfile_name)
-        ds_defer = dcmread(self.testfile_name, defer_size=2000)
+        with caplog.at_level(logging.DEBUG, logger="pydicom"):
+            ds_defer = dcmread(self.testfile_name, defer_size=2000)
+
         for data_elem in ds_norm:
             tag = data_elem.tag
 
@@ -1486,6 +1649,10 @@ class TestDeferredRead:
                 assert numpy.allclose(data_elem.value, ds_defer[tag].value)
             else:
                 assert data_elem.value == ds_defer[tag].value
+
+        assert (
+            "Defer size exceeded. Skipping forward to next data element."
+        ) in caplog.text
 
     def test_zipped_deferred(self):
         """Deferred values from a gzipped file works."""
@@ -1499,6 +1666,17 @@ class TestDeferredRead:
 
     def test_filelike_deferred(self):
         """Deferred values work with file-like objects."""
+        f = open(ct_name, "rb")
+        dataset = pydicom.dcmread(f, defer_size=1024)
+        assert 32768 == len(dataset.PixelData)
+        # The 'Histogram tables' private data element is also > 1024 bytes so
+        # pluck this out to confirm multiple deferred reads work (#1609).
+        private_block = dataset.private_block(0x43, "GEMS_PARM_01")
+        assert 2068 == len(private_block[0x29].value)
+        f.close()
+
+    def test_buffer_deferred(self):
+        """Deferred values work with buffer-like objects."""
         with open(ct_name, "rb") as fp:
             data = fp.read()
         filelike = io.BytesIO(data)
@@ -1508,6 +1686,13 @@ class TestDeferredRead:
         # pluck this out to confirm multiple deferred reads work (#1609).
         private_block = dataset.private_block(0x43, "GEMS_PARM_01")
         assert 2068 == len(private_block[0x29].value)
+
+    def test_named_buffer_deferred(self):
+        """Deferred values work with file-like objects."""
+        path = get_testdata_file("image_dfl.dcm")
+        ds = pydicom.dcmread(path, defer_size=1024)
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert 262144 == len(ds.PixelData)
 
 
 class TestReadTruncatedFile:
@@ -1533,10 +1718,9 @@ class TestReadTruncatedFile:
         mr.decode()
         # Need to escape brackets
         msg = (
-            r"The length of the pixel data in the dataset \(8130 bytes\) "
-            r"doesn't match the expected length \(8192 bytes\). "
-            r"The dataset may be corrupted or there may be an issue with "
-            r"the pixel data handler."
+            r"The number of bytes of pixel data is less than expected \(8130 vs 8192 "
+            r"bytes\) - the dataset may be corrupted, have an invalid group 0028 "
+            "element value, or the transfer syntax may be incorrect"
         )
         with pytest.raises(ValueError, match=msg):
             mr.pixel_array
@@ -1605,7 +1789,7 @@ class TestDataElementGenerator:
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF
-        bytestream = b"\x10\x00\x10\x00" b"PN" b"\x06\x00" b"ABCDEF"
+        bytestream = b"\x10\x00\x10\x00PN\x06\x00ABCDEF"
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, True)
@@ -1615,7 +1799,7 @@ class TestDataElementGenerator:
     def test_little_endian_implicit(self):
         """Test reading little endian implicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF
-        bytestream = b"\x10\x00\x10\x00" b"\x06\x00\x00\x00" b"ABCDEF"
+        bytestream = b"\x10\x00\x10\x00\x06\x00\x00\x00ABCDEF"
         fp = BytesIO(bytestream)
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
@@ -1624,9 +1808,17 @@ class TestDataElementGenerator:
     def test_big_endian_explicit(self):
         """Test reading big endian explicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF
-        bytestream = b"\x00\x10\x00\x10" b"PN" b"\x00\x06" b"ABCDEF"
+        bytestream = b"\x00\x10\x00\x10PN\x00\x06ABCDEF"
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+
+
+def test_read_file_meta_info():
+    """Test read_file_meta_info()"""
+    ds = read_file_meta_info(rtplan_name)
+    assert len(ds) == 6
+    assert isinstance(ds, FileMetaDataset)
+    assert ds.TransferSyntaxUID == ImplicitVRLittleEndian

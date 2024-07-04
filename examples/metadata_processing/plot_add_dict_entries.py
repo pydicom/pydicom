@@ -7,14 +7,15 @@ This examples illustrates how to add private dictionary items to the DICOM
 dictionary dynamically. This allows you to read private tags not present in
 pydicom's private dictionary when loading an existing dataset.
 """
+
 # authors : Darcy Mason and pydicom contributors
 # license : MIT
 
+import io
 
 from pydicom import dcmread
 from pydicom.datadict import add_private_dict_entries
 from pydicom.dataset import Dataset
-from pydicom.filebase import DicomBytesIO
 from pydicom.valuerep import VR
 
 print(__doc__)
@@ -35,7 +36,7 @@ block.add_new(0x03, VR.UI, "1.2.3.4.5")
 
 # write the dataset into a memory file and read it back
 # this simulates reading from a normal DICOM file
-fp = DicomBytesIO()
+fp = io.BytesIO()
 ds.save_as(fp)
 ds = dcmread(fp, force=True)
 

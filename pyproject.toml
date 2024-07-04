@@ -45,16 +45,17 @@ docs = [
 ]
 
 dev = [
-    "black==23.10.1",
-    "mypy==1.6.1",
+    "black==24.4.2",
+    "mypy==1.10.1",
     "pydicom-data",
     "pytest",
     "pytest-cov",
-    "ruff==0.1.3",
-    "types-requests"
+    "ruff==0.5.0",
+    "types-requests",
+    "pre-commit",
 ]
 
-basic = ["numpy"]
+basic = ["numpy", "types-pydicom"]
 
 pixeldata = [
     "numpy",
@@ -93,6 +94,12 @@ force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]
+src = ["src"]
+line-length = 214
+target-version = "py310"
+include = ["src/*.py", "tests/*.py", "doc/*.py"]
+
+[tool.ruff.lint]
 select = [
     "UP",
     "C9",
@@ -102,41 +109,33 @@ select = [
     "W",
 ]
 ignore = [
-    "E402",
-    "F401",
-    "F403",
-    "F405",
-    "F541",
-    "F601",
-    "F811",
-    "F841",
     "PLR5501",
     "PLC1901",
     "PLR2004",
     "PLW0603",
     "PLW2901",
 ]
-line-length = 214
-target-version = "py310"
 
-[tool.ruff.mccabe]
-max-complexity = 32
+[tool.ruff.lint.mccabe]
+max-complexity = 36
 
-[tool.ruff.pylint]
+[tool.ruff.lint.pylint]
 max-args = 17
-max-branches = 42
+max-branches = 43
 max-returns = 9
-max-statements = 106
+max-statements = 108
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
 "src/pydicom/config.py" = ["PLW0602"]
+"src/pydicom/sr/_concepts_dict.py" = ["F601"]
+"tests/*.py" = ["F401"]
 
 [tool.mypy]
 python_version = "3.10"
 files = "src/"
 exclude = ["src/pydicom/benchmarks/", "src/pydicom/pixel_data_handlers/pillow_handler.py"]
-show_error_codes = true
+hide_error_codes = false
 warn_redundant_casts = false
 warn_unused_ignores = false
 warn_return_any = true
@@ -145,6 +144,7 @@ ignore_missing_imports = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+disable_error_code = ["method-assign", "ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
 # 2023-06: mypy complains for a line in this file if ignore used or not.

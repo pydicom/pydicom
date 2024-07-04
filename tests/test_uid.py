@@ -1,8 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for uid.py"""
 
-from importlib import import_module
-import sys
 import uuid
 
 import pytest
@@ -10,6 +8,7 @@ import pytest
 from pydicom.uid import (
     UID,
     generate_uid,
+    register_transfer_syntax,
     PYDICOM_ROOT_UID,
     JPEGLSNearLossless,
     CTImageStorage,
@@ -36,7 +35,7 @@ class TestGenerateUID:
 
         # Test invalid UID prefixes
         for invalid_prefix in (
-            ("1" * 63) + ".",
+            ("1" * 54) + ".",
             "",
             ".",
             "1",
@@ -54,7 +53,7 @@ class TestGenerateUID:
             "1.",
             "1.23.",
             "1.0.23.",
-            ("1" * 62) + ".",
+            ("1" * 53) + ".",
             "1.2.3.444444.",
         ):
             uid = generate_uid(prefix=valid_prefix)
@@ -355,8 +354,7 @@ class TestUIDPrivate:
 
     def test_is_transfer_syntax(self):
         """Test that UID.is_transfer_syntax works with private UIDs."""
-        with pytest.raises(ValueError):
-            self.uid.is_transfer_syntax
+        assert not self.uid.is_transfer_syntax
 
     def test_is_compressed(self):
         """Test that UID.is_compressed works with private UIDs."""
@@ -395,3 +393,65 @@ class TestUIDPrivate:
     def test_keyword(self):
         """Test the keyword property."""
         assert "" == self.uid.keyword
+
+    def test_private_encoding(self):
+        """Test setting encoding via UID.set_private_encoding()"""
+        self.uid.set_private_encoding(True, True)
+        assert self.uid.is_transfer_syntax
+        assert self.uid.is_implicit_VR
+        assert self.uid.is_little_endian
+        self.uid.set_private_encoding(False, False)
+        assert not self.uid.is_implicit_VR
+        assert not self.uid.is_little_endian
+
+        # Test encoding attr are copied to new UID instance
+        uid = UID(self.uid)
+        assert uid.is_transfer_syntax
+        assert not uid.is_implicit_VR
+        assert not uid.is_little_endian
+
+
+class TestRegisterTransferSyntax:
+    """Tests for register_transfer_syntax()"""
+
+    def teardown_method(self):
+        pydicom.uid.PrivateTransferSyntaxes = []
+
+    def test_no_encoding_raises(self):
+        """Test not supplying the encoding raises"""
+        uid = UID("1.2.3")
+        msg = (
+            "The corresponding dataset encoding for 'uid' must be set using "
+            "the 'implicit_vr' and 'little_endian' arguments"
+        )
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax(uid)
+
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax("1.2.3")
+
+        assert pydicom.uid.PrivateTransferSyntaxes == []
+
+    def test_encoding_uid(self):
+        """Test encoding supplied via set_private_encoding()"""
+        assert pydicom.uid.PrivateTransferSyntaxes == []
+
+        uid = UID("1.2.3")
+        uid.set_private_encoding(True, False)
+        register_transfer_syntax(uid)
+        assert uid in pydicom.uid.PrivateTransferSyntaxes
+        uid = pydicom.uid.PrivateTransferSyntaxes[0]
+        assert uid.is_transfer_syntax
+        assert uid.is_implicit_VR
+        assert not uid.is_little_endian
+
+    def test_encoding_str(self):
+        """Test encoding supplied via args"""
+        assert pydicom.uid.PrivateTransferSyntaxes == []
+
+        register_transfer_syntax("1.2.3", False, True)
+        uid = pydicom.uid.PrivateTransferSyntaxes[0]
+        assert uid == "1.2.3"
+        assert uid.is_transfer_syntax
+        assert not uid.is_implicit_VR
+        assert uid.is_little_endian

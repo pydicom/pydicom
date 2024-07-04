@@ -6,6 +6,7 @@ import os
 from os.path import basename
 from pathlib import Path
 import shutil
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -24,9 +25,16 @@ from pydicom.data import download
 from pydicom.data.download import get_data_dir, calculate_file_hash, get_cached_filehash
 
 
-EXT_PYDICOM = False
-if "pydicom-data" in external_data_sources():
-    EXT_PYDICOM = True
+EXT_PYDICOM = "pydicom-data" in external_data_sources()
+if EXT_PYDICOM:
+    DATA_SRC = external_data_sources()["pydicom-data"].data_path
+    try:
+        with open(DATA_SRC / "test", "wb") as f:
+            pass
+        os.remove(DATA_SRC / "test")
+        IS_WRITEABLE = True
+    except Exception:
+        IS_WRITEABLE = False
 
 
 @pytest.fixture
@@ -113,8 +121,27 @@ class TestGetData:
         for x in palettes:
             assert palbase in x
 
+    def test_no_absolute_path_in_get_testdata_file(self):
+        msg = (
+            "'get_testdata_file' does not support absolute paths, "
+            "as it only works with internal pydicom test data - "
+            r"did you mean 'dcmread\(\"/foo/bar.dcm\"\)'?"
+        )
+        with pytest.raises(ValueError, match=msg):
+            get_testdata_file("/foo/bar.dcm")
 
-@pytest.mark.skipif(not EXT_PYDICOM, reason="pydicom-data not installed")
+    def test_no_absolute_path_in_get_testdata_files(self):
+        msg = (
+            "'get_testdata_files' does not support absolute paths, as it only works "
+            "with internal pydicom test data."
+        )
+        with pytest.raises(ValueError, match=msg):
+            get_testdata_files("/foo/*.dcm")
+
+
+@pytest.mark.skipif(
+    not EXT_PYDICOM or not IS_WRITEABLE, reason="pydicom-data not installed or RO"
+)
 class TestExternalDataSource:
     """Tests for the external data sources."""
 
@@ -122,14 +149,15 @@ class TestExternalDataSource:
         self.dpath = external_data_sources()["pydicom-data"].data_path
 
         # Backup the 693_UNCI.dcm file
-        p = self.dpath / "693_UNCI.dcm"
-        shutil.copy(p, self.dpath / "PYTEST_BACKUP")
+        self.src = self.dpath / "693_UNCI.dcm"
+        self.tdir = TemporaryDirectory(ignore_cleanup_errors=True)
+        self.dst = Path(self.tdir.name) / "PYTEST_BACKUP"
+        shutil.copy(self.src, self.dst)
 
     def teardown_method(self):
         # Restore the backed-up file
-        p = self.dpath / "693_UNCI.dcm"
-        shutil.copy(self.dpath / "PYTEST_BACKUP", p)
-        os.remove(self.dpath / "PYTEST_BACKUP")
+        shutil.copy(self.dst, self.src)
+        self.tdir.cleanup()
 
         if "mylib" in external_data_sources():
             del external_data_sources()["mylib"]
@@ -268,9 +296,7 @@ class TestDownload:
     def test_get_testdata_file_network_outage(self, download_failure):
         """Test a network outage when using get_testdata_file."""
         fname = "693_UNCI.dcm"
-        msg = (
-            r"A download failure occurred while attempting to " r"retrieve 693_UNCI.dcm"
-        )
+        msg = r"A download failure occurred while attempting to retrieve 693_UNCI.dcm"
         with pytest.warns(UserWarning, match=msg):
             assert get_testdata_file(fname) is None
 

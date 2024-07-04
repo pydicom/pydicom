@@ -5,15 +5,13 @@ import datetime
 from decimal import Decimal
 from enum import Enum, unique
 import re
-import sys
 from math import floor, isfinite, log10
-from typing import TypeVar, Optional, Union, Any, cast
-from collections.abc import Callable, MutableSequence, Sequence, Iterator
-import warnings
+from typing import Optional, Any, cast
+from collections.abc import Callable, Sequence, Iterator
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.multival import MultiValue
+from pydicom.misc import warn_and_log
 
 
 # can't import from charset or get circular import
@@ -433,7 +431,7 @@ def validate_value(
             if not is_valid:
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
-                warnings.warn(msg)
+                warn_and_log(msg)
 
 
 @unique
@@ -743,7 +741,7 @@ class DT(_DateTimeBase, datetime.datetime):
             match = cls._regex_dt.match(val)
             if not match or len(val) > 26:
                 raise ValueError(
-                    f"Unable to convert non-conformant value '{val}' to 'DT' " "object"
+                    f"Unable to convert non-conformant value '{val}' to 'DT' object"
                 )
 
             dt_match = match.group(2)
@@ -767,7 +765,7 @@ class DT(_DateTimeBase, datetime.datetime):
 
             # DT may include a leap second which isn't allowed by datetime
             if kwargs["second"] == 60:
-                warnings.warn(
+                warn_and_log(
                     "'datetime.datetime' doesn't allow a value of '60' for "
                     "the seconds component, changing to '59'"
                 )
@@ -852,7 +850,7 @@ class TM(_DateTimeBase, datetime.time):
             match = cls._RE_TIME.match(val)
             if not match:
                 raise ValueError(
-                    f"Unable to convert non-conformant value '{val}' to 'TM' " "object"
+                    f"Unable to convert non-conformant value '{val}' to 'TM' object"
                 )
 
             hour = int(match.group("h"))
@@ -860,7 +858,7 @@ class TM(_DateTimeBase, datetime.time):
             second = 0 if match.group("s") is None else int(match.group("s"))
 
             if second == 60:
-                warnings.warn(
+                warn_and_log(
                     "'datetime.time' doesn't allow a value of '60' for the "
                     "seconds component, changing to '59'"
                 )
@@ -950,7 +948,7 @@ def format_number_as_ds(val: float | Decimal) -> str:
         raise TypeError("'val' must be of type float or decimal.Decimal")
     if not isfinite(val):
         raise ValueError(
-            "Cannot encode non-finite floats as DICOM decimal strings. " f"Got '{val}'"
+            f"Cannot encode non-finite floats as DICOM decimal strings. Got '{val}'"
         )
 
     valstr = str(val)
@@ -1039,6 +1037,8 @@ class DSfloat(float):
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
 
+        self.original_string: str
+
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
         has_attribute = hasattr(val, "original_string")
@@ -1078,7 +1078,7 @@ class DSfloat(float):
             if not is_valid_ds(str(self)):
                 # This will catch nan and inf
                 raise ValueError(
-                    f'Value "{str(self)}" is not valid for elements with a VR ' "of DS"
+                    f'Value "{str(self)}" is not valid for elements with a VR of DS'
                 )
 
     def __eq__(self, other: Any) -> Any:
@@ -1172,6 +1172,8 @@ class DSdecimal(Decimal):
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
 
+        self.original_string: str
+
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
         pre_checked = False
@@ -1210,15 +1212,13 @@ class DSdecimal(Decimal):
                 )
                 if validation_mode == config.RAISE:
                     raise OverflowError(msg)
-                warnings.warn(msg)
+                warn_and_log(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
-                msg = (
-                    f'Value "{str(self)}" is not valid for elements with a VR ' "of DS"
-                )
+                msg = f'Value "{str(self)}" is not valid for elements with a VR of DS'
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
-                warnings.warn(msg)
+                warn_and_log(msg)
 
     def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
@@ -1306,7 +1306,10 @@ class ISfloat(float):
         cls: type["ISfloat"],
         val: str | float | Decimal,
         validation_mode: int | None = None,
-    ) -> float:
+    ) -> float | str:
+        if isinstance(val, str) and val.strip() == "":
+            return ""
+
         return super().__new__(cls, val)
 
     def __init__(
@@ -1318,9 +1321,9 @@ class ISfloat(float):
         elif isinstance(val, IS | ISfloat) and hasattr(val, "original_string"):
             self.original_string = val.original_string
         if validation_mode:
-            msg = f'Value "{str(self)}" is not valid for elements with a VR ' "of IS"
+            msg = f'Value "{str(self)}" is not valid for elements with a VR of IS'
             if validation_mode == config.WARN:
-                warnings.warn(msg)
+                warn_and_log(msg)
             elif validation_mode == config.RAISE:
                 msg += "\nSet reading_validation_mode to WARN or IGNORE to bypass"
                 raise TypeError(msg)
@@ -1404,48 +1407,6 @@ class IS(int):
 
     def __repr__(self) -> str:
         return f"'{super().__repr__()}'"
-
-
-_T = TypeVar("_T")
-
-
-def MultiString(
-    val: str,
-    valtype: Callable[[str], _T] | None = None,
-    validation_mode: int | None = None,
-) -> _T | MutableSequence[_T]:
-    """Split a string by delimiters if there are any
-
-    Parameters
-    ----------
-    val : str
-        The string to split up.
-    valtype : type or callable, optional
-        Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
-        overwrite to a specific type.
-    validation_mode : int
-        Defines if values are validated and how validation errors are
-        handled.
-
-    Returns
-    -------
-    valtype or MultiValue of valtype
-        The split value as `valtype` or a :class:`list` of `valtype`.
-    """
-    if valtype is None:
-        valtype = cast(Callable[[str], _T], str)
-
-    # Remove trailing blank used to pad to even length
-    # 2005.05.25: also check for trailing 0, error made
-    # in PET files we are converting
-    while val and val.endswith((" ", "\x00")):
-        val = val[:-1]
-
-    splitup: list[str] = val.split("\\")
-    if len(splitup) == 1:
-        return valtype(splitup[0])
-
-    return MultiValue(valtype, splitup, validation_mode)
 
 
 def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] | None:
@@ -1614,8 +1575,6 @@ class PersonName:
         """Returns up to three decoded person name components as a
         :class:`tuple` of :class:`str`.
 
-        .. versionadded:: 1.2
-
         Returns
         -------
         Tuple[str, ...]
@@ -1640,8 +1599,6 @@ class PersonName:
     def family_name(self) -> str:
         """Return the first (family name) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(0)
 
@@ -1649,8 +1606,6 @@ class PersonName:
     def given_name(self) -> str:
         """Return the second (given name) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(1)
 
@@ -1658,8 +1613,6 @@ class PersonName:
     def middle_name(self) -> str:
         """Return the third (middle name) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(2)
 
@@ -1667,8 +1620,6 @@ class PersonName:
     def name_prefix(self) -> str:
         """Return the fourth (name prefix) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(3)
 
@@ -1676,8 +1627,6 @@ class PersonName:
     def name_suffix(self) -> str:
         """Return the fifth (name suffix) group of the alphabetic person name
         representation as a unicode string
-
-        .. versionadded:: 1.2
         """
         return self._name_part(4)
 
@@ -1695,8 +1644,6 @@ class PersonName:
     def ideographic(self) -> str:
         """Return the second (ideographic) person name component as a
         unicode string
-
-        .. versionadded:: 1.2
         """
         try:
             return self.components[1]
@@ -1707,8 +1654,6 @@ class PersonName:
     def phonetic(self) -> str:
         """Return the third (phonetic) person name component as a
         unicode string
-
-        .. versionadded:: 1.2
         """
         try:
             return self.components[2]

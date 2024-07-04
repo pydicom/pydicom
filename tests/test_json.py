@@ -1,10 +1,10 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
+import logging
 from unittest import mock
 
 import pytest
 
-from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
@@ -153,7 +153,7 @@ class TestAT:
         )
         with pytest.warns(
             UserWarning,
-            match="Invalid value '000910AG' for " "AT element - ignoring it",
+            match="Invalid value '000910AG' for AT element - ignoring it",
         ):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
@@ -166,7 +166,7 @@ class TestAT:
         )
         with pytest.raises(
             ValueError,
-            match="Data element '000910AG' could " "not be loaded from JSON:",
+            match="Data element '000910AG' could not be loaded from JSON:",
         ):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
@@ -195,10 +195,10 @@ class TestDataSetToJson:
         ds.add_new(
             0x00091005,
             "OD",
-            b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03\x04\x05\x06\x07",
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03\x04\x05\x06\x07",
         )
         ds.add_new(
-            0x00091006, "OL", b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x01\x01\x02\x03"
+            0x00091006, "OL", b"\x00\x01\x02\x03\x04\x05\x06\x07\x01\x01\x02\x03"
         )
         ds.add_new(0x00091007, "UI", "1.2.3.4.5.6")
         ds.add_new(0x00091008, "DA", "20200101")
@@ -255,8 +255,8 @@ class TestDataSetToJson:
         ds.add_new(0x00100010, "PN", "Jane^Doe")
         # as the order of the keys is not defined, we have to check both
         assert ds.to_json() in (
-            '{"00100010": {"vr": "PN", "Value": [{' '"Alphabetic": "Jane^Doe"}]}}',
-            '{"00100010": {"Value": [{' '"Alphabetic": "Jane^Doe"}], "vr": "PN"}}',
+            '{"00100010": {"vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]}}',
+            '{"00100010": {"Value": [{"Alphabetic": "Jane^Doe"}], "vr": "PN"}}',
         )
 
         assert {
@@ -267,8 +267,8 @@ class TestDataSetToJson:
         element = DataElement(0x00100010, "PN", "Jane^Doe")
         # as the order of the keys is not defined, we have to check both
         assert element.to_json() in (
-            '{"vr": "PN", "Value": [{' '"Alphabetic": "Jane^Doe"}]}',
-            '{"Value": [{' '"Alphabetic": "Jane^Doe"}], "vr": "PN"}',
+            '{"vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]}',
+            '{"Value": [{"Alphabetic": "Jane^Doe"}], "vr": "PN"}',
         )
 
         assert {"vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]} == element.to_json(
@@ -301,7 +301,7 @@ class TestDataSetToJson:
 
         assert "00100010" not in ds_json
 
-    def test_suppress_invalid_tags_with_failed_dataelement(self):
+    def test_suppress_invalid_tags_with_failed_dataelement(self, caplog):
         """Test tags that raise exceptions don't if suppress_invalid_tags True."""
         ds = Dataset()
         # we have to add a RawDataElement as creating a DataElement would
@@ -310,8 +310,13 @@ class TestDataSetToJson:
             Tag(0x00082128), "IS", 4, b"5.25", 0, True, True
         )
 
-        ds_json = ds.to_json_dict(suppress_invalid_tags=True)
-        assert "00082128" not in ds_json
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            ds_json = ds.to_json_dict(suppress_invalid_tags=True)
+            assert "00082128" not in ds_json
+
+        assert (
+            "Error while processing tag 00082128: Invalid value for VR IS: '5.25'"
+        ) in caplog.text
 
 
 class TestSequence:
@@ -340,6 +345,45 @@ class TestBinary:
         ds_json["00091002"]["InlineBinary"] = ["QmluYXJ5Q29udGVudA=="]
         ds1 = Dataset.from_json(ds_json)
         assert ds == ds1
+
+    def test_inline_binary_un_sq(self):
+        # Test unknown VR with inline binary and a sequence
+        seq_item = Dataset()
+        seq_item.update(
+            {
+                "PatientPosition": "HFS",
+                "PatientSetupNumber": "1",
+                "SetupTechniqueDescription": "",
+            }
+        )
+        ds_ref = Dataset()
+        ds_ref.PatientSetupSequence = [seq_item]
+
+        ds_json = {
+            "300A0180": {
+                "vr": "UN",
+                "InlineBinary": "/v8A4B4AAAAYAABRBAAAAEhGUyAKMIIBAgAAADEgCjCyAQAAAAA=",
+            }
+        }
+        ds1 = Dataset.from_json(ds_json)
+        assert "PatientSetupSequence" in ds1
+        assert ds1 == ds_ref
+
+    def test_inline_binary_un_pad(self):
+        # Test unknown VR with inline binary and odd-length values
+        # The value ("HFS") is an odd length.
+        # The value is padded with a space before base64 encoding because
+        # UN uses implicit VR little endian.
+        # When reading back, the padding should be removed.
+        ds_json = {
+            "00185100": {
+                "vr": "UN",
+                "InlineBinary": "SEZTIA==",
+            }
+        }
+        ds1 = Dataset.from_json(ds_json)
+        assert "PatientPosition" in ds1
+        assert ds1.PatientPosition == "HFS"
 
     def test_invalid_inline_binary(self):
         msg = (

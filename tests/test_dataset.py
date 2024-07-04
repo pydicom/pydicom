@@ -30,17 +30,16 @@ from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta, FileMetaDataset
 from pydicom.encaps import encapsulate
 from pydicom.filebase import DicomBytesIO
-from pydicom.overlays import numpy_handler as NP_HANDLER
-from pydicom.pixel_data_handlers.util import get_image_pixel_ids
+from pydicom.pixels.utils import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian,
+    ExplicitVRLittleEndian,
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID,
-    ExplicitVRLittleEndian,
-    MediaStorageDirectoryStorage,
+    CTImageStorage,
 )
 from pydicom.valuerep import DS, VR
 
@@ -48,6 +47,14 @@ from pydicom.valuerep import DS, VR
 class BadRepr:
     def __repr__(self):
         raise ValueError("bad repr")
+
+
+@pytest.fixture()
+def clear_pixel_data_handlers():
+    orig_handlers = pydicom.config.pixel_data_handlers
+    pydicom.config.pixel_data_handlers = []
+    yield
+    pydicom.config.pixel_data_handlers = orig_handlers
 
 
 class TestDataset:
@@ -64,12 +71,10 @@ class TestDataset:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
         ds.PixelData = "xyzlmnop"
-        msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
-        msg_from_numpy = (
-            r"'FileMetaDataset' object has no attribute " "'TransferSyntaxUID'"
+        msg = (
+            "Unable to decode the pixel data as the dataset's 'file_meta' has "
+            r"no \(0002,0010\) 'Transfer Syntax UID' element"
         )
-        msg_from_pillow = r"'Dataset' object has no attribute " "'PixelRepresentation'"
-        msg = "(" + "|".join([msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
 
@@ -80,9 +85,7 @@ class TestDataset:
         sub_ds.BeamNumber = "1"
         dataset.BeamSequence = Sequence([sub_ds])
         fp = DicomBytesIO()
-        dataset.is_little_endian = True
-        dataset.is_implicit_VR = True
-        pydicom.dcmwrite(fp, dataset)
+        dataset.save_as(fp, implicit_vr=True)
 
         def _reset():
             fp.seek(0)
@@ -119,8 +122,6 @@ class TestDataset:
         ds1, ds2 = _reset()
         ds2.BeamSequence[0].BeamNumber = "2"
         assert ds2 != ds1
-
-        fp.close()
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
@@ -307,7 +308,7 @@ class TestDataset:
 
     def test_setdefault_unknown_tag_strict(self, raise_on_writing_invalid_value):
         with pytest.raises(KeyError, match=r"\(8888,0004\)"):
-            elem = self.ds.setdefault(0x88880004, "foo")
+            self.ds.setdefault(0x88880004, "foo")
 
     def test_setdefault_tuple(self):
         elem = self.ds.setdefault((0x300A, 0x00B2), "foo")
@@ -327,7 +328,7 @@ class TestDataset:
 
     def test_setdefault_unknown_tuple_strict(self, raise_on_writing_invalid_value):
         with pytest.raises(KeyError, match=r"\(8888,0004\)"):
-            elem = self.ds.setdefault((0x8888, 0x0004), "foo")
+            self.ds.setdefault((0x8888, 0x0004), "foo")
 
     def test_setdefault_use_value(self, dont_raise_on_writing_invalid_value):
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
@@ -1032,6 +1033,18 @@ class TestDataset:
         # Slice all items - should return original dataset
         assert ds == ds.get_item(slice(None, None))
 
+    def test_getitem_deferred(self):
+        """Test get_item(..., keep_deferred)"""
+        test_file = get_testdata_file("MR_small.dcm")
+        ds = dcmread(test_file, force=True, defer_size="0.8 kB")
+        elem = ds.get_item("PixelData", keep_deferred=True)
+        assert isinstance(elem, RawDataElement)
+        assert elem.value is None
+
+        elem = ds.get_item("PixelData", keep_deferred=False)
+        assert isinstance(elem, DataElement)
+        assert elem.value is not None
+
     def test_get_private_item(self):
         ds = Dataset()
         ds.add_new(0x00080005, "CS", "ISO_IR 100")
@@ -1131,6 +1144,23 @@ class TestDataset:
         item = ds.get_private_item(0x0009, 0x02, "Creator 2.0")
         assert 2 == item.value
 
+    def test_private_block_deepcopy(self):
+        """Test deepcopying a private block."""
+        ds = Dataset()
+        ds.private_block(0x000B, "Foo", create=True)
+
+        ds2 = copy.deepcopy(ds)
+        assert ds2[0x000B0010].value == "Foo"
+
+    def test_private_block_pickle(self):
+        """Test pickling a private block."""
+        ds = Dataset()
+        ds.private_block(0x000B, "Foo", create=True)
+
+        s = pickle.dumps({"ds": ds})
+        ds2 = pickle.loads(s)["ds"]
+        assert ds2[0x000B0010].value == "Foo"
+
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078
         ct_filename = get_testdata_file("CT_small.dcm")
@@ -1142,7 +1172,7 @@ class TestDataset:
         ds.private_block(0x13, "GEMS_PATI_01", create=True)
         assert ["GEMS_PATI_01"] == ds.private_creators(0x13)
 
-    def test_add_known_private_tag(self):
+    def test_add_known_private_tag2(self):
         # regression test for #1082
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         assert "[Patient Status]" == ds[0x11, 0x1010].name
@@ -1277,7 +1307,7 @@ class TestDataset:
         ds.add_new(0x00250011, "LO", "Valid Creator")
         ds.add_new(0x00251007, "UN", "foobar")
         ds.add_new(0x00251107, "UN", "foobaz")
-        msg = r"\(0025,0010\) '\[13975, 13802]' " r"is not a valid private creator"
+        msg = r"\(0025,0010\) '\[13975, 13802]' is not a valid private creator"
         with pytest.warns(UserWarning, match=msg):
             assert (
                 str(ds[0x00251007]) == "(0025,1007) Private tag data"
@@ -1289,7 +1319,7 @@ class TestDataset:
         )
 
     def test_is_original_encoding(self):
-        """Test Dataset.write_like_original"""
+        """Test Dataset.is_original_encoding"""
         ds = Dataset()
         assert not ds.is_original_encoding
 
@@ -1298,8 +1328,8 @@ class TestDataset:
         ds.set_original_encoding(True, True, ["latin_1"])
         assert not ds.is_original_encoding
 
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
         assert ds.is_original_encoding
         # changed character set
         ds.SpecificCharacterSet = "ISO_IR 192"
@@ -1307,11 +1337,48 @@ class TestDataset:
         # back to original character set
         ds.SpecificCharacterSet = "ISO_IR 100"
         assert ds.is_original_encoding
-        ds.is_little_endian = False
+        ds._is_little_endian = False
         assert not ds.is_original_encoding
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
+        ds._is_little_endian = True
+        ds._is_implicit_VR = False
         assert not ds.is_original_encoding
+
+        ds.set_original_encoding(True, True, None)
+        assert ds.original_character_set == ["latin_1"]
+
+    def test_original_charset_is_equal_to_charset_after_dcmread(self):
+        default_encoding_test_file = get_testdata_file("liver_1frame.dcm")
+        non_default_encoding_test_file = get_testdata_file("CT_small.dcm")
+
+        default_encoding_ds = dcmread(default_encoding_test_file)
+        non_default_encoding_ds = dcmread(non_default_encoding_test_file)
+
+        assert default_encoding_ds.original_character_set == "iso8859"
+        assert (
+            default_encoding_ds.original_character_set
+            == default_encoding_ds._character_set
+        )
+        assert (
+            default_encoding_ds.ReferencedSeriesSequence[0].original_character_set
+            == default_encoding_ds.ReferencedSeriesSequence[0]._character_set
+        )
+        assert (
+            default_encoding_ds.file_meta.original_character_set
+            == default_encoding_ds.file_meta._character_set
+        )
+        assert non_default_encoding_ds.original_character_set == ["latin_1"]
+        assert (
+            non_default_encoding_ds.original_character_set
+            == non_default_encoding_ds._character_set
+        )
+        assert (
+            non_default_encoding_ds.OtherPatientIDsSequence[0].original_character_set
+            == non_default_encoding_ds.OtherPatientIDsSequence[0]._character_set
+        )
+        assert (
+            non_default_encoding_ds.file_meta.original_character_set
+            == non_default_encoding_ds.file_meta._character_set
+        )
 
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""
@@ -1355,183 +1422,6 @@ class TestDataset:
         assert ds.data_element("BeamSequence") == next(elem_gen)
         assert ds.BeamSequence[0].data_element("PatientName") == next(elem_gen)
 
-    def test_save_as(self):
-        """Test Dataset.save_as"""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.PatientName = "CITIZEN"
-        # Raise AttributeError if is_implicit_VR or is_little_endian missing
-        with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False)
-
-        ds.is_implicit_VR = True
-        with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False)
-
-        ds.is_little_endian = True
-        del ds.is_implicit_VR
-        with pytest.raises(AttributeError):
-            ds.save_as(fp, write_like_original=False)
-
-        ds.is_implicit_VR = True
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.MediaStorageSOPClassUID = "1.1"
-        ds.file_meta.MediaStorageSOPInstanceUID = "1.2"
-        ds.file_meta.TransferSyntaxUID = "1.3"
-        ds.file_meta.ImplementationClassUID = "1.4"
-        ds.save_as(fp, write_like_original=False)
-
-    def test_save_as_compressed_no_encaps(self):
-        """Test saving a compressed dataset with no encapsulation."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
-        ds.PixelData = b"\x00\x01\x02\x03\x04\x05\x06"
-        ds["PixelData"].VR = "OB"
-        msg = (
-            r"Pixel Data has an undefined length indicating "
-            r"that it's compressed, but the data isn't encapsulated"
-        )
-        with pytest.raises(ValueError, match=msg):
-            ds.save_as(fp)
-
-    def test_save_as_compressed_encaps(self):
-        """Test saving a compressed dataset with encapsulation."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
-        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
-        ds["PixelData"].VR = "OB"
-        ds.save_as(fp)
-
-    def test_save_as_no_pixel_data(self):
-        """Test saving with no Pixel Data."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
-        ds.save_as(fp)
-
-    def test_save_as_no_file_meta(self):
-        """Test saving with no Transfer Syntax or file_meta."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.save_as(fp)
-
-        del ds.file_meta
-        ds.save_as(fp)
-
-    def test_save_as_private_transfer_syntax(self):
-        """Test saving with a private transfer syntax."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = "1.2.3.4.5.6"
-        ds.save_as(fp)
-
-    def test_save_as_set_little_implicit_with_tsyntax(self):
-        """Test setting is_implicit_VR and is_little_endian from tsyntax"""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.PatientName = "CITIZEN"
-        # Raise if is_implicit_VR or is_little_endian missing with no tsyntax
-        msg = (
-            r"'Dataset.is_little_endian' and 'Dataset.is_implicit_VR' must be "
-            r"set appropriately before saving"
-        )
-        with pytest.raises(AttributeError, match=msg):
-            ds.save_as(fp)
-
-        # Test private transfer syntax raises
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = "1.2"
-        with pytest.raises(AttributeError, match=msg):
-            ds.save_as(fp)
-
-        # Test public transfer syntax OK
-        ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.1"
-        ds.save_as(fp)
-
-    def test_save_as_undefined(self):
-        """Test setting is_undefined_length correctly."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
-        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
-        elem = ds["PixelData"]
-        elem.VR = "OB"
-        # Compressed
-        # False to True
-        assert not elem.is_undefined_length
-        ds.save_as(fp)
-        assert elem.is_undefined_length
-        # True to True
-        ds.save_as(fp)
-        assert elem.is_undefined_length
-
-        # Uncompressed
-        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        # True to False
-        ds.save_as(fp)
-        assert not elem.is_undefined_length
-        # False to False
-        ds.save_as(fp)
-        assert not elem.is_undefined_length
-
-    def test_save_as_undefined_private(self):
-        """Test is_undefined_length unchanged with private tsyntax."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = "1.2.3.4.5"
-        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
-        elem = ds["PixelData"]
-        elem.VR = "OB"
-        # Unchanged - False
-        assert not elem.is_undefined_length
-        ds.save_as(fp)
-        assert not elem.is_undefined_length
-        # Unchanged - True
-        elem.is_undefined_length = True
-        ds.save_as(fp)
-        assert elem.is_undefined_length
-
-    def test_save_as_undefined_no_tsyntax(self):
-        """Test is_undefined_length unchanged with no tsyntax."""
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
-        elem = ds["PixelData"]
-        elem.VR = "OB"
-        # Unchanged - False
-        assert not elem.is_undefined_length
-        ds.save_as(fp)
-        assert not elem.is_undefined_length
-        # Unchanged - True
-        elem.is_undefined_length = True
-        ds.save_as(fp)
-        assert elem.is_undefined_length
-
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
         test_file = get_testdata_file("CT_small.dcm")
@@ -1566,10 +1456,11 @@ class TestDataset:
         fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
         ds.NumberOfFrames = 0
-        with pytest.warns(UserWarning, match=r"value of 0 for \(0028,0008\)"):
+        msg = r"A value of '0' for \(0028,0008\) 'Number of Frames' is invalid"
+        with pytest.warns(UserWarning, match=msg):
             assert ds.pixel_array is not None
 
-    def test_pixel_array_id_changed(self):
+    def test_pixel_array_id_changed(self, clear_pixel_data_handlers):
         """Test that we try to get new pixel data if the id has changed."""
         fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
@@ -1577,22 +1468,70 @@ class TestDataset:
         ds._pixel_id = 1234
         assert id(ds.PixelData) != ds._pixel_id
         ds._pixel_array = "Test Value"
-        # If _pixel_id doesn't match then attempt to get new pixel data
-        orig_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = []
-        with pytest.raises(NotImplementedError):
+        msg = (
+            r"Unable to decode the pixel data as a \(0002,0010\) 'Transfer Syntax UID' "
+            "value of '1.2.3.4' is not supported"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            ds.pixel_array
+
+        ds.pixel_array_options(use_v2_backend=True)
+        msg = "Unable to decode pixel data with a transfer syntax UID of '1.2.3.4'"
+        with pytest.raises(NotImplementedError, match=msg):
             ds.convert_pixel_data()
 
-        pydicom.config.pixel_data_handlers = orig_handlers
+    def test_pixel_array_id_reset_on_delete(self):
+        """Test _pixel_array and _pixel_id reset when deleting pixel data"""
+        fpath = get_testdata_file("CT_small.dcm")
+        ds = dcmread(fpath)
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds.PixelData
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds["PixelData"]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[Tag("PixelData")]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[0x7FE00010]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
+
+        ds.PixelData = b"\x00\x01"
+        ds._pixel_id = {"SamplesPerPixel": 3}
+        ds._pixel_array = True
+
+        del ds[0x7FE00000:0x7FE00012]
+        assert ds._pixel_id == {}
+        assert ds._pixel_array is None
 
     def test_pixel_array_unknown_syntax(self):
         """Test that pixel_array for an unknown syntax raises exception."""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.file_meta.TransferSyntaxUID = "1.2.3.4"
         msg = (
-            r"Unable to decode pixel data with a transfer syntax UID of "
-            r"'1.2.3.4' \(1.2.3.4\) as there are no pixel data handlers "
-            r"available that support it"
+            r"Unable to decode the pixel data as a \(0002,0010\) 'Transfer Syntax UID' "
+            "value of '1.2.3.4' is not supported"
         )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
@@ -1718,6 +1657,403 @@ class TestDataset:
         with pytest.raises(ValueError, match=msg):
             ds["invalid"] = ds["PatientName"]
 
+    def test_values(self):
+        """Test Dataset.values()."""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientID = "Bar"
+
+        values = list(ds.values())
+        assert values[0] == ds["PatientName"]
+        assert values[1] == ds["BeamSequence"]
+        assert len(values) == 2
+
+    def test_pixel_rep(self):
+        """Tests for Dataset._pixel_rep"""
+        ds = Dataset()
+        ds.PixelRepresentation = None
+        ds.BeamSequence = []
+
+        fp = io.BytesIO()
+        ds.save_as(fp, implicit_vr=True)
+        ds = dcmread(fp, force=True)
+        assert not hasattr(ds, "_pixel_rep")
+        assert ds.PixelRepresentation is None
+        assert ds.BeamSequence == []
+        # Attribute not set if Pixel Representation is None
+        assert not hasattr(ds, "_pixel_rep")
+
+        ds = dcmread(fp, force=True)
+        ds.PixelRepresentation = 0
+        assert ds.BeamSequence == []
+        assert ds._pixel_rep == 0
+
+        ds = dcmread(fp, force=True)
+        ds.PixelRepresentation = 1
+        assert ds.BeamSequence == []
+        assert ds._pixel_rep == 1
+
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds._set_pixel_representation(ds["PixelRepresentation"])
+        assert ds._pixel_rep == 0
+
+
+class TestDatasetSaveAs:
+    def test_no_transfer_syntax(self):
+        """Test basic use of Dataset.save_as()"""
+        ds = Dataset()
+        ds.PatientName = "CITIZEN"
+
+        # Requires implicit_vr
+        msg = (
+            "Unable to determine the encoding to use for writing the dataset, "
+            "please set the file meta's Transfer Syntax UID or use the "
+            "'implicit_vr' and 'little_endian' arguments"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
+
+        # OK
+        ds.save_as(DicomBytesIO(), implicit_vr=True)
+
+    def test_little_endian_default(self):
+        """Test that the default uses little endian."""
+        ds = Dataset()
+        ds.PatientName = "CITIZEN"
+        bs = io.BytesIO()
+        ds.save_as(bs, implicit_vr=True, little_endian=None)
+        assert ds["PatientName"].tag.group == 0x0010
+        assert bs.getvalue()[:4] == b"\x10\x00\x10\x00"
+
+    def test_mismatch(self):
+        """Test mismatch between transfer syntax and args."""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+
+        msg = (
+            "The 'implicit_vr' value is not consistent with the required "
+            "VR encoding for the 'Implicit VR Little Endian' transfer syntax"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO(), implicit_vr=False, little_endian=False)
+
+        msg = (
+            "The 'little_endian' value is not consistent with the required "
+            "endianness for the 'Implicit VR Little Endian' transfer syntax"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO(), implicit_vr=True, little_endian=False)
+
+    def test_priority_syntax(self):
+        """Test prefer transfer syntax over dataset attributes."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        assert not ds.original_encoding[0]
+        assert not ds._is_implicit_VR
+
+        # Explicit -> implicit
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding[0]
+        assert ds._is_implicit_VR
+
+        # Implicit -> explicit
+        fp = DicomBytesIO()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        ds._is_implicit_VR = True
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert not ds.original_encoding[0]
+
+        ds = Dataset()
+        ds.preamble = b"\x00" * 128
+        ds.PatientName = "Foo"
+        ds._is_little_endian = True
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+
+        # Big endian
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert not ds.original_encoding[1]
+
+        # Little endian
+        ds._read_little = None
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding[1]
+
+    def test_priority_args(self):
+        """Test prefer args over dataset attributes."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        del ds.file_meta
+        assert not ds.original_encoding[0]
+        assert not ds._is_implicit_VR
+
+        # Explicit -> implicit
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=True)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding == (True, True)
+        assert ds._is_implicit_VR
+
+        # Implicit -> explicit
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=False)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding == (False, True)
+
+        ds = Dataset()
+        ds.preamble = b"\x00" * 128
+        ds.PatientName = "Foo"
+        ds._is_little_endian = True
+
+        # Big endian
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=False, little_endian=False)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert not ds.original_encoding[1]
+
+        # Little endian
+        ds._read_little = None
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=False, little_endian=True)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding[1]
+
+    def test_priority_attr(self):
+        """Test priority of dataset attrs over original."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        del ds.file_meta
+        assert not ds.original_encoding[0]
+
+        # Explicit -> implicit
+        fp = DicomBytesIO()
+        ds._is_implicit_VR = True
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding == (True, True)
+
+        # Implicit -> explicit
+        fp = DicomBytesIO()
+        ds._is_implicit_VR = False
+        ds.save_as(fp)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert ds.original_encoding == (False, True)
+
+    def test_write_like_original(self):
+        ds = Dataset()
+        ds.SOPClassUID = "1.2.3"
+        ds.SOPInstanceUID = "1.2.3.4"
+        msg = (
+            "'write_like_original' is deprecated and will be removed in v4.0, "
+            "please use 'enforce_file_format' instead"
+        )
+
+        # Test kwarg - not enforce_file_format
+        with pytest.warns(DeprecationWarning, match=msg):
+            ds.save_as(DicomBytesIO(), write_like_original=False, implicit_vr=True)
+
+        # Test default - not enforce_file_format
+        ds.save_as(DicomBytesIO(), implicit_vr=True)
+
+    def test_save_as_compressed_no_encaps(self):
+        """Test saving a compressed dataset with no encapsulation."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
+        ds.PixelData = b"\x00\x01\x02\x03\x04\x05\x06"
+        ds["PixelData"].VR = "OB"
+        msg = (
+            r"The \(7FE0,0010\) 'Pixel Data' element value hasn't been encapsulated "
+            "as required for a compressed transfer syntax - see pydicom.encaps."
+            r"encapsulate\(\) for more information"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
+    def test_save_as_compressed_encaps(self):
+        """Test saving a compressed dataset with encapsulation."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
+        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
+        ds["PixelData"].VR = "OB"
+        ds.save_as(fp)
+
+    def test_save_as_no_pixel_data(self):
+        """Test saving with no Pixel Data."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
+        ds.save_as(fp)
+
+    def test_save_as_no_file_meta(self):
+        """Test saving with no Transfer Syntax or file_meta."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.save_as(fp, implicit_vr=False)
+
+        del ds.file_meta
+        ds.save_as(fp, implicit_vr=False)
+
+    def test_save_as_private_transfer_syntax(self):
+        """Test saving with a private transfer syntax."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = "1.2.3.4.5.6"
+
+        msg = (
+            "The 'implicit_vr' and 'little_endian' arguments are required "
+            "when using a private transfer syntax"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
+        ds.save_as(fp, implicit_vr=False)
+
+    def test_save_as_set_little_implicit_with_tsyntax(self):
+        """Test setting is_implicit_VR and is_little_endian from tsyntax"""
+        ds = Dataset()
+        ds.PatientName = "CITIZEN"
+        msg = (
+            "Unable to determine the encoding to use for writing the dataset, "
+            "please set the file meta's Transfer Syntax UID or use the "
+            "'implicit_vr' and 'little_endian' arguments"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
+
+        # Test public transfer syntax OK
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.1"
+        ds.save_as(DicomBytesIO())
+
+    def test_save_as_undefined(self):
+        """Test setting is_undefined_length correctly."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
+        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
+        elem = ds["PixelData"]
+        elem.VR = "OB"
+        # Compressed
+        # False to True
+        assert not elem.is_undefined_length
+        ds.save_as(fp)
+        assert elem.is_undefined_length
+        # True to True
+        ds.save_as(fp)
+        assert elem.is_undefined_length
+
+        # Uncompressed
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        # True to False
+        ds.save_as(fp)
+        assert not elem.is_undefined_length
+        # False to False
+        ds.save_as(fp)
+        assert not elem.is_undefined_length
+
+    def test_save_as_undefined_private(self):
+        """Test is_undefined_length unchanged with private tsyntax."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = "1.2.3.4.5"
+        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
+        elem = ds["PixelData"]
+        elem.VR = "OB"
+        # Unchanged - False
+        assert not elem.is_undefined_length
+        ds.save_as(fp, implicit_vr=True)
+        assert not elem.is_undefined_length
+        # Unchanged - True
+        elem.is_undefined_length = True
+        ds.save_as(fp, implicit_vr=True)
+        assert elem.is_undefined_length
+
+    def test_save_as_undefined_no_tsyntax(self):
+        """Test is_undefined_length unchanged with no tsyntax."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.PixelData = encapsulate([b"\x00\x01\x02\x03\x04\x05\x06"])
+        elem = ds["PixelData"]
+        elem.VR = "OB"
+        # Unchanged - False
+        assert not elem.is_undefined_length
+        ds.save_as(fp, implicit_vr=False)
+        assert not elem.is_undefined_length
+        # Unchanged - True
+        elem.is_undefined_length = True
+        ds.save_as(fp, implicit_vr=False)
+        assert elem.is_undefined_length
+
+    def test_convert_big_little_endian_raises(self):
+        """Test conversion between big <-> little endian raises exception"""
+        ds = Dataset()
+        ds._read_implicit = True
+        msg = (
+            r"'Dataset.save_as\(\)' cannot be used to "
+            r"convert between little and big endian encoding. Please "
+            r"read the documentation for filewriter.dcmwrite\(\) "
+            r"if this is what you really want to do"
+        )
+
+        # Test using is_little_endian
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
+        ds._read_little = False
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
+
+        ds._read_little = True
+        ds._is_little_endian = False
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
+
+        # Test using args
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO(), implicit_vr=True, little_endian=False)
+
+        ds._read_little = False
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO(), implicit_vr=True, little_endian=True)
+
+        # Test using transfer syntax
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
+
+        ds._read_little = True
+        ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(DicomBytesIO())
+
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
@@ -1729,7 +2065,7 @@ class TestDatasetElements:
 
     def test_sequence_assignment(self):
         """Assignment to SQ works only if valid Sequence assigned."""
-        msg = r"Sequence contents must be Dataset instances"
+        msg = r"Sequence contents must be 'Dataset' instances"
         with pytest.raises(TypeError, match=msg):
             self.ds.ConceptCodeSequence = [1, 2, 3]
 
@@ -1751,49 +2087,10 @@ class TestDatasetElements:
         assert hasattr(self.ds, "file_meta")
         assert not self.ds.file_meta
 
-    def test_fix_meta_info(self):
-        self.ds.is_little_endian = True
-        self.ds.is_implicit_VR = True
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
-
-        self.ds.is_implicit_VR = False
-        self.ds.fix_meta_info(enforce_standard=False)
-        # transfer syntax does not change because of ambiguity
-        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
-
-        self.ds.is_little_endian = False
-        self.ds.is_implicit_VR = True
-        with pytest.raises(NotImplementedError):
-            self.ds.fix_meta_info()
-
-        self.ds.is_implicit_VR = False
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
-
-        assert "MediaStorageSOPClassUID" not in self.ds.file_meta
-        assert "MediaStorageSOPInstanceUID" not in self.ds.file_meta
-        with pytest.raises(ValueError, match="Missing required File Meta .*"):
-            self.ds.fix_meta_info(enforce_standard=True)
-
-        self.ds.SOPClassUID = "1.2.3"
-        self.ds.SOPInstanceUID = "4.5.6"
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert "1.2.3" == self.ds.file_meta.MediaStorageSOPClassUID
-        assert "4.5.6" == self.ds.file_meta.MediaStorageSOPInstanceUID
-        self.ds.fix_meta_info(enforce_standard=True)
-
-        self.ds.file_meta = FileMetaDataset()
-        with pytest.raises(
-            ValueError,
-            match=r"Only group 2 data elements are allowed in a FileMetaDataset",
-        ):
-            self.ds.file_meta.PatientID = "PatientID"
-
     def test_validate_and_correct_file_meta(self):
         file_meta = FileMetaDataset()
         validate_file_meta(file_meta, enforce_standard=False)
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError):
             validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta = Dataset()  # not FileMetaDataset for bkwds-compat checks
@@ -1801,8 +2098,8 @@ class TestDatasetElements:
         for enforce_standard in (True, False):
             with pytest.raises(
                 ValueError,
-                match=r"Only File Meta Information Group "
-                r"\(0002,eeee\) elements must be present .*",
+                match=r"Only File Meta Information group "
+                r"\(0002,eeee\) elements may be present .*",
             ):
                 validate_file_meta(file_meta, enforce_standard=enforce_standard)
 
@@ -1810,7 +2107,7 @@ class TestDatasetElements:
         file_meta.MediaStorageSOPClassUID = "1.2.3"
         file_meta.MediaStorageSOPInstanceUID = "1.2.4"
         # still missing TransferSyntaxUID
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError):
             validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
@@ -1842,13 +2139,11 @@ class TestFileDataset:
 
     def test_pickle_data_elements(self):
         ds = pydicom.dcmread(self.test_file)
-        assert ds.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         for e in ds:
             # make sure all data elements have been loaded
             pass
         s = pickle.dumps({"ds": ds})
         ds1 = pickle.loads(s)["ds"]
-        assert ds1.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         assert ds == ds1
 
     def test_pickle_nested_sequence(self):
@@ -1878,15 +2173,15 @@ class TestFileDataset:
         e = dcmread(self.test_file)
         assert d == e
 
-        e.is_implicit_VR = not e.is_implicit_VR
+        e._read_implicit = not e._read_implicit
         assert d == e
 
-        e.is_implicit_VR = not e.is_implicit_VR
+        e._read_implicit = not e._read_implicit
         assert d == e
-        e.is_little_endian = not e.is_little_endian
+        e._read_little = not e._read_little
         assert d == e
 
-        e.is_little_endian = not e.is_little_endian
+        e._read_little = not e._read_little
         assert d == e
         e.filename = "test_filename.dcm"
         assert d == e
@@ -1941,49 +2236,170 @@ class TestFileDataset:
             "__class_getitem__",
         }
         if "PyPy" in python_implementation():
-            expected_diff.remove("__ror__")
+            # __ror__ missing in <= 3.10.13
+            if "__ror__" not in dir(dict):
+                expected_diff.remove("__ror__")
+
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
-    def test_copy_filedataset(self):
+    def test_copy_filelike_open(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        assert not f.closed
+
+        ds_copy = copy.copy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+        f.close()
+
+    def test_copy_filelike_closed(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        f.close()
+        assert f.closed
+
+        ds_copy = copy.copy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_copy_buffer_open(self):
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
+            data = fb.read()
+        buff = io.BytesIO(data)
+        ds = pydicom.dcmread(buff)
+
+        ds_copy = copy.copy(ds)
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert ds_copy.filename is None
+        assert ds_copy == ds
+        # Shallow copy, the two buffers share the same object
+        assert ds_copy.buffer is ds.buffer
+        assert not ds.buffer.closed
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_copy_buffer_closed(self):
         with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
         buff.close()
-        msg = (
-            "The 'filename' attribute of the dataset is a "
-            "file-like object and will be set to None"
-        )
-        with pytest.warns(UserWarning, match=msg):
-            ds_copy = copy.copy(ds)
-        assert ds.filename is not None
-        assert ds_copy.filename is None
+        assert buff.closed
+
+        ds_copy = copy.copy(ds)
         assert ds_copy == ds
 
-    def test_deepcopy_filedataset(self):
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert ds.buffer.closed
+
+        assert ds_copy.filename is None
+        assert ds_copy.buffer is buff
+        assert ds_copy.buffer.closed
+
+        # Shallow copy, the two buffers share the same object
+        assert ds_copy.buffer is ds.buffer
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_deepcopy_filelike_open(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        assert not f.closed
+
+        ds_copy = copy.deepcopy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+        f.close()
+
+    def test_deepcopy_filelike_closed(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        f.close()
+        assert f.closed
+
+        ds_copy = copy.deepcopy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_deepcopy_buffer_open(self):
+        # regression test for #1147
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
+            data = fb.read()
+        buff = io.BytesIO(data)
+        ds = pydicom.dcmread(buff)
+        assert not buff.closed
+
+        ds_copy = copy.deepcopy(ds)
+        assert ds_copy == ds
+
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert not ds.buffer.closed
+
+        assert ds_copy.filename is None
+        assert isinstance(ds_copy.buffer, io.BytesIO)
+        assert not ds_copy.buffer.closed
+
+        # Deep copy, the two buffers should not be the same object, but equal otherwise
+        assert ds.buffer is not ds_copy.buffer
+        assert ds.buffer.getvalue() == ds_copy.buffer.getvalue()
+
+    def test_deepcopy_buffer_closed(self):
         # regression test for #1147
         with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
         buff.close()
+        assert buff.closed
         msg = (
-            "The 'filename' attribute of the dataset is a "
-            "file-like object and will be set to None"
+            "The ValueError exception 'I/O operation on closed file.' occurred trying "
+            "to deepcopy the buffer-like the dataset was read from, the 'buffer' "
+            "attribute will be set to 'None' in the copied object"
         )
         with pytest.warns(UserWarning, match=msg):
             ds_copy = copy.deepcopy(ds)
-        assert ds.filename is not None
-        assert ds_copy.filename is None
+
         assert ds_copy == ds
+
+        # Deep copy, the two buffers should not be the same object but
+        #   cannot copy a closed IOBase object
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert ds.buffer.closed
+
+        assert ds_copy.filename is None
+        assert ds_copy.buffer is None
 
     def test_equality_with_different_metadata(self):
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds2 = copy.deepcopy(ds)
         assert ds == ds2
         ds.filename = "foo.dcm"
-        ds.is_implicit_VR = not ds.is_implicit_VR
-        ds.is_little_endian = not ds.is_little_endian
+        ds._read_implicit = not ds._read_implicit
+        ds._read_little = not ds._read_little
         ds.file_meta = None
         ds.preamble = None
         assert ds == ds2
@@ -1994,9 +2410,12 @@ class TestFileDataset:
         ds = FileDataset(
             filename_or_obj="", dataset={}, file_meta=file_meta, preamble=b"\0" * 128
         )
+        assert ds.filename == ""
+        assert ds.buffer is None
 
         ds2 = copy.deepcopy(ds)
         assert ds2.filename == ""
+        assert ds2.buffer is None
 
     def test_deepcopy_dataset_subclass(self):
         """Regression test for #1813."""
@@ -2013,17 +2432,28 @@ class TestFileDataset:
         """Regression test for #1816"""
         ds = Dataset()
         ds.BeamSequence = []
-        elem = ds["BeamSequence"]
-        assert elem.parent is ds
 
         ds2 = Dataset()
         ds2.update(ds)
-        elem = ds2["BeamSequence"]
-        assert elem.parent is ds2
 
         ds3 = copy.deepcopy(ds2)
-        elem = ds3["BeamSequence"]
-        assert elem.parent is ds3
+        assert ds3 == ds
+
+    def test_buffer(self):
+        """Test the buffer attribute."""
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
+            buffer = io.BytesIO(fb.read())
+
+        ds = dcmread(buffer)
+        assert ds.filename is None
+        assert ds.buffer is buffer
+        assert ds.fileobj_type == io.BytesIO
+
+        # Deflated datasets get inflated to a DicomBytesIO() buffer
+        ds = dcmread(get_testdata_file("image_dfl.dcm"))
+        assert ds.filename.endswith("image_dfl.dcm")
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert ds.fileobj_type == DicomBytesIO
 
 
 class TestDatasetOverlayArray:
@@ -2031,66 +2461,19 @@ class TestDatasetOverlayArray:
 
     def setup_method(self):
         """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = [NP_HANDLER]
-
         self.ds = dcmread(get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm"))
 
-        class DummyHandler:
-            def __init__(self):
-                self.raise_exc = False
-                self.has_dependencies = True
-                self.DEPENDENCIES = {
-                    "numpy": ("http://www.numpy.org/", "NumPy"),
-                }
-                self.HANDLER_NAME = "Dummy"
-
-            def supports_transfer_syntax(self, syntax):
-                return True
-
-            def is_available(self):
-                return self.has_dependencies
-
-            def get_overlay_array(self, ds, group):
-                if self.raise_exc:
-                    raise ValueError("Dummy error message")
-
-                return "Success"
-
-        self.dummy = DummyHandler()
-
-    def teardown_method(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_no_possible(self):
-        """Test with no possible handlers available."""
-        pydicom.config.overlay_data_handlers = []
-        with pytest.raises((NotImplementedError, RuntimeError)):
-            self.ds.overlay_array(0x6000)
-
+    @pytest.mark.skipif(HAVE_NP, reason="numpy is available")
     def test_possible_not_available(self):
         """Test with possible but not available handlers."""
-        self.dummy.has_dependencies = False
-        pydicom.config.overlay_data_handlers = [self.dummy]
-        msg = (
-            r"The following handlers are available to decode the overlay "
-            r"data however they are missing required dependencies: "
-        )
-        with pytest.raises(RuntimeError, match=msg):
+        msg = r"NumPy is required for FileDataset.overlay_array\(\)"
+        with pytest.raises(ImportError, match=msg):
             self.ds.overlay_array(0x6000)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="numpy is not available")
     def test_possible_available(self):
         """Test with possible and available handlers."""
-        pydicom.config.overlay_data_handlers = [self.dummy]
-        assert "Success" == self.ds.overlay_array(0x6000)
-
-    def test_handler_raises(self):
-        """Test the handler raising an exception."""
-        self.dummy.raise_exc = True
-        pydicom.config.overlay_data_handlers = [self.dummy]
-        with pytest.raises(ValueError, match=r"Dummy error message"):
-            self.ds.overlay_array(0x6000)
+        assert isinstance(self.ds.overlay_array(0x6000), numpy.ndarray)
 
 
 class TestFileMeta:
@@ -2215,9 +2598,7 @@ class TestFileMeta:
         ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
         ds.BeamSequence[0].Manufacturer = "Linac, co."
         ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
-        ds.read_encoding = "utf-8"
+        ds.set_original_encoding(True, True, "utf-8")
         ds_copy = copy_method(ds)
         assert isinstance(ds_copy, Dataset)
         assert len(ds_copy) == 2
@@ -2226,18 +2607,21 @@ class TestFileMeta:
         assert ds_copy.BeamSequence[1].Manufacturer == "Linac and Sons, co."
         if copy_method == copy.deepcopy:
             assert id(ds_copy.BeamSequence[0]) != id(ds.BeamSequence[0])
-
-            # dereference weakrefs and check are pointing to correct objects
-            assert ds.BeamSequence is ds.BeamSequence[0].parent_seq()
-            assert ds is ds.BeamSequence.parent_dataset()
-            assert ds_copy.BeamSequence is ds_copy.BeamSequence[0].parent_seq()
-            assert ds_copy is ds_copy.BeamSequence.parent_dataset()
         else:
             # shallow copy
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
-        assert ds_copy.is_implicit_VR
-        assert ds_copy.is_little_endian
-        assert ds_copy.read_encoding == "utf-8"
+        assert ds_copy.original_encoding == (True, True)
+        assert ds_copy.original_character_set == "utf-8"
+
+    def test_tsyntax_encoding(self):
+        file_meta = FileMetaDataset()
+        assert file_meta._tsyntax_encoding == (None, None)
+        file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        assert file_meta._tsyntax_encoding == (True, True)
+        file_meta.TransferSyntaxUID = "1.2.3.4"
+        assert file_meta._tsyntax_encoding == (None, None)
+        file_meta.TransferSyntaxUID = CTImageStorage
+        assert file_meta._tsyntax_encoding == (None, None)
 
 
 @pytest.fixture
@@ -2298,8 +2682,6 @@ CAMEL_CASE = (
         "_parent_encoding",
         "_dict",
         "is_decompressed",
-        "read_little_endian",
-        "read_implicit_vr",
         "read_encoding",
         "_private_blocks",
         "default_element_format",
@@ -2350,10 +2732,21 @@ def test_setattr_warns(setattr_warn):
     with assert_no_warning():
         ds = Dataset()
 
+    deprecations = (
+        "is_implicit_VR",
+        "is_little_endian",
+        "read_encoding",
+    )
+
     for s in CAMEL_CASE[0]:
-        with assert_no_warning():
-            val = getattr(ds, s, None)
-            setattr(ds, s, val)
+        if s in deprecations:
+            with pytest.warns(DeprecationWarning):
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
+        else:
+            with assert_no_warning():
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
 
     for s in CAMEL_CASE[1]:
         msg = (
@@ -2370,10 +2763,21 @@ def test_setattr_raises(setattr_raise):
     with assert_no_warning():
         ds = Dataset()
 
+    deprecations = (
+        "is_implicit_VR",
+        "is_little_endian",
+        "read_encoding",
+    )
+
     for s in CAMEL_CASE[0]:
-        with assert_no_warning():
-            val = getattr(ds, s, None)
-            setattr(ds, s, val)
+        if s in deprecations:
+            with pytest.warns(DeprecationWarning):
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
+        else:
+            with assert_no_warning():
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
 
     for s in CAMEL_CASE[1]:
         msg = (
@@ -2390,16 +2794,147 @@ def test_setattr_ignore(setattr_ignore):
     with assert_no_warning():
         ds = Dataset()
 
+    deprecations = (
+        "is_implicit_VR",
+        "is_little_endian",
+        "read_encoding",
+    )
+
     for s in CAMEL_CASE[0]:
-        with assert_no_warning():
-            val = getattr(ds, s, None)
-            setattr(ds, s, val)
+        if s in deprecations:
+            with pytest.warns(DeprecationWarning):
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
+        else:
+            with assert_no_warning():
+                val = getattr(ds, s, None)
+                setattr(ds, s, val)
 
     ds = Dataset()
     for s in CAMEL_CASE[1]:
         with assert_no_warning():
             getattr(ds, s, None)
             setattr(ds, s, None)
+
+
+@pytest.fixture
+def use_future():
+    original = config._use_future
+    config._use_future = True
+    yield
+    config._use_future = original
+
+
+class TestFuture:
+    def test_save_as_write_like_original_raises(self, use_future):
+        ds = Dataset()
+        msg = (
+            "'write_like_original' is no longer accepted as a positional or "
+            "keyword argument, use 'enforce_file_format' instead"
+        )
+        with pytest.raises(TypeError, match=msg):
+            ds.save_as(None, write_like_original=False)
+
+    def test_save_as_endianness_conversion(self, use_future):
+        ds = Dataset()
+        ds._is_implicit_VR = True
+        ds._is_little_endian = True
+
+        ds._read_implicit = False
+        ds._read_little = False
+        ds.save_as(DicomBytesIO())
+
+        ds._read_little = True
+        ds._is_little_endian = False
+        ds.save_as(DicomBytesIO())
+
+    def test_is_original_encoding(self, use_future):
+        ds = Dataset()
+        ds._read_charset = ["latin_1"]
+        ds.SpecificCharacterSet = "ISO_IR 100"
+        assert ds.is_original_encoding
+        ds.SpecificCharacterSet = "ISO_IR 192"
+        assert not ds.is_original_encoding
+        ds.SpecificCharacterSet = "ISO_IR 100"
+        assert ds.is_original_encoding
+
+    def test_is_little_endian_raises(self, use_future):
+        ds = Dataset()
+        assert not hasattr(ds, "_is_little_endian")
+
+        msg = "'Dataset' object has no attribute 'is_little_endian'"
+        with pytest.raises(AttributeError, match=msg):
+            ds.is_little_endian = True
+
+        ds._is_little_endian = True
+        with pytest.raises(AttributeError, match=msg):
+            ds.is_little_endian
+
+    def test_is_implicit_VR_raises(self, use_future):
+        ds = Dataset()
+        assert not hasattr(ds, "_is_implicit_VR")
+
+        msg = "'Dataset' object has no attribute 'is_implicit_VR'"
+        with pytest.raises(AttributeError, match=msg):
+            ds.is_implicit_VR = True
+
+        ds._is_implicit_VR = True
+        with pytest.raises(AttributeError, match=msg):
+            ds.is_implicit_VR
+
+    def test_read_encoding_raises(self, use_future):
+        ds = Dataset()
+        msg = "'Dataset' object has no attribute 'read_encoding'"
+        with pytest.raises(AttributeError, match=msg):
+            ds.read_encoding = "foo"
+
+        ds._read_charset = "foo"
+        with pytest.raises(AttributeError, match=msg):
+            ds.read_encoding
+
+    def test_read_implicit_vr_raises(self, use_future):
+        ds = Dataset()
+        ds._read_implicit = True
+        msg = "'Dataset' object has no attribute 'read_implicit_vr'"
+        with pytest.raises(AttributeError, match=msg):
+            ds.read_implicit_vr
+
+    def test_read_little_endian_raises(self, use_future):
+        ds = Dataset()
+        ds._read_little = True
+        msg = "'Dataset' object has no attribute 'read_little_endian'"
+        with pytest.raises(AttributeError, match=msg):
+            ds.read_little_endian
+
+    def test_slice(self, use_future):
+        ds = Dataset()
+        ds._is_little_endian = True
+        ds._is_implicit_VR = True
+
+        ds = ds[0x00080001:]
+        assert not hasattr(ds, "_is_little_endian")
+        assert not hasattr(ds, "_is_implicit_VR")
+
+    def test_convert_pixel_data(self, use_future):
+        msg = "'Dataset' object has no attribute 'convert_pixel_data'"
+        with pytest.raises(AttributeError, match=msg):
+            Dataset().convert_pixel_data()
+
+    def test_pixel_array_options(self, use_future):
+        msg = (
+            r"Dataset.pixel_array_options\(\) got an unexpected "
+            "keyword argument 'use_v2_backend'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            Dataset().pixel_array_options(use_v2_backend=True)
+
+    def test_decompress(self, use_future):
+        msg = (
+            r"Dataset.decompress\(\) got an unexpected "
+            "keyword argument 'handler_name'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            Dataset().decompress(handler_name="foo")
 
 
 def test_pickling_and_unpickling_buffered_pixel_data():

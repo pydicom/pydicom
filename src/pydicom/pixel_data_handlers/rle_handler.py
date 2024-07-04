@@ -36,21 +36,19 @@ in the table below.
 """
 
 from struct import unpack
-import sys
 from typing import TYPE_CHECKING, cast
-import warnings
 
 try:
     import numpy as np
-    import numpy
+    import numpy  # noqa: F401
 
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
 
-from pydicom.encaps import decode_data_sequence, defragment_data
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_nr_frames
-from pydicom.encoders.native import _encode_frame
+from pydicom.encaps import generate_frames
+from pydicom.misc import warn_and_log
+from pydicom.pixels.utils import pixel_dtype, get_nr_frames
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -155,28 +153,17 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = ">") -> "np.ndarray":
 
     nr_bits = cast(int, ds.BitsAllocated)
     nr_samples = cast(int, ds.SamplesPerPixel)
-    nr_frames = get_nr_frames(ds)
+    nr_frames = get_nr_frames(ds, warn=False)
     rows = cast(int, ds.Rows)
     cols = cast(int, ds.Columns)
 
     # Decompress each frame of the pixel data
     pixel_data = bytearray()
-    if nr_frames > 1:
-        for rle_frame in decode_data_sequence(ds.PixelData):
-            frame = _rle_decode_frame(
-                rle_frame, rows, cols, nr_samples, nr_bits, rle_segment_order
-            )
-            pixel_data.extend(frame)
-    else:
-        frame = _rle_decode_frame(
-            defragment_data(ds.PixelData),
-            rows,
-            cols,
-            nr_samples,
-            nr_bits,
-            rle_segment_order,
+    for frame in generate_frames(ds.PixelData, number_of_frames=nr_frames):
+        im = _rle_decode_frame(
+            frame, rows, cols, nr_samples, nr_bits, rle_segment_order
         )
-        pixel_data.extend(frame)
+        pixel_data.extend(im)
 
     arr = np.frombuffer(pixel_data, pixel_dtype(ds))
 
@@ -348,7 +335,7 @@ def _rle_decode_frame(
                     f"{rows * columns} bytes)"
                 )
             elif actual_length != rows * columns:
-                warnings.warn(
+                warn_and_log(
                     "The decoded RLE segment contains non-conformant padding "
                     f"- {actual_length} vs. {rows * columns} bytes expected"
                 )

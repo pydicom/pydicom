@@ -2,12 +2,12 @@
 """Functions for reading to certain bytes, e.g. delimiters."""
 import os
 from struct import pack, unpack
-from typing import Union, BinaryIO, cast
+from typing import BinaryIO, cast
 
 from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
 from pydicom.datadict import dictionary_description
-from pydicom.filebase import DicomFileLike
+from pydicom.filebase import ReadableBuffer, WriteableBuffer
 
 from pydicom.config import logger
 
@@ -328,7 +328,7 @@ def _try_read_encapsulated_pixel_data(
 
     length = fp.read(4)
     if length != b"\0\0\0\0":
-        msg = "Expected 4 zero bytes after undefined length delimiter " "at pos {0:04x}"
+        msg = "Expected 4 zero bytes after undefined length delimiter at pos {0:04x}"
         logger.debug(msg.format(fp.tell() - 4))
 
     if defer_size is not None and defer_size <= byte_count:
@@ -420,7 +420,7 @@ def length_of_undefined_length(
 
 
 def path_from_pathlike(
-    file_object: PathType | BinaryIO | DicomFileLike,
+    file_object: PathType | BinaryIO | ReadableBuffer | WriteableBuffer,
 ) -> str | BinaryIO:
     """Returns the path if `file_object` is a path-like object, otherwise the
     original `file_object`.
