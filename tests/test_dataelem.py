@@ -1251,3 +1251,17 @@ class TestDataElementValidation:
             ds.PixelData = np.ones((3, 4), dtype="u1")
 
         assert ds.PixelData == b"\x00\x01"
+
+    @pytest.mark.parametrize("value", (None, b"", b"\x00", b"\x00\x01\x02\x03"))
+    def test_valid_o_star_value(self, value):
+        for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
+            DataElement(0x00410001, "vr", value, validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (-2, 4294967300))
+    def test_invalid_o_star_value(self, value):
+        for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
+            msg = f"A value of type 'int' cannot be assigned to a tag with VR {vr}"
+            with pytest.warns(UserWarning, match=msg):
+                DataElement(0x00410001, vr, value, validation_mode=config.WARN)
+            with pytest.raises(ValueError, match=msg):
+                DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
