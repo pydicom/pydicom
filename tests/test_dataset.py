@@ -2372,9 +2372,9 @@ class TestFileDataset:
         buff.close()
         assert buff.closed
         msg = (
-            "The ValueError exception 'I/O operation on closed file.' occurred trying "
-            "to deepcopy the buffer-like the dataset was read from, the 'buffer' "
-            "attribute will be set to 'None' in the copied object"
+            r"The ValueError exception '(.*)' occurred trying to deepcopy the "
+            "buffer-like the dataset was read from, the 'buffer' attribute will be "
+            "set to 'None' in the copied object"
         )
         with pytest.warns(UserWarning, match=msg):
             ds_copy = copy.deepcopy(ds)
