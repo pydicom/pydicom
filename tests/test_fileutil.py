@@ -10,6 +10,7 @@ from pydicom.fileutil import (
     check_buffer,
     reset_buffer_position,
     read_buffer,
+    buffer_remaining,
     buffer_length,
 )
 
@@ -47,40 +48,63 @@ class TestBufferFunctions:
     def test_check_buffer(self):
         """Test check_buffer()"""
         b = BytesIO()
-        assert check_buffer(b) is True
+        assert check_buffer(b) is None
+
         b.close()
         assert b.closed
-        assert check_buffer(b) is False
+
+        msg = "Unable to use the buffer object as it has been closed"
+        with pytest.raises(ValueError, match=msg):
+            check_buffer(b)
 
         class Foo:
-            read = None
+            closed = False
+
+        def _bar(self):
+            pass
 
         foo = Foo()
-        assert check_buffer(foo) is False
-        foo.seek = None
-        assert check_buffer(foo) is False
-        foo.tell = None
-        assert check_buffer(foo) is True
-        foo.closed = True
-        assert check_buffer(foo) is False
-        foo.closed = False
-        assert check_buffer(foo) is True
+        msg = (
+            r"Invalid buffer object type 'Foo', the object must have read\(\), "
+            r"seek\(\) and tell\(\) methods"
+        )
+        with pytest.raises(TypeError, match=msg):
+            check_buffer(foo)
 
-    def test_buffer_length(self):
-        """Test buffer_length()"""
-        assert buffer_length(BytesIO()) == 0
-        assert buffer_length(BytesIO(b"\x00")) == 1
-        assert buffer_length(BytesIO(b"\x00" * 100)) == 100
+        foo.read = _bar
+        with pytest.raises(TypeError, match=msg):
+            check_buffer(foo)
+
+        foo.seek = _bar
+        with pytest.raises(TypeError, match=msg):
+            check_buffer(foo)
+
+        foo.tell = _bar
+        assert check_buffer(foo) is None
+
+        foo.closed = True
+        msg = "Unable to use the buffer object as it has been closed"
+        with pytest.raises(ValueError, match=msg):
+            check_buffer(foo)
+
+        foo.closed = False
+        assert check_buffer(foo) is None
+
+    def test_buffer_remaining(self):
+        """Test buffer_remaining()"""
+        assert buffer_remaining(BytesIO()) == 0
+        assert buffer_remaining(BytesIO(b"\x00")) == 1
+        assert buffer_remaining(BytesIO(b"\x00" * 100)) == 100
 
         b = BytesIO(b"\x00" * 100)
         b.seek(100)
-        assert buffer_length(b) == 0
+        assert buffer_remaining(b) == 0
         assert b.tell() == 100
         b.seek(0)
-        assert buffer_length(b) == 100
+        assert buffer_remaining(b) == 100
         assert b.tell() == 0
         b.seek(13)
-        assert buffer_length(b) == 87
+        assert buffer_remaining(b) == 87
         assert b.tell() == 13
 
     def test_reset_buffer_position(self):
@@ -108,12 +132,21 @@ class TestBufferFunctions:
 
         assert b.tell() == 0
 
+        b.close()
+        msg = "Unable to use the buffer object as it has been closed"
+        with pytest.raises(ValueError, match=msg):
+            with reset_buffer_position(b) as idx:
+                assert idx == 100
+                b.seek(0)
+
     def test_read_buffer(self):
         """Test read_buffer()"""
         b = BytesIO()
-        gen = read_buffer(b)
-        assert next(gen) == b""
-        pytest.raises(StopIteration, next, gen)
+        d = []
+        for data in read_buffer(b):
+            d.append(data)
+
+        assert d == []
 
         b = BytesIO(b"\x01" * 100 + b"\x02\x03")
         out = bytearray()
@@ -122,3 +155,24 @@ class TestBufferFunctions:
 
         assert len(out) == 102
         assert out == b.getvalue()
+
+        msg = "Invalid 'chunk_size' value '-12', must be greater than 0"
+        with pytest.raises(ValueError, match=msg):
+            next(read_buffer(b, chunk_size=-12))
+
+        b.close()
+        msg = "Unable to use the buffer object as it has been closed"
+        with pytest.raises(ValueError, match=msg):
+            next(read_buffer(b))
+
+    def test_buffer_length(self):
+        """Test buffer_length()"""
+        assert buffer_length(BytesIO()) == 0
+        assert buffer_length(BytesIO(b"\x00")) == 1
+        assert buffer_length(BytesIO(b"\x00" * 100)) == 100
+
+        b = BytesIO(b"\x00" * 100)
+        b.seek(100)
+        assert buffer_length(b) == 100
+        b.seek(50)
+        assert buffer_length(b) == 100

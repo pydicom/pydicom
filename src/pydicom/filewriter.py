@@ -22,7 +22,7 @@ from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
 from pydicom.fileutil import (
     path_from_pathlike,
     PathType,
-    buffer_length,
+    buffer_remaining,
     read_buffer,
     reset_buffer_position,
 )
@@ -693,7 +693,7 @@ def write_data_element(
     value_length = (
         buffer.tell()
         if not elem.is_buffered
-        else buffer_length(cast(BufferedIOBase, elem.value))
+        else buffer_remaining(cast(BufferedIOBase, elem.value))
     )
 
     if (

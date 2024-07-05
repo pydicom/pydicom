@@ -32,7 +32,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
-from pydicom.fileutil import check_buffer
+from pydicom.fileutil import check_buffer, buffer_length
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
     BUFFERABLE_VRS,
@@ -452,16 +452,22 @@ class DataElement:
         # * All byte-like VRs
         # * Ambiguous VRs that may be byte-like
         if isinstance(val, BufferedIOBase):
+            supported = sorted(str(vr) for vr in BUFFERABLE_VRS if "or" not in vr)
             if self.VR not in BUFFERABLE_VRS:
                 raise ValueError(
                     f"Elements with a VR of '{self.VR}' cannot be used with buffered "
-                    f"values, supported VRs are: {BUFFERABLE_VRS}."
+                    f"values, supported VRs are: {', '.join(supported)}"
                 )
 
             # Ensure pre-conditions are met - we will check these when reading the
             #   value as well but better to fail early if possible
-            if not check_buffer(val):
-                raise ValueError("FIXME")
+            try:
+                check_buffer(val)
+            except Exception as exc:
+                raise ValueError(
+                    f"The buffered value for {self.tag} '{self.name}' has been closed "
+                    "or is invalid"
+                ) from exc
 
             self._value = val
             return
@@ -493,8 +499,17 @@ class DataElement:
         if self.value is None:
             return 0
 
-        if isinstance(self.value, str | bytes | PersonName | BufferedIOBase):
+        if isinstance(self.value, str | bytes | PersonName):
             return 1 if self.value else 0
+
+        if isinstance(self.value, BufferedIOBase):
+            try:
+                return 1 if buffer_length(self.value) else 0
+            except Exception as exc:
+                raise ValueError(
+                    f"The buffered value for {self.tag} '{self.name}' has been closed "
+                    "or is invalid"
+                ) from exc
 
         try:
             iter(self.value)

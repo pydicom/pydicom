@@ -449,7 +449,7 @@ def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
     return TupleTag(cast(tuple[int, int], unpack(f"{endianness}HH", b)))
 
 
-def check_buffer(buffer: BufferedIOBase) -> bool:
+def check_buffer(buffer: BufferedIOBase) -> None:
     """Return ``True`` if `buffer` is usable, ``False`` otherwise.
 
     Parameters
@@ -457,11 +457,15 @@ def check_buffer(buffer: BufferedIOBase) -> bool:
     buffer : io.BufferedIOBase
         The buffer to check, must have `read()`, `seek()` and `tell()` methods.
     """
-    attr = [hasattr(buffer, m) for m in ("read", "seek", "tell")]
-    if all(attr) and not getattr(buffer, "closed", False):
-        return True
+    for attr in ("read", "seek", "tell"):
+        if not callable(getattr(buffer, attr, None)):
+            raise TypeError(
+                f"Invalid buffer object type '{type(buffer).__name__}', the object "
+                "must have read(), seek() and tell() methods"
+            )
 
-    return False
+    if getattr(buffer, "closed", False):
+        raise ValueError("Unable to use the buffer object as it has been closed")
 
 
 @contextmanager
@@ -479,8 +483,7 @@ def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
     int
         The initial position of the buffer.
     """
-    if not check_buffer(buffer):
-        raise IOError("The buffer is a bad buffer")
+    check_buffer(buffer)
 
     initial_offset = buffer.tell()
     yield initial_offset
@@ -489,47 +492,55 @@ def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
 
 
 def read_buffer(buffer: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[bytes]:
-    """Consume data from a buffered value. The value must be a buffer, the buffer must be
-    readable, the buffer must be seekable, and the buffer must not be closed.
+    """Read data from `buffer`.
 
-    NOTE: The buffer is NOT returned to its starting position.
+    The buffer is NOT returned to its starting position.
 
     Parameters
     ----------
     buffer : io.BufferedIOBase
-        The buffer to read from. It must meet the required pre-conditions.
+        The buffer to read from.
     chunk_size : int, optional
-        The amount of bytes to read at a time. Less bytes may be read if there are less
-        than the specified amount of bytes in the stream. Must be > 0. Default is 8192.
+        The amount of bytes to read per iteration (default 8192). Fewer bytes may be
+        yielded if there is insufficient remaining data in `buffer`.
 
     Yields
     -------
     bytes
         Data read from the buffer of length up to the specified chunk_size.
-
-    Raises
-    ------
-    AssertionError
-        If the buffer is not seekable, readable, or is closed.
     """
     if chunk_size <= 0:
         raise ValueError(
             f"Invalid 'chunk_size' value '{chunk_size}', must be greater than 0"
         )
 
-    if not check_buffer(buffer):
-        raise ValueError("bad buffer")
-
-    if buffer_length(buffer) == 0:
-        yield b""
-        return
-
+    check_buffer(buffer)
     while chunk := buffer.read(chunk_size):
         if chunk:
             yield chunk
 
 
 def buffer_length(buffer: BufferedIOBase) -> int:
+    """Return the remaining length of the buffer with respect to the current position.
+
+    Parameters
+    ----------
+    buffer : io.BufferedIOBase
+        The buffer to return the remaining length for.
+
+    Returns
+    -------
+    int
+        The remaining length of the buffer from the current position.
+    """
+    with reset_buffer_position(buffer):
+        buffer.seek(0, os.SEEK_SET)
+        start = buffer.tell()
+        buffer.seek(0, os.SEEK_END)
+        return buffer.tell() - start
+
+
+def buffer_remaining(buffer: BufferedIOBase) -> int:
     """Return the remaining length of the buffer with respect to the current position.
 
     Parameters

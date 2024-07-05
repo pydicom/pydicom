@@ -33,6 +33,7 @@ from pydicom.filewriter import (
     write_PN,
     _format_DT,
     write_text,
+    write_OBvalue,
     write_OWvalue,
     writers,
     dcmwrite,
@@ -2700,6 +2701,82 @@ class TestWriteNumbers:
 class TestWriteOtherVRs:
     """Tests for writing the 'O' VRs like OB, OW, OF, etc."""
 
+    def test_write_ob(self):
+        """Test writing element with VR OF"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", b"\x00\x01\x02\x03")
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", b"\x00\x01\x02")
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
+    def test_write_ob_buffered(self):
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        b = BytesIO(b"\x00\x01\x02\x03")
+        elem = DataElement(0x7FE00008, "OB", b)
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", b)
+        b.close()
+        msg = "Unable to use the buffer object as it has been closed"
+        with pytest.raises(ValueError, match=msg):
+            write_OBvalue(fp, elem)
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", BytesIO(b"\x00\x01\x02"))
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
+    def test_write_ow(self):
+        """Test writing element with VR OW"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", b"\x00\x01\x02\x03")
+        write_OWvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", b"\x00\x01\x02")
+        write_OWvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
+    def test_write_ow_buffered(self):
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        b = BytesIO(b"\x00\x01\x02\x03")
+        elem = DataElement(0x7FE00008, "OW", b)
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", b)
+        b.close()
+        msg = "Unable to use the buffer object as it has been closed"
+        with pytest.raises(ValueError, match=msg):
+            write_OBvalue(fp, elem)
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", BytesIO(b"\x00\x01\x02"))
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
     def test_write_of(self):
         """Test writing element with VR OF"""
         fp = DicomBytesIO()
@@ -3105,6 +3182,120 @@ def test_all_writers():
     assert set(VR) == set(writers)
 
 
+class TestWritingBufferedPixelData:
+    @pytest.mark.parametrize("bits_allocated", (8, 16))
+    def test_writing_dataset_with_buffered_pixel_data(self, bits_allocated):
+        pixel_data = b"\x00\x01\x02\x03"
+
+        # Baseline
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+
+        ds = Dataset()
+        ds.BitsAllocated = bits_allocated
+        ds.PixelData = pixel_data
+
+        ds.save_as(fp, implicit_vr=False, little_endian=True)
+
+        fp_buffered = DicomBytesIO()
+        fp_buffered.is_little_endian = True
+        fp_buffered.is_implicit_VR = False
+
+        ds_buffered = Dataset()
+        ds_buffered.BitsAllocated = bits_allocated
+        ds_buffered.PixelData = BytesIO(pixel_data)
+
+        ds_buffered.save_as(fp_buffered, implicit_vr=False, little_endian=True)
+
+        assert fp.getvalue() == fp_buffered.getvalue()
+
+    @pytest.mark.parametrize("bits_allocated", (8, 16))
+    def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(
+        self, bits_allocated
+    ):
+        try:
+            import resource
+        except ImportError:
+            pytest.skip("The 'resource' module is not supported on this platform")
+
+        KILOBYTE = 1000
+        MEGABYTE = KILOBYTE * 1000
+        bytes_per_iter = MEGABYTE
+
+        ds = Dataset()
+        # ds.is_little_endian = True
+        # ds.is_implicit_VR = False
+        ds.BitsAllocated = bits_allocated
+
+        with TemporaryFile("+wb") as large_dataset, TemporaryFile("+wb") as fp:
+            # generate 500 megabytes
+            data = BytesIO()
+            for _ in range(bytes_per_iter):
+                data.write(b"\x00")
+
+            data.seek(0)
+
+            # 500 megabytes
+            for _ in range(500):
+                large_dataset.write(data.getbuffer())
+
+            large_dataset.seek(0)
+
+            # take a snapshot of memory
+            baseline_memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+            # set the pixel data to the buffer
+            ds.PixelData = large_dataset
+            ds.save_as(fp, little_endian=True, implicit_vr=False)
+
+            memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+            # on MacOS, maxrss is in bytes. On unix, its in kilobytes
+            limit = 0
+            if sys.platform.startswith("linux"):
+                # memory usage is in kilobytes
+                limit = (MEGABYTE * 400) / KILOBYTE
+            elif sys.platform.startswith("darwin"):
+                # memory usage is in bytes
+                limit = MEGABYTE * 400
+            else:
+                pytest.skip("This test is not setup to run on this platform")
+
+            # if we have successfully kept the PixelData out of memory, then our peak memory usage
+            # usage be less than prev peak + the size of the file
+            assert memory_usage < (baseline_memory_usage + limit)
+
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
+    def test_all_supported_VRS_can_write_a_buffered_value(self, vr):
+        data = b"\x00\x01\x02\x03"
+        buffer = BytesIO(data)
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+
+        fn, _ = writers[cast(VR, vr)]
+        fn(fp, DataElement("PixelData", vr, buffer))
+
+        assert fp.getvalue() == data
+
+    def test_saving_a_file_with_a_closed_file(self):
+        ds = Dataset()
+        ds.BitsAllocated = 8
+
+        with TemporaryFile("+wb") as f:
+            ds.PixelData = f
+
+        with TemporaryFile("+wb") as f:
+            msg = (
+                r"The buffered value for \(7FE0,0010\) 'Pixel Data' is invalid or "
+                "unusable"
+            )
+            with pytest.raises(ValueError, match=msg):
+                ds.save_as(f, little_endian=True, implicit_vr=True)
+
+
 @pytest.fixture
 def use_future():
     original = config._use_future
@@ -3140,119 +3331,3 @@ class TestFuture:
         )
         with pytest.raises(TypeError, match=msg):
             dcmwrite(None, ds, True, write_like_original=True)
-
-
-class TestWritingBufferedPixelData:
-    @pytest.mark.parametrize("bits_allocated", (8, 16))
-    def test_writing_dataset_with_buffered_pixel_data(self, bits_allocated):
-        pixel_data = b"\x00\x01\x02\x03"
-
-        # Baseline
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        fp.is_implicit_VR = False
-
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.BitsAllocated = bits_allocated
-        ds.PixelData = pixel_data
-
-        ds.save_as(fp)
-
-        fp_buffered = DicomBytesIO()
-        fp_buffered.is_little_endian = True
-        fp_buffered.is_implicit_VR = False
-
-        ds_buffered = Dataset()
-        ds_buffered.is_little_endian = True
-        ds_buffered.is_implicit_VR = False
-        ds_buffered.BitsAllocated = bits_allocated
-        ds_buffered.PixelData = BytesIO(pixel_data)
-
-        ds_buffered.save_as(fp_buffered)
-
-        assert fp.getvalue() == fp_buffered.getvalue()
-
-    @pytest.mark.parametrize("bits_allocated", (8, 16))
-    def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(
-        self, bits_allocated
-    ):
-        try:
-            import resource
-        except ImportError:
-            pytest.skip("The 'resource' module is not supported on this platform")
-
-        KILOBYTE = 1000
-        MEGABYTE = KILOBYTE * 1000
-        bytes_per_iter = MEGABYTE
-
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        ds.BitsAllocated = bits_allocated
-
-        with TemporaryFile("+wb") as large_dataset, TemporaryFile("+wb") as fp:
-            # generate 500 megabytes
-            data = BytesIO()
-            for _ in range(bytes_per_iter):
-                data.write(b"\x00")
-
-            data.seek(0)
-
-            # 500 megabytes
-            for _ in range(500):
-                large_dataset.write(data.getbuffer())
-
-            large_dataset.seek(0)
-
-            # take a snapshot of memory
-            baseline_memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-
-            # set the pixel data to the buffer
-            ds.PixelData = large_dataset
-            ds.save_as(fp)
-
-            memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-
-            # on MacOS, maxrss is in bytes. On unix, its in kilobytes
-            limit = 0
-            if sys.platform.startswith("linux"):
-                # memory usage is in kilobytes
-                limit = (MEGABYTE * 400) / KILOBYTE
-            elif sys.platform.startswith("darwin"):
-                # memory usage is in bytes
-                limit = MEGABYTE * 400
-            else:
-                pytest.skip("This test is not setup to run on this platform")
-
-            # if we have successfully kept the PixelData out of memory, then our peak memory usage
-            # usage be less than prev peak + the size of the file
-            assert memory_usage < (baseline_memory_usage + limit)
-
-    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
-    def test_all_supported_VRS_can_write_a_buffered_value(self, vr):
-        data = b"\x00\x01\x02\x03"
-        buffer = BytesIO(data)
-
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        fp.is_implicit_VR = False
-
-        fn, _ = writers[cast(VR, vr)]
-        fn(fp, DataElement("PixelData", vr, buffer))
-
-        assert fp.getvalue() == data
-
-    def test_saving_a_file_with_a_closed_file(self):
-        ds = Dataset()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = True
-        ds.BitsAllocated = 8
-
-        with TemporaryFile("+wb") as file:
-            ds.PixelData = file
-
-        with TemporaryFile("+wb") as file:
-            with pytest.raises(AssertionError, match="The stream has been closed"):
-                ds.save_as(file)
