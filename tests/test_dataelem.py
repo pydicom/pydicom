@@ -1286,8 +1286,8 @@ class TestBufferedDataElement:
         b = io.BytesIO()
         b.close()
         msg = (
-            r"The buffered value for \(0040,A123\) 'Person Name' is invalid or "
-            "unusable"
+            r"The buffered value for \(0040,A123\) 'Person Name' has been closed or "
+            "is invalid"
         )
         with pytest.raises(ValueError, match=msg):
             DataElement("PersonName", "OB", b)

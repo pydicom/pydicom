@@ -2817,6 +2817,38 @@ def test_setattr_ignore(setattr_ignore):
             setattr(ds, s, None)
 
 
+class TestDatasetWithBufferedData:
+    """Tests for datasets with buffered element values"""
+    def test_pickle(self):
+        """Test pickling a dataset with buffered element value"""
+        b = io.BytesIO(b"\x00\x01")
+        ds = Dataset()
+        ds.PixelData = b
+
+        s = pickle.dumps({"ds": ds})
+        ds1 = pickle.loads(s)["ds"]
+        assert ds.PixelData is not ds1.PixelData
+        assert ds == ds1
+
+        with tempfile.NamedTemporaryFile("+wb") as t:
+            t.write(b"\x00\x01\x02\x03\x04")
+            t.seek(0)
+
+            ds = Dataset()
+            ds.PixelData = t
+            s = pickle.dumps({"ds": ds})
+            ds1 = pickle.loads(s)["ds"]
+            assert ds == ds1
+
+    def test_copy(self):
+        """Test copy.copy() for dataset with buffered element value"""
+        pass
+
+    def test_deepcopy(self):
+        """Test copy.deepcopy() for dataset with buffered element value"""
+        pass
+
+
 @pytest.fixture
 def use_future():
     original = config._use_future
@@ -2935,15 +2967,3 @@ class TestFuture:
         )
         with pytest.raises(TypeError, match=msg):
             Dataset().decompress(handler_name="foo")
-
-
-def test_pickling_and_unpickling_buffered_pixel_data():
-    with tempfile.NamedTemporaryFile("+wb") as file:
-        file.write(b"\x00\x01\x02\x03\x04")
-        file.seek(0)
-
-        ds = Dataset()
-        ds.PixelData = file
-        s = pickle.dumps({"ds": ds})
-        ds1 = pickle.loads(s)["ds"]
-        assert ds == ds1

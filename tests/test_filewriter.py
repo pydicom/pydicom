@@ -14,6 +14,13 @@ from tempfile import TemporaryFile
 from typing import cast
 import zlib
 
+try:
+    import resource
+
+    HAVE_RESOURCE = True
+except ImportError:
+    HAVE_RESOURCE = False
+
 import pytest
 
 from pydicom import config, __version_info__, uid
@@ -3210,26 +3217,21 @@ class TestWritingBufferedPixelData:
 
         assert fp.getvalue() == fp_buffered.getvalue()
 
+    @pytest.mark.skipif(not HAVE_RESOURCE, reason="resource is unix only")
     @pytest.mark.parametrize("bits_allocated", (8, 16))
     def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(
         self, bits_allocated
     ):
-        try:
-            import resource
-        except ImportError:
-            pytest.skip("The 'resource' module is not supported on this platform")
-
+        FILE_SIZE = 100  # MB
         KILOBYTE = 1000
         MEGABYTE = KILOBYTE * 1000
         bytes_per_iter = MEGABYTE
 
         ds = Dataset()
-        # ds.is_little_endian = True
-        # ds.is_implicit_VR = False
         ds.BitsAllocated = bits_allocated
 
         with TemporaryFile("+wb") as large_dataset, TemporaryFile("+wb") as fp:
-            # generate 500 megabytes
+            # generate large file
             data = BytesIO()
             for _ in range(bytes_per_iter):
                 data.write(b"\x00")
@@ -3237,7 +3239,7 @@ class TestWritingBufferedPixelData:
             data.seek(0)
 
             # 500 megabytes
-            for _ in range(500):
+            for _ in range(FILE_SIZE):
                 large_dataset.write(data.getbuffer())
 
             large_dataset.seek(0)
@@ -3255,15 +3257,15 @@ class TestWritingBufferedPixelData:
             limit = 0
             if sys.platform.startswith("linux"):
                 # memory usage is in kilobytes
-                limit = (MEGABYTE * 400) / KILOBYTE
+                limit = (MEGABYTE * FILE_SIZE / 5 * 4) / KILOBYTE
             elif sys.platform.startswith("darwin"):
                 # memory usage is in bytes
-                limit = MEGABYTE * 400
+                limit = MEGABYTE * FILE_SIZE / 5 * 4
             else:
                 pytest.skip("This test is not setup to run on this platform")
 
-            # if we have successfully kept the PixelData out of memory, then our peak memory usage
-            # usage be less than prev peak + the size of the file
+            # if we have successfully kept the PixelData out of memory, then our peak
+            #   memory usage # usage be less than prev peak + the size of the file
             assert memory_usage < (baseline_memory_usage + limit)
 
     @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
@@ -3289,8 +3291,8 @@ class TestWritingBufferedPixelData:
 
         with TemporaryFile("+wb") as f:
             msg = (
-                r"The buffered value for \(7FE0,0010\) 'Pixel Data' is invalid or "
-                "unusable"
+                r"The buffered value for \(7FE0,0010\) 'Pixel Data' has been closed or "
+                "is invalid"
             )
             with pytest.raises(ValueError, match=msg):
                 ds.save_as(f, little_endian=True, implicit_vr=True)

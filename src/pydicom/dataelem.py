@@ -32,7 +32,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
-from pydicom.fileutil import check_buffer, buffer_length
+from pydicom.fileutil import check_buffer, buffer_length, read_buffer
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
     BUFFERABLE_VRS,
@@ -654,7 +654,10 @@ class DataElement:
                     self.value, other.value
                 )
 
-            return self.value == other.value
+            sval = b"".join(read_buffer(self.value)) if self.is_buffered else self.value
+            oval = b"".join(read_buffer(other.value)) if other.is_buffered else other.value
+
+            return sval == oval
 
         return NotImplemented
 
