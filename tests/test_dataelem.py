@@ -1355,6 +1355,24 @@ class TestBufferedDataElement:
         assert elem != b_elem
         assert elem != b_elem
 
+    def test_equality_offset(self):
+        """Test equality when the buffer isn't positioned at the start"""
+        elem = DataElement("PersonName", "OB", b"\x00\x01")
+
+        b = io.BytesIO(b"\x00\x01")
+        b_elem = DataElement("PersonName", "OB", b)
+        b.seek(2)
+
+        assert b_elem == elem
+        assert b_elem == elem
+
+        c = io.BytesIO(b"\x00\x01")
+        c_elem = DataElement("PersonName", "OB", c)
+        c.seek(1)
+
+        assert b_elem == c_elem
+        assert b_elem == c_elem
+
     def test_equality_multichunk(self):
         """Test element equality when the value gets chunked"""
         # Test multiple of default chunk size

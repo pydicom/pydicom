@@ -570,6 +570,7 @@ def buffer_equality(
 
     # Avoid reading the entire buffer object into memory
     with reset_buffer_position(buffer):
+        buffer.seek(0)
         if isinstance(other, bytes | bytearray):
             start = 0
             for data in read_buffer(buffer):
@@ -582,6 +583,7 @@ def buffer_equality(
             return True
 
         with reset_buffer_position(other):
+            other.seek(0)
             for data_a, data_b in zip(read_buffer(buffer), read_buffer(other)):
                 if data_a != data_b:
                     return False
