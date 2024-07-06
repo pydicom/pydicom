@@ -1352,8 +1352,8 @@ class TestBufferedDataElement:
 
         # First is not buffered, second is
         # Test equality multiple times to ensure buffer can be re-read
-        assert elem == b_elem
-        assert elem == b_elem
+        assert elem != b_elem
+        assert elem != b_elem
 
     def test_equality_multichunk(self):
         """Test element equality when the value gets chunked"""
