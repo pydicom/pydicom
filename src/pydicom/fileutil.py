@@ -535,10 +535,7 @@ def buffer_length(buffer: BufferedIOBase) -> int:
         The total length of the buffer.
     """
     with reset_buffer_position(buffer):
-        buffer.seek(0, os.SEEK_SET)
-        start = buffer.tell()
-        buffer.seek(0, os.SEEK_END)
-        return buffer.tell() - start
+        return buffer.seek(0, os.SEEK_END)
 
 
 def buffer_remaining(buffer: BufferedIOBase) -> int:
@@ -555,9 +552,7 @@ def buffer_remaining(buffer: BufferedIOBase) -> int:
         The remaining length of the buffer from the current position.
     """
     with reset_buffer_position(buffer) as current_offset:
-        # Go to the end of the stream
-        buffer.seek(0, os.SEEK_END)
-        return buffer.tell() - current_offset
+        return buffer.seek(0, os.SEEK_END) - current_offset
 
 
 def buffer_equality(
