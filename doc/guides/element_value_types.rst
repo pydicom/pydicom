@@ -156,6 +156,5 @@ However, there are limitations and things to be aware of when using a buffered v
   :func:`~copy.deepcopy` such as :class:`~io.BufferedReader` are not able to be pickled
   or deepcopied.
 * Using a buffered *Pixel Data* value for datasets with a compressed (encapsulated)
-  transfer syntax require you to have first :func:`encapsulated<encaps.encapsulate>`
-  the compressed frame data and written it to the buffer (which easy to do in a memory
-  efficient manner).
+  transfer syntax requires you to have first :func:`encapsulated<encaps.encapsulate>`
+  the compressed frame data and written it to the buffer.
