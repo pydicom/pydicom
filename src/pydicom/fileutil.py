@@ -450,22 +450,23 @@ def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
 
 
 def check_buffer(buffer: BufferedIOBase) -> None:
-    """Return ``True`` if `buffer` is usable, ``False`` otherwise.
+    """Raise an exception if `buffer` is not usable as an element value.
 
     Parameters
     ----------
     buffer : io.BufferedIOBase
-        The buffer to check, must have `read()`, `seek()` and `tell()` methods.
+        The buffer to check, must be :meth:`~io.IOBase.readable`,
+        :meth:`~io.IOBase.seekable` and not be :attr:`io.IOBase.closed`.
     """
-    for attr in ("read", "seek", "tell"):
-        if not callable(getattr(buffer, attr, None)):
-            raise TypeError(
-                f"Invalid buffer object type '{type(buffer).__name__}', the object "
-                "must have read(), seek() and tell() methods"
-            )
+    if not isinstance(buffer, BufferedIOBase):
+        raise TypeError("the buffer must inherit from 'io.BufferedIOBase'")
 
-    if getattr(buffer, "closed", False):
-        raise ValueError("Unable to use the buffer object as it has been closed")
+    if buffer.closed:
+        raise ValueError("the buffer has been closed")
+
+    # readable() covers read(), seekable() covers seek() and tell()
+    if not buffer.readable() or not buffer.seekable():
+        raise ValueError("the buffer must be readable and seekable")
 
 
 @contextmanager
@@ -521,7 +522,7 @@ def read_buffer(buffer: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[b
 
 
 def buffer_length(buffer: BufferedIOBase) -> int:
-    """Return the remaining length of the buffer with respect to the current position.
+    """Return the total length of the buffer.
 
     Parameters
     ----------
@@ -531,7 +532,7 @@ def buffer_length(buffer: BufferedIOBase) -> int:
     Returns
     -------
     int
-        The remaining length of the buffer from the current position.
+        The total length of the buffer.
     """
     with reset_buffer_position(buffer):
         buffer.seek(0, os.SEEK_SET)
@@ -557,3 +558,32 @@ def buffer_remaining(buffer: BufferedIOBase) -> int:
         # Go to the end of the stream
         buffer.seek(0, os.SEEK_END)
         return buffer.tell() - current_offset
+
+
+def buffer_equality(
+    buffer: BufferedIOBase,
+    other: bytes | bytearray | BufferedIOBase,
+) -> bool:
+    """Return ``True`` if `buffer` and `other` are equal, ``False`` otherwise."""
+    if not isinstance(other, bytes | bytearray | BufferedIOBase):
+        return False
+
+    # Avoid reading the entire buffer object into memory
+    with reset_buffer_position(buffer):
+        if isinstance(other, bytes | bytearray):
+            start = 0
+            for data in read_buffer(buffer):
+                nr_read = len(data)
+                if other[start : start + nr_read] != data:
+                    return False
+
+                start += nr_read
+
+            return True
+
+        with reset_buffer_position(other):
+            for data_a, data_b in zip(read_buffer(buffer), read_buffer(other)):
+                if data_a != data_b:
+                    return False
+
+        return True

@@ -2,6 +2,7 @@
 """Test suite for util functions"""
 from io import BytesIO, RawIOBase
 from pathlib import Path
+import tempfile
 
 import pytest
 
@@ -47,48 +48,30 @@ class TestBufferFunctions:
 
     def test_check_buffer(self):
         """Test check_buffer()"""
-        b = BytesIO()
-        assert check_buffer(b) is None
+        # Invalid type
+        msg = "the buffer must inherit from 'io.BufferedIOBase'"
+        with pytest.raises(TypeError, match=msg):
+            check_buffer(None)
 
+        b = BytesIO()
+        assert b.readable()
+        assert b.seekable()
+        assert not b.closed
+        check_buffer(b)
+
+        # Buffer has been closed
         b.close()
         assert b.closed
 
-        msg = "Unable to use the buffer object as it has been closed"
+        msg = "the buffer has been closed"
         with pytest.raises(ValueError, match=msg):
             check_buffer(b)
 
-        class Foo:
-            closed = False
-
-        def _bar(self):
-            pass
-
-        foo = Foo()
-        msg = (
-            r"Invalid buffer object type 'Foo', the object must have read\(\), "
-            r"seek\(\) and tell\(\) methods"
-        )
-        with pytest.raises(TypeError, match=msg):
-            check_buffer(foo)
-
-        foo.read = _bar
-        with pytest.raises(TypeError, match=msg):
-            check_buffer(foo)
-
-        foo.seek = _bar
-        with pytest.raises(TypeError, match=msg):
-            check_buffer(foo)
-
-        foo.tell = _bar
-        assert check_buffer(foo) is None
-
-        foo.closed = True
-        msg = "Unable to use the buffer object as it has been closed"
+        # Buffer is not readable
+        msg = "the buffer must be readable and seekable"
         with pytest.raises(ValueError, match=msg):
-            check_buffer(foo)
-
-        foo.closed = False
-        assert check_buffer(foo) is None
+            with tempfile.TemporaryFile(mode="wb") as t:
+                check_buffer(t)
 
     def test_buffer_remaining(self):
         """Test buffer_remaining()"""
@@ -133,7 +116,7 @@ class TestBufferFunctions:
         assert b.tell() == 0
 
         b.close()
-        msg = "Unable to use the buffer object as it has been closed"
+        msg = "the buffer has been closed"
         with pytest.raises(ValueError, match=msg):
             with reset_buffer_position(b) as idx:
                 assert idx == 100
@@ -161,7 +144,7 @@ class TestBufferFunctions:
             next(read_buffer(b, chunk_size=-12))
 
         b.close()
-        msg = "Unable to use the buffer object as it has been closed"
+        msg = "the buffer has been closed"
         with pytest.raises(ValueError, match=msg):
             next(read_buffer(b))
 

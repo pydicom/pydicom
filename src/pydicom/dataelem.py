@@ -8,10 +8,11 @@ A DataElement has a tag,
 """
 
 import base64
+from collections.abc import Callable, MutableSequence
+import copy
 from io import BufferedIOBase
 import json
 from typing import Optional, Any, TYPE_CHECKING, NamedTuple
-from collections.abc import Callable, MutableSequence
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
@@ -32,7 +33,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
-from pydicom.fileutil import check_buffer, buffer_length, read_buffer
+from pydicom.fileutil import check_buffer, buffer_length, buffer_equality
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
     BUFFERABLE_VRS,
@@ -176,29 +177,31 @@ class DataElement:
 
         Parameters
         ----------
-        tag : int or str or 2-tuple of int
+        tag : int | str | tuple[int, int]
             The DICOM (group, element) tag in any form accepted by
             :func:`~pydicom.tag.Tag` such as ``'PatientName'``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
             The 2 character DICOM value representation (see DICOM Standard,
             Part 5, :dcm:`Section 6.2<part05/sect_6.2.html>`).
-        value
-            The value of the data element. One of the following:
+        value : Any
+            The value of the data element, the :doc:`allowed type depends on the VR
+            </guides/element_value_types>` and includes:
 
-            * a single string value
-            * a number
-            * a :class:`list` or :class:`tuple` with all strings or all numbers
-            * a multi-value string with backslash separator
+            * a single :class:`str` value
+            * an :class:`int` or :class:`int`
+            * a :class:`list` or :class:`tuple` containing only a single type of item
+              such as :class:`str`, :class:`int` or :class:`float`
+            * a raw :class:`bytes` value
         file_value_tell : int, optional
             The byte offset to the start of the encoded element value.
-        is_undefined_length : bool
+        is_undefined_length : bool, optional
             Used internally to store whether the length field for this element
             was ``0xFFFFFFFF``, i.e. 'undefined length'. Default is ``False``.
-        already_converted : bool
+        already_converted : bool, optional
             Used to determine whether or not the element's value requires
             conversion to a value with VM > 1. Default is ``False``.
-        validation_mode : int
+        validation_mode : int, optional
             Defines if values are validated and how validation errors are
             handled.
         """
@@ -439,21 +442,28 @@ class DataElement:
 
     @property
     def value(self) -> Any:
-        """Return the element's value."""
+        """Get or set the element's value.
+
+        Parameters
+        ----------
+        val : Any
+            The value to use to set the element's value, should be an :doc:`appropriate
+            type for the VR</guides/element_value_types>`. The value will be validated
+            in accordance with the element's :attr:`~DataElement.validation_mode`.
+
+        Returns
+        -------
+        Any
+            The element's value.
+        """
         return self._value
 
     @value.setter
     def value(self, val: Any) -> None:
-        """Convert (if necessary) and set the value of the element."""
-        # Check if is multiple values separated by backslash
-        #   If so, turn them into a list of separate values
-        # Exclude splitting values with backslash characters based on:
-        # * Which str-like VRs can have backslashes in Part 5, Section 6.2
-        # * All byte-like VRs
-        # * Ambiguous VRs that may be byte-like
+        # O* elements set using a buffer object
         if isinstance(val, BufferedIOBase):
-            supported = sorted(str(vr) for vr in BUFFERABLE_VRS if "or" not in vr)
             if self.VR not in BUFFERABLE_VRS:
+                supported = sorted(str(vr) for vr in BUFFERABLE_VRS if "or" not in vr)
                 raise ValueError(
                     f"Elements with a VR of '{self.VR}' cannot be used with buffered "
                     f"values, supported VRs are: {', '.join(supported)}"
@@ -464,14 +474,17 @@ class DataElement:
             try:
                 check_buffer(val)
             except Exception as exc:
-                raise ValueError(
-                    f"The buffered value for {self.tag} '{self.name}' has been closed "
-                    "or is invalid"
-                ) from exc
+                raise type(exc)(f"Invalid buffer for {self.tag} '{self.name}': {exc}")
 
             self._value = val
             return
 
+        # Check if is multiple values separated by backslash
+        #   If so, turn them into a list of separate values
+        # Exclude splitting values with backslash characters based on:
+        # * Which str-like VRs can have backslashes in Part 5, Section 6.2
+        # * All byte-like VRs
+        # * Ambiguous VRs that may be byte-like
         if self.VR not in ALLOW_BACKSLASH:
             if isinstance(val, str):
                 val = val.split("\\") if "\\" in val else val
@@ -479,11 +492,6 @@ class DataElement:
                 val = val.split(b"\\") if b"\\" in val else val
 
         self._value = self._convert_value(val)
-
-    @property
-    def is_buffered(self) -> bool:
-        """Return ``True`` if the element's value is a buffer."""
-        return isinstance(self._value, BufferedIOBase)
 
     @property
     def VM(self) -> int:
@@ -506,10 +514,7 @@ class DataElement:
             try:
                 return 1 if buffer_length(self.value) else 0
             except Exception as exc:
-                raise ValueError(
-                    f"The buffered value for {self.tag} '{self.name}' has been closed "
-                    "or is invalid"
-                ) from exc
+                raise type(exc)(f"Invalid buffer for {self.tag} '{self.name}': {exc}")
 
         try:
             iter(self.value)
@@ -517,6 +522,13 @@ class DataElement:
             return 1
 
         return len(self.value)
+
+    @property
+    def is_buffered(self) -> bool:
+        """Return ``True`` if the element's value is a :class:`io.BufferedIOBase`
+        instance, ``False`` otherwise.
+        """
+        return isinstance(self._value, BufferedIOBase)
 
     @property
     def is_empty(self) -> bool:
@@ -628,6 +640,26 @@ class DataElement:
         self.validate(val)
         return val
 
+    def __deepcopy__(self, memo: dict[int, Any]) -> "DataElement":
+        """Implementation of copy.deepcopy()."""
+        # Overridden to allow for a nice exception message for buffered elements
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if self.is_buffered and k == "_value":
+                try:
+                    setattr(result, k, copy.deepcopy(v, memo))
+                except Exception as exc:
+                    raise type(exc)(
+                        f"Error deepcopying the buffered element {self.tag} "
+                        f"'{self.name}': {exc}"
+                    )
+            else:
+                setattr(result, k, copy.deepcopy(v, memo))
+
+        return result
+
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
 
@@ -650,14 +682,22 @@ class DataElement:
 
             # tag and VR match, now check the value
             if config.have_numpy and isinstance(self.value, numpy.ndarray):
-                return len(self.value) == len(other.value) and numpy.allclose(
+                return len(self.value) == len(other.value) and numpy.array_equal(
                     self.value, other.value
                 )
 
-            sval = b"".join(read_buffer(self.value)) if self.is_buffered else self.value
-            oval = b"".join(read_buffer(other.value)) if other.is_buffered else other.value
+            if not self.is_buffered and not other.is_buffered:
+                return self.value == other.value
 
-            return sval == oval
+            try:
+                # `self` is buffered, `other` may or may not be buffered
+                if self.is_buffered:
+                    return buffer_equality(self.value, other.value)
+
+                # `other` is buffered, `self` is not
+                return buffer_equality(other.value, self.value)
+            except Exception as exc:
+                raise type(exc)(f"Invalid buffer for {self.tag} '{self.name}': {exc}")
 
         return NotImplemented
 

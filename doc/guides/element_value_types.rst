@@ -33,98 +33,129 @@ ensure that the value gets written correctly?
   :class:`~dataset.Dataset` instances.
 
 
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| VR | Name             | Set using       | Stored as (T)                     | Type hint for element value |
-+====+==================+=================+===================================+=============================+
-| AE | Application      | :class:`str`    | :class:`str`                      | Union[None, T,              |
-|    | Entity           |                 |                                   | MutableSequence[T]]         |
-+----+------------------+-----------------+-----------------------------------+                             |
-| AS | Age String       | :class:`str`    | :class:`str`                      |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| AT | Attribute Tag    | Tag             | :class:`~tag.BaseTag`             |                             |
-|    |                  | :sup:`1`        |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| CS | Code String      | :class:`str`    | :class:`str`                      |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| DA | Date             | :class:`str`    | :class:`str` or                   |                             |
-|    |                  |                 | :class:`~valuerep.DA`\ :sup:`2`   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| DS | Decimal String   | :class:`str`,   | :class:`~valuerep.DSfloat` or     |                             |
-|    |                  | :class:`float`  | :class:`~valuerep.DSdecimal`\     |                             |
-|    |                  | or :class:`int` | :sup:`3`                          |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| DT | Date Time        | :class:`str`    | :class:`str` or                   |                             |
-|    |                  |                 | :class:`~valuerep.DT`\ :sup:`2`   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| FL | Floating Point   | :class:`float`  | :class:`float`                    |                             |
-|    | Single           |                 |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| FD | Floating Point   | :class:`float`  | :class:`float`                    |                             |
-|    | Double           |                 |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| IS | Integer String   | :class:`str`    | :class:`~valuerep.IS`             |                             |
-|    |                  | or :class:`int` |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| LO | Long String      | :class:`str`    | :class:`str`                      |                             |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| LT | Long Text        | :class:`str`    | :class:`str`                      | Optional[T]                 |
-+----+------------------+-----------------+-----------------------------------+                             |
-| OB | Other Byte       | :class:`bytes`  | :class:`bytes`                    |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| OD | Other Double     | :class:`bytes`  | :class:`bytes`                    |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| OF | Other Float      | :class:`bytes`  | :class:`bytes`                    |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| OL | Other Long       | :class:`bytes`  | :class:`bytes`                    |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| OV | Other 64-bit     | :class:`bytes`  | :class:`bytes`                    |                             |
-|    | Very Long        |                 |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| OW | Other Word       | :class:`bytes`  | :class:`bytes`                    |                             |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| PN | Person Name      | :class:`str`    | :class:`~valuerep.PersonName`     | Union[None, T,              |
-+----+------------------+-----------------+-----------------------------------+ MutableSequence[T]]         |
-| SH | Short String     | :class:`str`    | :class:`str`                      |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| SL | Signed Long      | :class:`int`    | :class:`int`                      |                             |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| SQ | Sequence of      | :class:`list`   | :class:`~sequence.Sequence`       | MutableSequence[            |
-|    | Items            |                 |                                   | :class:`~dataset.Dataset`]  |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| SS | Signed Short     | :class:`int`    | :class:`int`                      | Union[None, T,              |
-|    |                  |                 |                                   | MutableSequence[T]]         |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| ST | Short Text       | :class:`str`    | :class:`str`                      | Optional[T]                 |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| SV | Signed 64-bit    | :class:`int`    | :class:`int`                      | Union[None, T,              |
-|    | Very Long        |                 |                                   | MutableSequence[T]]         |
-+----+------------------+-----------------+-----------------------------------+                             |
-| TM | Time             | :class:`str`    | :class:`str` or                   |                             |
-|    |                  |                 | :class:`~valuerep.TM`\ :sup:`2`   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| UC | Unlimited        | :class:`str`    | :class:`str`                      |                             |
-|    | Characters       |                 |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| UI | Unique           | :class:`str`    | :class:`~uid.UID`                 |                             |
-|    | Identifier (UID) |                 |                                   |                             |
-+----+------------------+-----------------+-----------------------------------+                             |
-| UL | Unsigned Long    | :class:`int`    | :class:`int`                      |                             |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| UN | Unknown          | :class:`bytes`  | :class:`bytes`                    | Optional[T]                 |
-+----+------------------+-----------------+-----------------------------------+                             |
-| UR | URI/URL          | :class:`str`    | :class:`str`                      |                             |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| US | Unsigned Short   | :class:`int`    | :class:`int`                      | Union[None, T,              |
-|    |                  |                 |                                   | MutableSequence[T]]         |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| UT | Unlimited Text   | :class:`str`    | :class:`str`                      | Optional[T]                 |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
-| UV | Unsigned 64-bit  | :class:`int`    | :class:`int`                      | Union[None, T,              |
-|    | Very Long        |                 |                                   | MutableSequence[T]]         |
-+----+------------------+-----------------+-----------------------------------+-----------------------------+
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| VR | Name             | Set using                  | Stored as (T)                     | Type hint for element value |
++====+==================+============================+===================================+=============================+
+| AE | Application      | :class:`str`               | :class:`str`                      | None | T |                  |
+|    | Entity           |                            |                                   | MutableSequence[T]          |
++----+------------------+----------------------------+-----------------------------------+                             |
+| AS | Age String       | :class:`str`               | :class:`str`                      |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| AT | Attribute Tag    | Tag\ :sup:`1`              | :class:`~tag.BaseTag`             |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| CS | Code String      | :class:`str`               | :class:`str`                      |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| DA | Date             | :class:`str`               | :class:`str` or                   |                             |
+|    |                  |                            | :class:`~valuerep.DA`\ :sup:`2`   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| DS | Decimal String   | :class:`str`,              | :class:`~valuerep.DSfloat` or     |                             |
+|    |                  | :class:`float`             | :class:`~valuerep.DSdecimal`\     |                             |
+|    |                  | or :class:`int`            | :sup:`3`                          |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| DT | Date Time        | :class:`str`               | :class:`str` or                   |                             |
+|    |                  |                            | :class:`~valuerep.DT`\ :sup:`2`   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| FL | Floating Point   | :class:`float`             | :class:`float`                    |                             |
+|    | Single           |                            |                                   |                             |
++----+------------------+                            |                                   |                             |
+| FD | Floating Point   |                            |                                   |                             |
+|    | Double           |                            |                                   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| IS | Integer String   | :class:`str`               | :class:`~valuerep.IS`             |                             |
+|    |                  | or :class:`int`            |                                   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| LO | Long String      | :class:`str`               | :class:`str`                      |                             |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| LT | Long Text        | :class:`str`               | :class:`str`                      | None | T                    |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| OB | Other Byte       | :class:`bytes` or          | :class:`bytes` or                 | None | T                    |
++----+------------------+ :class:`io.BufferedIOBase` | :class:`io.BufferedIOBase`        |                             |
+| OD | Other Double     | \ :sup:`4`                 |                                   |                             |
++----+------------------+                            |                                   |                             |
+| OF | Other Float      |                            |                                   |                             |
++----+------------------+                            |                                   |                             |
+| OL | Other Long       |                            |                                   |                             |
++----+------------------+                            |                                   |                             |
+| OV | Other 64-bit     |                            |                                   |                             |
+|    | Very Long        |                            |                                   |                             |
++----+------------------+                            |                                   |                             |
+| OW | Other Word       |                            |                                   |                             |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| PN | Person Name      | :class:`str`               | :class:`~valuerep.PersonName`     | None | T |                  |
++----+------------------+----------------------------+-----------------------------------+ MutableSequence[T]          |
+| SH | Short String     | :class:`str`               | :class:`str`                      |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| SL | Signed Long      | :class:`int`               | :class:`int`                      |                             |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| SQ | Sequence of      | :class:`list`              | :class:`~sequence.Sequence`       | MutableSequence[            |
+|    | Items            |                            |                                   | :class:`~dataset.Dataset`]  |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| SS | Signed Short     | :class:`int`               | :class:`int`                      | None | T |                  |
+|    |                  |                            |                                   | MutableSequence[T]          |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| ST | Short Text       | :class:`str`               | :class:`str`                      | None | T                    |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| SV | Signed 64-bit    | :class:`int`               | :class:`int`                      | None | T |                  |
+|    | Very Long        |                            |                                   | MutableSequence[T]          |
++----+------------------+----------------------------+-----------------------------------+                             |
+| TM | Time             | :class:`str`               | :class:`str` or                   |                             |
+|    |                  |                            | :class:`~valuerep.TM`\ :sup:`2`   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| UC | Unlimited        | :class:`str`               | :class:`str`                      |                             |
+|    | Characters       |                            |                                   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| UI | Unique           | :class:`str`               | :class:`~uid.UID`                 |                             |
+|    | Identifier (UID) |                            |                                   |                             |
++----+------------------+----------------------------+-----------------------------------+                             |
+| UL | Unsigned Long    | :class:`int`               | :class:`int`                      |                             |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| UN | Unknown          | :class:`bytes`             | :class:`bytes`                    | None | T                    |
++----+------------------+----------------------------+-----------------------------------+                             |
+| UR | URI/URL          | :class:`str`               | :class:`str`                      |                             |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| US | Unsigned Short   | :class:`int`               | :class:`int`                      | None | T |                  |
+|    |                  |                            |                                   | MutableSequence[T]          |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| UT | Unlimited Text   | :class:`str`               | :class:`str`                      | None | T                    |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
+| UV | Unsigned 64-bit  | :class:`int`               | :class:`int`                      | None | T |                  |
+|    | Very Long        |                            |                                   | MutableSequence[T]          |
++----+------------------+----------------------------+-----------------------------------+-----------------------------+
 
 | :sup:`1` Any type accepted by :func:`~tag.Tag` can be used
 | :sup:`2` If :attr:`config.datetime_conversion<config.datetime_conversion>`
   = ``True`` (default ``False``)
 | :sup:`3` If :attr:`config.use_DS_decimal<config.use_DS_decimal>`
   = ``True`` (default ``False``)
+| :sup:`4` See notes for bufferable O* VRs below
+
+
+Bufferable O* VRs
+-----------------
+
+The value for elements with O\* VRs (**OB**, **OD**, **OF**, **OL**, **OV** and
+**OW**) can be set using an object that inherits from :class:`io.BufferedIOBase` such
+as the :class:`io.BufferedReader` instances returned by the :func:`open` built-in when
+in read mode. This allows you to avoid having to read a large amount of data into
+memory when creating datasets::
+
+    from pydicom import Dataset, FileMetaDataset
+    from pydicom.uid import ExplicitVRLittleEndian
+
+    with open("a_large_amount_of_data", "rb") a f:
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxIOD = ExplicitVRLittleEndian
+        ds.PixelData = f
+        ds.save_as("large_dataset.dcm")
+
+
+However, there are limitations and things to be aware of when using a buffered value:
+
+* Datasets containing buffered objects that don't normally work with :mod:`pickle` or
+  :func:`~copy.deepcopy` such as :class:`~io.BufferedReader` are not able to be pickled
+  or deepcopied.
+* Using a buffered *Pixel Data* value for datasets with a compressed (encapsulated)
+  transfer syntax require you to have first :func:`encapsulated<encaps.encapsulate>`
+  the compressed frame data and written it to the buffer (which easy to do in a memory
+  efficient manner).

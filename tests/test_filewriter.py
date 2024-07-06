@@ -2735,7 +2735,7 @@ class TestWriteOtherVRs:
         fp.is_little_endian = True
         elem = DataElement(0x7FE00008, "OB", b)
         b.close()
-        msg = "Unable to use the buffer object as it has been closed"
+        msg = "the buffer has been closed"
         with pytest.raises(ValueError, match=msg):
             write_OBvalue(fp, elem)
 
@@ -2773,7 +2773,7 @@ class TestWriteOtherVRs:
         fp.is_little_endian = True
         elem = DataElement(0x7FE00008, "OW", b)
         b.close()
-        msg = "Unable to use the buffer object as it has been closed"
+        msg = "the buffer has been closed"
         with pytest.raises(ValueError, match=msg):
             write_OBvalue(fp, elem)
 
@@ -3291,8 +3291,8 @@ class TestWritingBufferedPixelData:
 
         with TemporaryFile("+wb") as f:
             msg = (
-                r"The buffered value for \(7FE0,0010\) 'Pixel Data' has been closed or "
-                "is invalid"
+                r"Invalid buffer for \(7FE0,0010\) 'Pixel Data': the buffer has been "
+                "closed"
             )
             with pytest.raises(ValueError, match=msg):
                 ds.save_as(f, little_endian=True, implicit_vr=True)

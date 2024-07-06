@@ -2,10 +2,12 @@
 """Unit tests for the pydicom.dataelem module."""
 
 # Many tests of DataElement class are implied in test_dataset also
+import copy
 import datetime
 import math
 import io
 import re
+import tempfile
 
 import pytest
 
@@ -1275,6 +1277,7 @@ class TestBufferedDataElement:
         assert data == value
 
     def test_unsupported_vr_raises(self):
+        """Test using a buffer with an unsupported VR raises"""
         msg = (
             "Elements with a VR of 'PN' cannot be used with buffered values, "
             "supported VRs are: OB, OD, OF, OL, OV, OW"
@@ -1283,14 +1286,23 @@ class TestBufferedDataElement:
             DataElement("PersonName", "PN", io.BytesIO())
 
     def test_invalid_buffer_raises(self):
+        """Test invalid buffer raises on setting the value"""
         b = io.BytesIO()
         b.close()
         msg = (
-            r"The buffered value for \(0040,A123\) 'Person Name' has been closed or "
-            "is invalid"
+            r"Invalid buffer for \(0040,A123\) 'Person Name': the buffer has been "
+            "closed"
         )
         with pytest.raises(ValueError, match=msg):
             DataElement("PersonName", "OB", b)
+
+        msg = (
+            r"Invalid buffer for \(0040,A123\) 'Person Name': the buffer must be "
+            "readable and seekable"
+        )
+        with tempfile.TemporaryFile(mode="wb") as t:
+            with pytest.raises(ValueError, match=msg):
+                DataElement("PersonName", "OB", t)
 
     def test_printing_value(self):
         value = b"\x00\x01\x02\x03"
@@ -1304,8 +1316,103 @@ class TestBufferedDataElement:
         assert repr(elem) == str(elem)
 
     def test_VM(self):
+        """Test buffered element VM"""
         elem = DataElement("PersonName", "OB", io.BytesIO())
-        print(elem.value, type(elem.value))
         assert elem.VM == 0
         elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
         assert elem.VM == 1
+
+    def test_equality(self):
+        """Test element equality"""
+        # First is buffered, second is not
+        elem = DataElement("PersonName", "OB", b"\x00\x01")
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+
+        # Test equality multiple times to ensure buffer can be re-read
+        assert b_elem == elem
+        assert b_elem == elem
+
+        # First and second are both buffered
+        b_elem2 = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+        assert b_elem == b_elem2
+        assert b_elem == b_elem2
+
+        # First is not buffered, second is
+        # Test equality multiple times to ensure buffer can be re-read
+        assert elem == b_elem
+        assert elem == b_elem
+
+    def test_equality_multichunk(self):
+        """Test element equality when the value gets chunked"""
+        # Test multiple of default chunk size
+        value = b"\x00\x01\x02" * 8192
+        elem = DataElement("PersonName", "OB", value)
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(value))
+        assert b_elem == elem
+
+        # Test not a multiple of default chunk size
+        value = b"\x00\x01\x02" * 8418
+        elem = DataElement("PersonName", "OB", value)
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(value))
+        assert b_elem == elem
+
+        # Test empty
+        value = b""
+        elem = DataElement("PersonName", "OB", value)
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(value))
+        assert b_elem == elem
+
+    def test_equality_raises(self):
+        """Test equality raises if buffer invalid."""
+        elem = DataElement("PersonName", "OB", b"\x00\x01")
+        b = io.BytesIO(b"\x00\x01")
+        b_elem = DataElement("PersonName", "OB", b)
+
+        assert b_elem == elem
+
+        # First buffer is invalid
+        b.close()
+        msg = (
+            r"Invalid buffer for \(0040,A123\) 'Person Name': the buffer has been "
+            "closed"
+        )
+        with pytest.raises(ValueError, match=msg):
+            b_elem == elem
+
+        # Second buffer is invalid
+        with pytest.raises(ValueError, match=msg):
+            elem == b_elem
+
+        # Both buffers are invalid
+        c = io.BytesIO(b"\x00\x01")
+        c_elem = DataElement("PersonName", "OB", c)
+        c.close()
+
+        with pytest.raises(ValueError, match=msg):
+            b_elem == c_elem
+
+    def test_deepcopy(self):
+        """Test deepcopy with a buffered value"""
+        b = io.BytesIO(b"\x00\x01")
+        elem = DataElement("PersonName", "OB", b)
+
+        elem2 = copy.deepcopy(elem)
+        assert isinstance(elem.value, io.BytesIO)
+        assert isinstance(elem2.value, io.BytesIO)
+        assert elem.value.getvalue() == b.getvalue()
+        assert elem2.value.getvalue() == b.getvalue()
+        assert elem2.value is not elem.value
+        assert elem2 == elem
+
+    def test_deepcopy_closed(self):
+        """Test deepcopy with a buffered value"""
+        b = io.BytesIO(b"\x00\x01")
+        elem = DataElement("PersonName", "OB", b)
+        b.close()
+
+        msg = (
+            r"Error deepcopying the buffered element \(0040,A123\) 'Person Name': "
+            "I/O operation on closed file"
+        )
+        with pytest.raises(ValueError, match=msg):
+            copy.deepcopy(elem)
