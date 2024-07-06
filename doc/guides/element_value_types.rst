@@ -142,7 +142,7 @@ memory when creating datasets::
     from pydicom import Dataset, FileMetaDataset
     from pydicom.uid import ExplicitVRLittleEndian
 
-    with open("a_large_amount_of_data", "rb") a f:
+    with open("a_large_amount_of_data", "rb") as f:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxIOD = ExplicitVRLittleEndian

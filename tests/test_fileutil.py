@@ -7,6 +7,7 @@ import tempfile
 
 import pytest
 
+from pydicom.config import settings
 from pydicom.fileutil import (
     path_from_pathlike,
     check_buffer,
@@ -46,6 +47,13 @@ class TestPathFromPathLike:
 
     def test_path_like(self):
         assert "test.dcm" == path_from_pathlike(PathLike("test.dcm"))
+
+
+@pytest.fixture
+def reset_buffered_read_size():
+    original = settings.buffered_read_size
+    yield
+    settings.buffered_read_size = original
 
 
 class TestBufferFunctions:
@@ -153,6 +161,22 @@ class TestBufferFunctions:
         msg = "the buffer has been closed"
         with pytest.raises(ValueError, match=msg):
             next(read_buffer(b))
+
+    def test_read_buffer_chunk_size(self):
+        """Test the chunk size for read_buffer()"""
+        b = BytesIO(b"\x01\x02" * 6)
+        settings.buffered_read_size = 2
+
+        for idx, data in enumerate(read_buffer(b)):
+            assert data == b"\x01\x02"
+
+        assert idx == 5
+
+        b.seek(0)
+        for idx, data in enumerate(read_buffer(b, chunk_size=4)):
+            assert data == b"\x01\x02\x01\x02"
+
+        assert idx == 2
 
     def test_buffer_length(self):
         """Test buffer_length()"""

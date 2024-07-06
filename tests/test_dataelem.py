@@ -1289,7 +1289,7 @@ class TestBufferedDataElement:
         with pytest.raises(ValueError, match=msg):
             DataElement("PersonName", "PN", io.BytesIO())
 
-    @pytest.mark.skipif(IS_WINDOWS, reason="Running on Windows")
+    @pytest.mark.skipif(IS_WINDOWS, reason="TemporaryFile on Windows always readable")
     def test_invalid_buffer_raises(self):
         """Test invalid buffer raises on setting the value"""
         b = io.BytesIO()

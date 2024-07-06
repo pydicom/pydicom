@@ -3286,7 +3286,7 @@ class TestWritingBufferedPixelData:
 
         assert fp.getvalue() == data
 
-    @pytest.mark.skipif(IS_WINDOWS, reason="Running on Windows")
+    @pytest.mark.skipif(IS_WINDOWS, reason="TemporaryFile on Windows always readable")
     def test_saving_a_file_with_a_closed_file(self):
         ds = Dataset()
         ds.BitsAllocated = 8

@@ -13,7 +13,7 @@ from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
 from pydicom.datadict import dictionary_description
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 
-from pydicom.config import logger
+from pydicom.config import logger, settings
 
 
 PathType = str | bytes | os.PathLike
@@ -492,7 +492,9 @@ def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
     buffer.seek(initial_offset)
 
 
-def read_buffer(buffer: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[bytes]:
+def read_buffer(
+    buffer: BufferedIOBase, *, chunk_size: int | None = None
+) -> Iterator[bytes]:
     """Read data from `buffer`.
 
     The buffer is NOT returned to its starting position.
@@ -510,6 +512,7 @@ def read_buffer(buffer: BufferedIOBase, *, chunk_size: int = 8192) -> Iterator[b
     bytes
         Data read from the buffer of length up to the specified chunk_size.
     """
+    chunk_size = settings.buffered_read_size if chunk_size is None else chunk_size
     if chunk_size <= 0:
         raise ValueError(
             f"Invalid 'chunk_size' value '{chunk_size}', must be greater than 0"
