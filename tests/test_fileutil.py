@@ -178,6 +178,10 @@ class TestBufferFunctions:
 
         assert idx == 2
 
+        msg = "The read size must be greater than 0"
+        with pytest.raises(ValueError, match=msg):
+            settings.buffered_read_size = -1
+
     def test_buffer_length(self):
         """Test buffer_length()"""
         assert buffer_length(BytesIO()) == 0
