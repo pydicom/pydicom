@@ -582,6 +582,9 @@ def buffer_equality(
 
             return len(other) == start
 
+        if buffer_length(buffer) != buffer_length(other):
+            return False
+
         with reset_buffer_position(other):
             other.seek(0)
             for data_a, data_b in zip(read_buffer(buffer), read_buffer(other)):

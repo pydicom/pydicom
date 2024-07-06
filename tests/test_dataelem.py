@@ -1380,6 +1380,9 @@ class TestBufferedDataElement:
 
         assert b_elem != elem
 
+        c_elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01\x02\x03"))
+        assert b_elem != c_elem
+
     def test_equality_multichunk(self):
         """Test element equality when the value gets chunked"""
         # Test multiple of default chunk size
