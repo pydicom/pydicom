@@ -686,7 +686,7 @@ class DataElement:
 
             # tag and VR match, now check the value
             if config.have_numpy and isinstance(self.value, numpy.ndarray):
-                return len(self.value) == len(other.value) and numpy.array_equal(
+                return len(self.value) == len(other.value) and numpy.allclose(
                     self.value, other.value
                 )
 

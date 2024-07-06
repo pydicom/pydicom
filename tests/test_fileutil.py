@@ -2,6 +2,7 @@
 """Test suite for util functions"""
 from io import BytesIO, RawIOBase
 from pathlib import Path
+import platform
 import tempfile
 
 import pytest
@@ -13,7 +14,11 @@ from pydicom.fileutil import (
     read_buffer,
     buffer_remaining,
     buffer_length,
+    buffer_equality,
 )
+
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 class PathLike:
@@ -46,6 +51,7 @@ class TestPathFromPathLike:
 class TestBufferFunctions:
     """Test for the buffer functions"""
 
+    @pytest.mark.skipif(IS_WINDOWS, reason="Running on Windows")
     def test_check_buffer(self):
         """Test check_buffer()"""
         # Invalid type
@@ -159,3 +165,7 @@ class TestBufferFunctions:
         assert buffer_length(b) == 100
         b.seek(50)
         assert buffer_length(b) == 100
+
+    def test_equality_not_buffer(self):
+        """Test equality if 'other' is not a buffer or bytes"""
+        assert buffer_equality(b"", None) is False

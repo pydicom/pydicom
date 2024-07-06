@@ -8,6 +8,7 @@ import os
 import sys
 from pathlib import Path
 import pickle
+import platform
 
 from struct import unpack
 from tempfile import TemporaryFile
@@ -79,6 +80,9 @@ multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
 deflate_name = get_testdata_file("image_dfl.dcm")
 
 base_version = ".".join(str(i) for i in __version_info__)
+
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 def files_identical(a, b):
@@ -3282,6 +3286,7 @@ class TestWritingBufferedPixelData:
 
         assert fp.getvalue() == data
 
+    @pytest.mark.skipif(IS_WINDOWS, reason="Running on Windows")
     def test_saving_a_file_with_a_closed_file(self):
         ds = Dataset()
         ds.BitsAllocated = 8

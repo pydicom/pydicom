@@ -6,6 +6,7 @@ import copy
 import datetime
 import math
 import io
+import platform
 import re
 import tempfile
 
@@ -29,6 +30,9 @@ from pydicom.tag import Tag, BaseTag
 from .test_util import save_private_dict
 from pydicom.uid import UID
 from pydicom.valuerep import BUFFERABLE_VRS, DSfloat, validate_value
+
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 class TestDataElement:
@@ -1285,6 +1289,7 @@ class TestBufferedDataElement:
         with pytest.raises(ValueError, match=msg):
             DataElement("PersonName", "PN", io.BytesIO())
 
+    @pytest.mark.skipif(IS_WINDOWS, reason="Running on Windows")
     def test_invalid_buffer_raises(self):
         """Test invalid buffer raises on setting the value"""
         b = io.BytesIO()
@@ -1332,10 +1337,18 @@ class TestBufferedDataElement:
         assert b_elem == elem
         assert b_elem == elem
 
+        elem.value = b"\x01\x02"
+        assert b_elem != elem
+        assert b_elem != elem
+
         # First and second are both buffered
         b_elem2 = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
         assert b_elem == b_elem2
         assert b_elem == b_elem2
+
+        b_elem2 = DataElement("PersonName", "OB", io.BytesIO(b"\x01\x02"))
+        assert b_elem != b_elem2
+        assert b_elem != b_elem2
 
         # First is not buffered, second is
         # Test equality multiple times to ensure buffer can be re-read
