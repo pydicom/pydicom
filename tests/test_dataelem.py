@@ -1373,6 +1373,13 @@ class TestBufferedDataElement:
         assert b_elem == c_elem
         assert b_elem == c_elem
 
+    def test_equality_larger(self):
+        """Test equality when bytes is larger than buffer"""
+        elem = DataElement("PersonName", "OB", b"\x00\x01\x02\x03")
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+
+        assert b_elem != elem
+
     def test_equality_multichunk(self):
         """Test element equality when the value gets chunked"""
         # Test multiple of default chunk size

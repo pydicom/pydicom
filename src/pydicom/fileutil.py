@@ -580,7 +580,7 @@ def buffer_equality(
 
                 start += nr_read
 
-            return True
+            return len(other) == start
 
         with reset_buffer_position(other):
             other.seek(0)
