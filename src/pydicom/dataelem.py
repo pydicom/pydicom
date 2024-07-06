@@ -154,6 +154,10 @@ class DataElement:
         (default ``True``).
     tag : pydicom.tag.BaseTag
         The element's tag.
+    validation_mode : int
+        The mode used to validate the element's value. See
+        :attr:`Settings.writing_validation_mode
+        <pydicom.config.Settings.writing_validation_mode>` for more information.
     VR : str
         The element's Value Representation.
     """

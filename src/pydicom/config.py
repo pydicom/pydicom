@@ -197,10 +197,11 @@ class Settings:
         """Defines behavior of validation while reading values, compared with
         the DICOM standard, e.g. that DS strings are not longer than
         16 characters and contain only allowed characters.
-        The default (:attr:`WARN`) is to issue a warning in the case of
-        an invalid value, :attr:`RAISE` will raise an error in this
-        case, and :attr:`IGNORE` will bypass the
-        validation (with the exception of some encoding errors).
+
+        * :attr:`WARN` will emit a warning in the case of an invalid value (default)
+        * :attr:`RAISE` will raise an error instead
+        * :attr:`IGNORE` will bypass the validation (with the exception of some
+          encoding errors).
         """
         # upwards compatibility
         if self._reading_validation_mode is None:
