@@ -2,13 +2,15 @@
 """Functions for working with encapsulated (compressed) pixel data."""
 
 from collections.abc import Iterator
-from io import BytesIO
+from io import BytesIO, BufferedIOBase
+import os
 from struct import pack, unpack
 from typing import Any
 
 from pydicom import config
 from pydicom.misc import warn_and_log
 from pydicom.filebase import DicomBytesIO, DicomIO, ReadableBuffer
+from pydicom.fileutil import buffer_length, reset_buffer_position
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
 
 
@@ -927,6 +929,270 @@ def encapsulate_extended(frames: list[bytes]) -> tuple[bytes, bytes, bytes]:
     lengths = pack(f"<{nr_frames}Q", *frame_lengths)
 
     return encapsulate(frames, has_bot=False), offsets, lengths
+
+
+_ITEM_TAG = b"\xFE\xFF\x00\xE0"
+_SEQ_DELIMITER = b"\xFE\xFF\xDD\xE0"
+
+
+class _BufferedItem:
+    """Convenience class for a buffered encapsulation item.
+
+    Attributes
+    ----------
+    buffer : io.BufferedIOBase
+        The buffer containing data to be encapsulated.
+    length : int
+        The total length of the encapsulated item, including the item tag and
+        value and any trailing padding required to bring the item data up to an
+        even length.
+    """
+
+    def __init__(self, buffer: BufferedIOBase, item_tag: bytes = _ITEM_TAG) -> None:
+        """Create a new ``_BufferedItem`` instance.
+
+        Parameters
+        ----------
+        buffer : io.BufferedIOBase
+            The buffer containing data to be encapsulated.
+        item_tag : bytes, optional
+            The value to use for the item tag, defaults to the sequence item tag.
+        """
+        self.buffer = buffer
+        # The non-padded length of the data in the buffer
+        self._blen = buffer_length(buffer)
+
+        if self._blen > 2**32 - 2:
+            raise ValueError("Buffers greater than 4294967294 bytes are not supported")
+
+        self.length = 8 + self._blen + (self._blen % 2)
+        # Whether or not the buffer needs trailing padding
+        self._padding = bool(self._blen % 2)
+        # The item tag and length
+        self._item = b"".join(
+            (item_tag, (self.length - 8).to_bytes(length=4, byteorder="little")),
+        )
+
+    def read(self, start: int, size: int = 8192) -> bytes:
+        """Return data from the encapsulated frame.
+
+        Parameters
+        ----------
+        start : int
+            The initial position in the buffer where data should be read from, must be
+            greater than or equal to 0.
+        size : int, optional
+            The number of bytes to read from the buffer, default 8192.
+
+        Returns
+        -------
+        bytes
+            The data read from the buffer.
+        """
+        if not 0 <= start < self.length:
+            raise ValueError(
+                f"Invalid 'start' value '{start}', must be in the closed interval "
+                f"[0, {self.length - 1}]"
+            )
+
+        out = bytearray()
+        nr_retries = 0
+        nr_read = 0
+
+        while length := (size - nr_read):
+            offset = start + nr_read
+            if offset < 8:
+                # `offset` in item tag/length
+                _read = self._item[offset : offset + length]
+            elif 0 <= (offset - 8) < self._blen:
+                # `offset` in frame
+                with reset_buffer_position(self.buffer):
+                    self.buffer.seek(offset - 8)
+                    _read = self.buffer.read(length)
+
+            elif self._padding and offset == self.length - 1:
+                # `offset` in end of frame padding
+                _read = b"\x00"
+            else:
+                # `offset` past the end of the frame
+                break
+
+            # Hmm... better to have it and not need it
+            if not _read:
+                break
+
+            nr_read += len(_read)
+            out.extend(_read)
+
+        return bytes(out)
+
+
+class EncapsulatedBuffer(BufferedIOBase):
+    """ """
+
+    def __init__(self, buffers: tuple[BufferedIOBase], has_bot: bool = False) -> None:
+        """Create a new class instance.
+
+        Parameters
+        ----------
+        buffers : tuple[io.BufferedIOBase]
+            The buffered pixel data frames to be encapsulated on writing the dataset.
+        has_bot : bool, optional
+            If ``True`` then the Basic Offset Table will include the offsets for
+            each encapsulated items, otherwise no offsets will be included (default).
+        """
+        # The items to be encapsulated
+        self._items = [_BufferedItem(b) for b in buffers]
+
+        # The current position of the encapsulated buffer
+        self._offset = 0
+
+        # Use a non-empty Basic Offset Table
+        self._use_bot = has_bot
+
+    @property
+    def basic_offset_table(self) -> bytes:
+        """Return an encoded Basic Offset Table."""
+        if not self._use_bot:
+            return b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+
+        # The item tag for the offset table
+        bot = [b"\xFE\xFF\x00\xE0"]
+        # Add the item length
+        bot.append(pack("<I", 4 * len(self.offsets)))
+        # Add the item value
+        bot.append(pack(f"<{len(self.offsets)}I", *self.offsets))
+
+        return b"".join(bot)
+
+    @property
+    def closed(self) -> bool:
+        """Return ``True`` if any of the buffered frames are closed."""
+        return any(bf.buffer.closed for bf in self._items)
+
+    @property
+    def extended_lengths(self) -> bytes:
+        """Return an encoded *Extended Offset Table Lengths* value from `lengths`
+
+        Returns
+        -------
+        bytes
+            Length of each frame.
+        """
+        return pack(f"<{len(self.lengths)}Q", *self.lengths)
+
+    @property
+    def extended_offsets(self) -> bytes:
+        """Return an encoded *Extended Offset Table* value from `offsets`
+
+        The offset to the first byte of the item tag of the first fragment for every
+        frame.
+
+        Measured from the first byte of the first item tag following the empty
+        Basic Offset Table Item (the first item tag of the first fragment of the
+        first frame). The first offset must therefore be 0.
+
+        Parameters
+        ----------
+        offsets : list[int]
+            A list containing the offsets to the start of each encapsulated item,
+            starting at offset 0 for the first item.
+
+        Returns
+        -------
+        bytes
+            Offsets
+        """
+        return pack(f"<{len(self.offsets)}Q", *self.offsets)
+
+    @property
+    def encapsulated_length(self) -> int:
+        """Return the total length of the encapulated *Pixel Data* value."""
+        return len(self.basic_offset_table) + sum(self.lengths) + 8
+
+    @property
+    def lengths(self) -> list[int]:
+        """Return the encapsulated item lengths."""
+        return [item.length for item in self._items]
+
+    @property
+    def offsets(self) -> list[int]:
+        """Return the encapsulated item offsets, starting at 0 for the first item."""
+        return [sum(self.lengths[0:idx]) for idx, _ in enumerate(self.lengths)]
+
+    def read(self, size: int = 8192, /) -> bytes:
+        """Read up to `size` bytes of data from the encapsulated buffers.
+
+        Parameters
+        ----------
+        size : int
+            The amount of data to be read.
+        """
+        bot = self.basic_offset_table
+
+        offsets = [0]  # Basic Offset Table
+        offsets.extend([x + len(bot) for x in self.offsets])
+        offsets.append(self.offsets[-1] + len(bot))  # sequence delimiter
+        offsets.append(self.encapsulated_length)
+        print("offsets", offsets)
+
+        buffers = {idx + 1: item for idx, item in enumerate(self._items)}
+        buffers[0] = _BufferedItem(BytesIO(bot[8:]))
+        buffers[len(buffers)] = _BufferedItem(BytesIO(b""), item_tag=_SEQ_DELIMITER)
+
+        nr_read = 0
+        out = bytearray()
+        while length := (size - nr_read):
+            # print(f"** Offset: {self._offset}, size: {size}, nr_read: {nr_read}, length: {length}, total {self.length}")
+            for idx, (start, end) in enumerate(zip(offsets, offsets[1:])):
+                # is_in = start <= self._offset < end
+                # print(f"  idx: {idx}, start: {start} <= offset {self._offset} < end: {end} = {is_in}")
+                if start <= self._offset < end:
+                    # print(f"  trying to read {length} bytes from item '{idx}'")
+                    _read = buffers[idx].read(self._offset - start, length)
+                    # print(f"  read {len(_read)} bytes")
+
+                    break
+
+            if nr_read >= self.encapsulated_length:
+                break
+
+            self._offset += len(_read)
+            nr_read += len(_read)
+            out.extend(_read)
+
+        return bytes(out)
+
+    def seek(self, offset: int, whence: int = os.SEEK_SET, /) -> int:
+        """Change the encapsulated buffers position to the given byte `offset`,
+        relative to the position indicated by `whence` and return the new absolute
+        position.
+        """
+        if whence == os.SEEK_SET:
+            # relative to beginning of file
+            self._offset = offset
+        elif whence == os.SEEK_CUR:
+            # relative to current file position
+            self._offset = self._offset + offset
+        elif whence == os.SEEK_END:
+            # relative to end of the file
+            self._offset = self.encapsulated_length - offset
+
+        return self._offset
+
+    def tell(self) -> int:
+        """Return the current stream position of the encapsulated buffers"""
+        return self._offset
+
+    # def readable(self) -> bool:
+    #     (b.readable() for b in self._buffers)
+    #
+    #     return True
+    #
+    # def seekable(self) -> bool:
+    #     (b.seekable() for b in self._buffers)
+    #
+    #     return True
 
 
 # Deprecated functions

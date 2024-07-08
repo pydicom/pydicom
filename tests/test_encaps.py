@@ -20,6 +20,8 @@ from pydicom.encaps import (
     generate_fragmented_frames,
     generate_frames,
     get_frame,
+    _BufferedItem,
+    EncapsulatedBuffer,
 )
 from pydicom.filebase import DicomBytesIO
 
@@ -3012,6 +3014,239 @@ class TestGetFrame:
             assert frame == references[1]
             frame = get_frame(mm, 9, number_of_frames=10)
             assert frame == references[2]
+
+
+class TestBufferedFrame:
+    """Tests for _BufferedItem"""
+
+    def test_init(self):
+        """Test creating a new instance"""
+        # Even length frame
+        b = BytesIO(b"\x00\x01" * 10)
+        bf = _BufferedItem(b)
+        assert bf.buffer == b
+        assert bf.length == 28
+        assert bf._item == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert not bf._padding
+
+        # Odd-length frame gets padded
+        b = BytesIO(b"\x00\x01\x02" * 3)
+        bf = _BufferedItem(b)
+        assert bf.buffer == b
+        assert bf.length == 18
+        assert bf._item == b"\xFE\xFF\x00\xE0\x0A\x00\x00\x00"
+        assert bf._padding
+
+    def test_read_even(self):
+        """Test read() using an even length frame buffer"""
+        b = BytesIO(b"\x00\x01" * 10)
+        bf = _BufferedItem(b)
+        out = bf.read(0)
+        assert b.tell() == 0
+        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[8:] == b"\x00\x01" * 10
+
+        out = bf.read(1)
+        assert b.tell() == 0
+        assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[7:] == b"\x00\x01" * 10
+
+        # Offset at end of item value
+        out = bf.read(7)
+        assert b.tell() == 0
+        assert out[:1] == b"\x00"
+        assert out[1:] == b"\x00\x01" * 10
+
+        # Offset at start of frame buffer
+        out = bf.read(8)
+        assert b.tell() == 0
+        assert out == b"\x00\x01" * 10
+
+        out = bf.read(9)
+        assert b.tell() == 0
+        assert out == b"\x01" + b"\x00\x01" * 9
+
+        # Offset at end of frame buffer
+        out = bf.read(27)
+        assert b.tell() == 0
+        assert out == b"\x01"
+
+        # Offset invalid
+        msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
+        with pytest.raises(ValueError, match=msg):
+            bf.read(28)
+
+        msg = r"Invalid 'start' value '-1', must be in the closed interval \[0, 27\]"
+        with pytest.raises(ValueError, match=msg):
+            bf.read(-1)
+
+    def test_read_odd(self):
+        """Test read() using an odd length frame buffer"""
+        b = BytesIO(b"\x01\x02" * 9 + b"\x01")
+        assert len(b.getvalue()) % 2
+        bf = _BufferedItem(b)
+        out = bf.read(0)
+        assert b.tell() == 0
+        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[8:] == b"\x01\x02" * 9 + b"\x01\x00"
+
+        out = bf.read(1)
+        assert b.tell() == 0
+        assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[7:] == b"\x01\x02" * 9 + b"\x01\x00"
+
+        # Offset at end of item value
+        out = bf.read(7)
+        assert b.tell() == 0
+        assert out[:1] == b"\x00"
+        assert out[1:] == b"\x01\x02" * 9 + b"\x01\x00"
+
+        # Offset at start of frame buffer
+        out = bf.read(8)
+        assert b.tell() == 0
+        assert out == b"\x01\x02" * 9 + b"\x01\x00"
+
+        out = bf.read(9)
+        assert b.tell() == 0
+        assert out == b"\x02" + b"\x01\x02" * 8 + b"\x01\x00"
+
+        # Offset at end of frame buffer
+        out = bf.read(26)
+        assert b.tell() == 0
+        assert out == b"\x01\x00"
+
+        # Offset at padding
+        out = bf.read(27)
+        assert b.tell() == 0
+        assert out == b"\x00"
+
+        # Offset invalid
+        msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
+        with pytest.raises(ValueError, match=msg):
+            bf.read(28)
+
+        msg = r"Invalid 'start' value '-1', must be in the closed interval \[0, 27\]"
+        with pytest.raises(ValueError, match=msg):
+            bf.read(-1)
+
+    def test_read_partial_even(self):
+        """Test partial read() using an even length frame buffer"""
+        b = BytesIO(b"\x00\x01" * 10)
+        bf = _BufferedItem(b)
+
+        out = bf.read(0, size=0)
+        assert out == b""
+
+        out = bf.read(0, size=1)
+        assert out == b"\xFE"
+
+        out = bf.read(0, size=5)
+        assert out == b"\xFE\xFF\x00\xE0\x14"
+
+        out = bf.read(0, size=8)
+        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+
+        out = bf.read(0, size=9)
+        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[8:] == b"\x00"
+
+        out = bf.read(1, size=0)
+        assert out[:7] == b""
+
+        # Read to end of item value
+        out = bf.read(1, size=7)
+        assert out == b"\xFF\x00\xE0\x14\x00\x00\x00"
+
+        # Read past end of item value
+        out = bf.read(1, size=8)
+        assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[7:] == b"\x00"
+
+        # Offset at end of item
+        out = bf.read(7, size=0)
+        assert out == b""
+
+        out = bf.read(7, size=4)
+        assert out == b"\x00\x00\x01\x00"
+
+        # Offset at start of frame
+        out = bf.read(8, size=5)
+        assert out == b"\x00\x01\x00\x01\x00"
+
+        # Offset at end of frame
+        out = bf.read(27, size=1)
+        assert out == b"\x01"
+
+        # Offset invalid
+        msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
+        with pytest.raises(ValueError, match=msg):
+            bf.read(28, size=0)
+
+    def test_read_partial_odd(self):
+        """Test partial read() using an odd length frame buffer"""
+        b = BytesIO(b"\x01\x02" * 9 + b"\x01")
+        assert len(b.getvalue()) % 2
+        bf = _BufferedItem(b)
+
+        # Offset at end of frame buffer
+        out = bf.read(26, size=1)
+        assert out == b"\x01"
+
+        out = bf.read(26, size=2)
+        assert out == b"\x01\x00"
+
+        # Offset at padding
+        out = bf.read(27, size=1)
+        assert out == b"\x00"
+
+        # Offset invalid
+        msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
+        with pytest.raises(ValueError, match=msg):
+            bf.read(28)
+
+    def test_empty_buffer(self):
+        """Test using an empty buffer"""
+        msg = "No data found in buffer"
+        with pytest.raises(ValueError, match=msg):
+            bf = _BufferedItem(BytesIO())
+
+
+class TestEncapsulatedBuffer:
+    """Tests for EncapsulatedBuffer"""
+
+    def test_init(self):
+        """Test creating a new instance"""
+        # Even length frame
+        b = BytesIO(b"\x00\x01" * 10)
+        eb = EncapsulatedBuffer([b])
+        assert eb.encapsulated_length == 44
+
+    def test_nobot(self):
+        """Test create_bot() without offsets"""
+        b = BytesIO(b"\x00\x01" * 10)
+        eb = EncapsulatedBuffer([b])
+        bot = eb.basic_offset_table
+        assert bot == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+
+    def test_read(self):
+        """Test read()"""
+        b = BytesIO(b"\x01\x02" * 10)
+        eb = EncapsulatedBuffer([b])
+        assert eb.encapsulated_length == 44
+
+        out = eb.read(8)
+        assert out == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+
+        eb.seek(0)
+        out = eb.read(8192)
+        assert len(out) == 44
+        # Basic Offset Table with no values
+        assert out[:8] == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        # Encapsulated buffer item
+        assert out[8:36] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00" + b"\x01\x02" * 10
+        # Sequence delimiter item
+        assert out[36:] == b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
+        assert eb.tell() == 44
 
 
 @pytest.fixture
