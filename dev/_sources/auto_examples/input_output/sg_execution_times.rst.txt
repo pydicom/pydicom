@@ -45,5 +45,5 @@ Computation times
      - 00:00.004
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``plot_read_rtplan.py``)
-     - 00:00.002
+     - 00:00.003
      - 0.0
