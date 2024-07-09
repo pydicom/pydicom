@@ -61,7 +61,7 @@ class TestMisc:
     def test_warn_and_log(self, caplog):
         """Test warn_and_log"""
 
-        with caplog.at_level(logging.WARN, logger="pydicom"):
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
             with pytest.warns(UserWarning, match="Foo"):
                 warn_and_log("Foo!")
 
