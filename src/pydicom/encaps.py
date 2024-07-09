@@ -642,11 +642,7 @@ def get_frame(
     raise ValueError(f"There is insufficient pixel data to contain {index + 1} frames")
 
 
-# Functions for encapsulating data
-_ITEM_TAG = b"\xFE\xFF\x00\xE0"
-_SEQ_DELIMITER = b"\xFE\xFF\xDD\xE0"
-
-
+# Functions and classes for encapsulating data
 class _BufferedItem:
     """Convenience class for a buffered encapsulation item.
 
@@ -660,15 +656,13 @@ class _BufferedItem:
         even length.
     """
 
-    def __init__(self, buffer: BufferedIOBase, item_tag: bytes = _ITEM_TAG) -> None:
+    def __init__(self, buffer: BufferedIOBase) -> None:
         """Create a new ``_BufferedItem`` instance.
 
         Parameters
         ----------
         buffer : io.BufferedIOBase
             The buffer containing data to be encapsulated, may be empty.
-        item_tag : bytes, optional
-            The value to use for the item tag, defaults to the sequence item tag.
         """
         self.buffer = buffer
         # The non-padded length of the data in the buffer
@@ -684,7 +678,10 @@ class _BufferedItem:
         self._padding = bool(self._blen % 2)
         # The item tag and length
         self._item = b"".join(
-            (item_tag, (self.length - 8).to_bytes(length=4, byteorder="little")),
+            (
+                b"\xFE\xFF\x00\xE0",
+                (self.length - 8).to_bytes(length=4, byteorder="little"),
+            )
         )
 
     def read(self, start: int, size: int) -> bytes:
@@ -777,20 +774,14 @@ class EncapsulatedBuffer(BufferedIOBase):
         self._item_offsets = [0]
         # Start of the item tag for each frame
         self._item_offsets.extend([x + len(bot) for x in self.offsets])
-        # Start of the item tag of the sequence delimiter
-        self._item_offsets.append(sum(self.lengths) + len(bot))
         # End of the encapsulation
         self._item_offsets.append(self.encapsulated_length)
 
         # A dict containing the items to read encoded data from
         #   0: the buffered Basic Offset Table value
         #   1 to len(frames): the buffered frames
-        #   len(frames) + 1: the buffered sequence delimiter item value
         self._buffers = {idx + 1: item for idx, item in enumerate(self._items)}
         self._buffers[0] = _BufferedItem(BytesIO(bot[8:]))
-        # self._buffers[len(self._buffers )] = _BufferedItem(
-        #     BytesIO(b""), item_tag=_SEQ_DELIMITER
-        # )
 
     @property
     def basic_offset_table(self) -> bytes:
@@ -1237,6 +1228,12 @@ def encapsulate_buffer(
     EncapsulatedBuffer
         A :class:`~pydicom.encaps.EncapsulatedBuffer` instance that can be used as
         the value for a *Pixel Data* element.
+
+    See Also
+    --------
+    :func:`~pydicom.encaps.encapsulate`
+    :func:`~pydicom.encaps.encapsulate_extended`
+    :func:`~pydicom.encaps.encapsulate_extended_buffer`
     """
     return EncapsulatedBuffer(buffers, use_bot=has_bot)
 

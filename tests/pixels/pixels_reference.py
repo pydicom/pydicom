@@ -1515,7 +1515,7 @@ def test(ref, arr, **kwargs):
             [27, 128, 128],
             [32, 128, 128],
             [32, 128, 128],
-            [30, 128, 128],
+            [30, 128, 128],  #
             [23, 128, 128],
             [21, 128, 128],
             [24, 128, 128],
@@ -1526,7 +1526,7 @@ def test(ref, arr, **kwargs):
             [55, 128, 128],
             [64, 128, 128],
             [74, 128, 128],
-            [81, 128, 128],
+            [81, 128, 128],  #
             [86, 128, 128],
             [97, 128, 128],
             [104, 128, 128],
@@ -1562,10 +1562,10 @@ JPGB_08_08_3_1F_YBR_FULL = PixelReference("SC_rgb_jpeg_dcmtk.dcm", "u1", test)
 def test(ref, arr, **kwargs):
     if kwargs.get("plugin", None) in ("pillow", "gdcm"):
         assert tuple(arr[5, 50, :]) == (76, 85, 254)
-        assert tuple(arr[15, 50, :]) == (166, 109, 190)
+        assert tuple(arr[15, 50, :]) == (166, 109, 190)  #
         assert tuple(arr[25, 50, :]) == (150, 46, 21)
-        assert tuple(arr[35, 50, :]) == (203, 85, 74)
-        assert tuple(arr[45, 50, :]) == (29, 255, 108)
+        assert tuple(arr[35, 50, :]) == (203, 85, 74)  #
+        assert tuple(arr[45, 50, :]) == (29, 255, 108)  #
         assert tuple(arr[55, 50, :]) == (142, 192, 117)
         assert tuple(arr[65, 50, :]) == (0, 128, 128)
         assert tuple(arr[75, 50, :]) == (64, 128, 128)
@@ -1614,10 +1614,10 @@ JPGB_08_08_3_0_1F_YBR_FULL_422_422 = PixelReference(
 def test(ref, arr, **kwargs):
     if kwargs.get("plugin", None) in ("pillow", "gdcm"):
         assert tuple(arr[5, 50, :]) == (76, 85, 254)
-        assert tuple(arr[15, 50, :]) == (166, 109, 190)
+        assert tuple(arr[15, 50, :]) == (166, 109, 190)  #
         assert tuple(arr[25, 50, :]) == (150, 46, 21)
-        assert tuple(arr[35, 50, :]) == (203, 85, 74)
-        assert tuple(arr[45, 50, :]) == (29, 255, 108)
+        assert tuple(arr[35, 50, :]) == (203, 85, 74)  #
+        assert tuple(arr[45, 50, :]) == (29, 255, 108)  #
         assert tuple(arr[55, 50, :]) == (142, 192, 117)
         assert tuple(arr[65, 50, :]) == (0, 128, 128)
         assert tuple(arr[75, 50, :]) == (64, 128, 128)

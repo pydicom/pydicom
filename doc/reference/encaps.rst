@@ -36,7 +36,10 @@ Creating Encapsulated Data
    :toctree: generated/
 
    encapsulate
+   encapsulate_buffer
    encapsulate_extended
+   encapsulate_extended_buffer
    fragment_frame
    itemize_fragment
    itemize_frame
+   EncapsulatedBuffer
