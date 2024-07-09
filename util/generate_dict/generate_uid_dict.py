@@ -47,8 +47,8 @@ def write_dict(fp, dict_name, attributes):
     )
 
     fp.write(f"\n{dict_name} = {{\n    ")
-    fp.write(",  # noqa\n    ".join(uid_entry.format(**attr) for attr in attributes))
-    fp.write("  # noqa\n}\n")
+    fp.write(",\n    ".join(uid_entry.format(**attr) for attr in attributes))
+    fp.write("\n}\n")
 
 
 def parse_row(column_names, row):

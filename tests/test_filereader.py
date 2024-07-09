@@ -49,7 +49,7 @@ have_gdcm_handler = gdcm_handler.is_available()
 
 have_numpy = pydicom.config.have_numpy
 if have_numpy:
-    import numpy  # NOQA
+    import numpy
 
 try:
     import jpeg_ls

@@ -87,7 +87,7 @@ def write_dict(fp, dict_name, dict_entries):
             vr, vm, name = dict_entries[owner][tag]
             quote = '"' if "'" in name else "'"
             fp.write(
-                f"""        '{tag}': ('{vr}', '{vm}', {quote}{name}{quote}, ''),  # noqa\n"""
+                f"""        '{tag}': ('{vr}', '{vm}', {quote}{name}{quote}, ''),\n"""
             )
         fp.write("    },\n")
     fp.write("}\n")
