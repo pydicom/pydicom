@@ -2441,7 +2441,7 @@ class Dataset:
             with tag_in_exception(elem.tag):
                 if elem.VR == VR_.SQ:  # a sequence
                     strings.append(
-                        f"{indent_str}{str(elem.tag)}  {elem.name}  "
+                        f"{indent_str}{elem.tag}  {elem.name}  "
                         f"{len(elem.value)} item(s) ---- "
                     )
                     if not top_level_only:

@@ -52,7 +52,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
             f"Data element '{element}' is not in the dataset"
         )
     except IndexError as e:
-        raise argparse.ArgumentTypeError(f"'{element}' has an index error: {str(e)}")
+        raise argparse.ArgumentTypeError(f"'{element}' has an index error: {e}")
 
 
 def filespec_parts(filespec: str) -> tuple[str, str, str]:
@@ -160,7 +160,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         )
         raise argparse.ArgumentTypeError(f"File '{filename}' not found{extra}")
     except Exception as e:
-        raise argparse.ArgumentTypeError(f"Error reading '{filename}': {str(e)}")
+        raise argparse.ArgumentTypeError(f"Error reading '{filename}': {e}")
 
     if not element:
         return [(ds, None)]

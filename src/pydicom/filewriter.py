@@ -270,7 +270,7 @@ def correct_ambiguous_vr_element(
             _correct_ambiguous_vr_element(elem, ancestors, is_little_endian)
         except AttributeError as e:
             raise AttributeError(
-                f"Failed to resolve ambiguous VR for tag {elem.tag}: {str(e)}"
+                f"Failed to resolve ambiguous VR for tag {elem.tag}: {e}"
             )
 
     return elem
@@ -614,7 +614,7 @@ def write_data_element(
     if not fp.is_implicit_VR and vr and len(vr) != 2:
         msg = (
             f"Cannot write ambiguous VR of '{vr}' for data element with "
-            f"tag {repr(elem.tag)}.\nSet the correct VR before "
+            f"tag {elem.tag!r}.\nSet the correct VR before "
             f"writing, or use an implicit VR transfer syntax"
         )
         raise ValueError(msg)
