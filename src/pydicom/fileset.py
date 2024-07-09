@@ -1470,10 +1470,7 @@ class FileSet:
 
             return True
 
-        matches = []
-        for instance in self:
-            if match(instance, **kwargs):
-                matches.append(instance)
+        matches = [instance for instance in self if match(instance, **kwargs)]
 
         if not load and not has_elements:
             warn_and_log(
