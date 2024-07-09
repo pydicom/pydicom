@@ -4,6 +4,7 @@
 from io import BytesIO
 import mmap
 from struct import unpack
+import tempfile
 
 import pytest
 
@@ -22,8 +23,11 @@ from pydicom.encaps import (
     get_frame,
     _BufferedItem,
     EncapsulatedBuffer,
+    encapsulate_buffer,
+    encapsulate_extended_buffer,
 )
 from pydicom.filebase import DicomBytesIO
+from pydicom.fileutil import read_buffer
 
 
 JP2K_10FRAME_NOBOT = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
@@ -3041,93 +3045,93 @@ class TestBufferedFrame:
         """Test read() using an even length frame buffer"""
         b = BytesIO(b"\x00\x01" * 10)
         bf = _BufferedItem(b)
-        out = bf.read(0)
+        out = bf.read(0, 8192)
         assert b.tell() == 0
         assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
         assert out[8:] == b"\x00\x01" * 10
 
-        out = bf.read(1)
+        out = bf.read(1, 8192)
         assert b.tell() == 0
         assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
         assert out[7:] == b"\x00\x01" * 10
 
         # Offset at end of item value
-        out = bf.read(7)
+        out = bf.read(7, 8192)
         assert b.tell() == 0
         assert out[:1] == b"\x00"
         assert out[1:] == b"\x00\x01" * 10
 
         # Offset at start of frame buffer
-        out = bf.read(8)
+        out = bf.read(8, 8192)
         assert b.tell() == 0
         assert out == b"\x00\x01" * 10
 
-        out = bf.read(9)
+        out = bf.read(9, 8192)
         assert b.tell() == 0
         assert out == b"\x01" + b"\x00\x01" * 9
 
         # Offset at end of frame buffer
-        out = bf.read(27)
+        out = bf.read(27, 8192)
         assert b.tell() == 0
         assert out == b"\x01"
 
         # Offset invalid
         msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
         with pytest.raises(ValueError, match=msg):
-            bf.read(28)
+            bf.read(28, 8192)
 
         msg = r"Invalid 'start' value '-1', must be in the closed interval \[0, 27\]"
         with pytest.raises(ValueError, match=msg):
-            bf.read(-1)
+            bf.read(-1, 8192)
 
     def test_read_odd(self):
         """Test read() using an odd length frame buffer"""
         b = BytesIO(b"\x01\x02" * 9 + b"\x01")
         assert len(b.getvalue()) % 2
         bf = _BufferedItem(b)
-        out = bf.read(0)
+        out = bf.read(0, 8192)
         assert b.tell() == 0
         assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
         assert out[8:] == b"\x01\x02" * 9 + b"\x01\x00"
 
-        out = bf.read(1)
+        out = bf.read(1, 8192)
         assert b.tell() == 0
         assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
         assert out[7:] == b"\x01\x02" * 9 + b"\x01\x00"
 
         # Offset at end of item value
-        out = bf.read(7)
+        out = bf.read(7, 8192)
         assert b.tell() == 0
         assert out[:1] == b"\x00"
         assert out[1:] == b"\x01\x02" * 9 + b"\x01\x00"
 
         # Offset at start of frame buffer
-        out = bf.read(8)
+        out = bf.read(8, 8192)
         assert b.tell() == 0
         assert out == b"\x01\x02" * 9 + b"\x01\x00"
 
-        out = bf.read(9)
+        out = bf.read(9, 8192)
         assert b.tell() == 0
         assert out == b"\x02" + b"\x01\x02" * 8 + b"\x01\x00"
 
         # Offset at end of frame buffer
-        out = bf.read(26)
+        out = bf.read(26, 8192)
         assert b.tell() == 0
         assert out == b"\x01\x00"
 
         # Offset at padding
-        out = bf.read(27)
+        out = bf.read(27, 8192)
         assert b.tell() == 0
         assert out == b"\x00"
 
         # Offset invalid
         msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
         with pytest.raises(ValueError, match=msg):
-            bf.read(28)
+            bf.read(28, 8192)
 
         msg = r"Invalid 'start' value '-1', must be in the closed interval \[0, 27\]"
         with pytest.raises(ValueError, match=msg):
-            bf.read(-1)
+            bf.read(-1, 8192)
 
     def test_read_partial_even(self):
         """Test partial read() using an even length frame buffer"""
@@ -3202,13 +3206,23 @@ class TestBufferedFrame:
         # Offset invalid
         msg = r"Invalid 'start' value '28', must be in the closed interval \[0, 27\]"
         with pytest.raises(ValueError, match=msg):
-            bf.read(28)
+            bf.read(28, 2)
 
     def test_empty_buffer(self):
         """Test using an empty buffer"""
-        msg = "No data found in buffer"
-        with pytest.raises(ValueError, match=msg):
-            bf = _BufferedItem(BytesIO())
+        bf = _BufferedItem(BytesIO())
+        assert bf.length == 8
+
+
+class FooBuffer(BytesIO):
+    _readable = True
+    _seekable = True
+
+    def readable(self):
+        return self._readable
+
+    def seekable(self):
+        return self._seekable
 
 
 class TestEncapsulatedBuffer:
@@ -3219,34 +3233,519 @@ class TestEncapsulatedBuffer:
         # Even length frame
         b = BytesIO(b"\x00\x01" * 10)
         eb = EncapsulatedBuffer([b])
-        assert eb.encapsulated_length == 44
+        assert eb.encapsulated_length == 36
 
-    def test_nobot(self):
-        """Test create_bot() without offsets"""
+    def test_bot_empty(self):
+        """Test an empty Basic Offset Table"""
         b = BytesIO(b"\x00\x01" * 10)
         eb = EncapsulatedBuffer([b])
         bot = eb.basic_offset_table
         assert bot == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
 
+    def test_bot(self):
+        """Test a non-empty Basic Offset Table"""
+        eb = EncapsulatedBuffer([BytesIO(b"\xFF")], use_bot=True)
+        bot = eb.basic_offset_table
+        assert bot == b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00"
+
+        eb = EncapsulatedBuffer([BytesIO(b"\xFF"), BytesIO(b"\xFE" * 99)], use_bot=True)
+        bot = eb.basic_offset_table
+        assert bot[:8] == b"\xFE\xFF\x00\xE0\x08\x00\x00\x00"
+        assert bot[8:] == b"\x00\x00\x00\x00\x0A\x00\x00\x00"
+
+        eb = EncapsulatedBuffer(
+            [BytesIO(b"\xFF"), BytesIO(b"\xFE" * 99), BytesIO(b"\xFD" * 1024)],
+            use_bot=True,
+        )
+        bot = eb.basic_offset_table
+        assert bot[:8] == b"\xFE\xFF\x00\xE0\x0C\x00\x00\x00"
+        assert bot[8:] == b"\x00\x00\x00\x00\x0A\x00\x00\x00\x76\x00\x00\x00"
+
+        eb = EncapsulatedBuffer(
+            [
+                BytesIO(b"\xFF"),
+                BytesIO(b"\xFE" * 99),
+                BytesIO(b"\xFD" * 1024),
+                BytesIO(b"\xFC" * 18),
+            ],
+            use_bot=True,
+        )
+        bot = eb.basic_offset_table
+        assert bot[:8] == b"\xFE\xFF\x00\xE0\x10\x00\x00\x00"
+        assert bot[8:] == (
+            b"\x00\x00\x00\x00\x0A\x00\x00\x00\x76\x00\x00\x00\x7E\x04\x00\x00"
+        )
+
+    def test_closed(self):
+        """Test the closed property"""
+        b = BytesIO(b"\xFF")
+        eb = EncapsulatedBuffer([b])
+        assert not eb.closed
+
+        b.close()
+        assert eb.closed
+
+        b = BytesIO(b"\xFF")
+        c = BytesIO(b"\xFF")
+        d = BytesIO(b"\xFF")
+        e = BytesIO(b"\xFF")
+        eb = EncapsulatedBuffer([b, c, d, e])
+        assert not eb.closed
+
+        e.close()
+        assert eb.closed
+
+    def test_seek_tell(self):
+        """Test the seek() and tell() methods."""
+        eb = EncapsulatedBuffer([BytesIO()])
+        # os.SEEK_SET -> offset relative to start
+        assert eb.tell() == 0
+        assert eb.seek(0, 0) == 0
+        assert eb.tell() == 0
+        assert eb.seek(8, 0) == 8
+        assert eb.tell() == 8
+        assert eb.seek(23, 0) == 23
+        assert eb.tell() == 23
+        assert eb.seek(30, 0) == 30
+        assert eb.tell() == 30
+
+        msg = "Negative seek 'offset' value -1"
+        with pytest.raises(ValueError, match=msg):
+            eb.seek(-1, 0)
+
+        # os.SEEK_CUR -> offset relative to current position
+        eb.seek(0, 0)
+        assert eb.seek(-1, 1) == 0
+        assert eb.tell() == 0
+        assert eb.seek(1, 1) == 1
+        assert eb.tell() == 1
+        eb.seek(0, 0)
+        assert eb.seek(30, 1) == 30
+        assert eb.tell() == 30
+
+        assert eb.seek(0, 2) == 16
+        assert eb.seek(0, 1) == 16
+        assert eb.seek(-1, 1) == 15
+        assert eb.seek(-15, 1) == 0
+        assert eb.seek(-1, 1) == 0
+
+        # os.SEEK_END -> offset relative to end
+        assert eb.seek(0, 2) == 16
+        assert eb.tell() == 16
+        assert eb.seek(-7, 2) == 9
+        assert eb.tell() == 9
+        assert eb.seek(-15, 2) == 1
+        assert eb.seek(-16, 2) == 0
+        assert eb.seek(-17, 2) == 0
+
+        msg = "Invalid 'whence' value, should be 0, 1 or 2"
+        with pytest.raises(ValueError, match=msg):
+            eb.seek(0, 3)
+
+        with pytest.raises(ValueError, match=msg):
+            eb.seek(0, -1)
+
+    def test_lengths(self):
+        """Test the lengths property"""
+        assert EncapsulatedBuffer([BytesIO()]).lengths == [8]
+        assert EncapsulatedBuffer([BytesIO(), BytesIO()]).lengths == [8, 8]
+
+        assert EncapsulatedBuffer([BytesIO(b"\x00")]).lengths == [10]
+        assert EncapsulatedBuffer([BytesIO(b"\x00\x01")]).lengths == [10]
+
+        assert EncapsulatedBuffer([BytesIO(b"\x00"), BytesIO(b"\x00\x01")]).lengths == [
+            10,
+            10,
+        ]
+
+        assert EncapsulatedBuffer(
+            [BytesIO(b"\x00\x01" * 150), BytesIO(b"\x02\x03\x04\x05")]
+        ).lengths == [308, 12]
+        assert EncapsulatedBuffer(
+            [
+                BytesIO(b"\x00\x01" * 150),
+                BytesIO(b"\x02\x03\x04\x05"),
+                BytesIO(b"\x00\x01\x02" * 111),
+            ]
+        ).lengths == [308, 12, 342]
+
+    def test_offsets(self):
+        """Test the offsets property"""
+        assert EncapsulatedBuffer([BytesIO()]).offsets == [0]
+        assert EncapsulatedBuffer([BytesIO(), BytesIO()]).offsets == [0, 8]
+
+        assert EncapsulatedBuffer([BytesIO(b"\x00")]).offsets == [0]
+        assert EncapsulatedBuffer([BytesIO(b"\x00\x01")]).offsets == [0]
+
+        assert EncapsulatedBuffer([BytesIO(b"\x00"), BytesIO(b"\x00\x01")]).offsets == [
+            0,
+            10,
+        ]
+
+        assert EncapsulatedBuffer(
+            [BytesIO(b"\x00\x01" * 150), BytesIO(b"\x02\x03\x04\x05")]
+        ).offsets == [0, 308]
+        assert EncapsulatedBuffer(
+            [
+                BytesIO(b"\x00\x01" * 150),
+                BytesIO(b"\x02\x03\x04\x05"),
+                BytesIO(b"\x00\x01\x02" * 111),
+            ]
+        ).offsets == [0, 308, 320]
+
+    def test_encapsulated_length_empty_bot(self):
+        """Test the encapsulated_length property with an empty BOT"""
+        assert EncapsulatedBuffer([BytesIO()]).encapsulated_length == 16
+        assert EncapsulatedBuffer([BytesIO(), BytesIO()]).encapsulated_length == 24
+
+        assert EncapsulatedBuffer([BytesIO(b"\x00")]).encapsulated_length == 18
+        assert EncapsulatedBuffer([BytesIO(b"\x00\x01")]).encapsulated_length == 18
+
+        assert (
+            EncapsulatedBuffer(
+                [BytesIO(b"\x00"), BytesIO(b"\x00\x01")]
+            ).encapsulated_length
+            == 28
+        )
+
+        assert (
+            EncapsulatedBuffer(
+                [BytesIO(b"\x00\x01" * 150), BytesIO(b"\x02\x03\x04\x05")]
+            ).encapsulated_length
+            == 328
+        )
+        assert (
+            EncapsulatedBuffer(
+                [
+                    BytesIO(b"\x00\x01" * 150),
+                    BytesIO(b"\x02\x03\x04\x05"),
+                    BytesIO(b"\x00\x01\x02" * 111),
+                ]
+            ).encapsulated_length
+            == 670
+        )
+
+    def test_encapsulated_length_bot(self):
+        """Test the encapsulated_length property with an empty BOT"""
+        # BOT adds 4 bytes per item
+        assert EncapsulatedBuffer([BytesIO()], True).encapsulated_length == 16 + 4
+        assert (
+            EncapsulatedBuffer([BytesIO(), BytesIO()], True).encapsulated_length
+            == 24 + 8
+        )
+
+        assert (
+            EncapsulatedBuffer([BytesIO(b"\x00")], True).encapsulated_length == 18 + 4
+        )
+        assert (
+            EncapsulatedBuffer([BytesIO(b"\x00\x01")], True).encapsulated_length
+            == 18 + 4
+        )
+
+        assert (
+            EncapsulatedBuffer(
+                [BytesIO(b"\x00"), BytesIO(b"\x00\x01")], True
+            ).encapsulated_length
+            == 28 + 8
+        )
+
+        assert (
+            EncapsulatedBuffer(
+                [BytesIO(b"\x00\x01" * 150), BytesIO(b"\x02\x03\x04\x05")], True
+            ).encapsulated_length
+            == 328 + 8
+        )
+        assert (
+            EncapsulatedBuffer(
+                [
+                    BytesIO(b"\x00\x01" * 150),
+                    BytesIO(b"\x02\x03\x04\x05"),
+                    BytesIO(b"\x00\x01\x02" * 111),
+                ],
+                True,
+            ).encapsulated_length
+            == 670 + 12
+        )
+
     def test_read(self):
         """Test read()"""
         b = BytesIO(b"\x01\x02" * 10)
         eb = EncapsulatedBuffer([b])
-        assert eb.encapsulated_length == 44
+        assert eb.encapsulated_length == 36
 
         out = eb.read(8)
         assert out == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
 
         eb.seek(0)
         out = eb.read(8192)
-        assert len(out) == 44
+        assert len(out) == 36
         # Basic Offset Table with no values
         assert out[:8] == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
         # Encapsulated buffer item
-        assert out[8:36] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00" + b"\x01\x02" * 10
-        # Sequence delimiter item
-        assert out[36:] == b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
-        assert eb.tell() == 44
+        assert out[8:] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00" + b"\x01\x02" * 10
+        assert eb.tell() == 36
+
+        eb = EncapsulatedBuffer(
+            [
+                BytesIO(b"\x00\x01" * 150),
+                BytesIO(b"\x02\x03\x04\x05"),
+                BytesIO(b"\x06\x07\x08" * 111),
+            ],
+        )
+        assert eb.encapsulated_length == 670
+        assert eb.read(6) == b"\xFE\xFF\x00\xE0\x00\x00"
+        assert eb.tell() == 6
+        # End of first item tag, first item tag, start of first item value
+        assert eb.read(13) == (
+            b"\x00\x00" + b"\xFE\xFF\x00\xE0\x2C\x01\x00\x00" + b"\x00\x01\x00"
+        )
+        assert eb.tell() == 19
+        eb.read(294)
+        assert eb.tell() == 313
+        # End of first item value, second item tag, start of second item value
+        assert eb.read(12) == (
+            b"\x01\x00\x01" + b"\xFE\xFF\x00\xE0\x04\x00\x00\x00" + b"\x02"
+        )
+        assert eb.tell() == 325
+        # End of second item value, third item tag, start of third item value
+        assert eb.read(12) == (
+            b"\x03\x04\x05" + b"\xFE\xFF\x00\xE0\x4E\x01\x00\x00" + b"\x06"
+        )
+        assert eb.tell() == 337
+        eb.read(108)
+        assert eb.tell() == 445
+        # End of third item value, sequence delimiter item
+        out = eb.read()
+        assert out[222:] == b"\x07\x08\x00"
+        assert eb.tell() == 670
+
+        assert eb.read() == b""
+        assert eb.tell() == 670
+
+        eb.seek(445, 0)
+        out = eb.read()
+        assert out[222:] == b"\x07\x08\x00"
+        assert eb.tell() == 670
+
+    def test_readable(self):
+        """Test readable()"""
+        assert EncapsulatedBuffer([BytesIO(b"\x01\x02" * 10)]).readable()
+
+        b = FooBuffer()
+        c = FooBuffer()
+        d = FooBuffer()
+        eb = EncapsulatedBuffer([b, c, d])
+        assert eb.readable()
+        c._readable = False
+        assert not eb.readable()
+
+    def test_seekable(self):
+        """Test seekable()"""
+        assert EncapsulatedBuffer([BytesIO(b"\x01\x02" * 10)]).seekable()
+
+        b = FooBuffer()
+        c = FooBuffer()
+        d = FooBuffer()
+        eb = EncapsulatedBuffer([b, c, d])
+        assert eb.seekable()
+        c._seekable = False
+        assert not eb.seekable()
+
+    def test_extended_lengths(self):
+        """Test the extended_lengths property"""
+        eb = EncapsulatedBuffer([BytesIO()])
+        assert eb.extended_lengths == b"\x00" * 8
+        eb = EncapsulatedBuffer([BytesIO(), BytesIO()])
+        assert eb.extended_lengths == b"\x00" * 16
+        eb = EncapsulatedBuffer([BytesIO(b"\x00"), BytesIO()])
+        assert eb.extended_lengths == b"\x02" + b"\x00" * 15
+        eb = EncapsulatedBuffer(
+            [
+                BytesIO(b"\x00\x01" * 150),
+                BytesIO(b"\x02\x03\x04\x05"),
+                BytesIO(b"\x00\x01\x02" * 111),
+            ],
+        )
+        out = eb.extended_lengths
+        assert out[:8] == b"\x2C\x01" + b"\x00" * 6
+        assert out[8:16] == b"\x04" + b"\x00" * 7
+        assert out[16:] == b"\x4E\x01" + b"\x00" * 6
+
+    def test_extended_offsets(self):
+        """Test the extended_offsets property"""
+        eb = EncapsulatedBuffer([BytesIO()])
+        assert eb.extended_offsets == b"\x00" * 8
+        eb = EncapsulatedBuffer([BytesIO(), BytesIO()])
+        assert eb.extended_offsets == b"\x00" * 8 + b"\x08" + b"\x00" * 7
+        eb = EncapsulatedBuffer([BytesIO(b"\x00"), BytesIO()])
+        assert eb.extended_offsets == b"\x00" * 8 + b"\x0A" + b"\x00" * 7
+        eb = EncapsulatedBuffer(
+            [
+                BytesIO(b"\x00\x01" * 150),
+                BytesIO(b"\x02\x03\x04\x05"),
+                BytesIO(b"\x00\x01\x02" * 111),
+                BytesIO(b"\x00\x01\x02" * 5),
+            ],
+        )
+        out = eb.extended_offsets
+        assert out[:8] == b"\x00" * 8
+        assert out[8:16] == b"\x34\x01" + b"\x00" * 6
+        assert out[16:24] == b"\x40\x01" + b"\x00" * 6
+        assert out[24:] == b"\x96\x02" + b"\x00" * 6
+
+
+class TestEncapsulateBufferFunc:
+    """Test encaps.encapsulate_buffer."""
+
+    def test_encapsulate_single_fragment_per_frame_no_bot(self):
+        """Test encapsulating single fragment per frame with no BOT values."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = [
+            BytesIO(f)
+            for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
+        assert len(frames) == 10
+
+        data = encapsulate_buffer(frames, has_bot=False)
+        assert isinstance(data, EncapsulatedBuffer)
+        test_frames = generate_frames(data, number_of_frames=ds.NumberOfFrames)
+        for a, b in zip(test_frames, frames):
+            assert a == b.getvalue()
+
+        # Original data has no BOT values
+        data.seek(0)
+        assert b"".join(read_buffer(data)) == ds.PixelData
+
+    def test_encapsulate_single_fragment_per_frame_bot(self):
+        """Test encapsulating single fragment per frame with BOT values."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = [
+            BytesIO(f)
+            for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
+        assert len(frames) == 10
+
+        data = encapsulate_buffer(frames, has_bot=True)
+        test_frames = generate_frames(data, number_of_frames=ds.NumberOfFrames)
+        for a, b in zip(test_frames, frames):
+            assert a == b.getvalue()
+
+        data.seek(0)
+        fp = DicomBytesIO(b"".join(read_buffer(data)))
+        fp.is_little_endian = True
+        offsets = parse_basic_offsets(fp)
+        assert offsets == [
+            0x0000,  # 0
+            0x0EEE,  # 3822
+            0x1DF6,  # 7670
+            0x2CF8,  # 11512
+            0x3BFC,  # 15356
+            0x4ADE,  # 19166
+            0x59A2,  # 22946
+            0x6834,  # 26676
+            0x76E2,  # 30434
+            0x8594,  # 34196
+        ]
+
+    def test_encapsulate_bot(self):
+        """Test the Basic Offset Table is correct."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = [
+            BytesIO(f)
+            for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
+        assert len(frames) == 10
+
+        data = encapsulate_buffer(frames, has_bot=True)
+        assert data.read(56) == (
+            b"\xfe\xff\x00\xe0"  # Basic offset table item tag
+            b"\x28\x00\x00\x00"  # Basic offset table length
+            b"\x00\x00\x00\x00"  # First offset
+            b"\xee\x0e\x00\x00"
+            b"\xf6\x1d\x00\x00"
+            b"\xf8\x2c\x00\x00"
+            b"\xfc\x3b\x00\x00"
+            b"\xde\x4a\x00\x00"
+            b"\xa2\x59\x00\x00"
+            b"\x34\x68\x00\x00"
+            b"\xe2\x76\x00\x00"
+            b"\x94\x85\x00\x00"  # Last offset
+            b"\xfe\xff\x00\xe0"  # Next item tag
+            b"\xe6\x0e\x00\x00"  # Next item length
+        )
+
+    def test_encapsulate_bot_large_raises(self):
+        """Test exception raised if too much pixel data for BOT."""
+
+        class FakeBytes(bytes):
+            length = -1
+
+            def __len__(self):
+                return self.length
+
+            def __getitem__(self, s):
+                return b"\x00" * 5
+
+        frame_a = FakeBytes()
+        frame_a.length = 2**32 - 1 - 8  # 8 for first BOT item tag/length
+        frame_b = FakeBytes()
+        frame_b.length = 10
+        encapsulate([frame_a, frame_b], has_bot=True)
+
+        frame_a.length = 2**32 - 1 - 7
+        msg = (
+            r"The total length of the encapsulated frame data \(4294967296 "
+            r"bytes\) will be greater than the maximum allowed by the Basic "
+        )
+        with pytest.raises(ValueError, match=msg):
+            encapsulate([frame_a, frame_b], has_bot=True)
+
+
+class TestEncapsulateExtendedBuffer:
+    """Tests for encaps.encapsulate_extended_buffer."""
+
+    def test_encapsulate(self):
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = [
+            BytesIO(f)
+            for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
+        ]
+        assert len(frames) == 10
+
+        out = encapsulate_extended_buffer(frames)
+        # Pixel Data encapsulated OK
+        assert isinstance(out[0], EncapsulatedBuffer)
+        test_frames = [
+            f for f in generate_frames(out[0], number_of_frames=ds.NumberOfFrames)
+        ]
+        for a, b in zip(test_frames, frames):
+            assert a == b.getvalue()
+
+        # Extended Offset Table is OK
+        assert isinstance(out[1], bytes)
+        assert [
+            0x0000,  # 0
+            0x0EEE,  # 3822
+            0x1DF6,  # 7670
+            0x2CF8,  # 11512
+            0x3BFC,  # 15356
+            0x4ADE,  # 19166
+            0x59A2,  # 22946
+            0x6834,  # 26676
+            0x76E2,  # 30434
+            0x8594,  # 34196
+        ] == list(unpack("<10Q", out[1]))
+
+        # Extended Offset Table Lengths are OK
+        assert isinstance(out[2], bytes)
+        assert [len(f.getvalue()) for f in frames] == list(unpack("<10Q", out[2]))
+
+    def test_encapsulate_odd_length(self):
+        """Test encapsulating odd-length frames"""
+        frames = [b"\x00", b"\x01", b"\x02"]
+        eot_encapsulated, eot, eot_lengths = encapsulate_extended(frames)
+        assert unpack(f"<{len(frames)}Q", eot) == (0, 10, 20)
+        assert unpack(f"<{len(frames)}Q", eot_lengths) == (2, 2, 2)
 
 
 @pytest.fixture

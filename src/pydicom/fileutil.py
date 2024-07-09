@@ -13,7 +13,7 @@ from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
 from pydicom.datadict import dictionary_description
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 
-from pydicom.config import logger
+from pydicom.config import logger, settings
 
 
 PathType = str | bytes | os.PathLike
