@@ -673,7 +673,8 @@ class _BufferedItem:
                 "Buffers containing more than 4294967294 bytes are not supported"
             )
 
-        self.length = 8 + self._blen + (self._blen % 2)
+        # 8 bytes for the item tag and length
+        self.length = 8 + self._blen + self._blen % 2
         # Whether or not the buffer needs trailing padding
         self._padding = bool(self._blen % 2)
         # The item tag and length
@@ -690,8 +691,9 @@ class _BufferedItem:
         Parameters
         ----------
         start : int
-            The initial position in the buffer where data should be read from, must be
-            greater than or equal to 0.
+            The initial position in the encapsulated item where data should be read
+            from, must be greater than or equal to 0, where ``0`` is the first byte
+            of the item tag.
         size : int, optional
             The number of bytes to read from the buffer.
 
@@ -720,7 +722,7 @@ class _BufferedItem:
                     _read = self.buffer.read(length)
 
             elif self._padding and offset == self.length - 1:
-                # `offset` in end of item value padding
+                # `offset` in the item value padding
                 _read = b"\x00"
             else:
                 # `offset` past the end of the item value
@@ -747,15 +749,19 @@ class EncapsulatedBuffer(BufferedIOBase):
 
         Parameters
         ----------
-        buffers : tuple[io.BufferedIOBase]
+        buffers : list[io.BufferedIOBase]
             The buffered pixel data frames to be encapsulated on writing the dataset.
-            Only a single frame of pixel data can be in each buffer.
+            Only a single frame of pixel data can be in each buffer and the buffers
+            must inherit from :class:`io.BufferedIODBase` and be readable and seekable.
         use_bot : bool, optional
             If ``True`` then the Basic Offset Table will include the offsets for
             each encapsulated items, otherwise no offsets will be included (default).
         """
         if not isinstance(buffers, list):
-            raise TypeError("'buffers' must be a list of io.BufferedIOBase")
+            raise TypeError(
+                "'buffers' must be a list of objects that inherit from "
+                "'io.BufferedIOBase'"
+            )
 
         # The items to be encapsulated
         self._items = [_BufferedItem(b) for b in buffers]
@@ -769,17 +775,17 @@ class EncapsulatedBuffer(BufferedIOBase):
         # The basic offset table
         bot = self.basic_offset_table
 
-        # Offset for the buffered items
+        # Offsets for the buffered items
         # Start of the item tag for the Basic Offset Table
         self._item_offsets = [0]
         # Start of the item tag for each frame
-        self._item_offsets.extend([x + len(bot) for x in self.offsets])
+        self._item_offsets.extend([offset + len(bot) for offset in self.offsets])
         # End of the encapsulation
         self._item_offsets.append(self.encapsulated_length)
 
         # A dict containing the items to read encoded data from
         #   0: the buffered Basic Offset Table value
-        #   1 to len(frames): the buffered frames
+        #   1 to len(buffers): the buffered frames
         self._buffers = {idx + 1: item for idx, item in enumerate(self._items)}
         self._buffers[0] = _BufferedItem(BytesIO(bot[8:]))
 
@@ -813,7 +819,7 @@ class EncapsulatedBuffer(BufferedIOBase):
             The encoded lengths of the frame.
         """
         # Exclude the item tag and item length
-        return pack(f"<{len(self.lengths)}Q", *(x - 8 for x in self.lengths))
+        return pack(f"<{len(self.lengths)}Q", *(length - 8 for length in self.lengths))
 
     @property
     def extended_offsets(self) -> bytes:
@@ -831,7 +837,7 @@ class EncapsulatedBuffer(BufferedIOBase):
     @property
     def encapsulated_length(self) -> int:
         """Return the total length of the encapulated *Pixel Data* value."""
-        return len(self.basic_offset_table) + sum(self.lengths)  # + 8
+        return len(self.basic_offset_table) + sum(self.lengths)
 
     @property
     def lengths(self) -> list[int]:
@@ -907,34 +913,19 @@ class EncapsulatedBuffer(BufferedIOBase):
         if whence not in (0, 1, 2):
             raise ValueError("Invalid 'whence' value, should be 0, 1 or 2")
 
-        # b = BytesIO(b"\x00\x01\x02\x03\x04\x05")
+        # Behavior emulates io.BytesIO
         if whence == os.SEEK_SET:
-            # relative to beginning of file
-            # b.seek(0, SEEK_SET) -> 0
-            # b.seek(10, SEEK_SET) -> 10
-            # b.seek(-1, SEEK_SET) -> ValueError: negative seek value -1
+            # relative to beginning of buffer
             if offset < 0:
                 raise ValueError(f"Negative seek 'offset' value {offset}")
 
             new_offset = offset
         elif whence == os.SEEK_CUR:
-            # relative to current file position
-            # b.seek(0, SEEK_SET);
-            #   b.seek(-1, SEEK_CUR) -> 0
-            #   b.seek(10, SEEK_CUR) -> 10
-            # b.seek(0, SEEK_END);
-            #   b.seek(0, SEEK_CUR) -> 6
-            #   b.seek(-6, SEEK_CUR) -> 0
-            #   b.seek(-7, SEEK_CUR) -> 0
-            #   b.seek(10, SEEK_CUR) -> 16
+            # relative to current buffer position
             new_offset = self._offset + offset
             new_offset = 0 if new_offset < 0 else new_offset
         elif whence == os.SEEK_END:
-            # relative to end of the file
-            # b.seek(0, SEEK_END) -> 6,
-            # b.seek(10, SEEK_END) -> 16
-            # b.seek(-6, SEEK_END) -> 0
-            # b.seek(-7, SEEK_END) -> 0
+            # relative to end of the buffer
             new_offset = self.encapsulated_length + offset
             new_offset = 0 if new_offset < 0 else new_offset
 

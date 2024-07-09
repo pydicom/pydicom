@@ -1,9 +1,5 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
-
-from collections.abc import Generator, Iterator
-from contextlib import contextmanager
-from io import BufferedIOBase
 import os
 from struct import pack, unpack
 from typing import BinaryIO, cast
@@ -13,7 +9,7 @@ from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
 from pydicom.datadict import dictionary_description
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 
-from pydicom.config import logger, settings
+from pydicom.config import logger
 
 
 PathType = str | bytes | os.PathLike
@@ -447,112 +443,3 @@ def path_from_pathlike(
 
 def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
     return TupleTag(cast(tuple[int, int], unpack(f"{endianness}HH", b)))
-
-
-def check_buffer(buffer: BufferedIOBase) -> None:
-    """Raise an exception if `buffer` is not usable as an element value.
-
-    Parameters
-    ----------
-    buffer : io.BufferedIOBase
-        The buffer to check, must be :meth:`~io.IOBase.readable`,
-        :meth:`~io.IOBase.seekable` and not be :attr:`io.IOBase.closed`.
-    """
-    if not isinstance(buffer, BufferedIOBase):
-        raise TypeError("the buffer must inherit from 'io.BufferedIOBase'")
-
-    if buffer.closed:
-        raise ValueError("the buffer has been closed")
-
-    # readable() covers read(), seekable() covers seek() and tell()
-    if not buffer.readable() or not buffer.seekable():
-        raise ValueError("the buffer must be readable and seekable")
-
-
-@contextmanager
-def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
-    """Yields the initial position of the buffer and return to that position on exiting
-    the context.
-
-    Parameters
-    ----------
-    buffer : io.BufferedIOBase
-        The buffer to use.
-
-    Yields
-    ------
-    int
-        The initial position of the buffer.
-    """
-    check_buffer(buffer)
-
-    initial_offset = buffer.tell()
-    yield initial_offset
-
-    buffer.seek(initial_offset)
-
-
-def read_buffer(
-    buffer: BufferedIOBase, *, chunk_size: int | None = None
-) -> Iterator[bytes]:
-    """Read data from `buffer`.
-
-    The buffer is NOT returned to its starting position.
-
-    Parameters
-    ----------
-    buffer : io.BufferedIOBase
-        The buffer to read from.
-    chunk_size : int, optional
-        The amount of bytes to read per iteration (default 8192). Fewer bytes may be
-        yielded if there is insufficient remaining data in `buffer`.
-
-    Yields
-    -------
-    bytes
-        Data read from the buffer of length up to the specified chunk_size.
-    """
-    chunk_size = settings.buffered_read_size if chunk_size is None else chunk_size
-    if chunk_size <= 0:
-        raise ValueError(
-            f"Invalid 'chunk_size' value '{chunk_size}', must be greater than 0"
-        )
-
-    check_buffer(buffer)
-    while chunk := buffer.read(chunk_size):
-        if chunk:
-            yield chunk
-
-
-def buffer_length(buffer: BufferedIOBase) -> int:
-    """Return the total length of the buffer.
-
-    Parameters
-    ----------
-    buffer : io.BufferedIOBase
-        The buffer to return the remaining length for.
-
-    Returns
-    -------
-    int
-        The total length of the buffer.
-    """
-    with reset_buffer_position(buffer):
-        return buffer.seek(0, os.SEEK_END)
-
-
-def buffer_remaining(buffer: BufferedIOBase) -> int:
-    """Return the remaining length of the buffer with respect to the current position.
-
-    Parameters
-    ----------
-    buffer : io.BufferedIOBase
-        The buffer to return the remaining length for.
-
-    Returns
-    -------
-    int
-        The remaining length of the buffer from the current position.
-    """
-    with reset_buffer_position(buffer) as current_offset:
-        return buffer.seek(0, os.SEEK_END) - current_offset

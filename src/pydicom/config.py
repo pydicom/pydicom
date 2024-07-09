@@ -191,7 +191,6 @@ class Settings:
         # currently the default value depends on enforce_valid_values
         self._writing_validation_mode: int | None = RAISE if _use_future else None
         self._infer_sq_for_un_vr: bool = True
-        self.buffered_read_size = 8192
 
     @property
     def reading_validation_mode(self) -> int:

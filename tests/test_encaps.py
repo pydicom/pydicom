@@ -3212,17 +3212,35 @@ class TestBufferedFrame:
         """Test using an empty buffer"""
         bf = _BufferedItem(BytesIO())
         assert bf.length == 8
+        out = bf.read(7, 10)
+        assert out == b"\x00"
+
+    def test_too_large_buffer_raises(self):
+        """Test exception raised if the buffer is too large."""
+        b = FooBuffer()
+        b._tell = 2**32 - 1
+
+        msg = "Buffers containing more than 4294967294 bytes are not supported"
+        with pytest.raises(ValueError, match=msg):
+            _BufferedItem(b)
 
 
 class FooBuffer(BytesIO):
     _readable = True
     _seekable = True
+    _tell = 0
 
     def readable(self):
         return self._readable
 
     def seekable(self):
         return self._seekable
+
+    def tell(self):
+        return self._tell
+
+    def seek(self, offset, whence=0):
+        return self._tell
 
 
 class TestEncapsulatedBuffer:
@@ -3234,6 +3252,12 @@ class TestEncapsulatedBuffer:
         b = BytesIO(b"\x00\x01" * 10)
         eb = EncapsulatedBuffer([b])
         assert eb.encapsulated_length == 36
+
+        msg = (
+            "'buffers' must be a list of objects that inherit from 'io.BufferedIOBase'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            EncapsulatedBuffer(b)
 
     def test_bot_empty(self):
         """Test an empty Basic Offset Table"""
