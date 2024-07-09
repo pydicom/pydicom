@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.630** total execution time for 15 files **from all galleries**:
+**00:00.569** total execution time for 15 files **from all galleries**:
 
 .. container::
 
@@ -33,21 +33,18 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py` (``../examples/input_output/plot_read_fileset.py``)
-     - 00:00.205
+     - 00:00.187
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``../examples/image_processing/plot_waveforms.py``)
-     - 00:00.199
+     - 00:00.180
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
-     - 00:00.101
+     - 00:00.092
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``../examples/input_output/plot_read_dicom.py``)
-     - 00:00.094
+     - 00:00.084
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``../examples/metadata_processing/plot_anonymize.py``)
-     - 00:00.007
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``../examples/input_output/plot_write_dicom.py``)
      - 00:00.007
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` (``../examples/image_processing/plot_downsize_image.py``)
@@ -56,6 +53,9 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py` (``../examples/input_output/plot_printing_dataset.py``)
      - 00:00.005
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``../examples/input_output/plot_write_dicom.py``)
+     - 00:00.004
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``../examples/metadata_processing/plot_add_dict_entries.py``)
      - 00:00.003
      - 0.0
@@ -63,7 +63,7 @@ Computation times
      - 00:00.002
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py` (``../examples/metadata_processing/plot_sequences.py``)
-     - 00:00.002
+     - 00:00.001
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dicomtree.py` (``../examples/dicomtree.py``)
      - 00:00.000
