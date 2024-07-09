@@ -524,7 +524,7 @@ class RecordNode(Iterable["RecordNode"]):
         for node in self:
             indent = indent_char * node.depth
             if node.children:
-                s.append(f"{indent}{str(node)}")
+                s.append(f"{indent}{node}")
                 # Summarise any leaves at the next level
                 for child in node.children:
                     if child.has_instance:

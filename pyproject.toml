@@ -128,7 +128,9 @@ max-statements = 108
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
+"src/pydicom/_*_dict.py" = ["E501"]
 "src/pydicom/config.py" = ["PLW0602"]
+"src/pydicom/uid.py" = ["E501"]
 "src/pydicom/sr/_concepts_dict.py" = ["F601"]
 "tests/*.py" = ["F401"]
 

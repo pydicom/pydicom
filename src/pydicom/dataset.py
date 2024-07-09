@@ -2334,11 +2334,9 @@ class Dataset:
         return wave_handler.multiplex_array(self, index, as_raw=False)
 
     # Format strings spec'd according to python string formatting options
-    #    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting # noqa
+    #    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
     default_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
-    default_sequence_element_format = (
-        "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"  # noqa
-    )
+    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
 
     def formatted_lines(
         self,
@@ -2443,7 +2441,7 @@ class Dataset:
             with tag_in_exception(elem.tag):
                 if elem.VR == VR_.SQ:  # a sequence
                     strings.append(
-                        f"{indent_str}{str(elem.tag)}  {elem.name}  "
+                        f"{indent_str}{elem.tag}  {elem.name}  "
                         f"{len(elem.value)} item(s) ---- "
                     )
                     if not top_level_only:
@@ -3114,7 +3112,7 @@ class Dataset:
     def to_json_dict(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Callable[[DataElement], str] | None = None,  # noqa
+        bulk_data_element_handler: Callable[[DataElement], str] | None = None,
         suppress_invalid_tags: bool = False,
     ) -> dict[str, Any]:
         """Return a dictionary representation of the :class:`Dataset`
@@ -3164,7 +3162,7 @@ class Dataset:
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Callable[[DataElement], str] | None = None,  # noqa
+        bulk_data_element_handler: Callable[[DataElement], str] | None = None,
         dump_handler: Callable[[dict[str, Any]], str] | None = None,
         suppress_invalid_tags: bool = False,
     ) -> str:

@@ -43,7 +43,7 @@ def retry(
                 try:
                     return f(*args, **kwargs)
                 except exc as e:
-                    msg = f"{str(e)}: retrying in {mdelay} seconds..."
+                    msg = f"{e}: retrying in {mdelay} seconds..."
                     if exc_msg:
                         msg += f"  {exc_msg}"
 
