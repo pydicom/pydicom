@@ -4,7 +4,6 @@
 from io import BytesIO
 from struct import unpack, unpack_from
 from typing import TYPE_CHECKING, cast
-from collections.abc import Iterable
 
 try:
     import numpy as np
@@ -27,6 +26,7 @@ from pydicom.uid import UID
 from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterable
     from pydicom.dataset import Dataset
 
 
