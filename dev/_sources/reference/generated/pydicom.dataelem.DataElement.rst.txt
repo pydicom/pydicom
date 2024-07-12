@@ -31,6 +31,7 @@
       ~DataElement.VM
       ~DataElement.descripWidth
       ~DataElement.empty_value
+      ~DataElement.is_buffered
       ~DataElement.is_empty
       ~DataElement.is_private
       ~DataElement.is_raw

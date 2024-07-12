@@ -68,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pydicom.config.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.buffered_read_size"><code class="docutils literal notranslate"><span class="pre">Settings.buffered_read_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.infer_sq_for_un_vr"><code class="docutils literal notranslate"><span class="pre">Settings.infer_sq_for_un_vr</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.reading_validation_mode"><code class="docutils literal notranslate"><span class="pre">Settings.reading_validation_mode</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.writing_validation_mode"><code class="docutils literal notranslate"><span class="pre">Settings.writing_validation_mode</span></code></a></li>
@@ -161,12 +162,24 @@
 <p><em>pydicom</em> configuration options</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydicom.config.Settings">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2fe73330a/pydicom/config.py#L181"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.Settings" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/9f1e8e132/pydicom/config.py#L181"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.Settings" title="Link to this definition">¶</a></dt>
 <dd><p>Collection of several configuration values.
 Accessed via the singleton <a class="reference internal" href="generated/pydicom.config.settings.html#pydicom.config.settings" title="pydicom.config.settings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">settings</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 2.3.</span></p>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.config.Settings.buffered_read_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buffered_read_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#pydicom.config.Settings.buffered_read_size" title="Link to this definition">¶</a></dt>
+<dd><p>Get or set the chunk size when reading from buffered
+<a class="reference internal" href="generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The chunk size to use, must be greater than 0 (default 8192).</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pydicom.config.Settings.infer_sq_for_un_vr">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">infer_sq_for_un_vr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.config.Settings.infer_sq_for_un_vr" title="Link to this definition">¶</a></dt>
@@ -182,11 +195,13 @@ conformant and would lead to a failure if accessing it.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reading_validation_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#pydicom.config.Settings.reading_validation_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Defines behavior of validation while reading values, compared with
 the DICOM standard, e.g. that DS strings are not longer than
-16 characters and contain only allowed characters.
-The default (<a class="reference internal" href="generated/pydicom.config.WARN.html#pydicom.config.WARN" title="pydicom.config.WARN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">WARN</span></code></a>) is to issue a warning in the case of
-an invalid value, <a class="reference internal" href="generated/pydicom.config.RAISE.html#pydicom.config.RAISE" title="pydicom.config.RAISE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RAISE</span></code></a> will raise an error in this
-case, and <a class="reference internal" href="generated/pydicom.config.IGNORE.html#pydicom.config.IGNORE" title="pydicom.config.IGNORE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">IGNORE</span></code></a> will bypass the
-validation (with the exception of some encoding errors).</p>
+16 characters and contain only allowed characters.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/pydicom.config.WARN.html#pydicom.config.WARN" title="pydicom.config.WARN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">WARN</span></code></a> will emit a warning in the case of an invalid value (default)</p></li>
+<li><p><a class="reference internal" href="generated/pydicom.config.RAISE.html#pydicom.config.RAISE" title="pydicom.config.RAISE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RAISE</span></code></a> will raise an error instead</p></li>
+<li><p><a class="reference internal" href="generated/pydicom.config.IGNORE.html#pydicom.config.IGNORE" title="pydicom.config.IGNORE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">IGNORE</span></code></a> will bypass the validation (with the exception of some
+encoding errors).</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py property">

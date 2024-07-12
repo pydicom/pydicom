@@ -26,6 +26,7 @@
    .. autosummary::
    
       ~RawDataElement.VR
+      ~RawDataElement.is_buffered
       ~RawDataElement.is_implicit_VR
       ~RawDataElement.is_little_endian
       ~RawDataElement.is_raw

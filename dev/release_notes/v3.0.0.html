@@ -351,6 +351,8 @@ for applying ICC profiles to an <a class="reference external" href="https://nump
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update_raw_element" title="pydicom.dataset.Dataset.update_raw_element"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.update_raw_element()</span></code></a>
 to make it easier to modify a <a class="reference internal" href="../reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawDataElement</span></code></a>’s VR or value
 prior to conversion to a <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1739">#1739</a>).</p></li>
+<li><p>Added support for using <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a> subclasses to set the value for
+elements with O* VRs such as <strong>OB</strong> and <strong>OW</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1913">#1913</a>).</p></li>
 </ul>
 </section>
 <section id="fixes">

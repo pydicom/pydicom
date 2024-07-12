@@ -232,6 +232,8 @@ Enhancements
 * Added :meth:`Dataset.update_raw_element()<pydicom.dataset.Dataset.update_raw_element>`
   to make it easier to modify a :class:`~pydicom.dataelem.RawDataElement`'s VR or value
   prior to conversion to a :class:`~pydicom.dataelem.DataElement` (:issue:`1739`).
+* Added support for using :class:`io.BufferedIOBase` subclasses to set the value for
+  elements with O* VRs such as **OB** and **OW** (:issue:`1913`).
 
 
 Fixes

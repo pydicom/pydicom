@@ -65,7 +65,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Guides</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="user/index.html">pydicom User Guide</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Element VRs and Python types</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Element VRs and Python types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bufferable-o-vrs">Bufferable O* VRs</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="plugin_table.html">Plugins for Pixel Data Compression and Decompression</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decoding/index.html">Pixel Data Decoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encoding/index.html">Pixel Data Encoding</a></li>
@@ -160,8 +163,8 @@ never have a VM greater than 1.</p></li>
 Entity</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
-<td rowspan="11"><p>Union[None, T,
-MutableSequence[T]]</p></td>
+<td rowspan="11"><p>None | T |
+MutableSequence[T]</p></td>
 </tr>
 <tr class="row-odd"><td><p>AS</p></td>
 <td><p>Age String</p></td>
@@ -170,8 +173,7 @@ MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-even"><td><p>AT</p></td>
 <td><p>Attribute Tag</p></td>
-<td><p>Tag
-<sup>1</sup></p></td>
+<td><p>Tag<sup>1</sup></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>CS</p></td>
@@ -202,14 +204,12 @@ or <a class="reference external" href="https://docs.python.org/3/library/functio
 <tr class="row-odd"><td><p>FL</p></td>
 <td><p>Floating Point
 Single</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
+<td rowspan="2"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
+<td rowspan="2"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>FD</p></td>
 <td><p>Floating Point
 Double</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>IS</p></td>
 <td><p>Integer String</p></td>
@@ -226,45 +226,39 @@ or <a class="reference external" href="https://docs.python.org/3/library/functio
 <td><p>Long Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
-<td rowspan="7"><p>Optional[T]</p></td>
+<td><p>None | T</p></td>
 </tr>
 <tr class="row-even"><td><p>OB</p></td>
 <td><p>Other Byte</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
+<td rowspan="6"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a>
+<sup>4</sup></p></td>
+<td rowspan="6"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a></p></td>
+<td rowspan="6"><p>None | T</p></td>
 </tr>
 <tr class="row-odd"><td><p>OD</p></td>
 <td><p>Other Double</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>OF</p></td>
 <td><p>Other Float</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>OL</p></td>
 <td><p>Other Long</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>OV</p></td>
 <td><p>Other 64-bit
 Very Long</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>OW</p></td>
 <td><p>Other Word</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>PN</p></td>
 <td><p>Person Name</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a></p></td>
-<td rowspan="3"><p>Union[None, T,
-MutableSequence[T]]</p></td>
+<td rowspan="3"><p>None | T |
+MutableSequence[T]</p></td>
 </tr>
 <tr class="row-odd"><td><p>SH</p></td>
 <td><p>Short String</p></td>
@@ -288,22 +282,22 @@ Items</p></td>
 <td><p>Signed Short</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
-<td><p>Union[None, T,
-MutableSequence[T]]</p></td>
+<td><p>None | T |
+MutableSequence[T]</p></td>
 </tr>
 <tr class="row-odd"><td><p>ST</p></td>
 <td><p>Short Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
-<td><p>Optional[T]</p></td>
+<td><p>None | T</p></td>
 </tr>
 <tr class="row-even"><td><p>SV</p></td>
 <td><p>Signed 64-bit
 Very Long</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
-<td rowspan="5"><p>Union[None, T,
-MutableSequence[T]]</p></td>
+<td rowspan="5"><p>None | T |
+MutableSequence[T]</p></td>
 </tr>
 <tr class="row-odd"><td><p>TM</p></td>
 <td><p>Time</p></td>
@@ -332,7 +326,7 @@ Identifier (UID)</p></td>
 <td><p>Unknown</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
-<td rowspan="2"><p>Optional[T]</p></td>
+<td rowspan="2"><p>None | T</p></td>
 </tr>
 <tr class="row-even"><td><p>UR</p></td>
 <td><p>URI/URL</p></td>
@@ -343,22 +337,22 @@ Identifier (UID)</p></td>
 <td><p>Unsigned Short</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
-<td><p>Union[None, T,
-MutableSequence[T]]</p></td>
+<td><p>None | T |
+MutableSequence[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>UT</p></td>
 <td><p>Unlimited Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
-<td><p>Optional[T]</p></td>
+<td><p>None | T</p></td>
 </tr>
 <tr class="row-odd"><td><p>UV</p></td>
 <td><p>Unsigned 64-bit
 Very Long</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
-<td><p>Union[None, T,
-MutableSequence[T]]</p></td>
+<td><p>None | T |
+MutableSequence[T]</p></td>
 </tr>
 </tbody>
 </table>
@@ -368,7 +362,36 @@ MutableSequence[T]]</p></td>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
 <div class="line"><sup>3</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.use_DS_decimal</span></code></a>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
+<div class="line"><sup>4</sup> See notes for bufferable O* VRs below</div>
 </div>
+<section id="bufferable-o-vrs">
+<h2>Bufferable O* VRs<a class="headerlink" href="#bufferable-o-vrs" title="Link to this heading">¶</a></h2>
+<p>The value for elements with O* VRs (<strong>OB</strong>, <strong>OD</strong>, <strong>OF</strong>, <strong>OL</strong>, <strong>OV</strong> and
+<strong>OW</strong>) can be set using an object that inherits from <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a> such
+as the <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedReader" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedReader</span></code></a> instances returned by the <a class="reference external" href="https://docs.python.org/3/library/functions.html#open" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> built-in when
+in read mode. This allows you to avoid having to read a large amount of data into
+memory when creating datasets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;a_large_amount_of_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxIOD</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;large_dataset.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, there are limitations and things to be aware of when using a buffered value:</p>
+<ul class="simple">
+<li><p>Datasets containing buffered objects that don’t normally work with <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code></a> or
+<a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">deepcopy()</span></code></a> such as <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedReader" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> are not able to be pickled
+or deepcopied.</p></li>
+<li><p>Using a buffered <em>Pixel Data</em> value for datasets with a compressed (encapsulated)
+transfer syntax requires you to have first <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulated</span></code></a>
+the compressed frame data and written it to the buffer.</p></li>
+</ul>
+</section>
 </section>
 
 
