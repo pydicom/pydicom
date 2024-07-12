@@ -1622,7 +1622,7 @@ def test_set_value(vr, pytype, vm0, vmN, keyword, disable_value_validation):
 @pytest.mark.parametrize("vr, pytype, vm0, vmN, keyword", VALUE_REFERENCE)
 def test_assigning_bytes(vr, pytype, vm0, vmN, keyword):
     """Test that byte VRs are excluded from the backslash check."""
-    if pytype == bytes:
+    if pytype is bytes:
         ds = Dataset()
         value = b"\x00\x01" + b"\\" + b"\x02\x03"
         setattr(ds, keyword, value)

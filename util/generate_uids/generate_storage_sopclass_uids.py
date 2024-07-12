@@ -27,7 +27,7 @@ def is_storage_class(attributes):
 
 def uid_line(uid, keyword):
     """Return the UID class definition line to be written to the file."""
-    return f"{keyword} = UID('{uid}')  # noqa\n"
+    return f"{keyword} = UID('{uid}')\n"
 
 
 def update_uids(path: Path) -> None:

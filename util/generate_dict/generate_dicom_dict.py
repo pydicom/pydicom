@@ -82,8 +82,8 @@ def write_dict(fp, dict_name, attributes, tag_is_string):
         entry_format = f"{{Tag}}: {tag_content}"
 
     fp.write(f"\n{dict_name} = {{\n    ")
-    fp.write(",  # noqa\n    ".join(entry_format.format(**attr) for attr in attributes))
-    fp.write("  # noqa\n}\n")
+    fp.write(",\n    ".join(entry_format.format(**attr) for attr in attributes))
+    fp.write("\n}\n")
 
 
 def parse_header(header_row):

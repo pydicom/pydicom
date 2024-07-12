@@ -944,7 +944,7 @@ def DataElement_from_raw(
             elif raw.tag.element == 0:
                 vr = VR_.UL
             else:
-                msg = f"Unknown DICOM tag {str(raw.tag)}"
+                msg = f"Unknown DICOM tag {raw.tag}"
                 if config.settings.reading_validation_mode == config.RAISE:
                     raise KeyError(msg + " can't look up VR")
 
@@ -963,7 +963,7 @@ def DataElement_from_raw(
     try:
         value = convert_value(vr, raw, encoding)
     except NotImplementedError as e:
-        raise NotImplementedError(f"{str(e)} in tag {raw.tag!r}")
+        raise NotImplementedError(f"{e} in tag {raw.tag!r}")
     except BytesLengthException as e:
         message = (
             f"{e} This occurred while trying to parse {raw.tag} according "

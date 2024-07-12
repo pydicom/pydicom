@@ -612,15 +612,14 @@ def get_table_o1(data: bytes) -> list[tuple[str, str, str]]:
     body = root.find("w3:body", namespaces=namespaces)
     table = body.findall(".//w3:tbody", namespaces=namespaces)[0]
     rows = table.findall("./w3:tr", namespaces=namespaces)
-    table_data = []
-    for row in rows:
-        table_data.append(
-            (
-                _get_text(row[0].findall(".//w3:p", namespaces=namespaces)[-1]),
-                _get_text(row[1].findall(".//w3:p", namespaces=namespaces)[0]),
-                _get_text(row[2].findall(".//w3:p", namespaces=namespaces)[0]),
-            )
+    table_data = [
+        (
+            _get_text(row[0].findall(".//w3:p", namespaces=namespaces)[-1]),
+            _get_text(row[1].findall(".//w3:p", namespaces=namespaces)[0]),
+            _get_text(row[2].findall(".//w3:p", namespaces=namespaces)[0]),
         )
+        for row in rows
+    ]
 
     return table_data
 

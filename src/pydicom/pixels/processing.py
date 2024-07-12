@@ -4,7 +4,6 @@
 from io import BytesIO
 from struct import unpack, unpack_from
 from typing import TYPE_CHECKING, cast
-from collections.abc import Iterable
 
 try:
     import numpy as np
@@ -27,6 +26,7 @@ from pydicom.uid import UID
 from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterable
     from pydicom.dataset import Dataset
 
 
@@ -153,7 +153,7 @@ def apply_color_lut(
     nominal_depth = lut_desc[2]
     dtype = np.dtype(f"uint{nominal_depth:.0f}")
 
-    luts = []
+    luts: list[bytes] = []
     if "RedPaletteColorLookupTableData" in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
         r_lut = cast(bytes, ds.RedPaletteColorLookupTableData)
@@ -166,8 +166,11 @@ def apply_color_lut(
         actual_depth = len(r_lut) / nr_entries * 8
         dtype = np.dtype(f"uint{actual_depth:.0f}")
 
-        for lut_bytes in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
-            luts.append(np.frombuffer(lut_bytes, dtype=dtype))
+        luts.extend(
+            np.frombuffer(lut_bytes, dtype=dtype)
+            for lut_bytes in (r_lut, g_lut, b_lut, a_lut)
+            if lut_bytes
+        )
     elif "SegmentedRedPaletteColorLookupTableData" in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
         r_lut = cast(bytes, ds.SegmentedRedPaletteColorLookupTableData)
@@ -194,11 +197,12 @@ def apply_color_lut(
         fmt = "B" if byte_depth == 1 else "H"
         actual_depth = nominal_depth
 
-        for seg in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
-            len_seg = len(seg) // byte_depth
-            s_fmt = f"{endianness}{len_seg}{fmt}"
-            lut_ints = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
-            luts.append(np.asarray(lut_ints, dtype=dtype))
+        for seg in (r_lut, g_lut, b_lut, a_lut):
+            if seg:
+                len_seg = len(seg) // byte_depth
+                s_fmt = f"{endianness}{len_seg}{fmt}"
+                lut_ints = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
+                luts.append(np.asarray(lut_ints, dtype=dtype))
     else:
         raise ValueError("No suitable Palette Color Lookup Table Module found")
 

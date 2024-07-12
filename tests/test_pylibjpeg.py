@@ -104,19 +104,13 @@ RLE_32_3_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
 # FMT_BA_BV_SPX_PR_FRAMESF_PI
 # JPGB: 1.2.840.10008.1.2.4.50 - JPEG Baseline (8-bit only)
 JPGB_08_08_3_0_1F_YBR_FULL = get_testdata_file("SC_rgb_small_odd_jpeg.dcm")
-JPGB_08_08_3_0_120F_YBR_FULL_422 = get_testdata_file(
-    "color3d_jpeg_baseline.dcm"
-)  # noqa
+JPGB_08_08_3_0_120F_YBR_FULL_422 = get_testdata_file("color3d_jpeg_baseline.dcm")
 # Different subsampling 411, 422, 444
-JPGB_08_08_3_0_1F_YBR_FULL_422_411 = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+np.dcm"
-)  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+s2.dcm"
-)  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
+JPGB_08_08_3_0_1F_YBR_FULL_422_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+np.dcm")
+JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s2.dcm")
+JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")
+JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")
+JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")
 JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
 # JPGE: 1.2.840.1.2.4.51 - JPEG Extended
 JPGE_BAD = get_testdata_file("JPEG-lossy.dcm")  # Bad JPEG file
@@ -134,27 +128,27 @@ JPG_REFERENCE_DATA = [
     (
         JPGB_08_08_3_0_120F_YBR_FULL_422,
         (JPGB, 8, 3, 0, 120, (120, 480, 640, 3), "uint8"),
-    ),  # noqa
+    ),
     (
         JPGB_08_08_3_0_1F_YBR_FULL_422_411,
         (JPGB, 8, 3, 0, 1, (100, 100, 3), "uint8"),
-    ),  # noqa
+    ),
     (
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
         (JPGB, 8, 3, 0, 1, (100, 100, 3), "uint8"),
-    ),  # noqa
+    ),
     (
         JPGB_08_08_3_0_1F_YBR_FULL_411,
         (JPGB, 8, 3, 0, 1, (100, 100, 3), "uint8"),
-    ),  # noqa
+    ),
     (
         JPGB_08_08_3_0_1F_YBR_FULL_422,
         (JPGB, 8, 3, 0, 1, (100, 100, 3), "uint8"),
-    ),  # noqa
+    ),
     (
         JPGB_08_08_3_0_1F_YBR_FULL_444,
         (JPGB, 8, 3, 0, 1, (100, 100, 3), "uint8"),
-    ),  # noqa
+    ),
     (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (100, 100, 3), "uint8")),
     (JPGE_16_12_1_0_1F_M2, (JPGE, 16, 1, 0, 1, (1024, 256), "uint16")),
     (JPGL_08_08_1_0_1F, (JPGL, 8, 1, 0, 1, (768, 1024), "uint8")),

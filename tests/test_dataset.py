@@ -1699,6 +1699,45 @@ class TestDataset:
         ds._set_pixel_representation(ds["PixelRepresentation"])
         assert ds._pixel_rep == 0
 
+    def test_update_raw(self):
+        """Tests for Dataset.update_raw_element()"""
+        ds = Dataset()
+
+        msg = "Either or both of 'vr' and 'value' are required"
+        with pytest.raises(ValueError, match=msg):
+            ds.update_raw_element(None)
+
+        msg = "Invalid VR value 'XX'"
+        with pytest.raises(ValueError, match=msg):
+            ds.update_raw_element(None, vr="XX")
+
+        msg = "'value' must be bytes, not 'int'"
+        with pytest.raises(TypeError, match=msg):
+            ds.update_raw_element(None, value=1234)
+
+        msg = r"No element with tag \(0010,0010\) was found"
+        with pytest.raises(KeyError, match=msg):
+            ds.update_raw_element(0x00100010, vr="US")
+
+        ds.PatientName = "Foo"
+        msg = (
+            r"The element with tag \(0010,0010\) has already been converted to a "
+            "'DataElement' instance, this method must be called earlier"
+        )
+        with pytest.raises(TypeError, match=msg):
+            ds.update_raw_element(0x00100010, vr="US")
+
+        raw = RawDataElement(0x00100010, "PN", 4, b"Fooo", 0, True, True)
+        ds._dict[0x00100010] = raw
+        ds.update_raw_element("PatientName", vr="US")
+        assert ds.PatientName == [28486, 28527]
+        assert isinstance(ds["PatientName"].VR, str)
+
+        raw = RawDataElement(0x00100010, "PN", 4, b"Fooo", 0, True, True)
+        ds._dict[0x00100010] = raw
+        ds.update_raw_element(0x00100010, value=b"Bar")
+        assert ds.PatientName == "Bar"
+
 
 class TestDatasetSaveAs:
     def test_no_transfer_syntax(self):
@@ -2375,9 +2414,9 @@ class TestFileDataset:
         buff.close()
         assert buff.closed
         msg = (
-            "The ValueError exception 'I/O operation on closed file.' occurred trying "
-            "to deepcopy the buffer-like the dataset was read from, the 'buffer' "
-            "attribute will be set to 'None' in the copied object"
+            r"The ValueError exception '(.*)' occurred trying to deepcopy the "
+            "buffer-like the dataset was read from, the 'buffer' attribute will be "
+            "set to 'None' in the copied object"
         )
         with pytest.warns(UserWarning, match=msg):
             ds_copy = copy.deepcopy(ds)

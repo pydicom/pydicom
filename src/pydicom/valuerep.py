@@ -620,7 +620,7 @@ class _DateTimeBase:
         return super().__str__()
 
     def __repr__(self) -> str:
-        return f'"{str(self)}"'
+        return f'"{self}"'
 
 
 class DA(_DateTimeBase, datetime.date):
@@ -1078,7 +1078,7 @@ class DSfloat(float):
             if not is_valid_ds(str(self)):
                 # This will catch nan and inf
                 raise ValueError(
-                    f'Value "{str(self)}" is not valid for elements with a VR of DS'
+                    f'Value "{self}" is not valid for elements with a VR of DS'
                 )
 
     def __eq__(self, other: Any) -> Any:
@@ -1215,7 +1215,7 @@ class DSdecimal(Decimal):
                 warn_and_log(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
-                msg = f'Value "{str(self)}" is not valid for elements with a VR of DS'
+                msg = f'Value "{self}" is not valid for elements with a VR of DS'
                 if validation_mode == config.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
@@ -1243,7 +1243,7 @@ class DSdecimal(Decimal):
     def __repr__(self) -> str:
         if self.auto_format and hasattr(self, "original_string"):
             return f"'{self.original_string}'"
-        return f"'{str(self)}'"
+        return f"'{self}'"
 
 
 # CHOOSE TYPE OF DS
@@ -1321,7 +1321,7 @@ class ISfloat(float):
         elif isinstance(val, IS | ISfloat) and hasattr(val, "original_string"):
             self.original_string = val.original_string
         if validation_mode:
-            msg = f'Value "{str(self)}" is not valid for elements with a VR of IS'
+            msg = f'Value "{self}" is not valid for elements with a VR of IS'
             if validation_mode == config.WARN:
                 warn_and_log(msg)
             elif validation_mode == config.RAISE:
