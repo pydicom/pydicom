@@ -1124,6 +1124,19 @@ class TestDecoder_Array:
         assert arr.shape == (9, 64, 64)
         assert meta["number_of_frames"] == 9
 
+    def test_native_from_buffer(self):
+        """Test decoding a dataset which uses buffered Pixel Data."""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        ds = dcmread(EXPL_16_1_10F.path)
+        ds.PixelData = BytesIO(ds.PixelData)
+        for index in [0, 4, 9]:
+            arr, meta = decoder.as_array(ds, index=index)
+            EXPL_16_1_10F.test(arr, index=index)
+            assert arr.shape == EXPL_16_1_10F.shape[1:]
+            assert arr.dtype == EXPL_16_1_10F.dtype
+            assert arr.flags.writeable
+            assert meta["bits_stored"] == 12
+
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""
         decoder = get_decoder(RLELossless)
@@ -1179,6 +1192,20 @@ class TestDecoder_Array:
         arr, meta = decoder.as_array(src, **runner.options)
         assert arr.shape == (10, 64, 64)
         assert meta["number_of_frames"] == 10
+
+    def test_encapsulated_from_buffer(self):
+        """Test decoding a dataset which uses buffered Pixel Data."""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        ds = dcmread(reference.path)
+        ds.PixelData = BytesIO(ds.PixelData)
+        for index in [0, 4, 9]:
+            arr, meta = decoder.as_array(ds, index=index)
+            reference.test(arr, index=index)
+            assert arr.shape == reference.shape[1:]
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+            assert meta["bits_stored"] == 12
 
     def test_processing_colorspace(self):
         """Test the processing colorspace options."""

@@ -5,12 +5,22 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
 import os
+import sys
 from pathlib import Path
 import pickle
+import platform
 
 from struct import unpack
 from tempfile import TemporaryFile
+from typing import cast
 import zlib
+
+try:
+    import resource
+
+    HAVE_RESOURCE = True
+except ImportError:
+    HAVE_RESOURCE = False
 
 import pytest
 
@@ -31,6 +41,7 @@ from pydicom.filewriter import (
     write_PN,
     _format_DT,
     write_text,
+    write_OBvalue,
     write_OWvalue,
     writers,
     dcmwrite,
@@ -48,7 +59,7 @@ from pydicom.uid import (
     UID,
 )
 from pydicom.util.hexutil import hex2bytes
-from pydicom.valuerep import DA, DT, TM, VR
+from pydicom.valuerep import BUFFERABLE_VRS, DA, DT, TM, VR
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
@@ -69,6 +80,9 @@ multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
 deflate_name = get_testdata_file("image_dfl.dcm")
 
 base_version = ".".join(str(i) for i in __version_info__)
+
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 def files_identical(a, b):
@@ -2698,6 +2712,82 @@ class TestWriteNumbers:
 class TestWriteOtherVRs:
     """Tests for writing the 'O' VRs like OB, OW, OF, etc."""
 
+    def test_write_ob(self):
+        """Test writing element with VR OF"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", b"\x00\x01\x02\x03")
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", b"\x00\x01\x02")
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
+    def test_write_ob_buffered(self):
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        b = BytesIO(b"\x00\x01\x02\x03")
+        elem = DataElement(0x7FE00008, "OB", b)
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", b)
+        b.close()
+        msg = "the buffer has been closed"
+        with pytest.raises(ValueError, match=msg):
+            write_OBvalue(fp, elem)
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OB", BytesIO(b"\x00\x01\x02"))
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
+    def test_write_ow(self):
+        """Test writing element with VR OW"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", b"\x00\x01\x02\x03")
+        write_OWvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", b"\x00\x01\x02")
+        write_OWvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
+    def test_write_ow_buffered(self):
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        b = BytesIO(b"\x00\x01\x02\x03")
+        elem = DataElement(0x7FE00008, "OW", b)
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x03"
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", b)
+        b.close()
+        msg = "the buffer has been closed"
+        with pytest.raises(ValueError, match=msg):
+            write_OBvalue(fp, elem)
+
+        # Odd length value padded
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7FE00008, "OW", BytesIO(b"\x00\x01\x02"))
+        write_OBvalue(fp, elem)
+        assert fp.getvalue() == b"\x00\x01\x02\x00"
+
     def test_write_of(self):
         """Test writing element with VR OF"""
         fp = DicomBytesIO()
@@ -2991,14 +3081,21 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.seek(0)
         assert self.fp.read() == expected
 
-    def test_little_endian_incorrect_data(self):
+    @pytest.mark.parametrize(
+        "data",
+        (
+            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
+            BytesIO(b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0"),
+        ),
+    )
+    def test_little_endian_incorrect_data(self, data):
         """Writing pixel data not starting with an item tag raises."""
         self.fp.is_little_endian = True
         self.fp.is_implicit_VR = False
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\xff\xff\x00\xe0\x00\x01\x02\x03\xfe\xff\xdd\xe0",
+            data,
             is_undefined_length=True,
         )
         msg = (
@@ -3009,14 +3106,21 @@ class TestWriteUndefinedLengthPixelData:
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
 
-    def test_big_endian_incorrect_data(self):
+    @pytest.mark.parametrize(
+        "data",
+        (
+            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
+            BytesIO(b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd"),
+        ),
+    )
+    def test_big_endian_incorrect_data(self, data):
         """Writing pixel data not starting with an item tag raises."""
         self.fp.is_little_endian = False
         self.fp.is_implicit_VR = False
         pixel_data = DataElement(
             0x7FE00010,
             "OB",
-            b"\x00\x00\x00\x00\x00\x01\x02\x03\xff\xfe\xe0\xdd",
+            data,
             is_undefined_length=True,
         )
         msg = (
@@ -3087,6 +3191,116 @@ class TestWriteUndefinedLengthPixelData:
 def test_all_writers():
     """Test that the VR writer functions are complete"""
     assert set(VR) == set(writers)
+
+
+class TestWritingBufferedPixelData:
+    @pytest.mark.parametrize("bits_allocated", (8, 16))
+    def test_writing_dataset_with_buffered_pixel_data(self, bits_allocated):
+        pixel_data = b"\x00\x01\x02\x03"
+
+        # Baseline
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+
+        ds = Dataset()
+        ds.BitsAllocated = bits_allocated
+        ds.PixelData = pixel_data
+
+        ds.save_as(fp, implicit_vr=False, little_endian=True)
+
+        fp_buffered = DicomBytesIO()
+        fp_buffered.is_little_endian = True
+        fp_buffered.is_implicit_VR = False
+
+        ds_buffered = Dataset()
+        ds_buffered.BitsAllocated = bits_allocated
+        ds_buffered.PixelData = BytesIO(pixel_data)
+
+        ds_buffered.save_as(fp_buffered, implicit_vr=False, little_endian=True)
+
+        assert fp.getvalue() == fp_buffered.getvalue()
+
+    @pytest.mark.skipif(not HAVE_RESOURCE, reason="resource is unix only")
+    @pytest.mark.parametrize("bits_allocated", (8, 16))
+    def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(
+        self, bits_allocated
+    ):
+        FILE_SIZE = 100  # MB
+        KILOBYTE = 1000
+        MEGABYTE = KILOBYTE * 1000
+        bytes_per_iter = MEGABYTE
+
+        ds = Dataset()
+        ds.BitsAllocated = bits_allocated
+
+        with TemporaryFile("+wb") as large_dataset, TemporaryFile("+wb") as fp:
+            # generate large file
+            data = BytesIO()
+            for _ in range(bytes_per_iter):
+                data.write(b"\x00")
+
+            data.seek(0)
+
+            # 500 megabytes
+            for _ in range(FILE_SIZE):
+                large_dataset.write(data.getbuffer())
+
+            large_dataset.seek(0)
+
+            # take a snapshot of memory
+            baseline_memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+            # set the pixel data to the buffer
+            ds.PixelData = large_dataset
+            ds.save_as(fp, little_endian=True, implicit_vr=False)
+
+            memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+            # on MacOS, maxrss is in bytes. On unix, its in kilobytes
+            limit = 0
+            if sys.platform.startswith("linux"):
+                # memory usage is in kilobytes
+                limit = (MEGABYTE * FILE_SIZE / 5 * 4) / KILOBYTE
+            elif sys.platform.startswith("darwin"):
+                # memory usage is in bytes
+                limit = MEGABYTE * FILE_SIZE / 5 * 4
+            else:
+                pytest.skip("This test is not setup to run on this platform")
+
+            # if we have successfully kept the PixelData out of memory, then our peak
+            #   memory usage # usage be less than prev peak + the size of the file
+            assert memory_usage < (baseline_memory_usage + limit)
+
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
+    def test_all_supported_VRS_can_write_a_buffered_value(self, vr):
+        data = b"\x00\x01\x02\x03"
+        buffer = BytesIO(data)
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+
+        fn, _ = writers[cast(VR, vr)]
+        fn(fp, DataElement("PixelData", vr, buffer))
+
+        assert fp.getvalue() == data
+
+    @pytest.mark.skipif(IS_WINDOWS, reason="TemporaryFile on Windows always readable")
+    def test_saving_a_file_with_a_closed_file(self):
+        ds = Dataset()
+        ds.BitsAllocated = 8
+
+        with TemporaryFile("+wb") as f:
+            ds.PixelData = f
+
+        with TemporaryFile("+wb") as f:
+            msg = (
+                r"Invalid buffer for \(7FE0,0010\) 'Pixel Data': the buffer has been "
+                "closed"
+            )
+            with pytest.raises(ValueError, match=msg):
+                ds.save_as(f, little_endian=True, implicit_vr=True)
 
 
 @pytest.fixture

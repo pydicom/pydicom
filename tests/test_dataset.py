@@ -5,6 +5,9 @@ import copy
 import io
 import math
 import pickle
+import sys
+import weakref
+import tempfile
 from platform import python_implementation
 
 import pytest
@@ -2851,6 +2854,125 @@ def test_setattr_ignore(setattr_ignore):
         with assert_no_warning():
             getattr(ds, s, None)
             setattr(ds, s, None)
+
+
+class TestDatasetWithBufferedData:
+    """Tests for datasets with buffered element values"""
+
+    def test_pickle_bytesio(self):
+        """Test pickling a dataset with buffered element value"""
+        b = io.BytesIO(b"\x00\x01")
+        ds = Dataset()
+        ds.PixelData = b
+
+        s = pickle.dumps({"ds": ds})
+        ds1 = pickle.loads(s)["ds"]
+        assert ds.PixelData is not ds1.PixelData
+        assert ds == ds1
+
+    def test_pickle_bufferedreader_raises(self):
+        with tempfile.TemporaryDirectory() as tdir:
+            with open(f"{tdir}/foo.bin", "wb") as f:
+                f.write(b"\x00\x01\x02\x03\x04")
+
+            with open(f"{tdir}/foo.bin", "rb") as f:
+                ds = Dataset()
+                ds.PixelData = f
+
+            with pytest.raises(TypeError, match="cannot pickle"):
+                pickle.dumps({"ds": ds})
+
+    def test_copy_bytesio(self):
+        """Test copy.copy() for dataset with buffered element value"""
+        b = io.BytesIO(b"\x00\x01")
+        ds = Dataset()
+        ds.PixelData = b
+        ds2 = copy.copy(ds)
+        assert isinstance(ds2.PixelData, io.BytesIO)
+        assert ds2.PixelData is ds.PixelData
+
+    def test_copy_bytesio_closed(self):
+        """Test copy.copy() for dataset with buffered element value"""
+        b = io.BytesIO(b"\x00\x01")
+        ds = Dataset()
+        ds.PixelData = b
+        b.close()
+
+        ds2 = copy.copy(ds)
+        assert isinstance(ds2.PixelData, io.BytesIO)
+        assert ds2.PixelData is ds.PixelData
+        assert ds2.PixelData.closed
+
+    def test_copy_bufferedreader(self):
+        with tempfile.TemporaryDirectory() as tdir:
+            with open(f"{tdir}/foo.bin", "wb") as f:
+                f.write(b"\x00\x01\x02\x03\x04")
+
+            with open(f"{tdir}/foo.bin", "rb") as f:
+                ds = Dataset()
+                ds.PixelData = f
+
+            ds2 = copy.copy(ds)
+            assert isinstance(ds2.PixelData, io.BufferedReader)
+            assert ds2.PixelData is ds.PixelData
+
+    def test_copy_bufferedreader_closed(self):
+        with tempfile.TemporaryDirectory() as tdir:
+            with open(f"{tdir}/foo.bin", "wb") as f:
+                f.write(b"\x00\x01\x02\x03\x04")
+
+            with open(f"{tdir}/foo.bin", "rb") as f:
+                ds = Dataset()
+                ds.PixelData = f
+
+            ds.PixelData.close()
+
+            ds2 = copy.copy(ds)
+            assert isinstance(ds2.PixelData, io.BufferedReader)
+            assert ds2.PixelData is ds.PixelData
+            assert ds2.PixelData.closed
+
+    def test_deepcopy_bytesio(self):
+        """Test copy.deepcopy() for dataset with buffered element value"""
+        b = io.BytesIO(b"\x00\x01")
+        ds = Dataset()
+        ds.PixelData = b
+
+        ds2 = copy.deepcopy(ds)
+        assert isinstance(ds2.PixelData, io.BytesIO)
+        assert ds2.PixelData is not ds.PixelData
+        assert ds2.PixelData.getvalue() == ds.PixelData.getvalue()
+
+    def test_deepcopy_bytesio_closed(self):
+        """Test copy.deepcopy() for dataset with buffered element value"""
+        b = io.BytesIO(b"\x00\x01")
+        ds = Dataset()
+        ds.PixelData = b
+        b.close()
+
+        msg = (
+            r"Error deepcopying the buffered element \(7FE0,0010\) 'Pixel Data': I/O "
+            "operation on closed file"
+        )
+        with pytest.raises(ValueError, match=msg):
+            copy.deepcopy(ds)
+
+    def test_deepcopy_bufferedreader_raises(self):
+        with tempfile.TemporaryDirectory() as tdir:
+            print(tdir)
+            with open(f"{tdir}/foo.bin", "wb") as f:
+                f.write(b"\x00\x01\x02\x03\x04")
+
+            with open(f"{tdir}/foo.bin", "rb") as f:
+                ds = Dataset()
+                ds.PixelData = f
+
+        msg = (
+            r"Error deepcopying the buffered element \(7FE0,0010\) 'Pixel Data': "
+            "cannot pickle '_io.BufferedReader' object"
+        )
+        with pytest.raises(TypeError, match=msg):
+            copy.deepcopy(ds)
 
 
 @pytest.fixture

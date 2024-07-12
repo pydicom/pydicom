@@ -3399,7 +3399,7 @@ class FileDataset(Dataset):
         if self.filename and os.path.exists(self.filename):
             self.timestamp = os.stat(self.filename).st_mtime
 
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "FileDataset":
+    def __deepcopy__(self, memo: dict[int, Any]) -> "FileDataset":
         """Return a deep copy of the file dataset.
 
         Sets the `buffer` to ``None`` if it's been closed or is otherwise not copyable.
@@ -3409,19 +3409,13 @@ class FileDataset(Dataset):
         FileDataset
             A deep copy of the file dataset.
         """
-        copied = self.__class__(
-            self.filename,  # type: ignore[arg-type]
-            self,
-            self.preamble,
-            self.file_meta,
-            self.is_implicit_VR,  # type: ignore[arg-type]
-            self.is_little_endian,  # type: ignore[arg-type]
-        )
-
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
         for k, v in self.__dict__.items():
             if k == "buffer":
                 try:
-                    copied.__dict__[k] = copy.deepcopy(v)
+                    setattr(result, k, copy.deepcopy(v, memo))
                 except Exception as exc:
                     warn_and_log(
                         f"The {type(exc).__name__} exception '{exc}' occurred "
@@ -3429,11 +3423,11 @@ class FileDataset(Dataset):
                         "from, the 'buffer' attribute will be set to 'None' in the "
                         "copied object"
                     )
-                    copied.__dict__[k] = None
+                    setattr(result, k, copy.deepcopy(None, memo))
             else:
-                copied.__dict__[k] = copy.deepcopy(v)
+                setattr(result, k, copy.deepcopy(v, memo))
 
-        return copied
+        return result
 
 
 def validate_file_meta(
