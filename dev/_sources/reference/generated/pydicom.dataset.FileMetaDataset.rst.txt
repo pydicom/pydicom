@@ -52,6 +52,7 @@
       ~FileMetaDataset.top
       ~FileMetaDataset.trait_names
       ~FileMetaDataset.update
+      ~FileMetaDataset.update_raw_element
       ~FileMetaDataset.validate
       ~FileMetaDataset.values
       ~FileMetaDataset.walk

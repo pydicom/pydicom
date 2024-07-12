@@ -52,6 +52,7 @@
       ~FileDataset.top
       ~FileDataset.trait_names
       ~FileDataset.update
+      ~FileDataset.update_raw_element
       ~FileDataset.values
       ~FileDataset.walk
       ~FileDataset.waveform_array

@@ -52,6 +52,7 @@
       ~Dataset.top
       ~Dataset.trait_names
       ~Dataset.update
+      ~Dataset.update_raw_element
       ~Dataset.values
       ~Dataset.walk
       ~Dataset.waveform_array
