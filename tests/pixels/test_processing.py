@@ -13,6 +13,13 @@ try:
 except ImportError:
     HAVE_NP = False
 
+try:
+    import PIL
+
+    HAVE_PIL = True
+except ImportError:
+    HAVE_PIL = False
+
 from pydicom import dcmread, config
 from pydicom.data import get_testdata_file, get_palette_files
 from pydicom.dataset import Dataset, FileMetaDataset
@@ -20,11 +27,13 @@ from pydicom.pixels.processing import (
     convert_color_space,
     apply_color_lut,
     _expand_segmented_lut,
+    apply_icc_profile,
     apply_modality_lut,
     apply_voi_lut,
     apply_voi,
     apply_windowing,
     apply_presentation_lut,
+    create_icc_transform,
 )
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 
@@ -55,6 +64,11 @@ MOD_16_SEQ = get_testdata_file("mlut_18.dcm")
 # WIN: Windowing operation
 WIN_12_1F = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
 VOI_08_1F = get_testdata_file("vlut_04.dcm")
+# ICC profile
+ICC_PROFILE = get_testdata_file("crayons.icc")
+
+
+TEST_CMS = HAVE_NP and HAVE_PIL
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -1931,3 +1945,192 @@ class TestApplyPresentationLUT:
         )
         for (y, x), result in zip(coords, results):
             assert out[y, x] == result
+
+
+@pytest.mark.skipif(not TEST_CMS, reason="Numpy or PIL are not available")
+class TestApplyICCProfile:
+    """Tests for apply_icc_profile()"""
+
+    def setup_method(self):
+        with open(ICC_PROFILE, "rb") as f:
+            self.profile = f.read()
+
+    def test_invalid_args_raises(self):
+        """Test exception raised if invalid args passed."""
+        arr = np.empty((3, 3), dtype="u1")
+        msg = "Either 'ds' or 'transform' must be supplied"
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(arr)
+
+        msg = "Only one of 'ds' and 'transform' should be used, not both"
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(arr, ds="foo", transform="bar")
+
+    def test_invalid_arr_raises(self):
+        """Test exception raised if invalid ndarray passed."""
+        arr = np.empty((3, 3), dtype="u1")
+        msg = "The ndarray must have 3 or 4 dimensions, not 2"
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(arr, Dataset())
+
+        arr = np.empty((3, 3, 2), dtype="u1")
+        msg = (
+            r"Invalid ndarray shape, must be \(rows, columns, 3\) or \(frames, rows, "
+            r"columns, 3\), not \(3, 3, 2\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(arr, Dataset())
+
+    def test_invalid_intent_raises(self):
+        """Test an invalid intent raises an exception."""
+        ds = Dataset()
+        ds.ICCProfile = self.profile
+
+        msg = "Invalid 'intent' value '-1', must be 0, 1, 2 or 3"
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(np.empty((3, 3, 3)), ds, intent=-1)
+
+    def test_invalid_color_space_raises(self):
+        """Test an invalid color_space raises an exception."""
+        ds = Dataset()
+        ds.ICCProfile = b"\x00\x01"
+        ds.ColorSpace = "ROMMRGB"
+        arr = np.empty((3, 3, 3))
+        msg = (
+            r"The \(0028,2002\) 'Color Space' value 'ROMMRGB' is not supported by "
+            "Pillow, please use the 'color_space' argument to specify a "
+            "supported value"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(arr, ds)
+
+        msg = (
+            "Unsupported 'color_space' value 'ADOBERGB', must be 'sRGB', 'LAB' or "
+            "'XYZ'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_icc_profile(arr, ds, color_space="ADOBERGB")
+
+    def test_ds_profile(self):
+        """Test applying the profile in a dataset"""
+        # Single frame
+        ds = dcmread(RGB_8_3_1F)
+        ds.ICCProfile = self.profile
+
+        arr = ds.pixel_array
+        out = apply_icc_profile(arr.copy(), ds=ds)
+        assert not np.array_equal(arr, out)
+
+        # Multiframe
+        ds = dcmread(RGB_8_3_2F)
+        ds.ICCProfile = self.profile
+
+        arr = ds.pixel_array
+        out = apply_icc_profile(arr.copy(), ds)
+        assert not np.array_equal(arr, out)
+
+    def test_transform(self):
+        """Test applying the profile in a dataset"""
+        # Single frame
+        transform = create_icc_transform(icc_profile=self.profile)
+
+        ds = dcmread(RGB_8_3_1F)
+        arr = ds.pixel_array
+        arr_copy = arr.copy()
+        out = apply_icc_profile(arr_copy, transform=transform)
+        assert not np.array_equal(arr, out)
+        # In-place update
+        assert out is arr_copy
+
+        # Multiframe
+        ds = dcmread(RGB_8_3_2F)
+        arr = ds.pixel_array
+        arr_copy = arr.copy()
+        out = apply_icc_profile(arr_copy, transform=transform)
+        assert not np.array_equal(arr, out)
+        # In-place update
+        assert out is arr_copy
+
+
+@pytest.mark.skipif(not HAVE_NP or HAVE_PIL, reason="Numpy missing PIL not")
+def test_apply_icc_profile_no_pillow_raises():
+    """Test exception raised if PIL is missing."""
+    msg = "Pillow is required to apply an ICC profile to an ndarray"
+    with pytest.raises(ImportError, match=msg):
+        apply_icc_profile(np.empty((3, 3)))
+
+
+@pytest.mark.skipif(not TEST_CMS, reason="Numpy or PIL are not available")
+class TestCreateICCTransform:
+    """Tests for create_icc_transform()"""
+
+    def setup_method(self):
+        with open(ICC_PROFILE, "rb") as f:
+            self.profile = f.read()
+
+    def test_invalid_args_raises(self):
+        """Test exception raised if invalid args passed."""
+        msg = "Either 'ds' or 'icc_profile' must be supplied"
+        with pytest.raises(ValueError, match=msg):
+            create_icc_transform()
+
+        msg = "Only one of 'ds' and 'icc_profile' should be used, not both"
+        with pytest.raises(ValueError, match=msg):
+            create_icc_transform(ds="foo", icc_profile="bar")
+
+    def test_ds_no_profile_raises(self):
+        """Test passing dataset without an ICC Profile raises an exception."""
+        msg = r"No \(0028,2000\) 'ICC Profile' element was found in 'ds'"
+        with pytest.raises(ValueError, match=msg):
+            create_icc_transform(ds=Dataset())
+
+    def test_invalid_intent_raises(self):
+        """Test an invalid intent raises an exception."""
+        ds = Dataset()
+        ds.ICCProfile = self.profile
+
+        msg = "Invalid 'intent' value '-1', must be 0, 1, 2 or 3"
+        with pytest.raises(ValueError, match=msg):
+            create_icc_transform(ds, intent=-1)
+
+    def test_invalid_color_space_raises(self):
+        """Test an invalid color_space raises an exception."""
+        ds = Dataset()
+        ds.ICCProfile = self.profile
+        ds.ColorSpace = "ROMMRGB"
+
+        msg = (
+            r"The \(0028,2002\) 'Color Space' value 'ROMMRGB' is not supported by "
+            "Pillow, please use the 'color_space' argument to specify a "
+            "supported value"
+        )
+        with pytest.raises(ValueError, match=msg):
+            create_icc_transform(ds)
+
+        msg = (
+            "Unsupported 'color_space' value 'ADOBERGB', must be 'sRGB', 'LAB' or "
+            "'XYZ'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            create_icc_transform(ds, color_space="ADOBERGB")
+
+    def test_transform(self):
+        """Test creating transforms"""
+        transform = create_icc_transform(icc_profile=self.profile)
+        assert isinstance(transform, PIL.ImageCms.ImageCmsTransform)
+        p = transform.output_profile
+        assert "sRGB" in p.profile.profile_description
+
+        ds = Dataset()
+        ds.ICCProfile = self.profile
+        transform = create_icc_transform(ds)
+        p = transform.output_profile
+        assert "sRGB" in p.profile.profile_description
+
+
+@pytest.mark.skipif(TEST_CMS, reason="Numpy or PIL are available")
+def test_create_icc_transform_no_pillow_raises():
+    """Test exception raised if PIL is missing."""
+    msg = "Pillow is required to create a color transformation object"
+    with pytest.raises(ImportError, match=msg):
+        create_icc_transform()

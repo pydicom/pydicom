@@ -38,8 +38,8 @@ except ImportError:
 # directory, add these directories to sys.path here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-sys.path.insert(0, os.path.abspath("../build_tools/sphinx"))  # noqa
-from github_link import make_linkcode_resolve  # noqa: E402
+sys.path.insert(0, os.path.abspath("../build_tools/sphinx"))
+from github_link import make_linkcode_resolve
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -97,6 +97,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
+    "pillow": ("https://pillow.readthedocs.io/en/stable", None),
 }
 
 sphinx_gallery_conf = {
@@ -316,7 +317,7 @@ def setup(app):
 # The following is used by sphinx.ext.linkcode to provide links to github
 linkcode_resolve = make_linkcode_resolve(
     "pydicom",
-    "https://github.com/pydicom/pydicom/blob/{revision}/{package}/{path}#L{lineno}",  # noqa
+    "https://github.com/pydicom/pydicom/blob/{revision}/{package}/{path}#L{lineno}",
 )
 
 doctest_global_setup = """

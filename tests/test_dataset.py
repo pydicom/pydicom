@@ -1696,6 +1696,45 @@ class TestDataset:
         ds._set_pixel_representation(ds["PixelRepresentation"])
         assert ds._pixel_rep == 0
 
+    def test_update_raw(self):
+        """Tests for Dataset.update_raw_element()"""
+        ds = Dataset()
+
+        msg = "Either or both of 'vr' and 'value' are required"
+        with pytest.raises(ValueError, match=msg):
+            ds.update_raw_element(None)
+
+        msg = "Invalid VR value 'XX'"
+        with pytest.raises(ValueError, match=msg):
+            ds.update_raw_element(None, vr="XX")
+
+        msg = "'value' must be bytes, not 'int'"
+        with pytest.raises(TypeError, match=msg):
+            ds.update_raw_element(None, value=1234)
+
+        msg = r"No element with tag \(0010,0010\) was found"
+        with pytest.raises(KeyError, match=msg):
+            ds.update_raw_element(0x00100010, vr="US")
+
+        ds.PatientName = "Foo"
+        msg = (
+            r"The element with tag \(0010,0010\) has already been converted to a "
+            "'DataElement' instance, this method must be called earlier"
+        )
+        with pytest.raises(TypeError, match=msg):
+            ds.update_raw_element(0x00100010, vr="US")
+
+        raw = RawDataElement(0x00100010, "PN", 4, b"Fooo", 0, True, True)
+        ds._dict[0x00100010] = raw
+        ds.update_raw_element("PatientName", vr="US")
+        assert ds.PatientName == [28486, 28527]
+        assert isinstance(ds["PatientName"].VR, str)
+
+        raw = RawDataElement(0x00100010, "PN", 4, b"Fooo", 0, True, True)
+        ds._dict[0x00100010] = raw
+        ds.update_raw_element(0x00100010, value=b"Bar")
+        assert ds.PatientName == "Bar"
+
 
 class TestDatasetSaveAs:
     def test_no_transfer_syntax(self):
@@ -2239,38 +2278,156 @@ class TestFileDataset:
 
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
-    def test_copy_filedataset(self):
+    def test_copy_filelike_open(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        assert not f.closed
+
+        ds_copy = copy.copy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+        f.close()
+
+    def test_copy_filelike_closed(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        f.close()
+        assert f.closed
+
+        ds_copy = copy.copy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_copy_buffer_open(self):
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
+            data = fb.read()
+        buff = io.BytesIO(data)
+        ds = pydicom.dcmread(buff)
+
+        ds_copy = copy.copy(ds)
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert ds_copy.filename is None
+        assert ds_copy == ds
+        # Shallow copy, the two buffers share the same object
+        assert ds_copy.buffer is ds.buffer
+        assert not ds.buffer.closed
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_copy_buffer_closed(self):
         with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
         buff.close()
-        msg = (
-            "The 'filename' attribute of the dataset is a "
-            "file-like object and will be set to None"
-        )
-        with pytest.warns(UserWarning, match=msg):
-            ds_copy = copy.copy(ds)
-        assert ds.filename is not None
-        assert ds_copy.filename is None
+        assert buff.closed
+
+        ds_copy = copy.copy(ds)
         assert ds_copy == ds
 
-    def test_deepcopy_filedataset(self):
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert ds.buffer.closed
+
+        assert ds_copy.filename is None
+        assert ds_copy.buffer is buff
+        assert ds_copy.buffer.closed
+
+        # Shallow copy, the two buffers share the same object
+        assert ds_copy.buffer is ds.buffer
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_deepcopy_filelike_open(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        assert not f.closed
+
+        ds_copy = copy.deepcopy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+        f.close()
+
+    def test_deepcopy_filelike_closed(self):
+        f = open(get_testdata_file("CT_small.dcm"), "rb")
+        ds = pydicom.dcmread(f)
+        f.close()
+        assert f.closed
+
+        ds_copy = copy.deepcopy(ds)
+        assert ds.PatientName == ds_copy.PatientName
+        assert ds.filename.endswith("CT_small.dcm")
+        assert ds.buffer is None
+        assert ds_copy.filename.endswith("CT_small.dcm")
+        assert ds_copy.buffer is None
+        assert ds_copy == ds
+        assert ds_copy.fileobj_type == ds.fileobj_type
+
+    def test_deepcopy_buffer_open(self):
+        # regression test for #1147
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
+            data = fb.read()
+        buff = io.BytesIO(data)
+        ds = pydicom.dcmread(buff)
+        assert not buff.closed
+
+        ds_copy = copy.deepcopy(ds)
+        assert ds_copy == ds
+
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert not ds.buffer.closed
+
+        assert ds_copy.filename is None
+        assert isinstance(ds_copy.buffer, io.BytesIO)
+        assert not ds_copy.buffer.closed
+
+        # Deep copy, the two buffers should not be the same object, but equal otherwise
+        assert ds.buffer is not ds_copy.buffer
+        assert ds.buffer.getvalue() == ds_copy.buffer.getvalue()
+
+    def test_deepcopy_buffer_closed(self):
         # regression test for #1147
         with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
         buff.close()
+        assert buff.closed
         msg = (
-            "The 'filename' attribute of the dataset is a "
-            "file-like object and will be set to None"
+            r"The ValueError exception '(.*)' occurred trying to deepcopy the "
+            "buffer-like the dataset was read from, the 'buffer' attribute will be "
+            "set to 'None' in the copied object"
         )
         with pytest.warns(UserWarning, match=msg):
             ds_copy = copy.deepcopy(ds)
-        assert ds.filename is not None
-        assert ds_copy.filename is None
+
         assert ds_copy == ds
+
+        # Deep copy, the two buffers should not be the same object but
+        #   cannot copy a closed IOBase object
+        assert ds.filename is None
+        assert ds.buffer is buff
+        assert ds.buffer.closed
+
+        assert ds_copy.filename is None
+        assert ds_copy.buffer is None
 
     def test_equality_with_different_metadata(self):
         ds = dcmread(get_testdata_file("CT_small.dcm"))
@@ -2289,9 +2446,12 @@ class TestFileDataset:
         ds = FileDataset(
             filename_or_obj="", dataset={}, file_meta=file_meta, preamble=b"\0" * 128
         )
+        assert ds.filename == ""
+        assert ds.buffer is None
 
         ds2 = copy.deepcopy(ds)
         assert ds2.filename == ""
+        assert ds2.buffer is None
 
     def test_deepcopy_dataset_subclass(self):
         """Regression test for #1813."""
@@ -2314,6 +2474,22 @@ class TestFileDataset:
 
         ds3 = copy.deepcopy(ds2)
         assert ds3 == ds
+
+    def test_buffer(self):
+        """Test the buffer attribute."""
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
+            buffer = io.BytesIO(fb.read())
+
+        ds = dcmread(buffer)
+        assert ds.filename is None
+        assert ds.buffer is buffer
+        assert ds.fileobj_type == io.BytesIO
+
+        # Deflated datasets get inflated to a DicomBytesIO() buffer
+        ds = dcmread(get_testdata_file("image_dfl.dcm"))
+        assert ds.filename.endswith("image_dfl.dcm")
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert ds.fileobj_type == DicomBytesIO
 
 
 class TestDatasetOverlayArray:

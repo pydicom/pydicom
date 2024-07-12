@@ -46,16 +46,16 @@ docs = [
 
 dev = [
     "black==24.4.2",
-    "mypy==1.10.0",
+    "mypy==1.10.1",
     "pydicom-data",
     "pytest",
     "pytest-cov",
-    "ruff==0.4.7",
+    "ruff==0.5.0",
     "types-requests",
     "pre-commit",
 ]
 
-basic = ["numpy"]
+basic = ["numpy", "types-pydicom"]
 
 pixeldata = [
     "numpy",
@@ -96,7 +96,6 @@ force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 [tool.ruff]
 src = ["src"]
 line-length = 214
-target-version = "py310"
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
 
 [tool.ruff.lint]
@@ -105,13 +104,15 @@ select = [
     "C9",
     "E",
     "F",
+    "PERF",
     "PL",
     "W",
 ]
 ignore = [
-    "PLR5501",
+    "PERF203",
     "PLC1901",
     "PLR2004",
+    "PLR5501",
     "PLW0603",
     "PLW2901",
 ]
@@ -127,7 +128,9 @@ max-statements = 108
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
+"src/pydicom/_*_dict.py" = ["E501"]
 "src/pydicom/config.py" = ["PLW0602"]
+"src/pydicom/uid.py" = ["E501"]
 "src/pydicom/sr/_concepts_dict.py" = ["F601"]
 "tests/*.py" = ["F401"]
 
@@ -135,7 +138,6 @@ max-statements = 108
 python_version = "3.10"
 files = "src/"
 exclude = ["src/pydicom/benchmarks/", "src/pydicom/pixel_data_handlers/pillow_handler.py"]
-hide_error_codes = false
 warn_redundant_casts = false
 warn_unused_ignores = false
 warn_return_any = true

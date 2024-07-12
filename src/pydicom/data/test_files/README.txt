@@ -342,6 +342,12 @@ MR-SIEMENS-DICOM-WithOverlays.dcm (from GDCM)
     * Icon Image Sequence
     * 8-bit Palette Color LUT
 
+== ICC Profiles ==
+
+* crayons.icc
+
+    ICC profile from https://github.com/mm2/Little-CMS (MIT License)
+
 
 == Licenses ==
 

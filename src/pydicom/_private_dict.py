@@ -1473,6 +1473,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '01F1xx0D': ('DS', '1', 'Rotation Angle', ''),  # noqa
         '01F1xx0E': ('FL', '1', 'Unknown', ''),  # noqa
         '01F1xx26': ('DS', '1', 'Pitch', ''),  # noqa
+        '01F11026': ('FD', '1', 'Pitch', ''),  # noqa
         '01F1xx27': ('DS', '1', 'Rotation Time', ''),  # noqa
         '01F1xx28': ('DS', '1', 'Unknown', ''),  # noqa
         '01F1xx30': ('US', '1', 'Unknown', ''),  # noqa

@@ -49,7 +49,7 @@ have_gdcm_handler = gdcm_handler.is_available()
 
 have_numpy = pydicom.config.have_numpy
 if have_numpy:
-    import numpy  # NOQA
+    import numpy
 
 try:
     import jpeg_ls
@@ -285,6 +285,8 @@ class TestReader:
         # If we can read anything else, the decompression must have been ok.
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert ds.filename == deflate_name
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR
@@ -1664,6 +1666,17 @@ class TestDeferredRead:
 
     def test_filelike_deferred(self):
         """Deferred values work with file-like objects."""
+        f = open(ct_name, "rb")
+        dataset = pydicom.dcmread(f, defer_size=1024)
+        assert 32768 == len(dataset.PixelData)
+        # The 'Histogram tables' private data element is also > 1024 bytes so
+        # pluck this out to confirm multiple deferred reads work (#1609).
+        private_block = dataset.private_block(0x43, "GEMS_PARM_01")
+        assert 2068 == len(private_block[0x29].value)
+        f.close()
+
+    def test_buffer_deferred(self):
+        """Deferred values work with buffer-like objects."""
         with open(ct_name, "rb") as fp:
             data = fp.read()
         filelike = io.BytesIO(data)
@@ -1673,6 +1686,13 @@ class TestDeferredRead:
         # pluck this out to confirm multiple deferred reads work (#1609).
         private_block = dataset.private_block(0x43, "GEMS_PARM_01")
         assert 2068 == len(private_block[0x29].value)
+
+    def test_named_buffer_deferred(self):
+        """Deferred values work with file-like objects."""
+        path = get_testdata_file("image_dfl.dcm")
+        ds = pydicom.dcmread(path, defer_size=1024)
+        assert isinstance(ds.buffer, DicomBytesIO)
+        assert 262144 == len(ds.PixelData)
 
 
 class TestReadTruncatedFile:
