@@ -35,6 +35,10 @@ Changes
   method will now raise an exception if the user tries to convert between little
   and big endian datasets. If this is something you need, use
   :func:`~pydicom.filewriter.dcmwrite` instead.
+* :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>` and
+  :func:`~pydicom.filewriter.dcmwrite` will now raise a :class:`FileExistsError` by
+  default when trying to write to a file that already exists. This behavior can be
+  overridden by passing ``exist_ok=True`` (:issue:`2104`).
 * `implicit_vr`, `little_endian` and `force_encoding` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`.
 * The priority used to decide which encoding to use with

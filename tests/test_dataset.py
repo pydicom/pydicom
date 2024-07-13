@@ -4,11 +4,12 @@
 import copy
 import io
 import math
+from pathlib import Path
 import pickle
+from platform import python_implementation
 import sys
 import weakref
 import tempfile
-from platform import python_implementation
 
 import pytest
 
@@ -2092,6 +2093,24 @@ class TestDatasetSaveAs:
         ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
         with pytest.raises(ValueError, match=msg):
             ds.save_as(DicomBytesIO())
+
+    def test_exist_ok(self):
+        """Test the exist_ok argument"""
+        ds = dcmread(get_testdata_file("MR_small.dcm"))
+        patient_name = ds.PatientName
+
+        with tempfile.TemporaryDirectory() as tdir:
+            p = Path(tdir) / "foo.dcm"
+            p.touch()
+
+            assert p.exists()
+
+            msg = r"File exists: '(.*)foo.dcm'"
+            with pytest.raises(FileExistsError, match=msg):
+                ds.save_as(p, exist_ok=False)
+
+            ds.save_as(p, exist_ok=True)
+            assert dcmread(p).PatientName == patient_name
 
 
 class TestDatasetElements:
