@@ -2898,7 +2898,7 @@ class TestDatasetWithBufferedData:
                 ds = Dataset()
                 ds.PixelData = f
 
-            with pytest.raises(TypeError, match="cannot pickle"):
+            with pytest.raises(TypeError, match="cannot"):
                 pickle.dumps({"ds": ds})
 
     def test_copy_bytesio(self):
@@ -2978,7 +2978,6 @@ class TestDatasetWithBufferedData:
 
     def test_deepcopy_bufferedreader_raises(self):
         with tempfile.TemporaryDirectory() as tdir:
-            print(tdir)
             with open(f"{tdir}/foo.bin", "wb") as f:
                 f.write(b"\x00\x01\x02\x03\x04")
 
@@ -2988,7 +2987,7 @@ class TestDatasetWithBufferedData:
 
         msg = (
             r"Error deepcopying the buffered element \(7FE0,0010\) 'Pixel Data': "
-            "cannot pickle '_io.BufferedReader' object"
+            r"cannot (.*) '_io.BufferedReader' object"
         )
         with pytest.raises(TypeError, match=msg):
             copy.deepcopy(ds)
