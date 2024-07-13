@@ -3,7 +3,6 @@
 
 from collections.abc import Iterator
 from io import BytesIO, BufferedIOBase
-import logging
 import os
 from struct import pack, unpack
 from typing import Any
@@ -13,9 +12,6 @@ from pydicom.misc import warn_and_log
 from pydicom.filebase import DicomBytesIO, DicomIO, ReadableBuffer
 from pydicom.fileutil import buffer_length, reset_buffer_position
 from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
-
-
-LOGGER = logging.getLogger(__name__)
 
 
 # Functions for parsing encapsulated data
@@ -865,28 +861,15 @@ class EncapsulatedBuffer(BufferedIOBase):
         if self._offset >= self.encapsulated_length:
             return b""
 
-        LOGGER.debug(
-            f"EncapsulatedBuffer.read({size}): item offsets {self.offsets}, lengths "
-            f"{self.lengths}, BOT {self._use_bot}, total encapsulated length "
-            f"{self.encapsulated_length} bytes"
-        )
-
         size = self.encapsulated_length if size is None else size
 
         nr_read = 0
         out = bytearray()
         while length := (size - nr_read):
-            LOGGER.debug(
-                f" At offset {self._offset}, {nr_read} bytes have been read, "
-                f"{length} remaining"
-            )
-
             iterator = enumerate(zip(self._item_offsets, self._item_offsets[1:]))
             for idx, (start, end) in iterator:
-                LOGGER.debug(f"  {idx}: ({start} <= {self._offset} < {end})")
                 if start <= self._offset < end:
                     _read = self._buffers[idx].read(self._offset - start, length)
-                    LOGGER.debug(f"   Asked for {length} bytes, got {len(_read)}")
                     break
 
             if not _read:
