@@ -3,6 +3,7 @@
 
 from collections.abc import Callable, Iterator, Iterable
 import logging
+from io import BufferedIOBase
 import sys
 from typing import Any, BinaryIO, cast, TYPE_CHECKING
 
@@ -683,7 +684,10 @@ class DecodeRunner(RunnerBase):
         if isinstance(src, Dataset):
             self._set_options_ds(src)
             self._src = src[self.pixel_keyword].value
-            self._src_type = "Dataset"
+            if isinstance(self._src, BufferedIOBase):
+                self._src_type = "BinaryIO"
+            else:
+                self._src_type = "Dataset"
         elif hasattr(src, "read"):
             self._src = src
             self._src_type = "BinaryIO"

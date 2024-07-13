@@ -1,12 +1,14 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 
-from collections.abc import Callable
 from io import BytesIO
 import os
 from struct import Struct
 from types import TracebackType
-from typing import cast, Any, TypeVar, Protocol
+from typing import TYPE_CHECKING, cast, Any, TypeVar, Protocol
+
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Callable
 
 
 ExitException = tuple[

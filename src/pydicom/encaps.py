@@ -1451,8 +1451,7 @@ def _get_frame_offsets(fp: DicomIO) -> tuple[bool, list[int]]:
     if length == 0:
         offsets.append(0)
 
-    for ii in range(length // 4):
-        offsets.append(fp.read_UL())
+    offsets.extend(fp.read_UL() for ii in range(length // 4))
 
     return bool(length), offsets
 
