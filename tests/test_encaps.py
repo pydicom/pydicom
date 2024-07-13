@@ -3226,20 +3226,24 @@ class TestBufferedFrame:
 
 
 class FooBuffer(BytesIO):
+    _read = b""
     _readable = True
     _seekable = True
     _tell = 0
 
+    def read(self, size):
+        return self._read
+
     def readable(self):
         return self._readable
+
+    def seek(self, offset, whence=0):
+        return self._tell
 
     def seekable(self):
         return self._seekable
 
     def tell(self):
-        return self._tell
-
-    def seek(self, offset, whence=0):
         return self._tell
 
 
@@ -3550,6 +3554,17 @@ class TestEncapsulatedBuffer:
         out = eb.read()
         assert out[222:] == b"\x07\x08\x00"
         assert eb.tell() == 670
+
+    def test_read_none(self):
+        """Test read() when no data available from the buffer."""
+        b = FooBuffer()
+        b._tell = 20
+        eb = EncapsulatedBuffer([b])
+        assert eb.encapsulated_length == 36
+
+        # Start of FooBuffer's data
+        eb.seek(16)
+        assert eb.read(20) == b""
 
     def test_readable(self):
         """Test readable()"""
