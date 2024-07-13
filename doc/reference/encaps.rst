@@ -42,4 +42,9 @@ Creating Encapsulated Data
    fragment_frame
    itemize_fragment
    itemize_frame
-   EncapsulatedBuffer
+
+
+Management class for encapsulating buffers:
+
+.. autoclass:: EncapsulatedBuffer
+    :exclude-members: close, detach, fileno, flush, isatty, read1, readinto, readint1, readline, readlines, truncate, writable, write, writelines
