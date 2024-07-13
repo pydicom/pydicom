@@ -145,7 +145,7 @@ memory when creating datasets::
     with open("a_large_amount_of_data", "rb") as f:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxIOD = ExplicitVRLittleEndian
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds.PixelData = f
         ds.save_as("large_dataset.dcm")
 
@@ -161,7 +161,7 @@ the buffered frames::
     with open("a_large_jpeg2000_file.j2k", "rb") as f:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxIOD = JPEG2000Lossless
+        ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
         ds.PixelData = encapsulate_buffer([f])
         ds.save_as("large_compressed_dataset.dcm")
 
