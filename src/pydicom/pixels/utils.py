@@ -5,7 +5,6 @@ from collections.abc import Iterable, Iterator, ByteString
 import importlib
 import logging
 from pathlib import Path
-from os import PathLike
 from struct import unpack, Struct
 from sys import byteorder
 from typing import BinaryIO, Any, cast, TYPE_CHECKING
@@ -32,6 +31,7 @@ from pydicom.uid import (
 from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
+    from os import PathLike
     from pydicom.dataset import Dataset
 
 

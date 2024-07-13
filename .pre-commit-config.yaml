@@ -21,7 +21,7 @@ repos:
       exclude: _.*_dict.py
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.4.7
+  rev: v0.5.1
   hooks:
   - id: ruff
     args: [src, --fix, --show-fixes, --exit-non-zero-on-fix]

@@ -524,7 +524,7 @@ class RecordNode(Iterable["RecordNode"]):
         for node in self:
             indent = indent_char * node.depth
             if node.children:
-                s.append(f"{indent}{str(node)}")
+                s.append(f"{indent}{node}")
                 # Summarise any leaves at the next level
                 for child in node.children:
                     if child.has_instance:
@@ -1470,10 +1470,7 @@ class FileSet:
 
             return True
 
-        matches = []
-        for instance in self:
-            if match(instance, **kwargs):
-                matches.append(instance)
+        matches = [instance for instance in self if match(instance, **kwargs)]
 
         if not load and not has_elements:
             warn_and_log(
