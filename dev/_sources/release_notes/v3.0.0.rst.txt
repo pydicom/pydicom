@@ -234,6 +234,8 @@ Enhancements
   prior to conversion to a :class:`~pydicom.dataelem.DataElement` (:issue:`1739`).
 * Added support for using :class:`io.BufferedIOBase` subclasses to set the value for
   elements with O* VRs such as **OB** and **OW** (:issue:`1913`).
+* Added elements with **OB**,  **OD**, **OF**, **OL**, **OW**, **OV** VRs to the type
+  validation checking when setting :class:`~pydicom.dataelem.DataElement` values (:issue:`1414`).
 
 
 Fixes
