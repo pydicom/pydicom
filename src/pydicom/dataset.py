@@ -2533,7 +2533,7 @@ class Dataset:
         implicit_vr: bool | None = None,
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
-        exist_ok: bool = False,
+        exist_ok: bool = True,
         **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
@@ -2602,9 +2602,9 @@ class Dataset:
               *File Meta Information Group* elements then they will not be
               added or written
         exist_ok : bool, optional
-            If ``False`` (default) and `filename` is a :class:`str` or PathLike, then
-            raise a :class:`FileExistsError` if a file already exists with the given
-            filename.
+            If ``False`` and `filename` is a :class:`str` or PathLike, then raise a
+            :class:`FileExistsError` if a file already exists with the given filename
+            (default ``True``).
 
         See Also
         --------
