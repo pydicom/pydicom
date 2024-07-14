@@ -1263,7 +1263,12 @@ class TestDataElementValidation:
         assert ds.PixelData == b"\x00\x01"
 
     @pytest.mark.parametrize("value", (None, b"", b"\x00", b"\x00\x01\x02\x03"))
-    def test_valid_o_star_value(self, value):
+    def test_valid_o_star_bytes(self, value):
+        for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
+            DataElement(0x00410001, "vr", value, validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (bytearray(), bytearray(b"\x00\x01\x02\x03")))
+    def test_valid_o_star_bytearray(self, value):
         for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
             DataElement(0x00410001, "vr", value, validation_mode=config.RAISE)
 
