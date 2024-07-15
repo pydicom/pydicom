@@ -147,7 +147,8 @@ if __name__ == "__main__":
         root = ET.fromstring(response.read().decode("utf-8"))
 
     entries = parse_private_docbook(root)
-    entries.update(ADDITIONS)
+    for creator in ADDITIONS:
+        entries[creator].update(ADDITIONS[creator])
 
     with open(PYDICOM_DICT_FILENAME, "w", encoding="utf8") as py_file:
         py_file.write('"""' + PYDICOM_DICT_DOCSTRING + '"""')
