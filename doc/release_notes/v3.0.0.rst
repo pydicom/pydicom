@@ -26,7 +26,7 @@ Changes
   (:issue:`1773`).
 * :attr:`DataElement.VM<pydicom.dataelem.DataElement.VM>` always returns ``1``
   for **SQ** elements (:issue:`1481`).
-* DICOM dictionary updated to 2023d.
+* DICOM dictionary updated to 2024c.
 * Concepts dictionaries updated to 2024c.
 * :func:`~pydicom.dataset.validate_file_meta` now checks to ensure required
   Type 1 elements aren't empty.
