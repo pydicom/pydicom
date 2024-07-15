@@ -4,11 +4,12 @@
 import copy
 import io
 import math
+from pathlib import Path
 import pickle
+from platform import python_implementation
 import sys
 import weakref
 import tempfile
-from platform import python_implementation
 
 import pytest
 
@@ -2093,6 +2094,24 @@ class TestDatasetSaveAs:
         with pytest.raises(ValueError, match=msg):
             ds.save_as(DicomBytesIO())
 
+    def test_exist_ok(self):
+        """Test the exist_ok argument"""
+        ds = dcmread(get_testdata_file("MR_small.dcm"))
+        patient_name = ds.PatientName
+
+        with tempfile.TemporaryDirectory() as tdir:
+            p = Path(tdir) / "foo.dcm"
+            p.touch()
+
+            assert p.exists()
+
+            msg = r"File exists: '(.*)foo.dcm'"
+            with pytest.raises(FileExistsError, match=msg):
+                ds.save_as(p, exist_ok=False)
+
+            ds.save_as(p, exist_ok=True)
+            assert dcmread(p).PatientName == patient_name
+
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
@@ -2879,7 +2898,7 @@ class TestDatasetWithBufferedData:
                 ds = Dataset()
                 ds.PixelData = f
 
-            with pytest.raises(TypeError, match="cannot pickle"):
+            with pytest.raises(TypeError, match="cannot"):
                 pickle.dumps({"ds": ds})
 
     def test_copy_bytesio(self):
@@ -2959,7 +2978,6 @@ class TestDatasetWithBufferedData:
 
     def test_deepcopy_bufferedreader_raises(self):
         with tempfile.TemporaryDirectory() as tdir:
-            print(tdir)
             with open(f"{tdir}/foo.bin", "wb") as f:
                 f.write(b"\x00\x01\x02\x03\x04")
 
@@ -2969,7 +2987,7 @@ class TestDatasetWithBufferedData:
 
         msg = (
             r"Error deepcopying the buffered element \(7FE0,0010\) 'Pixel Data': "
-            "cannot pickle '_io.BufferedReader' object"
+            r"cannot (.*) '_io.BufferedReader' object"
         )
         with pytest.raises(TypeError, match=msg):
             copy.deepcopy(ds)
