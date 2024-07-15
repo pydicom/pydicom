@@ -130,9 +130,9 @@
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>Many DICOM SOP classes contain bulk pixel data, which is usually used to
-represent one or more image frames (although <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.18.3.html">other types of data</a> are possible). In these SOP classes the pixel
+represent one or more image frames (although <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.18.3.html">other types of data</a> are possible). In these SOP classes the pixel
 data is (almost) always contained in the (7FE0,0010) <em>Pixel Data</em> element.
-The only exception to this is <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.75.3.html">Parametric Map Storage</a> which may instead contain data in the (7FE0,0008)
+The only exception to this is <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.75.3.html">Parametric Map Storage</a> which may instead contain data in the (7FE0,0008)
 <em>Float Pixel Data</em> or (7FE0,0009) <em>Double Float Pixel Data</em> elements.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -156,12 +156,12 @@ stored in a variety of different ways:</p>
 <div><ul class="simple">
 <li><p>The pixel values may be signed or unsigned integers, or floats</p></li>
 <li><p>There may be multiple image frames</p></li>
-<li><p>There may be <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1">multiple planes per frame</a> (i.e. RGB) and the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3">order
+<li><p>There may be <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1">multiple planes per frame</a> (i.e. RGB) and the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3">order
 of the pixels</a> may be different</p></li>
 <li><p>The image data may be encoded using one of the available compression
 standards (<code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.50</span></code> <em>JPEG Baseline</em>,
 <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code> <em>RLE Lossless</em>, etc). Encoded image data will also
-be <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a> and each encapsulated image
+be <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a> and each encapsulated image
 frame may be broken up into one or more fragments.</p></li>
 </ul>
 </div></blockquote>
@@ -236,7 +236,7 @@ of <em>Photometric Interpretation</em> to match.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>See the DICOM Standard, Part 3,
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1">Section C.7.6.3.1</a> for more
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1">Section C.7.6.3.1</a> for more
 information about color spaces.</p>
 </div>
 </section>
@@ -258,7 +258,7 @@ to apply a palette color LUT to the pixel data to produce an RGB image.</p>
 </pre></div>
 </div>
 <p>It’s also possible to apply one of the DICOM
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_B.html">well-known color palettes</a> provided the bit-depth
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_B.html">well-known color palettes</a> provided the bit-depth
 of the pixel data is 8-bit.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
 <span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
@@ -272,13 +272,13 @@ of the pixel data is 8-bit.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>See the DICOM Standard, Part 3, Annexes
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">C.7.6.3</a> and
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.9.html">C.7.9</a> for more information.</p>
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">C.7.6.3</a> and
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.9.html">C.7.9</a> for more information.</p>
 </div>
 </section>
 <section id="modality-lut-or-rescale-operation">
 <h2>Modality LUT or Rescale Operation<a class="headerlink" href="#modality-lut-or-rescale-operation" title="Link to this heading">¶</a></h2>
-<p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Modality LUT</a> module
+<p>The DICOM <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Modality LUT</a> module
 converts raw pixel data values to a specific (possibly unitless) physical
 quantity, such as Hounsfield units for CT. The
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.apply_modality_lut.html#pydicom.pixels.processing.apply_modality_lut" title="pydicom.pixels.processing.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> function can be
@@ -297,7 +297,7 @@ first.</p>
 </section>
 <section id="voi-lut-or-windowing-operation">
 <h2>VOI LUT or Windowing Operation<a class="headerlink" href="#voi-lut-or-windowing-operation" title="Link to this heading">¶</a></h2>
-<p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT</a> module applies a
+<p>The DICOM <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT</a> module applies a
 VOI or windowing operation to input values. The
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.apply_voi_lut.html#pydicom.pixels.processing.apply_voi_lut" title="pydicom.pixels.processing.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> function
 can be used with an input array and a dataset containing a VOI LUT module to

@@ -112,41 +112,41 @@
 <section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.alphabetic" title="pydicom.valuerep.PersonName.alphabetic"><code class="xref py py-attr docutils literal notranslate"><span class="pre">alphabetic</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1634">#1634</a>)</p></li>
-<li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.json_key" title="pydicom.tag.BaseTag.json_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">json_key</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1648">#1648</a>)</p></li>
+<li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.alphabetic" title="pydicom.valuerep.PersonName.alphabetic"><code class="xref py py-attr docutils literal notranslate"><span class="pre">alphabetic</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1634">#1634</a>)</p></li>
+<li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.json_key" title="pydicom.tag.BaseTag.json_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">json_key</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1648">#1648</a>)</p></li>
 <li><p>Added value validation for numerical VRs, add type validation for all
-validated VRs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1414">#1414</a>)</p></li>
+validated VRs (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1414">#1414</a>)</p></li>
 <li><p>CLI commands now accept <em>pydicom</em> charset test files and CLI help shows
-Python Version (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1674">#1674</a>)</p></li>
-<li><p>Added support for Python 3.11 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1658">#1658</a>)</p></li>
+Python Version (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1674">#1674</a>)</p></li>
+<li><p>Added support for Python 3.11 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1658">#1658</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.ISfloat.html#pydicom.valuerep.ISfloat" title="pydicom.valuerep.ISfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISfloat</span></code></a> to allow non-strict reading of
-existing files with float IS values (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1661">#1661</a>)</p></li>
+existing files with float IS values (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1661">#1661</a>)</p></li>
 <li><p>Improved speed of creating and accessing highly nested structures
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1728">#1728</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1734">#1734</a>)</p></li>
-<li><p>Switched to a pyproject.toml build process (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1792">#1792</a>)</p></li>
-<li><p>Updated DICOM and UID dicts to DICOM 2023b (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1803">#1803</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1728">#1728</a>, <a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1734">#1734</a>)</p></li>
+<li><p>Switched to a pyproject.toml build process (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1792">#1792</a>)</p></li>
+<li><p>Updated DICOM and UID dicts to DICOM 2023b (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1803">#1803</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed length validation of DS values with maximum length without a leading
-zero (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1632">#1632</a>)</p></li>
-<li><p>Increased download speed with progress bar for test data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1611">#1611</a>)</p></li>
-<li><p>Fixed crash due to invalid private creator (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1638">#1638</a>)</p></li>
-<li><p>Fixed extremely long BytesLengthException error messages (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1683">#1683</a>)</p></li>
+zero (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1632">#1632</a>)</p></li>
+<li><p>Increased download speed with progress bar for test data (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1611">#1611</a>)</p></li>
+<li><p>Fixed crash due to invalid private creator (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1638">#1638</a>)</p></li>
+<li><p>Fixed extremely long BytesLengthException error messages (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1683">#1683</a>)</p></li>
 <li><p>In codify, ensure unique variable names for DICOM keywords repeated
-in sequences, and handle unicode characters correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1670">#1670</a>)</p></li>
+in sequences, and handle unicode characters correctly (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1670">#1670</a>)</p></li>
 <li><p>Fixed handling of some invalid values in
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_json_dict()</span></code></a> if <cite>suppress_invalid_tags</cite> is
-set to <cite>True</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1693">#1693</a>)</p></li>
+set to <cite>True</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1693">#1693</a>)</p></li>
 <li><p>Fixed reading of data with 8 bits allocated, encoded in Big Endian transfer
-syntax using VR <code class="docutils literal notranslate"><span class="pre">OW</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1680">#1680</a>)</p></li>
+syntax using VR <code class="docutils literal notranslate"><span class="pre">OW</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1680">#1680</a>)</p></li>
 <li><p>Fixed crash if reading regular dataset that has the SOP Class of a DICOMDIR
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1702">#1702</a>)</p></li>
-<li><p>Fixed wrong waveform data calculation when as_raw=False and baseline!=0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1667">#1667</a>)</p></li>
-<li><p>Fixed reading LUTData to expected size (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1747">#1747</a>)</p></li>
-<li><p>Fixed handling of AT VRs when codifying data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1738">#1738</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1702">#1702</a>)</p></li>
+<li><p>Fixed wrong waveform data calculation when as_raw=False and baseline!=0 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1667">#1667</a>)</p></li>
+<li><p>Fixed reading LUTData to expected size (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1747">#1747</a>)</p></li>
+<li><p>Fixed handling of AT VRs when codifying data elements (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1738">#1738</a>)</p></li>
 </ul>
 </section>
 <section id="pydicom-internals">
@@ -154,7 +154,7 @@ syntax using VR <code class="docutils literal notranslate"><span class="pre">OW<
 <ul class="simple">
 <li><p>In test suites, renamed ‘setup’ and ‘teardown’ methods, deprecated starting
 in pytest 7.2</p></li>
-<li><p>Use own fork of <cite>CharPyLS</cite> to handle builds with Python 3.11 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1788">#1788</a>)</p></li>
+<li><p>Use own fork of <cite>CharPyLS</cite> to handle builds with Python 3.11 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1788">#1788</a>)</p></li>
 </ul>
 </section>
 </section>

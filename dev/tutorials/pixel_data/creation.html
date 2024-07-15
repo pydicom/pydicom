@@ -171,7 +171,7 @@ it to little-endian ordered <a class="reference external" href="https://docs.pyt
 </pre></div>
 </div>
 <p>The datasets we’ll be creating don’t meet the requirements of any DICOM
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_A.html">IOD</a> and so aren’t conformant DICOM SOP instances, but
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_A.html">IOD</a> and so aren’t conformant DICOM SOP instances, but
 they’re sufficient to demonstrate how to create and add pixel data to a
 <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> using <em>pydicom</em>. To create pixel data for an
 actual dataset you should check the requirements of the specific IOD you’re working
@@ -189,12 +189,12 @@ as <em>Bits Stored</em>, <em>Photometric Interpretation</em> and others.</p>
 <li><p>The <em>Photometric Interpretation</em> should be appropriate for a single sample per pixel</p></li>
 <li><p>If <em>Bits Allocated</em> is &lt;= 8 then <em>Pixel Data</em> uses a VR of <strong>OB</strong></p></li>
 </ul>
-<p>The <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VR</a> for <em>Pixel Data</em> may be <strong>OB</strong> or <strong>OW</strong> depending
+<p>The <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VR</a> for <em>Pixel Data</em> may be <strong>OB</strong> or <strong>OW</strong> depending
 on the value of <em>Bits Allocated</em>. <em>pydicom</em> will set this automatically when
 writing the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to file as long as <em>Bits Allocated</em> has
 been set, but for completeness we’ll be setting it manually.</p>
 <p>The example has two different sets of <em>Pixel Data</em>; one with an even number of bytes
-and one with an odd number. The <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html">DICOM Standard</a> requires
+and one with an odd number. The <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html">DICOM Standard</a> requires
 odd length <em>Pixel Data</em> have trailing padding sufficient to make it an even length,
 so the latter case demonstrates how to do so.</p>
 <p>Because we’ll be using NumPy to create the data we need an array with a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>

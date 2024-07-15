@@ -141,9 +141,9 @@ accessing its managed SOP instances</p></li>
 <p>It’s assumed that you’re already familiar with the <a class="reference internal" href="dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
 <p><strong>References</strong></p>
 <ul class="simple">
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a></p></li>
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">DICOM File Service</a></p></li>
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Media Formats and Physical Media for Media Interchange</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">DICOM File Service</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Media Formats and Physical Media for Media Interchange</a></p></li>
 </ul>
 <section id="the-dicom-file-set">
 <h2>The DICOM File-set<a class="headerlink" href="#the-dicom-file-set" title="Link to this heading">¶</a></h2>
@@ -152,7 +152,7 @@ space. Most people have probably interacted with a File-set without being aware
 of it; one place they’re frequently used is on the CDs/DVDs containing DICOM
 data that are given to a patient after a medical procedure (such as an MR or
 ultrasound).</p>
-<p>The specification for File-sets is given in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">Part 10 of the DICOM
+<p>The specification for File-sets is given in <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">Part 10 of the DICOM
 Standard</a>.</p>
 <section id="the-dicomdir-file">
 <h3>The DICOMDIR file<a class="headerlink" href="#the-dicomdir-file" title="Link to this heading">¶</a></h3>
@@ -166,7 +166,7 @@ dataset.</p>
 location of which is dependent on the type of media used to store the File-set.
 For the most commonly used media (DVD, CD, USB, PC file system, etc), the
 DICOMDIR file will be in the root directory of the File-set. For other
-media types, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Part 12 of the DICOM Standard</a>
+media types, <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Part 12 of the DICOM Standard</a>
 specifies where the DICOMDIR must be located.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -177,7 +177,7 @@ require recalculating the offsets for each directory record. Use the
 </div>
 <p>The DICOMDIR file is used to summarize the contents of the File-set and is a
 <em>Media Storage Directory</em> instance that follows the
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a>.</p>
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">dicomdir</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span><span class="o">.</span><span class="n">name</span>
@@ -190,7 +190,7 @@ and one or more records are used to briefly describe an available SOP
 Instance and its location within the File-set’s directory structure. Each
 record has a <em>record type</em> given by the (0004,1430) <em>Directory Record Type</em>
 element, and different records are related to each other using the hierarchy
-given in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.4.html#table_F.4-1">Table F.4-1</a>.</p>
+given in <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.4.html#table_F.4-1">Table F.4-1</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">DirectoryRecordSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="go">(0004, 1400) Offset of the Next Directory Record UL: 3126</span>
 <span class="go">(0004, 1410) Record In-use Flag                  US: 65535</span>
@@ -201,9 +201,9 @@ given in <a class="reference external" href="http://dicom.nema.org/medical/dicom
 <span class="go">(0010, 0020) Patient ID                          LO: &#39;77654033&#39;</span>
 </pre></div>
 </div>
-<p>Here we have a <code class="docutils literal notranslate"><span class="pre">'PATIENT'</span></code> record, which from <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html#table_F.5-1">Table F.5-1</a> we see must also contain <em>Patient’s Name</em>
+<p>Here we have a <code class="docutils literal notranslate"><span class="pre">'PATIENT'</span></code> record, which from <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html#table_F.5-1">Table F.5-1</a> we see must also contain <em>Patient’s Name</em>
 and <em>Patient ID</em> elements. The full list of available record types and their
-requirements is in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html">Annex F.5 of Part 3 of the DICOM Standard</a>.</p>
+requirements is in <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html">Annex F.5 of Part 3 of the DICOM Standard</a>.</p>
 </section>
 </section>
 <section id="fileset">

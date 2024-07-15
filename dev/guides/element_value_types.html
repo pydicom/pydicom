@@ -122,9 +122,9 @@
 <p>DICOM elements can contain anything from ASCII strings to unicode text,
 decimals, floats, signed and unsigned integers of different byte-depth and
 even encoded data. The format of the value of an element is given by its
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">Value Representation</a> or VR, and a list of VRs is
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">Value Representation</a> or VR, and a list of VRs is
 given in the DICOM Standard in Part 5,
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html#table_6.2-1">Table 6.2-1</a>.</p>
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html#table_6.2-1">Table 6.2-1</a>.</p>
 <p>So when using <em>pydicom</em>, what Python type should be used with a given VR to
 ensure that the value gets written correctly?</p>
 <ul class="simple">
@@ -138,7 +138,7 @@ the table below</p></li>
 <li><p>Non-<strong>SQ</strong> element values:</p>
 <ul>
 <li><p>Can also be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of their <em>set using</em> type - for
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.4.html">Value Multiplicity</a> (VM) &gt; 1, the value will
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.4.html">Value Multiplicity</a> (VM) &gt; 1, the value will
 be stored as a <a class="reference internal" href="../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> of their <em>stored as</em> type</p></li>
 <li><p>However, according to the DICOM Standard, elements with VR <strong>LT</strong>, <strong>OB</strong>,
 <strong>OD</strong>, <strong>OF</strong>, <strong>OL</strong>, <strong>OW</strong>, <strong>ST</strong>, <strong>UN</strong>, <strong>UR</strong> and <strong>UT</strong> should

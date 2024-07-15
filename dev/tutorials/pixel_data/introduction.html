@@ -181,7 +181,7 @@ only one may be present in any given dataset.</p>
 </tr>
 </tbody>
 </table>
-<p>All three elements use <strong>O*</strong> <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VRs</a> (such as <strong>OB</strong> and
+<p>All three elements use <strong>O*</strong> <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VRs</a> (such as <strong>OB</strong> and
 <strong>OD</strong>), which in <em>pydicom</em> are <a class="reference internal" href="../../guides/element_value_types.html"><span class="doc">stored as</span></a>
 (and should be set using) <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
@@ -192,7 +192,7 @@ only one may be present in any given dataset.</p>
 <span class="go">b&#39;\xfe\xff\x00\xe0\x00\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x01\x00\xffO\xffQ...</span>
 </pre></div>
 </div>
-<p>If the dataset’s been written using the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>
+<p>If the dataset’s been written using the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>
 it should have a <em>Transfer Syntax UID</em> element which describes how the pixel data
 is encoded and whether it’s undergone compression:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
@@ -203,7 +203,7 @@ is encoded and whether it’s undergone compression:</p>
 </pre></div>
 </div>
 <p>In the example above the <em>Transfer Syntax UID</em> indicates that the pixel data has
-been compressed using the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.4.html">JPEG 2000</a> compression method.
+been compressed using the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.4.html">JPEG 2000</a> compression method.
 Other things to keep in mind with compressed transfer syntaxes are:</p>
 <ul class="simple">
 <li><p>Only datasets that use the <em>Pixel Data</em> element may be compressed</p></li>
@@ -231,7 +231,7 @@ or the <a class="reference internal" href="../../reference/generated/pydicom.enc
 <p>The pixel data in this dataset uses <a class="reference external" href="https://en.wikipedia.org/wiki/Endianness">little-endian byte ordering</a> and is uncompressed. Uncompressed
 transfer syntaxes never use encapsulation and may use any one of the
 three pixel data elements, although <em>Pixel Data</em> is the most common.</p>
-<p>A dataset with pixel data should always contain group <code class="docutils literal notranslate"><span class="pre">0x0028</span></code> <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements, which are needed to properly interpret
+<p>A dataset with pixel data should always contain group <code class="docutils literal notranslate"><span class="pre">0x0028</span></code> <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements, which are needed to properly interpret
 the encoded pixel data byte stream:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">group_dataset</span><span class="p">(</span><span class="mh">0x0028</span><span class="p">)</span>
 <span class="go">(0028,0002) Samples per Pixel                   US: 1</span>
@@ -413,7 +413,7 @@ to use the specified <a class="reference internal" href="../../guides/plugin_tab
 <p>Sometimes a dataset’s pixel data may be very large due to it having a large number
 of frames and you’d like to avoid having the entire thing read into memory.
 By passing the path to the dataset (as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>) to
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> only the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements and the minimum amount of required
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> only the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements and the minimum amount of required
 pixel data will be loaded:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
 <span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
@@ -445,7 +445,7 @@ pixel data will be loaded:</p>
 </pre></div>
 </div>
 <p>If you’re supplying a path to <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>
-or <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> and you need access to the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> elements to perform image processing operations on
+or <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> and you need access to the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> elements to perform image processing operations on
 the array (such as <a class="reference internal" href="../../reference/generated/pydicom.pixels.apply_rescale.html#pydicom.pixels.apply_rescale" title="pydicom.pixels.apply_rescale"><code class="xref py py-func docutils literal notranslate"><span class="pre">rescale</span></code></a> or
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">windowing</span></code></a>) you can access them by passing
 an empty <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance via the <cite>ds_out</cite> argument,
@@ -502,7 +502,7 @@ directly, instead use the class instance returned by <a class="reference interna
 <span class="k">assert</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;photometric_interpretation&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;RGB&quot;</span>
 </pre></div>
 </div>
-<p>This is especially useful for non-conformant datasets where the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements have values that don’t match the
+<p>This is especially useful for non-conformant datasets where the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements have values that don’t match the
 actual pixel data (such as <em>Number of Frames</em> or <em>Photometric Interpretation</em>).</p>
 </section>
 <section id="conclusion-and-next-steps">

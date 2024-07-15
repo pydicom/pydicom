@@ -126,7 +126,7 @@
 and from JSON format has been added. This support is considered to be in
 beta state, and the API is still subject to change.</p>
 <p>Support for the JSON format has been added to the DICOM Standard in
-Part 18 as the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">DICOM JSON Model</a>. The standard
+Part 18 as the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">DICOM JSON Model</a>. The standard
 describes how different DICOM value representations can be encoded in JSON.</p>
 <section id="converting-a-dataset-into-json-format">
 <h2>Converting a dataset into JSON format<a class="headerlink" href="#converting-a-dataset-into-json-format" title="Link to this heading">¶</a></h2>
@@ -170,8 +170,8 @@ dictionary. There is only a single function to handle both cases:</p>
 <section id="working-with-large-binary-data">
 <h2>Working with large binary data<a class="headerlink" href="#working-with-large-binary-data" title="Link to this heading">¶</a></h2>
 <p>Large binary data can be handled in two ways. It can be encoded
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.7.html">inline</a> as a base64-encoded string, or it can
-be accessed via a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.6.html">BulkDataURI</a> provided in the
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.7.html">inline</a> as a base64-encoded string, or it can
+be accessed via a <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.6.html">BulkDataURI</a> provided in the
 JSON data, that provides the possibility to retrieve the data using the
 <a class="reference external" href="https://www.dicomstandard.org/dicomweb/retrieve-wado-rs-and-wado-uri/">DICOMweb WADO-RS</a>
 standard.</p>

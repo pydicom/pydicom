@@ -114,7 +114,7 @@ rather than <code class="docutils literal notranslate"><span class="pre">import<
 <li><p>added handlers for converting (7fe0,0010) <em>Pixel Data</em> to a <cite>numpy.ndarray</cite></p>
 <ul>
 <li><p>optional GDCM support for reading files with compressed pixel data
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/18">#18</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/18">#18</a>)</p></li>
 <li><p>optional Pillow and jpeg_ls support for reading some compressed pixel data
 files</p></li>
 <li><p>support for decompressing a compressed dataset in-place</p></li>
@@ -131,11 +131,11 @@ files</p></li>
 values before exceptions thrown</p></li>
 <li><p>added context management methods to <code class="docutils literal notranslate"><span class="pre">Dataset</span></code></p></li>
 <li><p>added <code class="docutils literal notranslate"><span class="pre">misc.is_dicom()</span></code> function to check for DICOM file format</p></li>
-<li><p>added date/time converters (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</p></li>
-<li><p>added option to attempt other VRs if translate fails (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</p></li>
+<li><p>added date/time converters (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</p></li>
+<li><p>added option to attempt other VRs if translate fails (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</p></li>
 <li><p>added heuristics to read files that have no preamble or file meta
 information</p></li>
-<li><p>support for multi-valued DA, DT, TM data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</p></li>
+<li><p>support for multi-valued DA, DT, TM data elements (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DataElement</span></code>: added <code class="docutils literal notranslate"><span class="pre">keyword</span></code> and <code class="docutils literal notranslate"><span class="pre">is_retired</span></code> properties</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datadict</span></code>: added <code class="docutils literal notranslate"><span class="pre">dictionary_is_retired()</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datadict</span></code>: added ability to add custom DICOM dictionary items via
@@ -147,8 +147,8 @@ information</p></li>
 <li><p>add/update TransferSyntaxUID when writing standard</p></li>
 <li><p>renamed <code class="docutils literal notranslate"><span class="pre">UID</span></code> package to <code class="docutils literal notranslate"><span class="pre">uid</span></code> (conforms to Python standard)</p></li>
 <li><p>added property <code class="docutils literal notranslate"><span class="pre">uid.is_private</span></code></p></li>
-<li><p>added definitions for storage SOP Class UIDs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</p></li>
-<li><p>added possibility to read only specific tags (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</p></li>
+<li><p>added definitions for storage SOP Class UIDs (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</p></li>
+<li><p>added possibility to read only specific tags (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</p></li>
 <li><p>added missing meta elements when writing DICOM file</p></li>
 <li><p>added <code class="docutils literal notranslate"><span class="pre">encaps</span></code> generator functions to access compressed frames</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">read_file</span></code> changed to <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>, <code class="docutils literal notranslate"><span class="pre">write_file</span></code> to <code class="docutils literal notranslate"><span class="pre">dcmwrite</span></code> for
@@ -173,10 +173,10 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
-<li><p>updated uid generation to ensure uniqueness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</p></li>
+<li><p>correctly handle PlanarConfiguration==0 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
+<li><p>updated uid generation to ensure uniqueness (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</p></li>
 <li><p>handle missing patient data in <code class="docutils literal notranslate"><span class="pre">show_dicomdir</span></code></p></li>
-<li><p>assume default transfer syntax if none in file meta  (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</p></li>
+<li><p>assume default transfer syntax if none in file meta  (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</p></li>
 <li><p>fixed reading/writing of empty tags and tags with bad VR</p></li>
 <li><p>fixed reading AE elements with leading or trailing spaces</p></li>
 <li><p>fixed handling of ambiguous VR elements</p></li>

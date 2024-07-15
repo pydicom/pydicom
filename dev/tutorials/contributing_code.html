@@ -142,7 +142,7 @@
 <h2>Download the current source code<a class="headerlink" href="#download-the-current-source-code" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and
-<a class="reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
 <li><p>Install <a class="reference external" href="https://git-scm.com/downloads">Git</a>. If you’re new to Git,
 the Django project has a good introduction on <a class="reference external" href="https://docs.djangoproject.com/en/3.0/internals/contributing/writing-code/working-with-git/">working with Git and GitHub</a>.
 You can also take a look at the <a class="reference external" href="https://guides.github.com/introduction/flow/">GitHub branch-based workflow</a></p></li>
@@ -193,7 +193,7 @@ the test, <strong>s</strong> that the test was skipped (usually due to a missing
 optional library) and <strong>x</strong> that the test failed as expected.</p>
 <p>Once the tests are complete you should get a short summary of the results.
 At this stage the entire test suite <em>should</em> pass. If you get any failures
-or errors you should check the <a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a> for any
+or errors you should check the <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a> for any
 relevant issues or create a new one if there are none.</p>
 </section>
 <section id="create-a-new-branch">
@@ -218,15 +218,15 @@ especially if you’re also learning how to use pytest from scratch. You may
 find the following resources useful:</p>
 <ul class="simple">
 <li><p>Take a look at the
-<a class="reference external" href="https://github.com/pydicom/pydicom/tree/main/tests">existing pydicom test suite</a>
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/tree/main/tests">existing pydicom test suite</a>
 and see how the tests are written. There are examples for writing
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137">a single test</a>,
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27">a group of related tests</a>,
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_handler_util.py#L834">testing for exceptions</a>,
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_config.py#L28">capturing log output</a>,
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_pillow_pixel_data.py#L452">testing for warnings</a>,
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137">a single test</a>,
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27">a group of related tests</a>,
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_handler_util.py#L834">testing for exceptions</a>,
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_config.py#L28">capturing log output</a>,
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_pillow_pixel_data.py#L452">testing for warnings</a>,
 and running
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L215">parametrized tests</a>.</p></li>
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L215">parametrized tests</a>.</p></li>
 <li><p>Dive Into Python has a very nice <a class="reference external" href="https://diveinto.org/python3/unit-testing.html">section on unit testing</a> (however it uses
 <code class="docutils literal notranslate"><span class="pre">unittest</span></code> instead of pytest).</p></li>
 <li><p>The <a class="reference external" href="https://docs.pytest.org/en/latest/example/index.html">pytest documentation</a>
@@ -238,7 +238,7 @@ asking for help.</p>
 </div>
 <p>Let’s say we wanted to add a new <a class="reference external" href="https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids">pre-defined UID</a>
 to <em>pydicom</em> with a value of <code class="docutils literal notranslate"><span class="pre">1.2.3.4.500</span></code>. We’d first add a new test at the
-bottom of <a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/tests/test_uid.py">test_uid.py</a>:</p>
+bottom of <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/tests/test_uid.py">test_uid.py</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_new_uid</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test uid.NewDefinedUID.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">NewDefinedUID</span>
@@ -264,8 +264,8 @@ file and that the test itself is written correctly.</p>
 <section id="make-a-code-change-and-document-it">
 <h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Link to this heading">¶</a></h2>
 <p>Next we’ll make changes to the actual source code. Open
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/uid.py">uid.py</a> in a text editor and around
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236">line 236</a>
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/uid.py">uid.py</a> in a text editor and around
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236">line 236</a>
 make the following changes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RLELossless</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.5&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;1.2.840.10008.1.2.5&quot;&quot;&quot;</span>
@@ -276,7 +276,7 @@ make the following changes:</p>
 </div>
 <p>The line <code class="docutils literal notranslate"><span class="pre">&quot;&quot;&quot;1.2.3.4.500&quot;&quot;&quot;</span></code> is the <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">docstring</a> for our new UID. In order for
 it to be included in the API reference documentation we’ll also need to update
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/main/doc/reference/uid.rst">uid.rst</a>:</p>
+<a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/doc/reference/uid.rst">uid.rst</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JPEG2000MultiComponentLossless</span>
 <span class="n">JPEG2000MultiComponent</span>
 <span class="n">RLELossless</span>
@@ -329,7 +329,7 @@ patch, send it to your fork:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin new-uid
 </pre></div>
 </div>
-<p>You can create a pull request by visiting the <a class="reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you should see your branch under <em>“Your recently push
+<p>You can create a pull request by visiting the <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you should see your branch under <em>“Your recently push
 branches”</em>. Click <em>“Compare &amp; pull request”</em> and fill out the title (with a
 <code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> prefix, i.e. <code class="docutils literal notranslate"><span class="pre">[WIP]</span> <span class="pre">Add</span> <span class="pre">NewDefinedUID</span> <span class="pre">to</span> <span class="pre">uid.py</span></code>) and follow the
 instructions in the main entry window.</p>

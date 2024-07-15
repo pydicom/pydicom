@@ -139,18 +139,18 @@ conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> <
 </div>
 <p><strong>References</strong></p>
 <ul class="simple">
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a></p></li>
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/chapter_C.html">Waveform Explanatory Information</a></p></li>
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/sect_C.5.html">Waveform Information Model</a></p></li>
-<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Waveform IODs</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/chapter_C.html">Waveform Explanatory Information</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/sect_C.5.html">Waveform Information Model</a></p></li>
+<li><p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Waveform IODs</a></p></li>
 </ul>
 <section id="waveforms-in-dicom">
 <h2>Waveforms in DICOM<a class="headerlink" href="#waveforms-in-dicom" title="Link to this heading">¶</a></h2>
-<p>There are a number of DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Information Object Definitions</a> (IODs) that contain
-waveforms, such as <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>,
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.9.html">Respiratory Waveform</a> and
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.11.html">Real-Time Audio Waveform</a>. Every waveform IOD
-uses the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a> to represent one or
+<p>There are a number of DICOM <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Information Object Definitions</a> (IODs) that contain
+waveforms, such as <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>,
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.9.html">Respiratory Waveform</a> and
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.11.html">Real-Time Audio Waveform</a>. Every waveform IOD
+uses the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a> to represent one or
 more multi-channel time-based digitized waveforms, sampled at constant time
 intervals.</p>
 <p>The waveforms within a dataset are contained in the items of the (5400,0100)
@@ -216,7 +216,7 @@ defining information for each channel is available in the (5400,0200)
 </pre></div>
 </div>
 <p>If <em>Waveform Bits Allocated</em> is <code class="docutils literal notranslate"><span class="pre">16</span></code> and <em>Waveform Sample Interpretation</em> is
-<code class="docutils literal notranslate"><span class="pre">'SS'</span></code> then the data for this multiplex consists of <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html#table_C.10-10">signed 16-bit
+<code class="docutils literal notranslate"><span class="pre">'SS'</span></code> then the data for this multiplex consists of <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html#table_C.10-10">signed 16-bit
 samples</a>. Waveform data is encoded
 with the channels interleaved, so for our case the data is ordered as:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>(Ch 1, Sample 1), (Ch 2, Sample 1), ..., (Ch 12, Sample 1),
@@ -292,7 +292,7 @@ using signed 16-bit integers, but you can use signed or unsigned 8, 16, 32 or
 </pre></div>
 </div>
 <p>To find out which elements we need to add to our new multiplex, we check the
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a> in Part 3 of the DICOM
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a> in Part 3 of the DICOM
 Standard. Type 1 elements must be present and not empty, Type 1C are
 conditionally required, Type 2 elements must be present but may be empty, and
 Type 3 elements are optional.</p>

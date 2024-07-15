@@ -121,7 +121,7 @@
   <section id="glossary">
 <h1>Glossary<a class="headerlink" href="#glossary" title="Link to this heading">¶</a></h1>
 <section id="file-meta-information">
-<span id="glossary-file-meta"></span><h2><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/">File Meta Information</a><a class="headerlink" href="#file-meta-information" title="Link to this heading">¶</a></h2>
+<span id="glossary-file-meta"></span><h2><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/">File Meta Information</a><a class="headerlink" href="#file-meta-information" title="Link to this heading">¶</a></h2>
 <dl id="transfer-syntax">
 <dt><strong>(0002,0010) Transfer Syntax UID</strong></dt><dd><p>The <em>Transfer Syntax UID</em> is a unique identifier that provides information
 on how a DICOM dataset has been encoded. All transfer syntaxes have two
@@ -139,7 +139,7 @@ in the dataset is <a class="reference internal" href="../reference/generated/pyd
 encapsulated transfer syntaxes have pixel data that’s been compressed using
 the compression technique specified by the transfer syntax. For example, a
 dataset with the <em>JPEG Baseline (Process 1)</em> transfer syntax will have pixel
-data that’s compressed using <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html#sect_A.4.1">ISO/IEC 10918-1 JPEG compression</a>.</p></li>
+data that’s compressed using <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html#sect_A.4.1">ISO/IEC 10918-1 JPEG compression</a>.</p></li>
 <li><p><strong>Native (unencapsulated) transfer syntaxes</strong>: these have no encapsulation,
 and hence no compression of the <em>Pixel Data</em>.</p></li>
 </ul>
@@ -147,23 +147,23 @@ and hence no compression of the <em>Pixel Data</em>.</p></li>
 while native transfer syntaxes use the encoding matching their description:
 a dataset with the <em>Implicit VR Little Endian</em> transfer syntax uses implicit
 VR, little endian encoding, for example.</p>
-<p>The DICOM Standard provides a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_A.html">list of public transfer syntaxes</a>, however privately defined transfer syntaxes are
+<p>The DICOM Standard provides a <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_A.html">list of public transfer syntaxes</a>, however privately defined transfer syntaxes are
 also allowed.</p>
-<p>References: <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_10.html">DICOM Standard, Part 5, Section 10</a>
-and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_A.html">Annex A</a></p>
+<p>References: <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_10.html">DICOM Standard, Part 5, Section 10</a>
+and <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_A.html">Annex A</a></p>
 </dd>
 </dl>
 </section>
 <section id="image-pixel-module">
-<span id="glossary-image-pixel"></span><h2><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel Module</a><a class="headerlink" href="#image-pixel-module" title="Link to this heading">¶</a></h2>
+<span id="glossary-image-pixel"></span><h2><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel Module</a><a class="headerlink" href="#image-pixel-module" title="Link to this heading">¶</a></h2>
 <dl id="samples-per-pixel">
 <dt><strong>(0028,0002) Samples per Pixel</strong></dt><dd><p>The number of samples per pixel, otherwise known as the number of image
 channels, components or planes. An RGB image has 3 samples per pixel (red,
 green and blue), a grayscale image has 1 sample per pixel (intensity).
 The <em>Samples per Pixel</em> for all DICOM <em>Pixel Data</em> is either 1 or 3,
 however 4 was previously allowed.</p>
-<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>, but may be constrained by the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
-<p>Reference: <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1">DICOM Standard, Part 3, Section C.7.6.3.1.1</a></p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>, but may be constrained by the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
+<p>Reference: <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1">DICOM Standard, Part 3, Section C.7.6.3.1.1</a></p>
 </dd>
 </dl>
 <dl id="photometric-interpretation">
@@ -190,13 +190,13 @@ performs a transformation and the decoder doesn’t, since having a correct
 <em>Photometric Interpretation</em> makes it possible to determine which inverse
 transformation to use to return the pixel data to its original color space.</p>
 <p>For more detailed information on each of the defined photometric
-interpretations refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2">Annex C.7.6.3.1</a> of Part 3 of the DICOM
+interpretations refer to <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2">Annex C.7.6.3.1</a> of Part 3 of the DICOM
 Standard.</p>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">'MONOCHROME1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'MONOCHROME2'</span></code>, <code class="docutils literal notranslate"><span class="pre">'PALETTE</span> <span class="pre">COLOR'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL_422'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_PARTIAL_420'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'YBR_ICT'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_RCT'</span></code>, however restrictions apply based on
 the <em>Transfer Syntax UID</em>, and further constraints may be required by the
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
 </dd>
 </dl>
 <dl id="planar-configuration">
@@ -209,7 +209,7 @@ value for the second pixel: R1, G1, B1, R2, G2, B2, …, Rn, Gn, Bn.</p></li>
 …, Rn, G1, G2, …, Gn, B1, B2, …, Bn.</p></li>
 </ul>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
-<p>Reference: <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3">DICOM Standard, Part 3, Section C.7.6.3.1.3</a></p>
+<p>Reference: <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3">DICOM Standard, Part 3, Section C.7.6.3.1.3</a></p>
 </dd>
 </dl>
 <dl id="number-of-frames">
@@ -234,8 +234,8 @@ All DICOM <em>Pixel Data</em> is either 1 (for bit-packed <em>Pixel Data</em>) o
 typically a multiple of 8 such as 8, 16 or 32, with 64 currently being the
 maximum used. Using the example of a <em>Bits Stored</em> of 12, this means that
 the actual number of bits used to contain the values must be at least 16.</p>
-<p>For more detailed information refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
-<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or a multiple of <code class="docutils literal notranslate"><span class="pre">8</span></code>, however many <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IODs</a> place further restrictions on what the value may be.</p>
+<p>For more detailed information refer to <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or a multiple of <code class="docutils literal notranslate"><span class="pre">8</span></code>, however many <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IODs</a> place further restrictions on what the value may be.</p>
 </dd>
 </dl>
 <dl id="bits-stored">
@@ -244,7 +244,7 @@ pixel. For example, with a <em>Bits Stored</em> value of <code class="docutils l
 grayscale image will have pixel values in the range 0 to 4095 and an
 unsigned RGB image will have values in the range (R: 0 to 4095, G: 0 to
 4095, B: 0 to 4095). Must be equal to or less than <em>Bits Allocated</em>.</p>
-<p>For more detailed information refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
+<p>For more detailed information refer to <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
 <p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> to <em>Bits Allocated</em> (inclusive)</p>
 </dd>
 </dl>
@@ -261,7 +261,7 @@ have been allowed in past versions of the DICOM Standard.</p>
 or unsigned integers. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> indicates the <em>Pixel Data</em> contains
 unsigned integers while a value of <code class="docutils literal notranslate"><span class="pre">1</span></code> indicates it contains signed
 integers.</p>
-<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code>, but may be constrained by the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code>, but may be constrained by the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
 </dd>
 </dl>
 </section>

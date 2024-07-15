@@ -109,13 +109,13 @@
 <li><p>New User Guide page for Python 2 support timeline</p></li>
 <li><p>New User Guide page for working with private data elements</p></li>
 <li><p>example loading set of CT slices and plotting axial, sagittal
-and coronal (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/789">#789</a>)</p></li>
+and coronal (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/789">#789</a>)</p></li>
 </ul>
 </section>
 <section id="changes">
 <h2>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Removed deprecated uid variables, config.image_handlers and DeferredDataElement (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/760">#760</a>)</p></li>
+<li><p>Removed deprecated uid variables, config.image_handlers and DeferredDataElement (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/760">#760</a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isMultiValue</span></code> is deprecated and will be removed in v1.4.
 Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isStringOrStringList</span></code> and <code class="docutils literal notranslate"><span class="pre">dataelem.isString</span></code> functions are
@@ -123,7 +123,7 @@ removed</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entry</span></code> and <code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entries</span></code> now raise if
 trying to add a private tag</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataset.Dataset.maxBytesToDisplay</span></code> also limits display length for
-non-binary VRs (by number of items) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/666">#666</a>)</p></li>
+non-binary VRs (by number of items) (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/666">#666</a>)</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -131,20 +131,20 @@ non-binary VRs (by number of items) (<a class="reference external" href="https:/
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entry</span></code> and
 <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entries</span></code> to add custom private tags
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/799">#799</a>)</p></li>
-<li><p>Added possibility to write into zip file using gzip, by avoiding seek (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/753">#753</a>)</p></li>
-<li><p>Added RLE encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/730">#730</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/799">#799</a>)</p></li>
+<li><p>Added possibility to write into zip file using gzip, by avoiding seek (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/753">#753</a>)</p></li>
+<li><p>Added RLE encoding (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/730">#730</a>)</p></li>
 <li><p>Added handling of incorrect transfer syntax (explicit vs implicit)
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/820">#820</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/820">#820</a>)</p></li>
 <li><p>Added creation of Tag instances by DICOM keyword, e.g Tag(“PatientName”)</p></li>
 <li><p>Added possibility to get and add private tags without adding them to the
 private dictionary</p></li>
 <li><p>Added possibility to use a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> in a <code class="docutils literal notranslate"><span class="pre">NumPy</span></code> array</p></li>
 <li><p>Allow missing padding byte in Pixel Data, issue a warning in this case
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/864">#864</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/864">#864</a>)</p></li>
 <li><p>Add in-memory image decoding with GDCM</p></li>
 <li><p>Check really used implicit/explicit VR before reading a
-data set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/819">#819</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/820">#820</a>)</p></li>
+data set (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/819">#819</a>, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/820">#820</a>)</p></li>
 <li><p>Added alpha conversion of Datasets to/from JSON format (Python 3 only)</p></li>
 </ul>
 </section>
@@ -152,28 +152,28 @@ data set (<a class="reference external" href="https://github.com/pydicom/pydicom
 <h2>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Correctly handle <cite>Dataset.pop</cite> and <cite>Dataset.setdefault</cite> for tuple and
-keyword arguments (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/852">#852</a>)</p></li>
+keyword arguments (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/852">#852</a>)</p></li>
 <li><p>Correctly handle encoding errors when any of the encodings are invalid
-(not just the first) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/850">#850</a>)</p></li>
+(not just the first) (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/850">#850</a>)</p></li>
 <li><p>Do not raise while resolving an ambiguous VR dependent on
 <cite>PixelRepresentation</cite> if both <cite>PixelRepresentation</cite> and <cite>PixelData</cite> are
-not present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/838">#838</a>)</p></li>
+not present (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/838">#838</a>)</p></li>
 <li><p>Raise exception with specific message if value is too large to be written
-in explicit transfer syntax (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/757">#757</a>)</p></li>
+in explicit transfer syntax (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/757">#757</a>)</p></li>
 <li><p>Make hash for <cite>PersonName3</cite> behave as expected, make <cite>PersonName</cite> objects
-immutable (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/785">#785</a>)</p></li>
+immutable (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/785">#785</a>)</p></li>
 <li><p>Fixed <cite>generate_uid()</cite> returning non-conformant UIDs when <cite>prefix=None</cite>
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/788">#788</a>)</p></li>
-<li><p>Avoid exception if reading from empty file (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/810">#810</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/788">#788</a>)</p></li>
+<li><p>Avoid exception if reading from empty file (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/810">#810</a>)</p></li>
 <li><p>An invalid encoding is now replaced by the default encoding, if
-<code class="docutils literal notranslate"><span class="pre">config.enforce_valid_values</span></code> is not set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/815">#815</a>)</p></li>
-<li><p>Correctly handle elements with ambiguous VR in sequence items (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/804">#804</a>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">config.enforce_valid_values</span></code> is not set (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/815">#815</a>)</p></li>
+<li><p>Correctly handle elements with ambiguous VR in sequence items (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/804">#804</a>)</p></li>
 <li><p>Fix bug where new DicomDir objects always have is_implicit_VR</p></li>
-<li><p>Fix dataset equality for mixed raw vs converted data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/835">#835</a>)</p></li>
+<li><p>Fix dataset equality for mixed raw vs converted data elements (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/835">#835</a>)</p></li>
 <li><p>Remove excess padding in Pixel Data</p></li>
 <li><p>Fix wrong date format in anonymize example</p></li>
-<li><p>Fix unknown VR exception message when VR isn’t ASCII (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/791">#791</a>)</p></li>
-<li><p>Fix jis-x-0201 characters encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/856">#856</a>)</p></li>
+<li><p>Fix unknown VR exception message when VR isn’t ASCII (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/791">#791</a>)</p></li>
+<li><p>Fix jis-x-0201 characters encoding (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/856">#856</a>)</p></li>
 </ul>
 </section>
 </section>

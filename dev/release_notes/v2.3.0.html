@@ -113,7 +113,7 @@ deprecated and will be removed in v3.0, use
 <li><p><a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is deprecated in favor of
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code></p></li>
 <li><p>Added <cite>download</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
-to allow skipping downloading the file if missed locally (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1617">#1617</a>)</p></li>
+to allow skipping downloading the file if missed locally (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1617">#1617</a>)</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -124,16 +124,16 @@ on reading and writing. Depending on the value of
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code>
 and <code class="xref py py-attr docutils literal notranslate"><span class="pre">writing_validation_mode</span></code>
 a warning is logged, an exception is raised, or the validation is skipped.</p></li>
-<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><code class="xref py py-class docutils literal notranslate"><span class="pre">VR</span></code></a> enum (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1500">#1500</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><code class="xref py py-class docutils literal notranslate"><span class="pre">VR</span></code></a> enum (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1500">#1500</a>)</p></li>
 <li><p>UIDs for all Storage SOP Classes have been added to the <code class="docutils literal notranslate"><span class="pre">uid</span></code> module
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1498">#1498</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1498">#1498</a>)</p></li>
 <li><p>Use rle_handler as last resort handler for decoding RLE encoded data as it is
-the slowest handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1487">#1487</a>)</p></li>
-<li><p>Added, enhanced, or removed a number of Mitra private dictionary entries (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
+the slowest handler (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1487">#1487</a>)</p></li>
+<li><p>Added, enhanced, or removed a number of Mitra private dictionary entries (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
 <li><p>Added support for unpacking bit-packed data without using NumPy to
 <code class="xref py py-func docutils literal notranslate"><span class="pre">unpack_bits`(:pr:`1594()</span></code>)</p></li>
 <li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">expand_ybr422()</span></code> for expanding
-uncompressed <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> data to <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1593">#1593</a>)</p></li>
+uncompressed <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> data to <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1593">#1593</a>)</p></li>
 <li><p>Replacement of <code class="docutils literal notranslate"><span class="pre">UN</span></code> VR with <code class="docutils literal notranslate"><span class="pre">SQ</span></code> VR for undefined length data elements
 (introduced in 2.2.2), can now be configured via
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">infer_sq_for_un_vr</span></code></p></li>
@@ -143,24 +143,24 @@ uncompressed <code class="docutils literal notranslate"><span class="pre">YBR_FU
 <section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Fixed odd-length <strong>OB</strong> values not being padded during write (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1511">#1511</a>)</p></li>
+<li><p>Fixed odd-length <strong>OB</strong> values not being padded during write (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1511">#1511</a>)</p></li>
 <li><p>Fixed Hologic private dictionary entry (0019xx43)</p></li>
-<li><p>Fixed Mitra global patient ID private dictionary entry (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
+<li><p>Fixed Mitra global patient ID private dictionary entry (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> not setting the correct
-encoding for the rest of the dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1565">#1565</a>)</p></li>
+encoding for the rest of the dataset (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1565">#1565</a>)</p></li>
 <li><p>Fixed <cite>AttributeError</cite> on deep copy of <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1571">#1571</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1571">#1571</a>)</p></li>
 <li><p>Fixed an exception during pixel decoding if using GDCM &lt; 2.8.8 on Windows
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1581">#1581</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1581">#1581</a>)</p></li>
 <li><p>Fixed crashes on Windows and MacOS when using the GDCM plugin to compress
-into <em>RLE Lossless</em> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1581">#1581</a>)</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">dir(Dataset())</span></code> not returning class attributes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1599">#1599</a>)</p></li>
+into <em>RLE Lossless</em> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1581">#1581</a>)</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">dir(Dataset())</span></code> not returning class attributes (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1599">#1599</a>)</p></li>
 <li><p>Fixed bad DICOMDIR offsets when using <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileSet.write()</span></code></a> with a <em>Directory Record Sequence</em> using
-undefined length items (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1596">#1596</a>)</p></li>
+undefined length items (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1596">#1596</a>)</p></li>
 <li><p>Assigning a list of length one as tag value is now correctly handled as
-assigning the single value (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1606">#1606</a>)</p></li>
+assigning the single value (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1606">#1606</a>)</p></li>
 <li><p>Fixed an exception with multiple deferred reads with file-like objects
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1609">#1609</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1609">#1609</a>)</p></li>
 </ul>
 </section>
 </section>
