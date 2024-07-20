@@ -690,7 +690,7 @@ class _BufferedItem:
             The initial position in the encapsulated item where data should be read
             from, must be greater than or equal to 0, where ``0`` is the first byte
             of the item tag.
-        size : int, optional
+        size : int
             The number of bytes to read from the buffer.
 
         Returns
@@ -893,7 +893,7 @@ class EncapsulatedBuffer(BufferedIOBase):
         relative to the position indicated by `whence` and return the new absolute
         position.
         """
-        if whence not in (0, 1, 2):
+        if whence not in (os.SEEK_SET, os.SEEK_CUR, os.SEEK_END):
             raise ValueError("Invalid 'whence' value, should be 0, 1 or 2")
 
         # Behavior emulates io.BytesIO
