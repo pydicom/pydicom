@@ -264,6 +264,7 @@ Storage SOP Class UIDs
    VideoPhotographicImageStorage
    VisualAcuityMeasurementsStorage
    VolumeRenderingVolumetricPresentationStateStorage
+   WaveformAnnotationSRStorage
    WideFieldOphthalmicPhotography3DCoordinatesImageStorage
    WideFieldOphthalmicPhotographyStereographicProjectionImageStorage
    XADefinedProcedureProtocolStorage
