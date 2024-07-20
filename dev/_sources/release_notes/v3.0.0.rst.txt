@@ -237,6 +237,9 @@ Enhancements
   prior to conversion to a :class:`~pydicom.dataelem.DataElement` (:issue:`1739`).
 * Added support for using :class:`io.BufferedIOBase` subclasses to set the value for
   elements with O* VRs such as **OB** and **OW** (:issue:`1913`).
+* Added :func:`~pydicom.encaps.encapsulate_buffer` and
+  :func:`~pydicom.encaps.encapsulate_extended_buffer` for encapsulating buffered
+  compressed *Pixel Data* via :class:`~pydicom.encaps.EncapsulatedBuffer` instances.
 * Added elements with **OB**,  **OD**, **OF**, **OL**, **OW**, **OV** VRs to the type
   validation checking when setting :class:`~pydicom.dataelem.DataElement` values (:issue:`1414`).
 

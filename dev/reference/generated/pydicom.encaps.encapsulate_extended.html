@@ -28,8 +28,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.encaps.fragment_frame" href="pydicom.encaps.fragment_frame.html" />
-    <link rel="prev" title="pydicom.encaps.encapsulate" href="pydicom.encaps.encapsulate.html" /> 
+    <link rel="next" title="pydicom.encaps.encapsulate_extended_buffer" href="pydicom.encaps.encapsulate_extended_buffer.html" />
+    <link rel="prev" title="pydicom.encaps.encapsulate_buffer" href="pydicom.encaps.encapsulate_buffer.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -76,10 +76,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate_buffer.html">pydicom.encaps.encapsulate_buffer</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.encapsulate_extended</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate_extended_buffer.html">pydicom.encaps.encapsulate_extended_buffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../encaps.html#pydicom.encaps.EncapsulatedBuffer"><code class="docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -140,7 +143,7 @@
 <h1>pydicom.encaps.encapsulate_extended<a class="headerlink" href="#pydicom-encaps-encapsulate-extended" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.encaps.encapsulate_extended">
-<span class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></span><span class="sig-name descname"><span class="pre">encapsulate_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fb698f8c3/pydicom/encaps.py#L869"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.encapsulate_extended" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></span><span class="sig-name descname"><span class="pre">encapsulate_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L1215"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.encapsulate_extended" title="Link to this definition">¶</a></dt>
 <dd><p>Return encapsulated image data and values for the Extended Offset Table
 elements.</p>
 <p>When using a compressed transfer syntax (such as RLE Lossless or one of
@@ -155,13 +158,19 @@ dataset (recommended)</p></li>
 <li><p>Pass <code class="docutils literal notranslate"><span class="pre">has_bot=False</span></code> to <a class="reference internal" href="pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a></p></li>
 </ul>
 <p class="rubric">Examples</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate_extended</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate_extended</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
 
 <span class="c1"># &#39;frames&#39; is a list of image frames that have been each been encoded</span>
 <span class="c1"># separately using the compression method corresponding to the Transfer</span>
 <span class="c1"># Syntax UID</span>
 <span class="n">frames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
 <span class="n">out</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEG2000Lossless</span>
 
 <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -182,7 +191,7 @@ table lengths).</p>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a></p>
+<p><a class="reference internal" href="pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a>, <a class="reference internal" href="pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_buffer()</span></code></a>, <a class="reference internal" href="pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended_buffer()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -192,8 +201,8 @@ table lengths).</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pydicom.encaps.encapsulate.html" class="btn btn-neutral float-left" title="pydicom.encaps.encapsulate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pydicom.encaps.fragment_frame.html" class="btn btn-neutral float-right" title="pydicom.encaps.fragment_frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.encaps.encapsulate_buffer.html" class="btn btn-neutral float-left" title="pydicom.encaps.encapsulate_buffer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.encaps.encapsulate_extended_buffer.html" class="btn btn-neutral float-right" title="pydicom.encaps.encapsulate_extended_buffer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

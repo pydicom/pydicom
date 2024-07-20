@@ -91,10 +91,13 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#creating-encapsulated-data">Creating Encapsulated Data</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.encapsulate_buffer.html">pydicom.encaps.encapsulate_buffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended.html">pydicom.encaps.encapsulate_extended</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended_buffer.html">pydicom.encaps.encapsulate_extended_buffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.encaps.EncapsulatedBuffer"><code class="docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -207,8 +210,14 @@ as (7FE0,0010) <em>Pixel Data</em>.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate</span></code></a>(frames[, fragments_per_frame, ...])</p></td>
 <td><p>Return encapsulated <cite>frames</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate_extended</span></code></a>(frames)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate_buffer</span></code></a>(buffers[, has_bot])</p></td>
+<td><p>Return an <a class="reference internal" href="#pydicom.encaps.EncapsulatedBuffer" title="pydicom.encaps.EncapsulatedBuffer"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a> instance from <cite>buffers</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate_extended</span></code></a>(frames)</p></td>
 <td><p>Return encapsulated image data and values for the Extended Offset Table elements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate_extended_buffer</span></code></a>(buffers)</p></td>
+<td><p>Return <a class="reference internal" href="#pydicom.encaps.EncapsulatedBuffer" title="pydicom.encaps.EncapsulatedBuffer"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a> as well as encoded offsets and lengths for the Extended Offset Table elements.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.fragment_frame.html#pydicom.encaps.fragment_frame" title="pydicom.encaps.fragment_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fragment_frame</span></code></a>(frame[, nr_fragments])</p></td>
 <td><p>Yield one or more fragments from <cite>frame</cite>.</p></td>
@@ -221,6 +230,120 @@ as (7FE0,0010) <em>Pixel Data</em>.</p>
 </tr>
 </tbody>
 </table>
+<p>Management class for encapsulating buffers:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></span><span class="sig-name descname"><span class="pre">EncapsulatedBuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><span class="pre">BufferedIOBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L736"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer" title="Link to this definition">¶</a></dt>
+<dd><p>Convenience class for managing the encapsulation of one or more buffers
+containing compressed <em>Pixel Data</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 3.0.</span></p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.basic_offset_table">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basic_offset_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.basic_offset_table" title="Link to this definition">¶</a></dt>
+<dd><p>Return an encoded Basic Offset Table.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.closed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">closed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.closed" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if any of the encapsulated buffers are closed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.encapsulated_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">encapsulated_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.encapsulated_length" title="Link to this definition">¶</a></dt>
+<dd><p>Return the total length of the encapulated <em>Pixel Data</em> value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.extended_lengths">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extended_lengths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.extended_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Return an encoded <em>Extended Offset Table Lengths</em> value from <cite>lengths</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The encoded lengths of the frame.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.extended_offsets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extended_offsets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.extended_offsets" title="Link to this definition">¶</a></dt>
+<dd><p>Return an encoded <em>Extended Offset Table</em> value from <cite>offsets</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The encoded offsets to the first byte of the item tag of the first fragment
+for every frame, as measured from the first byte of the first item tag
+following the empty Basic Offset Table Item.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.lengths">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lengths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Return the encapsulated item lengths.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.offsets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">offsets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.offsets" title="Link to this definition">¶</a></dt>
+<dd><p>Return the encapsulated item offsets, starting at 0 for the first item.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8192</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L848"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.read" title="Link to this definition">¶</a></dt>
+<dd><p>Read up to <cite>size</cite> bytes of data from the encapsulated buffers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>optional</em>) – The amount of data to be read, if <code class="docutils literal notranslate"><span class="pre">None</span></code> then all data will be returned.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data read from the encapsulated buffers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.readable">
+<span class="sig-name descname"><span class="pre">readable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L887"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.readable" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if all the encapsulated buffers are readable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.seek">
+<span class="sig-name descname"><span class="pre">seek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">whence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L891"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.seek" title="Link to this definition">¶</a></dt>
+<dd><p>Change the encapsulated buffers position to the given byte <cite>offset</cite>,
+relative to the position indicated by <cite>whence</cite> and return the new absolute
+position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.seekable">
+<span class="sig-name descname"><span class="pre">seekable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L919"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.seekable" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if all the encapsulated buffers are seekable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.encaps.EncapsulatedBuffer.tell">
+<span class="sig-name descname"><span class="pre">tell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0928099e9/pydicom/encaps.py#L923"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.EncapsulatedBuffer.tell" title="Link to this definition">¶</a></dt>
+<dd><p>Return the current stream position of the encapsulated buffers</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

@@ -377,20 +377,30 @@ memory when creating datasets:</p>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;a_large_amount_of_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
     <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxIOD</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
     <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">f</span>
     <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;large_dataset.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>However, there are limitations and things to be aware of when using a buffered value:</p>
-<ul class="simple">
-<li><p>Datasets containing buffered objects that don’t normally work with <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code></a> or
-<a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">deepcopy()</span></code></a> such as <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedReader" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> are not able to be pickled
-or deepcopied.</p></li>
-<li><p>Using a buffered <em>Pixel Data</em> value for datasets with a compressed (encapsulated)
-transfer syntax requires you to have first <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulated</span></code></a>
-the compressed frame data and written it to the buffer.</p></li>
-</ul>
+<p>To use a buffered <em>Pixel Data</em> value with a dataset that has a compressed transfer
+syntax such as <em>JPEG 2000 Lossles</em>, the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_buffer()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended_buffer()</span></code></a> functions can be used to encapsulate
+the buffered frames:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate_buffer</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;a_large_jpeg2000_file.j2k&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEG2000Lossless</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate_buffer</span><span class="p">([</span><span class="n">f</span><span class="p">])</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;large_compressed_dataset.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, be aware that Datasets containing buffered objects that don’t normally work
+with <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">deepcopy()</span></code></a> such as
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedReader" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> are not able to be pickled or deepcopied.</p>
 </section>
 </section>
 

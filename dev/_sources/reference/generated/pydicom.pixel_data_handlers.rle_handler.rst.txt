@@ -4,11 +4,6 @@
 .. automodule:: pydicom.pixel_data_handlers.rle_handler
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -19,15 +14,3 @@
       should_change_PhotometricInterpretation_to_RGB
       supports_transfer_syntax
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

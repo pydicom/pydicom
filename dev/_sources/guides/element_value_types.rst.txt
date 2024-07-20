@@ -145,16 +145,26 @@ memory when creating datasets::
     with open("a_large_amount_of_data", "rb") as f:
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxIOD = ExplicitVRLittleEndian
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds.PixelData = f
         ds.save_as("large_dataset.dcm")
 
+To use a buffered *Pixel Data* value with a dataset that has a compressed transfer
+syntax such as *JPEG 2000 Lossles*, the :func:`~pydicom.encaps.encapsulate_buffer` and
+:func:`~pydicom.encaps.encapsulate_extended_buffer` functions can be used to encapsulate
+the buffered frames::
 
-However, there are limitations and things to be aware of when using a buffered value:
+    from pydicom import Dataset, FileMetaDataset
+    from pydicom.encaps import encapsulate_buffer
+    from pydicom.uid import JPEG2000Lossless
 
-* Datasets containing buffered objects that don't normally work with :mod:`pickle` or
-  :func:`~copy.deepcopy` such as :class:`~io.BufferedReader` are not able to be pickled
-  or deepcopied.
-* Using a buffered *Pixel Data* value for datasets with a compressed (encapsulated)
-  transfer syntax requires you to have first :func:`encapsulated<encaps.encapsulate>`
-  the compressed frame data and written it to the buffer.
+    with open("a_large_jpeg2000_file.j2k", "rb") as f:
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
+        ds.PixelData = encapsulate_buffer([f])
+        ds.save_as("large_compressed_dataset.dcm")
+
+However, be aware that Datasets containing buffered objects that don't normally work
+with :mod:`pickle` or :func:`~copy.deepcopy` such as
+:class:`~io.BufferedReader` are not able to be pickled or deepcopied.
