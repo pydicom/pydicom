@@ -35,6 +35,9 @@ Changes
   method will now raise an exception if the user tries to convert between little
   and big endian datasets. If this is something you need, use
   :func:`~pydicom.filewriter.dcmwrite` instead.
+* Added the `exist_ok` argument to :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>`
+  and :func:`~pydicom.filewriter.dcmwrite` to allow raising a :class:`FileExistsError`
+  if trying to write to a file that already exists (:issue:`2104`).
 * `implicit_vr`, `little_endian` and `force_encoding` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`.
 * The priority used to decide which encoding to use with
@@ -237,6 +240,8 @@ Enhancements
 * Added :func:`~pydicom.encaps.encapsulate_buffer` and
   :func:`~pydicom.encaps.encapsulate_extended_buffer` for encapsulating buffered
   compressed *Pixel Data* via :class:`~pydicom.encaps.EncapsulatedBuffer` instances.
+* Added elements with **OB**,  **OD**, **OF**, **OL**, **OW**, **OV** VRs to the type
+  validation checking when setting :class:`~pydicom.dataelem.DataElement` values (:issue:`1414`).
 
 
 Fixes

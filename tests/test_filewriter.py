@@ -1829,6 +1829,24 @@ class TestDCMWrite:
         for elem_orig, elem_conv in zip(ds_orig, ds_expl):
             assert elem_orig.value == elem_conv.value
 
+    def test_exist_ok(self):
+        """Test the exist_ok argument"""
+        ds = dcmread(ct_name)
+        patient_name = ds.PatientName
+
+        with tempfile.TemporaryDirectory() as tdir:
+            p = Path(tdir) / "foo.dcm"
+            p.touch()
+
+            assert p.exists()
+
+            msg = r"File exists: '(.*)foo.dcm'"
+            with pytest.raises(FileExistsError, match=msg):
+                dcmwrite(p, ds, exist_ok=False)
+
+            dcmwrite(p, ds, exist_ok=True)
+            assert dcmread(p).PatientName == patient_name
+
 
 class TestDCMWrite_EnforceFileFormat:
     """Tests for dcmwrite(enforce_file_format=True)"""

@@ -1123,6 +1123,7 @@ def dcmwrite(
     little_endian: bool | None = None,
     enforce_file_format: bool = False,
     force_encoding: bool = False,
+    exist_ok: bool = True,
     **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
@@ -1130,7 +1131,7 @@ def dcmwrite(
 
     .. versionchanged:: 3.0
 
-        Added the `enforce_file_format` keyword argument.
+        Added the `enforce_file_format` and `exist_ok` keyword arguments.
 
     .. deprecated:: 3.0
 
@@ -1258,6 +1259,10 @@ def dcmwrite(
         If ``True`` then force the encoding to follow `implicit_vr` and
         `little_endian`. Cannot be used with `enforce_file_format`. Default
         ``False``.
+    exist_ok : bool, optional
+        If ``False`` and `filename` is a :class:`str` or PathLike, then raise a
+        :class:`FileExistsError` if a file already exists with the given filename
+        (default ``True``).
 
     Raises
     ------
@@ -1402,7 +1407,8 @@ def dcmwrite(
     filename = path_from_pathlike(filename)
     if isinstance(filename, str):
         # A path-like to be written to
-        fp: DicomIO = DicomFile(filename, "wb")
+        file_mode = "xb" if not exist_ok else "wb"
+        fp: DicomIO = DicomFile(filename, file_mode)
         # caller provided a file name; we own the file handle
         caller_owns_file = False
     elif isinstance(filename, DicomIO):
