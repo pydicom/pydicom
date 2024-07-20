@@ -1,0 +1,6 @@
+﻿pydicom.uid.WaveformAnnotationSRStorage
+=======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: WaveformAnnotationSRStorage
