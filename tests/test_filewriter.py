@@ -3244,33 +3244,23 @@ class TestWritingBufferedPixelData:
     def test_writing_dataset_with_buffered_pixel_data_reads_data_in_chunks(
         self, bits_allocated
     ):
-        FILE_SIZE = 100  # MB
         KILOBYTE = 1000
         MEGABYTE = KILOBYTE * 1000
-        bytes_per_iter = MEGABYTE
+        FILE_SIZE = 50 * MEGABYTE
 
         ds = Dataset()
         ds.BitsAllocated = bits_allocated
 
-        with TemporaryFile("+wb") as large_dataset, TemporaryFile("+wb") as fp:
-            # generate large file
-            data = BytesIO()
-            for _ in range(bytes_per_iter):
-                data.write(b"\x00")
-
-            data.seek(0)
-
-            # 500 megabytes
-            for _ in range(FILE_SIZE):
-                large_dataset.write(data.getbuffer())
-
-            large_dataset.seek(0)
+        with TemporaryFile("+wb") as buffer, TemporaryFile("+wb") as fp:
+            # 100 megabytes
+            buffer.write(b"\x00" * FILE_SIZE)
+            buffer.seek(0)
 
             # take a snapshot of memory
             baseline_memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
             # set the pixel data to the buffer
-            ds.PixelData = large_dataset
+            ds.PixelData = buffer
             ds.save_as(fp, little_endian=True, implicit_vr=False)
 
             memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -3279,10 +3269,10 @@ class TestWritingBufferedPixelData:
             limit = 0
             if sys.platform.startswith("linux"):
                 # memory usage is in kilobytes
-                limit = (MEGABYTE * FILE_SIZE / 5 * 4) / KILOBYTE
+                limit = (FILE_SIZE / 5 * 4) / KILOBYTE
             elif sys.platform.startswith("darwin"):
                 # memory usage is in bytes
-                limit = MEGABYTE * FILE_SIZE / 5 * 4
+                limit = FILE_SIZE / 5 * 4
             else:
                 pytest.skip("This test is not setup to run on this platform")
 

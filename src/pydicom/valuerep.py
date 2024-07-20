@@ -1108,7 +1108,7 @@ class DSfloat(float):
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
-        if self.auto_format and hasattr(self, "original_string"):
+        if hasattr(self, "original_string"):
             return f"'{self.original_string}'"
 
         return f"'{super().__repr__()}'"
@@ -1219,7 +1219,7 @@ class DSdecimal(Decimal):
                 if validation_mode == config.RAISE:
                     raise OverflowError(msg)
                 warn_and_log(msg)
-            if not is_valid_ds(repr(self).strip("'")):
+            elif not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 msg = f'Value "{self}" is not valid for elements with a VR of DS'
                 if validation_mode == config.RAISE:
@@ -1247,8 +1247,9 @@ class DSdecimal(Decimal):
         return super().__str__()
 
     def __repr__(self) -> str:
-        if self.auto_format and hasattr(self, "original_string"):
+        if hasattr(self, "original_string"):
             return f"'{self.original_string}'"
+
         return f"'{self}'"
 
 
