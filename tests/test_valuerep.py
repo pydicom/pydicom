@@ -745,7 +745,17 @@ class TestDSdecimal:
     def test_DSdecimal(self, allow_ds_float):
         """Test creating a value using DSdecimal."""
         x = DSfloat("1.2345")
+        assert x.original_string == "1.2345"
+        assert not x.auto_format
+        assert str(x) == "1.2345"
+        assert repr(x) == "'1.2345'"
+
         y = DSdecimal(x)
+        assert y.original_string == "1.2345"
+        assert not y.auto_format
+        assert str(y) == "1.2345"
+        assert repr(y) == "'1.2345'"
+
         assert Decimal(1.2345) == y
         assert "1.2345" == y.original_string
 
@@ -915,15 +925,22 @@ class TestIS:
         bin_elem = b"\x18\x00\x52\x11\x04\x00\x00\x0014.5"
         with BytesIO(bin_elem) as bio:
             ds = read_dataset(bio, True, True)
-        with pytest.warns(UserWarning, match="Invalid value for VR IS"):
-            assert isinstance(ds.Exposure, ISfloat)
+
+        # Will warn when the element is first converted to DataElement
+        msg1 = 'Value "14.5" is not valid for elements with a VR of IS'
+        msg2 = "Invalid value for VR IS: '14.5'"
+        with pytest.warns(UserWarning, match=msg1):
+            with pytest.warns(UserWarning, match=msg2):
+                assert isinstance(ds.Exposure, ISfloat)
+
         assert ds.Exposure == 14.5
 
         # Strict checking raises an error
         with pytest.raises(ValueError):
-            _ = IS("14.5", validation_mode=config.RAISE)
+            IS("14.5", validation_mode=config.RAISE)
+
         with pytest.raises(TypeError):
-            _ = IS(14.5, validation_mode=config.RAISE)
+            IS(14.5, validation_mode=config.RAISE)
 
     def test_float_init(self):
         """New ISfloat created from another behaves correctly"""

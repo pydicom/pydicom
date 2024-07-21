@@ -134,8 +134,3 @@ We are all volunteers working on *pydicom* in our free time. As our
 resources are limited, we very much value your contributions, be it bug fixes, new
 core features, or documentation improvements. For more information, please
 read our [contribution guide](https://github.com/pydicom/pydicom/blob/main/CONTRIBUTING.md).
-
-If you have examples or extensions of *pydicom* that don't belong with the
-core software, but that you deem useful to others, you can add them to our
-contribution repository:
-[contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
