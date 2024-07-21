@@ -86,6 +86,10 @@ Very simple app to display unicode person names.
 
       :download:`Download Python source code: show_charset_name.py <show_charset_name.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: show_charset_name.zip <show_charset_name.zip>`
+
 
 .. only:: html
 

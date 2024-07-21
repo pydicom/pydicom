@@ -115,6 +115,10 @@ Show a dicom file using a hierarchical tree in a graphical window.
 
       :download:`Download Python source code: dicomtree.py <dicomtree.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: dicomtree.zip <dicomtree.zip>`
+
 
 .. only:: html
 

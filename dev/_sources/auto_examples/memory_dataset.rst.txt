@@ -120,6 +120,10 @@ datasets saved as blobs in a database.
 
       :download:`Download Python source code: memory_dataset.py <memory_dataset.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: memory_dataset.zip <memory_dataset.zip>`
+
 
 .. only:: html
 

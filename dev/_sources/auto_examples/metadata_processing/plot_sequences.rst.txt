@@ -98,6 +98,10 @@ This examples illustrates how to work with sequences.
 
       :download:`Download Python source code: plot_sequences.py <plot_sequences.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_sequences.zip <plot_sequences.zip>`
+
 
 .. only:: html
 

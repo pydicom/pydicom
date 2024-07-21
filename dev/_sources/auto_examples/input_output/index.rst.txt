@@ -36,7 +36,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to open a DICOM file, print some dataset information, and show it ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to open a DICOM file, print some dataset information, and show it using matplotlib.">
 
 .. only:: html
 
@@ -70,7 +70,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to write a DICOM file from scratch using pydicom. This example does not ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to write a DICOM file from scratch using pydicom. This example does not produce a DICOM standards compliant file as written, you will have to change UIDs to valid values and add all required DICOM data elements.">
 
 .. only:: html
 

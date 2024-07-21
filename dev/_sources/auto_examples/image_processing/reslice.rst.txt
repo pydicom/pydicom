@@ -121,6 +121,10 @@ location, building a 3D image and reslicing it in different planes.
 
       :download:`Download Python source code: reslice.py <reslice.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: reslice.zip <reslice.zip>`
+
 
 .. only:: html
 

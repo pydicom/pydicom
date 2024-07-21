@@ -68,7 +68,7 @@ Somewhere to start
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Show how to write a DICOM dataset into a byte array and to read it back from a byte array. This...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Show how to write a DICOM dataset into a byte array and to read it back from a byte array. This can be helpful for example if working with datasets saved as blobs in a database.">
 
 .. only:: html
 
@@ -115,7 +115,7 @@ be applied to DICOM images.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from 512  imes 512 to 64       imes 64. The down...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from 512  imes 512 to 64       imes 64. The downsizing is performed by taking the central section instead of averagin the pixels. Finally, the image is store as a dicom image.">
 
 .. only:: html
 
@@ -149,7 +149,7 @@ be applied to DICOM images.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates loading multiple files, sorting them by slice location, building a 3D ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates loading multiple files, sorting them by slice location, building a 3D image and reslicing it in different planes.">
 
 .. only:: html
 
@@ -203,7 +203,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to open a DICOM file, print some dataset information, and show it ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to open a DICOM file, print some dataset information, and show it using matplotlib.">
 
 .. only:: html
 
@@ -237,7 +237,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to write a DICOM file from scratch using pydicom. This example does not ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to write a DICOM file from scratch using pydicom. This example does not produce a DICOM standards compliant file as written, you will have to change UIDs to valid values and add all required DICOM data elements.">
 
 .. only:: html
 
@@ -326,7 +326,7 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add private dictionary items to the DICOM dictionary dynamical...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add private dictionary items to the DICOM dictionary dynamically. This allows you to read private tags not present in pydicom&#x27;s private dictionary when loading an existing dataset.">
 
 .. only:: html
 

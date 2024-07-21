@@ -54,7 +54,7 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add private dictionary items to the DICOM dictionary dynamical...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add private dictionary items to the DICOM dictionary dynamically. This allows you to read private tags not present in pydicom&#x27;s private dictionary when loading an existing dataset.">
 
 .. only:: html
 

@@ -9,7 +9,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -129,8 +129,8 @@ example does not produce a DICOM standards compliant file as written, you will
 have to change UIDs to valid values and add all required DICOM data elements.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting dataset values...
 Setting file meta information...
-Writing dataset to: /tmp/tmpe2yfpgzt.dcm
-Load dataset from: /tmp/tmpe2yfpgzt.dcm ...
+Writing dataset to: /tmp/tmpe6ggg7ob.dcm
+Load dataset from: /tmp/tmpe6ggg7ob.dcm ...
 Dataset.file_meta -------------------------------
 (0002,0000) File Meta Information Group Length  UL: 128
 (0002,0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;
@@ -140,11 +140,11 @@ Dataset.file_meta -------------------------------
 (0002,0012) Implementation Class UID            UI: 1.2.3.4
 (0002,0013) Implementation Version Name         SH: &#39;PYDICOM 3.0.0&#39;
 -------------------------------------------------
-(0008,0023) Content Date                        DA: &#39;20240720&#39;
-(0008,0033) Content Time                        TM: &#39;231503.704267&#39;
+(0008,0023) Content Date                        DA: &#39;20240721&#39;
+(0008,0033) Content Time                        TM: &#39;220220.414388&#39;
 (0010,0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010,0020) Patient ID                          LO: &#39;123456&#39;
-Deleting file: /tmp/tmpe2yfpgzt.dcm ...
+Deleting file: /tmp/tmpe6ggg7ob.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -167,7 +167,7 @@ Deleting file: /tmp/tmpe2yfpgzt.dcm ...
 <a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span></a> <span class="o">=</span> <span class="s2">&quot;Test^Firstname&quot;</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span></a> <span class="o">=</span> <span class="s2">&quot;123456&quot;</span>
 <span class="c1"># Set creation date/time</span>
-<a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">ContentDate</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">ContentTime</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H%M%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># long format with micro seconds</span>
 
@@ -203,6 +203,9 @@ Deleting file: /tmp/tmpe2yfpgzt.dcm ...
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7e3f494a513e0ac1eb4963e47afed114/plot_write_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/19dffd8ecceafb0b86a407e6b5b90bdc/plot_write_dicom.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_write_dicom.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
