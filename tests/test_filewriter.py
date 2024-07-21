@@ -3252,7 +3252,6 @@ class TestWritingBufferedPixelData:
         ds.BitsAllocated = bits_allocated
 
         with TemporaryFile("+wb") as buffer, TemporaryFile("+wb") as fp:
-            # 100 megabytes
             buffer.write(b"\x00" * FILE_SIZE)
             buffer.seek(0)
 
