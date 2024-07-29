@@ -26,7 +26,7 @@ Changes
   (:issue:`1773`).
 * :attr:`DataElement.VM<pydicom.dataelem.DataElement.VM>` always returns ``1``
   for **SQ** elements (:issue:`1481`).
-* DICOM dictionary updated to 2023d.
+* DICOM dictionary updated to 2024c.
 * Concepts dictionaries updated to 2024c.
 * :func:`~pydicom.dataset.validate_file_meta` now checks to ensure required
   Type 1 elements aren't empty.
@@ -35,6 +35,9 @@ Changes
   method will now raise an exception if the user tries to convert between little
   and big endian datasets. If this is something you need, use
   :func:`~pydicom.filewriter.dcmwrite` instead.
+* Added the `exist_ok` argument to :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>`
+  and :func:`~pydicom.filewriter.dcmwrite` to allow raising a :class:`FileExistsError`
+  if trying to write to a file that already exists (:issue:`2104`).
 * `implicit_vr`, `little_endian` and `force_encoding` optional arguments
   added to  :func:`~pydicom.filewriter.dcmwrite`.
 * The priority used to decide which encoding to use with
@@ -232,6 +235,13 @@ Enhancements
 * Added :meth:`Dataset.update_raw_element()<pydicom.dataset.Dataset.update_raw_element>`
   to make it easier to modify a :class:`~pydicom.dataelem.RawDataElement`'s VR or value
   prior to conversion to a :class:`~pydicom.dataelem.DataElement` (:issue:`1739`).
+* Added support for using :class:`io.BufferedIOBase` subclasses to set the value for
+  elements with O* VRs such as **OB** and **OW** (:issue:`1913`).
+* Added :func:`~pydicom.encaps.encapsulate_buffer` and
+  :func:`~pydicom.encaps.encapsulate_extended_buffer` for encapsulating buffered
+  compressed *Pixel Data* via :class:`~pydicom.encaps.EncapsulatedBuffer` instances.
+* Added elements with **OB**,  **OD**, **OF**, **OL**, **OW**, **OV** VRs to the type
+  validation checking when setting :class:`~pydicom.dataelem.DataElement` values (:issue:`1414`).
 * Added :func:`~pydicom.dataelem.convert_raw_data_element` for converting raw element data to
   :class:`~pydicom.dataelem.DataElement` instances.
 * Added the :mod:`~pydicom.hooks` module which contains an interface for adding callback

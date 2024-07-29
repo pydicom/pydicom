@@ -36,7 +36,15 @@ Creating Encapsulated Data
    :toctree: generated/
 
    encapsulate
+   encapsulate_buffer
    encapsulate_extended
+   encapsulate_extended_buffer
    fragment_frame
    itemize_fragment
    itemize_frame
+
+
+Management class for encapsulating buffers:
+
+.. autoclass:: EncapsulatedBuffer
+    :exclude-members: close, detach, fileno, flush, isatty, read1, readinto, readint1, readline, readlines, truncate, writable, write, writelines

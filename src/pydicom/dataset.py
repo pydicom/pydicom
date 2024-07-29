@@ -2533,6 +2533,7 @@ class Dataset:
         implicit_vr: bool | None = None,
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
+        exist_ok: bool = True,
         **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
@@ -2557,7 +2558,8 @@ class Dataset:
 
         .. versionchanged:: 3.0
 
-            Added `implicit_vr`, `little_endian` and `enforce_file_format`
+            Added `implicit_vr`, `little_endian`, `enforce_file_format` and `exist_ok`
+            keyword arguments
 
         .. deprecated:: 3.0
 
@@ -2599,6 +2601,10 @@ class Dataset:
             - ``Dataset.file_meta``: if the dataset is missing any required
               *File Meta Information Group* elements then they will not be
               added or written
+        exist_ok : bool, optional
+            If ``False`` and `filename` is a :class:`str` or PathLike, then raise a
+            :class:`FileExistsError` if a file already exists with the given filename
+            (default ``True``).
 
         See Also
         --------
@@ -2640,6 +2646,7 @@ class Dataset:
             implicit_vr=implicit_vr,
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
+            exist_ok=exist_ok,
             **kwargs,
         )
 
@@ -3401,7 +3408,7 @@ class FileDataset(Dataset):
         if self.filename and os.path.exists(self.filename):
             self.timestamp = os.stat(self.filename).st_mtime
 
-    def __deepcopy__(self, memo: dict[int, Any] | None) -> "FileDataset":
+    def __deepcopy__(self, memo: dict[int, Any]) -> "FileDataset":
         """Return a deep copy of the file dataset.
 
         Sets the `buffer` to ``None`` if it's been closed or is otherwise not copyable.
@@ -3411,19 +3418,13 @@ class FileDataset(Dataset):
         FileDataset
             A deep copy of the file dataset.
         """
-        copied = self.__class__(
-            self.filename,  # type: ignore[arg-type]
-            self,
-            self.preamble,
-            self.file_meta,
-            self.is_implicit_VR,  # type: ignore[arg-type]
-            self.is_little_endian,  # type: ignore[arg-type]
-        )
-
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
         for k, v in self.__dict__.items():
             if k == "buffer":
                 try:
-                    copied.__dict__[k] = copy.deepcopy(v)
+                    setattr(result, k, copy.deepcopy(v, memo))
                 except Exception as exc:
                     warn_and_log(
                         f"The {type(exc).__name__} exception '{exc}' occurred "
@@ -3431,11 +3432,11 @@ class FileDataset(Dataset):
                         "from, the 'buffer' attribute will be set to 'None' in the "
                         "copied object"
                     )
-                    copied.__dict__[k] = None
+                    setattr(result, k, copy.deepcopy(None, memo))
             else:
-                copied.__dict__[k] = copy.deepcopy(v)
+                setattr(result, k, copy.deepcopy(v, memo))
 
-        return copied
+        return result
 
 
 def validate_file_meta(

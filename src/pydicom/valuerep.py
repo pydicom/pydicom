@@ -377,6 +377,12 @@ VALIDATORS = {
     "IS": validate_length_and_type_and_regex,
     "LO": validate_type_and_length,
     "LT": validate_type_and_length,
+    "OB": lambda vr, value: validate_type(vr, value, (bytes, bytearray)),
+    "OD": lambda vr, value: validate_type(vr, value, (bytes, bytearray)),
+    "OF": lambda vr, value: validate_type(vr, value, (bytes, bytearray)),
+    "OL": lambda vr, value: validate_type(vr, value, (bytes, bytearray)),
+    "OW": lambda vr, value: validate_type(vr, value, (bytes, bytearray)),
+    "OV": lambda vr, value: validate_type(vr, value, (bytes, bytearray)),
     "PN": validate_pn,
     "SH": validate_type_and_length,
     "SL": lambda vr, value: validate_number(vr, value, -0x80000000, 0x7FFFFFFF),
@@ -589,6 +595,9 @@ EXPLICIT_VR_LENGTH_16 = {
     VR.US,
 }
 EXPLICIT_VR_LENGTH_32 = STANDARD_VR - EXPLICIT_VR_LENGTH_16
+
+# VRs that are allowed to be buffers
+BUFFERABLE_VRS = (BYTES_VR | {VR.OB_OW}) - {VR.UN}
 
 
 class _DateTimeBase:
@@ -1099,7 +1108,7 @@ class DSfloat(float):
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
-        if self.auto_format and hasattr(self, "original_string"):
+        if hasattr(self, "original_string"):
             return f"'{self.original_string}'"
 
         return f"'{super().__repr__()}'"
@@ -1210,7 +1219,7 @@ class DSdecimal(Decimal):
                 if validation_mode == config.RAISE:
                     raise OverflowError(msg)
                 warn_and_log(msg)
-            if not is_valid_ds(repr(self).strip("'")):
+            elif not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 msg = f'Value "{self}" is not valid for elements with a VR of DS'
                 if validation_mode == config.RAISE:
@@ -1238,8 +1247,9 @@ class DSdecimal(Decimal):
         return super().__str__()
 
     def __repr__(self) -> str:
-        if self.auto_format and hasattr(self, "original_string"):
+        if hasattr(self, "original_string"):
             return f"'{self.original_string}'"
+
         return f"'{self}'"
 
 

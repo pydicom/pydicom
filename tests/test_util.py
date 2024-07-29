@@ -119,7 +119,7 @@ class TestCodify:
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
         input_elem = [
-            DataElement(0x00100010, "OB", "CITIZEN"),
+            DataElement(0x00100010, "OB", b"CITIZEN"),
             DataElement(0x0008010C, "UI", "1.1"),
             DataElement(0x00200011, "IS", 3),
         ]

@@ -2,8 +2,13 @@
 """Unit tests for the pydicom.dataelem module."""
 
 # Many tests of DataElement class are implied in test_dataset also
+import copy
 import datetime
 import math
+import io
+import platform
+import re
+import tempfile
 
 import pytest
 
@@ -19,6 +24,7 @@ from pydicom.dataelem import (
 from pydicom.dataset import Dataset
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
+from pydicom.fileutil import read_buffer
 from pydicom.hooks import (
     hooks,
     raw_element_value_retry,
@@ -28,7 +34,10 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from .test_util import save_private_dict
 from pydicom.uid import UID
-from pydicom.valuerep import DSfloat, validate_value
+from pydicom.valuerep import BUFFERABLE_VRS, DSfloat, validate_value
+
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 class TestDataElement:
@@ -581,6 +590,7 @@ class TestDataElement:
     def test_vm_sequence(self):
         """Test DataElement.VM for SQ."""
         elem = DataElement(0x300A00B0, "SQ", [])
+        assert not elem.is_buffered
         assert elem.VR == "SQ"
         assert len(elem.value) == 0
         assert elem.VM == 1
@@ -1402,6 +1412,221 @@ class TestDataElementValidation:
             ds.PixelData = np.ones((3, 4), dtype="u1")
 
         assert ds.PixelData == b"\x00\x01"
+
+    @pytest.mark.parametrize("value", (None, b"", b"\x00", b"\x00\x01\x02\x03"))
+    def test_valid_o_star_bytes(self, value):
+        for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
+            DataElement(0x00410001, "vr", value, validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (bytearray(), bytearray(b"\x00\x01\x02\x03")))
+    def test_valid_o_star_bytearray(self, value):
+        for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
+            DataElement(0x00410001, "vr", value, validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (-2, 4294967300))
+    def test_invalid_o_star_value(self, value):
+        for vr in ("OB", "OD", "OF", "OL", "OW", "OV"):
+            msg = f"A value of type 'int' cannot be assigned to a tag with VR {vr}"
+            with pytest.warns(UserWarning, match=msg):
+                DataElement(0x00410001, vr, value, validation_mode=config.WARN)
+            with pytest.raises(ValueError, match=msg):
+                DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
+
+
+class TestBufferedDataElement:
+    """Tests setting a DataElement value to a buffer"""
+
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
+    def test_reading_dataelement_buffer(self, vr):
+        value = b"\x00\x01\x02\x03"
+        buffer = io.BytesIO(value)
+        elem = DataElement("PixelData", vr, buffer)
+
+        data: bytes = b""
+        # while read_bytes is tested in test_buffer.py, this tests the integration
+        # between the helper and DataElement since this is the main use case
+        for chunk in read_buffer(elem.value):
+            data += chunk
+
+        assert data == value
+
+    def test_unsupported_vr_raises(self):
+        """Test using a buffer with an unsupported VR raises"""
+        msg = (
+            "Elements with a VR of 'PN' cannot be used with buffered values, "
+            "supported VRs are: OB, OD, OF, OL, OV, OW"
+        )
+        with pytest.raises(ValueError, match=msg):
+            DataElement("PersonName", "PN", io.BytesIO())
+
+    @pytest.mark.skipif(IS_WINDOWS, reason="TemporaryFile on Windows always readable")
+    def test_invalid_buffer_raises(self):
+        """Test invalid buffer raises on setting the value"""
+        b = io.BytesIO()
+        b.close()
+        msg = (
+            r"Invalid buffer for \(0040,A123\) 'Person Name': the buffer has been "
+            "closed"
+        )
+        with pytest.raises(ValueError, match=msg):
+            DataElement("PersonName", "OB", b)
+
+        msg = (
+            r"Invalid buffer for \(0040,A123\) 'Person Name': the buffer must be "
+            "readable and seekable"
+        )
+        with tempfile.TemporaryFile(mode="wb") as t:
+            with pytest.raises(ValueError, match=msg):
+                DataElement("PersonName", "OB", t)
+
+    def test_printing_value(self):
+        value = b"\x00\x01\x02\x03"
+        buffer = io.BytesIO(value)
+        elem = DataElement("PixelData", "OB", buffer)
+        assert elem.is_buffered
+        assert re.compile(
+            r"^\(7FE0,0010\) Pixel Data\W*OB: <_io.BytesIO object.*$"
+        ).match(str(elem))
+        assert elem.repval.startswith("<_io.BytesIO object at")
+        assert repr(elem) == str(elem)
+
+    def test_VM(self):
+        """Test buffered element VM"""
+        elem = DataElement("PersonName", "OB", io.BytesIO())
+        assert elem.VM == 0
+        elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+        assert elem.VM == 1
+
+    def test_equality(self):
+        """Test element equality"""
+        # First is buffered, second is not
+        elem = DataElement("PersonName", "OB", b"\x00\x01")
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+
+        # Test equality multiple times to ensure buffer can be re-read
+        assert b_elem == elem
+        assert b_elem == elem
+
+        elem.value = b"\x01\x02"
+        assert b_elem != elem
+        assert b_elem != elem
+
+        # First and second are both buffered
+        b_elem2 = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+        assert b_elem == b_elem2
+        assert b_elem == b_elem2
+
+        b_elem2 = DataElement("PersonName", "OB", io.BytesIO(b"\x01\x02"))
+        assert b_elem != b_elem2
+        assert b_elem != b_elem2
+
+        # First is not buffered, second is
+        # Test equality multiple times to ensure buffer can be re-read
+        assert elem != b_elem
+        assert elem != b_elem
+
+    def test_equality_offset(self):
+        """Test equality when the buffer isn't positioned at the start"""
+        elem = DataElement("PersonName", "OB", b"\x00\x01")
+
+        b = io.BytesIO(b"\x00\x01")
+        b_elem = DataElement("PersonName", "OB", b)
+        b.seek(2)
+
+        assert b_elem == elem
+        assert b_elem == elem
+
+        c = io.BytesIO(b"\x00\x01")
+        c_elem = DataElement("PersonName", "OB", c)
+        c.seek(1)
+
+        assert b_elem == c_elem
+        assert b_elem == c_elem
+
+    def test_equality_larger(self):
+        """Test equality when bytes is larger than buffer"""
+        elem = DataElement("PersonName", "OB", b"\x00\x01\x02\x03")
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01"))
+
+        assert b_elem != elem
+
+        c_elem = DataElement("PersonName", "OB", io.BytesIO(b"\x00\x01\x02\x03"))
+        assert b_elem != c_elem
+
+    def test_equality_multichunk(self):
+        """Test element equality when the value gets chunked"""
+        # Test multiple of default chunk size
+        value = b"\x00\x01\x02" * 8192
+        elem = DataElement("PersonName", "OB", value)
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(value))
+        assert b_elem == elem
+
+        # Test not a multiple of default chunk size
+        value = b"\x00\x01\x02" * 8418
+        elem = DataElement("PersonName", "OB", value)
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(value))
+        assert b_elem == elem
+
+        # Test empty
+        value = b""
+        elem = DataElement("PersonName", "OB", value)
+        b_elem = DataElement("PersonName", "OB", io.BytesIO(value))
+        assert b_elem == elem
+
+    def test_equality_raises(self):
+        """Test equality raises if buffer invalid."""
+        elem = DataElement("PersonName", "OB", b"\x00\x01")
+        b = io.BytesIO(b"\x00\x01")
+        b_elem = DataElement("PersonName", "OB", b)
+
+        assert b_elem == elem
+
+        # First buffer is invalid
+        b.close()
+        msg = (
+            r"Invalid buffer for \(0040,A123\) 'Person Name': the buffer has been "
+            "closed"
+        )
+        with pytest.raises(ValueError, match=msg):
+            b_elem == elem
+
+        # Second buffer is invalid
+        with pytest.raises(ValueError, match=msg):
+            elem == b_elem
+
+        # Both buffers are invalid
+        c = io.BytesIO(b"\x00\x01")
+        c_elem = DataElement("PersonName", "OB", c)
+        c.close()
+
+        with pytest.raises(ValueError, match=msg):
+            b_elem == c_elem
+
+    def test_deepcopy(self):
+        """Test deepcopy with a buffered value"""
+        b = io.BytesIO(b"\x00\x01")
+        elem = DataElement("PersonName", "OB", b)
+
+        elem2 = copy.deepcopy(elem)
+        assert isinstance(elem.value, io.BytesIO)
+        assert isinstance(elem2.value, io.BytesIO)
+        assert elem.value.getvalue() == b.getvalue()
+        assert elem2.value.getvalue() == b.getvalue()
+        assert elem2.value is not elem.value
+        assert elem2 == elem
+
+    def test_deepcopy_closed(self):
+        """Test deepcopy with a buffered value"""
+        b = io.BytesIO(b"\x00\x01")
+        elem = DataElement("PersonName", "OB", b)
+        b.close()
+
+        msg = (
+            r"Error deepcopying the buffered element \(0040,A123\) 'Person Name': "
+            "I/O operation on closed file"
+        )
+        with pytest.raises(ValueError, match=msg):
+            copy.deepcopy(elem)
 
 
 @pytest.fixture
