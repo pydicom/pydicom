@@ -2533,7 +2533,7 @@ class Dataset:
         implicit_vr: bool | None = None,
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
-        exist_ok: bool = True,
+        overwrite: bool = True,
         **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
@@ -2558,7 +2558,7 @@ class Dataset:
 
         .. versionchanged:: 3.0
 
-            Added `implicit_vr`, `little_endian`, `enforce_file_format` and `exist_ok`
+            Added `implicit_vr`, `little_endian`, `enforce_file_format` and `overwrite`
             keyword arguments
 
         .. deprecated:: 3.0
@@ -2601,7 +2601,7 @@ class Dataset:
             - ``Dataset.file_meta``: if the dataset is missing any required
               *File Meta Information Group* elements then they will not be
               added or written
-        exist_ok : bool, optional
+        overwrite : bool, optional
             If ``False`` and `filename` is a :class:`str` or PathLike, then raise a
             :class:`FileExistsError` if a file already exists with the given filename
             (default ``True``).
@@ -2646,7 +2646,7 @@ class Dataset:
             implicit_vr=implicit_vr,
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
-            exist_ok=exist_ok,
+            overwrite=overwrite,
             **kwargs,
         )
 
