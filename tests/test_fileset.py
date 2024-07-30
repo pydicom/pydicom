@@ -743,7 +743,7 @@ class TestRecordNode:
         item = ds.DirectoryRecordSequence[-1]
         assert "IMAGE" == item.DirectoryRecordType
         item.ReferencedFileID = "01"
-        ds.save_as(p / "DICOMDIR", exist_ok=True)
+        ds.save_as(p / "DICOMDIR", overwrite=True)
         fs = FileSet(ds)
         assert fs._instances[0].node._file_id == Path("01")
 

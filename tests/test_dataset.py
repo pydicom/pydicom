@@ -2094,8 +2094,8 @@ class TestDatasetSaveAs:
         with pytest.raises(ValueError, match=msg):
             ds.save_as(DicomBytesIO())
 
-    def test_exist_ok(self):
-        """Test the exist_ok argument"""
+    def test_overwrite(self):
+        """Test the overwrite argument"""
         ds = dcmread(get_testdata_file("MR_small.dcm"))
         patient_name = ds.PatientName
 
@@ -2107,9 +2107,9 @@ class TestDatasetSaveAs:
 
             msg = r"File exists: '(.*)foo.dcm'"
             with pytest.raises(FileExistsError, match=msg):
-                ds.save_as(p, exist_ok=False)
+                ds.save_as(p, overwrite=False)
 
-            ds.save_as(p, exist_ok=True)
+            ds.save_as(p, overwrite=True)
             assert dcmread(p).PatientName == patient_name
 
 
