@@ -103,7 +103,7 @@ In both cases this will compress the :class:`~pydicom.dataset.Dataset` in-place:
 * The *Pixel Data* will be set with the encapsulated RLE codestream
 * The *Transfer Syntax UID* will be set to *RLE Lossless*
 * A new *SOP Instance UID* value will be also be generated, but this can
-  be disabled by passing ``new_instance_uid=False``.
+  be disabled by passing ``generate_instance_uid=False``.
 
 When using an :class:`~numpy.ndarray` the :attr:`~numpy.ndarray.shape`,
 :class:`~numpy.dtype` and contents of `arr` must match the corresponding
@@ -370,7 +370,7 @@ This will decompress the :class:`~pydicom.dataset.Dataset` in-place:
 * The :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements will be updated
   as required to match the uncompressed pixel data.
 * A new *SOP Instance UID* value will be also be generated, but this can
-  be disabled by passing ``new_instance_uid=False``.
+  be disabled by passing ``generate_instance_uid=False``.
 
 Dataset decompression uses the same backend as accessing compressed *Pixel Data*,
 so the same :doc:`customization options</guides/decoding/decoder_options>` of the decoding
