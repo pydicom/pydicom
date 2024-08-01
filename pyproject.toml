@@ -41,6 +41,7 @@ docs = [
     "sphinx_rtd_theme",
     "sphinx-gallery",
     "sphinxcontrib-napoleon",
+    "sphinxcontrib-jquery",
     "sphinx-copybutton"
 ]
 

@@ -59,7 +59,6 @@ html:
 	rm -rf $(BUILDDIR)/html/_images
 	#rm -rf _build/doctrees/
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html -j auto
-	python3 fix_search.py  # TODO remove when sphinx_rtd_theme fixes upstream
 	touch $(BUILDDIR)/html/.nojekyll
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
