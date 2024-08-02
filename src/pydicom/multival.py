@@ -106,7 +106,7 @@ class ConstrainedList(MutableSequence[T]):
         )
 
 
-class MultiValue(ConstrainedList):
+class MultiValue(ConstrainedList[T]):
     """Class to hold any multi-valued DICOM value, or any list of items that
     are all of the same type.
 
