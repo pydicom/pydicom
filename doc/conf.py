@@ -66,6 +66,7 @@ extensions = [
     "sphinx.ext.napoleon",  # Numpy style docstrings
     "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
+    "sphinxcontrib.jquery",  # Needed by sphinx_rtd_theme
     # Custom
     "sphinx_copybutton",
 ]
