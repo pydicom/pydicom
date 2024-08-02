@@ -25,7 +25,7 @@ from pydicom.filereader import (
     data_element_generator,
     read_file_meta_info,
 )
-from pydicom.dataelem import DataElement, DataElement_from_raw
+from pydicom.dataelem import DataElement, convert_raw_data_element
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
@@ -1794,7 +1794,7 @@ class TestDataElementGenerator:
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, True)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
-        assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+        assert elem == convert_raw_data_element(next(gen), encoding="ISO_IR 100")
 
     def test_little_endian_implicit(self):
         """Test reading little endian implicit VR data"""
@@ -1803,7 +1803,7 @@ class TestDataElementGenerator:
         fp = BytesIO(bytestream)
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
-        assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+        assert elem == convert_raw_data_element(next(gen), encoding="ISO_IR 100")
 
     def test_big_endian_explicit(self):
         """Test reading big endian explicit VR data"""
@@ -1813,7 +1813,7 @@ class TestDataElementGenerator:
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
-        assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+        assert elem == convert_raw_data_element(next(gen), encoding="ISO_IR 100")
 
 
 def test_read_file_meta_info():

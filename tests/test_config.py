@@ -10,7 +10,7 @@ from pydicom import dcmread
 from pydicom.config import debug
 from pydicom.data import get_testdata_file
 from pydicom import config
-from pydicom.dataelem import RawDataElement, DataElement_from_raw
+from pydicom.dataelem import RawDataElement, convert_raw_data_element
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 
@@ -144,11 +144,12 @@ class TestSettings:
     def test_default_for_reading_validation_mode(self):
         raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
         with pytest.warns(UserWarning):
-            DataElement_from_raw(raw)
+            convert_raw_data_element(raw)
 
     def test_reading_validation_mode_with_enforce_valid_values(
         self, enforce_valid_values
     ):
         raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
-        with pytest.raises(KeyError):
-            DataElement_from_raw(raw)
+        msg = r"VR lookup failed for the raw element with tag \(8888,0002\)"
+        with pytest.raises(KeyError, match=msg):
+            convert_raw_data_element(raw)

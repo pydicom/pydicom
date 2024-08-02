@@ -19,12 +19,17 @@ from pydicom.datadict import add_private_dict_entry
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
-    DataElement_from_raw,
+    convert_raw_data_element,
 )
 from pydicom.dataset import Dataset
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.fileutil import read_buffer
+from pydicom.hooks import (
+    hooks,
+    raw_element_value_retry,
+    raw_element_value_fix_separator,
+)
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from .test_util import save_private_dict
@@ -602,7 +607,7 @@ class TestRawDataElement:
         raw = RawDataElement(Tag(0x88880088), None, 4, b"unknown", 0, True, True)
 
         with pytest.warns(UserWarning, match=r"\(8888,0088\)"):
-            element = DataElement_from_raw(raw)
+            element = convert_raw_data_element(raw)
             assert element.VR == "UN"
 
     def test_key_error(self, enforce_valid_values):
@@ -612,13 +617,14 @@ class TestRawDataElement:
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
         raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
 
-        with pytest.raises(KeyError, match=r"\(8888,0002\)"):
-            DataElement_from_raw(raw)
+        msg = r"VR lookup failed for the raw element with tag \(8888,0002\)"
+        with pytest.raises(KeyError, match=msg):
+            convert_raw_data_element(raw)
 
     def test_valid_tag(self, no_datetime_conversion):
         """RawDataElement: conversion of known tag succeeds..."""
         raw = RawDataElement(Tag(0x00080020), "DA", 8, b"20170101", 0, False, True)
-        element = DataElement_from_raw(raw, default_encoding)
+        element = convert_raw_data_element(raw, encoding=default_encoding)
         assert "Study Date" == element.name
         assert "DA" == element.VR
         assert "20170101" == element.value
@@ -626,7 +632,7 @@ class TestRawDataElement:
         raw = RawDataElement(
             Tag(0x00080000), None, 4, b"\x02\x00\x00\x00", 0, True, True
         )
-        elem = DataElement_from_raw(raw, default_encoding)
+        elem = convert_raw_data_element(raw, encoding=default_encoding)
         assert "UL" == elem.VR
 
     def test_data_element_without_encoding(self):
@@ -634,14 +640,14 @@ class TestRawDataElement:
         raw = RawDataElement(
             Tag(0x00104000), "LT", 23, b"comment\\comment2\\comment3", 0, False, True
         )
-        element = DataElement_from_raw(raw)
+        element = convert_raw_data_element(raw)
         assert "Patient Comments" == element.name
 
     def test_unknown_vr(self):
         """Test converting a raw element with unknown VR"""
         raw = RawDataElement(Tag(0x00080000), "AA", 8, b"20170101", 0, False, True)
         with pytest.raises(NotImplementedError):
-            DataElement_from_raw(raw, default_encoding)
+            convert_raw_data_element(raw, encoding=default_encoding)
 
     @pytest.fixture
     def accept_wrong_length(self, request):
@@ -655,7 +661,7 @@ class TestRawDataElement:
         """Check exception when number of raw bytes is not correct."""
         raw = RawDataElement(Tag(0x00190000), "FD", 1, b"1", 0, False, True)
         with pytest.raises(BytesLengthException):
-            DataElement_from_raw(raw)
+            convert_raw_data_element(raw)
 
     @pytest.mark.parametrize("accept_wrong_length", [True], indirect=True)
     def test_wrong_bytes_length_convert_to_UN(self, accept_wrong_length):
@@ -670,7 +676,7 @@ class TestRawDataElement:
             r"Setting VR to 'UN'."
         )
         with pytest.warns(UserWarning, match=msg):
-            raw_elem = DataElement_from_raw(raw)
+            raw_elem = convert_raw_data_element(raw)
             assert "UN" == raw_elem.VR
             assert value == raw_elem.value
 
@@ -753,6 +759,151 @@ class TestRawDataElement:
             assert elem.VR == "UN"
             assert elem.name == "[Another Number]"
             assert elem.value == b"12345678"
+
+    def test_lut_descriptor_modifier_invalid(self):
+        """Test fixing value for LUT Descriptor if value is not an int"""
+        raw = RawDataElement(Tag(0x00283002), None, 4, ["a", 0, 1], 0, True, True)
+        elem = convert_raw_data_element(raw)
+        assert elem.value == ["a", 0, 1]
+
+    def test_UN_unknown_public_tag(self):
+        """Test converting a UN element with unknown public tag"""
+        raw = RawDataElement(Tag(0x88883002), "UN", 4, b"\x02\x04", 0, True, True)
+        elem = convert_raw_data_element(raw)
+        assert elem.value == b"\x02\x04"
+        assert elem.tag == 0x88883002
+        assert elem.VR == "UN"
+
+
+@pytest.fixture
+def reset_hooks():
+    original = (
+        hooks.raw_element_vr,
+        hooks.raw_element_value,
+        hooks.raw_element_kwargs,
+    )
+    yield
+    (
+        hooks.raw_element_vr,
+        hooks.raw_element_value,
+        hooks.raw_element_kwargs,
+    ) = original
+
+
+class TestConvertRawDataElementHooks:
+    """Tests for the hooks in convert_raw_data_element()"""
+
+    def test_vr(self, reset_hooks):
+        """Test the 'raw_element_vr' hook"""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        raw = RawDataElement(Tag(0x00100020), None, 4, b"unknown", 0, True, True)
+
+        d = {}
+
+        def func(raw, data, **kwargs):
+            data["VR"] = "LO"
+            d.update(kwargs)
+
+        kwargs = {"a": 1, "b": []}
+
+        hooks.register_callback("raw_element_vr", func)
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
+        assert elem.value == "unknown"
+        assert elem.VR == "LO"
+        assert elem.tag == (0x00100020)
+
+        assert d["encoding"] == default_encoding
+        assert d["ds"] == ds
+        assert d["a"] == 1
+        assert d["b"] == []
+
+    def test_value(self, reset_hooks):
+        """Test the 'raw_element_vr' hook"""
+        ds = Dataset()
+        ds.PatientName = "Foo"
+        raw = RawDataElement(Tag(0x00100020), "LO", 4, b"unknown", 0, True, True)
+
+        d = {}
+
+        def func(raw, data, **kwargs):
+            data["value"] = "12345"
+            d.update(kwargs)
+
+        kwargs = {"c": 3, "d": None}
+
+        hooks.register_callback("raw_element_value", func)
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        elem = convert_raw_data_element(raw, encoding=default_encoding, ds=ds)
+        assert elem.value == "12345"
+        assert elem.VR == "LO"
+        assert elem.tag == (0x00100020)
+
+        assert d["encoding"] == default_encoding
+        assert d["ds"] == ds
+        assert d["c"] == 3
+        assert d["d"] is None
+
+    def test_value_retry(self, reset_hooks):
+        """Test the 'raw_element_value_retry' function"""
+        raw = RawDataElement(Tag(0x00000903), None, 4, b"12345", 0, True, True)
+
+        # Original function raises and exception
+        msg = "Expected total bytes to be an even multiple of bytes per value"
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(raw)
+
+        # No target_VRs set, no change
+        hooks.register_callback("raw_element_value", raw_element_value_retry)
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(raw)
+
+        kwargs = {"target_VRs": {"US": ("SS", "SH")}}
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        # Test candidate VRs to see if they can be used instead
+        #   in this case SS will fail and SH will succeed
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "12345"
+        assert elem.VR == "SH"
+
+        # If unable to convert then raise original exception
+        kwargs["target_VRs"]["US"] = ("SS",)
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(raw)
+
+    def test_value_fix_separator(self, reset_hooks):
+        """Test the 'raw_element_value_fix_separator' function"""
+        raw = RawDataElement(
+            Tag(0x00000902), None, 4, b"\x41\x42\x2C\x43\x44\x2C\x45\x46", 0, True, True
+        )
+
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "AB,CD,EF"
+
+        hooks.register_callback("raw_element_value", raw_element_value_fix_separator)
+
+        # No target_VRs set, no change
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "AB,CD,EF"
+
+        kwargs = {"target_VRs": ("LO",)}
+        hooks.register_kwargs("raw_element_kwargs", kwargs)
+
+        elem = convert_raw_data_element(raw)
+        assert elem.value == ["AB", "CD", "EF"]
+
+        kwargs["separator"] = ":"
+        raw = raw._replace(value=raw.value.replace(b"\x2C", b":"))
+        elem = convert_raw_data_element(raw)
+        assert elem.value == ["AB", "CD", "EF"]
+
+        raw = raw._replace(VR="SH")
+        elem = convert_raw_data_element(raw)
+        assert elem.value == "AB:CD:EF"
 
 
 class TestDataElementValidation:
@@ -1476,3 +1627,28 @@ class TestBufferedDataElement:
         )
         with pytest.raises(ValueError, match=msg):
             copy.deepcopy(elem)
+
+
+@pytest.fixture
+def use_future():
+    original = config._use_future
+    config._use_future = True
+    yield
+    config._use_future = original
+
+
+def test_deprecation_warnings():
+    from pydicom.dataelem import DataElement_from_raw
+
+    raw = RawDataElement(Tag(0x00100010), None, 4, b"unknown", 0, True, True)
+    msg = (
+        "'pydicom.dataelem.DataElement_from_raw' is deprecated and will be removed "
+        "in v4.0, please use 'pydicom.dataelem.convert_raw_data_element' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        DataElement_from_raw(raw)
+
+
+def test_import_raises(use_future):
+    with pytest.raises(ImportError):
+        from pydicom.dataelem import DataElement_from_raw

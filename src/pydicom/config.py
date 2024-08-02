@@ -39,7 +39,6 @@ VR of **DS** are represented as :class:`~decimal.Decimal`.
 Default ``False``.
 """
 
-
 data_element_callback: Optional["ElementCallback"] = None
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a
@@ -47,17 +46,33 @@ data_element_callback: Optional["ElementCallback"] = None
 before it is added to the :class:`~pydicom.dataset.Dataset`.
 
 Default ``None``.
+
+.. deprecated:: 3.0
+
+    ``data_element_callback`` will be removed in v4.0, use
+    :meth:`~pydicom.hooks.Hooks.register_callback` instead.
 """
 
 data_element_callback_kwargs: dict[str, Any] = {}
 """Set the keyword arguments passed to :func:`data_element_callback`.
 
 Default ``{}``.
+
+.. deprecated:: 3.0
+
+    ``data_element_callback_kwargs`` will be removed in v4.0, use
+    :meth:`~pydicom.hooks.Hooks.register_kwargs` instead.
 """
 
 
 def reset_data_element_callback() -> None:
-    """Reset the :func:`data_element_callback` function to the default."""
+    """Reset the :func:`data_element_callback` function to the default.
+
+    .. deprecated:: 3.0
+
+        ``reset_data_element_callback()`` will be removed in v4.0, use
+        :meth:`pydicom.hooks.Hooks.reset` instead.
+    """
     global data_element_callback
     global data_element_callback_kwargs
     data_element_callback = None

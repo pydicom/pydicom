@@ -179,3 +179,7 @@ class TestDict:
         msg = r"Tag \(0009,0003\) not found in DICOM dictionary"
         with pytest.raises(KeyError, match=msg):
             _dictionary_vr_fast(0x00090003)
+
+        msg = r"Tag \(50F1,0010\) not found in DICOM dictionary"
+        with pytest.raises(KeyError, match=msg):
+            _dictionary_vr_fast(0x50F10010)

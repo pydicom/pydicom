@@ -216,20 +216,20 @@ Enhancements
 * Improve support for reading and resolving inline binary data with `VR=UN` from Json
   (:issue:`2062`).
 * :func:`~pydicom.pixels.utils.get_j2k_parameters` now takes into account the JP2 header
-  (if present, although it's non-conformant for it to be) (:issue:`2073`)
-* Added support for NumPy v2.0 (:issue:`2075`)
+  (if present, although it's non-conformant for it to be) (:issue:`2073`).
+* Added support for NumPy v2.0 (:issue:`2075`).
 * Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
-  create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`)
+  create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`).
 * Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
-  (:issue:`1454`)
+  (:issue:`1454`).
 * Added the :meth:`Dataset.set_pixel_data()<pydicom.dataset.Dataset.set_pixel_data>` method
   and :func:`~pydicom.pixels.set_pixel_data` function for automatically setting a
   dataset's *Pixel Data* and related Image Pixel module elements using an
-  :class:`~numpy.ndarray` (:issue:`50`)
+  :class:`~numpy.ndarray` (:issue:`50`).
 * Added typing support for :class:`~pydicom.dataset.Dataset` element access using the
-  `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package. (:issue:`1485`)
+  `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package. (:issue:`1485`).
 * Added :func:`~pydicom.pixels.apply_presentation_lut` for applying a Presentation LUT
-  to an :class:`~numpy.ndarray` (:issue:`1265`)
+  to an :class:`~numpy.ndarray` (:issue:`1265`).
 * Added :func:`~pydicom.pixels.apply_icc_profile` and :func:`~pydicom.pixels.create_icc_transform`
   for applying ICC profiles to an :class:`~numpy.ndarray` (:issue:`1244`).
 * Added :meth:`Dataset.update_raw_element()<pydicom.dataset.Dataset.update_raw_element>`
@@ -242,6 +242,12 @@ Enhancements
   compressed *Pixel Data* via :class:`~pydicom.encaps.EncapsulatedBuffer` instances.
 * Added elements with **OB**,  **OD**, **OF**, **OL**, **OW**, **OV** VRs to the type
   validation checking when setting :class:`~pydicom.dataelem.DataElement` values (:issue:`1414`).
+* Added :func:`~pydicom.dataelem.convert_raw_data_element` for converting raw element data to
+  :class:`~pydicom.dataelem.DataElement` instances.
+* Added the :mod:`~pydicom.hooks` module which contains an interface for adding callback
+  functions via the :class:`~pydicom.hooks.Hooks` singleton, as well as default and
+  alternative convenience callbacks for :func:`~pydicom.dataelem.convert_raw_data_element`
+  (:issue:`1556`).
 
 
 Fixes
@@ -353,6 +359,15 @@ Deprecations
 * :meth:`Dataset.convert_pixel_data()<pydicom.dataset.Dataset.convert_pixel_data>`
   will be removed in v4.0, use :meth:`Dataset.pixel_array_options()
   <pydicom.dataset.Dataset.pixel_array_options>` instead.
+* :func:`~pydicom.dataelem.DataElement_from_raw` will be removed in v4.0, please
+  use :func:`~pydicom.dataelem.convert_raw_data_element` instead.
+* :attr:`config.data_element_callback<pydicom.config.data_element_callback>` and
+  :attr:`config.data_element_callback_kwargs<pydicom.config.data_element_callback_kwargs>`
+  will be removed in v4.0, please use the hooks for
+  :func:`~pydicom.dataelem.convert_raw_data_element` instead.
+* The ``pydicom.utils.fixers`` submodule will be removed in v4.0, please use the
+  alternative callbacks for :func:`~pydicom.dataelem.convert_raw_data_element`
+  in the :mod:`~pydicom.hooks` module instead.
 
 
 Pydicom Internals
