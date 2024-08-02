@@ -360,4 +360,3 @@ Pydicom Internals
 * Repository folder structure refactored.
 * Renamed top level ``source`` folder to ``util``.
 * New CI tools - `dependabot`, and `pre-commit` using black and ruff.
-* Added a script to hotfix the documentation search function (:issue:`1965`).

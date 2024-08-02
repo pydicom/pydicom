@@ -20,6 +20,8 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="../../_static/documentation_options.js?v=afcbd73c"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -206,7 +208,7 @@ Syntax UID</em>:</p>
 <li><p>The <em>Pixel Data</em> will be set with the encapsulated RLE codestream</p></li>
 <li><p>The <em>Transfer Syntax UID</em> will be set to <em>RLE Lossless</em></p></li>
 <li><p>A new <em>SOP Instance UID</em> value will be also be generated, but this can
-be disabled by passing <code class="docutils literal notranslate"><span class="pre">new_instance_uid=False</span></code>.</p></li>
+be disabled by passing <code class="docutils literal notranslate"><span class="pre">generate_instance_uid=False</span></code>.</p></li>
 </ul>
 <p>When using an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>,
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents of <cite>arr</cite> must match the corresponding
@@ -436,7 +438,7 @@ compressed data.</p>
 <li><p>The <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements will be updated
 as required to match the uncompressed pixel data.</p></li>
 <li><p>A new <em>SOP Instance UID</em> value will be also be generated, but this can
-be disabled by passing <code class="docutils literal notranslate"><span class="pre">new_instance_uid=False</span></code>.</p></li>
+be disabled by passing <code class="docutils literal notranslate"><span class="pre">generate_instance_uid=False</span></code>.</p></li>
 </ul>
 <p>Dataset decompression uses the same backend as accessing compressed <em>Pixel Data</em>,
 so the same <a class="reference internal" href="../../guides/decoding/decoder_options.html"><span class="doc">customization options</span></a> of the decoding
