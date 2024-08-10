@@ -28,12 +28,14 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Hooks:
-    """Management class for callback functions
+    """Management class for callback functions.
 
     .. versionadded:: 3.0
 
-    New instances of this class should not be created, instead use the instance
-    imported with ``from pydicom.hooks import hooks``.
+    .. warning::
+
+        New instances of this class should not be created, instead use the instance
+        imported with ``from pydicom.hooks import hooks``.
 
     **Available Hooks**
 
@@ -173,7 +175,7 @@ def raw_element_vr(
         The raw data element to determine the VR for.
     data : dict[str, Any]
         A dict to store the results of the VR lookup, which should be added
-        as {"VR": str}.
+        as ``{"VR": str}``.
     ds : pydicom.dataset.Dataset | None
         The dataset the element belongs to.
     **kwargs: dict[str, Any]
@@ -235,7 +237,7 @@ def raw_element_value(
         The raw data element to determine the VR for.
     data : dict[str, Any]
         A dict to store the results of the value conversion, which should be added
-        as {"value": Any}.
+        as ``{"value": Any}``.
     encoding : str | MutableSequence[str] | None
         The character set encoding to use for text VRs.
     **kwargs: dict[str, Any]
@@ -319,7 +321,7 @@ def raw_element_value_fix_separator(
         The raw data element to determine the VR for.
     data : dict[str, Any]
         A dict to store the results of the value conversion, which should be added
-        as {"value": Any}.
+        as ``{"value": Any}``.
     encoding : str | MutableSequence[str] | None
         The character set encoding to use for text VRs.
     separator : str | bytes, optional
@@ -379,7 +381,7 @@ def raw_element_value_retry(
         The raw data element to determine the VR for.
     data : dict[str, Any]
         A dict to store the results of the value conversion, which should be added
-        as {"value": Any}.
+        as ``{"value": Any}``.
     encoding : str | MutableSequence[str] | None
         The character set encoding to use for text VRs.
     target_VRs : dict[str, tuple[str, ...]], optional
@@ -406,7 +408,7 @@ def raw_element_value_retry(
 
 
 hooks: Hooks = Hooks()
-"""The global :class:`Hooks` singleton.
+"""The global :class:`~pydicom.hooks.Hooks` singleton.
 
 .. versionadded:: 3.0
 """
