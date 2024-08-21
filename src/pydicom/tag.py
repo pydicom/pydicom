@@ -258,3 +258,10 @@ SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))
 TAG_PIXREP = BaseTag(0x00280103)
 # (0008,0005) *Specific Character Set*
 TAG_CHARSET = BaseTag(0x00080005)
+
+
+# The first and third values of the following elements are always US
+#   even if the VR is SS (PS3.3 C.7.6.3.1.5, C.11.1, C.11.2).
+# (0028,1101-1103) RGB Palette Color LUT Descriptor
+# (0028,3002) LUT Descriptor
+_LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)

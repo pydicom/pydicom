@@ -16,7 +16,7 @@ from pydicom.datadict import _dictionary_vr_fast
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
-    DataElement_from_raw,
+    convert_raw_data_element,
     empty_value_for_VR,
 )
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
@@ -494,7 +494,7 @@ def read_dataset(
     if 0x00080005 in raw_data_elements:
         elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
         char_set = cast(
-            str | MutableSequence[str] | None, DataElement_from_raw(elem).value
+            str | MutableSequence[str] | None, convert_raw_data_element(elem).value
         )
         encoding = convert_encodings(char_set)  # -> List[str]
     else:

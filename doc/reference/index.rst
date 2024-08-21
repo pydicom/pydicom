@@ -27,6 +27,7 @@ This API reference guide details the functions, modules and objects included in
    fileio
    fileset
    handlers
+   hooks
    misc
    overlays
    pixels

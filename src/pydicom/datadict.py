@@ -331,7 +331,7 @@ def _dictionary_vr_fast(tag: int) -> str:
     try:
         return DicomDictionary[tag][0]
     except KeyError:
-        if not tag >> 16 % 2 == 1:
+        if not (tag >> 16) % 2 == 1:
             mask_x = mask_match(tag)
             if mask_x:
                 return RepeatersDictionary[mask_x][0]
