@@ -69,24 +69,3 @@ class TestHooks:
         assert hooks.raw_element_kwargs == {}
         hooks.register_kwargs("raw_element_kwargs", d)
         assert hooks.raw_element_kwargs == d
-
-    def test_reset(self, reset_hooks):
-        """Test Hooks.reset()"""
-
-        def foo():
-            pass
-
-        hooks.register_callback("raw_element_vr", foo)
-        hooks.register_callback("raw_element_value", foo)
-
-        d = {"a": 1}
-        hooks.register_kwargs("raw_element_kwargs", d)
-
-        assert hooks.raw_element_vr == foo
-        assert hooks.raw_element_value == foo
-        assert hooks.raw_element_kwargs == d
-
-        hooks.reset()
-        assert hooks.raw_element_vr == raw_element_vr
-        assert hooks.raw_element_value == raw_element_value
-        assert hooks.raw_element_kwargs == {}

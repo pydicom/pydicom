@@ -887,7 +887,7 @@ def convert_raw_data_element(
       **US**), required to add ``{"value": Any}`` to `data`.
 
     :meth:`~pydicom.hooks.Hooks.register_callback` is used to set the callback
-    function for a given hook.
+    function for a given hook, and only one callback can be set per hook.
 
     Parameters
     ----------

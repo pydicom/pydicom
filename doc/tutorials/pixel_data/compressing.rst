@@ -59,7 +59,7 @@ Data* in a manner conformant to the :dcm:`requirements of the DICOM Standard
 Compressing a dataset (with *RLE Lossless*)
 -------------------------------------------
 
-Compression an existing uncompressed dataset can be performed by passing the *Transfer
+Compression of an existing uncompressed dataset can be performed by passing the *Transfer
 Syntax UID* of the compression method you'd like to use to :meth:`Dataset.compress()
 <pydicom.dataset.Dataset.compress>`, or by using the :func:`~pydicom.pixels.compress`
 function. We'll be using *RLE Lossless* to start with, which is based on the

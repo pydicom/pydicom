@@ -52,8 +52,8 @@ class Hooks:
 
     def __init__(self) -> None:
         """Initialize a new ``Hooks`` instance."""
-        self.raw_element_value: RawDataHook = raw_element_value
-        self.raw_element_vr: RawDataHook = raw_element_vr
+        self.raw_element_value: RawDataHook
+        self.raw_element_vr: RawDataHook
         self.raw_element_kwargs: dict[str, Any] = {}
 
     def register_callback(self, hook: str, func: Callable) -> None:
@@ -65,24 +65,25 @@ class Hooks:
         .. code-block:: python
 
             from pydicom import dcmread
-            from pyicom.hooks import hooks, raw_element_value_fix_separator
+            from pydicom.hooks import hooks, raw_element_value_fix_separator
 
             hooks.register_callback(
                 "raw_element_value", raw_element_value_fix_separator
             )
             kwargs = {"target_VRs": ("DS", "IS")}
-            hooks.register_kwargs("raw_element_kwags", kwargs)
+            hooks.register_kwargs("raw_element_kwargs", kwargs)
 
             ds = dcmread("path/to/dataset.dcm")
 
         Parameters
         ----------
         hook : str
-            The name of the hook to register the function to.
+            The name of the hook to register the function to, allowed values
+            ``"raw_element_vr"`` and ``"raw_element_value"``.
         func : Callable
-            The callback function to use with the hook. For details on the required
-            function signatures please see the documentation for the corresponding
-            calling function.
+            The callback function to use with the hook. Only one callback function can
+            be used per hook. For details on the required function signatures please
+            see the documentation for the corresponding calling function.
         """
         if not callable(func):
             raise TypeError("'func' must be a callable function")
@@ -101,7 +102,8 @@ class Hooks:
         Parameters
         ----------
         hook : str
-            The name of the hook to register `kwargs` to.
+            The name of the hook to register `kwargs` to, allowed value
+            ``"raw_element_kwargs"``.
         kwargs : dict[str, Any]
             A :class:`dict` containing keyword arguments to be passed to the
             hook's corresponding callback function(s).
@@ -113,12 +115,6 @@ class Hooks:
             self.raw_element_kwargs = kwargs
         else:
             raise ValueError(f"Unknown hook '{hook}'")
-
-    def reset(self) -> None:
-        """Reset all callbacks back to their defaults."""
-        self.raw_element_value = raw_element_value
-        self.raw_element_vr = raw_element_vr
-        self.raw_element_kwargs = {}
 
 
 def _private_vr_for_tag(ds: "Dataset | None", tag: BaseTag) -> str:
@@ -234,7 +230,7 @@ def raw_element_value(
     Parameters
     ----------
     raw : RawDataElement
-        The raw data element to determine the VR for.
+        The raw data element to determine the value for.
     data : dict[str, Any]
         A dict to store the results of the value conversion, which should be added
         as ``{"value": Any}``.
@@ -318,7 +314,7 @@ def raw_element_value_fix_separator(
     Parameters
     ----------
     raw : RawDataElement
-        The raw data element to determine the VR for.
+        The raw data element to determine the value for.
     data : dict[str, Any]
         A dict to store the results of the value conversion, which should be added
         as ``{"value": Any}``.
@@ -378,7 +374,7 @@ def raw_element_value_retry(
     Parameters
     ----------
     raw : RawDataElement
-        The raw data element to determine the VR for.
+        The raw data element to determine the value for.
     data : dict[str, Any]
         A dict to store the results of the value conversion, which should be added
         as ``{"value": Any}``.
@@ -412,3 +408,5 @@ hooks: Hooks = Hooks()
 
 .. versionadded:: 3.0
 """
+hooks.raw_element_value = raw_element_value
+hooks.raw_element_vr = raw_element_vr
