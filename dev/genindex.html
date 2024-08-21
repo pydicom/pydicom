@@ -162,6 +162,8 @@
 </li>
         <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.__init__">(pydicom.fileset.RecordNode method)</a>
 </li>
+        <li><a href="reference/generated/pydicom.hooks.Hooks.html#pydicom.hooks.Hooks.__init__">(pydicom.hooks.Hooks method)</a>
+</li>
         <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.__init__">(pydicom.multival.MultiValue method)</a>
 </li>
         <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.__init__">(pydicom.pixels.decoders.base.Decoder method)</a>
@@ -612,6 +614,8 @@
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.values.convert_PN.html#pydicom.values.convert_PN">convert_PN() (in module pydicom.values)</a>
+</li>
+      <li><a href="reference/generated/pydicom.dataelem.convert_raw_data_element.html#pydicom.dataelem.convert_raw_data_element">convert_raw_data_element() (in module pydicom.dataelem)</a>
 </li>
       <li><a href="reference/generated/pydicom.values.convert_single_string.html#pydicom.values.convert_single_string">convert_single_string() (in module pydicom.values)</a>
 </li>
@@ -1339,6 +1343,10 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.hooks.Hooks.html#pydicom.hooks.Hooks">Hooks (class in pydicom.hooks)</a>
+</li>
+      <li><a href="reference/generated/pydicom.hooks.hooks.html#pydicom.hooks.hooks">hooks (in module pydicom.hooks)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.HTJ2K.html#pydicom.uid.HTJ2K">HTJ2K (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixels.decoders.HTJ2KDecoder.html#pydicom.pixels.decoders.HTJ2KDecoder">HTJ2KDecoder (in module pydicom.pixels.decoders)</a>
@@ -1957,6 +1965,8 @@
 </li>
         <li><a href="reference/examples.html#module-pydicom.examples">pydicom.examples</a>
 </li>
+        <li><a href="reference/hooks.html#module-pydicom.hooks">pydicom.hooks</a>
+</li>
         <li><a href="reference/overlays.html#module-pydicom.overlays">pydicom.overlays</a>
 </li>
         <li><a href="reference/generated/pydicom.overlays.numpy_handler.html#module-pydicom.overlays.numpy_handler">pydicom.overlays.numpy_handler</a>
@@ -2326,8 +2336,6 @@
         <li><a href="reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.private_creator">(pydicom.tag.BaseTag property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.private_creators">private_creators() (pydicom.dataset.Dataset method)</a>
 
       <ul>
@@ -2336,6 +2344,8 @@
         <li><a href="reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset.private_creators">(pydicom.dataset.FileMetaDataset method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.datadict.private_dictionary_description.html#pydicom.datadict.private_dictionary_description">private_dictionary_description() (in module pydicom.datadict)</a>
 </li>
       <li><a href="reference/generated/pydicom.datadict.private_dictionary_VM.html#pydicom.datadict.private_dictionary_VM">private_dictionary_VM() (in module pydicom.datadict)</a>
@@ -2373,6 +2383,13 @@
 
       <ul>
         <li><a href="reference/examples.html#module-pydicom.examples">module</a>
+</li>
+      </ul></li>
+      <li>
+    pydicom.hooks
+
+      <ul>
+        <li><a href="reference/hooks.html#module-pydicom.hooks">module</a>
 </li>
       </ul></li>
       <li>
@@ -2525,6 +2542,14 @@
 </li>
       <li><a href="reference/generated/pydicom.config.RAISE.html#pydicom.config.RAISE">RAISE (in module pydicom.config)</a>
 </li>
+      <li><a href="reference/generated/pydicom.hooks.raw_element_value.html#pydicom.hooks.raw_element_value">raw_element_value() (in module pydicom.hooks)</a>
+</li>
+      <li><a href="reference/generated/pydicom.hooks.raw_element_value_fix_separator.html#pydicom.hooks.raw_element_value_fix_separator">raw_element_value_fix_separator() (in module pydicom.hooks)</a>
+</li>
+      <li><a href="reference/generated/pydicom.hooks.raw_element_value_retry.html#pydicom.hooks.raw_element_value_retry">raw_element_value_retry() (in module pydicom.hooks)</a>
+</li>
+      <li><a href="reference/generated/pydicom.hooks.raw_element_vr.html#pydicom.hooks.raw_element_vr">raw_element_vr() (in module pydicom.hooks)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement">RawDataElement (class in pydicom.dataelem)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.RawDataStorage.html#pydicom.uid.RawDataStorage">RawDataStorage (in module pydicom.uid)</a>
@@ -2637,6 +2662,10 @@
 </li>
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode">RecordNode (class in pydicom.fileset)</a>
 </li>
+      <li><a href="reference/generated/pydicom.hooks.Hooks.html#pydicom.hooks.Hooks.register_callback">register_callback() (pydicom.hooks.Hooks method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.hooks.Hooks.html#pydicom.hooks.Hooks.register_kwargs">register_kwargs() (pydicom.hooks.Hooks method)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.register_transfer_syntax.html#pydicom.uid.register_transfer_syntax">register_transfer_syntax() (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal.remainder_near">remainder_near() (pydicom.valuerep.DSdecimal method)</a>
@@ -2657,6 +2686,8 @@
         <li><a href="reference/generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder.remove_plugin">(pydicom.pixels.encoders.base.Encoder method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.remove_private_tags">remove_private_tags() (pydicom.dataset.Dataset method)</a>
 
       <ul>
@@ -2665,8 +2696,6 @@
         <li><a href="reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset.remove_private_tags">(pydicom.dataset.FileMetaDataset method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.removeprefix">removeprefix() (pydicom.uid.UID method)</a>
 
       <ul>

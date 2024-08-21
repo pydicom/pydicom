@@ -109,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
@@ -164,6 +165,10 @@
 <span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">data_element_callback_kwargs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#pydicom.config.data_element_callback_kwargs" title="Link to this definition">¶</a></dt>
 <dd><p>Set the keyword arguments passed to <a class="reference internal" href="pydicom.config.data_element_callback.html#pydicom.config.data_element_callback" title="pydicom.config.data_element_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">data_element_callback()</span></code></a>.</p>
 <p>Default <code class="docutils literal notranslate"><span class="pre">{}</span></code>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 3.0: </span><code class="docutils literal notranslate"><span class="pre">data_element_callback_kwargs</span></code> will be removed in v4.0, use
+<a class="reference internal" href="pydicom.hooks.Hooks.html#pydicom.hooks.Hooks.register_kwargs" title="pydicom.hooks.Hooks.register_kwargs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_kwargs()</span></code></a> instead.</p>
+</div>
 </dd></dl>
 
 </section>

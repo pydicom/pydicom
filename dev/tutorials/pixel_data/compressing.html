@@ -131,7 +131,7 @@
   <section id="pixel-data-part-3-compression-and-decompression">
 <h1><em>Pixel Data</em> - Part 3: Compression and decompression<a class="headerlink" href="#pixel-data-part-3-compression-and-decompression" title="Link to this heading">¶</a></h1>
 <p>In part 1 of this tutorial you learned how to <a class="reference internal" href="introduction.html"><span class="doc">access the pixel data</span></a> as either the raw <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or a NumPy
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> and in part 2 you learned how to <a class="reference internal" href="creation.html"><span class="doc">create new pixel data</span></a> and add it to a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> and in part 2 you learned how to <a class="reference internal" href="creation.html"><span class="doc">create new pixel data</span></a> and add it to a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.
 In this final part you’ll learn how to compress and decompress datasets containing
 <em>Pixel Data</em>.</p>
 <p><strong>Prerequisites</strong></p>
@@ -167,7 +167,7 @@ also be included in the dataset</p></li>
 </ul>
 <section id="compressing-a-dataset-with-rle-lossless">
 <h3>Compressing a dataset (with <em>RLE Lossless</em>)<a class="headerlink" href="#compressing-a-dataset-with-rle-lossless" title="Link to this heading">¶</a></h3>
-<p>Compression an existing uncompressed dataset can be performed by passing the <em>Transfer
+<p>Compression of an existing uncompressed dataset can be performed by passing the <em>Transfer
 Syntax UID</em> of the compression method you’d like to use to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>, or by using the <a class="reference internal" href="../../reference/generated/pydicom.pixels.compress.html#pydicom.pixels.compress" title="pydicom.pixels.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">compress()</span></code></a>
 function. We’ll be using <em>RLE Lossless</em> to start with, which is based on the
 <a class="reference external" href="https://en.wikipedia.org/wiki/PackBits">PackBits</a> compression scheme:</p>
@@ -180,7 +180,7 @@ function. We’ll be using <em>RLE Lossless</em> to start with, which is based o
 </pre></div>
 </div>
 <p>If you’re creating a new dataset, or if you want to update the <em>Pixel Data</em> for an
-existing dataset, you can pass an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> along with the <em>Transfer
+existing dataset, you can pass an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> along with the <em>Transfer
 Syntax UID</em>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span>
@@ -210,8 +210,8 @@ Syntax UID</em>:</p>
 <li><p>A new <em>SOP Instance UID</em> value will be also be generated, but this can
 be disabled by passing <code class="docutils literal notranslate"><span class="pre">generate_instance_uid=False</span></code>.</p></li>
 </ul>
-<p>When using an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>,
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents of <cite>arr</cite> must match the corresponding
+<p>When using an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>,
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents of <cite>arr</cite> must match the corresponding
 <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements in the dataset,
 such as <em>Rows</em>, <em>Columns</em>, <em>Samples per Pixel</em>, etc. If they don’t match you’ll get an exception:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>

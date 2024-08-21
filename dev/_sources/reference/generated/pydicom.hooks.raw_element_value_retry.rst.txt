@@ -1,0 +1,6 @@
+﻿pydicom.hooks.raw\_element\_value\_retry
+========================================
+
+.. currentmodule:: pydicom.hooks
+
+.. autofunction:: raw_element_value_retry

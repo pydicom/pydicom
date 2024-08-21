@@ -30,7 +30,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pydicom.dataelem.DataElement" href="generated/pydicom.dataelem.DataElement.html" />
+    <link rel="next" title="pydicom.dataelem.convert_raw_data_element" href="generated/pydicom.dataelem.convert_raw_data_element.html" />
     <link rel="prev" title="Representation of Data Elements" href="elem.html" /> 
 </head>
 
@@ -74,6 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="elem.html">Representation of Data Elements</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.convert_raw_data_element.html">pydicom.dataelem.convert_raw_data_element</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.DataElement.html">pydicom.dataelem.DataElement</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.DataElement_from_raw.html">pydicom.dataelem.DataElement_from_raw</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.RawDataElement.html">pydicom.dataelem.RawDataElement</a></li>
@@ -92,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
@@ -145,13 +147,16 @@
 <p>Representation of DICOM data elements</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataElement</span></code></a>(tag, VR, value[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataelem.convert_raw_data_element.html#pydicom.dataelem.convert_raw_data_element" title="pydicom.dataelem.convert_raw_data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_raw_data_element</span></code></a>(raw, *[, encoding, ds])</p></td>
+<td><p>Return a <a class="reference internal" href="generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> created from <cite>raw</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataElement</span></code></a>(tag, VR, value[, ...])</p></td>
 <td><p>Contain and manipulate a DICOM Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataelem.DataElement_from_raw.html#pydicom.dataelem.DataElement_from_raw" title="pydicom.dataelem.DataElement_from_raw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataElement_from_raw</span></code></a>(raw_data_element[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataelem.DataElement_from_raw.html#pydicom.dataelem.DataElement_from_raw" title="pydicom.dataelem.DataElement_from_raw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataElement_from_raw</span></code></a>(raw_data_element[, ...])</p></td>
 <td><p>Return a <a class="reference internal" href="generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> created from <cite>raw_data_element</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawDataElement</span></code></a>(tag, VR, length, value, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawDataElement</span></code></a>(tag, VR, length, value, ...)</p></td>
 <td><p>Container for the data from a raw (mostly) undecoded element.</p></td>
 </tr>
 </tbody>
@@ -163,7 +168,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="elem.html" class="btn btn-neutral float-left" title="Representation of Data Elements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generated/pydicom.dataelem.DataElement.html" class="btn btn-neutral float-right" title="pydicom.dataelem.DataElement" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/pydicom.dataelem.convert_raw_data_element.html" class="btn btn-neutral float-right" title="pydicom.dataelem.convert_raw_data_element" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
