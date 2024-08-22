@@ -585,6 +585,9 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
 
     .. versionadded:: 2.1
 
+    See :func:`~pydicom.pixels.processing.apply_voi_lut` for applying *Window
+    Width*/*Window Center* as a fallback if no *VOI LUT Sequence* is present.
+
     Parameters
     ----------
     arr : numpy.ndarray
@@ -608,6 +611,7 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     --------
     :func:`~pydicom.pixels.processing.apply_modality_lut`
     :func:`~pydicom.pixels.processing.apply_windowing`
+    :func:`~pydicom.pixels.processing.apply_voi_lut`
 
     References
     ----------
@@ -710,6 +714,7 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
     --------
     :func:`~pydicom.pixels.processing.apply_modality_lut`
     :func:`~pydicom.pixels.processing.apply_voi`
+    :func:`~pydicom.pixels.processing.apply_voi_lut`
 
     References
     ----------
