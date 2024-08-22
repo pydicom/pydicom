@@ -582,9 +582,11 @@ def apply_voi_lut(
 
 def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     """Apply a VOI lookup table to `arr`.
-    See :func:`~pydicom.pixels.processing.apply_voi_lut` for applying *Window Width*/*Window Center* as a fallback if no *VOI LUT Sequence* is present.
 
     .. versionadded:: 2.1
+
+    See :func:`~pydicom.pixels.processing.apply_voi_lut` for applying *Window 
+    Width*/*Window Center* as a fallback if no *VOI LUT Sequence* is present.
 
     Parameters
     ----------
