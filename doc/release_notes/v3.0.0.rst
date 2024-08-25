@@ -1,6 +1,15 @@
 Version 3.0.0
 =================================
 
+The major breaking changes with the version 3.0 release are:
+
+  * The value for :attr:`~pydicom.uid.JPEGLossless` has changed to ``1.2.840.10008.1.2.4.57``.
+  * The encoding used when saving datasets defaults to the set *Transfer Syntax UID*.
+  * :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` will convert YCbCr
+    *Pixel Data* to RGB by default when possible.
+  * ``read_file`` and ``write_file`` have been removed.
+
+
 Changes
 -------
 * Removed support for Python <= 3.9.
