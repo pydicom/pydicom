@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Version 3.0.0 &mdash; pydicom 3.0.0.dev0 documentation</title>
+  <title>Version 3.0.0 &mdash; pydicom 3.0.0rc1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -22,7 +22,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=afcbd73c"></script>
+        <script src="../_static/documentation_options.js?v=8e589072"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -45,7 +45,7 @@
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                3.0.0.dev0
+                3.0.0rc1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -105,6 +105,16 @@
              
   <section id="version-3-0-0">
 <h1>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Link to this heading">¶</a></h1>
+<p>The major breaking changes with the version 3.0 release are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The value for <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLossless.html#pydicom.uid.JPEGLossless" title="pydicom.uid.JPEGLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLossless</span></code></a> has changed to <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.57</span></code>.</p></li>
+<li><p>The encoding used when saving datasets defaults to the set <em>Transfer Syntax UID</em>.</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> will convert YCbCr
+<em>Pixel Data</em> to RGB by default when possible.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">read_file</span></code> and <code class="docutils literal notranslate"><span class="pre">write_file</span></code> have been removed.</p></li>
+</ul>
+</div></blockquote>
 <section id="changes">
 <h2>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
