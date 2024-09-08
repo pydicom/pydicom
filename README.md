@@ -115,11 +115,10 @@ ds.save_as("/path/to/file_updated.dcm")
 With [NumPy](https://numpy.org) and [matplotlib](https://matplotlib.org/)
 ```python
 import matplotlib.pyplot as plt
-from pydicom import dcmread
-from pydicom.data import get_testdata_file
+from pydicom import dcmread, examples
 
-# The path to a pydicom test dataset
-path = get_testdata_file("CT_small.dcm")
+# The path to the example "ct" dataset included with pydicom
+path: "pathlib.Path" = examples.get_path("ct")
 ds = dcmread(path)
 # `arr` is a numpy.ndarray
 arr = ds.pixel_array
