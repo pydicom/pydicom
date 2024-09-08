@@ -1,0 +1,6 @@
+﻿pydicom.pixels.processing.apply\_windowing
+==========================================
+
+.. currentmodule:: pydicom.pixels.processing
+
+.. autofunction:: apply_windowing

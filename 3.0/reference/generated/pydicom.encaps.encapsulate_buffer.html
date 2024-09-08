@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydicom.encaps.encapsulate_buffer &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.encaps.encapsulate_extended" href="pydicom.encaps.encapsulate_extended.html" />
+    <link rel="prev" title="pydicom.encaps.encapsulate" href="pydicom.encaps.encapsulate.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.encapsulate_buffer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate_extended.html">pydicom.encaps.encapsulate_extended</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate_extended_buffer.html">pydicom.encaps.encapsulate_extended_buffer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../encaps.html#pydicom.encaps.EncapsulatedBuffer"><code class="docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.encaps.encapsulate_buffer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydicom-encaps-encapsulate-buffer">
+<h1>pydicom.encaps.encapsulate_buffer<a class="headerlink" href="#pydicom-encaps-encapsulate-buffer" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicom.encaps.encapsulate_buffer">
+<span class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></span><span class="sig-name descname"><span class="pre">encapsulate_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><span class="pre">BufferedIOBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_bot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../encaps.html#pydicom.encaps.EncapsulatedBuffer" title="pydicom.encaps.EncapsulatedBuffer"><span class="pre">EncapsulatedBuffer</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/encaps.py#L1159"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.encapsulate_buffer" title="Link to this definition">¶</a></dt>
+<dd><p>Return an <a class="reference internal" href="../encaps.html#pydicom.encaps.EncapsulatedBuffer" title="pydicom.encaps.EncapsulatedBuffer"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a> instance from <cite>buffers</cite>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 3.0.</span></p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate_buffer</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+
+<span class="c1"># Open the compressed image frames as io.BufferedReader instances</span>
+<span class="n">frame1</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;frame1.j2k&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+<span class="n">frame2</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;frame2.j2k&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+<span class="n">frame3</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;frame3.j2k&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEG2000Lossless</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate_buffer</span><span class="p">([</span><span class="n">frame1</span><span class="p">,</span> <span class="n">frame2</span><span class="p">,</span> <span class="n">frame3</span><span class="p">])</span>
+
+<span class="c1"># Write the encapsulated buffer data to file</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;buffered_dataset.dcm&quot;</span><span class="p">)</span>
+
+<span class="c1"># Close the buffers</span>
+<span class="n">frame1</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">frame2</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">frame3</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>buffers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><em>io.BufferedIOBase</em></a><em>]</em>) – A list of objects inheriting <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a> containing the
+compressed <em>Pixel Data</em> frames to be encapsulated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="../encaps.html#pydicom.encaps.EncapsulatedBuffer" title="pydicom.encaps.EncapsulatedBuffer"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncapsulatedBuffer</span></code></a> instance that can be used as
+the value for a <em>Pixel Data</em> element.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../encaps.html#pydicom.encaps.EncapsulatedBuffer" title="pydicom.encaps.EncapsulatedBuffer">EncapsulatedBuffer</a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a>, <a class="reference internal" href="pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a>, <a class="reference internal" href="pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended_buffer()</span></code></a></p>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pydicom.encaps.encapsulate.html" class="btn btn-neutral float-left" title="pydicom.encaps.encapsulate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.encaps.encapsulate_extended.html" class="btn btn-neutral float-right" title="pydicom.encaps.encapsulate_extended" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

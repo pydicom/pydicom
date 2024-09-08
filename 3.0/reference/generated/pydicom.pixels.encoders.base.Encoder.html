@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydicom.pixels.encoders.base.Encoder &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.pixels.encoders.base.EncodeRunner" href="pydicom.pixels.encoders.base.EncodeRunner.html" />
+    <link rel="prev" title="pydicom.pixels.encoders.RLELosslessEncoder" href="pydicom.pixels.encoders.RLELosslessEncoder.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_icc_profile.html">pydicom.pixels.apply_icc_profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_presentation_lut.html">pydicom.pixels.apply_presentation_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.create_icc_transform.html">pydicom.pixels.create_icc_transform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.set_pixel_data.html">pydicom.pixels.set_pixel_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../pixels.html#sub-modules">Sub-modules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pixels.processing.html">Pixel Data Processing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.processing</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+          <li class="breadcrumb-item"><a href="../pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.pixels.encoders.base.Encoder</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydicom-pixels-encoders-base-encoder">
+<h1>pydicom.pixels.encoders.base.Encoder<a class="headerlink" href="#pydicom-pixels-encoders-base-encoder" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.pixels.encoders.base.</span></span><span class="sig-name descname"><span class="pre">Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/encoders/base.py#L464"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder" title="Link to this definition">¶</a></dt>
+<dd><p>Factory class for data encoders.</p>
+<p>Every available <code class="docutils literal notranslate"><span class="pre">Encoder</span></code> instance in <em>pydicom</em> corresponds directly
+to a single DICOM <em>Transfer Syntax UID</em>, and provides a  mechanism for
+converting raw unencoded source data to meet the requirements of that
+transfer syntax using one or more <a class="reference internal" href="../../guides/encoding/encoder_plugins.html"><span class="doc">encoding plugins</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.2.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/encoders/base.py#L476"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new data encoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uid</strong> (<a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><em>pydicom.uid.UID</em></a>) – The <em>Transfer Syntax UID</em> that the encoder supports.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.__init__" title="pydicom.pixels.encoders.base.Encoder.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(uid)</p></td>
+<td><p>Create a new data encoder.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.add_plugin" title="pydicom.pixels.encoders.base.Encoder.add_plugin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_plugin</span></code></a>(label, import_path)</p></td>
+<td><p>Add a plugin to the class instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.add_plugins" title="pydicom.pixels.encoders.base.Encoder.add_plugins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_plugins</span></code></a>(plugins)</p></td>
+<td><p>Add multiple plugins to the class instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.encode" title="pydicom.pixels.encoders.base.Encoder.encode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encode</span></code></a>(src, *[, index, validate, ...])</p></td>
+<td><p>Return an encoded frame of the pixel data in <cite>src</cite> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.iter_encode" title="pydicom.pixels.encoders.base.Encoder.iter_encode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_encode</span></code></a>(src, *[, validate, encoding_plugin])</p></td>
+<td><p>Yield encoded frames of the pixel data in <cite>src</cite> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.remove_plugin" title="pydicom.pixels.encoders.base.Encoder.remove_plugin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_plugin</span></code></a>(label)</p></td>
+<td><p>Remove a plugin.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.UID" title="pydicom.pixels.encoders.base.Encoder.UID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UID</span></code></a></p></td>
+<td><p>Return the corresponding <em>Transfer Syntax UID</em> as <a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-class docutils literal notranslate"><span class="pre">UID</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.available_plugins" title="pydicom.pixels.encoders.base.Encoder.available_plugins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">available_plugins</span></code></a></p></td>
+<td><p>Return a tuple containing available plugins.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.is_available" title="pydicom.pixels.encoders.base.Encoder.is_available"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_available</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if plugins are available that can be used to encode or decode data, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.is_encapsulated" title="pydicom.pixels.encoders.base.Encoder.is_encapsulated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_encapsulated</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the decoder is for an encapsulated transfer syntax, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.is_native" title="pydicom.pixels.encoders.base.Encoder.is_native"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_native</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the decoder is for an native transfer syntax, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder.missing_dependencies" title="pydicom.pixels.encoders.base.Encoder.missing_dependencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">missing_dependencies</span></code></a></p></td>
+<td><p>Return nice strings for plugins with missing dependencies.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.UID">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></em><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.UID" title="Link to this definition">¶</a></dt>
+<dd><p>Return the corresponding <em>Transfer Syntax UID</em> as <a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-class docutils literal notranslate"><span class="pre">UID</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.add_plugin">
+<span class="sig-name descname"><span class="pre">add_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/common.py#L44"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.add_plugin" title="Link to this definition">¶</a></dt>
+<dd><p>Add a plugin to the class instance.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method is not thread-safe.</p>
+</div>
+<p>The requirements for encoding plugins are available
+<a class="reference internal" href="../../guides/encoding/encoder_plugins.html"><span class="doc">here</span></a>, while the requirements
+for decoding plugins are available <a class="reference internal" href="../../guides/decoding/decoder_plugins.html"><span class="doc">here</span></a>.</p>
+<p>Only encoding plugins should be added to
+<a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a> class instances
+and only decoding plugins should be added to
+<a class="reference internal" href="pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The label to use for the plugin, should be unique.</p></li>
+<li><p><strong>import_path</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – The module import path and the function’s name (e.g.
+<code class="docutils literal notranslate"><span class="pre">('pydicom.pixels.encoders.pylibjpeg',</span> <span class="pre">'encode_pixel_data')</span></code> or
+<code class="docutils literal notranslate"><span class="pre">('pydicom.pixels.decoders.pylibjpeg',</span> <span class="pre">'decode_pixel_data')</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ModuleNotFoundError" title="(in Python v3.12)"><strong>ModuleNotFoundError</strong></a> – If the module import path is incorrect or unavailable.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.12)"><strong>AttributeError</strong></a> – If the plugin’s required functions and attributes aren’t found in
+    the module.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.add_plugins">
+<span class="sig-name descname"><span class="pre">add_plugins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/common.py#L102"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.add_plugins" title="Link to this definition">¶</a></dt>
+<dd><p>Add multiple plugins to the class instance.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method is not thread-safe.</p>
+</div>
+<p>The requirements for encoding plugins are available
+<a class="reference internal" href="../../guides/encoding/encoder_plugins.html"><span class="doc">here</span></a>, while the requirements
+for decoding plugins are available <a class="reference internal" href="../../guides/decoding/decoder_plugins.html"><span class="doc">here</span></a>.</p>
+<p>Only encoding plugins should be added to
+<a class="reference internal" href="#pydicom.pixels.encoders.base.Encoder" title="pydicom.pixels.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a> class instances
+and only decoding plugins should be added to
+<a class="reference internal" href="pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plugins</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em><em>]</em><em>]</em>) – <p>A list of [label, import path] for the plugins, where:</p>
+<ul class="simple">
+<li><p><cite>label</cite> is the label to use for the plugin, which should be unique.</p></li>
+<li><p><cite>import path</cite> is the module import path and the function’s
+name (e.g. <code class="docutils literal notranslate"><span class="pre">('pydicom.pixels.encoders.pylibjpeg',</span> <span class="pre">'encode_pixel_data')</span></code>
+or <code class="docutils literal notranslate"><span class="pre">('pydicom.pixels.decoders.pylibjpeg',</span> <span class="pre">'decode_pixel_data')</span></code>).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.available_plugins">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">available_plugins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.available_plugins" title="Link to this definition">¶</a></dt>
+<dd><p>Return a tuple containing available plugins.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding_plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/encoders/base.py#L486"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.encode" title="Link to this definition">¶</a></dt>
+<dd><p>Return an encoded frame of the pixel data in <cite>src</cite> as
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>With the exception of <em>RLE Lossless</em>, this method requires the
+installation of additional packages to perform the actual pixel
+data encoding. See the <a class="reference internal" href="../../guides/user/image_data_compression.html"><span class="doc">encoding documentation</span></a> for more information.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><em>bytes</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><em>numpy.ndarray</em></a><em> or </em><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>pydicom.dataset.Dataset</em></a>) – <p>Single or multi-frame pixel data as one of the following:</p>
+<ul>
+<li><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>: the uncompressed pixel data, should be
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shaped</span></code></a> as:</p>
+<ul>
+<li><p>(rows, columns) for single frame, single sample data.</p></li>
+<li><p>(rows, columns, planes) for single frame, multi-sample data.</p></li>
+<li><p>(frames, rows, columns) for multi-frame, single sample data.</p></li>
+<li><p>(frames, rows, columns, planes) for multi-frame and
+multi-sample data.</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>: the dataset containing
+the uncompressed <em>Pixel Data</em> to be encoded.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>: the uncompressed little-endian ordered pixel
+data. <cite>src</cite> should use 1, 2, 4 or 8 bytes per pixel, whichever
+of these is sufficient for the (0028,0103) <em>Bits Stored</em> value.</p></li>
+</ul>
+</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>optional</em>) – Required when <cite>src</cite> contains multiple frames, this is the index
+of the frame to be encoded.</p></li>
+<li><p><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then validate the supplied encoding options
+and pixel data prior to encoding, otherwise if <code class="docutils literal notranslate"><span class="pre">False</span></code> no
+validation will be performed.</p></li>
+<li><p><strong>encoding_plugin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the pixel data encoding plugin to use. If
+<cite>encoding_plugin</cite> is not specified then all available
+plugins will be tried (default). For information on the available
+plugins for each encoder see the
+<a class="reference internal" href="../pixels.encoders.html#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">documentation</span></code></a>.</p></li>
+<li><p><strong>**kwargs</strong> – <p>The following keyword parameters are required when <cite>src</cite> is
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'rows'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of rows of pixels in <cite>src</cite>,
+maximum 65535.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'columns'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of columns of pixels in
+<cite>src</cite>, maximum 65535.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'number_of_frames'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of frames
+in <cite>src</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'samples_per_pixel'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of samples
+per pixel in <cite>src</cite>, should be 1 or 3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'bits_allocated'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used
+to contain each pixel, should be a multiple of 8.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'bits_stored'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits actually
+used per pixel. For example, an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> <cite>src</cite> might have a
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> of <code class="docutils literal notranslate"><span class="pre">'uint16'</span></code> (range 0 to 65535) but
+only contain 12-bit pixel values (range 0 to 4095).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'pixel_representation'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the type of data
+being encoded, <code class="docutils literal notranslate"><span class="pre">0</span></code> for unsigned, <code class="docutils literal notranslate"><span class="pre">1</span></code> for 2’s complement
+(signed)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'photometric_interpretation'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the intended
+color space of the <em>encoded</em> pixel data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+</ul>
+<p>Optional keyword parameters for the encoding plugin may also be
+present. See the <a class="reference internal" href="../../guides/encoding/encoder_plugin_options.html"><span class="doc">encoding plugin options</span></a> for more information.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The encoded pixel data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.is_available">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.is_available" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if plugins are available that can be used to encode or
+decode data, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.is_encapsulated">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_encapsulated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.is_encapsulated" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the decoder is for an encapsulated transfer
+syntax, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.is_native">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_native</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.is_native" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the decoder is for an native transfer
+syntax, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.iter_encode">
+<span class="sig-name descname"><span class="pre">iter_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding_plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" title="(in Python v3.12)"><span class="pre">Iterator</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/encoders/base.py#L597"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.iter_encode" title="Link to this definition">¶</a></dt>
+<dd><p>Yield encoded frames of the pixel data in <cite>src</cite> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>With the exception of <em>RLE Lossless</em>, this method requires the
+installation of additional packages to perform the actual pixel
+data encoding. See the <a class="reference internal" href="../../guides/user/image_data_compression.html"><span class="doc">encoding documentation</span></a> for more information.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><em>bytes</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><em>numpy.ndarray</em></a><em> or </em><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>pydicom.dataset.Dataset</em></a>) – <p>Single or multi-frame pixel data as one of the following:</p>
+<ul>
+<li><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>: the uncompressed pixel data, should be
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shaped</span></code></a> as:</p>
+<ul>
+<li><p>(rows, columns) for single frame, single sample data.</p></li>
+<li><p>(rows, columns, planes) for single frame, multi-sample data.</p></li>
+<li><p>(frames, rows, columns) for multi-frame, single sample data.</p></li>
+<li><p>(frames, rows, columns, planes) for multi-frame and
+multi-sample data.</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>: the dataset containing
+the uncompressed <em>Pixel Data</em> to be encoded.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>: the uncompressed little-endian ordered pixel
+data. <cite>src</cite> should use 1, 2, 4 or 8 bytes per pixel, whichever
+of these is sufficient for the (0028,0103) <em>Bits Stored</em> value.</p></li>
+</ul>
+</p></li>
+<li><p><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then validate the supplied encoding options
+and pixel data prior to encoding, otherwise if <code class="docutils literal notranslate"><span class="pre">False</span></code> no
+validation will be performed.</p></li>
+<li><p><strong>encoding_plugin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the pixel data encoding plugin to use. If
+<cite>encoding_plugin</cite> is not specified then all available
+plugins will be tried (default). For information on the available
+plugins for each encoder see the
+<a class="reference internal" href="../pixels.encoders.html#module-pydicom.pixels.encoders" title="pydicom.pixels.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">documentation</span></code></a>.</p></li>
+<li><p><strong>**kwargs</strong> – <p>The following keyword parameters are required when <cite>src</cite> is
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'rows'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of rows of pixels in <cite>src</cite>,
+maximum 65535.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'columns'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of columns of pixels in
+<cite>src</cite>, maximum 65535.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'number_of_frames'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of frames
+in <cite>src</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'samples_per_pixel'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of samples
+per pixel in <cite>src</cite>, should be 1 or 3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'bits_allocated'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used
+to contain each pixel, should be a multiple of 8.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'bits_stored'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits actually
+used per pixel. For example, an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> <cite>src</cite> might have a
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> of <code class="docutils literal notranslate"><span class="pre">'uint16'</span></code> (range 0 to 65535) but
+only contain 12-bit pixel values (range 0 to 4095).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'pixel_representation'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the type of data
+being encoded, <code class="docutils literal notranslate"><span class="pre">0</span></code> for unsigned, <code class="docutils literal notranslate"><span class="pre">1</span></code> for 2’s complement
+(signed)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'photometric_interpretation'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the intended
+color space of the encoded pixel data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+</ul>
+<p>Optional keyword parameters for the encoding plugin may also be
+present. See the <a class="reference internal" href="../../guides/encoding/encoder_plugin_options.html"><span class="doc">encoding plugin options</span></a> for more information.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>bytes</em> – An encoded frame of pixel data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.missing_dependencies">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">missing_dependencies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.missing_dependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Return nice strings for plugins with missing dependencies.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.pixels.encoders.base.Encoder.remove_plugin">
+<span class="sig-name descname"><span class="pre">remove_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/common.py#L177"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.encoders.base.Encoder.remove_plugin" title="Link to this definition">¶</a></dt>
+<dd><p>Remove a plugin.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method is not thread-safe.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The label of the plugin to remove.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pydicom.pixels.encoders.RLELosslessEncoder.html" class="btn btn-neutral float-left" title="pydicom.pixels.encoders.RLELosslessEncoder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.pixels.encoders.base.EncodeRunner.html" class="btn btn-neutral float-right" title="pydicom.pixels.encoders.base.EncodeRunner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

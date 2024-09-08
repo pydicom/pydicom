@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.pixel\_dtype
+=================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: pixel_dtype

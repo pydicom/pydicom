@@ -1,0 +1,6 @@
+﻿pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage
+===================================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: OphthalmicVisualFieldStaticPerimetryMeasurementsStorage

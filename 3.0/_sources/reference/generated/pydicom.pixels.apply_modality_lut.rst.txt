@@ -1,0 +1,6 @@
+﻿pydicom.pixels.apply\_modality\_lut
+===================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: apply_modality_lut

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydicom.pixels.utils.set_pixel_data &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.pixels.utils.unpack_bits" href="pydicom.pixels.utils.unpack_bits.html" />
+    <link rel="prev" title="pydicom.pixels.utils.reshape_pixel_array" href="pydicom.pixels.utils.reshape_pixel_array.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_icc_profile.html">pydicom.pixels.apply_icc_profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_presentation_lut.html">pydicom.pixels.apply_presentation_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.create_icc_transform.html">pydicom.pixels.create_icc_transform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.set_pixel_data.html">pydicom.pixels.set_pixel_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../pixels.html#sub-modules">Sub-modules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pixels.processing.html">Pixel Data Processing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.processing</span></code>)</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+          <li class="breadcrumb-item"><a href="../pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.pixels.utils.set_pixel_data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydicom-pixels-utils-set-pixel-data">
+<h1>pydicom.pixels.utils.set_pixel_data<a class="headerlink" href="#pydicom-pixels-utils-set-pixel-data" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicom.pixels.utils.set_pixel_data">
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.utils.</span></span><span class="sig-name descname"><span class="pre">set_pixel_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photometric_interpretation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_stored</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_instance_uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/pixels/utils.py#L1741"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.utils.set_pixel_data" title="Link to this definition">¶</a></dt>
+<dd><p>Use an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to set a dataset’s <em>Pixel Data</em> and related
+Image Pixel module elements.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 3.0.</span></p>
+</div>
+<p>The following <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.3.html#table_C.7-11c">Image Pixel</a>
+module elements values will be added, updated or removed as necessary:</p>
+<ul class="simple">
+<li><p>(0028,0002) <em>Samples per Pixel</em> using a value corresponding to
+<cite>photometric_interpretation</cite>.</p></li>
+<li><p>(0028,0004) <em>Photometric Interpretation</em> from <cite>photometric_interpretation</cite>.</p></li>
+<li><p>(0028,0006) <em>Planar Configuration</em> will be added and set to <code class="docutils literal notranslate"><span class="pre">0</span></code> if
+<em>Samples per Pixel</em> is &gt; 1, otherwise it will be removed.</p></li>
+<li><p>(0028,0008) <em>Number of Frames</em> from the array <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>,
+however it will be removed if <cite>arr</cite> only contains a single frame.</p></li>
+<li><p>(0028,0010) <em>Rows</em> and (0028,0011) <em>Columns</em> from the array
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>.</p></li>
+<li><p>(0028,0100) <em>Bits Allocated</em> from the array <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>.</p></li>
+<li><p>(0028,0101) <em>Bits Stored</em> and (0028,0102) <em>High Bit</em> from <cite>bits_stored</cite>.</p></li>
+<li><p>(0028,0103) <em>Pixel Representation</em> from the array <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>.</p></li>
+</ul>
+<p>In addition:</p>
+<ul class="simple">
+<li><p>The <em>Transfer Syntax UID</em> will be set to <em>Explicit VR Little
+Endian</em> if it doesn’t already exist or uses a compressed (encapsulated)
+transfer syntax.</p></li>
+<li><p>If <cite>generate_instance_uid</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then the <em>SOP Instance UID</em>
+will be added or updated.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>pydicom.dataset.Dataset</em></a>) – The little endian encoded dataset to be modified.</p></li>
+<li><p><strong>arr</strong> (<em>np.ndarray</em>) – <p>An array with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> uint8, uint16, int8 or int16. The
+array must be shaped as one of the following:</p>
+<ul>
+<li><p>(rows, columns) for a single frame of grayscale data.</p></li>
+<li><p>(frames, rows, columns) for multi-frame grayscale data.</p></li>
+<li><p>(rows, columns, samples) for a single frame of multi-sample data
+such as RGB.</p></li>
+<li><p>(frames, rows, columns, samples) for multi-frame, multi-sample data.</p></li>
+</ul>
+</p></li>
+<li><p><strong>photometric_interpretation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The value to use for (0028,0004) <em>Photometric Interpretation</em>. Valid values
+are <code class="docutils literal notranslate"><span class="pre">&quot;MONOCHROME1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;MONOCHROME2&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PALETTE</span> <span class="pre">COLOR&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;RGB&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code>.</p></li>
+<li><p><strong>bits_stored</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The value to use for (0028,0101) <em>Bits Stored</em>. Must be no greater than
+the number of bits used by the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.itemsize.html#numpy.dtype.itemsize" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">itemsize</span></code></a> of <cite>arr</cite>.</p></li>
+<li><p><strong>generate_instance_uid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then add or update the (0008,0018) <em>SOP Instance
+UID</em> element with a value generated using <a class="reference internal" href="pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_uid()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pydicom.pixels.utils.reshape_pixel_array.html" class="btn btn-neutral float-left" title="pydicom.pixels.utils.reshape_pixel_array" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.pixels.utils.unpack_bits.html" class="btn btn-neutral float-right" title="pydicom.pixels.utils.unpack_bits" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

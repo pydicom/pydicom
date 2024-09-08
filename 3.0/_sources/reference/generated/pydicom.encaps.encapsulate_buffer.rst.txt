@@ -1,0 +1,6 @@
+﻿pydicom.encaps.encapsulate\_buffer
+==================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: encapsulate_buffer

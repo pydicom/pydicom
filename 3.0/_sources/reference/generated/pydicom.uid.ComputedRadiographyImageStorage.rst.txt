@@ -1,0 +1,6 @@
+﻿pydicom.uid.ComputedRadiographyImageStorage
+===========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ComputedRadiographyImageStorage

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydicom.valuerep.VR &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Example Datasets (pydicom.examples)" href="../examples.html" />
+    <link rel="prev" title="pydicom.valuerep.TM" href="pydicom.valuerep.TM.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DA.html">pydicom.valuerep.DA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.is_valid_ds.html">pydicom.valuerep.is_valid_ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.format_number_as_ds.html">pydicom.valuerep.format_number_as_ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DS.html">pydicom.valuerep.DS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DSdecimal.html">pydicom.valuerep.DSdecimal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DSfloat.html">pydicom.valuerep.DSfloat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DT.html">pydicom.valuerep.DT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.ISfloat.html">pydicom.valuerep.ISfloat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.valuerep.VR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../elem.html">Representation of Data Elements</a></li>
+          <li class="breadcrumb-item"><a href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.valuerep.VR</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydicom-valuerep-vr">
+<h1>pydicom.valuerep.VR<a class="headerlink" href="#pydicom-valuerep-vr" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.valuerep.</span></span><span class="sig-name descname"><span class="pre">VR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/valuerep.py#L443"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.valuerep.VR" title="Link to this definition">¶</a></dt>
+<dd><p>DICOM Data Element’s Value Representation (VR)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.encode" title="pydicom.valuerep.VR.encode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encode</span></code></a>([encoding, errors])</p></td>
+<td><p>Encode the string using the codec registered for encoding.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.replace" title="pydicom.valuerep.VR.replace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace</span></code></a>(old, new[, count])</p></td>
+<td><p>Return a copy with all occurrences of substring old replaced by new.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.split" title="pydicom.valuerep.VR.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split</span></code></a>([sep, maxsplit])</p></td>
+<td><p>Return a list of the substrings in the string, using sep as the separator string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.rsplit" title="pydicom.valuerep.VR.rsplit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsplit</span></code></a>([sep, maxsplit])</p></td>
+<td><p>Return a list of the substrings in the string, using sep as the separator string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.join" title="pydicom.valuerep.VR.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code></a>(iterable, /)</p></td>
+<td><p>Concatenate any number of strings.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.capitalize" title="pydicom.valuerep.VR.capitalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capitalize</span></code></a>()</p></td>
+<td><p>Return a capitalized version of the string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.casefold" title="pydicom.valuerep.VR.casefold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">casefold</span></code></a>()</p></td>
+<td><p>Return a version of the string suitable for caseless comparisons.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.title" title="pydicom.valuerep.VR.title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">title</span></code></a>()</p></td>
+<td><p>Return a version of the string where each word is titlecased.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.center" title="pydicom.valuerep.VR.center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center</span></code></a>(width[, fillchar])</p></td>
+<td><p>Return a centered string of length width.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.count" title="pydicom.valuerep.VR.count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the number of non-overlapping occurrences of substring sub in string S[start:end].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.expandtabs" title="pydicom.valuerep.VR.expandtabs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expandtabs</span></code></a>([tabsize])</p></td>
+<td><p>Return a copy where all tab characters are expanded using spaces.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.find" title="pydicom.valuerep.VR.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the lowest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.partition" title="pydicom.valuerep.VR.partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition</span></code></a>(sep, /)</p></td>
+<td><p>Partition the string into three parts using the given separator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.index" title="pydicom.valuerep.VR.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the lowest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.ljust" title="pydicom.valuerep.VR.ljust"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ljust</span></code></a>(width[, fillchar])</p></td>
+<td><p>Return a left-justified string of length width.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.lower" title="pydicom.valuerep.VR.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a>()</p></td>
+<td><p>Return a copy of the string converted to lowercase.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.lstrip" title="pydicom.valuerep.VR.lstrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lstrip</span></code></a>([chars])</p></td>
+<td><p>Return a copy of the string with leading whitespace removed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.rfind" title="pydicom.valuerep.VR.rfind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rfind</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the highest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.rindex" title="pydicom.valuerep.VR.rindex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rindex</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the highest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.rjust" title="pydicom.valuerep.VR.rjust"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rjust</span></code></a>(width[, fillchar])</p></td>
+<td><p>Return a right-justified string of length width.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.rstrip" title="pydicom.valuerep.VR.rstrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rstrip</span></code></a>([chars])</p></td>
+<td><p>Return a copy of the string with trailing whitespace removed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.rpartition" title="pydicom.valuerep.VR.rpartition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rpartition</span></code></a>(sep, /)</p></td>
+<td><p>Partition the string into three parts using the given separator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.splitlines" title="pydicom.valuerep.VR.splitlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">splitlines</span></code></a>([keepends])</p></td>
+<td><p>Return a list of the lines in the string, breaking at line boundaries.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.strip" title="pydicom.valuerep.VR.strip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip</span></code></a>([chars])</p></td>
+<td><p>Return a copy of the string with leading and trailing whitespace removed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.swapcase" title="pydicom.valuerep.VR.swapcase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">swapcase</span></code></a>()</p></td>
+<td><p>Convert uppercase characters to lowercase and lowercase characters to uppercase.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.translate" title="pydicom.valuerep.VR.translate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate</span></code></a>(table, /)</p></td>
+<td><p>Replace each character in the string using the given translation table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.upper" title="pydicom.valuerep.VR.upper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper</span></code></a>()</p></td>
+<td><p>Return a copy of the string converted to uppercase.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.startswith" title="pydicom.valuerep.VR.startswith"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startswith</span></code></a>(prefix[, start[, end]])</p></td>
+<td><p>Return True if S starts with the specified prefix, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.endswith" title="pydicom.valuerep.VR.endswith"><code class="xref py py-obj docutils literal notranslate"><span class="pre">endswith</span></code></a>(suffix[, start[, end]])</p></td>
+<td><p>Return True if S ends with the specified suffix, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.removeprefix" title="pydicom.valuerep.VR.removeprefix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeprefix</span></code></a>(prefix, /)</p></td>
+<td><p>Return a str with the given prefix string removed if present.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.removesuffix" title="pydicom.valuerep.VR.removesuffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removesuffix</span></code></a>(suffix, /)</p></td>
+<td><p>Return a str with the given suffix string removed if present.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isascii" title="pydicom.valuerep.VR.isascii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isascii</span></code></a>()</p></td>
+<td><p>Return True if all characters in the string are ASCII, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.islower" title="pydicom.valuerep.VR.islower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">islower</span></code></a>()</p></td>
+<td><p>Return True if the string is a lowercase string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isupper" title="pydicom.valuerep.VR.isupper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isupper</span></code></a>()</p></td>
+<td><p>Return True if the string is an uppercase string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.istitle" title="pydicom.valuerep.VR.istitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">istitle</span></code></a>()</p></td>
+<td><p>Return True if the string is a title-cased string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isspace" title="pydicom.valuerep.VR.isspace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isspace</span></code></a>()</p></td>
+<td><p>Return True if the string is a whitespace string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isdecimal" title="pydicom.valuerep.VR.isdecimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isdecimal</span></code></a>()</p></td>
+<td><p>Return True if the string is a decimal string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isdigit" title="pydicom.valuerep.VR.isdigit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isdigit</span></code></a>()</p></td>
+<td><p>Return True if the string is a digit string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isnumeric" title="pydicom.valuerep.VR.isnumeric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isnumeric</span></code></a>()</p></td>
+<td><p>Return True if the string is a numeric string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isalpha" title="pydicom.valuerep.VR.isalpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isalpha</span></code></a>()</p></td>
+<td><p>Return True if the string is an alphabetic string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isalnum" title="pydicom.valuerep.VR.isalnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isalnum</span></code></a>()</p></td>
+<td><p>Return True if the string is an alpha-numeric string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isidentifier" title="pydicom.valuerep.VR.isidentifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isidentifier</span></code></a>()</p></td>
+<td><p>Return True if the string is a valid Python identifier, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.isprintable" title="pydicom.valuerep.VR.isprintable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isprintable</span></code></a>()</p></td>
+<td><p>Return True if the string is printable, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.zfill" title="pydicom.valuerep.VR.zfill"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zfill</span></code></a>(width, /)</p></td>
+<td><p>Pad a numeric string with zeros on the left, to fill a field of the given width.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.format" title="pydicom.valuerep.VR.format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Return a formatted version of S, using substitutions from args and kwargs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.format_map" title="pydicom.valuerep.VR.format_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_map</span></code></a>(mapping)</p></td>
+<td><p>Return a formatted version of S, using substitutions from mapping.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.VR.maketrans" title="pydicom.valuerep.VR.maketrans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maketrans</span></code></a></p></td>
+<td><p>Return a translation table usable for str.translate().</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AE</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AS</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AT</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CS</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DA</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DT</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FD</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FL</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IS</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LO</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LT</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OB</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OD</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OF</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OL</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OW</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OV</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PN</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SH</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SL</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQ</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SS</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ST</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SV</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TM</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UC</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UI</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UL</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UN</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">US</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UT</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UV</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">US_SS_OW</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">US_SS</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">US_OW</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OB_OW</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.capitalize">
+<span class="sig-name descname"><span class="pre">capitalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.capitalize" title="Link to this definition">¶</a></dt>
+<dd><p>Return a capitalized version of the string.</p>
+<p>More specifically, make the first character have upper case and the rest lower
+case.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.casefold">
+<span class="sig-name descname"><span class="pre">casefold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.casefold" title="Link to this definition">¶</a></dt>
+<dd><p>Return a version of the string suitable for caseless comparisons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.center">
+<span class="sig-name descname"><span class="pre">center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.center" title="Link to this definition">¶</a></dt>
+<dd><p>Return a centered string of length width.</p>
+<p>Padding is done using the specified fill character (default is a space).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.count">
+<span class="sig-name descname"><span class="pre">count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.count" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of non-overlapping occurrences of substring sub in
+string S[start:end].  Optional arguments start and end are
+interpreted as in slice notation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.encode" title="Link to this definition">¶</a></dt>
+<dd><p>Encode the string using the codec registered for encoding.</p>
+<dl class="simple">
+<dt>encoding</dt><dd><p>The encoding in which to encode the string.</p>
+</dd>
+<dt>errors</dt><dd><p>The error handling scheme to use for encoding errors.
+The default is ‘strict’ meaning that encoding errors raise a
+UnicodeEncodeError.  Other possible values are ‘ignore’, ‘replace’ and
+‘xmlcharrefreplace’ as well as any other name registered with
+codecs.register_error that can handle UnicodeEncodeErrors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.endswith">
+<span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.endswith" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if S ends with the specified suffix, False otherwise.
+With optional start, test S beginning at that position.
+With optional end, stop comparing S at that position.
+suffix can also be a tuple of strings to try.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.expandtabs">
+<span class="sig-name descname"><span class="pre">expandtabs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tabsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.expandtabs" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy where all tab characters are expanded using spaces.</p>
+<p>If tabsize is not given, a tab size of 8 characters is assumed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.find" title="Link to this definition">¶</a></dt>
+<dd><p>Return the lowest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Return -1 on failure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.format" title="Link to this definition">¶</a></dt>
+<dd><p>Return a formatted version of S, using substitutions from args and kwargs.
+The substitutions are identified by braces (‘{’ and ‘}’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.format_map">
+<span class="sig-name descname"><span class="pre">format_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.format_map" title="Link to this definition">¶</a></dt>
+<dd><p>Return a formatted version of S, using substitutions from mapping.
+The substitutions are identified by braces (‘{’ and ‘}’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.index" title="Link to this definition">¶</a></dt>
+<dd><p>Return the lowest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Raises ValueError when the substring is not found.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isalnum">
+<span class="sig-name descname"><span class="pre">isalnum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isalnum" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is an alpha-numeric string, False otherwise.</p>
+<p>A string is alpha-numeric if all characters in the string are alpha-numeric and
+there is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isalpha">
+<span class="sig-name descname"><span class="pre">isalpha</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isalpha" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is an alphabetic string, False otherwise.</p>
+<p>A string is alphabetic if all characters in the string are alphabetic and there
+is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isascii">
+<span class="sig-name descname"><span class="pre">isascii</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isascii" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if all characters in the string are ASCII, False otherwise.</p>
+<p>ASCII characters have code points in the range U+0000-U+007F.
+Empty string is ASCII too.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isdecimal">
+<span class="sig-name descname"><span class="pre">isdecimal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isdecimal" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a decimal string, False otherwise.</p>
+<p>A string is a decimal string if all characters in the string are decimal and
+there is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isdigit">
+<span class="sig-name descname"><span class="pre">isdigit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isdigit" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a digit string, False otherwise.</p>
+<p>A string is a digit string if all characters in the string are digits and there
+is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isidentifier">
+<span class="sig-name descname"><span class="pre">isidentifier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isidentifier" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a valid Python identifier, False otherwise.</p>
+<p>Call keyword.iskeyword(s) to test whether string s is a reserved identifier,
+such as “def” or “class”.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.islower">
+<span class="sig-name descname"><span class="pre">islower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.islower" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a lowercase string, False otherwise.</p>
+<p>A string is lowercase if all cased characters in the string are lowercase and
+there is at least one cased character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isnumeric">
+<span class="sig-name descname"><span class="pre">isnumeric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isnumeric" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a numeric string, False otherwise.</p>
+<p>A string is numeric if all characters in the string are numeric and there is at
+least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isprintable">
+<span class="sig-name descname"><span class="pre">isprintable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isprintable" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is printable, False otherwise.</p>
+<p>A string is printable if all of its characters are considered printable in
+repr() or if it is empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isspace">
+<span class="sig-name descname"><span class="pre">isspace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isspace" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a whitespace string, False otherwise.</p>
+<p>A string is whitespace if all characters in the string are whitespace and there
+is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.istitle">
+<span class="sig-name descname"><span class="pre">istitle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.istitle" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a title-cased string, False otherwise.</p>
+<p>In a title-cased string, upper- and title-case characters may only
+follow uncased characters and lowercase characters only cased ones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.isupper">
+<span class="sig-name descname"><span class="pre">isupper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.isupper" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is an uppercase string, False otherwise.</p>
+<p>A string is uppercase if all cased characters in the string are uppercase and
+there is at least one cased character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.join" title="Link to this definition">¶</a></dt>
+<dd><p>Concatenate any number of strings.</p>
+<p>The string whose method is called is inserted in between each given string.
+The result is returned as a new string.</p>
+<p>Example: ‘.’.join([‘ab’, ‘pq’, ‘rs’]) -&gt; ‘ab.pq.rs’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.ljust">
+<span class="sig-name descname"><span class="pre">ljust</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.ljust" title="Link to this definition">¶</a></dt>
+<dd><p>Return a left-justified string of length width.</p>
+<p>Padding is done using the specified fill character (default is a space).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.lower">
+<span class="sig-name descname"><span class="pre">lower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.lower" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string converted to lowercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.lstrip">
+<span class="sig-name descname"><span class="pre">lstrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.lstrip" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string with leading whitespace removed.</p>
+<p>If chars is given and not None, remove characters in chars instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.maketrans">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maketrans</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.maketrans" title="Link to this definition">¶</a></dt>
+<dd><p>Return a translation table usable for str.translate().</p>
+<p>If there is only one argument, it must be a dictionary mapping Unicode
+ordinals (integers) or characters to Unicode ordinals, strings or None.
+Character keys will be then converted to ordinals.
+If there are two arguments, they must be strings of equal length, and
+in the resulting dictionary, each character in x will be mapped to the
+character at the same position in y. If there is a third argument, it
+must be a string, whose characters will be mapped to None in the result.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.partition">
+<span class="sig-name descname"><span class="pre">partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.partition" title="Link to this definition">¶</a></dt>
+<dd><p>Partition the string into three parts using the given separator.</p>
+<p>This will search for the separator in the string.  If the separator is found,
+returns a 3-tuple containing the part before the separator, the separator
+itself, and the part after it.</p>
+<p>If the separator is not found, returns a 3-tuple containing the original string
+and two empty strings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.removeprefix">
+<span class="sig-name descname"><span class="pre">removeprefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.removeprefix" title="Link to this definition">¶</a></dt>
+<dd><p>Return a str with the given prefix string removed if present.</p>
+<p>If the string starts with the prefix string, return string[len(prefix):].
+Otherwise, return a copy of the original string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.removesuffix">
+<span class="sig-name descname"><span class="pre">removesuffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.removesuffix" title="Link to this definition">¶</a></dt>
+<dd><p>Return a str with the given suffix string removed if present.</p>
+<p>If the string ends with the suffix string and that suffix is not empty,
+return string[:-len(suffix)]. Otherwise, return a copy of the original
+string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.replace" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy with all occurrences of substring old replaced by new.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>count</dt><dd><p>Maximum number of occurrences to replace.
+-1 (the default value) means replace all occurrences.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>If the optional argument count is given, only the first count occurrences are
+replaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.rfind">
+<span class="sig-name descname"><span class="pre">rfind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.rfind" title="Link to this definition">¶</a></dt>
+<dd><p>Return the highest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Return -1 on failure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.rindex">
+<span class="sig-name descname"><span class="pre">rindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.rindex" title="Link to this definition">¶</a></dt>
+<dd><p>Return the highest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Raises ValueError when the substring is not found.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.rjust">
+<span class="sig-name descname"><span class="pre">rjust</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.rjust" title="Link to this definition">¶</a></dt>
+<dd><p>Return a right-justified string of length width.</p>
+<p>Padding is done using the specified fill character (default is a space).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.rpartition">
+<span class="sig-name descname"><span class="pre">rpartition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.rpartition" title="Link to this definition">¶</a></dt>
+<dd><p>Partition the string into three parts using the given separator.</p>
+<p>This will search for the separator in the string, starting at the end. If
+the separator is found, returns a 3-tuple containing the part before the
+separator, the separator itself, and the part after it.</p>
+<p>If the separator is not found, returns a 3-tuple containing two empty strings
+and the original string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.rsplit">
+<span class="sig-name descname"><span class="pre">rsplit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.rsplit" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of the substrings in the string, using sep as the separator string.</p>
+<blockquote>
+<div><dl>
+<dt>sep</dt><dd><p>The separator used to split the string.</p>
+<p>When set to None (the default value), will split on any whitespace
+character (including \n \r \t \f and spaces) and will discard
+empty strings from the result.</p>
+</dd>
+<dt>maxsplit</dt><dd><p>Maximum number of splits (starting from the left).
+-1 (the default value) means no limit.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Splitting starts at the end of the string and works to the front.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.rstrip">
+<span class="sig-name descname"><span class="pre">rstrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.rstrip" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string with trailing whitespace removed.</p>
+<p>If chars is given and not None, remove characters in chars instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.split" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of the substrings in the string, using sep as the separator string.</p>
+<blockquote>
+<div><dl>
+<dt>sep</dt><dd><p>The separator used to split the string.</p>
+<p>When set to None (the default value), will split on any whitespace
+character (including \n \r \t \f and spaces) and will discard
+empty strings from the result.</p>
+</dd>
+<dt>maxsplit</dt><dd><p>Maximum number of splits (starting from the left).
+-1 (the default value) means no limit.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Note, str.split() is mainly useful for data that has been intentionally
+delimited.  With natural text that includes punctuation, consider using
+the regular expression module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.splitlines">
+<span class="sig-name descname"><span class="pre">splitlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keepends</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.splitlines" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of the lines in the string, breaking at line boundaries.</p>
+<p>Line breaks are not included in the resulting list unless keepends is given and
+true.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.startswith">
+<span class="sig-name descname"><span class="pre">startswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pydicom.valuerep.VR.startswith" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if S starts with the specified prefix, False otherwise.
+With optional start, test S beginning at that position.
+With optional end, stop comparing S at that position.
+prefix can also be a tuple of strings to try.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.strip">
+<span class="sig-name descname"><span class="pre">strip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.strip" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string with leading and trailing whitespace removed.</p>
+<p>If chars is given and not None, remove characters in chars instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.swapcase">
+<span class="sig-name descname"><span class="pre">swapcase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.swapcase" title="Link to this definition">¶</a></dt>
+<dd><p>Convert uppercase characters to lowercase and lowercase characters to uppercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.title">
+<span class="sig-name descname"><span class="pre">title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.title" title="Link to this definition">¶</a></dt>
+<dd><p>Return a version of the string where each word is titlecased.</p>
+<p>More specifically, words start with uppercased characters and all remaining
+cased characters have lower case.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.translate" title="Link to this definition">¶</a></dt>
+<dd><p>Replace each character in the string using the given translation table.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>table</dt><dd><p>Translation table, which must be a mapping of Unicode ordinals to
+Unicode ordinals, strings, or None.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The table must implement lookup/indexing via __getitem__, for instance a
+dictionary or list.  If this operation raises LookupError, the character is
+left untouched.  Characters mapped to None are deleted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.upper">
+<span class="sig-name descname"><span class="pre">upper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.upper" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string converted to uppercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.valuerep.VR.zfill">
+<span class="sig-name descname"><span class="pre">zfill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.valuerep.VR.zfill" title="Link to this definition">¶</a></dt>
+<dd><p>Pad a numeric string with zeros on the left, to fill a field of the given width.</p>
+<p>The string is never truncated.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pydicom.valuerep.TM.html" class="btn btn-neutral float-left" title="pydicom.valuerep.TM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../examples.html" class="btn btn-neutral float-right" title="Example Datasets (pydicom.examples)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

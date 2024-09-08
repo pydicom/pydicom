@@ -1,0 +1,6 @@
+﻿pydicom.pixels.apply\_voi
+=========================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: apply_voi

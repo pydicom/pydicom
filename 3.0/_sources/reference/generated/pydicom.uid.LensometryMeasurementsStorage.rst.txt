@@ -1,0 +1,6 @@
+﻿pydicom.uid.LensometryMeasurementsStorage
+=========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: LensometryMeasurementsStorage

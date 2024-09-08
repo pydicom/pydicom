@@ -1,0 +1,6 @@
+﻿pydicom.pixels.unpack\_bits
+===========================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: unpack_bits

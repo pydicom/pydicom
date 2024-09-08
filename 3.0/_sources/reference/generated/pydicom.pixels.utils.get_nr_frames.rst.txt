@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.get\_nr\_frames
+====================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: get_nr_frames

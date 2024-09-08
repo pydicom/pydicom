@@ -1,0 +1,6 @@
+﻿pydicom.pixels.processing.apply\_voi\_lut
+=========================================
+
+.. currentmodule:: pydicom.pixels.processing
+
+.. autofunction:: apply_voi_lut

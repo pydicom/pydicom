@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Data - Part 1: Introduction and accessing &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Pixel Data - Part 2: Creation of pixel data" href="creation.html" />
+    <link rel="prev" title="Pixel Data" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><em>Pixel Data</em></a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><em>Pixel Data</em> - Part 1: Introduction and accessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#converting-to-an-ndarray">Converting to an <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#converting-to-an-ndarray-with-metadata">Converting to an <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> with metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#conclusion-and-next-steps">Conclusion and next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="creation.html"><em>Pixel Data</em> - Part 2: Creation of pixel data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compressing.html"><em>Pixel Data</em> - Part 3: Compression and decompression</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../filesets.html">DICOM File-sets and DICOMDIR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
+          <li class="breadcrumb-item"><a href="index.html"><em>Pixel Data</em></a></li>
+      <li class="breadcrumb-item active"><em>Pixel Data</em> - Part 1: Introduction and accessing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pixel-data-part-1-introduction-and-accessing">
+<h1><em>Pixel Data</em> - Part 1: Introduction and accessing<a class="headerlink" href="#pixel-data-part-1-introduction-and-accessing" title="Link to this heading">¶</a></h1>
+<p>This is part 1 of the tutorial on using <em>pydicom</em> with DICOM <em>Pixel Data</em>. It covers:</p>
+<ul class="simple">
+<li><p>An introduction to DICOM pixel data</p></li>
+<li><p>Converting pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p></li>
+<li><p>Customizing the conversion process</p></li>
+</ul>
+<p>It’s assumed that you’re already familiar with the <a class="reference internal" href="../dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
+<p><strong>Prerequisites</strong></p>
+<p>Installing using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom<span class="w"> </span>numpy<span class="w"> </span>matplotlib<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span>
+</pre></div>
+</div>
+<p>Installing on conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>matplotlib
+conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom
+pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span>
+</pre></div>
+</div>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>Many DICOM SOP classes contain bulk pixel data, which typically represents medical
+imagery or 2D slices of a 3D volume. This data is most commonly found in
+the <em>Pixel Data</em> element, however it may be in <em>Float Pixel Data</em> or <em>Double Float
+Pixel Data</em> instead, depending on the SOP class. The table below lists these
+possible pixel data containing elements, although it’s important to note that
+only one may be present in any given dataset.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Keyword</p></th>
+<th class="head"><p>VR</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>(7FE0,0008)</p></td>
+<td><p><em>Float Pixel Data</em></p></td>
+<td><p>FloatPixelData</p></td>
+<td><p><strong>OF</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>(7FE0,0009)</p></td>
+<td><p><em>Double Pixel Data</em></p></td>
+<td><p>DoubleFloatPixelData</p></td>
+<td><p><strong>OD</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>(7FE0,0010)</p></td>
+<td><p><em>Pixel Data</em></p></td>
+<td><p>PixelData</p></td>
+<td><p><strong>OB</strong> or <strong>OW</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>All three elements use <strong>O*</strong> <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VRs</a> (such as <strong>OB</strong> and
+<strong>OD</strong>), which in <em>pydicom</em> are <a class="reference internal" href="../../guides/element_value_types.html"><span class="doc">stored as</span></a>
+(and should be set using) <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">group_dataset</span><span class="p">(</span><span class="mh">0x7FE0</span><span class="p">)</span>
+<span class="go">(7FE0,0010) Pixel Data                          OB: Array of 152326 elements</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span> 
+<span class="go">b&#39;\xfe\xff\x00\xe0\x00\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x01\x00\xffO\xffQ...</span>
+</pre></div>
+</div>
+<p>If the dataset’s been written using the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>
+it should have a <em>Transfer Syntax UID</em> element which describes how the pixel data
+is encoded and whether it’s undergone compression:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;JPEG 2000 Image Compression (Lossless Only)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span><span class="o">.</span><span class="n">is_compressed</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>In the example above the <em>Transfer Syntax UID</em> indicates that the pixel data has
+been compressed using the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.4.html">JPEG 2000</a> compression method.
+Other things to keep in mind with compressed transfer syntaxes are:</p>
+<ul class="simple">
+<li><p>Only datasets that use the <em>Pixel Data</em> element may be compressed</p></li>
+<li><p>Each frame of pixel data is compressed separately</p></li>
+<li><p>The compressed frames are then <a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulated</span></code></a>
+and the encapsulated data used to set the <em>Pixel Data</em> value</p></li>
+</ul>
+<p>To access the encapsulated frames you can use <a class="reference internal" href="../../reference/generated/pydicom.encaps.get_frame.html#pydicom.encaps.get_frame" title="pydicom.encaps.get_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame()</span></code></a>
+or the <a class="reference internal" href="../../reference/generated/pydicom.encaps.generate_frames.html#pydicom.encaps.generate_frames" title="pydicom.encaps.generate_frames"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_frames()</span></code></a> iterator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">get_frame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">get_frame</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">number_of_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
+<span class="go">152294</span>
+</pre></div>
+</div>
+<p>The next example uses an uncompressed <em>Transfer Syntax UID</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Explicit VR Little Endian&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tsyntax</span><span class="o">.</span><span class="n">is_compressed</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>The pixel data in this dataset uses <a class="reference external" href="https://en.wikipedia.org/wiki/Endianness">little-endian byte ordering</a> and is uncompressed. Uncompressed
+transfer syntaxes never use encapsulation and may use any one of the
+three pixel data elements, although <em>Pixel Data</em> is the most common.</p>
+<p>A dataset with pixel data should always contain group <code class="docutils literal notranslate"><span class="pre">0x0028</span></code> <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements, which are needed to properly interpret
+the encoded pixel data byte stream:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">group_dataset</span><span class="p">(</span><span class="mh">0x0028</span><span class="p">)</span>
+<span class="go">(0028,0002) Samples per Pixel                   US: 1</span>
+<span class="go">(0028,0004) Photometric Interpretation          CS: &#39;MONOCHROME2&#39;</span>
+<span class="go">(0028,0010) Rows                                US: 128</span>
+<span class="go">(0028,0011) Columns                             US: 128</span>
+<span class="go">(0028,0030) Pixel Spacing                       DS: [0.661468, 0.661468]</span>
+<span class="go">(0028,0100) Bits Allocated                      US: 16</span>
+<span class="go">(0028,0101) Bits Stored                         US: 16</span>
+<span class="go">(0028,0102) High Bit                            US: 15</span>
+<span class="go">(0028,0103) Pixel Representation                US: 1</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>An explanation of what these elements represent can be found in the
+<a class="reference internal" href="../../guides/glossary.html"><span class="doc">glossary</span></a>, but briefly, the above indicates that this
+dataset contains a single grayscale image with dimensions 128 x 128 and that each
+pixel should be interpreted as a 2-byte signed integer.</p>
+</section>
+<section id="converting-to-an-ndarray">
+<h2>Converting to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><a class="headerlink" href="#converting-to-an-ndarray" title="Link to this heading">¶</a></h2>
+<p>Properly interpreting all the possible variations of a dataset’s pixel data requires
+a lot of specific domain knowledge, not just of DICOM but also the various
+JPEG compression schemes. For this reason <em>pydicom</em> offers a number of methods
+for converting the pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, the most high-level
+of which are the <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
+functions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+
+<span class="c1"># Get an example dataset as a FileDataset instance</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+
+<span class="c1"># Convert the pixel data to an ndarray</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;int16&quot;</span>
+
+<span class="c1"># Display the pixel data using matplotlib</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will convert the entire pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> before using
+<a class="reference external" href="https://matplotlib.org/">matplotlib</a> to display it. If the dataset has multiple
+frames but you’re only interested in a particular one, then you can use the <cite>index</cite> parameter
+to return it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+
+<span class="c1"># Get an example multi-frame dataset</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rt_dose</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">==</span> <span class="s1">&#39;15&#39;</span>
+
+<span class="c1"># Return all frames</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Return only the first frame</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> can be used to iterate through either all
+the available frames or those specified by the <cite>indices</cite> parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">iter_pixels</span>
+
+<span class="c1"># Iterate through all frames</span>
+<span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">iter_pixels</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">rt_dose</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Iterate through the first 3 even frames</span>
+<span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">iter_pixels</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">rt_dose</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]):</span>
+    <span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="controlling-decoding">
+<h3>Controlling decoding<a class="headerlink" href="#controlling-decoding" title="Link to this heading">¶</a></h3>
+<p>The default decoding options for <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> have been chosen to return the pixel data in
+its most commonly used form; for multi-sample data this means RGB is returned
+by default. Datasets with pixel data in <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a>
+color space are converted using <a class="reference internal" href="../../reference/generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> prior
+to the array being returned. If you’d like to skip this conversion and return the
+data as found in the dataset you can pass <code class="docutils literal notranslate"><span class="pre">raw=True</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL_422&quot;</span>
+
+<span class="n">ybr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">im2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">im1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ybr</span><span class="p">)</span>
+<span class="n">im1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original (in YCbCr)&quot;</span><span class="p">)</span>
+<span class="n">im2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+<span class="n">im2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Converted (in RGB)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Further customization of the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> is possible by
+passing one or more <a class="reference internal" href="../../guides/decoding/decoder_options.html"><span class="doc">decoding options</span></a> to
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>.</p>
+</section>
+<section id="compressed-transfer-syntaxes">
+<h3>Compressed transfer syntaxes<a class="headerlink" href="#compressed-transfer-syntaxes" title="Link to this heading">¶</a></h3>
+<p>When converting datasets with a compressed transfer syntax, one or more additional
+packages are needed to perform the actual decompression (via their corresponding decoding
+plugins). By default, all available plugins will be tried and the first successful
+one will have its results returned:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+
+<span class="c1"># Returns the results from the first successful decoding plugin</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If no plugins are available for the given transfer syntax due to missing dependencies
+you’ll get an exception:</p>
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/pixels/utils.py&quot;</span>, line <span class="m">1386</span>, in <span class="n">pixel_array</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">decoder</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span>
+<span class="w">           </span><span class="pm">^^^^^^^^^^^^^^^^^</span>
+  File <span class="nb">&quot;.../pydicom/pixels/decoders/base.py&quot;</span>, line <span class="m">971</span>, in <span class="n">as_array</span>
+<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_validate_plugins</span><span class="p">(</span><span class="n">decoding_plugin</span><span class="p">),</span>
+<span class="w">    </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+  File <span class="nb">&quot;.../pydicom/pixels/common.py&quot;</span>, line <span class="m">249</span>, in <span class="n">_validate_plugins</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<span class="gr">RuntimeError</span>: <span class="n">Unable to decompress &#39;JPEG 2000 Image Compression (Lossless Only)&#39; pixel data because all plugins are missing dependencies:</span>
+<span class="x">    gdcm - requires gdcm&gt;=3.0.10</span>
+<span class="x">    pylibjpeg - requires pylibjpeg&gt;=2.0 and pylibjpeg-openjpeg&gt;=2.0</span>
+<span class="x">    pillow - requires numpy and pillow&gt;=10.0</span>
+</pre></div>
+</div>
+<p>While the resulting <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for lossless compression methods should
+be identical no matter which plugin is used, there may be slight differences for lossy
+compression methods. To ensure consistency you can use the <cite>decoding_plugin</cite> argument
+to use the specified <a class="reference internal" href="../../guides/plugin_table.html"><span class="doc">decompression plugin</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+
+<span class="c1"># Return the results from the &#39;pylibjpeg&#39; decoding plugin</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">decoding_plugin</span><span class="o">=</span><span class="s2">&quot;pylibjpeg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And of course if the specified plugin isn’t available you’ll get an exception:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_array</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span><span class="p">,</span> <span class="n">decoding_plugin</span><span class="o">=</span><span class="s2">&quot;pillow&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/pixels/utils.py&quot;</span>, line <span class="m">1386</span>, in <span class="n">pixel_array</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">decoder</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span>
+<span class="w">           </span><span class="pm">^^^^^^^^^^^^^^^^^</span>
+  File <span class="nb">&quot;.../pydicom/pixels/decoders/base.py&quot;</span>, line <span class="m">971</span>, in <span class="n">as_array</span>
+<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_validate_plugins</span><span class="p">(</span><span class="n">decoding_plugin</span><span class="p">),</span>
+<span class="w">    </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+  File <span class="nb">&quot;.../pydicom/pixels/common.py&quot;</span>, line <span class="m">230</span>, in <span class="n">_validate_plugins</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<span class="gr">RuntimeError</span>: <span class="n">Unable to decompress &#39;JPEG 2000 Image Compression (Lossless Only)&#39; pixel data because the specified plugin is missing dependencies:</span>
+<span class="x">    pillow - requires numpy and pillow&gt;=10.0</span>
+</pre></div>
+</div>
+</section>
+<section id="minimizing-memory-usage">
+<h3>Minimizing memory usage<a class="headerlink" href="#minimizing-memory-usage" title="Link to this heading">¶</a></h3>
+<p>Sometimes a dataset’s pixel data may be very large due to it having a large number
+of frames and you’d like to avoid having the entire thing read into memory.
+By passing the path to the dataset (as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>) to
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> only the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements and the minimum amount of required
+pixel data will be loaded:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+
+<span class="c1"># Get the path to the &#39;examples.rt_dose&#39; dataset</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;rt_dose&quot;</span><span class="p">)</span>
+
+<span class="c1"># Return the first frame of the pixel data</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The same is true for <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">iter_pixels</span>
+
+<span class="c1"># Get the path to the &#39;examples.ybr_color&#39; dataset</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ybr_color&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create an empty ndarray and use it to initialize the display</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;u1&quot;</span><span class="p">))</span>
+
+<span class="c1"># Iterate through the frames and update the display</span>
+<span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">iter_pixels</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.033</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you’re supplying a path to <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a>
+or <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> and you need access to the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> elements to perform image processing operations on
+the array (such as <a class="reference internal" href="../../reference/generated/pydicom.pixels.apply_rescale.html#pydicom.pixels.apply_rescale" title="pydicom.pixels.apply_rescale"><code class="xref py py-func docutils literal notranslate"><span class="pre">rescale</span></code></a> or
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">windowing</span></code></a>) you can access them by passing
+an empty <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance via the <cite>ds_out</cite> argument,
+or alternatively by using <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> with
+<code class="docutils literal notranslate"><span class="pre">stop_before_pixels=True</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span><span class="p">,</span> <span class="n">apply_rescale</span>
+
+<span class="c1"># Get the path to the &#39;examples.ct&#39; dataset</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ds_out</span><span class="o">=</span><span class="n">ds</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">RescaleIntercept</span> <span class="o">==</span> <span class="s2">&quot;-1024.0&quot;</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">RescaleSlope</span> <span class="o">==</span> <span class="s2">&quot;1.0&quot;</span>
+
+<span class="c1"># Convert raw CT values to Hounsfield units</span>
+<span class="n">hu</span> <span class="o">=</span> <span class="n">apply_rescale</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="converting-to-an-ndarray-with-metadata">
+<h2>Converting to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with metadata<a class="headerlink" href="#converting-to-an-ndarray-with-metadata" title="Link to this heading">¶</a></h2>
+<p>While <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
+should cover most use cases, you may want more information about the returned
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, such as what color space it’s in. The <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a> methods provide mid-level access
+to <em>pydicom’s</em> pixel data decoding functionality while still handling most of the complexity
+of conversion to an array. More importantly, they return or yield a tuple of
+(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>), where the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> contains metadata
+describing the corresponding <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class should not be used
+directly, instead use the class instance returned by <a class="reference internal" href="../../reference/generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_decoder()</span></code></a>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">get_decoder</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL_422&quot;</span>
+
+<span class="c1"># Get the &#39;Decoder&#39; instance required to decode the dataset&#39;s pixel data</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">get_decoder</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
+
+<span class="c1"># Converts the pixel data to an ndarray in the original color space</span>
+<span class="n">arr</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;rows&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;samples_per_pixel&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;photometric_interpretation&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL_422&quot;</span>
+
+<span class="c1"># Converts the pixel data to an ndarray in RGB color space</span>
+<span class="n">arr</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;photometric_interpretation&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;RGB&quot;</span>
+</pre></div>
+</div>
+<p>This is especially useful for non-conformant datasets where the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements have values that don’t match the
+actual pixel data (such as <em>Number of Frames</em> or <em>Photometric Interpretation</em>).</p>
+</section>
+<section id="conclusion-and-next-steps">
+<h2>Conclusion and next steps<a class="headerlink" href="#conclusion-and-next-steps" title="Link to this heading">¶</a></h2>
+<p>In part 1 of this tutorial you’ve been introduced to DICOM’s pixel data and learned how to
+use <em>pydicom</em> to access it, convert it to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> and how to
+control the conversion process. In the next part you’ll learn how to
+<a class="reference internal" href="creation.html"><span class="doc">create your own pixel data from scratch</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Pixel Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="creation.html" class="btn btn-neutral float-right" title="Pixel Data - Part 2: Creation of pixel data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

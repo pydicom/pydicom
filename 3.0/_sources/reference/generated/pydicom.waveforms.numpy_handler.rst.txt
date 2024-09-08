@@ -1,0 +1,14 @@
+﻿pydicom.waveforms.numpy\_handler
+================================
+
+.. automodule:: pydicom.waveforms.numpy_handler
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      generate_multiplex
+      is_available
+      multiplex_array
+   

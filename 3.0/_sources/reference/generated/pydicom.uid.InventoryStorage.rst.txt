@@ -1,0 +1,6 @@
+﻿pydicom.uid.InventoryStorage
+============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: InventoryStorage

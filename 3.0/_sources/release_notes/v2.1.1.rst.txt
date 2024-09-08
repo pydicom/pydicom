@@ -1,0 +1,10 @@
+Version 2.1.1
+=============
+
+Fixes
+-----
+
+* Remove ``py.typed`` (:issue:`1251`)
+* Fix ``ImportError`` with Python 3.6.0 (:issue:`1253`)
+* Fix converting Sequences with Bulk Data when loading from JSON
+  (:issue:`1254`)

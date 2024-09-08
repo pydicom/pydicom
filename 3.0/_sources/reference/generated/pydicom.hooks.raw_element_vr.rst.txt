@@ -1,0 +1,6 @@
+﻿pydicom.hooks.raw\_element\_vr
+==============================
+
+.. currentmodule:: pydicom.hooks
+
+.. autofunction:: raw_element_vr

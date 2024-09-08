@@ -1,0 +1,6 @@
+﻿pydicom.uid.ConfocalMicroscopyTiledPyramidalImageStorage
+========================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ConfocalMicroscopyTiledPyramidalImageStorage

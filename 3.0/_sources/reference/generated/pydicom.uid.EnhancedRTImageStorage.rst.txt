@@ -1,0 +1,6 @@
+﻿pydicom.uid.EnhancedRTImageStorage
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: EnhancedRTImageStorage

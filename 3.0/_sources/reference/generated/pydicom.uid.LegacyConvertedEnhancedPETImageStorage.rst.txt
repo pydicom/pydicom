@@ -1,0 +1,6 @@
+﻿pydicom.uid.LegacyConvertedEnhancedPETImageStorage
+==================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: LegacyConvertedEnhancedPETImageStorage

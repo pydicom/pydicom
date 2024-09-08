@@ -1,0 +1,6 @@
+﻿pydicom.encaps.parse\_basic\_offsets
+====================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: parse_basic_offsets

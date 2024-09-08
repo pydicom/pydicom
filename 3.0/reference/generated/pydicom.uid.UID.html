@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydicom.uid.UID &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.uid.AcquisitionContextSRStorage" href="pydicom.uid.AcquisitionContextSRStorage.html" />
+    <link rel="prev" title="pydicom.uid.RE_VALID_UID_PREFIX" href="pydicom.uid.RE_VALID_UID_PREFIX.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../uid.html#transfer-syntax-uids">Transfer Syntax UIDs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uid.html#transfer-syntax-lists">Transfer Syntax Lists</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../uid.html#uid-utilities">UID Utilities</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.generate_uid.html">pydicom.uid.generate_uid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.register_transfer_syntax.html">pydicom.uid.register_transfer_syntax</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PYDICOM_ROOT_UID.html">pydicom.uid.PYDICOM_ROOT_UID</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PYDICOM_IMPLEMENTATION_UID.html">pydicom.uid.PYDICOM_IMPLEMENTATION_UID</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RE_VALID_UID.html">pydicom.uid.RE_VALID_UID</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RE_VALID_UID_PREFIX.html">pydicom.uid.RE_VALID_UID_PREFIX</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.uid.UID</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../uid.html#storage-sop-class-uids">Storage SOP Class UIDs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.uid.UID</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydicom-uid-uid">
+<h1>pydicom.uid.UID<a class="headerlink" href="#pydicom-uid-uid" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicom.uid.UID">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></span><span class="sig-name descname"><span class="pre">UID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/uid.py#L15"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.UID" title="Link to this definition">¶</a></dt>
+<dd><p>Human friendly UIDs as a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> subclass.</p>
+<p><strong>Private Transfer Syntaxes</strong></p>
+<p>If creating a private transfer syntax UID, then you must also use
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">set_private_encoding()</span></code> to set the corresponding
+dataset encoding.</p>
+<p class="rubric">Examples</p>
+<p>General usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">UID</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.4.50&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span>
+<span class="go">&#39;1.2.840.10008.1.2.4.50&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span><span class="o">.</span><span class="n">is_implicit_VR</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span><span class="o">.</span><span class="n">is_little_endian</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span><span class="o">.</span><span class="n">is_transfer_syntax</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;JPEG Baseline (Process 1)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span><span class="o">.</span><span class="n">keyword</span>
+<span class="go">JPEGBaseline8Bit</span>
+</pre></div>
+</div>
+<p>Setting the encoding to explicit VR little endian for a private transfer
+syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s2">&quot;1.2.3.4&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span><span class="o">.</span><span class="n">set_private_encoding</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.__init__" title="pydicom.uid.UID.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.capitalize" title="pydicom.uid.UID.capitalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capitalize</span></code></a>()</p></td>
+<td><p>Return a capitalized version of the string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.casefold" title="pydicom.uid.UID.casefold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">casefold</span></code></a>()</p></td>
+<td><p>Return a version of the string suitable for caseless comparisons.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.center" title="pydicom.uid.UID.center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center</span></code></a>(width[, fillchar])</p></td>
+<td><p>Return a centered string of length width.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.count" title="pydicom.uid.UID.count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the number of non-overlapping occurrences of substring sub in string S[start:end].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.encode" title="pydicom.uid.UID.encode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encode</span></code></a>([encoding, errors])</p></td>
+<td><p>Encode the string using the codec registered for encoding.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.endswith" title="pydicom.uid.UID.endswith"><code class="xref py py-obj docutils literal notranslate"><span class="pre">endswith</span></code></a>(suffix[, start[, end]])</p></td>
+<td><p>Return True if S ends with the specified suffix, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.expandtabs" title="pydicom.uid.UID.expandtabs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expandtabs</span></code></a>([tabsize])</p></td>
+<td><p>Return a copy where all tab characters are expanded using spaces.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.find" title="pydicom.uid.UID.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the lowest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.format" title="pydicom.uid.UID.format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Return a formatted version of S, using substitutions from args and kwargs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.format_map" title="pydicom.uid.UID.format_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_map</span></code></a>(mapping)</p></td>
+<td><p>Return a formatted version of S, using substitutions from mapping.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.index" title="pydicom.uid.UID.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the lowest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.isalnum" title="pydicom.uid.UID.isalnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isalnum</span></code></a>()</p></td>
+<td><p>Return True if the string is an alpha-numeric string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.isalpha" title="pydicom.uid.UID.isalpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isalpha</span></code></a>()</p></td>
+<td><p>Return True if the string is an alphabetic string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.isascii" title="pydicom.uid.UID.isascii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isascii</span></code></a>()</p></td>
+<td><p>Return True if all characters in the string are ASCII, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.isdecimal" title="pydicom.uid.UID.isdecimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isdecimal</span></code></a>()</p></td>
+<td><p>Return True if the string is a decimal string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.isdigit" title="pydicom.uid.UID.isdigit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isdigit</span></code></a>()</p></td>
+<td><p>Return True if the string is a digit string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.isidentifier" title="pydicom.uid.UID.isidentifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isidentifier</span></code></a>()</p></td>
+<td><p>Return True if the string is a valid Python identifier, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.islower" title="pydicom.uid.UID.islower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">islower</span></code></a>()</p></td>
+<td><p>Return True if the string is a lowercase string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.isnumeric" title="pydicom.uid.UID.isnumeric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isnumeric</span></code></a>()</p></td>
+<td><p>Return True if the string is a numeric string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.isprintable" title="pydicom.uid.UID.isprintable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isprintable</span></code></a>()</p></td>
+<td><p>Return True if the string is printable, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.isspace" title="pydicom.uid.UID.isspace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isspace</span></code></a>()</p></td>
+<td><p>Return True if the string is a whitespace string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.istitle" title="pydicom.uid.UID.istitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">istitle</span></code></a>()</p></td>
+<td><p>Return True if the string is a title-cased string, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.isupper" title="pydicom.uid.UID.isupper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isupper</span></code></a>()</p></td>
+<td><p>Return True if the string is an uppercase string, False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.join" title="pydicom.uid.UID.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code></a>(iterable, /)</p></td>
+<td><p>Concatenate any number of strings.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.ljust" title="pydicom.uid.UID.ljust"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ljust</span></code></a>(width[, fillchar])</p></td>
+<td><p>Return a left-justified string of length width.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.lower" title="pydicom.uid.UID.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a>()</p></td>
+<td><p>Return a copy of the string converted to lowercase.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.lstrip" title="pydicom.uid.UID.lstrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lstrip</span></code></a>([chars])</p></td>
+<td><p>Return a copy of the string with leading whitespace removed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.maketrans" title="pydicom.uid.UID.maketrans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maketrans</span></code></a></p></td>
+<td><p>Return a translation table usable for str.translate().</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.partition" title="pydicom.uid.UID.partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition</span></code></a>(sep, /)</p></td>
+<td><p>Partition the string into three parts using the given separator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.removeprefix" title="pydicom.uid.UID.removeprefix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeprefix</span></code></a>(prefix, /)</p></td>
+<td><p>Return a str with the given prefix string removed if present.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.removesuffix" title="pydicom.uid.UID.removesuffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removesuffix</span></code></a>(suffix, /)</p></td>
+<td><p>Return a str with the given suffix string removed if present.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.replace" title="pydicom.uid.UID.replace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace</span></code></a>(old, new[, count])</p></td>
+<td><p>Return a copy with all occurrences of substring old replaced by new.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.rfind" title="pydicom.uid.UID.rfind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rfind</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the highest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.rindex" title="pydicom.uid.UID.rindex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rindex</span></code></a>(sub[, start[, end]])</p></td>
+<td><p>Return the highest index in S where substring sub is found, such that sub is contained within S[start:end].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.rjust" title="pydicom.uid.UID.rjust"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rjust</span></code></a>(width[, fillchar])</p></td>
+<td><p>Return a right-justified string of length width.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.rpartition" title="pydicom.uid.UID.rpartition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rpartition</span></code></a>(sep, /)</p></td>
+<td><p>Partition the string into three parts using the given separator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.rsplit" title="pydicom.uid.UID.rsplit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsplit</span></code></a>([sep, maxsplit])</p></td>
+<td><p>Return a list of the substrings in the string, using sep as the separator string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.rstrip" title="pydicom.uid.UID.rstrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rstrip</span></code></a>([chars])</p></td>
+<td><p>Return a copy of the string with trailing whitespace removed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.set_private_encoding" title="pydicom.uid.UID.set_private_encoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_private_encoding</span></code></a>(implicit_vr, little_endian)</p></td>
+<td><p>Set the corresponding dataset encoding for a privately defined transfer syntax.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.split" title="pydicom.uid.UID.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split</span></code></a>([sep, maxsplit])</p></td>
+<td><p>Return a list of the substrings in the string, using sep as the separator string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.splitlines" title="pydicom.uid.UID.splitlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">splitlines</span></code></a>([keepends])</p></td>
+<td><p>Return a list of the lines in the string, breaking at line boundaries.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.startswith" title="pydicom.uid.UID.startswith"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startswith</span></code></a>(prefix[, start[, end]])</p></td>
+<td><p>Return True if S starts with the specified prefix, False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.strip" title="pydicom.uid.UID.strip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip</span></code></a>([chars])</p></td>
+<td><p>Return a copy of the string with leading and trailing whitespace removed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.swapcase" title="pydicom.uid.UID.swapcase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">swapcase</span></code></a>()</p></td>
+<td><p>Convert uppercase characters to lowercase and lowercase characters to uppercase.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.title" title="pydicom.uid.UID.title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">title</span></code></a>()</p></td>
+<td><p>Return a version of the string where each word is titlecased.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.translate" title="pydicom.uid.UID.translate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate</span></code></a>(table, /)</p></td>
+<td><p>Replace each character in the string using the given translation table.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.upper" title="pydicom.uid.UID.upper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper</span></code></a>()</p></td>
+<td><p>Return a copy of the string converted to uppercase.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.zfill" title="pydicom.uid.UID.zfill"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zfill</span></code></a>(width, /)</p></td>
+<td><p>Pad a numeric string with zeros on the left, to fill a field of the given width.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.info" title="pydicom.uid.UID.info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code></a></p></td>
+<td><p>Return the UID info from the UID dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_compressed" title="pydicom.uid.UID.is_compressed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_compressed</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a compressed transfer syntax UID.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_deflated" title="pydicom.uid.UID.is_deflated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_deflated</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a deflated transfer syntax UID.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_encapsulated" title="pydicom.uid.UID.is_encapsulated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_encapsulated</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if an encasulated transfer syntax UID.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_implicit_VR" title="pydicom.uid.UID.is_implicit_VR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if an implicit VR transfer syntax UID.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_little_endian" title="pydicom.uid.UID.is_little_endian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_little_endian</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a little endian transfer syntax UID.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_private" title="pydicom.uid.UID.is_private"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_private</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the UID isn't an officially registered DICOM UID.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_retired" title="pydicom.uid.UID.is_retired"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_retired</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the UID is retired, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise or if private.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_transfer_syntax" title="pydicom.uid.UID.is_transfer_syntax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_transfer_syntax</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a transfer syntax UID.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_valid" title="pydicom.uid.UID.is_valid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code></a></p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>self</cite> is a valid UID, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.keyword" title="pydicom.uid.UID.keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyword</span></code></a></p></td>
+<td><p>Return the UID keyword from the UID dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.name" title="pydicom.uid.UID.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p>Return the UID name from the UID dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.type" title="pydicom.uid.UID.type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code></a></p></td>
+<td><p>Return the UID type from the UID dictionary.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.capitalize">
+<span class="sig-name descname"><span class="pre">capitalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.capitalize" title="Link to this definition">¶</a></dt>
+<dd><p>Return a capitalized version of the string.</p>
+<p>More specifically, make the first character have upper case and the rest lower
+case.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.casefold">
+<span class="sig-name descname"><span class="pre">casefold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.casefold" title="Link to this definition">¶</a></dt>
+<dd><p>Return a version of the string suitable for caseless comparisons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.center">
+<span class="sig-name descname"><span class="pre">center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.center" title="Link to this definition">¶</a></dt>
+<dd><p>Return a centered string of length width.</p>
+<p>Padding is done using the specified fill character (default is a space).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.count">
+<span class="sig-name descname"><span class="pre">count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.count" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of non-overlapping occurrences of substring sub in
+string S[start:end].  Optional arguments start and end are
+interpreted as in slice notation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.encode" title="Link to this definition">¶</a></dt>
+<dd><p>Encode the string using the codec registered for encoding.</p>
+<dl class="simple">
+<dt>encoding</dt><dd><p>The encoding in which to encode the string.</p>
+</dd>
+<dt>errors</dt><dd><p>The error handling scheme to use for encoding errors.
+The default is ‘strict’ meaning that encoding errors raise a
+UnicodeEncodeError.  Other possible values are ‘ignore’, ‘replace’ and
+‘xmlcharrefreplace’ as well as any other name registered with
+codecs.register_error that can handle UnicodeEncodeErrors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.endswith">
+<span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.endswith" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if S ends with the specified suffix, False otherwise.
+With optional start, test S beginning at that position.
+With optional end, stop comparing S at that position.
+suffix can also be a tuple of strings to try.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.expandtabs">
+<span class="sig-name descname"><span class="pre">expandtabs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tabsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.expandtabs" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy where all tab characters are expanded using spaces.</p>
+<p>If tabsize is not given, a tab size of 8 characters is assumed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.find" title="Link to this definition">¶</a></dt>
+<dd><p>Return the lowest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Return -1 on failure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.format" title="Link to this definition">¶</a></dt>
+<dd><p>Return a formatted version of S, using substitutions from args and kwargs.
+The substitutions are identified by braces (‘{’ and ‘}’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.format_map">
+<span class="sig-name descname"><span class="pre">format_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.format_map" title="Link to this definition">¶</a></dt>
+<dd><p>Return a formatted version of S, using substitutions from mapping.
+The substitutions are identified by braces (‘{’ and ‘}’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.index" title="Link to this definition">¶</a></dt>
+<dd><p>Return the lowest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Raises ValueError when the substring is not found.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.info">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="headerlink" href="#pydicom.uid.UID.info" title="Link to this definition">¶</a></dt>
+<dd><p>Return the UID info from the UID dictionary.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_compressed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_compressed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_compressed" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a compressed transfer syntax UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_deflated">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_deflated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_deflated" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a deflated transfer syntax UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_encapsulated">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_encapsulated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_encapsulated" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if an encasulated transfer syntax UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_implicit_VR">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_implicit_VR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_implicit_VR" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if an implicit VR transfer syntax UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_little_endian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_little_endian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_little_endian" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a little endian transfer syntax UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_private">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_private</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_private" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the UID isn’t an officially registered DICOM
+UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_retired">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_retired</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_retired" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the UID is retired, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise or if
+private.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_transfer_syntax">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_transfer_syntax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_transfer_syntax" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a transfer syntax UID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_valid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_valid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.uid.UID.is_valid" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>self</cite> is a valid UID, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isalnum">
+<span class="sig-name descname"><span class="pre">isalnum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isalnum" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is an alpha-numeric string, False otherwise.</p>
+<p>A string is alpha-numeric if all characters in the string are alpha-numeric and
+there is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isalpha">
+<span class="sig-name descname"><span class="pre">isalpha</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isalpha" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is an alphabetic string, False otherwise.</p>
+<p>A string is alphabetic if all characters in the string are alphabetic and there
+is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isascii">
+<span class="sig-name descname"><span class="pre">isascii</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isascii" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if all characters in the string are ASCII, False otherwise.</p>
+<p>ASCII characters have code points in the range U+0000-U+007F.
+Empty string is ASCII too.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isdecimal">
+<span class="sig-name descname"><span class="pre">isdecimal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isdecimal" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a decimal string, False otherwise.</p>
+<p>A string is a decimal string if all characters in the string are decimal and
+there is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isdigit">
+<span class="sig-name descname"><span class="pre">isdigit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isdigit" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a digit string, False otherwise.</p>
+<p>A string is a digit string if all characters in the string are digits and there
+is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isidentifier">
+<span class="sig-name descname"><span class="pre">isidentifier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isidentifier" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a valid Python identifier, False otherwise.</p>
+<p>Call keyword.iskeyword(s) to test whether string s is a reserved identifier,
+such as “def” or “class”.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.islower">
+<span class="sig-name descname"><span class="pre">islower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.islower" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a lowercase string, False otherwise.</p>
+<p>A string is lowercase if all cased characters in the string are lowercase and
+there is at least one cased character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isnumeric">
+<span class="sig-name descname"><span class="pre">isnumeric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isnumeric" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a numeric string, False otherwise.</p>
+<p>A string is numeric if all characters in the string are numeric and there is at
+least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isprintable">
+<span class="sig-name descname"><span class="pre">isprintable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isprintable" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is printable, False otherwise.</p>
+<p>A string is printable if all of its characters are considered printable in
+repr() or if it is empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isspace">
+<span class="sig-name descname"><span class="pre">isspace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isspace" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a whitespace string, False otherwise.</p>
+<p>A string is whitespace if all characters in the string are whitespace and there
+is at least one character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.istitle">
+<span class="sig-name descname"><span class="pre">istitle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.istitle" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is a title-cased string, False otherwise.</p>
+<p>In a title-cased string, upper- and title-case characters may only
+follow uncased characters and lowercase characters only cased ones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.isupper">
+<span class="sig-name descname"><span class="pre">isupper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.isupper" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the string is an uppercase string, False otherwise.</p>
+<p>A string is uppercase if all cased characters in the string are uppercase and
+there is at least one cased character in the string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.join" title="Link to this definition">¶</a></dt>
+<dd><p>Concatenate any number of strings.</p>
+<p>The string whose method is called is inserted in between each given string.
+The result is returned as a new string.</p>
+<p>Example: ‘.’.join([‘ab’, ‘pq’, ‘rs’]) -&gt; ‘ab.pq.rs’</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.keyword">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">keyword</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="headerlink" href="#pydicom.uid.UID.keyword" title="Link to this definition">¶</a></dt>
+<dd><p>Return the UID keyword from the UID dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.ljust">
+<span class="sig-name descname"><span class="pre">ljust</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.ljust" title="Link to this definition">¶</a></dt>
+<dd><p>Return a left-justified string of length width.</p>
+<p>Padding is done using the specified fill character (default is a space).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.lower">
+<span class="sig-name descname"><span class="pre">lower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.lower" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string converted to lowercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.lstrip">
+<span class="sig-name descname"><span class="pre">lstrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.lstrip" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string with leading whitespace removed.</p>
+<p>If chars is given and not None, remove characters in chars instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.maketrans">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maketrans</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.maketrans" title="Link to this definition">¶</a></dt>
+<dd><p>Return a translation table usable for str.translate().</p>
+<p>If there is only one argument, it must be a dictionary mapping Unicode
+ordinals (integers) or characters to Unicode ordinals, strings or None.
+Character keys will be then converted to ordinals.
+If there are two arguments, they must be strings of equal length, and
+in the resulting dictionary, each character in x will be mapped to the
+character at the same position in y. If there is a third argument, it
+must be a string, whose characters will be mapped to None in the result.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="headerlink" href="#pydicom.uid.UID.name" title="Link to this definition">¶</a></dt>
+<dd><p>Return the UID name from the UID dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.partition">
+<span class="sig-name descname"><span class="pre">partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.partition" title="Link to this definition">¶</a></dt>
+<dd><p>Partition the string into three parts using the given separator.</p>
+<p>This will search for the separator in the string.  If the separator is found,
+returns a 3-tuple containing the part before the separator, the separator
+itself, and the part after it.</p>
+<p>If the separator is not found, returns a 3-tuple containing the original string
+and two empty strings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.removeprefix">
+<span class="sig-name descname"><span class="pre">removeprefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.removeprefix" title="Link to this definition">¶</a></dt>
+<dd><p>Return a str with the given prefix string removed if present.</p>
+<p>If the string starts with the prefix string, return string[len(prefix):].
+Otherwise, return a copy of the original string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.removesuffix">
+<span class="sig-name descname"><span class="pre">removesuffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.removesuffix" title="Link to this definition">¶</a></dt>
+<dd><p>Return a str with the given suffix string removed if present.</p>
+<p>If the string ends with the suffix string and that suffix is not empty,
+return string[:-len(suffix)]. Otherwise, return a copy of the original
+string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.replace" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy with all occurrences of substring old replaced by new.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>count</dt><dd><p>Maximum number of occurrences to replace.
+-1 (the default value) means replace all occurrences.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>If the optional argument count is given, only the first count occurrences are
+replaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.rfind">
+<span class="sig-name descname"><span class="pre">rfind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.rfind" title="Link to this definition">¶</a></dt>
+<dd><p>Return the highest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Return -1 on failure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.rindex">
+<span class="sig-name descname"><span class="pre">rindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.rindex" title="Link to this definition">¶</a></dt>
+<dd><p>Return the highest index in S where substring sub is found,
+such that sub is contained within S[start:end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Raises ValueError when the substring is not found.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.rjust">
+<span class="sig-name descname"><span class="pre">rjust</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.rjust" title="Link to this definition">¶</a></dt>
+<dd><p>Return a right-justified string of length width.</p>
+<p>Padding is done using the specified fill character (default is a space).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.rpartition">
+<span class="sig-name descname"><span class="pre">rpartition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.rpartition" title="Link to this definition">¶</a></dt>
+<dd><p>Partition the string into three parts using the given separator.</p>
+<p>This will search for the separator in the string, starting at the end. If
+the separator is found, returns a 3-tuple containing the part before the
+separator, the separator itself, and the part after it.</p>
+<p>If the separator is not found, returns a 3-tuple containing two empty strings
+and the original string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.rsplit">
+<span class="sig-name descname"><span class="pre">rsplit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.rsplit" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of the substrings in the string, using sep as the separator string.</p>
+<blockquote>
+<div><dl>
+<dt>sep</dt><dd><p>The separator used to split the string.</p>
+<p>When set to None (the default value), will split on any whitespace
+character (including \n \r \t \f and spaces) and will discard
+empty strings from the result.</p>
+</dd>
+<dt>maxsplit</dt><dd><p>Maximum number of splits (starting from the left).
+-1 (the default value) means no limit.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Splitting starts at the end of the string and works to the front.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.rstrip">
+<span class="sig-name descname"><span class="pre">rstrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.rstrip" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string with trailing whitespace removed.</p>
+<p>If chars is given and not None, remove characters in chars instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.set_private_encoding">
+<span class="sig-name descname"><span class="pre">set_private_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">implicit_vr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">little_endian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/uid.py#L231"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.UID.set_private_encoding" title="Link to this definition">¶</a></dt>
+<dd><p>Set the corresponding dataset encoding for a privately defined transfer
+syntax.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 3.0.</span></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>implicit_vr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if the corresponding dataset encoding uses implicit VR,
+<code class="docutils literal notranslate"><span class="pre">False</span></code> for explicit VR.</p></li>
+<li><p><strong>little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if the corresponding dataset encoding uses little endian
+byte order, <code class="docutils literal notranslate"><span class="pre">False</span></code> for big endian byte order.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.split" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of the substrings in the string, using sep as the separator string.</p>
+<blockquote>
+<div><dl>
+<dt>sep</dt><dd><p>The separator used to split the string.</p>
+<p>When set to None (the default value), will split on any whitespace
+character (including \n \r \t \f and spaces) and will discard
+empty strings from the result.</p>
+</dd>
+<dt>maxsplit</dt><dd><p>Maximum number of splits (starting from the left).
+-1 (the default value) means no limit.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Note, str.split() is mainly useful for data that has been intentionally
+delimited.  With natural text that includes punctuation, consider using
+the regular expression module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.splitlines">
+<span class="sig-name descname"><span class="pre">splitlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keepends</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.splitlines" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of the lines in the string, breaking at line boundaries.</p>
+<p>Line breaks are not included in the resulting list unless keepends is given and
+true.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.startswith">
+<span class="sig-name descname"><span class="pre">startswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pydicom.uid.UID.startswith" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if S starts with the specified prefix, False otherwise.
+With optional start, test S beginning at that position.
+With optional end, stop comparing S at that position.
+prefix can also be a tuple of strings to try.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.strip">
+<span class="sig-name descname"><span class="pre">strip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.strip" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string with leading and trailing whitespace removed.</p>
+<p>If chars is given and not None, remove characters in chars instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.swapcase">
+<span class="sig-name descname"><span class="pre">swapcase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.swapcase" title="Link to this definition">¶</a></dt>
+<dd><p>Convert uppercase characters to lowercase and lowercase characters to uppercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.title">
+<span class="sig-name descname"><span class="pre">title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.title" title="Link to this definition">¶</a></dt>
+<dd><p>Return a version of the string where each word is titlecased.</p>
+<p>More specifically, words start with uppercased characters and all remaining
+cased characters have lower case.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.translate" title="Link to this definition">¶</a></dt>
+<dd><p>Replace each character in the string using the given translation table.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>table</dt><dd><p>Translation table, which must be a mapping of Unicode ordinals to
+Unicode ordinals, strings, or None.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The table must implement lookup/indexing via __getitem__, for instance a
+dictionary or list.  If this operation raises LookupError, the character is
+left untouched.  Characters mapped to None are deleted.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="headerlink" href="#pydicom.uid.UID.type" title="Link to this definition">¶</a></dt>
+<dd><p>Return the UID type from the UID dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.upper">
+<span class="sig-name descname"><span class="pre">upper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.upper" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of the string converted to uppercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.uid.UID.zfill">
+<span class="sig-name descname"><span class="pre">zfill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.zfill" title="Link to this definition">¶</a></dt>
+<dd><p>Pad a numeric string with zeros on the left, to fill a field of the given width.</p>
+<p>The string is never truncated.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pydicom.uid.RE_VALID_UID_PREFIX.html" class="btn btn-neutral float-left" title="pydicom.uid.RE_VALID_UID_PREFIX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.uid.AcquisitionContextSRStorage.html" class="btn btn-neutral float-right" title="pydicom.uid.AcquisitionContextSRStorage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

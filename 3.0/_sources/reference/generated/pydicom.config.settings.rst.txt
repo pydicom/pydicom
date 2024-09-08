@@ -1,0 +1,6 @@
+﻿pydicom.config.settings
+=======================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: settings

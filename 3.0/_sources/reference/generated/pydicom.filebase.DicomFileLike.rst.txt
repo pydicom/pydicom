@@ -1,0 +1,43 @@
+﻿pydicom.filebase.DicomFileLike
+==============================
+
+.. currentmodule:: pydicom.filebase
+
+.. autoclass:: DicomFileLike
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DicomFileLike.__init__
+      ~DicomFileLike.close
+      ~DicomFileLike.read
+      ~DicomFileLike.read_UL
+      ~DicomFileLike.read_US
+      ~DicomFileLike.read_exact
+      ~DicomFileLike.read_tag
+      ~DicomFileLike.seek
+      ~DicomFileLike.tell
+      ~DicomFileLike.write
+      ~DicomFileLike.write_UL
+      ~DicomFileLike.write_US
+      ~DicomFileLike.write_tag
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DicomFileLike.is_implicit_VR
+      ~DicomFileLike.is_little_endian
+      ~DicomFileLike.name
+      ~DicomFileLike.parent
+   
+   

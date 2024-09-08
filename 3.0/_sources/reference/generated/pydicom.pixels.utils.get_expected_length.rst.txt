@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.get\_expected\_length
+==========================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: get_expected_length

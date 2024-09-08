@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.get\_j2k\_parameters
+=========================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: get_j2k_parameters

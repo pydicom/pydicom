@@ -1,0 +1,6 @@
+﻿pydicom.uid.General32bitECGWaveformStorage
+==========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: General32bitECGWaveformStorage

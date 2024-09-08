@@ -1,0 +1,6 @@
+﻿pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo
+==========================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: SMPTEST211020UncompressedInterlacedActiveVideo

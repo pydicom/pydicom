@@ -1,0 +1,6 @@
+﻿pydicom.uid.VLWholeSlideMicroscopyImageStorage
+==============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: VLWholeSlideMicroscopyImageStorage

@@ -1,0 +1,111 @@
+﻿pydicom.valuerep.VR
+===================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: VR
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~VR.encode
+      ~VR.replace
+      ~VR.split
+      ~VR.rsplit
+      ~VR.join
+      ~VR.capitalize
+      ~VR.casefold
+      ~VR.title
+      ~VR.center
+      ~VR.count
+      ~VR.expandtabs
+      ~VR.find
+      ~VR.partition
+      ~VR.index
+      ~VR.ljust
+      ~VR.lower
+      ~VR.lstrip
+      ~VR.rfind
+      ~VR.rindex
+      ~VR.rjust
+      ~VR.rstrip
+      ~VR.rpartition
+      ~VR.splitlines
+      ~VR.strip
+      ~VR.swapcase
+      ~VR.translate
+      ~VR.upper
+      ~VR.startswith
+      ~VR.endswith
+      ~VR.removeprefix
+      ~VR.removesuffix
+      ~VR.isascii
+      ~VR.islower
+      ~VR.isupper
+      ~VR.istitle
+      ~VR.isspace
+      ~VR.isdecimal
+      ~VR.isdigit
+      ~VR.isnumeric
+      ~VR.isalpha
+      ~VR.isalnum
+      ~VR.isidentifier
+      ~VR.isprintable
+      ~VR.zfill
+      ~VR.format
+      ~VR.format_map
+      ~VR.maketrans
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~VR.AE
+      ~VR.AS
+      ~VR.AT
+      ~VR.CS
+      ~VR.DA
+      ~VR.DS
+      ~VR.DT
+      ~VR.FD
+      ~VR.FL
+      ~VR.IS
+      ~VR.LO
+      ~VR.LT
+      ~VR.OB
+      ~VR.OD
+      ~VR.OF
+      ~VR.OL
+      ~VR.OW
+      ~VR.OV
+      ~VR.PN
+      ~VR.SH
+      ~VR.SL
+      ~VR.SQ
+      ~VR.SS
+      ~VR.ST
+      ~VR.SV
+      ~VR.TM
+      ~VR.UC
+      ~VR.UI
+      ~VR.UL
+      ~VR.UN
+      ~VR.UR
+      ~VR.US
+      ~VR.UT
+      ~VR.UV
+      ~VR.US_SS_OW
+      ~VR.US_SS
+      ~VR.US_OW
+      ~VR.OB_OW
+   
+   

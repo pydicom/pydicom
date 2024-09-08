@@ -1,0 +1,6 @@
+﻿pydicom.uid.MediaStorageDirectoryStorage
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MediaStorageDirectoryStorage

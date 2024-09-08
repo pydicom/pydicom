@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEG2000MC
+======================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEG2000MC

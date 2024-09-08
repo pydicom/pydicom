@@ -1,0 +1,6 @@
+﻿pydicom.uid.register\_transfer\_syntax
+======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autofunction:: register_transfer_syntax

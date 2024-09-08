@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydicom.filereader.dcmread &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.filereader.read_dataset" href="pydicom.filereader.read_dataset.html" />
+    <link rel="prev" title="pydicom.filereader.data_element_offset_to_value" href="pydicom.filereader.data_element_offset_to_value.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../fileio.html">Dataset IO</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.data_element_generator.html">pydicom.filereader.data_element_generator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.data_element_offset_to_value.html">pydicom.filereader.data_element_offset_to_value</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.filereader.dcmread</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_dataset.html">pydicom.filereader.read_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_deferred_data_element.html">pydicom.filereader.read_deferred_data_element</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_file_meta_info.html">pydicom.filereader.read_file_meta_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_partial.html">pydicom.filereader.read_partial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_preamble.html">pydicom.filereader.read_preamble</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_sequence.html">pydicom.filereader.read_sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filereader.read_sequence_item.html">pydicom.filereader.read_sequence_item</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../fileio.html">Dataset IO</a></li>
+          <li class="breadcrumb-item"><a href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.filereader.dcmread</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydicom-filereader-dcmread">
+<h1>pydicom.filereader.dcmread<a class="headerlink" href="#pydicom-filereader-dcmread" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicom.filereader.dcmread">
+<span class="sig-prename descclassname"><span class="pre">pydicom.filereader.</span></span><span class="sig-name descname"><span class="pre">dcmread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><span class="pre">bytes</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.12)"><span class="pre">BinaryIO</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ReadableBuffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_before_pixels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">BaseTag</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><span class="pre">FileDataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b2073cccb/pydicom/filereader.py#L954"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Link to this definition">¶</a></dt>
+<dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
+<p>Read a DICOM dataset stored in accordance with the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File
+Format</a>. If the dataset is not stored in
+accordance with the File Format (i.e. the preamble and prefix are missing,
+there are missing required Type 1 <em>File Meta Information Group</em> elements
+or the entire <em>File Meta Information</em> is missing) then you will have to
+set <cite>force</cite> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p class="rubric">Examples</p>
+<p>Read and return a dataset stored in accordance with the DICOM File Format:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+</pre></div>
+</div>
+<p>Read and return a dataset not in accordance with the DICOM File Format:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+</pre></div>
+</div>
+<p>Use within a context manager:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>PathLike</em><em>, </em><em>file-like</em><em> or </em><em>readable buffer</em>) – A file-like object, a string containing the file name or the
+path to the file or a buffer-like object. The buffer-like object must
+have <code class="docutils literal notranslate"><span class="pre">seek()</span></code>, <code class="docutils literal notranslate"><span class="pre">read()</span></code> and <code class="docutils literal notranslate"><span class="pre">tell()</span></code> methods and the caller is
+responsible for closing it (if required).</p></li>
+<li><p><strong>defer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – If not used then all elements are read into memory. If specified,
+then if a data element’s stored value is larger than <cite>defer_size</cite>, the
+value is not read into memory until it is accessed in code. Should be
+the number of bytes to be read as <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>
+with units, e.g. <code class="docutils literal notranslate"><span class="pre">'512</span> <span class="pre">KB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'2</span> <span class="pre">MB'</span></code>.</p></li>
+<li><p><strong>stop_before_pixels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), the full file will be read and parsed. Set
+<code class="docutils literal notranslate"><span class="pre">True</span></code> to stop before reading (7FE0,0010) <em>Pixel Data</em> (and all
+subsequent elements).</p></li>
+<li><p><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), raises an
+<a class="reference internal" href="pydicom.errors.InvalidDicomError.html#pydicom.errors.InvalidDicomError" title="pydicom.errors.InvalidDicomError"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidDicomError</span></code></a> if the file is
+missing the <em>File Meta Information</em> header. Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to force
+reading even if no <em>File Meta Information</em> header is found.</p></li>
+<li><p><strong>specific_tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><em>2-tuple</em><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>)</em><em>, </em><em>optional</em>) – If used the only the supplied tags will be returned. The supplied
+elements can be tags or keywords. Note that the element (0008,0005)
+<em>Specific Character Set</em> is always returned if present - this ensures
+correct decoding of returned text values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> that represents
+a parsed DICOM file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset">FileDataset</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="pydicom.errors.InvalidDicomError.html#pydicom.errors.InvalidDicomError" title="pydicom.errors.InvalidDicomError"><strong>InvalidDicomError</strong></a> – If <cite>force</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code> and the file is not a valid DICOM file.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – If <cite>fp</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or of an unsupported type.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.FileDataset</span></code></a></dt><dd><p>Data class that is returned.</p>
+</dd>
+<dt><a class="reference internal" href="pydicom.filereader.read_partial.html#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filereader.read_partial</span></code></a></dt><dd><p>Only read part of a DICOM file, stopping on given conditions.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pydicom.filereader.data_element_offset_to_value.html" class="btn btn-neutral float-left" title="pydicom.filereader.data_element_offset_to_value" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.filereader.read_dataset.html" class="btn btn-neutral float-right" title="pydicom.filereader.read_dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

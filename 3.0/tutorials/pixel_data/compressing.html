@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Data - Part 3: Compression and decompression &mdash; pydicom 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Waveforms" href="../waveforms.html" />
+    <link rel="prev" title="Pixel Data - Part 2: Creation of pixel data" href="creation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><em>Pixel Data</em></a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="introduction.html"><em>Pixel Data</em> - Part 1: Introduction and accessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="creation.html"><em>Pixel Data</em> - Part 2: Creation of pixel data</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><em>Pixel Data</em> - Part 3: Compression and decompression</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#compression-of-pixel-data">Compression of <em>Pixel Data</em></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#decompression-of-pixel-data">Decompression of <em>Pixel Data</em></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../filesets.html">DICOM File-sets and DICOMDIR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
+          <li class="breadcrumb-item"><a href="index.html"><em>Pixel Data</em></a></li>
+      <li class="breadcrumb-item active"><em>Pixel Data</em> - Part 3: Compression and decompression</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pixel-data-part-3-compression-and-decompression">
+<h1><em>Pixel Data</em> - Part 3: Compression and decompression<a class="headerlink" href="#pixel-data-part-3-compression-and-decompression" title="Link to this heading">¶</a></h1>
+<p>In part 1 of this tutorial you learned how to <a class="reference internal" href="introduction.html"><span class="doc">access the pixel data</span></a> as either the raw <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or a NumPy
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> and in part 2 you learned how to <a class="reference internal" href="creation.html"><span class="doc">create new pixel data</span></a> and add it to a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.
+In this final part you’ll learn how to compress and decompress datasets containing
+<em>Pixel Data</em>.</p>
+<p><strong>Prerequisites</strong></p>
+<p>Installing using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom<span class="w"> </span>numpy<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span><span class="w"> </span>pyjpegls
+</pre></div>
+</div>
+<p>Installing on conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy
+conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom
+pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span><span class="w"> </span>pyjpegls
+</pre></div>
+</div>
+<section id="compression-of-pixel-data">
+<h2>Compression of <em>Pixel Data</em><a class="headerlink" href="#compression-of-pixel-data" title="Link to this heading">¶</a></h2>
+<p><em>pydicom</em> can perform dataset compression for the the following transfer syntaxes:</p>
+<ul class="simple">
+<li><p><em>JPEG-LS Lossless</em> and <em>JPEG-LS Near-lossless</em> compression with <a class="reference external" href="https://github.com/pydicom/pyjpegls">pyjpegls</a>.</p></li>
+<li><p><em>JPEG 2000 Lossless</em> and <em>JPEG 2000</em> compression with <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> and <a class="reference external" href="https://github.com/pydicom/pylibjpeg-openjpeg">pylibjpeg-openjpeg</a>.</p></li>
+<li><p><em>RLE Lossless</em>, which doesn’t need any additional packages but can be sped up
+if <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> and <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> are available.</p></li>
+</ul>
+<p>For all other transfer syntaxes it’s entirely up to you to compress the <em>Pixel
+Data</em> in a manner conformant to the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">requirements of the DICOM Standard</a>:</p>
+<ul class="simple">
+<li><p>Each frame of pixel data must be compressed separately</p></li>
+<li><p>All compressed frames must then be <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a>.</p></li>
+<li><p>The encapsulated byte stream is used to set the <em>Pixel Data</em> value</p></li>
+<li><p>When the amount of compressed frame data is very large then it’s recommended (but
+not required) that an <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">extended offset table</a>
+also be included in the dataset</p></li>
+<li><p>The VR for compressed <em>Pixel Data</em> is always <strong>OB</strong></p></li>
+</ul>
+<section id="compressing-a-dataset-with-rle-lossless">
+<h3>Compressing a dataset (with <em>RLE Lossless</em>)<a class="headerlink" href="#compressing-a-dataset-with-rle-lossless" title="Link to this heading">¶</a></h3>
+<p>Compression of an existing uncompressed dataset can be performed by passing the <em>Transfer
+Syntax UID</em> of the compression method you’d like to use to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>, or by using the <a class="reference internal" href="../../reference/generated/pydicom.pixels.compress.html#pydicom.pixels.compress" title="pydicom.pixels.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">compress()</span></code></a>
+function. We’ll be using <em>RLE Lossless</em> to start with, which is based on the
+<a class="reference external" href="https://en.wikipedia.org/wiki/PackBits">PackBits</a> compression scheme:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="o">.</span><span class="n">is_compressed</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you’re creating a new dataset, or if you want to update the <em>Pixel Data</em> for an
+existing dataset, you can pass an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> along with the <em>Transfer
+Syntax UID</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">=</span> <span class="mi">320</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="mi">480</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">HighBit</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;MONOCHROME2&quot;</span>
+
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">==</span> <span class="n">RLELossless</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In both cases this will compress the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in-place:</p>
+<ul class="simple">
+<li><p>The <em>Pixel Data</em> will be set with the encapsulated RLE codestream</p></li>
+<li><p>The <em>Transfer Syntax UID</em> will be set to <em>RLE Lossless</em></p></li>
+<li><p>A new <em>SOP Instance UID</em> value will be also be generated, but this can
+be disabled by passing <code class="docutils literal notranslate"><span class="pre">generate_instance_uid=False</span></code>.</p></li>
+</ul>
+<p>When using an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>,
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents of <cite>arr</cite> must match the corresponding
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements in the dataset,
+such as <em>Rows</em>, <em>Columns</em>, <em>Samples per Pixel</em>, etc. If they don’t match you’ll get an exception:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;i2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/src/pydicom/dataset.py&quot;</span>, line <span class="m">1957</span>, in <span class="n">compress</span>
+<span class="w">    </span><span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
+<span class="w">              </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+  File <span class="nb">&quot;.../pydicom/pixels/encoders/base.py&quot;</span>, line <span class="m">678</span>, in <span class="n">iter_encode</span>
+<span class="w">    </span><span class="n">runner</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+  File <span class="nb">&quot;.../pydicom/pixels/encoders/base.py&quot;</span>, line <span class="m">304</span>, in <span class="n">validate</span>
+<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">()</span>
+  File <span class="nb">&quot;.../pydicom/pixels/encoders/base.py&quot;</span>, line <span class="m">333</span>, in <span class="n">_validate_array</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="gr">  ValueError</span>: <span class="n">Mismatch between the expected ndarray shape (128, 128) and the actual shape (128, 129)</span>
+</pre></div>
+</div>
+<p>When there are multiple plugins available for compressing the given transfer syntax
+a <a class="reference internal" href="../../guides/plugin_table.html#guide-encoding-plugins"><span class="std std-ref">specific encoding plugin</span></a> can be used by passing
+the plugin name via the <cite>encoding_plugin</cite> argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s1">&#39;pylibjpeg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The RLE compression method is well supported by DICOM applications and can
+compress a wide range of images, however it’s usually less efficient than the JPEG
+family of compression schemes. More information on performing compression with
+<em>RLE Lossless</em> can be found in the <a class="reference internal" href="../../guides/encoding/rle_lossless.html"><span class="doc">RLE encoding guide</span></a>.</p>
+</section>
+<section id="compressing-with-jpeg-ls">
+<h3>Compressing with JPEG-LS<a class="headerlink" href="#compressing-with-jpeg-ls" title="Link to this heading">¶</a></h3>
+<p>The JPEG-LS compression scheme is based on <a class="reference external" href="https://www.iso.org/standard/22397.html">ISO/IEC
+14495-1</a>/<a class="reference external" href="https://www.itu.int/rec/T-REC-T.87-199806-I">ITU T.87</a>. While it can compress 2- to 16-bit
+images and uses a lossy quality specification mechanism that’s easy to understand,
+it’s not well suited for lossy compression of signed integers and is generally not
+well supported by third-party applications, so keep that in mind if you decide to use it.</p>
+<p><strong>Lossless compression</strong></p>
+<p>Performing lossless compression is straightforward:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSLossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSLossless</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Lossy compression</strong></p>
+<p>Lossy compression is a bit more complicated, especially when the pixel data
+uses signed integers. First up though, we’ll use an example with unsigned pixel data.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><em>pydicom</em> makes no recommendations for specifying the image quality for
+lossy encoding methods. Any examples of lossy encoding are for
+<strong>illustration purposes only</strong>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSNearLossless</span><span class="p">,</span> <span class="n">jls_error</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <cite>jls_error</cite> parameter is used to control the loss in image quality, and is
+directly related to the JPEG-LS NEAR parameter, which is the absolute allowed error
+in (unsigned) pixel data values. A <cite>jls_error</cite> of <code class="docutils literal notranslate"><span class="pre">3</span></code> therefore means that all
+pixels will be within 3 intensity units of the original.</p>
+<p>In our second lossy JPEG-LS example we’ll use a dataset with 16-bit signed integers,
+which is where the complication starts. The NEAR parameter is defined in terms of
+unsigned integers, so when used with signed values there can potentially be
+compression errors of up to the maximum bit-depth of the pixel data. To avoid this,
+the range of pixel values must be in the <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_(mathematics)">closed interval</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">jls_error</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">jls_error</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>For example, with a <em>Bits Stored</em> of <code class="docutils literal notranslate"><span class="pre">8</span></code> and <code class="docutils literal notranslate"><span class="pre">jls_error=3</span></code> the pixels must be in the
+range [-125, 124].</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span>
+<span class="go">16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">arr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="go">(128, 2191)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSNearLossless</span><span class="p">,</span> <span class="n">jls_error</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example the pixel values are within the allowed range so we don’t
+need to do anything further. If that weren’t the case you’d have to rescale
+the values or use a different compression method such as JPEG 2000 (recommended).</p>
+<p>More information on performing compression with JPEG-LS can be found in
+the <a class="reference internal" href="../../guides/encoding/jpeg_ls.html"><span class="doc">JPEG-LS encoding guide</span></a>.</p>
+</section>
+<section id="compressing-with-jpeg-2000">
+<h3>Compressing with JPEG 2000<a class="headerlink" href="#compressing-with-jpeg-2000" title="Link to this heading">¶</a></h3>
+<p>The JPEG 2000 compression scheme is based on <a class="reference external" href="https://www.iso.org/standard/78321.html">ISO/IEC 15444-1</a>/<a class="reference external" href="https://www.itu.int/rec/T-REC-T.800-201511-S/en">ITU T.800</a>. The format is fairly well supported
+by third-party applications and it can compress images with a wide variety of
+properties, making it a good choice for compressing datasets.</p>
+<p>Two transfer syntaxes are available that use JPEG 2000 compression; <em>JPEG 2000 Lossless</em>
+and <em>JPEG 2000</em>. While the DICOM Standard allows <em>JPEG 2000</em> to be either lossy or
+lossless, when used for compression in <em>pydicom</em> it’s always treated as being lossy in
+order to simplify its usage.</p>
+<p><strong>Lossless compression</strong></p>
+<p>As with RLE and JPEG-LS, performing lossless compression is straightforward:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000Lossless</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For RGB pixel data, JPEG 2000 can perform multiple component transformation
+(MCT) during the encoding process, which should improve the compression efficiency.
+This can be enabled or disabled by setting an appropriate <em>Photometric Interpretation</em>
+prior to compression:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;RGB&quot;</span></code> to disable MCT</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;YBR_RCT&quot;</span></code> to enable MCT for <em>JPEG 2000 Lossless</em></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;YBR_ICT&quot;</span></code> to enable MCT for <em>JPEG 2000</em></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span>
+<span class="go">&quot;RGB&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000Lossless</span><span class="p">)</span>  <span class="c1"># No MCT applied</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+<span class="go">334412</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;YBR_RCT&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000Lossless</span><span class="p">)</span>  <span class="c1"># MCT applied</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+<span class="go">152342</span>
+</pre></div>
+</div>
+<p><strong>Lossy compression</strong></p>
+<p>Lossy compression with <em>JPEG 2000</em> is both more and less complicated then JPEG-LS;
+you don’t have to worry about the pixel values for signed integers, but specifying
+the image quality is less intuitive.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><em>pydicom</em> makes no recommendations for specifying the image quality for
+lossy encoding methods. Any examples of lossy encoding are for
+<strong>illustration purposes only</strong>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000</span><span class="p">,</span> <span class="n">j2k_cr</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># 2 quality layers</span>
+</pre></div>
+</div>
+<p>With JPEG 2000 image quality is specified with either the <cite>j2k_cr</cite> or <cite>j2k_psnr</cite>
+parameters:</p>
+<ul class="simple">
+<li><p><cite>j2k_cr</cite> is a <code class="docutils literal notranslate"><span class="pre">list[float]</span></code> of compression ratios to use for each quality layer
+and is directly related to OpenJPEG’s <a class="reference external" href="https://github.com/uclouvain/openjpeg/wiki/DocJ2KCodec">-r compression ratio</a> option. There must
+be at least one layer and the minimum allowable compression ratio is <code class="docutils literal notranslate"><span class="pre">1</span></code>. When
+using multiple layers they should be ordered in decreasing value from left to right.</p></li>
+<li><p><cite>j2k_psnr</cite> is a <code class="docutils literal notranslate"><span class="pre">list[float]</span></code> of the peak signal-to-noise ratios (in dB) to use
+for each quality layer and is directly related to OpenJPEG’s <a class="reference external" href="https://github.com/uclouvain/openjpeg/wiki/DocJ2KCodec">-q quality</a> option.
+There must be at least one layer and when using multiple layers they should
+be ordered in increasing value from left to right.</p></li>
+</ul>
+<p>Choosing appropriate quality settings for <em>JPEG 2000</em> is far beyond the scope of this
+tutorial, but whatever you end up selecting should be thoroughly tested with a
+representative sample of expected pixel data.</p>
+<p>More information on performing compression with JPEG 2000 can be found in
+the <a class="reference internal" href="../../guides/encoding/jpeg_2k.html"><span class="doc">JPEG 2000 encoding guide</span></a>.</p>
+<section id="encapsulating-data-compressed-by-third-party-packages">
+<h4>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Link to this heading">¶</a></h4>
+<p>You can also use <em>pydicom</em> with third-party compression packages to encapsulate
+the compressed <em>Pixel Data</em>, provided they meet the requirements of the
+corresponding transfer syntax. The <a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a> or
+<a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> functions are used to encapsulate the
+compressed data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGBaseline8Bit</span>
+
+<span class="c1"># Fetch an example dataset</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+
+<span class="c1"># Use third-party package to compress</span>
+<span class="c1"># Let&#39;s assume it compresses to JPEG Baseline</span>
+<span class="n">frames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">third_party_compression_func</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Set the *Transfer Syntax UID* appropriately</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEGBaseline8Bit</span>
+<span class="c1"># For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged</span>
+
+<span class="c1"># Basic encapsulation</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;PixelData&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s2">&quot;OB&quot;</span>  <span class="c1"># always for encapsulated pixel data</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_basic.dcm&quot;</span><span class="p">)</span>
+
+<span class="c1"># Extended encapsulation</span>
+<span class="n">result</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTableLength</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;ct_compressed_ext.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="decompression-of-pixel-data">
+<h2>Decompression of <em>Pixel Data</em><a class="headerlink" href="#decompression-of-pixel-data" title="Link to this heading">¶</a></h2>
+<p>Datasets with a compressed <em>Transfer Syntax UID</em> can be decompressed with
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.decompress()</span></code></a> or the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.decompress.html#pydicom.pixels.decompress" title="pydicom.pixels.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a> function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">decompress</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will decompress the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in-place:</p>
+<ul class="simple">
+<li><p>The <em>Pixel Data</em> will be set using the uncompressed pixel data.</p></li>
+<li><p>The <em>Transfer Syntax UID</em> will be changed to <em>Explicit VR Little Endian</em>.</p></li>
+<li><p>The <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements will be updated
+as required to match the uncompressed pixel data.</p></li>
+<li><p>A new <em>SOP Instance UID</em> value will be also be generated, but this can
+be disabled by passing <code class="docutils literal notranslate"><span class="pre">generate_instance_uid=False</span></code>.</p></li>
+</ul>
+<p>Dataset decompression uses the same backend as accessing compressed <em>Pixel Data</em>,
+so the same <a class="reference internal" href="../../guides/decoding/decoder_options.html"><span class="doc">customization options</span></a> of the decoding
+process apply. For example, to use a <a class="reference internal" href="../../guides/plugin_table.html"><span class="doc">specific plugin</span></a>
+you can pass its name via the <cite>decoding_plugin</cite> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">decoding_plugin</span><span class="o">=</span><span class="s2">&quot;pylibjpeg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the dataset’s <em>Pixel Data</em> is in the YCbCr color space it will also be converted
+to RGB by default. This can be disabled by passing <code class="docutils literal notranslate"><span class="pre">as_rgb=False</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">convert_color_space</span><span class="p">,</span> <span class="n">pixel_array</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+
+<span class="c1"># Original dataset in RGB</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;RGB&quot;</span>
+
+<span class="c1"># Convert to YCbCr and compress</span>
+<span class="n">ybr</span> <span class="o">=</span> <span class="n">convert_color_space</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="p">,</span> <span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="s2">&quot;YBR_FULL&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;YBR_FULL&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000Lossless</span><span class="p">,</span> <span class="n">ybr</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL&quot;</span>
+
+<span class="c1"># RGB reference - needed because converting RGB -&gt; YBR -&gt; RGB is lossy</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">convert_color_space</span><span class="p">(</span><span class="n">ybr</span><span class="p">,</span> <span class="s2">&quot;YBR_FULL&quot;</span><span class="p">,</span> <span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+
+<span class="c1"># Decompress with conversion to RGB</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">decompress</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;RGB&quot;</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="c1"># Decompress without conversion to RGB</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;YBR_FULL&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000Lossless</span><span class="p">,</span> <span class="n">ybr</span><span class="p">)</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">as_rgb</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL&quot;</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">ybr</span><span class="p">,</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>In part 3 of this tutorial you’ve learned how to use <em>pydicom</em> to compress and decompress
+datasets and how to encapsulate pixel data that has been compressed by third-party
+packages. Having made it to the end of the pixel data tutorial you should now be
+comfortable using <em>pydicom</em> to perform pixel data related tasks.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="creation.html" class="btn btn-neutral float-left" title="Pixel Data - Part 2: Creation of pixel data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../waveforms.html" class="btn btn-neutral float-right" title="Waveforms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+﻿pydicom.filebase.DicomBytesIO
+=============================
+
+.. currentmodule:: pydicom.filebase
+
+.. autoclass:: DicomBytesIO
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DicomBytesIO.__init__
+      ~DicomBytesIO.close
+      ~DicomBytesIO.read
+      ~DicomBytesIO.read_UL
+      ~DicomBytesIO.read_US
+      ~DicomBytesIO.read_exact
+      ~DicomBytesIO.read_tag
+      ~DicomBytesIO.seek
+      ~DicomBytesIO.tell
+      ~DicomBytesIO.write
+      ~DicomBytesIO.write_UL
+      ~DicomBytesIO.write_US
+      ~DicomBytesIO.write_tag
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DicomBytesIO.is_implicit_VR
+      ~DicomBytesIO.is_little_endian
+      ~DicomBytesIO.name
+      ~DicomBytesIO.parent
+   
+   

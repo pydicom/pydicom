@@ -1,0 +1,6 @@
+﻿pydicom.pixels.create\_icc\_transform
+=====================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: create_icc_transform

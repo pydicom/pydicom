@@ -1,0 +1,6 @@
+﻿pydicom.uid.SegmentationStorage
+===============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: SegmentationStorage

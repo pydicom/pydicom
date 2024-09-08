@@ -1,0 +1,6 @@
+﻿pydicom.pixels.processing.convert\_color\_space
+===============================================
+
+.. currentmodule:: pydicom.pixels.processing
+
+.. autofunction:: convert_color_space

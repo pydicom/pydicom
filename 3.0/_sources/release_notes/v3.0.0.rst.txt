@@ -1,0 +1,386 @@
+Version 3.0.0
+=================================
+
+The major breaking changes with the version 3.0 release are:
+
+  * The value for :attr:`~pydicom.uid.JPEGLossless` has changed to ``1.2.840.10008.1.2.4.57``.
+  * The encoding used when saving datasets defaults to the set *Transfer Syntax UID*.
+  * :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` will convert YCbCr
+    *Pixel Data* to RGB by default when possible.
+  * ``read_file`` and ``write_file`` have been removed.
+
+
+Changes
+-------
+* Removed support for Python <= 3.9.
+* All tag formats changed to upper case, no space e.g. "(7FE0,0010)" rather than "(7fe0, 0010)".
+* Values with VR **AE** with an incorrect value length are now handled
+  gracefully (extra bytes are ignored with a warning).
+* A value of 0 for *Number of Frames* is now handled as 1 frame, with a user warning issued
+  on reading the pixel data (:issue:`1844`).
+* The value for :attr:`~pydicom.uid.JPEGLossless` has changed from
+  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword. Use
+  :attr:`~pydicom.uid.JPEGLosslessSV1` instead for 1.2.840.10008.1.2.4.70.
+* The theoretical maximum number of instances supported by
+  :class:`~pydicom.fileset.FileSet` has been reduced to 1838265625 to ensure support
+  for 32-bit systems (:issue:`1743`).
+* The characters used by :func:`~pydicom.fileset.generate_filename` when
+  `alphanumeric` is ``True`` has been reduced to [0-9][A-I,K-Z].
+* :func:`~pydicom.data.get_testdata_file` and
+  :func:`~pydicom.data.get_testdata_files`
+  now raise ``ValueError`` if called with an absolute path or pattern.
+* :func:`~pydicom.uid.generate_uid` has been changed to use a random suffix
+  generated using :func:`~secrets.randbelow` when `entropy_srcs` isn't used, and
+  the maximum allowed length of the `prefix` has been changed to 54 characters
+  (:issue:`1773`).
+* :attr:`DataElement.VM<pydicom.dataelem.DataElement.VM>` always returns ``1``
+  for **SQ** elements (:issue:`1481`).
+* DICOM dictionary updated to 2024c.
+* Concepts dictionaries updated to 2024c.
+* :func:`~pydicom.dataset.validate_file_meta` now checks to ensure required
+  Type 1 elements aren't empty.
+* `implicit_vr` and `little_endian` optional arguments added to
+  :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>`. In addition, this
+  method will now raise an exception if the user tries to convert between little
+  and big endian datasets. If this is something you need, use
+  :func:`~pydicom.filewriter.dcmwrite` instead.
+* Added the `overwrite` argument to :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>`
+  and :func:`~pydicom.filewriter.dcmwrite` to allow raising a :class:`FileExistsError`
+  if trying to write to a file that already exists (:issue:`2104`).
+* `implicit_vr`, `little_endian` and `force_encoding` optional arguments
+  added to  :func:`~pydicom.filewriter.dcmwrite`.
+* The priority used to decide which encoding to use with
+  :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>` and
+  :func:`~pydicom.filewriter.dcmwrite` has been changed to:
+
+  1. The set *Transfer Syntax UID*,
+  2. The `implicit_vr` and `little_endian` arguments,
+  3. :attr:`Dataset.is_implicit_VR<pydicom.dataset.Dataset.is_implicit_VR>` and
+     :attr:`Dataset.is_little_endian<pydicom.dataset.Dataset.is_little_endian>`,
+  4. :attr:`Dataset.original_encoding<pydicom.dataset.Dataset.original_encoding>`.
+* Datasets containing *Command Set* (0000,eeee) elements can no longer be written using
+  :meth:`Dataset.save_as()<pydicom.dataset.Dataset.save_as>` or
+  :func:`~pydicom.filewriter.dcmwrite`, use :func:`~pydicom.filewriter.write_dataset`
+  instead.
+* A dataset's :attr:`~pydicom.dataset.FileDataset.file_meta` elements are no longer
+  modified when writing.
+* :class:`~pydicom.filebase.DicomIO` now requires a readable or writeable buffer
+  during initialisation and :class:`~pydicom.filebase.DicomBytesIO` directly
+  inherits from it.
+* The ``pydicom.encoders`` module has been moved to :mod:`pydicom.pixels.encoders
+  <pydicom.pixels.encoders>`, the original import path will be removed in v4.0.
+* Using GDCM v3.0.23 or lower to decode JPEG-LS datasets with a *Bits Stored* of
+  6 or 7 produces incorrect results, so attempting to do so now raises an exception.
+  ``pyjpegls`` or ``pylibjpeg`` with ``pylibjpeg-libjpeg`` can be used instead (:issue:`2008`).
+* Using Pillow with JPEG 2000 encoded > 8-bit multi-sample data (such as RGB) now raises an
+  exception as Pillow cannot decode such data correctly (:issue:`2006`).
+* An exception will now be raised if an :class:`~numpy.ndarray` is used to set
+  *Pixel Data* (:issue:`50`).
+* Logging of errors when converting elements using :meth:`Dataset.to_json_dict()
+  <pydicom.dataset.Dataset.to_json_dict>` have been made more verbose and now use
+  ``logging.WARNING`` (:issue:`1909`).
+* Added :attr:`FileDataset.buffer<pydicom.dataset.FileDataset.buffer>` and changed
+  :attr:`FileDataset.filename<pydicom.dataset.FileDataset.filename>` to only be the
+  filename the dataset was read from (if any) (:issue:`1937`).
+
+
+Removals
+~~~~~~~~
+* The ``compat`` module has been removed.
+* The ``dicomdir`` module and ``DicomDir`` class have been removed and reading a
+  DICOMDIR dataset now returns a normal :class:`~pydicom.dataset.FileDataset` instance.
+  For handling DICOM File-sets and DICOMDIR datasets use the
+  :class:`~pydicom.fileset.FileSet` class instead.
+* The ``read_file`` and ``write_file`` functions have been removed, use
+  :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite`
+  instead.
+* The following UID constants have been removed:
+
+    * ``JPEGBaseline`` (use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead)
+    * ``JPEGExtended`` (use :attr:`~pydicom.uid.JPEGExtended12Bit` instead)
+    * ``JPEGLSLossy`` (use :attr:`~pydicom.uid.JPEGLSNearLossless` instead)
+    * ``JPEG2000MultiComponentLossless`` (use
+      :attr:`~pydicom.uid.JPEG2000MCLossless` instead)
+    * ``JPEG2000MultiComponent`` (use :attr:`~pydicom.uid.JPEG2000MC` instead)
+* The following UID lists have been removed:
+
+    * ``JPEGLossyCompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.JPEGTransferSyntaxes`
+    * ``JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
+    * ``JPEG2000CompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
+    * ``RLECompressedLosslessSyntaxes``: use
+      :attr:`~pydicom.uid.RLETransferSyntaxes`
+    * ``UncompressedPixelTransferSyntaxes``: use
+      :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
+    * ``PILSupportedCompressedPixelTransferSyntaxes``
+* The ``PersonNameUnicode`` class has been removed, use
+  :class:`~pydicom.valuerep.PersonName` instead.
+* The ``DataElement.description`` attribute has been removed, use
+  :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead.
+* The ``pixel_data_handlers.rle_handler.rle_encode_frame`` function has been
+  removed, use :meth:`Dataset.compress()<pydicom.dataset.Dataset.compress>` or
+  :attr:`~pydicom.pixels.encoders.base.RLELosslessEncoder` instead.
+* The ``_storage_sopclass_uids`` module has been removed, import UIDs from the
+  :mod:`~pydicom.uid` module instead.
+* The following properties have been removed:
+
+    * ``Dataset.parent`` and ``Dataset.parent_seq``
+    * ``Sequence.parent`` and ``Sequence.parent_dataset``
+    * ``DataElement.parent``
+* The ``overlay_data_handlers`` module has been removed, use the :mod:`~pydicom.overlays`
+  module instead.
+* ``config.overlay_data_handlers`` has been removed.
+* ``Dataset.fix_meta_info()`` has been removed as encoding state now follows the
+  transfer syntax instead of the other way around.
+
+
+Enhancements
+------------
+* Added details of missing required tag information when adding a dataset to a
+  File-set (:issue:`1752`).
+* The following UID constants have been added:
+
+    * :attr:`~pydicom.uid.MPEG2MPMLF`
+    * :attr:`~pydicom.uid.MPEG2MPHLF`
+    * :attr:`~pydicom.uid.MPEG4HP41F`
+    * :attr:`~pydicom.uid.MPEG4HP41BDF`
+    * :attr:`~pydicom.uid.MPEG4HP422DF`
+    * :attr:`~pydicom.uid.MPEG4HP423DF`
+    * :attr:`~pydicom.uid.MPEG4HP42STEREOF`
+    * :attr:`~pydicom.uid.HTJ2KLossless`
+    * :attr:`~pydicom.uid.HTJ2KLosslessRPCL`
+    * :attr:`~pydicom.uid.HTJ2K`
+    * :attr:`~pydicom.uid.JPIPHTJ2KReferenced`
+    * :attr:`~pydicom.uid.JPIPHTJ2KReferencedDeflate`
+    * :attr:`~pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo`
+    * :attr:`~pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo`
+    * :attr:`~pydicom.uid.SMPTEST211030PCMDigitalAudio`
+* Added convenience method :meth:`~pydicom.dataset.Dataset.add_new_private` to add a private tag.
+* Added the :ref:`examples<api_examples>` module to make it easier and less
+  confusing for users to work with the example datasets used by the documentation.
+* Added the ability to set the corresponding dataset encoding for private transfer
+  syntaxes to :class:`~pydicom.uid.UID` via the :meth:`~pydicom.uid.UID.set_private_encoding`
+  method.
+* Added the ability to register private transfer syntaxes with
+  :func:`~pydicom.uid.register_transfer_syntax` so they can be used when reading
+  datasets with :func:`~pydicom.filereader.dcmread`.
+* Warning messages are also sent to the pydicom logger (:issue:`1529`).
+* Added the following to the :mod:`~pydicom.encaps` module:
+
+  * :func:`~pydicom.encaps.parse_basic_offsets` for parsing the Basic Offset Table.
+  * :func:`~pydicom.encaps.parse_fragments` for determining the number of encapsulated
+    fragments and their byte offsets.
+  * :func:`~pydicom.encaps.generate_fragments` for yielding encapsulated fragments.
+  * :func:`~pydicom.encaps.generate_fragmented_frames` for yielding encapsulated frame
+    fragments.
+  * :func:`~pydicom.encaps.generate_frames` for yielding whole encapsulated frames.
+  * :func:`~pydicom.encaps.get_frame` for returning the specific encapsulated frame at `index`
+    without necessarily having to read the preceding frames into memory.
+
+  These new functions support reading encapsulated data from both :class:`bytes`
+  or any Python object with ``read()``, ``seek()`` and ``tell()`` methods such
+  as :class:`io.BytesIO`, :class:`BinaryIO<typing.BinaryIO>` or :class:`mmap.mmap`.
+  They also support using the :dcm:`Extended Offset Table
+  <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8>` for determining frame boundaries.
+* Added the `keep_deferred` keyword argument to :meth:`Dataset.get_item()
+  <pydicom.dataset.Dataset.get_item>` to allow accessing the file offset and
+  element length without having to read the element value. (:issue:`1873`).
+* Added the :mod:`~pydicom.pixels` module and a new more flexible backend for
+  decoding pixel data via :class:`~pydicom.pixels.decoders.base.Decoder` factory class
+  instances. The new decoding backend adds support for the following:
+
+  * Returning a view over the original pixel data buffer (:issue:`746`).
+  * Retrieving specific frames (:issue:`1263`, :issue:`1243`).
+  * Returning RGB pixel data by default for JPEG (:issue:`1781`, :issue:`1133`
+    and many others).
+  * Returning excess frames for JPEG when there is no Basic or Extended Offset
+    Table and the *Number of Frames* is incorrect (:issue:`1666`).
+  * Returning excess frames for native encoding when the *Number of Frames* is
+    incorrect (:issue:`2035`)
+  * Returning the decoded pixel data as either a NumPy :class:`~numpy.ndarray` or
+    `buffer-like object <https://docs.python.org/3/c-api/buffer.html#bufferobjects>`_.
+  * Iterating through either all or specific frames.
+
+* Added support for decoding HTJ2K transfer syntaxes (:issue:`1848`).
+* Added two functions for returning pixel data as a NumPy :class:`~numpy.ndarray`
+  from a path to a dataset while minimizing memory-usage: :func:`~pydicom.pixels.pixel_array`
+  and :func:`~pydicom.pixels.iter_pixels`.
+* Added two functions for compressing and decompressing datasets using the new
+  decoding backend: :func:`~pydicom.pixels.compress` and :func:`~pydicom.pixels.decompress`.
+* Added support for the following transfer syntaxes to :meth:`Dataset.compress()
+  <pydicom.dataset.Dataset.compress>` (:issue:`1997`):
+
+  * *JPEG-LS Lossless* with :attr:`~pydicom.pixels.encoders.JPEGLSLosslessEncoder`
+  * *JPEG-LS Near Lossless* with :attr:`~pydicom.pixels.encoders.JPEGLSNearLosslessEncoder`
+  * *JPEG 2000 Lossless* with :attr:`~pydicom.pixels.encoders.JPEG2000LosslessEncoder`
+  * *JPEG 2000* with :attr:`~pydicom.pixels.encoders.JPEG2000Encoder`
+
+  See the :doc:`JPEG-LS</guides/encoding/jpeg_ls>` and :doc:`JPEG 2000
+  </guides/encoding/jpeg_2k>` encoding guides for more information.
+* Added :meth:`Dataset.pixel_array_options()<pydicom.dataset.Dataset.pixel_array_options>`
+  for controlling pixel data decoding when using :attr:`Dataset.pixel_array
+  <pydicom.dataset.Dataset.pixel_array>` with the new :mod:`~pydicom.pixels` backend.
+* Improve support for reading and resolving inline binary data with `VR=UN` from Json
+  (:issue:`2062`).
+* :func:`~pydicom.pixels.utils.get_j2k_parameters` now takes into account the JP2 header
+  (if present, although it's non-conformant for it to be) (:issue:`2073`).
+* Added support for NumPy v2.0 (:issue:`2075`).
+* Added ``pydicom.__concepts_version__`` attribute with the DICOM Standard version used to
+  create the concepts dictionaries in :mod:`pydicom.sr` (:issue:`1021`).
+* Refactored the interface for the concepts in :mod:`pydicom.sr` to simplify the access types
+  (:issue:`1454`).
+* Added the :meth:`Dataset.set_pixel_data()<pydicom.dataset.Dataset.set_pixel_data>` method
+  and :func:`~pydicom.pixels.set_pixel_data` function for automatically setting a
+  dataset's *Pixel Data* and related Image Pixel module elements using an
+  :class:`~numpy.ndarray` (:issue:`50`).
+* Added typing support for :class:`~pydicom.dataset.Dataset` element access using the
+  `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package. (:issue:`1485`).
+* Added :func:`~pydicom.pixels.apply_presentation_lut` for applying a Presentation LUT
+  to an :class:`~numpy.ndarray` (:issue:`1265`).
+* Added :func:`~pydicom.pixels.apply_icc_profile` and :func:`~pydicom.pixels.create_icc_transform`
+  for applying ICC profiles to an :class:`~numpy.ndarray` (:issue:`1244`).
+* Added :meth:`Dataset.update_raw_element()<pydicom.dataset.Dataset.update_raw_element>`
+  to make it easier to modify a :class:`~pydicom.dataelem.RawDataElement`'s VR or value
+  prior to conversion to a :class:`~pydicom.dataelem.DataElement` (:issue:`1739`).
+* Added support for using :class:`io.BufferedIOBase` subclasses to set the value for
+  elements with O* VRs such as **OB** and **OW** (:issue:`1913`).
+* Added :func:`~pydicom.encaps.encapsulate_buffer` and
+  :func:`~pydicom.encaps.encapsulate_extended_buffer` for encapsulating buffered
+  compressed *Pixel Data* via :class:`~pydicom.encaps.EncapsulatedBuffer` instances.
+* Added elements with **OB**,  **OD**, **OF**, **OL**, **OW**, **OV** VRs to the type
+  validation checking when setting :class:`~pydicom.dataelem.DataElement` values (:issue:`1414`).
+* Added :func:`~pydicom.dataelem.convert_raw_data_element` for converting raw element data to
+  :class:`~pydicom.dataelem.DataElement` instances.
+* Added the :mod:`~pydicom.hooks` module which contains an interface for adding callback
+  functions via the :class:`~pydicom.hooks.Hooks` singleton, as well as default and
+  alternative convenience callbacks for :func:`~pydicom.dataelem.convert_raw_data_element`
+  (:issue:`1556`).
+
+
+Fixes
+-----
+* Fixed the GDCM and pylibjpeg handlers changing the *Pixel Representation* value to 0
+  when the J2K stream disagrees with the dataset and
+  :attr:`~pydicom.config.APPLY_J2K_CORRECTIONS` is ``True`` (:issue:`1689`).
+* Fixed pydicom codify error when relative path did not exist.
+* Fixed the VR enum sometimes returning invalid values for Python 3.11+ (:issue:`1874`).
+* Fixed pixel data handler for Pillow 10.1 raising an AttributeError (:issue:`1907`).
+* Fixed a possible security issue with :class:`~pydicom.fileset.FileInstance` instances
+  being able to escape the temporary directory when being added to a
+  :class:`~pydicom.fileset.FileSet` (:issue:`1922`).
+* Fixed an ``AttributeError`` when running :py:func:`~copy.deepcopy` after
+  :meth:`Dataset.update<pydicom.dataset.Dataset.update>` (:issue:`1816`).
+* Fixed :func:`~pydicom.encaps.encapsulate_extended` not returning the correct
+  values for odd-length frames (:issue:`1968`).
+* Fixed using the incorrect encoding when writing datasets converted between
+  explicit and implicit VR when only the *Transfer Syntax UID* was changed (:issue:`1943`).
+* Fixed the ``jpeg_ls``, ``pillow`` and ``rle`` pixel data handlers not working
+  correctly when a frame is spread across multiple fragments (:issue:`1774`).
+* Added mitigation for a rare case where clearing the pixel data value prior
+  to updating it may sometimes result in :attr:`~pydicom.dataset.Dataset.pixel_array`
+  returning the previous array instead of creating a new one (:issue:`1983`).
+* Fixed a ``KeyError`` when comparing codes with one of the codes having
+  ``scheme_designator`` set to ``SRT`` but not being included in the ``SRT``
+  to ``SCT`` code mapping (:issue:`1994`).
+* Fixed JPEG-LS datasets with a *Pixel Representation* of 1 returning incorrect
+  image data when *Bits Stored* is less than *Bits Allocated* (:issue:`2009`).
+* Fixed decoding failures for JPEG-LS datasets with *Bits Allocated* of 16 and
+  *Bits Stored* <= 8 (:issue:`2010`).
+* Fixed the *Pixel Data* VR not being set correctly with :func:`Dataset.compress()
+  <pydicom.dataset.Dataset.compress>` (:issue:`2013`).
+* Fixed :meth:`Dataset.decompress()<pydicom.dataset.Dataset.decompress>` not updating
+  the *Pixel Data* element value until after saving (:issue:`2024`).
+* Fixed a rare issue with converting pixel data to an :class:`~numpy.ndarray` when
+  *Bits Stored* is less than *Bits Allocated* and the unused bits haven't been
+  set to an appropriate value for correct interpretation of the data.
+* Fixed a ``RecursionError`` when using :func:`copy.deepcopy` with a dataset containing
+  a private block (:issue:`2025`).
+* Fixed non-unique keywords for the concept codes in ``pydicom.sr`` (:issue:`1388`).
+* Fixed keywords using Python identifiers in ``pydicom.sr`` (:issue:`1273`).
+* Fixed being unable to write *LUT Descriptor* when the VR is **SS** and the first
+  value is greater than 32767 (:issue:`2081`).
+* Fixed *Deflated Explicit VR Little Endian* datasets not working correctly with ``codify``
+  (:issue:`1937`).
+
+
+Deprecations
+------------
+* :attr:`Dataset.is_little_endian <pydicom.dataset.Dataset.is_little_endian>` and
+  :attr:`Dataset.is_implicit_VR<pydicom.dataset.Dataset.is_implicit_VR>` will be removed in v4.0.
+* :attr:`Dataset.read_little_endian<pydicom.dataset.Dataset.read_little_endian>` and
+  :attr:`Dataset.read_implicit_vr<pydicom.dataset.Dataset.read_implicit_vr>` will be removed in v4.0,
+  use :attr:`Dataset.original_encoding<pydicom.dataset.Dataset.original_encoding>` instead.
+* :attr:`Dataset.read_encoding<pydicom.dataset.Dataset.read_encoding>` will be removed in v4.0,
+  use :attr:`Dataset.original_character_set<pydicom.dataset.Dataset.original_character_set>` instead.
+* The `write_like_original` optional argument to
+  :meth:`Dataset.save_as<pydicom.dataset.Dataset.save_as>` and
+  :func:`~pydicom.filewriter.dcmwrite` will be removed in v4.0, use
+  `enforce_file_format` instead.
+* The following :mod:`~pydicom.encaps` module functions will be removed in v4.0:
+
+  * :func:`~pydicom.encaps.get_frame_offsets`, use :func:`~pydicom.encaps.parse_basic_offsets`
+    instead.
+  * :func:`~pydicom.encaps.generate_pixel_data_fragment`, use :func:`~pydicom.encaps.generate_fragments`
+    instead.
+  * :func:`~pydicom.encaps.generate_pixel_data_frame`, use :func:`~pydicom.encaps.generate_fragmented_frames`
+    instead.
+  * :func:`~pydicom.encaps.generate_pixel_data`, use :func:`~pydicom.encaps.generate_frames`
+    instead.
+  * :func:`~pydicom.encaps.decode_data_sequence`, use :func:`~pydicom.encaps.generate_fragments`
+    instead.
+  * :func:`~pydicom.encaps.defragment_data`, use :func:`~pydicom.encaps.generate_frames`
+    instead.
+  * :func:`~pydicom.encaps.read_item`, use :func:`~pydicom.encaps.generate_fragments`
+    instead.
+
+* The :mod:`pydicom.pixel_data_handlers` module will be removed in v4.0. All pixel
+  data processing will use the :mod:`pydicom.pixels` module instead starting
+  with v3.0.
+
+    * The following functions from :mod:`pydicom.pixel_data_handlers.util` have been
+      moved to :mod:`pydicom.pixels.processing`:
+
+      * :func:`~pydicom.pixels.processing.apply_color_lut`
+      * :func:`~pydicom.pixels.processing.apply_modality_lut`
+      * :func:`~pydicom.pixels.processing.apply_rescale`
+      * :func:`~pydicom.pixels.processing.apply_voi_lut`
+      * :func:`~pydicom.pixels.processing.apply_voi`
+      * :func:`~pydicom.pixels.processing.apply_windowing`
+      * :func:`~pydicom.pixels.processing.convert_color_space`
+
+    * The following functions from :mod:`pydicom.pixel_data_handlers.util` have been
+      moved to :mod:`pydicom.pixels.utils`:
+
+      * :func:`~pydicom.pixels.utils.expand_ybr422`
+      * :func:`~pydicom.pixels.utils.get_expected_length`
+      * :func:`~pydicom.pixels.utils.get_image_pixel_ids`
+      * :func:`~pydicom.pixels.utils.get_j2k_parameters`
+      * :func:`~pydicom.pixels.utils.get_nr_frames`
+      * :func:`~pydicom.pixels.utils.pack_bits`
+      * :func:`~pydicom.pixels.utils.pixel_dtype`
+      * :func:`~pydicom.pixels.utils.reshape_pixel_array`
+      * :func:`~pydicom.pixels.utils.unpack_bits`
+
+    * :func:`pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness` will be
+      removed in v4.0.
+* :meth:`Dataset.convert_pixel_data()<pydicom.dataset.Dataset.convert_pixel_data>`
+  will be removed in v4.0, use :meth:`Dataset.pixel_array_options()
+  <pydicom.dataset.Dataset.pixel_array_options>` instead.
+* :func:`~pydicom.dataelem.DataElement_from_raw` will be removed in v4.0, please
+  use :func:`~pydicom.dataelem.convert_raw_data_element` instead.
+* :attr:`config.data_element_callback<pydicom.config.data_element_callback>` and
+  :attr:`config.data_element_callback_kwargs<pydicom.config.data_element_callback_kwargs>`
+  will be removed in v4.0, please use the hooks for
+  :func:`~pydicom.dataelem.convert_raw_data_element` instead.
+* The ``pydicom.utils.fixers`` submodule will be removed in v4.0, please use the
+  alternative callbacks for :func:`~pydicom.dataelem.convert_raw_data_element`
+  in the :mod:`~pydicom.hooks` module instead.
+
+
+Pydicom Internals
+-----------------
+* Repository folder structure refactored.
+* Renamed top level ``source`` folder to ``util``.
+* New CI tools - `dependabot`, and `pre-commit` using black and ruff.

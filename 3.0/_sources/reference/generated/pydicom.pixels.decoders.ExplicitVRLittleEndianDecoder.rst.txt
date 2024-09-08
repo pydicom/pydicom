@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder
+=====================================================
+
+.. currentmodule:: pydicom.pixels.decoders
+
+.. autodata:: ExplicitVRLittleEndianDecoder

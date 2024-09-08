@@ -1,0 +1,6 @@
+﻿pydicom.uid.RawDataStorage
+==========================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RawDataStorage

@@ -1,0 +1,6 @@
+﻿pydicom.uid.EncapsulatedCDAStorage
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: EncapsulatedCDAStorage

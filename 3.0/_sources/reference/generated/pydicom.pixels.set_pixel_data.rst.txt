@@ -1,0 +1,6 @@
+﻿pydicom.pixels.set\_pixel\_data
+===============================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: set_pixel_data

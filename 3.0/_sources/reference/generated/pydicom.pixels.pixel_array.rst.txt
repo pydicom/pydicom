@@ -1,0 +1,6 @@
+﻿pydicom.pixels.pixel\_array
+===========================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: pixel_array

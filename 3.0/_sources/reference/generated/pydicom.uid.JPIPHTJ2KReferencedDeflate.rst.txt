@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPIPHTJ2KReferencedDeflate
+======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPIPHTJ2KReferencedDeflate

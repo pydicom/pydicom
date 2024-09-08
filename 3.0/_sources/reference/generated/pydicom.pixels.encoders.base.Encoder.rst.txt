@@ -1,0 +1,38 @@
+﻿pydicom.pixels.encoders.base.Encoder
+====================================
+
+.. currentmodule:: pydicom.pixels.encoders.base
+
+.. autoclass:: Encoder
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Encoder.__init__
+      ~Encoder.add_plugin
+      ~Encoder.add_plugins
+      ~Encoder.encode
+      ~Encoder.iter_encode
+      ~Encoder.remove_plugin
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Encoder.UID
+      ~Encoder.available_plugins
+      ~Encoder.is_available
+      ~Encoder.is_encapsulated
+      ~Encoder.is_native
+      ~Encoder.missing_dependencies
+   
+   

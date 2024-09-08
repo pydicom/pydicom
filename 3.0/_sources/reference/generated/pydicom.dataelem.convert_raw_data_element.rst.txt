@@ -1,0 +1,6 @@
+﻿pydicom.dataelem.convert\_raw\_data\_element
+============================================
+
+.. currentmodule:: pydicom.dataelem
+
+.. autofunction:: convert_raw_data_element

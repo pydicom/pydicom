@@ -1,0 +1,6 @@
+﻿pydicom.pixels.utils.expand\_ybr422
+===================================
+
+.. currentmodule:: pydicom.pixels.utils
+
+.. autofunction:: expand_ybr422

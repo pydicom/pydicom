@@ -1,0 +1,55 @@
+﻿pydicom.pixels.encoders.base.EncodeRunner
+=========================================
+
+.. currentmodule:: pydicom.pixels.encoders.base
+
+.. autoclass:: EncodeRunner
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~EncodeRunner.__init__
+      ~EncodeRunner.del_option
+      ~EncodeRunner.encode
+      ~EncodeRunner.frame_length
+      ~EncodeRunner.get_frame
+      ~EncodeRunner.get_option
+      ~EncodeRunner.set_encoders
+      ~EncodeRunner.set_option
+      ~EncodeRunner.set_options
+      ~EncodeRunner.set_source
+      ~EncodeRunner.validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~EncodeRunner.bits_allocated
+      ~EncodeRunner.bits_stored
+      ~EncodeRunner.columns
+      ~EncodeRunner.extended_offsets
+      ~EncodeRunner.is_array
+      ~EncodeRunner.is_binary
+      ~EncodeRunner.is_buffer
+      ~EncodeRunner.is_dataset
+      ~EncodeRunner.number_of_frames
+      ~EncodeRunner.options
+      ~EncodeRunner.photometric_interpretation
+      ~EncodeRunner.pixel_keyword
+      ~EncodeRunner.pixel_representation
+      ~EncodeRunner.planar_configuration
+      ~EncodeRunner.rows
+      ~EncodeRunner.samples_per_pixel
+      ~EncodeRunner.src
+      ~EncodeRunner.transfer_syntax
+   
+   

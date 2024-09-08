@@ -1,0 +1,30 @@
+﻿pydicom.sr.Concepts
+===================
+
+.. currentmodule:: pydicom.sr
+
+.. autoclass:: Concepts
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Concepts.CIDs
+      ~Concepts.__init__
+      ~Concepts.schemes
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Concepts.collections
+   
+   

@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPIPHTJ2KReferenced
+===============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPIPHTJ2KReferenced

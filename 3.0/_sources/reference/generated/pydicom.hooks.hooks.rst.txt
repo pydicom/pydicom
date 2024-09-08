@@ -1,0 +1,6 @@
+﻿pydicom.hooks.hooks
+===================
+
+.. currentmodule:: pydicom.hooks
+
+.. autodata:: hooks

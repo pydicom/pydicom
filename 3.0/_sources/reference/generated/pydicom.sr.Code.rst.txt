@@ -1,0 +1,33 @@
+﻿pydicom.sr.Code
+===============
+
+.. currentmodule:: pydicom.sr
+
+.. autoclass:: Code
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Code.__init__
+      ~Code.count
+      ~Code.index
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Code.meaning
+      ~Code.scheme_designator
+      ~Code.scheme_version
+      ~Code.value
+   
+   
