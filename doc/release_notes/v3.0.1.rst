@@ -1,0 +1,7 @@
+Version 3.0.1
+=============
+
+Fixes
+-----
+* Changed logging of missing plugin imports to use :attr:`logging.WARNING` and made it
+  controllable via :func:`config.debug()<pydicom.config.debug>` (:issue:`2128`).
