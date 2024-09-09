@@ -12,7 +12,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom import dcmread
+from pydicom import dcmread, config
 from pydicom.pixels import get_decoder
 from pydicom.pixels.utils import _passes_version_check
 from pydicom.uid import (
@@ -239,10 +239,18 @@ class TestDecoding:
         assert meta["photometric_interpretation"] == "YBR_FULL_422"
 
 
+@pytest.fixture()
+def enable_debugging():
+    original = config.debugging
+    config.debugging = True
+    yield
+    config.debugging = original
+
+
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
-def test_version_check(caplog):
+def test_version_check(enable_debugging, caplog):
     """Test _passes_version_check() when the package has no __version__"""
     # GDCM doesn't have a __version__ attribute
-    with caplog.at_level(logging.ERROR, logger="pydicom"):
+    with caplog.at_level(logging.WARNING, logger="pydicom"):
         assert _passes_version_check("gdcm", (3, 0)) is False
         assert "module 'gdcm' has no attribute '__version__'" in caplog.text

@@ -16,6 +16,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom import config
 from pydicom.charset import default_encoding
 from pydicom._dicom_dict import DicomDictionary
 from pydicom.encaps import encapsulate, encapsulate_extended
@@ -1274,7 +1275,8 @@ def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -
         module = importlib.import_module(package_name, "__version__")
         return tuple(int(x) for x in module.__version__.split(".")) >= minimum_version
     except Exception as exc:
-        LOGGER.exception(exc)
+        if config.debugging:
+            LOGGER.warning(exc)
 
     return False
 
