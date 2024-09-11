@@ -489,14 +489,14 @@ def enable_debugging():
 
 def test_version_check_debugging(enable_debugging, caplog):
     """Test _passes_version_check() when the package is absent and debugging on"""
-    with caplog.at_level(logging.WARNING, logger="pydicom"):
+    with caplog.at_level(logging.DEBUG, logger="pydicom"):
         assert _passes_version_check("foo", (3, 0)) is False
         assert "No module named 'foo'" in caplog.text
 
 
 def test_version_check_no_debugging(caplog):
     """Test _passes_version_check() when the package is absent and debugging off"""
-    with caplog.at_level(logging.WARNING, logger="pydicom"):
+    with caplog.at_level(logging.DEBUG, logger="pydicom"):
         assert _passes_version_check("foo", (3, 0)) is False
         assert not caplog.text
 

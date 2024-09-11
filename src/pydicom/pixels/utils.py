@@ -1276,7 +1276,7 @@ def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -
         return tuple(int(x) for x in module.__version__.split(".")) >= minimum_version
     except Exception as exc:
         if config.debugging:
-            LOGGER.warning(exc)
+            LOGGER.debug(exc)
 
     return False
 
