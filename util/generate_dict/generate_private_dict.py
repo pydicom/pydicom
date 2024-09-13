@@ -4,6 +4,9 @@ import xml.etree.ElementTree as ET
 from urllib.request import urlopen
 from pathlib import Path
 from collections import defaultdict
+import sys
+
+from pydicom.valuerep import VR
 
 
 GDCM_PRIVATE_DICT = (
@@ -93,6 +96,18 @@ def parse_private_docbook(doc_root):
         vr = entry.attrib["vr"]
         vm = entry.attrib["vm"]
         name = entry.attrib["name"].replace("\\", "\\\\")  # escape backslashes
+
+        # Check VR for conformance
+        try:
+            VR(vr)
+        except Exception:
+            print(f"Invalid VR found for {owner} {tag}: {vr}")
+
+            if "_" in vr:
+                vr = vr.replace("_", " or ")
+                print(f"  Replacing VR with {vr}")
+            else:
+                sys.exit()
 
         # Convert unknown element names to 'Unknown'
         if name == "?":
