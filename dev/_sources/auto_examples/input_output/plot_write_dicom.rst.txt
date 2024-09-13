@@ -37,8 +37,8 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting dataset values...
     Setting file meta information...
-    Writing dataset to: /tmp/tmpmwa26q4a.dcm
-    Load dataset from: /tmp/tmpmwa26q4a.dcm ...
+    Writing dataset to: /tmp/tmpwpgf1tuh.dcm
+    Load dataset from: /tmp/tmpwpgf1tuh.dcm ...
     Dataset.file_meta -------------------------------
     (0002,0000) File Meta Information Group Length  UL: 128
     (0002,0001) File Meta Information Version       OB: b'\x00\x01'
@@ -46,13 +46,13 @@ have to change UIDs to valid values and add all required DICOM data elements.
     (0002,0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002,0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
     (0002,0012) Implementation Class UID            UI: 1.2.3.4
-    (0002,0013) Implementation Version Name         SH: 'PYDICOM 3.0.0'
+    (0002,0013) Implementation Version Name         SH: 'PYDICOM 3.1.0'
     -------------------------------------------------
-    (0008,0023) Content Date                        DA: '20240908'
-    (0008,0033) Content Time                        TM: '220124.727369'
+    (0008,0023) Content Date                        DA: '20240913'
+    (0008,0033) Content Time                        TM: '035500.352958'
     (0010,0010) Patient's Name                      PN: 'Test^Firstname'
     (0010,0020) Patient ID                          LO: '123456'
-    Deleting file: /tmp/tmpmwa26q4a.dcm ...
+    Deleting file: /tmp/tmpwpgf1tuh.dcm ...
 
 
 
