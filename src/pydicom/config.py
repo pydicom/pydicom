@@ -30,6 +30,50 @@ if TYPE_CHECKING:  # pragma: no cover
 _use_future = False
 _use_future_env = os.getenv("PYDICOM_FUTURE")
 
+
+# Logging system and debug function to change logging level
+logger = logging.getLogger("pydicom")
+logger.addHandler(logging.NullHandler())
+
+debugging: bool
+
+
+def debug(debug_on: bool = True, default_handler: bool = True) -> None:
+    """Turn on/off debugging of DICOM file reading and writing.
+
+    When debugging is on, file location and details about the elements read at
+    that location are logged to the 'pydicom' logger using Python's
+    :mod:`logging`
+    module.
+
+    Parameters
+    ----------
+    debug_on : bool, optional
+        If ``True`` (default) then turn on debugging, ``False`` to turn off.
+    default_handler : bool, optional
+        If ``True`` (default) then use :class:`logging.StreamHandler` as the
+        handler for log messages.
+    """
+    global logger, debugging
+
+    if default_handler:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter("%(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    if debug_on:
+        logger.setLevel(logging.DEBUG)
+        debugging = True
+    else:
+        logger.setLevel(logging.WARNING)
+        debugging = False
+
+
+# force level=WARNING, in case logging default is set differently (issue 103)
+debug(False, False)
+
+
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal: bool = False
@@ -360,10 +404,6 @@ displaying the file meta information data elements
 .. versionadded:: 2.0
 """
 
-# Logging system and debug function to change logging level
-logger = logging.getLogger("pydicom")
-logger.addHandler(logging.NullHandler())
-
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
 import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
 import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
@@ -496,43 +536,6 @@ ValueError: Invalid value used with the 'in' operator: must be an
 element tag as a 2-tuple or int, or an element keyword
 """
 
-debugging: bool
-
-
-def debug(debug_on: bool = True, default_handler: bool = True) -> None:
-    """Turn on/off debugging of DICOM file reading and writing.
-
-    When debugging is on, file location and details about the elements read at
-    that location are logged to the 'pydicom' logger using Python's
-    :mod:`logging`
-    module.
-
-    Parameters
-    ----------
-    debug_on : bool, optional
-        If ``True`` (default) then turn on debugging, ``False`` to turn off.
-    default_handler : bool, optional
-        If ``True`` (default) then use :class:`logging.StreamHandler` as the
-        handler for log messages.
-    """
-    global logger, debugging
-
-    if default_handler:
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter("%(message)s")
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-
-    if debug_on:
-        logger.setLevel(logging.DEBUG)
-        debugging = True
-    else:
-        logger.setLevel(logging.WARNING)
-        debugging = False
-
-
-# force level=WARNING, in case logging default is set differently (issue 103)
-debug(False, False)
 
 if _use_future_env:
     if _use_future_env.lower() in ["true", "yes", "on", "1"]:
