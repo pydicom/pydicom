@@ -479,9 +479,9 @@ class TestIterPixels:
             next(iter_pixels(b))
 
 
-def test_version_check(caplog):
-    """Test _passes_version_check() when the package is absent"""
-    with caplog.at_level(logging.ERROR, logger="pydicom"):
+def test_version_check_debugging(caplog):
+    """Test _passes_version_check() when the package is absent and debugging on"""
+    with caplog.at_level(logging.DEBUG, logger="pydicom"):
         assert _passes_version_check("foo", (3, 0)) is False
         assert "No module named 'foo'" in caplog.text
 
