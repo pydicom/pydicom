@@ -1274,7 +1274,7 @@ def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -
         module = importlib.import_module(package_name, "__version__")
         return tuple(int(x) for x in module.__version__.split(".")) >= minimum_version
     except Exception as exc:
-        LOGGER.exception(exc)
+        LOGGER.debug(exc)
 
     return False
 
