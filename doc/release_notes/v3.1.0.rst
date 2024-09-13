@@ -5,3 +5,4 @@ Fixes
 -----
 * Changed logging of missing plugin imports to use :attr:`logging.WARNING` and made it
   controllable via :func:`config.debug()<pydicom.config.debug>` (:issue:`2128`).
+* Fixed an invalid VR value in the private data dictionary (:issue:`2132`).
