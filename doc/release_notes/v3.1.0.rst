@@ -1,0 +1,6 @@
+Version 3.1.0
+=============
+
+Fixes
+-----
+* Include all `examples` module datasets with the package (:issue:`2128`, :issue:`2131`)
