@@ -1834,7 +1834,7 @@ private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {
         '0027xxA0': ('IS', '1', 'No. of Data', ''),
         '0027xxA1': ('CS', '2', 'Data Input Type', ''),
         '0027xxA2': ('CS', '2', 'Data Output Type', ''),
-        '0027xxA3': ('US_SS', '1-n', 'Raw Data', ''),
+        '0027xxA3': ('US or SS', '1-n', 'Raw Data', ''),
         '0029xx20': ('CS', '1', 'Image Scanning Direction', ''),
         '0029xx25': ('CS', '1', 'Image Rotation/Reversal Information', ''),
         '0029xx30': ('CS', '1', 'Extended Reading Size Value', ''),
