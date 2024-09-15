@@ -21,17 +21,17 @@ The ``examples`` module contains the following DICOM datasets:
 +-------------------+---------------------------------------+----------------------+
 | ``rt_ss``         | ``rtstruct.dcm``                      | RT Structure Set     |
 +-------------------+---------------------------------------+----------------------+
-| ``overlay``       | ``MR-SIEMENS-DICOM-WithOverlays.dcm`` | MR Image             |
+| ``overlay``       | ``examples_overlay.dcm``              | MR Image             |
 +-------------------+---------------------------------------+----------------------+
 | ``waveform``      | ``waveform_ecg.dcm``                  | 12 Lead ECG          |
 +-------------------+---------------------------------------+----------------------+
-| ``rgb_color``     | ``US1_UNCR.dcm``                      | US Image             |
+| ``rgb_color``     | ``examples_rgb_color.dcm``            | US Image             |
 +-------------------+---------------------------------------+----------------------+
 | ``palette_color`` | ``OBXXXX1A.dcm``                      | US Image             |
 +-------------------+---------------------------------------+----------------------+
-| ``ybr_color``     | ``color3d_jpeg_baseline.dcm``         | US Multi-frame Image |
+| ``ybr_color``     | ``examples_ybr_color.dcm``            | US Multi-frame Image |
 +-------------------+---------------------------------------+----------------------+
-| ``jpeg2k``        | ``US1_J2KR.dcm``                      | US Image             |
+| ``jpeg2k``        | ``examples_jpeg2k.dcm``               | US Image             |
 +-------------------+---------------------------------------+----------------------+
 | ``dicomdir``      | ``DICOMDIR``                          | Media Storage        |
 +-------------------+---------------------------------------+----------------------+
