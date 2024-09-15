@@ -356,6 +356,14 @@ class TestDecodeRunner:
         runner.set_option("extended_offsets", ([0], [10]))
         runner._validate_options()
 
+        # Float/Double Float Pixel Data
+        runner.del_option("bits_stored")
+        runner.set_option("pixel_keyword", "FloatPixelData")
+        runner._validate_options()
+
+        runner.set_option("pixel_keyword", "DoubleFloatPixelData")
+        runner._validate_options()
+
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_decode(self):
         """Test decode()"""

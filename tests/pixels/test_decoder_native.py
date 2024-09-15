@@ -25,7 +25,12 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from .pixels_reference import PIXEL_REFERENCE, EXPL_16_1_1F_PAD, IMPL_32_1_1F
+from .pixels_reference import (
+    PIXEL_REFERENCE,
+    EXPL_16_1_1F_PAD,
+    IMPL_32_1_1F,
+    EXPL_64_1F_DOUBLE_FLOAT,
+)
 
 
 def name(ref):
@@ -82,21 +87,25 @@ class TestAsArray:
         """Test against the reference data for explicit little for binary IO."""
         decoder = get_decoder(ExplicitVRLittleEndian)
         ds = reference.ds
+        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
             "samples_per_pixel": ds.SamplesPerPixel,
             "photometric_interpretation": ds.PhotometricInterpretation,
-            "pixel_representation": ds.PixelRepresentation,
             "bits_allocated": ds.BitsAllocated,
-            "bits_stored": ds.BitsStored,
             "number_of_frames": ds.get("NumberOfFrames", 1),
             "planar_configuration": ds.get("PlanarConfiguration", 0),
-            "pixel_keyword": "PixelData",
+            "pixel_keyword": pixel_keyword,
         }
 
+        if "PixelData" in ds:
+            opts["bits_stored"] = ds.BitsStored
+            opts["pixel_representation"] = ds.PixelRepresentation
+
         with open(reference.path, "rb") as f:
-            file_offset = reference.ds["PixelData"].file_tell
+            file_offset = reference.ds[pixel_keyword].file_tell
             f.seek(file_offset)
             arr, _ = decoder.as_array(f, raw=True, **opts)
             assert f.tell() == file_offset
@@ -235,6 +244,7 @@ class TestAsArray:
         ds = dcmread(IMPL_32_1_1F.path)
         ds.FloatPixelData = ds.PixelData
         del ds.PixelData
+        del ds.BitsStored
         assert 32 == ds.BitsAllocated
         decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
         arr, _ = decoder.as_array(ds, raw=True)
@@ -249,6 +259,7 @@ class TestAsArray:
         ds = dcmread(IMPL_32_1_1F.path)
         ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
         del ds.PixelData
+        del ds.BitsStored
         ds.BitsAllocated = 64
         decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
         arr, _ = decoder.as_array(ds, raw=True)
@@ -306,21 +317,25 @@ class TestIterArray:
         """Test against the reference data for explicit little for binary IO."""
         decoder = get_decoder(ExplicitVRLittleEndian)
         ds = reference.ds
+        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
             "samples_per_pixel": ds.SamplesPerPixel,
             "photometric_interpretation": ds.PhotometricInterpretation,
-            "pixel_representation": ds.PixelRepresentation,
             "bits_allocated": ds.BitsAllocated,
-            "bits_stored": ds.BitsStored,
             "number_of_frames": ds.get("NumberOfFrames", 1),
             "planar_configuration": ds.get("PlanarConfiguration", 0),
-            "pixel_keyword": "PixelData",
+            "pixel_keyword": pixel_keyword,
         }
 
+        if "PixelData" in ds:
+            opts["bits_stored"] = ds.BitsStored
+            opts["pixel_representation"] = ds.PixelRepresentation
+
         with open(reference.path, "rb") as f:
-            file_offset = reference.ds["PixelData"].file_tell
+            file_offset = reference.ds[pixel_keyword].file_tell
             f.seek(file_offset)
 
             frame_generator = decoder.iter_array(f, raw=True, **opts)
@@ -492,21 +507,25 @@ class TestAsBuffer:
             return
 
         ds = reference.ds
+        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
             "samples_per_pixel": ds.SamplesPerPixel,
             "photometric_interpretation": ds.PhotometricInterpretation,
-            "pixel_representation": ds.PixelRepresentation,
             "bits_allocated": ds.BitsAllocated,
-            "bits_stored": ds.BitsStored,
             "number_of_frames": ds.get("NumberOfFrames", 1),
             "planar_configuration": ds.get("PlanarConfiguration", 0),
-            "pixel_keyword": "PixelData",
+            "pixel_keyword": pixel_keyword,
         }
 
+        if "PixelData" in ds:
+            opts["bits_stored"] = ds.BitsStored
+            opts["pixel_representation"] = ds.PixelRepresentation
+
         with open(reference.path, "rb") as f:
-            file_offset = reference.ds["PixelData"].file_tell
+            file_offset = reference.ds[pixel_keyword].file_tell
             f.seek(file_offset)
             arr, _ = decoder.as_array(f, raw=True, **opts)
             buffer, _ = decoder.as_buffer(f, **opts)
@@ -776,21 +795,25 @@ class TestIterBuffer:
             return
 
         ds = reference.ds
+        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
             "samples_per_pixel": ds.SamplesPerPixel,
             "photometric_interpretation": ds.PhotometricInterpretation,
-            "pixel_representation": ds.PixelRepresentation,
             "bits_allocated": ds.BitsAllocated,
-            "bits_stored": ds.BitsStored,
             "number_of_frames": ds.get("NumberOfFrames", 1),
             "planar_configuration": ds.get("PlanarConfiguration", 0),
-            "pixel_keyword": "PixelData",
+            "pixel_keyword": pixel_keyword,
         }
 
+        if "PixelData" in ds:
+            opts["bits_stored"] = ds.BitsStored
+            opts["pixel_representation"] = ds.PixelRepresentation
+
         with open(reference.path, "rb") as f:
-            file_offset = reference.ds["PixelData"].file_tell
+            file_offset = reference.ds[pixel_keyword].file_tell
             f.seek(file_offset)
             arr_gen = decoder.iter_array(f, raw=True, **opts)
             buf_gen = decoder.iter_buffer(f, **opts)

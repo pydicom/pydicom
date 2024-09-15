@@ -572,15 +572,17 @@ class RunnerBase:
                 "is invalid, it must be 1 or a multiple of 8 and in the range (1, 64)"
             )
 
-        if self._opts.get("bits_stored") is None:
-            raise AttributeError(f"{prefix},0101) 'Bits Stored'")
+        if "Float" not in self.pixel_keyword:
+            if self._opts.get("bits_stored") is None:
+                raise AttributeError(f"{prefix},0101) 'Bits Stored'")
 
-        if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
-            raise ValueError(
-                f"A (0028,0101) 'Bits Stored' value of '{self.bits_stored}' is "
-                "invalid, it must be in the range (1, 64) and no greater than "
-                f"the (0028,0100) 'Bits Allocated' value of '{self.bits_allocated}'"
-            )
+            if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
+                raise ValueError(
+                    f"A (0028,0101) 'Bits Stored' value of '{self.bits_stored}' is "
+                    "invalid, it must be in the range (1, 64) and no greater than "
+                    "the (0028,0100) 'Bits Allocated' value of "
+                    f"'{self.bits_allocated}'"
+                )
 
         if self._opts.get("columns") is None:
             raise AttributeError(f"{prefix},0011) 'Columns'")
