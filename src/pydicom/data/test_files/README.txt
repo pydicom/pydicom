@@ -259,6 +259,15 @@ explicit_VR-UN.dcm
   * image was compressed using "gdcmconv --j2k <original.dcm>"
   * almost all tags have VR "UN" due to gdcmconv issue
 
+== Examples Datasets ==
+
+* examples_jpeg2k.dcm: identical to US1_J2KR.dcm
+* examples_overlay.dcm: MR-SIEMENS-DICOM-WithOverlays.dcm with cropped Pixel Data and Overlay Data
+* examples_palette.dcm: OBXXXX1A.dcm with cropped Pixel Data
+* examples_rgb_color.dcm: US1_UNCR.dcm with cropped Pixel Data
+* examples_ybr_color.dcm: color3d_jpeg_baseline.dcm with reduced frames and rescaled Pixel Data
+
+
 == DICOMDIR tests ==
 
 dicomdirtests files were from https://www.pcir.org, freely available image sets.
