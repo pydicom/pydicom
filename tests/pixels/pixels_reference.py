@@ -604,15 +604,26 @@ def test(ref, arr, **kwargs):
 EXPL_32_3_2F = PixelReference("SC_rgb_32bit_2frame.dcm", "<u4", test)
 
 
-# EXPL, (64, NA), (1, 128, 128, 1), OD, MONOCHROME2
-# Double Float Pixel Data
+# EXPL, (32, NA), (1, 128, 128, 1), OD, MONOCHROME2
+# Float Pixel Data
 def test(ref, arr, **kwargs):
-    assert [-0.47545233, -0.38126547, -0.43364315, -0.83627632] == [
+    assert [0.92012787, 0.91510725, 0.9160201, 0.92104053] == [
         round(x, 8) for x in arr[:4, 0]
     ]
 
 
-EXPL_64_1F_DOUBLE_FLOAT = PixelReference("parametric_map.dcm", "<f8", test)
+EXPL_32_1F_FLOAT = PixelReference("parametric_map_float.dcm", "<f4", test)
+
+
+# EXPL, (64, NA), (1, 128, 128, 1), OD, MONOCHROME2
+# Double Float Pixel Data
+def test(ref, arr, **kwargs):
+    assert [0.9201278, 0.91510726, 0.91602008, 0.92104062] == [
+        round(x, 8) for x in arr[:4, 0]
+    ]
+
+
+EXPL_64_1F_DOUBLE_FLOAT = PixelReference("parametric_map_double_float.dcm", "<f8", test)
 
 
 PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
@@ -633,7 +644,8 @@ PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
     EXPL_16_3_2F,
     EXPL_32_3_1F,
     EXPL_32_3_2F,
-    EXPL_64_1F_DOUBLE_FLOAT,
+    EXPL_32_1F_FLOAT,  # Float Pixel Data
+    EXPL_64_1F_DOUBLE_FLOAT,  # Double Float Pixel Data
 ]
 PIXEL_REFERENCE[ImplicitVRLittleEndian] = [
     IMPL_08_08_3_0_1F_RGB,

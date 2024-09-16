@@ -37,6 +37,19 @@ def name(ref):
     return f"{ref.name}"
 
 
+def get_pixel_keyword(ds):
+    if "PixelData" in ds:
+        return "PixelData"
+
+    if "FloatPixelData" in ds:
+        return "FloatPixelData"
+
+    if "DoubleFloatPixelData" in ds:
+        return "DoubleFloatPixelData"
+
+    raise ValueError("No pixel data element found")
+
+
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestAsArray:
     """Tests for decoder.as_array() with native transfer syntaxes"""
@@ -87,7 +100,7 @@ class TestAsArray:
         """Test against the reference data for explicit little for binary IO."""
         decoder = get_decoder(ExplicitVRLittleEndian)
         ds = reference.ds
-        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+        pixel_keyword = get_pixel_keyword(ds)
 
         opts = {
             "rows": ds.Rows,
@@ -100,7 +113,7 @@ class TestAsArray:
             "pixel_keyword": pixel_keyword,
         }
 
-        if "PixelData" in ds:
+        if pixel_keyword == "PixelData":
             opts["bits_stored"] = ds.BitsStored
             opts["pixel_representation"] = ds.PixelRepresentation
 
@@ -238,37 +251,6 @@ class TestAsArray:
                 else:
                     assert arr.shape == reference.shape[1:]
 
-    def test_float_pixel_data(self):
-        """Test Float Pixel Data."""
-        # Only 1 sample per pixel allowed
-        ds = dcmread(IMPL_32_1_1F.path)
-        ds.FloatPixelData = ds.PixelData
-        del ds.PixelData
-        del ds.BitsStored
-        assert 32 == ds.BitsAllocated
-        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
-        arr, _ = decoder.as_array(ds, raw=True)
-        assert "float32" == arr.dtype
-
-        ref, _ = decoder.as_array(IMPL_32_1_1F.ds, raw=True)
-        assert np.array_equal(arr, ref.view("float32"))
-
-    def test_double_float_pixel_data(self):
-        """Test Double Float Pixel Data."""
-        # Only 1 sample per pixel allowed
-        ds = dcmread(IMPL_32_1_1F.path)
-        ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
-        del ds.PixelData
-        del ds.BitsStored
-        ds.BitsAllocated = 64
-        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
-        arr, _ = decoder.as_array(ds, raw=True)
-        assert "float64" == arr.dtype
-
-        ref, _ = decoder.as_array(IMPL_32_1_1F.ds, raw=True)
-        assert np.array_equal(arr.ravel()[:50], ref.view("float64").ravel())
-        assert np.array_equal(arr.ravel()[50:], ref.view("float64").ravel())
-
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestIterArray:
@@ -317,7 +299,7 @@ class TestIterArray:
         """Test against the reference data for explicit little for binary IO."""
         decoder = get_decoder(ExplicitVRLittleEndian)
         ds = reference.ds
-        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+        pixel_keyword = get_pixel_keyword(ds)
 
         opts = {
             "rows": ds.Rows,
@@ -330,7 +312,7 @@ class TestIterArray:
             "pixel_keyword": pixel_keyword,
         }
 
-        if "PixelData" in ds:
+        if pixel_keyword == "PixelData":
             opts["bits_stored"] = ds.BitsStored
             opts["pixel_representation"] = ds.PixelRepresentation
 
@@ -507,7 +489,7 @@ class TestAsBuffer:
             return
 
         ds = reference.ds
-        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+        pixel_keyword = get_pixel_keyword(ds)
 
         opts = {
             "rows": ds.Rows,
@@ -520,7 +502,7 @@ class TestAsBuffer:
             "pixel_keyword": pixel_keyword,
         }
 
-        if "PixelData" in ds:
+        if pixel_keyword == "PixelData":
             opts["bits_stored"] = ds.BitsStored
             opts["pixel_representation"] = ds.PixelRepresentation
 
@@ -724,28 +706,6 @@ class TestAsBuffer:
                     out[:27] = arr.ravel()
                     assert out.view(">u2").byteswap().tobytes() == buffer
 
-    def test_float_pixel_data(self):
-        """Test Float Pixel Data."""
-        ds = dcmread(IMPL_32_1_1F.path)
-        ref = ds.PixelData
-        ds.FloatPixelData = ref
-        del ds.PixelData
-        assert 32 == ds.BitsAllocated
-        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
-        buffer, _ = decoder.as_buffer(ds, raw=True)
-        assert buffer == ref
-
-    def test_double_float_pixel_data(self):
-        """Test Double Float Pixel Data."""
-        ds = dcmread(IMPL_32_1_1F.path)
-        ref = ds.PixelData + ds.PixelData
-        ds.DoubleFloatPixelData = ref
-        del ds.PixelData
-        ds.BitsAllocated = 64
-        decoder = get_decoder(ds.file_meta.TransferSyntaxUID)
-        buffer, _ = decoder.as_buffer(ds, raw=True)
-        assert buffer == ref
-
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
 class TestIterBuffer:
@@ -795,7 +755,7 @@ class TestIterBuffer:
             return
 
         ds = reference.ds
-        pixel_keyword = "PixelData" if "PixelData" in ds else "DoubleFloatPixelData"
+        pixel_keyword = get_pixel_keyword(ds)
 
         opts = {
             "rows": ds.Rows,
@@ -808,7 +768,7 @@ class TestIterBuffer:
             "pixel_keyword": pixel_keyword,
         }
 
-        if "PixelData" in ds:
+        if pixel_keyword == "PixelData":
             opts["bits_stored"] = ds.BitsStored
             opts["pixel_representation"] = ds.PixelRepresentation
 
