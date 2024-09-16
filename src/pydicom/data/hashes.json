@@ -75,5 +75,6 @@
   "JLSN_RGB_ILV0.dcm": "a377750d24bd3413d21faa343662dfff997db9acf65c0b095c5d8a95beb866fa",
   "JLSL_08_07_0_1F.dcm": "308fb028c8fbdd1e9a93e731978ea4da6b15cb55b40451cf6f21e7c9ba35dd8a",
   "JLSL_16_15_1_1F.dcm": "61f38f250a7dc82c44529c0face2eeab3ffd02ca8b9dfc756dd818eb252104b6",
-  "parametric_map.dcm": "91ebb0b0e3eca55e792b89135adbd17782f52981b339418d4780823fc5ea9291"
+  "parametric_map_float.dcm": "957f34397c26d82f7a90cad7a653ce0f7238f4be6aa9dfa9a33bae5dc2ce7e23",
+  "parametric_map_double_float.dcm": "a41e0b78b05e543a2448e22435858f9ca8d5f94807d7b391b93b4bca80e23a22"
 }
