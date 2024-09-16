@@ -5,3 +5,5 @@ Fixes
 -----
 * Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
 * Fixed an invalid VR value in the private data dictionary (:issue:`2132`).
+* Fixed checking for *Bits Stored* when converting *Float Pixel Data* and *Double Float
+  Pixel Data* using the :mod:`~pydicom.pixels` backend (:issue:`2135`).
