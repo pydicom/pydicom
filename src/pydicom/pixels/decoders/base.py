@@ -537,7 +537,6 @@ class DecodeRunner(RunnerBase):
         """
         d = {
             "bits_allocated": self.bits_allocated,
-            "bits_stored": self.bits_stored,
             "columns": self.columns,
             "number_of_frames": self.number_of_frames if not as_frame else 1,
             "photometric_interpretation": str(self.photometric_interpretation),
@@ -549,6 +548,7 @@ class DecodeRunner(RunnerBase):
             d["planar_configuration"] = self.planar_configuration
 
         if self.pixel_keyword == "PixelData":
+            d["bits_stored"] = self.bits_stored
             d["pixel_representation"] = self.pixel_representation
 
         return cast(dict[str, str | int], d)

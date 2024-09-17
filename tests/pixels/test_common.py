@@ -214,6 +214,7 @@ class TestRunnerBase:
         """Tests for validate_options()"""
         # Generic option validation
         runner = RunnerBase(ExplicitVRLittleEndian)
+        runner.set_option("pixel_keyword", "PixelData")
 
         msg = r"Missing required element: \(0028,0100\) 'Bits Allocated'"
         with pytest.raises(AttributeError, match=msg):
@@ -281,13 +282,15 @@ class TestRunnerBase:
         with pytest.raises(ValueError, match=msg):
             runner._validate_options()
 
+        runner.del_option("pixel_keyword")
+
         runner.set_option("photometric_interpretation", PI.RGB)
         msg = "No value for 'pixel_keyword' has been set"
         with pytest.raises(AttributeError, match=msg):
             runner._validate_options()
 
-        runner.set_option("pixel_keyword", -1)
-        msg = "Unknown 'pixel_keyword' value '-1'"
+        runner.set_option("pixel_keyword", "foo")
+        msg = "Unknown 'pixel_keyword' value 'foo'"
         with pytest.raises(ValueError, match=msg):
             runner._validate_options()
 
