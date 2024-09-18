@@ -22,33 +22,33 @@ from .pixels_reference import RLE_16_1_10F, EXPL_8_3_1F_YBR
 
 
 REFERENCE_FRAME_LENGTHS = [
-    # (rows, cols, samples), bit depth, result in (bytes, pixels, ybr_bytes)
+    # (rows, cols, samples), bit depth, result in (bytes (native), bytes(encapsulated), pixels, ybr_bytes)
     # YBR can only be 3 samples/px and > 1 bit depth
-    ((0, 0, 0), 1, (0, 0, None)),
-    ((1, 1, 1), 1, (1, 1, None)),  # 1 bit -> 1 byte
-    ((1, 1, 3), 1, (1, 3, None)),  # 3 bits -> 1 byte
-    ((1, 3, 3), 1, (2, 9, None)),  # 9 bits -> 2 bytes
-    ((2, 2, 1), 1, (1, 4, None)),  # 4 bits -> 1 byte
-    ((2, 4, 1), 1, (1, 8, None)),  # 8 bits -> 1 byte
-    ((3, 3, 1), 1, (2, 9, None)),  # 9 bits -> 2 bytes
-    ((512, 512, 1), 1, (32768, 262144, None)),  # Typical length
-    ((512, 512, 3), 1, (98304, 786432, None)),
-    ((0, 0, 0), 8, (0, 0, None)),
-    ((1, 1, 1), 8, (1, 1, None)),  # Odd length
-    ((9, 1, 1), 8, (9, 9, None)),  # Odd length
-    ((1, 2, 1), 8, (2, 2, None)),  # Even length
-    ((512, 512, 1), 8, (262144, 262144, None)),
-    ((512, 512, 3), 8, (786432, 786432, 524288)),
-    ((0, 0, 0), 16, (0, 0, None)),
-    ((1, 1, 1), 16, (2, 1, None)),  # 16 bit data can't be odd length
-    ((1, 2, 1), 16, (4, 2, None)),
-    ((512, 512, 1), 16, (524288, 262144, None)),
-    ((512, 512, 3), 16, (1572864, 786432, 1048576)),
-    ((0, 0, 0), 32, (0, 0, None)),
-    ((1, 1, 1), 32, (4, 1, None)),  # 32 bit data can't be odd length
-    ((1, 2, 1), 32, (8, 2, None)),
-    ((512, 512, 1), 32, (1048576, 262144, None)),
-    ((512, 512, 3), 32, (3145728, 786432, 2097152)),
+    ((0, 0, 0), 1, (0, 0, 0, None)),
+    ((1, 1, 1), 1, (0.125, 1, 1, None)),  # 1 bit -> 1/8 byte
+    ((1, 1, 3), 1, (0.375, 1, 3, None)),  # 3 bits -> 3/8 byte
+    ((1, 3, 3), 1, (1.125, 2, 9, None)),  # 9 bits -> 1 1/8 bytes
+    ((2, 2, 1), 1, (0.5, 1, 4, None)),  # 4 bits -> 1/2 byte
+    ((2, 4, 1), 1, (1, 1, 8, None)),  # 8 bits -> 1 byte
+    ((3, 3, 1), 1, (1.125, 2, 9, None)),  # 9 bits -> 1 1/8 bytes
+    ((512, 512, 1), 1, (32768, 32768, 262144, None)),  # Typical length
+    ((512, 512, 3), 1, (98304, 98304, 786432, None)),
+    ((0, 0, 0), 8, (0, 0, 0, None)),
+    ((1, 1, 1), 8, (1, 1, 1, None)),  # Odd length
+    ((9, 1, 1), 8, (9, 9, 9, None)),  # Odd length
+    ((1, 2, 1), 8, (2, 2, 2, None)),  # Even length
+    ((512, 512, 1), 8, (262144, 262144, 262144, None)),
+    ((512, 512, 3), 8, (786432, 786432, 786432, 524288)),
+    ((0, 0, 0), 16, (0, 0, 0, None)),
+    ((1, 1, 1), 16, (2, 2, 1, None)),  # 16 bit data can't be odd length
+    ((1, 2, 1), 16, (4, 4, 2, None)),
+    ((512, 512, 1), 16, (524288, 524288, 262144, None)),
+    ((512, 512, 3), 16, (1572864, 1572864, 786432, 1048576)),
+    ((0, 0, 0), 32, (0, 0, 0, None)),
+    ((1, 1, 1), 32, (4, 4, 1, None)),  # 32 bit data can't be odd length
+    ((1, 2, 1), 32, (8, 8, 2, None)),
+    ((512, 512, 1), 32, (1048576, 1048576, 262144, None)),
+    ((512, 512, 3), 32, (3145728, 3145728, 786432, 2097152)),
 ]
 
 
@@ -443,15 +443,15 @@ class TestRunnerBase:
         encaps_runner.set_options(**opts)
 
         assert length[0] == native_runner.frame_length(unit="bytes")
-        assert length[1] == native_runner.frame_length(unit="pixels")
-        assert length[0] == encaps_runner.frame_length(unit="bytes")
-        assert length[1] == encaps_runner.frame_length(unit="pixels")
+        assert length[2] == native_runner.frame_length(unit="pixels")
+        assert length[1] == encaps_runner.frame_length(unit="bytes")
+        assert length[2] == encaps_runner.frame_length(unit="pixels")
 
         if shape[2] == 3 and bits != 1:
             native_runner.set_option("photometric_interpretation", PI.YBR_FULL_422)
             encaps_runner.set_option("photometric_interpretation", PI.YBR_FULL_422)
-            assert length[2] == native_runner.frame_length(unit="bytes")
-            assert length[0] == encaps_runner.frame_length(unit="bytes")
+            assert length[3] == native_runner.frame_length(unit="bytes")
+            assert length[1] == encaps_runner.frame_length(unit="bytes")
 
 
 class TestCoderBase:

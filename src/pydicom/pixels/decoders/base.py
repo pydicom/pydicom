@@ -4,6 +4,8 @@
 from collections.abc import Callable, Iterator, Iterable
 import logging
 from io import BufferedIOBase
+from math import ceil, floor
+from operator import le
 import sys
 from typing import Any, BinaryIO, cast, TYPE_CHECKING
 
@@ -757,7 +759,7 @@ class DecodeRunner(RunnerBase):
         """Validate the supplied buffer data."""
         # Check that the actual length of the pixel data is as expected
         frame_length = self.frame_length(unit="bytes")
-        expected = frame_length * self.number_of_frames
+        expected = ceil(frame_length * self.number_of_frames)
         actual = len(cast(Buffer, self._src))
 
         if self.transfer_syntax.is_encapsulated:
@@ -1114,6 +1116,7 @@ class Decoder(CoderBase):
             A 1D array containing the pixel data.
         """
         length_bytes = runner.frame_length(unit="bytes")
+        length_pixels = int(runner.frame_length(unit="pixels"))
         dtype = runner.pixel_dtype
 
         src: memoryview | BinaryIO
@@ -1126,6 +1129,11 @@ class Decoder(CoderBase):
             # Should be the start of the pixel data element's value
             file_offset = src.tell()
             length_source = length_bytes * runner.number_of_frames
+
+        # Number of bits to remove from the start and end after unpacking in
+        # the case of bits_allocated = 1
+        bit_offset_start: int | None = None
+        bit_offset_end: int | None = None
 
         if runner._test_for("be_swap_ow"):
             # Big endian 8-bit data may be encoded as OW
@@ -1177,17 +1185,31 @@ class Decoder(CoderBase):
                 arr = arr.view(dtype)[:length_bytes]
         else:
             if index is not None:
-                start_offset = file_offset + index * length_bytes
+                start_offset = floor(file_offset + index * length_bytes)
                 if (start_offset + length_bytes) > file_offset + length_source:
                     raise ValueError(
                         f"There is insufficient pixel data to contain {index + 1} frames"
                     )
 
-                frame = runner.get_data(src, start_offset, length_bytes)
+                if runner.bits_allocated == 1:
+                    if length_pixels % 8 != 0:
+                        bit_offset_start = (index * length_pixels) % 8
+                        bit_offset_end = -(-((index + 1) * length_pixels) % 8)
+                        if bit_offset_end == 0:
+                            bit_offset_end = None
+
+                frame = runner.get_data(src, start_offset, ceil(length_bytes))
                 arr = np.frombuffer(frame, dtype=dtype)
             else:
                 length_bytes *= runner.number_of_frames
-                buffer = runner.get_data(src, file_offset, length_bytes)
+
+                if runner.bits_allocated == 1:
+                    if length_pixels % 8 != 0:
+                        bit_offset_end = -(-(runner.number_of_frames * length_pixels) % 8)
+                        if bit_offset_end == 0:
+                            bit_offset_end = None
+
+                buffer = runner.get_data(src, file_offset, ceil(length_bytes))
                 arr = np.frombuffer(buffer, dtype=dtype)
 
         # Unpack bit-packed data (if required)
@@ -1198,11 +1220,17 @@ class Decoder(CoderBase):
                     "original buffer for bit-packed pixel data"
                 )
 
-            length_pixels = runner.frame_length(unit="pixels")
             if index is None:
                 length_pixels *= runner.number_of_frames
 
-            return np.unpackbits(arr, bitorder="little", count=length_pixels)
+            unpacked = np.unpackbits(arr, bitorder="little", count=ceil(length_bytes) * 8)
+
+            # May need to remove bits from the beginning or end if frame
+            # boundaries are not byte-aligned
+            if bit_offset_start is not None or bit_offset_end is not None:
+                unpacked = unpacked[bit_offset_start:bit_offset_end]
+
+            return unpacked
 
         if runner.photometric_interpretation != PI.YBR_FULL_422:
             return arr
