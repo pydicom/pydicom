@@ -201,7 +201,7 @@ def test(ref, arr, **kwargs):
 EXPL_1_1_3F = PixelReference("liver.dcm", "u1", test)
 
 
-# Same image cropped from 512 x 512 to 510 x 510 such that frame boundaries are
+# Same image cropped from 512 x 512 to 510 x 511 such that frame boundaries are
 # no longer aligned with byte boundaries
 EXPL_1_1_3F_NONALIGNED = PixelReference("liver_seg_nonbyte_aligned.dcm", "u1", test)
 

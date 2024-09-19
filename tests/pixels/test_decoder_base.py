@@ -2,6 +2,7 @@
 
 from io import BytesIO
 import logging
+from math import ceil
 from struct import pack, unpack
 from sys import byteorder
 
@@ -34,6 +35,7 @@ except ImportError:
     HAVE_NP = False
 
 from .pixels_reference import (
+    EXPL_1_1_3F_NONALIGNED,
     PIXEL_REFERENCE,
     RLE_16_1_1F,
     RLE_16_1_10F,
@@ -1628,6 +1630,33 @@ class TestDecoder_Buffer:
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is src
+
+    def test_native_single_bit_nonaligned(self):
+        """Test `as_buffer` with a single bit image whose frame boundaries are
+        not aligned with byte boundaries."""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+
+        assert decoder.is_available
+
+        reference = EXPL_1_1_3F_NONALIGNED
+        buffer, _ = decoder.as_buffer(reference.ds)
+
+        expected_len = ceil(
+            (
+                reference.ds.Rows *
+                reference.ds.Columns *
+                reference.ds.SamplesPerPixel *
+                reference.ds.NumberOfFrames
+            ) / 8
+        )
+        assert len(buffer) == expected_len
+
+        msg = (
+            "Cannot return a buffer for individual frames since frame "
+            "boundaries do not align with byte boundaries."
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decoder.as_buffer(reference.ds, index=1)
 
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""

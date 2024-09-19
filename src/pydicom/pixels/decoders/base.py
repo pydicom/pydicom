@@ -1469,8 +1469,26 @@ class Decoder(CoderBase):
             same type as in the buffer containing the pixel data unless
             `view_only` is ``True`` in which case a :class:`memoryview` of the
             original buffer will be returned instead.
+
+        Notes
+        -----
+        For certain images, those with BitsAllocated=1, multiple frames and
+        number of pixels per frame that is not a multiple of 8, it is not
+        possible to isolate a buffer to a single frame. A ``RuntimeError`` will
+        be raised in these cases.
         """
         length_bytes = runner.frame_length(unit="bytes")
+
+        if (
+            not isinstance(length_bytes, int)
+            and index is not None
+            and runner.number_of_frames > 1
+        ):
+            raise RuntimeError(
+                "Cannot return a buffer for individual frames since frame "
+                "boundaries do not align with byte boundaries."
+            )
+
         src: Buffer | BinaryIO
         if runner.is_dataset or runner.is_buffer:
             if runner.get_option("view_only", False):
@@ -1522,7 +1540,7 @@ class Decoder(CoderBase):
 
         # Return all frames
         length_bytes *= runner.number_of_frames
-        return runner.get_data(src, file_offset, length_bytes)
+        return runner.get_data(src, file_offset, ceil(length_bytes))
 
     def iter_array(
         self,

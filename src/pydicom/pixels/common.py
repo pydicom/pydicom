@@ -372,10 +372,12 @@ class RunnerBase:
 
         Returns
         -------
-        int
-            The expected length of a single frame of pixel data in either
-            whole bytes or pixels, excluding the NULL trailing padding byte
-            for odd length data.
+        int | float
+            The expected length of a single frame of pixel data in either whole
+            bytes or pixels, excluding the NULL trailing padding byte for odd
+            length data. For "pixels", an integer will always be returned. For
+            "bytes", a float will be returned for images with BitsAllocated of
+            1 whose frames do not consist of a whole number of bytes.
         """
         length = self.rows * self.columns * self.samples_per_pixel
 
