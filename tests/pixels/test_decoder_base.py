@@ -1643,11 +1643,12 @@ class TestDecoder_Buffer:
 
         expected_len = ceil(
             (
-                reference.ds.Rows *
-                reference.ds.Columns *
-                reference.ds.SamplesPerPixel *
-                reference.ds.NumberOfFrames
-            ) / 8
+                reference.ds.Rows
+                * reference.ds.Columns
+                * reference.ds.SamplesPerPixel
+                * reference.ds.NumberOfFrames
+            )
+            / 8
         )
         assert len(buffer) == expected_len
 

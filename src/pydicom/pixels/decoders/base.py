@@ -5,7 +5,6 @@ from collections.abc import Callable, Iterator, Iterable
 import logging
 from io import BufferedIOBase
 from math import ceil, floor
-from operator import le
 import sys
 from typing import Any, BinaryIO, cast, TYPE_CHECKING
 
@@ -1047,7 +1046,7 @@ class Decoder(CoderBase):
         #   inserting it into the preallocated array, then resetting at the end
         #   so the returned image pixel dict matches the array
         original_bits_allocated = runner.bits_allocated
-        pixels_per_frame = runner.frame_length(unit="pixels")
+        pixels_per_frame = cast(int, runner.frame_length(unit="pixels"))
         number_of_frames = 1 if index is not None else runner.number_of_frames
 
         # Preallocate output array
@@ -1123,7 +1122,7 @@ class Decoder(CoderBase):
         if runner.is_dataset or runner.is_buffer:
             src = memoryview(cast(Buffer, runner.src))
             file_offset = 0
-            length_source = len(src)
+            length_source: int | float = len(src)
         else:
             src = cast(BinaryIO, runner.src)
             # Should be the start of the pixel data element's value
@@ -1148,6 +1147,11 @@ class Decoder(CoderBase):
                     "original buffer for 8-bit pixel data encoded as OW with "
                     "'Explicit VR Big Endian'"
                 )
+
+            # Since we are using 8 bit images, frames will always be an integer
+            # number of bytes
+            length_bytes = cast(int, length_bytes)
+            length_source = cast(int, length_source)
 
             # ndarray.byteswap() creates a new memory object
             if index is not None:
@@ -1205,7 +1209,9 @@ class Decoder(CoderBase):
 
                 if runner.bits_allocated == 1:
                     if length_pixels % 8 != 0:
-                        bit_offset_end = -(-(runner.number_of_frames * length_pixels) % 8)
+                        bit_offset_end = -(
+                            -(runner.number_of_frames * length_pixels) % 8
+                        )
                         if bit_offset_end == 0:
                             bit_offset_end = None
 
@@ -1223,7 +1229,9 @@ class Decoder(CoderBase):
             if index is None:
                 length_pixels *= runner.number_of_frames
 
-            unpacked = np.unpackbits(arr, bitorder="little", count=ceil(length_bytes) * 8)
+            unpacked = np.unpackbits(
+                arr, bitorder="little", count=ceil(length_bytes) * 8
+            )
 
             # May need to remove bits from the beginning or end if frame
             # boundaries are not byte-aligned
@@ -1497,13 +1505,19 @@ class Decoder(CoderBase):
                 src = cast(Buffer, runner.src)
 
             file_offset = 0
-            length_source = len(src)
+            length_source: int | float = len(src)
         else:
             src = cast(BinaryIO, runner.src)
             file_offset = src.tell()
             length_source = length_bytes * runner.number_of_frames
 
         if runner._test_for("be_swap_ow"):
+
+            # Since we are using 8 bit images, frames will always be an integer
+            # number of bytes
+            length_bytes = cast(int, length_bytes)
+            length_source = cast(int, length_source)
+
             # Big endian 8-bit data encoded as OW
             if index is not None:
                 # Return specified frame only
@@ -1530,13 +1544,13 @@ class Decoder(CoderBase):
 
         if index is not None:
             # Return specified frame only
-            start_offset = file_offset + index * length_bytes
+            start_offset = int(file_offset + index * length_bytes)
             if start_offset + length_bytes > file_offset + length_source:
                 raise ValueError(
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            return runner.get_data(src, start_offset, length_bytes)
+            return runner.get_data(src, start_offset, int(length_bytes))
 
         # Return all frames
         length_bytes *= runner.number_of_frames
