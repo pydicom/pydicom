@@ -21,6 +21,7 @@
     "JPGLosslessP14SV1_1s_1f_8b.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/JPGLosslessP14SV1_1s_1f_8b.dcm",
     "liver.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/liver.dcm",
     "liver_expb.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/liver_expb.dcm",
+    "liver_nonbyte_aligned.dcm": "https://github.com/pydicom/pydicom-data/raw/6cd879296e76a546de6c51438bcb6dfa5d0210c6/data/liver_nonbyte_aligned.dcm",
     "mlut_18.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/mlut_18.dcm",
     "MR-SIEMENS-DICOM-WithOverlays.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/MR-SIEMENS-DICOM-WithOverlays.dcm",
     "MR2_J2KI.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/MR2_J2KI.dcm",

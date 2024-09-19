@@ -203,7 +203,7 @@ EXPL_1_1_3F = PixelReference("liver.dcm", "u1", test)
 
 # Same image cropped from 512 x 512 to 510 x 511 such that frame boundaries are
 # no longer aligned with byte boundaries
-EXPL_1_1_3F_NONALIGNED = PixelReference("liver_seg_nonbyte_aligned.dcm", "u1", test)
+EXPL_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned.dcm", "u1", test)
 
 
 # DEFL, (8, 8), (1, 512, 512, 1), OB, MONOCHROME2, 0
