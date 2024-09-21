@@ -1639,9 +1639,9 @@ class TestDecoder_Buffer:
         assert decoder.is_available
 
         reference = EXPL_1_1_3F_NONALIGNED
-        buffer, _ = decoder.as_buffer(reference.ds)
+        full_buffer, _ = decoder.as_buffer(reference.ds)
 
-        expected_len = ceil(
+        full_len = ceil(
             (
                 reference.ds.Rows
                 * reference.ds.Columns
@@ -1650,14 +1650,17 @@ class TestDecoder_Buffer:
             )
             / 8
         )
-        assert len(buffer) == expected_len
+        assert len(full_buffer) == full_len
 
-        msg = (
-            "Cannot return a buffer for individual frames since frame "
-            "boundaries do not align with byte boundaries."
+        # When requesting a single frame, the returned buffer will contain some
+        # pixels from neighnoring frames
+        frame_1_buffer, _ = decoder.as_buffer(reference.ds, index=1)
+
+        frame_length_pixels = reference.ds.Rows * reference.ds.Columns
+        assert (
+            frame_1_buffer
+            == full_buffer[frame_length_pixels // 8 : ceil(2 * frame_length_pixels / 8)]
         )
-        with pytest.raises(RuntimeError, match=msg):
-            decoder.as_buffer(reference.ds, index=1)
 
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""

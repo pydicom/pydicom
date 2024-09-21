@@ -1129,11 +1129,6 @@ class Decoder(CoderBase):
             file_offset = src.tell()
             length_source = length_bytes * runner.number_of_frames
 
-        # Number of bits to remove from the start and end after unpacking in
-        # the case of bits_allocated = 1
-        bit_offset_start: int | None = None
-        bit_offset_end: int | None = None
-
         if runner._test_for("be_swap_ow"):
             # Big endian 8-bit data may be encoded as OW
             # For example a 1 x 1 x 3 image will (presumably) be:
@@ -1195,25 +1190,10 @@ class Decoder(CoderBase):
                         f"There is insufficient pixel data to contain {index + 1} frames"
                     )
 
-                if runner.bits_allocated == 1:
-                    if length_pixels % 8 != 0:
-                        bit_offset_start = (index * length_pixels) % 8
-                        bit_offset_end = -(-((index + 1) * length_pixels) % 8)
-                        if bit_offset_end == 0:
-                            bit_offset_end = None
-
                 frame = runner.get_data(src, start_offset, ceil(length_bytes))
                 arr = np.frombuffer(frame, dtype=dtype)
             else:
                 length_bytes *= runner.number_of_frames
-
-                if runner.bits_allocated == 1:
-                    if length_pixels % 8 != 0:
-                        bit_offset_end = -(
-                            -(runner.number_of_frames * length_pixels) % 8
-                        )
-                        if bit_offset_end == 0:
-                            bit_offset_end = None
 
                 buffer = runner.get_data(src, file_offset, ceil(length_bytes))
                 arr = np.frombuffer(buffer, dtype=dtype)
@@ -1226,8 +1206,13 @@ class Decoder(CoderBase):
                     "original buffer for bit-packed pixel data"
                 )
 
+            # Number of bits to remove from the start after unpacking in
+            bit_offset_start = 0
+
             if index is None:
                 length_pixels *= runner.number_of_frames
+            else:
+                bit_offset_start = (index * length_pixels) % 8
 
             unpacked = np.unpackbits(
                 arr, bitorder="little", count=ceil(length_bytes) * 8
@@ -1235,8 +1220,7 @@ class Decoder(CoderBase):
 
             # May need to remove bits from the beginning or end if frame
             # boundaries are not byte-aligned
-            if bit_offset_start is not None or bit_offset_end is not None:
-                unpacked = unpacked[bit_offset_start:bit_offset_end]
+            unpacked = unpacked[bit_offset_start : bit_offset_start + length_pixels]
 
             return unpacked
 
@@ -1482,20 +1466,14 @@ class Decoder(CoderBase):
         -----
         For certain images, those with BitsAllocated=1, multiple frames and
         number of pixels per frame that is not a multiple of 8, it is not
-        possible to isolate a buffer to a single frame. A ``RuntimeError`` will
-        be raised in these cases.
+        possible to isolate a buffer to a single frame because frame boundaries
+        may occur within the middle a byte. If a single frame is requested (via
+        ``index``) for these cases, the buffer returned will consist of the
+        smallest set of bytes required to entirely contain the requested frame.
+        However, the first and last byte may also contain information on pixel
+        values in neighboring frames.
         """
         length_bytes = runner.frame_length(unit="bytes")
-
-        if (
-            not isinstance(length_bytes, int)
-            and index is not None
-            and runner.number_of_frames > 1
-        ):
-            raise RuntimeError(
-                "Cannot return a buffer for individual frames since frame "
-                "boundaries do not align with byte boundaries."
-            )
 
         src: Buffer | BinaryIO
         if runner.is_dataset or runner.is_buffer:
@@ -1544,13 +1522,13 @@ class Decoder(CoderBase):
 
         if index is not None:
             # Return specified frame only
-            start_offset = int(file_offset + index * length_bytes)
+            start_offset = floor(file_offset + index * length_bytes)
             if start_offset + length_bytes > file_offset + length_source:
                 raise ValueError(
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            return runner.get_data(src, start_offset, int(length_bytes))
+            return runner.get_data(src, start_offset, ceil(length_bytes))
 
         # Return all frames
         length_bytes *= runner.number_of_frames
