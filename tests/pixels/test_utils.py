@@ -77,6 +77,7 @@ from .pixels_reference import (
     JLSN_08_01_1_0_1F,
     J2KR_08_08_3_0_1F_YBR_RCT,
     EXPL_1_1_3F,
+    EXPL_1_1_3F_NONALIGNED,
 )
 from ..test_helpers import assert_no_warning
 
@@ -1381,6 +1382,13 @@ class TestPackBits:
     def test_functional(self):
         """Test against a real dataset."""
         ds = EXPL_1_1_3F.ds
+        arr = ds.pixel_array
+        arr = arr.ravel()
+        assert ds.PixelData == pack_bits(arr)
+
+    def test_functional_nonaligned(self):
+        """Test against a real dataset."""
+        ds = EXPL_1_1_3F_NONALIGNED.ds
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)

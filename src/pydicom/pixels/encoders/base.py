@@ -175,12 +175,12 @@ class EncodeRunner(RunnerBase):
         #    8 < precision <= 16: a 16-bit container (short)
         #   16 < precision <= 32: a 32-bit container (int/long)
         #   32 < precision <= 64: a 64-bit container (long long)
-        bytes_per_frame = self.frame_length(unit="bytes")
+        bytes_per_frame = cast(int, self.frame_length(unit="bytes"))
         start = 0 if index is None else index * bytes_per_frame
         src = cast(bytes, self.src[start : start + bytes_per_frame])
 
         # Resize the data to fit the appropriate container
-        expected_length = self.frame_length(unit="pixels")
+        expected_length = cast(int, self.frame_length(unit="pixels"))
         bytes_per_pixel = len(src) // expected_length
 
         # 1 byte/px actual

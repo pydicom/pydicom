@@ -187,7 +187,7 @@ def test(ref, arr, **kwargs):
     # Frame 3
     if index in (None, 2):
         frame = arr if index == 2 else arr[2]
-        assert 0 == frame[511][511]
+        assert 0 == frame[-1][-1]
         assert 0 == frame[147, :249].max()
         assert (0, 1, 0, 1, 1, 1) == tuple(frame[147, 248:254])
         assert (1, 0, 1, 0, 1, 1) == tuple(frame[147, 260:266])
@@ -199,6 +199,11 @@ def test(ref, arr, **kwargs):
 
 
 EXPL_1_1_3F = PixelReference("liver.dcm", "u1", test)
+
+
+# Same image cropped from 512 x 512 to 510 x 511 such that frame boundaries are
+# no longer aligned with byte boundaries
+EXPL_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned.dcm", "u1", test)
 
 
 # DEFL, (8, 8), (1, 512, 512, 1), OB, MONOCHROME2, 0
@@ -629,6 +634,7 @@ EXPL_64_1F_DOUBLE_FLOAT = PixelReference("parametric_map_double_float.dcm", "<f8
 PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
     EXPL_1_1_1F,
     EXPL_1_1_3F,
+    EXPL_1_1_3F_NONALIGNED,
     EXPL_8_1_1F,
     EXPL_8_1_2F,
     EXPL_8_3_1F,
