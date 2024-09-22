@@ -1,0 +1,12 @@
+Version 3.0.1
+=============
+
+Fixes
+-----
+
+* Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
+* Include all :mod:`~pydicom.examples` module datasets with the package (:issue:`2128`, :issue:`2131`)
+* Fixed an invalid VR value in the private data dictionary (:issue:`2132`).
+* Fixed checking for *Bits Stored* when converting *Float Pixel Data* and *Double Float
+  Pixel Data* using the :mod:`~pydicom.pixels` backend (:issue:`2135`).
+* Fixed decoding of pixel data for images with *Bits Allocated* of 1 when frame boundaries are not aligned with byte boundaries (:issue:`2134`).
