@@ -357,7 +357,7 @@ class RunnerBase:
         """
         return self._opts.get("extended_offsets", None)
 
-    def frame_length(self, unit: str = "bytes") -> int:
+    def frame_length(self, unit: str = "bytes") -> int | float:
         """Return the expected length (in number of bytes or pixels) of each
         frame of pixel data.
 
@@ -372,22 +372,32 @@ class RunnerBase:
 
         Returns
         -------
-        int
-            The expected length of a single frame of pixel data in either
-            whole bytes or pixels, excluding the NULL trailing padding byte
-            for odd length data.
+        int | float
+            The expected length of a single frame of pixel data in either whole
+            bytes or pixels, excluding the NULL trailing padding byte for odd
+            length data. For "pixels", an integer will always be returned. For
+            "bytes", a float will be returned for images with BitsAllocated of
+            1 whose frames do not consist of a whole number of bytes.
         """
-        length = self.rows * self.columns * self.samples_per_pixel
+        length: int | float = self.rows * self.columns * self.samples_per_pixel
 
         if unit == "pixels":
             return length
 
         # Correct for the number of bytes per pixel
         if self.bits_allocated == 1:
-            # Determine the nearest whole number of bytes needed to contain
-            #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
-            #   are packed into 12.5 -> 13 bytes
-            length = length // 8 + (length % 8 > 0)
+            if self.transfer_syntax.is_encapsulated:
+                # Determine the nearest whole number of bytes needed to contain
+                # 1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits,
+                # which are packed into 12.5 -> 13 bytes
+                length = length // 8 + (length % 8 > 0)
+            else:
+                # For native, "bit-packed" pixel data, frames are not padded so
+                # this may not be a whole number of bytes e.g. 10x10 = 100
+                # pixels images are packed into 12.5 bytes
+                length = length / 8
+                if length.is_integer():
+                    length = int(length)
         else:
             length *= self.bits_allocated // 8
 
@@ -572,15 +582,17 @@ class RunnerBase:
                 "is invalid, it must be 1 or a multiple of 8 and in the range (1, 64)"
             )
 
-        if self._opts.get("bits_stored") is None:
-            raise AttributeError(f"{prefix},0101) 'Bits Stored'")
+        if "Float" not in self.pixel_keyword:
+            if self._opts.get("bits_stored") is None:
+                raise AttributeError(f"{prefix},0101) 'Bits Stored'")
 
-        if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
-            raise ValueError(
-                f"A (0028,0101) 'Bits Stored' value of '{self.bits_stored}' is "
-                "invalid, it must be in the range (1, 64) and no greater than "
-                f"the (0028,0100) 'Bits Allocated' value of '{self.bits_allocated}'"
-            )
+            if not 1 <= self.bits_stored <= self.bits_allocated <= 64:
+                raise ValueError(
+                    f"A (0028,0101) 'Bits Stored' value of '{self.bits_stored}' is "
+                    "invalid, it must be in the range (1, 64) and no greater than "
+                    "the (0028,0100) 'Bits Allocated' value of "
+                    f"'{self.bits_allocated}'"
+                )
 
         if self._opts.get("columns") is None:
             raise AttributeError(f"{prefix},0011) 'Columns'")

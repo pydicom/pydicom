@@ -21,6 +21,7 @@
     "JPGLosslessP14SV1_1s_1f_8b.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/JPGLosslessP14SV1_1s_1f_8b.dcm",
     "liver.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/liver.dcm",
     "liver_expb.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/liver_expb.dcm",
+    "liver_nonbyte_aligned.dcm": "https://github.com/pydicom/pydicom-data/raw/8da482f208401d63cd63f3f4efc41b6856ef36c7/data_store/data/liver_nonbyte_aligned.dcm",
     "mlut_18.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/mlut_18.dcm",
     "MR-SIEMENS-DICOM-WithOverlays.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/MR-SIEMENS-DICOM-WithOverlays.dcm",
     "MR2_J2KI.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/MR2_J2KI.dcm",
@@ -74,5 +75,7 @@
     "JLSL_RGB_ILV2.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSL_RGB_ILV2.dcm",
     "JLSN_RGB_ILV0.dcm": "https://github.com/pydicom/pydicom-data/raw/7358d21f75fa8cdc8ae4e0bb02f7612c52a140ec/data_store/data/JLSN_RGB_ILV0.dcm",
     "JLSL_08_07_0_1F.dcm": "https://github.com/pydicom/pydicom-data/raw/831d25636b0aff13916975c493b20d6fadc01d2e/data_store/data/JLSL_08_07_0_1F.dcm",
-    "JLSL_16_15_1_1F.dcm": "https://github.com/pydicom/pydicom-data/raw/eaaec0d930f5e578db5e56892da57a8e63af71d7/data_store/data/JLSL_16_15_1_1F.dcm"
+    "JLSL_16_15_1_1F.dcm": "https://github.com/pydicom/pydicom-data/raw/eaaec0d930f5e578db5e56892da57a8e63af71d7/data_store/data/JLSL_16_15_1_1F.dcm",
+    "parametric_map_float.dcm": "https://github.com/pydicom/pydicom-data/raw/812f8edacbb6a1f3606ff4a9c16c54b831e9fd3b/data_store/data/parametric_map_float.dcm",
+    "parametric_map_double_float.dcm": "https://github.com/pydicom/pydicom-data/raw/812f8edacbb6a1f3606ff4a9c16c54b831e9fd3b/data_store/data/parametric_map_double_float.dcm"
 }

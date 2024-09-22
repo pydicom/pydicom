@@ -77,6 +77,7 @@ from .pixels_reference import (
     JLSN_08_01_1_0_1F,
     J2KR_08_08_3_0_1F_YBR_RCT,
     EXPL_1_1_3F,
+    EXPL_1_1_3F_NONALIGNED,
 )
 from ..test_helpers import assert_no_warning
 
@@ -479,9 +480,9 @@ class TestIterPixels:
             next(iter_pixels(b))
 
 
-def test_version_check(caplog):
-    """Test _passes_version_check() when the package is absent"""
-    with caplog.at_level(logging.ERROR, logger="pydicom"):
+def test_version_check_debugging(caplog):
+    """Test _passes_version_check() when the package is absent and debugging on"""
+    with caplog.at_level(logging.DEBUG, logger="pydicom"):
         assert _passes_version_check("foo", (3, 0)) is False
         assert "No module named 'foo'" in caplog.text
 
@@ -1381,6 +1382,13 @@ class TestPackBits:
     def test_functional(self):
         """Test against a real dataset."""
         ds = EXPL_1_1_3F.ds
+        arr = ds.pixel_array
+        arr = arr.ravel()
+        assert ds.PixelData == pack_bits(arr)
+
+    def test_functional_nonaligned(self):
+        """Test against a real dataset."""
+        ds = EXPL_1_1_3F_NONALIGNED.ds
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)

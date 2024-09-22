@@ -187,7 +187,7 @@ def test(ref, arr, **kwargs):
     # Frame 3
     if index in (None, 2):
         frame = arr if index == 2 else arr[2]
-        assert 0 == frame[511][511]
+        assert 0 == frame[-1][-1]
         assert 0 == frame[147, :249].max()
         assert (0, 1, 0, 1, 1, 1) == tuple(frame[147, 248:254])
         assert (1, 0, 1, 0, 1, 1) == tuple(frame[147, 260:266])
@@ -199,6 +199,11 @@ def test(ref, arr, **kwargs):
 
 
 EXPL_1_1_3F = PixelReference("liver.dcm", "u1", test)
+
+
+# Same image cropped from 512 x 512 to 510 x 511 such that frame boundaries are
+# no longer aligned with byte boundaries
+EXPL_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned.dcm", "u1", test)
 
 
 # DEFL, (8, 8), (1, 512, 512, 1), OB, MONOCHROME2, 0
@@ -604,9 +609,32 @@ def test(ref, arr, **kwargs):
 EXPL_32_3_2F = PixelReference("SC_rgb_32bit_2frame.dcm", "<u4", test)
 
 
+# EXPL, (32, NA), (1, 128, 128, 1), OD, MONOCHROME2
+# Float Pixel Data
+def test(ref, arr, **kwargs):
+    assert [0.92012787, 0.91510725, 0.9160201, 0.92104053] == [
+        round(x, 8) for x in arr[:4, 0]
+    ]
+
+
+EXPL_32_1F_FLOAT = PixelReference("parametric_map_float.dcm", "<f4", test)
+
+
+# EXPL, (64, NA), (1, 128, 128, 1), OD, MONOCHROME2
+# Double Float Pixel Data
+def test(ref, arr, **kwargs):
+    assert [0.9201278, 0.91510726, 0.91602008, 0.92104062] == [
+        round(x, 8) for x in arr[:4, 0]
+    ]
+
+
+EXPL_64_1F_DOUBLE_FLOAT = PixelReference("parametric_map_double_float.dcm", "<f8", test)
+
+
 PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
     EXPL_1_1_1F,
     EXPL_1_1_3F,
+    EXPL_1_1_3F_NONALIGNED,
     EXPL_8_1_1F,
     EXPL_8_1_2F,
     EXPL_8_3_1F,
@@ -622,6 +650,8 @@ PIXEL_REFERENCE[ExplicitVRLittleEndian] = [
     EXPL_16_3_2F,
     EXPL_32_3_1F,
     EXPL_32_3_2F,
+    EXPL_32_1F_FLOAT,  # Float Pixel Data
+    EXPL_64_1F_DOUBLE_FLOAT,  # Double Float Pixel Data
 ]
 PIXEL_REFERENCE[ImplicitVRLittleEndian] = [
     IMPL_08_08_3_0_1F_RGB,

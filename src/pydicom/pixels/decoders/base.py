@@ -4,6 +4,7 @@
 from collections.abc import Callable, Iterator, Iterable
 import logging
 from io import BufferedIOBase
+from math import ceil, floor
 import sys
 from typing import Any, BinaryIO, cast, TYPE_CHECKING
 
@@ -537,7 +538,6 @@ class DecodeRunner(RunnerBase):
         """
         d = {
             "bits_allocated": self.bits_allocated,
-            "bits_stored": self.bits_stored,
             "columns": self.columns,
             "number_of_frames": self.number_of_frames if not as_frame else 1,
             "photometric_interpretation": str(self.photometric_interpretation),
@@ -549,6 +549,7 @@ class DecodeRunner(RunnerBase):
             d["planar_configuration"] = self.planar_configuration
 
         if self.pixel_keyword == "PixelData":
+            d["bits_stored"] = self.bits_stored
             d["pixel_representation"] = self.pixel_representation
 
         return cast(dict[str, str | int], d)
@@ -757,7 +758,7 @@ class DecodeRunner(RunnerBase):
         """Validate the supplied buffer data."""
         # Check that the actual length of the pixel data is as expected
         frame_length = self.frame_length(unit="bytes")
-        expected = frame_length * self.number_of_frames
+        expected = ceil(frame_length * self.number_of_frames)
         actual = len(cast(Buffer, self._src))
 
         if self.transfer_syntax.is_encapsulated:
@@ -1045,7 +1046,7 @@ class Decoder(CoderBase):
         #   inserting it into the preallocated array, then resetting at the end
         #   so the returned image pixel dict matches the array
         original_bits_allocated = runner.bits_allocated
-        pixels_per_frame = runner.frame_length(unit="pixels")
+        pixels_per_frame = cast(int, runner.frame_length(unit="pixels"))
         number_of_frames = 1 if index is not None else runner.number_of_frames
 
         # Preallocate output array
@@ -1114,13 +1115,14 @@ class Decoder(CoderBase):
             A 1D array containing the pixel data.
         """
         length_bytes = runner.frame_length(unit="bytes")
+        length_pixels = int(runner.frame_length(unit="pixels"))
         dtype = runner.pixel_dtype
 
         src: memoryview | BinaryIO
         if runner.is_dataset or runner.is_buffer:
             src = memoryview(cast(Buffer, runner.src))
             file_offset = 0
-            length_source = len(src)
+            length_source: int | float = len(src)
         else:
             src = cast(BinaryIO, runner.src)
             # Should be the start of the pixel data element's value
@@ -1140,6 +1142,11 @@ class Decoder(CoderBase):
                     "original buffer for 8-bit pixel data encoded as OW with "
                     "'Explicit VR Big Endian'"
                 )
+
+            # Since we are using 8 bit images, frames will always be an integer
+            # number of bytes
+            length_bytes = cast(int, length_bytes)
+            length_source = cast(int, length_source)
 
             # ndarray.byteswap() creates a new memory object
             if index is not None:
@@ -1177,17 +1184,18 @@ class Decoder(CoderBase):
                 arr = arr.view(dtype)[:length_bytes]
         else:
             if index is not None:
-                start_offset = file_offset + index * length_bytes
+                start_offset = floor(file_offset + index * length_bytes)
                 if (start_offset + length_bytes) > file_offset + length_source:
                     raise ValueError(
                         f"There is insufficient pixel data to contain {index + 1} frames"
                     )
 
-                frame = runner.get_data(src, start_offset, length_bytes)
+                frame = runner.get_data(src, start_offset, ceil(length_bytes))
                 arr = np.frombuffer(frame, dtype=dtype)
             else:
                 length_bytes *= runner.number_of_frames
-                buffer = runner.get_data(src, file_offset, length_bytes)
+
+                buffer = runner.get_data(src, file_offset, ceil(length_bytes))
                 arr = np.frombuffer(buffer, dtype=dtype)
 
         # Unpack bit-packed data (if required)
@@ -1198,11 +1206,23 @@ class Decoder(CoderBase):
                     "original buffer for bit-packed pixel data"
                 )
 
-            length_pixels = runner.frame_length(unit="pixels")
+            # Number of bits to remove from the start after unpacking in
+            bit_offset_start = 0
+
             if index is None:
                 length_pixels *= runner.number_of_frames
+            else:
+                bit_offset_start = (index * length_pixels) % 8
 
-            return np.unpackbits(arr, bitorder="little", count=length_pixels)
+            unpacked = np.unpackbits(
+                arr, bitorder="little", count=ceil(length_bytes) * 8
+            )
+
+            # May need to remove bits from the beginning or end if frame
+            # boundaries are not byte-aligned
+            unpacked = unpacked[bit_offset_start : bit_offset_start + length_pixels]
+
+            return unpacked
 
         if runner.photometric_interpretation != PI.YBR_FULL_422:
             return arr
@@ -1441,8 +1461,20 @@ class Decoder(CoderBase):
             same type as in the buffer containing the pixel data unless
             `view_only` is ``True`` in which case a :class:`memoryview` of the
             original buffer will be returned instead.
+
+        Notes
+        -----
+        For certain images, those with BitsAllocated=1, multiple frames and
+        number of pixels per frame that is not a multiple of 8, it is not
+        possible to isolate a buffer to a single frame because frame boundaries
+        may occur within the middle a byte. If a single frame is requested (via
+        ``index``) for these cases, the buffer returned will consist of the
+        smallest set of bytes required to entirely contain the requested frame.
+        However, the first and last byte may also contain information on pixel
+        values in neighboring frames.
         """
         length_bytes = runner.frame_length(unit="bytes")
+
         src: Buffer | BinaryIO
         if runner.is_dataset or runner.is_buffer:
             if runner.get_option("view_only", False):
@@ -1451,13 +1483,19 @@ class Decoder(CoderBase):
                 src = cast(Buffer, runner.src)
 
             file_offset = 0
-            length_source = len(src)
+            length_source: int | float = len(src)
         else:
             src = cast(BinaryIO, runner.src)
             file_offset = src.tell()
             length_source = length_bytes * runner.number_of_frames
 
         if runner._test_for("be_swap_ow"):
+
+            # Since we are using 8 bit images, frames will always be an integer
+            # number of bytes
+            length_bytes = cast(int, length_bytes)
+            length_source = cast(int, length_source)
+
             # Big endian 8-bit data encoded as OW
             if index is not None:
                 # Return specified frame only
@@ -1484,17 +1522,17 @@ class Decoder(CoderBase):
 
         if index is not None:
             # Return specified frame only
-            start_offset = file_offset + index * length_bytes
+            start_offset = floor(file_offset + index * length_bytes)
             if start_offset + length_bytes > file_offset + length_source:
                 raise ValueError(
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            return runner.get_data(src, start_offset, length_bytes)
+            return runner.get_data(src, start_offset, ceil(length_bytes))
 
         # Return all frames
         length_bytes *= runner.number_of_frames
-        return runner.get_data(src, file_offset, length_bytes)
+        return runner.get_data(src, file_offset, ceil(length_bytes))
 
     def iter_array(
         self,

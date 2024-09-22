@@ -40,6 +40,7 @@ SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
 
 IMPL = get_testdata_file("MR_small_implicit.dcm")
 EXPL = get_testdata_file("OBXXXX1A.dcm")
+RGB = get_testdata_file("US1_UNCR.dcm")
 
 
 @pytest.mark.skipif(SKIP_RLE, reason="no -rle plugin")
@@ -121,7 +122,7 @@ class TestJ2KLosslessEncoding:
         arr /= arr.max()
         self.ref = arr
 
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
 
         arr = arr.astype("float32")
@@ -241,7 +242,7 @@ class TestJ2KLosslessEncoding:
 
     def test_arr_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -278,7 +279,7 @@ class TestJ2KLosslessEncoding:
 
     def test_arr_u2_spp3(self):
         """Test unsigned bits allocated 16, bits stored (1, 16), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -313,7 +314,7 @@ class TestJ2KLosslessEncoding:
 
     def test_arr_u4_spp3(self):
         """Test unsigned bits allocated 32, bits stored (1, 24), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -571,7 +572,7 @@ class TestJ2KLosslessEncoding:
 
     def test_buffer_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -611,7 +612,7 @@ class TestJ2KLosslessEncoding:
 
     def test_buffer_u2_spp3(self):
         """Test unsigned bits allocated 16, bits stored (1, 16), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -649,7 +650,7 @@ class TestJ2KLosslessEncoding:
 
     def test_buffer_u4_spp3(self):
         """Test unsigned bits allocated 32, bits stored (1, 24), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -801,7 +802,7 @@ class TestJ2KLosslessEncoding:
     def test_mct(self):
         """Test that MCT is used correctly"""
         # If RGB then no MCT
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -827,7 +828,7 @@ class TestJ2KLosslessEncoding:
 
     def test_lossy_kwargs_raise(self):
         """Test that lossy kwargs raise an exception"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -855,7 +856,7 @@ class TestJ2KLosslessEncoding:
 
     def test_bits_stored_25_raises(self):
         """Test that bits stored > 24 raises an exception."""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -893,7 +894,7 @@ class TestJ2KEncoding:
         arr /= arr.max()
         self.ref = arr
 
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
 
         arr = arr.astype("float32")
@@ -1011,7 +1012,7 @@ class TestJ2KEncoding:
 
     def test_arr_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -1048,7 +1049,7 @@ class TestJ2KEncoding:
 
     def test_arr_u2_spp3(self):
         """Test unsigned bits allocated 16, bits stored (1, 16), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -1083,7 +1084,7 @@ class TestJ2KEncoding:
 
     def test_arr_u4_spp3(self):
         """Test unsigned bits allocated 32, bits stored (1, 24), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -1351,7 +1352,7 @@ class TestJ2KEncoding:
 
     def test_buffer_u1_spp3(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -1391,7 +1392,7 @@ class TestJ2KEncoding:
 
     def test_buffer_u2_spp3(self):
         """Test unsigned bits allocated 16, bits stored (1, 16), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -1429,7 +1430,7 @@ class TestJ2KEncoding:
 
     def test_buffer_u4_spp3(self):
         """Test unsigned bits allocated 32, bits stored (1, 24), samples per pixel 3"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         opts = {
             "rows": ds.Rows,
             "columns": ds.Columns,
@@ -1593,7 +1594,7 @@ class TestJ2KEncoding:
 
     def test_j2k_psnr(self):
         """Test compression using j2k_psnr"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -1620,7 +1621,7 @@ class TestJ2KEncoding:
     def test_mct(self):
         """Test that MCT is used correctly"""
         # If RGB then no MCT
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -1647,7 +1648,7 @@ class TestJ2KEncoding:
 
     def test_both_lossy_kwargs_raises(self):
         """Test that having both lossy kwargs raises an exception"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -1674,7 +1675,7 @@ class TestJ2KEncoding:
 
     def test_neither_lossy_kwargs_raises(self):
         """Test that having neither lossy kwarg raises an exception"""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
@@ -1698,7 +1699,7 @@ class TestJ2KEncoding:
 
     def test_bits_stored_25_raises(self):
         """Test that bits stored > 24 raises an exception."""
-        ds = examples.rgb_color
+        ds = dcmread(RGB)
         arr = ds.pixel_array
         opts = {
             "rows": ds.Rows,
