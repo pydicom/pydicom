@@ -1780,8 +1780,8 @@ def set_pixel_data(
     ds : pydicom.dataset.Dataset
         The little endian encoded dataset to be modified.
     arr : np.ndarray
-        An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
-        array must be shaped as one of the following:
+        An array with :class:`~numpy.dtype` bool, uint8, uint16, int8 or int16.
+        The array must be shaped as one of the following:
 
         * (rows, columns) for a single frame of grayscale data.
         * (frames, rows, columns) for multi-frame grayscale data.
@@ -1794,7 +1794,8 @@ def set_pixel_data(
         ``"YBR_FULL"``, ``"YBR_FULL_422"``.
     bits_stored : int
         The value to use for (0028,0101) *Bits Stored*. Must be no greater than
-        the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+        the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`,
+        or 1 in the case of an array of type bool.
     generate_instance_uid : bool, optional
         If ``True`` (default) then add or update the (0008,0018) *SOP Instance
         UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
@@ -1824,10 +1825,10 @@ def set_pixel_data(
     changes: dict[str, tuple[str, Any]] = {}
 
     shape, ndim, dtype = arr.shape, arr.ndim, arr.dtype
-    if dtype.kind not in ("u", "i") or dtype.itemsize not in (1, 2):
+    if dtype.kind not in ("u", "i", "b") or dtype.itemsize not in (1, 2):
         raise ValueError(
-            f"Unsupported ndarray dtype '{dtype}', must be int8, int16, uint8 or "
-            "uint16"
+            f"Unsupported ndarray dtype '{dtype}', must be bool, int8, int16, "
+            "uint8, or uint16"
         )
 
     # Use `photometric_interpretation` to determine *Samples Per Pixel*
@@ -1877,33 +1878,36 @@ def set_pixel_data(
         changes["Rows"] = ("+", shape[0] if ndim == 3 else shape[1])
         changes["Columns"] = ("+", shape[1] if ndim == 3 else shape[2])
 
-    if not 0 < bits_stored <= dtype.itemsize * 8:
+    bits_allocated = 1 if dtype.kind == "b" else dtype.itemsize * 8
+    if not 0 < bits_stored <= bits_allocated:
         raise ValueError(
             f"Invalid 'bits_stored' value '{bits_stored}', must be greater than 0 and "
             "less than or equal to the number of bits for the ndarray's itemsize "
-            f"'{arr.dtype.itemsize * 8}'"
+            f"'{bits_allocated}'"
         )
 
     # Check values in `arr` are in the range allowed by `bits_stored`
-    actual_min, actual_max = arr.min(), arr.max()
-    allowed_min = 0 if dtype.kind == "u" else -(2 ** (bits_stored - 1))
-    allowed_max = (
-        2**bits_stored - 1 if dtype.kind == "u" else 2 ** (bits_stored - 1) - 1
-    )
-    if actual_min < allowed_min or actual_max > allowed_max:
-        raise ValueError(
-            f"The range of values in the ndarray [{actual_min}, {actual_max}] is "
-            f"greater than that allowed by the 'bits_stored' value [{allowed_min}, "
-            f"{allowed_max}]"
+    # boolean arrays are valid by construction (bits_stored must be 1)
+    if dtype.kind != "b":
+        actual_min, actual_max = arr.min(), arr.max()
+        allowed_min = 0 if dtype.kind == "u" else -(2 ** (bits_stored - 1))
+        allowed_max = (
+            2**bits_stored - 1 if dtype.kind == "u" else 2 ** (bits_stored - 1) - 1
         )
+        if actual_min < allowed_min or actual_max > allowed_max:
+            raise ValueError(
+                f"The range of values in the ndarray [{actual_min}, {actual_max}] is "
+                f"greater than that allowed by the 'bits_stored' value [{allowed_min}, "
+                f"{allowed_max}]"
+            )
 
     changes["SamplesPerPixel"] = ("+", nr_samples)
     changes["PlanarConfiguration"] = ("+", 0) if nr_samples > 1 else ("-", None)
     changes["PhotometricInterpretation"] = ("+", photometric_interpretation)
-    changes["BitsAllocated"] = ("+", dtype.itemsize * 8)
+    changes["BitsAllocated"] = ("+", bits_allocated)
     changes["BitsStored"] = ("+", bits_stored)
     changes["HighBit"] = ("+", bits_stored - 1)
-    changes["PixelRepresentation"] = ("+", 0 if dtype.kind == "u" else 1)
+    changes["PixelRepresentation"] = ("+", 0 if dtype.kind in ("u", "b") else 1)
 
     # Update the Image Pixel module elements
     for keyword, (operation, value) in changes.items():
@@ -1924,7 +1928,10 @@ def set_pixel_data(
         arr = out
 
     # Update the Pixel Data
-    data = arr.tobytes()
+    if bits_allocated == 1:
+        data = pack_bits(arr)
+    else:
+        data = arr.tobytes()
     ds.PixelData = data if len(data) % 2 == 0 else b"".join((data, b"\x00"))
     elem = ds["PixelData"]
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
