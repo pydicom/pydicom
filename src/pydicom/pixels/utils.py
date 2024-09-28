@@ -1795,7 +1795,7 @@ def set_pixel_data(
     bits_stored : int
         The value to use for (0028,0101) *Bits Stored*. Must be no greater than
         the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`,
-        or 1 in the case of an array of type bool.
+        or 1 in the case of an array of dtype bool.
     generate_instance_uid : bool, optional
         If ``True`` (default) then add or update the (0008,0018) *SOP Instance
         UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
