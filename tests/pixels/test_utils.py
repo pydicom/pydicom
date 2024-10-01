@@ -1934,7 +1934,8 @@ class TestSetPixelData:
         """Test exception raised if dtype is unsupported"""
 
         msg = (
-            r"Unsupported ndarray dtype 'uint32', must be int8, int16, uint8 or uint16"
+            r"Unsupported ndarray dtype 'uint32', must be bool, int8, int16, uint8, "
+            r"or uint16"
         )
         with pytest.raises(ValueError, match=msg):
             set_pixel_data(
@@ -1942,7 +1943,8 @@ class TestSetPixelData:
             )
 
         msg = (
-            r"Unsupported ndarray dtype 'float32', must be int8, int16, uint8 or uint16"
+            r"Unsupported ndarray dtype 'float32', must be bool, int8, int16, uint8, "
+            r"or uint16"
         )
         with pytest.raises(ValueError, match=msg):
             set_pixel_data(
@@ -2082,6 +2084,37 @@ class TestSetPixelData:
         )
         with pytest.raises(NotImplementedError, match=msg):
             set_pixel_data(ds, arr, "MONOCHROME1", 8)
+
+    def test_bool(self):
+        """Test setting bool grayscale pixel data"""
+        ds = Dataset()
+        ds.PlanarConfiguration = 1
+        ds.NumberOfFrames = 2
+
+        arr = np.zeros((3, 5), dtype="bool")
+        arr[0, 0] = 1
+        set_pixel_data(ds, arr, "MONOCHROME2", 1)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.Rows == 3
+        assert ds.Columns == 5
+        assert ds.SamplesPerPixel == 1
+        assert ds.PhotometricInterpretation == "MONOCHROME2"
+        assert ds.PixelRepresentation == 0
+        assert ds.BitsAllocated == 1
+        assert ds.BitsStored == 1
+        assert ds.HighBit == 0
+        assert "NumberOfFrames" not in ds
+        assert "PlanarConfiguration" not in ds
+
+        elem = ds["PixelData"]
+        assert elem.VR == "OB"
+        assert len(elem.value) == 2
+        assert elem.is_undefined_length is False
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, arr)
 
     def test_grayscale_8bit_unsigned(self):
         """Test setting unsigned 8-bit grayscale pixel data"""
