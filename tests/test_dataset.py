@@ -306,7 +306,7 @@ class TestDataset:
         with pytest.raises(
             AttributeError, match="'Dataset' object has no attribute 'file_meta'"
         ):
-            self.ds.validate()
+            self.ds.validate(None)
 
         # Assign file_meta attribute with valid elements
         self.ds.file_meta = FileMetaDataset()
@@ -323,14 +323,14 @@ class TestDataset:
         # Test case 2: No errors after assigning file_meta with valid elements
         self.ds.is_little_endian = True
         self.ds.is_implicit_VR = False  # Changed to match ExplicitVRLittleEndian
-        self.ds.validate()
+        self.ds.validate(None)
 
         # Test case 3: Command Set elements (0000,eeee) are not allowed in datasets
         self.ds.add_new((0x0000, 0x0010), "LO", "COMMAND")
         with pytest.raises(
             ValueError, match="Command Set elements .* are not allowed in datasets"
         ):
-            self.ds.validate()
+            self.ds.validate(None)
         del self.ds[(0x0000, 0x0010)]
 
         # Test case 4: File Meta Information Group elements (0002,eeee) must be in a FileMetaDataset instance
@@ -339,13 +339,13 @@ class TestDataset:
             ValueError,
             match="File Meta Information Group elements .* must be in a FileMetaDataset",
         ):
-            self.ds.validate()
+            self.ds.validate(None)
         del self.ds[(0x0002, 0x0010)]
 
         # Test case 5: 'preamble' attribute must be 128-bytes long
         self.ds.preamble = b"0" * 127
         with pytest.raises(ValueError, match="'preamble' must be 128-bytes long"):
-            self.ds.validate()
+            self.ds.validate(None)
         del self.ds.preamble
 
     def test_setdefault_unknown_tag(self, dont_raise_on_writing_invalid_value):
