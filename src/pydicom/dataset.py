@@ -2652,10 +2652,20 @@ class Dataset:
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
 
-    def validate(self, _unused: _DatasetType) -> None:
+    def validate(self, _init_value: _DatasetType) -> None:
         """Validate the dataset.
 
         Performs the same validation checks as dcmwrite without writing to disk.
+
+        Parameters
+        ----------
+            _init_value : _DatasetType
+                Unused, required for compatibility with FileMetaDataset.
+
+        Returns
+        -------
+        None
+
 
         Raises
         ------
