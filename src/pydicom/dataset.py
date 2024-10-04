@@ -33,7 +33,15 @@ from contextlib import nullcontext
 from importlib.util import find_spec as have_package
 from itertools import takewhile
 from types import TracebackType
-from typing import TypeAlias, Any, AnyStr, cast, BinaryIO, TypeVar, overload
+from typing import (
+    TypeAlias,
+    Any,
+    AnyStr,
+    cast,
+    BinaryIO,
+    TypeVar,
+    overload,
+)
 
 try:
     import numpy
