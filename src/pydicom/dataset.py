@@ -268,12 +268,12 @@ class Dataset:
 
     Add private elements to the :class:`Dataset`
 
+    >>> block = ds.private_block(0x0041, 'My Creator', create=True)
+    >>> block.add_new(0x01, 'LO', '12345')
+
     Validate the dataset:
 
     >>> ds.validate()  # raises ValueError if invalid
-
-    >>> block = ds.private_block(0x0041, 'My Creator', create=True)
-    >>> block.add_new(0x01, 'LO', '12345')
 
     Updating and retrieving element values:
 
