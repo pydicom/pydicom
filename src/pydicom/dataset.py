@@ -33,15 +33,7 @@ from contextlib import nullcontext
 from importlib.util import find_spec as have_package
 from itertools import takewhile
 from types import TracebackType
-from typing import (
-    TypeAlias,
-    Any,
-    AnyStr,
-    cast,
-    BinaryIO,
-    TypeVar,
-    overload,
-)
+from typing import TypeAlias, Any, AnyStr, cast, BinaryIO, TypeVar, overload
 
 try:
     import numpy
@@ -267,6 +259,10 @@ class Dataset:
     >>> ds.BeamSequence[2].Manufacturer = "Linac and Daughters, co."
 
     Add private elements to the :class:`Dataset`
+
+    Validate the dataset:
+
+    >>> ds.validate()  # raises ValueError if invalid
 
     >>> block = ds.private_block(0x0041, 'My Creator', create=True)
     >>> block.add_new(0x01, 'LO', '12345')
@@ -2655,6 +2651,46 @@ class Dataset:
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
         if not hasattr(self, "file_meta"):
             self.file_meta = FileMetaDataset()
+
+    def validate(self, _unused: _DatasetType) -> None:
+        """Validate the dataset.
+
+        Performs the same validation checks as dcmwrite without writing to disk.
+
+        Raises
+        ------
+        ValueError
+            If the dataset is invalid.
+        """
+        # Check for disallowed tags
+        bad_tags = [x >> 16 for x in self._dict if x >> 16 in (0, 2)]
+        if bad_tags:
+            if 0 in bad_tags:
+                raise ValueError(
+                    "Command Set elements (0000,eeee) are not allowed in datasets"
+                )
+            else:
+                raise ValueError(
+                    "File Meta Information Group elements (0002,eeee) must be in a "
+                    "FileMetaDataset instance in the 'file_meta' attribute"
+                )
+
+        # Validate File Meta Information if present
+        if hasattr(self, "file_meta"):
+            validate_file_meta(self.file_meta, enforce_standard=True)
+
+        # Check TransferSyntaxUID if present
+        if "TransferSyntaxUID" in self.file_meta:
+            tsyntax = self.file_meta.TransferSyntaxUID
+            if tsyntax and not tsyntax.is_private and tsyntax.is_transfer_syntax:
+                if "PixelData" in self:
+                    self["PixelData"].is_undefined_length = tsyntax.is_compressed
+
+        # Validate preamble if present
+        if hasattr(self, "preamble"):
+            preamble = self.preamble
+            if preamble and len(preamble) != 128:
+                raise ValueError("'preamble' must be 128-bytes long")
 
     def __setattr__(self, name: str, value: Any) -> None:
         """Intercept any attempts to set a value for an instance attribute.
