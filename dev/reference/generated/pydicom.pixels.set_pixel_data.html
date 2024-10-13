@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
@@ -16,17 +18,13 @@
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=d3077db3"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d3077db3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -46,9 +44,6 @@
             pydicom
               <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                3.1.0.dev0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -158,7 +153,7 @@
 <h1>pydicom.pixels.set_pixel_data<a class="headerlink" href="#pydicom-pixels-set-pixel-data" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixels.set_pixel_data">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.</span></span><span class="sig-name descname"><span class="pre">set_pixel_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photometric_interpretation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_stored</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_instance_uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/927f08c84/pydicom/pixels/utils.py#L1741"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.set_pixel_data" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixels.</span></span><span class="sig-name descname"><span class="pre">set_pixel_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photometric_interpretation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_stored</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_instance_uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5f479582e/pydicom/pixels/utils.py#L1741"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixels.set_pixel_data" title="Link to this definition">¶</a></dt>
 <dd><p>Use an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to set a dataset’s <em>Pixel Data</em> and related
 Image Pixel module elements.</p>
 <div class="versionadded">
@@ -187,13 +182,19 @@ Endian</em> if it doesn’t already exist or uses a compressed (encapsulated)
 transfer syntax.</p></li>
 <li><p>If <cite>generate_instance_uid</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then the <em>SOP Instance UID</em>
 will be added or updated.</p></li>
+<li><p>If a <code class="docutils literal notranslate"><span class="pre">bool</span></code> array is used then the pixel data will be bit-packed using
+<a class="reference internal" href="pydicom.pixels.pack_bits.html#pydicom.pixels.pack_bits" title="pydicom.pixels.pack_bits"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code></a>.</p></li>
 </ul>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.1: </span>Added the ability to use a <code class="docutils literal notranslate"><span class="pre">bool</span></code> ndarray for <em>Bits Allocated</em> <code class="docutils literal notranslate"><span class="pre">1</span></code> with
+bit-packing.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>pydicom.dataset.Dataset</em></a>) – The little endian encoded dataset to be modified.</p></li>
-<li><p><strong>arr</strong> (<em>np.ndarray</em>) – <p>An array with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> uint8, uint16, int8 or int16. The
-array must be shaped as one of the following:</p>
+<li><p><strong>arr</strong> (<em>np.ndarray</em>) – <p>An array with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> bool, uint8, uint16, int8 or int16.
+The array must be shaped as one of the following:</p>
 <ul>
 <li><p>(rows, columns) for a single frame of grayscale data.</p></li>
 <li><p>(frames, rows, columns) for multi-frame grayscale data.</p></li>
@@ -202,12 +203,13 @@ such as RGB.</p></li>
 <li><p>(frames, rows, columns, samples) for multi-frame, multi-sample data.</p></li>
 </ul>
 </p></li>
-<li><p><strong>photometric_interpretation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The value to use for (0028,0004) <em>Photometric Interpretation</em>. Valid values
+<li><p><strong>photometric_interpretation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The value to use for (0028,0004) <em>Photometric Interpretation</em>. Valid values
 are <code class="docutils literal notranslate"><span class="pre">&quot;MONOCHROME1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;MONOCHROME2&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PALETTE</span> <span class="pre">COLOR&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;RGB&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code>.</p></li>
-<li><p><strong>bits_stored</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The value to use for (0028,0101) <em>Bits Stored</em>. Must be no greater than
-the number of bits used by the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.itemsize.html#numpy.dtype.itemsize" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">itemsize</span></code></a> of <cite>arr</cite>.</p></li>
-<li><p><strong>generate_instance_uid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then add or update the (0008,0018) <em>SOP Instance
+<li><p><strong>bits_stored</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The value to use for (0028,0101) <em>Bits Stored</em>. Must be no greater than
+the number of bits used by the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.itemsize.html#numpy.dtype.itemsize" title="(in NumPy v2.1)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">itemsize</span></code></a> of <cite>arr</cite>,
+or 1 in the case of an array of dtype bool.</p></li>
+<li><p><strong>generate_instance_uid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then add or update the (0008,0018) <em>SOP Instance
 UID</em> element with a value generated using <a class="reference internal" href="pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_uid()</span></code></a>.</p></li>
 </ul>
 </dd>

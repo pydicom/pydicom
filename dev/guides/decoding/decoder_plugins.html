@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
@@ -16,17 +18,13 @@
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=d3077db3"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d3077db3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -46,9 +44,6 @@
             pydicom
               <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                3.1.0.dev0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -153,7 +148,7 @@ a <a class="reference internal" href="../../reference/generated/pydicom.uid.UID.
 its dependencies met then it should return <code class="docutils literal notranslate"><span class="pre">True</span></code>, otherwise it should
 return <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </li>
-<li><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> named <code class="docutils literal notranslate"><span class="pre">DECODER_DEPENDENCIES</span></code> with the type
+<li><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> named <code class="docutils literal notranslate"><span class="pre">DECODER_DEPENDENCIES</span></code> with the type
 <code class="docutils literal notranslate"><span class="pre">dict[pydicom.uid.UID,</span> <span class="pre">tuple[str,</span> <span class="pre">...]</span></code>, such as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span><span class="p">,</span> <span class="n">JPEG2000</span>
 
@@ -182,29 +177,29 @@ either directly through the class properties or indirectly with the
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">transfer_syntax_uid</span></code>: <a class="reference internal" href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><code class="xref py py-class docutils literal notranslate"><span class="pre">UID</span></code></a> - the <em>Transfer
 Syntax UID</em> of the encoded data.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rows</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of rows of pixels in decoded data.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">columns</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> -  the number of columns of pixels in the
+<li><p><code class="docutils literal notranslate"><span class="pre">rows</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of rows of pixels in decoded data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">columns</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> -  the number of columns of pixels in the
 decoded data.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">samples_per_pixel</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of samples used per
+<li><p><code class="docutils literal notranslate"><span class="pre">samples_per_pixel</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of samples used per
 pixel, e.g. 1 for grayscale images or 3 for RGB.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">number_of_frames</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of image frames
+<li><p><code class="docutils literal notranslate"><span class="pre">number_of_frames</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of image frames
 contained in <cite>src</cite></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bits_allocated</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain
+<li><p><code class="docutils literal notranslate"><span class="pre">bits_allocated</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain
 each pixel in <cite>src</cite>, should be a multiple of 8.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bits_stored</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits actually used by
+<li><p><code class="docutils literal notranslate"><span class="pre">bits_stored</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits actually used by
 each pixel in <cite>src</cite>, e.g. 12-bit pixel data (range 0 to 4095) will be
 contained by 16-bits (range 0 to 65535).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">photometric_interpretation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the color space
+<li><p><code class="docutils literal notranslate"><span class="pre">photometric_interpretation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the color space
 of the encoded data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pixel_keyword</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - one of <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;FloatPixelData&quot;</span></code>,
+<li><p><code class="docutils literal notranslate"><span class="pre">pixel_keyword</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - one of <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;FloatPixelData&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;DoubleFloatPixelData&quot;</span></code>.</p></li>
 </ul>
 <p>And conditionally:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">pixel_representation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when
+<li><p><code class="docutils literal notranslate"><span class="pre">pixel_representation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when
 <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code> for unsigned integers,
 <code class="docutils literal notranslate"><span class="pre">1</span></code> for signed.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">planar_configuration</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when <code class="docutils literal notranslate"><span class="pre">samples_per_pixel</span></code>
+<li><p><code class="docutils literal notranslate"><span class="pre">planar_configuration</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when <code class="docutils literal notranslate"><span class="pre">samples_per_pixel</span></code>
 &gt; 1, <code class="docutils literal notranslate"><span class="pre">0</span></code> for color-by-pixel, <code class="docutils literal notranslate"><span class="pre">1</span></code> for color-by-plane.</p></li>
 </ul>
 <p>If your decoder needs to signal that one of the decoding option values needs
@@ -216,7 +211,7 @@ other decoding plugins that may also attempt to decode the same frame. It’s al
 important to be aware that any changes you make will also affect following frames
 (if any).</p>
 <p>When possible it’s recommended that the decoding function return the decoded
-pixel data as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> to minimize later memory usage.</p>
+pixel data as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> to minimize later memory usage.</p>
 </li>
 </ul>
 <p>An example of the requirements of a plugin is available <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/pixels/decoders/rle.py">here</a>.</p>
@@ -225,7 +220,7 @@ pixel data as a <a class="reference external" href="https://docs.python.org/3/li
 <h2>Adding Plugins to a Decoder<a class="headerlink" href="#adding-plugins-to-a-decoder" title="Link to this heading">¶</a></h2>
 <p>Additional plugins can be added to an existing decoder with the
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.add_plugin" title="pydicom.pixels.decoders.base.Decoder.add_plugin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_plugin()</span></code></a> method, which takes the
-a unique <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <cite>plugin_label</cite>, and a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <code class="docutils literal notranslate"><span class="pre">('the</span> <span class="pre">import</span>
+a unique <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <cite>plugin_label</cite>, and a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <code class="docutils literal notranslate"><span class="pre">('the</span> <span class="pre">import</span>
 <span class="pre">path</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">decoder</span> <span class="pre">function's</span> <span class="pre">module',</span> <span class="pre">'decoder</span> <span class="pre">function</span> <span class="pre">name')</span></code>. For
 example, if you’d import your decoder function <cite>my_decoder_func</cite> with
 <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">my_package.decoders</span> <span class="pre">import</span> <span class="pre">my_decoder_func</span></code>, then you’d do the
