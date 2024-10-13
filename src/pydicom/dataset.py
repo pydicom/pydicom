@@ -2840,12 +2840,19 @@ class Dataset:
           it doesn't already exist or uses a compressed (encapsulated) transfer syntax.
         * If `generate_instance_uid` is ``True`` (default) then the *SOP Instance UID*
           will be added or updated.
+        * If a ``bool`` array is used then the pixel data will be bit-packed using
+          :func:`~pydicom.pixels.pack_bits`.
+
+        .. versionchanged:: 3.1
+
+            Added the ability to use a ``bool`` ndarray for *Bits Allocated* ``1`` with
+            bit-packing.
 
         Parameters
         ----------
         arr : numpy.ndarray
-            An array with :class:`~numpy.dtype` uint8, uint16, int8 or int16. The
-            array must be shaped as one of the following:
+            An array with :class:`~numpy.dtype` bool, uint8, uint16, int8, or
+            int16. The array must be shaped as one of the following:
 
             * (rows, columns) for a single frame of grayscale data.
             * (frames, rows, columns) for multi-frame grayscale data.
@@ -2857,8 +2864,9 @@ class Dataset:
             values are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``,
             ``"RGB"``, ``"YBR_FULL"``, ``"YBR_FULL_422"``.
         bits_stored : int
-            The value to use for (0028,0101) *Bits Stored*. Must be no greater than
-            the number of bits used by the :attr:`~numpy.dtype.itemsize` of `arr`.
+            The value to use for (0028,0101) *Bits Stored*. Must be no greater
+            than the number of bits used by the :attr:`~numpy.dtype.itemsize`
+            of `arr`, or 1 in the case of an array of dtype bool.
         generate_instance_uid : bool, optional
             If ``True`` (default) then add or update the (0008,0018) *SOP Instance
             UID* element with a value generated using :func:`~pydicom.uid.generate_uid`.
