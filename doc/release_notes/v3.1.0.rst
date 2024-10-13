@@ -10,4 +10,7 @@ Fixes
 * Fixed checking for *Bits Stored* when converting *Float Pixel Data* and *Double Float
   Pixel Data* using the :mod:`~pydicom.pixels` backend (:issue:`2135`).
 * Fixed decoding of pixel data for images with *Bits Allocated* of 1 when frame boundaries are not aligned with byte boundaries (:issue:`2134`).
-* Add option to pass array of dtype `bool` to `set_pixel_data` to store with *BitsAllocated* of (using bit-packing) (:issue:`2141`).
+
+Enhancements
+------------
+* Added the option to pass a ``bool`` ndarray to :func:`~pydicom.pixels.set_pixel_data` to store with *Bits Allocated* of ``1`` using bit-packing (:issue:`2141`).

@@ -2840,6 +2840,8 @@ class Dataset:
           it doesn't already exist or uses a compressed (encapsulated) transfer syntax.
         * If `generate_instance_uid` is ``True`` (default) then the *SOP Instance UID*
           will be added or updated.
+        * If a ``bool`` array is used then the pixel data will be bit-packed using
+          :func:`~pydicom.pixels.pack_bits`.
 
         Parameters
         ----------

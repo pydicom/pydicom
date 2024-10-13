@@ -1774,6 +1774,8 @@ def set_pixel_data(
       transfer syntax.
     * If `generate_instance_uid` is ``True`` (default) then the *SOP Instance UID*
       will be added or updated.
+    * If a ``bool`` array is used then the pixel data will be bit-packed using
+      :func:`~pydicom.pixels.pack_bits`.
 
     Parameters
     ----------
@@ -1928,10 +1930,7 @@ def set_pixel_data(
         arr = out
 
     # Update the Pixel Data
-    if bits_allocated == 1:
-        data = pack_bits(arr)
-    else:
-        data = arr.tobytes()
+    data = pack_bits(arr) if bits_allocated == 1 else arr.tobytes()
     ds.PixelData = data if len(data) % 2 == 0 else b"".join((data, b"\x00"))
     elem = ds["PixelData"]
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
