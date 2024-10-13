@@ -1777,6 +1777,11 @@ def set_pixel_data(
     * If a ``bool`` array is used then the pixel data will be bit-packed using
       :func:`~pydicom.pixels.pack_bits`.
 
+    .. versionchanged:: 3.1
+
+        Added the ability to use a ``bool`` ndarray for *Bits Allocated* ``1`` with
+        bit-packing.
+
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
