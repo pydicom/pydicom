@@ -326,6 +326,12 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.107"""
     HEVCM10P51 = UID("1.2.840.10008.1.2.4.108")
     """1.2.840.10008.1.2.4.108"""
+    JPEGXLLossless = UID("1.2.840.10008.1.2.4.110")
+    """1.2.840.10008.1.2.4.110"""
+    JPEGXLJPEGRecompression = UID("1.2.840.10008.1.2.4.111")
+    """1.2.840.10008.1.2.4.111"""
+    JPEGXL = UID("1.2.840.10008.1.2.4.112")
+    """1.2.840.10008.1.2.4.112"""
     HTJ2KLossless = UID("1.2.840.10008.1.2.4.201")
     """1.2.840.10008.1.2.4.201"""
     HTJ2KLosslessRPCL = UID("1.2.840.10008.1.2.4.202")
@@ -376,6 +382,9 @@ AllTransferSyntaxes = [
     MPEG4HP42STEREOF,
     HEVCMP51,
     HEVCM10P51,
+    JPEGXLLossless,
+    JPEGXLJPEGRecompression,
+    JPEGXL,
     HTJ2KLossless,
     HTJ2KLosslessRPCL,
     HTJ2K,
@@ -409,6 +418,9 @@ JPEG2000TransferSyntaxes = [
     HTJ2K,
 ]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
+
+JPEGXLTransferSyntaxes = [JPEGXLLossless, JPEGXLJPEGRecompression, JPEGXL]
+"""JPEG XL (ISO/IEC 18181-1) transfer syntaxes."""
 
 MPEGTransferSyntaxes = [
     MPEG2MPML,
