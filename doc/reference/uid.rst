@@ -168,6 +168,7 @@ Storage SOP Class UIDs
    GrayscalePlanarMPRVolumetricPresentationStateStorage
    GrayscaleSoftcopyPresentationStateStorage
    HangingProtocolStorage
+   HeightMapSegmentationStorage
    HemodynamicWaveformStorage
    ImplantAssemblyTemplateStorage
    ImplantTemplateGroupStorage
@@ -178,6 +179,7 @@ Storage SOP Class UIDs
    InventoryStorage
    KeratometryMeasurementsStorage
    KeyObjectSelectionDocumentStorage
+   LabelMapSegmentationStorage
    LegacyConvertedEnhancedCTImageStorage
    LegacyConvertedEnhancedMRImageStorage
    LegacyConvertedEnhancedPETImageStorage
@@ -251,6 +253,8 @@ Storage SOP Class UIDs
    SurfaceScanMeshStorage
    SurfaceScanPointCloudStorage
    SurfaceSegmentationStorage
+   ThermographyImageStorage
+   ThermographyMultiFrameImageStorage
    TomotherapeuticRadiationRecordStorage
    TomotherapeuticRadiationStorage
    TractographyResultsStorage

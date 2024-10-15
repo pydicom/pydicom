@@ -797,6 +797,10 @@ EddyCurrentImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.1")
 """1.2.840.10008.5.1.4.1.1.601.1"""
 EddyCurrentMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.2")
 """1.2.840.10008.5.1.4.1.1.601.2"""
+ThermographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.3")
+"""1.2.840.10008.5.1.4.1.1.601.3"""
+ThermographyMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.4")
+"""1.2.840.10008.5.1.4.1.1.601.4"""
 RawDataStorage = UID("1.2.840.10008.5.1.4.1.1.66")
 """1.2.840.10008.5.1.4.1.1.66"""
 SpatialRegistrationStorage = UID("1.2.840.10008.5.1.4.1.1.66.1")
@@ -811,6 +815,10 @@ SurfaceSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.5")
 """1.2.840.10008.5.1.4.1.1.66.5"""
 TractographyResultsStorage = UID("1.2.840.10008.5.1.4.1.1.66.6")
 """1.2.840.10008.5.1.4.1.1.66.6"""
+LabelMapSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.7")
+"""1.2.840.10008.5.1.4.1.1.66.7"""
+HeightMapSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.8")
+"""1.2.840.10008.5.1.4.1.1.66.8"""
 RealWorldValueMappingStorage = UID("1.2.840.10008.5.1.4.1.1.67")
 """1.2.840.10008.5.1.4.1.1.67"""
 SurfaceScanMeshStorage = UID("1.2.840.10008.5.1.4.1.1.68.1")
