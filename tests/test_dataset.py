@@ -1739,6 +1739,23 @@ class TestDataset:
         ds.update_raw_element(0x00100010, value=b"Bar")
         assert ds.PatientName == "Bar"
 
+    def test_is_decompressed(self):
+        """Test Dataset.is_decompressed"""
+        ds = Dataset()
+        msg = (
+            "Unable to determine the dataset's compression state as there's no "
+            r"\(0002,0010\) 'Transfer Syntax UID' element in the dataset's "
+            "'file_meta' or no 'file_meta' has been set"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            ds.is_decompressed
+
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        assert ds.is_decompressed is True
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
+        assert ds.is_decompressed is False
+
 
 class TestDatasetSaveAs:
     def test_no_transfer_syntax(self):
@@ -2739,7 +2756,6 @@ CAMEL_CASE = (
         "patient_records",
         "_parent_encoding",
         "_dict",
-        "is_decompressed",
         "read_encoding",
         "_private_blocks",
         "default_element_format",

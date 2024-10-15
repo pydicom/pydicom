@@ -395,8 +395,6 @@ class Dataset:
         else:
             self._dict = args[0]
 
-        self.is_decompressed = False
-
         # the following read_XXX attributes are used internally to store
         # the properties of the dataset after read from a file
         # set depending on the endianness of the read dataset
@@ -1302,6 +1300,23 @@ class Dataset:
             ds._is_implicit_VR = self.is_implicit_VR
 
         return ds
+
+    @property
+    def is_decompressed(self) -> bool:
+        """Return ``True`` if the dataset uses an uncompressed (native) transfer syntax,
+        ``False`` otherwise.
+        """
+
+        file_meta = getattr(self, "file_meta", {})
+        tsyntax = file_meta.get("TransferSyntaxUID", "")
+        if not tsyntax:
+            raise AttributeError(
+                "Unable to determine the dataset's compression state as there's no "
+                "(0002,0010) 'Transfer Syntax UID' element in the dataset's "
+                "'file_meta' or no 'file_meta' has been set"
+            )
+
+        return not tsyntax.is_compressed
 
     @property
     def is_implicit_VR(self) -> bool | None:
