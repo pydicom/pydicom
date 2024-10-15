@@ -43,12 +43,15 @@ Transfer Syntax UIDs
    MPEG4HP42STEREOF
    HEVCMP51
    HEVCM10P51
-   RLELossless
+   JPEGXLLossless
+   JPEGXLJPEGRecompression
+   JPEGXL
    HTJ2KLossless
    HTJ2KLosslessRPCL
    HTJ2K
    JPIPHTJ2KReferenced
    JPIPHTJ2KReferencedDeflate
+   RLELossless
    SMPTEST211020UncompressedProgressiveActiveVideo
    SMPTEST211020UncompressedInterlacedActiveVideo
    SMPTEST211030PCMDigitalAudio
@@ -64,6 +67,7 @@ Transfer Syntax Lists
    JPEGTransferSyntaxes
    JPEGLSTransferSyntaxes
    JPEG2000TransferSyntaxes
+   JPEGXLTransferSyntaxes
    MPEGTransferSyntaxes
    RLETransferSyntaxes
    UncompressedTransferSyntaxes
@@ -164,6 +168,7 @@ Storage SOP Class UIDs
    GrayscalePlanarMPRVolumetricPresentationStateStorage
    GrayscaleSoftcopyPresentationStateStorage
    HangingProtocolStorage
+   HeightMapSegmentationStorage
    HemodynamicWaveformStorage
    ImplantAssemblyTemplateStorage
    ImplantTemplateGroupStorage
@@ -174,6 +179,7 @@ Storage SOP Class UIDs
    InventoryStorage
    KeratometryMeasurementsStorage
    KeyObjectSelectionDocumentStorage
+   LabelMapSegmentationStorage
    LegacyConvertedEnhancedCTImageStorage
    LegacyConvertedEnhancedMRImageStorage
    LegacyConvertedEnhancedPETImageStorage
@@ -247,6 +253,8 @@ Storage SOP Class UIDs
    SurfaceScanMeshStorage
    SurfaceScanPointCloudStorage
    SurfaceSegmentationStorage
+   ThermographyImageStorage
+   ThermographyMultiFrameImageStorage
    TomotherapeuticRadiationRecordStorage
    TomotherapeuticRadiationStorage
    TractographyResultsStorage
