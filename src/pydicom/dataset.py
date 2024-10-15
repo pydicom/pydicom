@@ -1305,6 +1305,8 @@ class Dataset:
     def is_decompressed(self) -> bool:
         """Return ``True`` if the dataset uses an uncompressed (native) transfer syntax,
         ``False`` otherwise.
+
+        .. versionadded:: 3.1
         """
 
         file_meta = getattr(self, "file_meta", {})
