@@ -14,3 +14,6 @@ Fixes
 Enhancements
 ------------
 * Added the option to pass a ``bool`` ndarray to :func:`~pydicom.pixels.set_pixel_data` to store with *Bits Allocated* of ``1`` using bit-packing (:issue:`2141`).
+* Added the :attr:`Dataset.is_decompressed<pydicom.dataset.Dataset.is_decompressed>`
+  convenience property for determining whether a dataset uses a compressed transfer
+  syntax or not (:issue:`2155`).
