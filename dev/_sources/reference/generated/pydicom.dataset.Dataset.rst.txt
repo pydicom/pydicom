@@ -68,6 +68,7 @@
       ~Dataset.default_element_format
       ~Dataset.default_sequence_element_format
       ~Dataset.indent_chars
+      ~Dataset.is_decompressed
       ~Dataset.is_implicit_VR
       ~Dataset.is_little_endian
       ~Dataset.is_original_encoding

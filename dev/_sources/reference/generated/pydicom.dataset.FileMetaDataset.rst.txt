@@ -69,6 +69,7 @@
       ~FileMetaDataset.default_element_format
       ~FileMetaDataset.default_sequence_element_format
       ~FileMetaDataset.indent_chars
+      ~FileMetaDataset.is_decompressed
       ~FileMetaDataset.is_implicit_VR
       ~FileMetaDataset.is_little_endian
       ~FileMetaDataset.is_original_encoding
