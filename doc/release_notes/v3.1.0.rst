@@ -1,6 +1,11 @@
 Version 3.1.0
 =============
 
+Changes
+-------
+
+* DICOM dictionary updated to 2024d.
+
 Fixes
 -----
 
@@ -14,3 +19,12 @@ Fixes
 Enhancements
 ------------
 * Added the option to pass a ``bool`` ndarray to :func:`~pydicom.pixels.set_pixel_data` to store with *Bits Allocated* of ``1`` using bit-packing (:issue:`2141`).
+* The following UID constants have been added:
+
+    * :attr:`~pydicom.uid.JPEGXLLossless`
+    * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
+    * :attr:`~pydicom.uid.JPEGXL`
+    * :attr:`~pydicom.uid.ThermographyImageStorage`
+    * :attr:`~pydicom.uid.ThermographyMultiFrameImageStorage`
+    * :attr:`~pydicom.uid.LabelMapSegmentationStorage`
+    * :attr:`~pydicom.uid.HeightMapSegmentationStorage`
