@@ -104,7 +104,7 @@ class TestEncodeRunner:
 
         # Test switching byte order to little endian
         arr = arr.astype(">u2")
-        assert arr.dtype.byteorder == ">"
+        assert arr.dtype.byteorder in (">", "=")
         runner.set_source(arr)
         assert runner.is_array
         assert runner.src is not arr

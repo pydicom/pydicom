@@ -151,7 +151,13 @@ def apply_color_lut(
     first_map = lut_desc[1]
     # Actual bit depth may be larger (8 bit entries in 16 bits allocated)
     nominal_depth = lut_desc[2]
-    dtype = np.dtype(f"uint{nominal_depth:.0f}")
+    if nominal_depth % 8:
+        raise ValueError(
+            f"The size of the LUT entries must be 8 or 16-bit, not {nominal_depth}-bit"
+        )
+
+    byte_depth = nominal_depth // 8
+    dtype = np.dtype(f"<u{byte_depth}")
 
     luts: list[bytes] = []
     if "RedPaletteColorLookupTableData" in ds:
@@ -164,7 +170,7 @@ def apply_color_lut(
         )
 
         actual_depth = len(r_lut) / nr_entries * 8
-        dtype = np.dtype(f"uint{actual_depth:.0f}")
+        dtype = np.dtype(f"<u{actual_depth // 8:.0f}")
 
         luts.extend(
             np.frombuffer(lut_bytes, dtype=dtype)
@@ -460,9 +466,9 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # LUTData is (US or OW)
         elem = item["LUTData"]
         if elem.VR == VR.US:
-            lut = np.asarray(elem.value, dtype="u2")
+            lut = np.asarray(elem.value, dtype="<u2")
         else:
-            lut = np.frombuffer(item.LUTData[:nr_bytes], dtype=f"uint{itemsize}")
+            lut = np.frombuffer(item.LUTData[:nr_bytes], dtype=f"<u{itemsize // 8}")
 
         # Set any unused bits to an appropriate value
         if bit_shift := itemsize - bit_depth:
@@ -473,10 +479,10 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
             np.right_shift(lut, bit_shift, out=lut)
 
         # Linearly scale `arr` to quantize it to `nr_entries` values
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max() / (nr_entries - 1)
-        arr = arr.astype("uint16")
+        arr = arr.astype("<u2")
 
         return cast("np.ndarray", lut[arr])
 

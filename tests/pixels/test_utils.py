@@ -2180,7 +2180,7 @@ class TestSetPixelData:
         ds.PlanarConfiguration = 1
         ds.NumberOfFrames = 2
 
-        arr = np.zeros((3, 5), dtype="u2")
+        arr = np.zeros((3, 5), dtype="<u2")
         arr[0, 0] = 65535
         set_pixel_data(ds, arr, "MONOCHROME1", 16)
 
@@ -2206,7 +2206,7 @@ class TestSetPixelData:
         ds.PlanarConfiguration = 1
         ds.NumberOfFrames = 2
 
-        arr = np.zeros((3, 5), dtype="i2")
+        arr = np.zeros((3, 5), dtype="<i2")
         arr[0, 0] = 32767
         arr[0, 1] = -32768
         set_pixel_data(ds, arr, "MONOCHROME1", 16)

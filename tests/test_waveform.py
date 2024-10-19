@@ -74,7 +74,7 @@ class TestHandlerGenerateMultiplex:
         arr = next(gen)
         assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
         assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
-        assert arr.dtype == "int16"
+        assert arr.dtype == "<i2"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
@@ -85,7 +85,7 @@ class TestHandlerGenerateMultiplex:
         arr = next(gen)
         assert [100, 81.25, 62.5, 43.75, 46.25] == arr[0:5, 0].tolist()
         assert [112.5, 106.25, 100, 93.75, 96.25] == arr[0:5, 1].tolist()
-        assert arr.dtype == "float"
+        assert arr.dtype == "<f8"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
@@ -121,14 +121,14 @@ class TestHandlerMultiplexArray:
         arr = multiplex_array(ds, index=0, as_raw=True)
         assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
         assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
-        assert arr.dtype == "int16"
+        assert arr.dtype == "<i2"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
         arr = multiplex_array(ds, index=1, as_raw=True)
         assert [10, 10, 30, 35, 25] == arr[0:5, 0].tolist()
         assert [80, 80, 80, 85, 80] == arr[0:5, 1].tolist()
-        assert arr.dtype == "int16"
+        assert arr.dtype == "<i2"
         assert arr.flags.writeable
         assert (1200, 12) == arr.shape
 
@@ -138,6 +138,6 @@ class TestHandlerMultiplexArray:
         arr = multiplex_array(ds, index=0, as_raw=False)
         assert [100, 81.25, 62.5, 43.75, 46.25] == arr[0:5, 0].tolist()
         assert [112.5, 106.25, 100, 93.75, 96.25] == arr[0:5, 1].tolist()
-        assert arr.dtype == "float"
+        assert arr.dtype == "<f8"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
