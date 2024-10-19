@@ -1824,6 +1824,7 @@ class TestDecompress:
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
         assert len(ds.PixelData) % 2 == 0
 
+    # Test runs if numpy + pillow
     @pytest.mark.skipif(not SKIP_J2K, reason="J2K plugin available")
     def test_no_decoders_raises(self):
         """Test exception raised if no decoders are available."""

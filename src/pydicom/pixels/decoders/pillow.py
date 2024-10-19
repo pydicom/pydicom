@@ -102,7 +102,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     buffer = bytearray(image.tobytes())  # so the array is writeable
     del image
     dtype = runner.pixel_dtype
-    arr = np.frombuffer(buffer, dtype=f"u{dtype.itemsize}")
+    arr = np.frombuffer(buffer, dtype=f"<u{dtype.itemsize}")
 
     is_signed = runner.pixel_representation
     if runner.get_option("apply_j2k_sign_correction", False):
