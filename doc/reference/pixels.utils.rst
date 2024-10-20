@@ -13,6 +13,7 @@ Pixel data related utility functions.
 
    as_pixel_options
    compress
+   convert_rle_endianness
    decompress
    expand_ybr422
    get_expected_length

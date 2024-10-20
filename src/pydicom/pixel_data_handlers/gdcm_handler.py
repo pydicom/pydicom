@@ -5,6 +5,7 @@ decode pixel transfer syntaxes.
 
 from copy import deepcopy
 import os
+import sys
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 
@@ -65,6 +66,11 @@ should_convert_these_syntaxes_to_RGB = [pydicom.uid.JPEGBaseline8Bit]
 def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_GDCM
+
+
+def _is_big_endian_system() -> bool:
+    """Wrapper to allow testing the big endian fixes on little endian systems."""
+    return sys.byteorder == "big"
 
 
 def needs_to_convert_to_RGB(ds: "Dataset") -> bool:
@@ -254,7 +260,17 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     # error handler configured.
     # Therefore, we can encode them back to a bytearray
     # by using the same parameters.
-    pixel_bytearray = pixel_str.encode("utf-8", "surrogateescape")
+    pixel_bytearray = cast(bytes, pixel_str.encode("utf-8", "surrogateescape"))
+
+    # On big endian systems GDCM returns data as big endian :(
+    if _is_big_endian_system() and ds.BitsAllocated > 8:
+        b = bytearray(pixel_bytearray)
+        if ds.BitsAllocated == 16:
+            b[::2], b[1::2] = b[1::2], b[::2]
+        elif ds.BitsAllocated == 32:
+            b[::4], b[1::4], b[2::4], b[3::4] = b[3::4], b[2::4], b[1::4], b[::4]
+
+        pixel_bytearray = bytes(b)
 
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include

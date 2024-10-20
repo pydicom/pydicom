@@ -6,7 +6,7 @@ from io import BytesIO
 import logging
 import os
 import random
-from struct import pack
+from struct import pack, unpack
 from sys import byteorder
 
 import pytest
@@ -24,6 +24,9 @@ from pydicom.encaps import get_frame, encapsulate
 from pydicom.pixels import pixel_array, iter_pixels, convert_color_space
 from pydicom.pixels.decoders.base import _PIXEL_DATA_DECODERS
 from pydicom.pixels.encoders import RLELosslessEncoder
+from pydicom.pixels.encoders.base import EncodeRunner
+from pydicom.pixels.encoders.native import _encode_frame
+from pydicom.pixels.decoders.rle import _rle_decode_frame
 from pydicom.pixels.utils import (
     as_pixel_options,
     _passes_version_check,
@@ -39,6 +42,7 @@ from pydicom.pixels.utils import (
     expand_ybr422,
     compress,
     decompress,
+    convert_rle_endianness,
 )
 from pydicom.uid import (
     EnhancedMRImageStorage,
@@ -63,9 +67,12 @@ from .pixels_reference import (
     RLE_16_1_10F,
     RLE_32_3_2F,
     EXPL_16_1_10F,
+    EXPL_16_1_1F,
     EXPL_16_16_1F,
+    EXPL_8_3_1F,
     EXPL_8_3_1F_ODD,
     EXPL_8_3_1F_YBR422,
+    EXPL_32_3_1F,
     IMPL_16_1_1F,
     JPGB_08_08_3_0_1F_RGB_NO_APP14,
     JPGB_08_08_3_0_1F_RGB_APP14,
@@ -87,11 +94,14 @@ HAVE_RLE = bool(importlib.util.find_spec("rle"))
 HAVE_JLS = bool(importlib.util.find_spec("jpeg_ls"))
 HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
 HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
+HAVE_GDCM = bool(importlib.util.find_spec("gdcm"))
+HAVE_PILLOW = bool(importlib.util.find_spec("PIL"))
 
 SKIP_RLE = not (HAVE_NP and HAVE_PYLJ and HAVE_RLE)
 SKIP_JPG = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
 SKIP_JLS = not (HAVE_NP and HAVE_JLS)
 SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
+HAVE_J2K_DECODERS = HAVE_NP and (HAVE_OJ or HAVE_PILLOW or HAVE_GDCM)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
@@ -1824,8 +1834,7 @@ class TestDecompress:
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
         assert len(ds.PixelData) % 2 == 0
 
-    # Test runs if numpy + pillow
-    @pytest.mark.skipif(not SKIP_J2K, reason="J2K plugin available")
+    @pytest.mark.skipif(HAVE_J2K_DECODERS, reason="J2K plugin available")
     def test_no_decoders_raises(self):
         """Test exception raised if no decoders are available."""
         ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT.path)
@@ -2361,3 +2370,85 @@ class TestSetPixelData:
             ds, np.zeros((3, 5, 3), dtype="u1"), "RGB", 8, generate_instance_uid=False
         )
         assert ds.SOPInstanceUID == uid
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+class TestConvertRLEEndianness:
+    """Tests for convert_rle_endianness()"""
+
+    def test_8bit_3sample(self):
+        """Test converting endianness for 8-bit 3 sample/pixel."""
+        ds = EXPL_8_3_1F.ds
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 8
+        assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        encoded = _encode_frame(ds.PixelData, runner)
+
+        # Only the header should be changed
+        converted = convert_rle_endianness(encoded, 1, ">")
+        assert encoded[64:] == converted[64:]
+        assert unpack("<16L", encoded[:64]) == unpack(">16L", converted[:64])
+
+    def test_16bit_3sample(self):
+        """Test converting endianness for 16-bit 3 sample/pixel."""
+        # Create the test array, each sample should be different
+        ref = np.zeros((128, 128, 3), dtype="<u2")
+        ref[..., 0] = EXPL_16_16_1F.ds.pixel_array
+        ref[..., 1] = EXPL_16_16_1F.ds.pixel_array
+        ref[..., 2] = EXPL_16_16_1F.ds.pixel_array
+        ref[..., 0] += 12552
+        ref[..., 1] += 7254
+        ref[..., 2] += 2561
+
+        kwargs = {
+            "rows": 128,
+            "columns": 128,
+            "samples_per_pixel": 3,
+            "photometric_interpretation": "RGB",
+            "pixel_representation": 0,
+            "bits_allocated": 16,
+            "bits_stored": 16,
+            "number_of_frames": 1,
+            "planar_configuration": 0,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        encoded = _encode_frame(ref.tobytes(), runner)
+
+        # Original encoded lengths are 4454, 16840, 3600, 16840, 4428, 16840
+        header = unpack("<16L", encoded[:64])
+        assert header[:7] == (6, 64, 4518, 21358, 24958, 41798, 46226)
+        assert header[7:] == (0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+        # After conversion segments are moved around and header values changed to match
+        converted = convert_rle_endianness(encoded, 2, ">")
+        header = unpack(">16L", converted[:64])
+        assert header[:7] == (6, 64, 16904, 21358, 38198, 41798, 58638)
+        assert header[7:] == (0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+        assert converted[64:16904] == encoded[4518:21358]
+        assert converted[16904:21358] == encoded[64:4518]
+
+        assert converted[21358:38198] == encoded[24958:41798]
+        assert converted[38198:41798] == encoded[21358:24958]
+
+        assert converted[41798:58638] == encoded[46226:]
+        assert converted[58638:] == encoded[41798:46226]
+
+        converted = convert_rle_endianness(converted, 2, "<")
+        assert converted == encoded

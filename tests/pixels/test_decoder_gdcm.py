@@ -158,7 +158,7 @@ class TestDecoding:
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
-        assert arr.dtype == np.uint16
+        assert arr.dtype == "<u2"
         assert arr.flags.writeable
 
     def test_bits_allocated_mismatch_as_buffer(self):

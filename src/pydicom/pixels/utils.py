@@ -5,7 +5,7 @@ from collections.abc import Iterable, Iterator, ByteString
 import importlib
 import logging
 from pathlib import Path
-from struct import unpack, Struct
+from struct import pack, unpack, Struct
 from sys import byteorder
 from typing import BinaryIO, Any, cast, TYPE_CHECKING
 
@@ -464,6 +464,69 @@ def compress(
         ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
 
     return ds
+
+
+def convert_rle_endianness(buffer: bytes, bytes_per_sample, endianness: str) -> bytes:
+    """Convert RLE encoded data from little to big endian (or vice versa).
+
+    ..versionadded:: 3.1
+
+    Parameters
+    ----------
+    buffer : bytes
+        The RLE encoded data to be converted.
+    bytes_per_sample : int
+        The number of bytes or segments per sample.
+    endianness : str
+        The endianness to use for the converted data, ``"<"`` for little endian
+        or ``">"`` for big endian. Little endian encoding is required by the
+        :dcm:`DICOM Standard<part05/chapter_G.html>`.
+    """
+    b = bytearray(buffer[:64])
+
+    # The header consists of the number of segments, then 15 segment offsets
+    header = list(unpack(f"{'>' if endianness == '<' else '<'}16L", b))
+
+    # If there is only 1 segment per sample we just need to update the header values
+    if bytes_per_sample == 1:
+        encoded_header = pack(f"{endianness}16L", *header)
+
+        return b"".join([encoded_header, buffer[64:]])
+
+    # If there are multiple segments per sample then invert their order
+    # For example, for 2 samples with 3 segments each then:
+    #   1a, 1b, 1c, 2a, 2b, 2c -> 1c, 1b, 1a, 2c, 2b, 2a
+    # Note that this also means the offsets in the header will change
+
+    # Starting and ending offsets for the segments
+    offsets = [x for x in header[1:] if x != 0]
+    offsets.append(len(buffer))
+
+    # The lengths of the segments using their new order
+    lengths = []
+
+    nr_samples = (len(offsets) - 1) // bytes_per_sample
+    for sample_idx in range(0, nr_samples):
+        sample_data = []
+        for segment_idx in range(bytes_per_sample - 1, -1, -1):
+            # For the 2 sample/3 segment example `idx` will be
+            #   2, 1, 0, 5, 4, 3
+            idx = bytes_per_sample * sample_idx + segment_idx
+            start, end = offsets[idx], offsets[idx + 1]
+            # Add the current segment data
+            sample_data.append(buffer[start:end])
+            lengths.append(end - start)
+
+        b.extend(b"".join(segment for segment in sample_data))
+
+    # Update the header with the new offsets
+    offset = 64
+    offsets = [offset := offset + l for l in lengths[:-1]]
+    header[2 : 2 + len(offsets)] = offsets
+
+    b[:64] = pack(f"{endianness}16L", *header)
+
+    return bytes(b)
 
 
 def decompress(

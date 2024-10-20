@@ -279,3 +279,39 @@ class TestRLELossless:
         msg = "Invalid photometric interpretation 'PALETTES COLOR'"
         with pytest.raises(ValueError, match=msg):
             gdcm_rle_encode(b"\x00", runner)
+
+    def test_big_endian_system_u16_3s_1f(self):
+        """Test the encoding results on a big endian system."""
+        ds = dcmread(EXPL_16_3_1F)
+        ref = ds.pixel_array
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": 3,
+            "bits_allocated": 16,
+            "bits_stored": 16,
+            "pixel_representation": 0,
+            "number_of_frames": 1,
+            "photometric_interpretation": "RGB",
+            "planar_configuration": 0,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        def foo(self, test: str) -> bool:
+            return True
+
+        runner._test_for = foo
+
+        gdcm_rle_encode(ds.PixelData, runner)
+
+        decoded = _rle_decode_frame(
+            encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
+        )
+        arr = np.frombuffer(convert_rle_endianness(decoded, 2, "<"), "<u2")
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)

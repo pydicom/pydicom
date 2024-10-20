@@ -132,7 +132,17 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     img.SetPixelFormat(pixel_format)
 
     # GDCM returns char* as str, so re-encode it to bytes
-    frame = img.GetBuffer().encode("utf-8", "surrogateescape")
+    frame = cast(bytes, img.GetBuffer().encode("utf-8", "surrogateescape"))
+
+    # On big endian systems GDCM returns data as big endian :(
+    if runner._test_for("gdcm_be_system"):
+        b = bytearray(frame)
+        if runner.bits_allocated == 16:
+            b[::2], b[1::2] = b[1::2], b[::2]
+        elif runner.bits_allocated == 32:
+            b[::4], b[1::4], b[2::4], b[3::4] = b[3::4], b[2::4], b[1::4], b[::4]
+
+        frame = bytes(b)
 
     # GDCM returns YBR_ICT and YBR_RCT as RGB
     if tsyntax in uid.JPEG2000TransferSyntaxes and photometric_interpretation in (
@@ -141,4 +151,4 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     ):
         runner.set_option("photometric_interpretation", PI.RGB)
 
-    return cast(bytes, frame)
+    return frame

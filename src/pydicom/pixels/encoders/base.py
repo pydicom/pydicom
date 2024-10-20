@@ -57,6 +57,10 @@ class EncodeOptions(RunnerOptions, total=False):
     # The peak signal-to-noise ratio for each layer, should be in increasing order
     j2k_psnr: list[float]
 
+    # RLE Lossless
+    # Fix GDCM encoding errors on big endian systems
+    rle_fix_gdcm_big_endian: bool
+
 
 class EncodeRunner(RunnerBase):
     """Class for managing the pixel data encoding process.
@@ -306,6 +310,15 @@ class EncodeRunner(RunnerBase):
             s.extend([f"  {name}" for name in self._encoders])
 
         return "\n".join(s)
+
+    def _test_for(self, test: str) -> bool:
+        """Return the result of `test` as :class:`bool`."""
+        if test == "gdcm_be_system":
+            return sys.byteorder == "big" and self.get_option(
+                "rle_fix_gdcm_big_endian", True
+            )
+
+        raise ValueError(f"Unknown test '{test}'")
 
     def validate(self) -> None:
         """Validate the encoding options and source pixel data."""

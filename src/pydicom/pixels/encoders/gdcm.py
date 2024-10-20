@@ -4,6 +4,7 @@
 from typing import cast
 
 from pydicom.pixels.encoders.base import EncodeRunner
+from pydicom.pixels.utils import convert_rle_endianness
 from pydicom.uid import RLELossless
 
 try:
@@ -137,7 +138,13 @@ def _rle_encode(src: bytes, runner: EncodeRunner) -> bytes:
         raise RuntimeError("Unexpected number of fragments found in the 'Pixel Data'")
 
     fragment = seq.GetFragment(0).GetByteValue().GetBuffer()
-    return cast(bytes, fragment.encode("utf-8", "surrogateescape"))
+    encoded = cast(bytes, fragment.encode("utf-8", "surrogateescape"))
+
+    # GDCM encodes RLE Lossless incorrectly on big endian systems
+    if runner._test_for("gdcm_be_system"):
+        return convert_rle_endianness(encoded, runner.bits_allocated // 8, "<")
+
+    return encoded
 
 
 _ENCODERS = {RLELossless: _rle_encode}
