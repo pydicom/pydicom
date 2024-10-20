@@ -466,7 +466,9 @@ def compress(
     return ds
 
 
-def convert_rle_endianness(buffer: bytes, bytes_per_sample, endianness: str) -> bytes:
+def _convert_rle_endianness(
+    buffer: bytes, bytes_per_sample: int, endianness: str
+) -> bytes:
     """Convert RLE encoded data from little to big endian (or vice versa).
 
     ..versionadded:: 3.1
@@ -521,7 +523,7 @@ def convert_rle_endianness(buffer: bytes, bytes_per_sample, endianness: str) -> 
 
     # Update the header with the new offsets
     offset = 64
-    offsets = [offset := offset + l for l in lengths[:-1]]
+    offsets = [offset := offset + length for length in lengths[:-1]]
     header[2 : 2 + len(offsets)] = offsets
 
     b[:64] = pack(f"{endianness}16L", *header)

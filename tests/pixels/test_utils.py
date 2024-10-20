@@ -42,7 +42,7 @@ from pydicom.pixels.utils import (
     expand_ybr422,
     compress,
     decompress,
-    convert_rle_endianness,
+    _convert_rle_endianness,
 )
 from pydicom.uid import (
     EnhancedMRImageStorage,
@@ -2374,12 +2374,11 @@ class TestSetPixelData:
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestConvertRLEEndianness:
-    """Tests for convert_rle_endianness()"""
+    """Tests for _convert_rle_endianness()"""
 
     def test_8bit_3sample(self):
         """Test converting endianness for 8-bit 3 sample/pixel."""
         ds = EXPL_8_3_1F.ds
-        ref = ds.pixel_array
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
@@ -2400,7 +2399,7 @@ class TestConvertRLEEndianness:
         encoded = _encode_frame(ds.PixelData, runner)
 
         # Only the header should be changed
-        converted = convert_rle_endianness(encoded, 1, ">")
+        converted = _convert_rle_endianness(encoded, 1, ">")
         assert encoded[64:] == converted[64:]
         assert unpack("<16L", encoded[:64]) == unpack(">16L", converted[:64])
 
@@ -2436,7 +2435,7 @@ class TestConvertRLEEndianness:
         assert header[7:] == (0, 0, 0, 0, 0, 0, 0, 0, 0)
 
         # After conversion segments are moved around and header values changed to match
-        converted = convert_rle_endianness(encoded, 2, ">")
+        converted = _convert_rle_endianness(encoded, 2, ">")
         header = unpack(">16L", converted[:64])
         assert header[:7] == (6, 64, 16904, 21358, 38198, 41798, 58638)
         assert header[7:] == (0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -2450,5 +2449,5 @@ class TestConvertRLEEndianness:
         assert converted[41798:58638] == encoded[46226:]
         assert converted[58638:] == encoded[41798:46226]
 
-        converted = convert_rle_endianness(converted, 2, "<")
+        converted = _convert_rle_endianness(converted, 2, "<")
         assert converted == encoded

@@ -154,7 +154,7 @@ class EncodeRunner(RunnerBase):
             itemsize = 8
 
         if arr.dtype.itemsize != itemsize:
-            arr = arr.astype(f"{arr.dtype.byteorder}{arr.dtype.kind}{itemsize}")
+            arr = arr.astype(f"<{arr.dtype.kind}{itemsize}")
 
         # JPEG-LS allows different ordering of the input image data via the
         #   interleave mode (ILV) parameter. ILV 0 matches a planar configuration

@@ -21,5 +21,3 @@ Enhancements
 * Added the :attr:`Dataset.is_decompressed<pydicom.dataset.Dataset.is_decompressed>`
   convenience property for determining whether a dataset uses a compressed transfer
   syntax or not (:issue:`2155`).
-* Added :func:`~pydicom.pixels.convert_rle_endianness` to convert encoded RLE Lossless
-  data between big and little endian formatting.

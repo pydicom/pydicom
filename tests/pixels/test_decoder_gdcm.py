@@ -2,6 +2,7 @@
 
 import importlib
 import logging
+import sys
 
 import pytest
 
@@ -13,7 +14,10 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom import dcmread, config
+from pydicom.encaps import get_frame
 from pydicom.pixels import get_decoder
+from pydicom.pixels.decoders.gdcm import _decode_frame
+from pydicom.pixels.decoders.base import DecodeRunner
 from pydicom.pixels.utils import _passes_version_check
 from pydicom.uid import (
     JPEGBaseline8Bit,
@@ -24,6 +28,7 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
+    RLELossless,
 )
 
 from .pixels_reference import (
@@ -34,6 +39,7 @@ from .pixels_reference import (
     JLSL_08_07_1_0_1F,
     JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
+    RLE_32_1_1F,
 )
 
 
@@ -237,6 +243,108 @@ class TestDecoding:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
         assert meta["photometric_interpretation"] == "YBR_FULL_422"
+
+    @pytest.mark.skipif(sys.byteorder != "little", reason="Running on BE system")
+    def test_endianness_conversion_08(self):
+        """Test no endianness change for 8-bit."""
+        # Ideally we would just run the regular tests on a big endian systems, but
+        #   instead we have specific tests that run on little endian and force the
+        #   system endianness conversion code to run
+        ds = JPGB_08_08_3_0_1F_RGB.ds
+        assert 8 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = DecodeRunner(JPEGBaseline8Bit)
+        runner.set_options(**kwargs)
+        frame = get_frame(ds.PixelData, 0, number_of_frames=1)
+        unconverted = _decode_frame(frame, runner)
+
+        def foo(*args, **kwargs):
+            return True
+
+        runner._test_for = foo
+
+        converted = bytearray(_decode_frame(frame, runner))
+        assert converted == unconverted
+
+    @pytest.mark.skipif(sys.byteorder != "little", reason="Running on BE system")
+    def test_endianness_conversion_16(self):
+        """Test that the endianness is changed when required."""
+        # 16-bit: byte swapping required
+        ds = J2KR_16_13_1_1_1F_M2_MISMATCH.ds
+        assert 16 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = DecodeRunner(JPEG2000Lossless)
+        runner.set_options(**kwargs)
+        frame = get_frame(ds.PixelData, 0, number_of_frames=1)
+        unconverted = _decode_frame(frame, runner)
+
+        def foo(*args, **kwargs):
+            return True
+
+        runner._test_for = foo
+
+        converted = bytearray(_decode_frame(frame, runner))
+        converted[::2], converted[1::2] = converted[1::2], converted[::2]
+        assert converted == unconverted
+
+    @pytest.mark.skipif(sys.byteorder != "little", reason="Running on BE system")
+    def test_endianness_conversion_32(self):
+        """Test that the endianness is changed when required."""
+        # 32-bit: byte swapping required
+        ds = RLE_32_1_1F.ds
+        assert 32 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = DecodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        frame = get_frame(ds.PixelData, 0, number_of_frames=1)
+        unconverted = _decode_frame(frame, runner)
+
+        def foo(*args, **kwargs):
+            return True
+
+        runner._test_for = foo
+
+        converted = bytearray(_decode_frame(frame, runner))
+        converted[::4], converted[1::4], converted[2::4], converted[3::4] = (
+            converted[3::4],
+            converted[2::4],
+            converted[1::4],
+            converted[::4],
+        )
+        assert converted == unconverted
 
 
 @pytest.fixture()

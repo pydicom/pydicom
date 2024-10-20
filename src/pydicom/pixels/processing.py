@@ -159,7 +159,7 @@ def apply_color_lut(
     byte_depth = nominal_depth // 8
     dtype = np.dtype(f"<u{byte_depth}")
 
-    luts: list[bytes] = []
+    luts: list[np.ndarray] = []
     if "RedPaletteColorLookupTableData" in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
         r_lut = cast(bytes, ds.RedPaletteColorLookupTableData)

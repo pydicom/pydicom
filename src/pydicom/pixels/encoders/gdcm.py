@@ -4,7 +4,7 @@
 from typing import cast
 
 from pydicom.pixels.encoders.base import EncodeRunner
-from pydicom.pixels.utils import convert_rle_endianness
+from pydicom.pixels.utils import _convert_rle_endianness
 from pydicom.uid import RLELossless
 
 try:
@@ -142,7 +142,7 @@ def _rle_encode(src: bytes, runner: EncodeRunner) -> bytes:
 
     # GDCM encodes RLE Lossless incorrectly on big endian systems
     if runner._test_for("gdcm_be_system"):
-        return convert_rle_endianness(encoded, runner.bits_allocated // 8, "<")
+        return _convert_rle_endianness(encoded, runner.bits_allocated // 8, "<")
 
     return encoded
 

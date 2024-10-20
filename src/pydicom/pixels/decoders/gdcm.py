@@ -134,7 +134,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     # GDCM returns char* as str, so re-encode it to bytes
     frame = cast(bytes, img.GetBuffer().encode("utf-8", "surrogateescape"))
 
-    # On big endian systems GDCM returns data as big endian :(
+    # On big endian systems GDCM returns decoded data as big endian :(
     if runner._test_for("gdcm_be_system"):
         b = bytearray(frame)
         if runner.bits_allocated == 16:
