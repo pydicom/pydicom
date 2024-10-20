@@ -471,8 +471,6 @@ def _convert_rle_endianness(
 ) -> bytes:
     """Convert RLE encoded data from little to big endian (or vice versa).
 
-    ..versionadded:: 3.1
-
     Parameters
     ----------
     buffer : bytes

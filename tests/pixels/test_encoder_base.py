@@ -144,6 +144,12 @@ class TestEncodeRunner:
             "  foo"
         )
 
+    def test_test_for_raises(self):
+        """Test _test_for('')"""
+        runner = EncodeRunner(RLELossless)
+        with pytest.raises(ValueError, match=r"Unknown test 'foo'"):
+            runner._test_for("foo")
+
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_validate_array_dimensions(self):
         """Test the ndarray dimensions validation."""

@@ -315,8 +315,10 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             # Need a copy of the pixel module to avoid modifying the original
             pixel_module = deepcopy(ds.group_dataset(0x0028))
             pixel_module.PixelRepresentation = 0
-            dtype = pixel_dtype(pixel_module)
-            arr = (arr.astype(dtype) << shift).astype(numpy_dtype) >> shift
+            arr = arr.astype(pixel_dtype(pixel_module))
+            numpy.left_shift(arr, shift, out=arr)
+            arr = arr.astype(numpy_dtype)
+            numpy.right_shift(arr, shift, out=arr)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
