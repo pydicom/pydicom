@@ -315,9 +315,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             # Need a copy of the pixel module to avoid modifying the original
             pixel_module = deepcopy(ds.group_dataset(0x0028))
             pixel_module.PixelRepresentation = 0
+            # Reinterpret values as unsigned values
             arr = arr.astype(pixel_dtype(pixel_module))
+            # Bit shift so the sign bit ends up as the MSB
             numpy.left_shift(arr, shift, out=arr)
+            # Reinterpret values as signed to match the dataset
             arr = arr.astype(numpy_dtype)
+            # Bit shift back to the original position, which maintains the
+            #   sign bit but sets the pixel value back to the original
             numpy.right_shift(arr, shift, out=arr)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
