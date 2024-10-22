@@ -103,6 +103,9 @@ class DecodeOptions(RunnerOptions, total=False):
     force_rgb: bool  # Force YBR to RGB conversion
     force_ybr: bool  # Force RGB to YBR conversion
 
+    ## GDCM options
+    gdcm_fix_big_endian: bool  # Apply fixes for GDCM on big endian systems
+
 
 def _process_color_space(
     arr: "np.ndarray", runner: "DecodeRunner", changes: dict[str, str | int]
@@ -744,6 +747,13 @@ class DecodeRunner(RunnerBase):
                 self.get_option("correct_unused_bits", False)
                 and self.pixel_keyword == "PixelData"
                 and self.bits_allocated > self.bits_stored
+            )
+
+        if test == "gdcm_be_system":
+            return (
+                sys.byteorder == "big"
+                and self.get_option("gdcm_fix_big_endian", True)
+                and self.bits_allocated > 8
             )
 
         raise ValueError(f"Unknown test '{test}'")

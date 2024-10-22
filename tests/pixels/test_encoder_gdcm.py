@@ -1,5 +1,7 @@
 """Tests for encoding pixel data with GDCM."""
 
+import sys
+
 import pytest
 
 from pydicom import dcmread
@@ -8,7 +10,7 @@ from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.encoders.gdcm import _rle_encode as gdcm_rle_encode
 from pydicom.pixels.decoders.rle import _rle_decode_frame
-from pydicom.pixels.utils import reshape_pixel_array
+from pydicom.pixels.utils import reshape_pixel_array, _convert_rle_endianness
 from pydicom.uid import RLELossless, JPEG2000, ExplicitVRLittleEndian
 
 
@@ -279,3 +281,31 @@ class TestRLELossless:
         msg = "Invalid photometric interpretation 'PALETTES COLOR'"
         with pytest.raises(ValueError, match=msg):
             gdcm_rle_encode(b"\x00", runner)
+
+    @pytest.mark.skipif(sys.byteorder != "little", reason="Running on BE system")
+    def test_endianness_conversion(self):
+        """Test that the endianness is changed when required."""
+        # Normally this would be on big endian systems, but we force it to happen
+        #   on little endian so it can be covered by the tests
+        ds = dcmread(EXPL_8_1_1F)
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "pixel_representation": ds.PixelRepresentation,
+            "number_of_frames": 1,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        unconverted = gdcm_rle_encode(ds.PixelData, runner)
+
+        def foo(*args, **kwargs):
+            return True
+
+        runner._test_for = foo
+        converted = gdcm_rle_encode(ds.PixelData, runner)
+        assert converted == _convert_rle_endianness(unconverted, 1, ">")

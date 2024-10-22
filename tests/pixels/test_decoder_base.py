@@ -241,9 +241,9 @@ class TestDecodeRunner:
     def test_pixel_dtype_float(self):
         runner = DecodeRunner(ExplicitVRLittleEndian)
         runner.set_option("pixel_keyword", "FloatPixelData")
-        assert runner.pixel_dtype == np.float32
+        assert runner.pixel_dtype == "<f4"
         runner.set_option("pixel_keyword", "DoubleFloatPixelData")
-        assert runner.pixel_dtype == np.float64
+        assert runner.pixel_dtype == "<f8"
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_pixel_dtype_byte_swapping(self):

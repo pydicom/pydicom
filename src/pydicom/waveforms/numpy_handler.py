@@ -49,12 +49,12 @@ WAVEFORM_DTYPES = {
     (8, "UB"): "uint8",
     (8, "MB"): "uint8",
     (8, "AB"): "uint8",
-    (16, "SS"): "int16",
-    (16, "US"): "uint16",
-    (32, "SL"): "int32",
-    (32, "UL"): "uint32",
-    (64, "SV"): "int64",
-    (64, "UV"): "uint64",
+    (16, "SS"): "<i2",
+    (16, "US"): "<u2",
+    (32, "SL"): "<i4",
+    (32, "UL"): "<u4",
+    (64, "SV"): "<i8",
+    (64, "UV"): "<u8",
 }
 
 
@@ -130,7 +130,7 @@ def generate_multiplex(
 
         if not as_raw:
             # Apply correction factor (if possible)
-            arr = arr.astype("float")
+            arr = arr.astype("<f8")
             seq = cast(list["Dataset"], item.ChannelDefinitionSequence)
             for jj, ch in enumerate(seq):
                 baseline = ch.get("ChannelBaseline", 0.0)
@@ -205,7 +205,7 @@ def multiplex_array(ds: "Dataset", index: int, as_raw: bool = True) -> "np.ndarr
 
     if not as_raw:
         # Apply correction factor (if possible)
-        arr = arr.astype("float")
+        arr = arr.astype("<f8")
         seq = cast(list["Dataset"], item.ChannelDefinitionSequence)
         for jj, ch in enumerate(seq):
             baseline = ch.get("ChannelBaseline", 0.0)

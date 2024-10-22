@@ -395,7 +395,7 @@ def test(ref, arr, **kwargs):
     assert arr[40:45, 40].tolist() == [1138, 1165, 1113, 1088, 1072]
 
 
-EXPL_16_16_1F = PixelReference("CT_small.dcm", "i2", test)
+EXPL_16_16_1F = PixelReference("CT_small.dcm", "<i2", test)
 
 
 # IMPL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
@@ -1756,7 +1756,7 @@ def test(ref, arr, **kwargs):
     assert 95 == arr[230, 120]
 
 
-JPGE_BAD = PixelReference("JPEG-lossy.dcm", "u2", test)
+JPGE_BAD = PixelReference("JPEG-lossy.dcm", "<u2", test)
 
 
 # JPGE, (16, 12), (1, 1024, 256, 1), OB, MONOCHROME2,
@@ -1767,7 +1767,7 @@ def test(ref, arr, **kwargs):
     assert 95 == arr[230, 120]
 
 
-JPGE_16_12_1_0_1F_M2 = PixelReference("JPGExtended.dcm", "u2", test)
+JPGE_16_12_1_0_1F_M2 = PixelReference("JPGExtended.dcm", "<u2", test)
 
 
 # JPGS, (8, 8), (1, 768, 1024, 1), OB, MONOCHROME2, 0
@@ -1892,7 +1892,7 @@ def test(ref, arr, **kwargs):
     assert arr[59:65, 58].tolist() == [-2073, -2629, -1167, 5566, 11808, 15604]
 
 
-JLSL_16_15_1_1_1F = PixelReference("JLSL_16_15_1_1F.dcm", "i2", test)
+JLSL_16_15_1_1_1F = PixelReference("JLSL_16_15_1_1F.dcm", "<i2", test)
 
 
 # JLSL, (16, 16), (1, 64, 64, 1), OW, MONOCHROME2, 1
@@ -1995,7 +1995,7 @@ def test(ref, arr, **kwargs):
     assert arr[40, 0] == 5
 
 
-JLSN_16_16_1_0_1F = PixelReference("JPEGLSNearLossless_16.dcm", "u2", test)
+JLSN_16_16_1_0_1F = PixelReference("JPEGLSNearLossless_16.dcm", "<u2", test)
 
 
 PIXEL_REFERENCE[JPEGLSLossless] = [

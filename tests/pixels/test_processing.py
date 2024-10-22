@@ -440,8 +440,8 @@ class TestApplyColorLUT:
         """Test that an invalid bit depth raises an exception."""
         ds = dcmread(PAL_08_256_0_16_1F)
         ds.RedPaletteColorLookupTableDescriptor[2] = 15
-        msg = r"data type ['\"]uint15['\"] not understood"
-        with pytest.raises(TypeError, match=msg):
+        msg = "The size of the LUT entries must be 8 or 16-bit, not 15-bit"
+        with pytest.raises(ValueError, match=msg):
             apply_color_lut(ds.pixel_array, ds)
 
     def test_invalid_lut_bit_depth_raises(self):
@@ -1757,7 +1757,7 @@ class TestApplyPresentationLUT:
             assert arr[y, x] == result
 
         out = apply_presentation_lut(arr, ds)
-        assert out.dtype == "uint16"
+        assert out.dtype == "<u2"
         assert (out.min(), out.max()) == (0, 1023)
 
         results = [0, 100, 205, 305, 409, 509, 614, 714, 818, 919, 1023]
@@ -1767,7 +1767,7 @@ class TestApplyPresentationLUT:
         # Reversed output
         seq[0].LUTData.reverse()
         out = apply_presentation_lut(arr, ds)
-        assert out.dtype == "uint16"
+        assert out.dtype == "<u2"
         assert (out.min(), out.max()) == (0, 1023)
 
         results = [1023, 923, 818, 718, 614, 514, 409, 309, 205, 104, 0]
@@ -1778,7 +1778,7 @@ class TestApplyPresentationLUT:
         seq[0].LUTDescriptor = [4096, 0, 16]
         seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
         out = apply_presentation_lut(arr, ds)
-        assert out.dtype == "uint16"
+        assert out.dtype == "<u2"
         assert (out.min(), out.max()) == (0, 65535)
 
         results = [
@@ -1872,7 +1872,7 @@ class TestApplyPresentationLUT:
             assert arr[y, x] == result
 
         out = apply_presentation_lut(arr, ds)
-        assert out.dtype == "uint16"
+        assert out.dtype == "<u2"
         assert (out.min(), out.max()) == (0, 1023)
 
         results = [0, 100, 205, 305, 409, 509, 614, 714, 818, 919, 1023]
@@ -1882,7 +1882,7 @@ class TestApplyPresentationLUT:
         # Reversed output
         seq[0].LUTData.reverse()
         out = apply_presentation_lut(arr, ds)
-        assert out.dtype == "uint16"
+        assert out.dtype == "<u2"
         assert (out.min(), out.max()) == (0, 1023)
 
         results = [1023, 923, 818, 718, 614, 514, 409, 309, 205, 104, 0]
@@ -1893,7 +1893,7 @@ class TestApplyPresentationLUT:
         seq[0].LUTDescriptor = [4096, 0, 16]
         seq[0].LUTData = [int(round(x * (2**16 - 1) / 4095, 0)) for x in range(0, 4096)]
         out = apply_presentation_lut(arr, ds)
-        assert out.dtype == "uint16"
+        assert out.dtype == "<u2"
         assert (out.min(), out.max()) == (0, 65535)
 
         results = [
