@@ -1333,9 +1333,11 @@ def _passes_version_check(package_name: str, minimum_version: tuple[int, ...]) -
     """Return True if `package_name` is available and its version is greater or
     equal to `minimum_version`
     """
+
     try:
         module = importlib.import_module(package_name, "__version__")
-        return tuple(int(x) for x in module.__version__.split(".")) >= minimum_version
+        version = module.__version__.split(".")[:len(minimum_version)]
+        return tuple(int(x) for x in version) >= minimum_version
     except Exception as exc:
         LOGGER.debug(exc)
 
