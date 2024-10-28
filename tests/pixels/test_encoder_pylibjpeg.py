@@ -219,7 +219,7 @@ class TestJ2KLosslessEncoding:
         if HAVE_GDCM:
             plugins.append("gdcm")
 
-        for bits_stored in range(16, 25):
+        for bits_stored in range(1, 25):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**24 - 1)
             ref = ref.astype("<u4")
