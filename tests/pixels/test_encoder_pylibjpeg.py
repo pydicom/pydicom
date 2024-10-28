@@ -196,10 +196,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -227,21 +223,17 @@ class TestJ2KLosslessEncoding:
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**24 - 1)
             ref = ref.astype("<u4")
-            print(bits_stored, ref, ref.dtype, ref.min(), ref.max())
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
                 ref, encoding_plugin="pylibjpeg", **opts
             )
-            with open(f"{bits_stored}.j2k", "wb") as f:
-                f.write(cs)
             for plugin in plugins:
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
                     **opts,
                 )
-                print(out, out.dtype, out.min(), out.max())
                 assert np.array_equal(out, ref)
 
     def test_arr_u1_spp3(self):
@@ -415,10 +407,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -532,9 +520,6 @@ class TestJ2KLosslessEncoding:
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -760,9 +745,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -971,10 +953,6 @@ class TestJ2KEncoding:
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -1191,10 +1169,6 @@ class TestJ2KEncoding:
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -1308,9 +1282,6 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -1547,9 +1518,6 @@ class TestJ2KEncoding:
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,

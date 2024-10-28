@@ -155,7 +155,7 @@ class TestLibJpegDecoder:
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
-        assert arr.dtype == np.uint16
+        assert arr.dtype == "<u2"
         assert arr.flags.writeable
         assert meta["bits_allocated"] == 16
         assert meta["bits_stored"] == 8
@@ -235,11 +235,11 @@ class TestLibJpegDecoder:
         decoder = get_decoder(JPEGLSLossless)
         buffer, meta = decoder.as_buffer(ds, decoding_plugin="pylibjpeg")
         assert meta["bits_allocated"] == 16
-        arr = np.frombuffer(buffer, dtype="u2")
+        arr = np.frombuffer(buffer, dtype="<u2")
         arr = arr.reshape(2, ds.Rows, ds.Columns)
         JLSL_08_07_1_0_1F.test(arr[0], plugin="pylibjpeg")
 
-        arr = arr.astype("i2")
+        arr = arr.astype("<i2")
         # Needs bit-shifting to convert values to signed
         np.left_shift(arr, 1, out=arr)
         np.right_shift(arr, 1, out=arr)
