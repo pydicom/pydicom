@@ -45,6 +45,20 @@ def download_failure():
     download._SIMULATE_NETWORK_OUTAGE = False
 
 
+@pytest.fixture()
+def data_directory(tmp_path_factory):
+    src = get_data_dir()
+    original = download._CONFIG_DIRECTORY
+    path = tmp_path_factory.mktemp("data")
+
+    # Copy contents of the cache to the new temporary directory
+    shutil.copytree(src, path / "data")
+
+    download._CONFIG_DIRECTORY = path
+    yield
+    download._CONFIG_DIRECTORY = original
+
+
 class TestGetData:
     def test_get_dataset(self):
         """Test the different functions to get lists of data files."""
@@ -310,9 +324,9 @@ class TestDownload:
             assert [] == get_testdata_files("693_UN*")
 
 
-def test_fetch_data_files():
+def test_fetch_data_files(data_directory):
     """Test fetch_data_files()."""
-    # Remove a single file from the cache
+    # Remove a single file from the temporary cache
     cache = get_data_dir()
     path = cache / "693_J2KR.dcm"
     if path.exists():

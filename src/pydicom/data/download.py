@@ -42,6 +42,7 @@ from pydicom.misc import warn_and_log
 
 HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
+_CONFIG_DIRECTORY = None  # For setting an alternative config directory
 
 
 def calculate_file_hash(fpath: pathlib.Path) -> str:
@@ -74,6 +75,12 @@ def get_config_dir() -> pathlib.Path:
     The config directory will be named ``.pydicom`` and will be created in the
     local user's home directory.
     """
+    if _CONFIG_DIRECTORY is not None:
+        p = pathlib.Path(_CONFIG_DIRECTORY)
+        p.mkdir(exist_ok=True)
+
+        return p
+
     config_dir = pathlib.Path.home() / ".pydicom"
     config_dir.mkdir(exist_ok=True)
 
