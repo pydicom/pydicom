@@ -43,7 +43,7 @@ class TestJpegLSLossless:
         arr = ds.pixel_array
 
         # Rescale to (0, 1)
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref = arr
@@ -51,7 +51,7 @@ class TestJpegLSLossless:
         ds = examples.rgb_color
         arr = ds.pixel_array
 
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref3 = arr
@@ -176,7 +176,7 @@ class TestJpegLSLossless:
         for bits_stored in range(2, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSLosslessEncoder.encode(ref, encoding_plugin="pyjpegls", **opts)
@@ -216,7 +216,7 @@ class TestJpegLSLossless:
         for bits_stored in range(2, 9):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSLosslessEncoder.encode(ref, encoding_plugin="pyjpegls", **opts)
@@ -236,7 +236,7 @@ class TestJpegLSLossless:
         for bits_stored in range(2, 9):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSLosslessEncoder.encode(ref, encoding_plugin="pyjpegls", **opts)
@@ -313,7 +313,7 @@ class TestJpegLSLossless:
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
             ref = ref.clip(-(2**15), 2**15 - 1)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSLosslessEncoder.encode(ref, encoding_plugin="pyjpegls", **opts)
@@ -459,7 +459,7 @@ class TestJpegLSLossless:
         for bits_stored in range(2, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -503,7 +503,7 @@ class TestJpegLSLossless:
         for bits_stored in range(2, 9):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 6
@@ -528,7 +528,7 @@ class TestJpegLSLossless:
         for bits_stored in range(2, 9):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSLosslessEncoder.encode(ref, encoding_plugin="pyjpegls", **opts)
@@ -610,7 +610,7 @@ class TestJpegLSLossless:
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
             ref = ref.clip(-(2**15), 2**15 - 1)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -669,7 +669,7 @@ class TestJpegLSNearLossless:
         arr = ds.pixel_array
 
         # Rescale to (0, 1)
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref = arr
@@ -677,7 +677,7 @@ class TestJpegLSNearLossless:
         ds = examples.rgb_color
         arr = ds.pixel_array
 
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref3 = arr
@@ -813,7 +813,7 @@ class TestJpegLSNearLossless:
         for bits_stored in range(2, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSNearLosslessEncoder.encode(
@@ -857,7 +857,7 @@ class TestJpegLSNearLossless:
         for bits_stored in range(2, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSNearLosslessEncoder.encode(
@@ -880,7 +880,7 @@ class TestJpegLSNearLossless:
         for bits_stored in range(2, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSNearLosslessEncoder.encode(
@@ -972,7 +972,7 @@ class TestJpegLSNearLossless:
             ref -= 2 ** (bits_stored - 1)
             # Clip within the min/max values for the given bits_stored
             ref = ref.clip(-(2 ** (bits_stored - 1)) + 1, 2 ** (bits_stored - 1) - 2)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSNearLosslessEncoder.encode(
@@ -1132,7 +1132,7 @@ class TestJpegLSNearLossless:
         for bits_stored in range(2, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -1179,7 +1179,7 @@ class TestJpegLSNearLossless:
         for bits_stored in range(2, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 6
@@ -1205,7 +1205,7 @@ class TestJpegLSNearLossless:
         for bits_stored in range(2, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEGLSNearLosslessEncoder.encode(
@@ -1300,7 +1300,7 @@ class TestJpegLSNearLossless:
             ref -= 2 ** (bits_stored - 1)
             # Clip within the min/max values for the given bits_stored
             ref = ref.clip(-(2 ** (bits_stored - 1)) + 1, 2 ** (bits_stored - 1) - 2)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2

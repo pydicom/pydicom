@@ -117,7 +117,7 @@ class TestJ2KLosslessEncoding:
         arr = ds.pixel_array
 
         # Rescale to (0, 1)
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref = arr
@@ -125,7 +125,7 @@ class TestJ2KLosslessEncoding:
         ds = dcmread(RGB)
         arr = ds.pixel_array
 
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref3 = arr
@@ -188,7 +188,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
@@ -196,10 +196,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -226,7 +222,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 25):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**24 - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
@@ -298,7 +294,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
@@ -329,7 +325,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 25):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**24 - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
@@ -403,7 +399,7 @@ class TestJ2KLosslessEncoding:
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
             ref = ref.clip(-32768, 32767)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
@@ -411,10 +407,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -443,7 +435,7 @@ class TestJ2KLosslessEncoding:
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
             ref = ref.clip(-8388608, 8388607)
-            ref = ref.astype("int32")
+            ref = ref.astype("<i4")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000LosslessEncoder.encode(
@@ -518,7 +510,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 65535)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -528,9 +520,6 @@ class TestJ2KLosslessEncoding:
                 buffer, encoding_plugin="pylibjpeg", **opts
             )
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -554,7 +543,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 25):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**24 - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 4
@@ -631,7 +620,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**16 - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 3 * 2
@@ -665,7 +654,7 @@ class TestJ2KLosslessEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**24 - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 3 * 4
@@ -745,7 +734,7 @@ class TestJ2KLosslessEncoding:
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
             ref = ref.clip(-(2**15), 2**15 - 1)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -756,9 +745,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -783,7 +769,7 @@ class TestJ2KLosslessEncoding:
             ref = self.ref * (2**bits_stored - 1)
             ref -= 2 ** (bits_stored - 1)
             ref = ref.clip(-(2**23), 2**23 - 1)
-            ref = ref.astype("int32")
+            ref = ref.astype("<i4")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 4
@@ -889,7 +875,7 @@ class TestJ2KEncoding:
         arr = ds.pixel_array
 
         # Rescale to (0, 1)
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref = arr
@@ -897,7 +883,7 @@ class TestJ2KEncoding:
         ds = dcmread(RGB)
         arr = ds.pixel_array
 
-        arr = arr.astype("float32")
+        arr = arr.astype("<f4")
         arr -= arr.min()
         arr /= arr.max()
         self.ref3 = arr
@@ -961,16 +947,12 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -998,7 +980,7 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 20), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
@@ -1069,7 +1051,7 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
@@ -1103,7 +1085,7 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 20), atols):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
@@ -1181,16 +1163,12 @@ class TestJ2KEncoding:
             minimum = -(2 ** (bits_stored - 1))
             maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                # Pillow doesn't decode 9-bit J2K correctly
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -1222,7 +1200,7 @@ class TestJ2KEncoding:
             minimum = -(2 ** (bits_stored - 1))
             maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
-            ref = ref.astype("int32")
+            ref = ref.astype("<i4")
 
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(ref, encoding_plugin="pylibjpeg", **opts)
@@ -1296,7 +1274,7 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -1304,9 +1282,6 @@ class TestJ2KEncoding:
             opts["bits_stored"] = bits_stored
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -1335,7 +1310,7 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 21), atols):
             ref = self.ref * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 4
@@ -1412,7 +1387,7 @@ class TestJ2KEncoding:
         for bits_stored in range(1, 17):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint16")
+            ref = ref.astype("<u2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 3 * 2
@@ -1449,7 +1424,7 @@ class TestJ2KEncoding:
         for bits_stored, atol in zip(range(1, 20), atols):
             ref = self.ref3 * (2**bits_stored - 1)
             ref = ref.clip(0, 2**bits_stored - 1)
-            ref = ref.astype("uint32")
+            ref = ref.astype("<u4")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 3 * 4
@@ -1534,7 +1509,7 @@ class TestJ2KEncoding:
             minimum = -(2 ** (bits_stored - 1))
             maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
-            ref = ref.astype("int16")
+            ref = ref.astype("<i2")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 2
@@ -1543,9 +1518,6 @@ class TestJ2KEncoding:
             cs = JPEG2000Encoder.encode(buffer, encoding_plugin="pylibjpeg", **opts)
 
             for plugin in plugins:
-                if plugin == "pillow" and bits_stored == 9:
-                    continue
-
                 out, _ = JPEG2000Decoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
@@ -1577,7 +1549,7 @@ class TestJ2KEncoding:
             minimum = -(2 ** (bits_stored - 1))
             maximum = 2 ** (bits_stored - 1) - 1
             ref = ref.clip(minimum, maximum)
-            ref = ref.astype("int32")
+            ref = ref.astype("<i4")
 
             buffer = ref.tobytes()
             assert len(buffer) == ds.Rows * ds.Columns * 4

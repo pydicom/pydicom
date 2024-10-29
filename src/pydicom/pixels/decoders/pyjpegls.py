@@ -18,14 +18,14 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGLSLossless: ("numpy", "pyjpegls>=1.2"),
-    uid.JPEGLSNearLossless: ("numpy", "pyjpegls>=1.2"),
+    uid.JPEGLSLossless: ("numpy", "pyjpegls>=1.5"),
+    uid.JPEGLSNearLossless: ("numpy", "pyjpegls>=1.5"),
 }
 
 
 def is_available(uid: str) -> bool:
     """Return ``True`` if the decoder has its dependencies met, ``False`` otherwise"""
-    return _passes_version_check("jpeg_ls", (1, 2))
+    return _passes_version_check("jpeg_ls", (1, 5))
 
 
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:

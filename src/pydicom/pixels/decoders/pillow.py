@@ -27,10 +27,10 @@ except ImportError:
 
 
 DECODER_DEPENDENCIES = {
-    uid.JPEGBaseline8Bit: ("pillow>=10.0",),
-    uid.JPEGExtended12Bit: ("pillow>=10.0",),
-    uid.JPEG2000Lossless: ("numpy", "pillow>=10.0"),
-    uid.JPEG2000: ("numpy", "pillow>=10.0"),
+    uid.JPEGBaseline8Bit: ("pillow>=10.3",),
+    uid.JPEGExtended12Bit: ("pillow>=10.3",),
+    uid.JPEG2000Lossless: ("numpy", "pillow>=10.3"),
+    uid.JPEG2000: ("numpy", "pillow>=10.3"),
 }
 
 _LIBJPEG_SYNTAXES = [uid.JPEGBaseline8Bit, uid.JPEGExtended12Bit]
@@ -41,7 +41,7 @@ def is_available(uid: str) -> bool:
     """Return ``True`` if a pixel data decoder for `uid` is available for use,
     ``False`` otherwise.
     """
-    if not _passes_version_check("PIL", (10, 0)):
+    if not _passes_version_check("PIL", (10, 3)):
         return False
 
     if uid in _LIBJPEG_SYNTAXES:

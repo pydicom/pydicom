@@ -17,8 +17,8 @@ except ImportError:
 
 
 ENCODER_DEPENDENCIES = {
-    uid.JPEG2000Lossless: ("numpy", "pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.2"),
-    uid.JPEG2000: ("numpy", "pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.2"),
+    uid.JPEG2000Lossless: ("numpy", "pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.4"),
+    uid.JPEG2000: ("numpy", "pylibjpeg>=2.0", "pylibjpeg-openjpeg>=2.4"),
     uid.RLELossless: ("numpy", "pylibjpeg>=2.0", "pylibjpeg-rle>=2.0"),
 }
 _OPENJPEG_SYNTAXES = [uid.JPEG2000Lossless, uid.JPEG2000]
@@ -33,7 +33,7 @@ def is_available(uid: str) -> bool:
         return False
 
     if uid in _OPENJPEG_SYNTAXES:
-        return _passes_version_check("openjpeg", (2, 2))
+        return _passes_version_check("openjpeg", (2, 4))
 
     if uid in _RLE_SYNTAXES:
         return _passes_version_check("rle", (2, 0))
