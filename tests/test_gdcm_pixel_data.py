@@ -22,7 +22,7 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import get_frame
 from pydicom.pixel_data_handlers import numpy_handler, gdcm_handler
 from pydicom.pixels.processing import _convert_YBR_FULL_to_RGB
-from pydicom.pixels.utils import get_j2k_parameters
+from pydicom.pixels.utils import get_j2k_parameters, reshape_pixel_array
 from pydicom.tag import Tag
 
 try:
@@ -32,7 +32,14 @@ try:
 except ImportError:
     HAVE_GDCM = False
 
+from .pixels.pixels_reference import (
+    J2KR_16_10_1_0_1F_M1,
+    JPGB_08_08_3_0_1F_RGB,
+    RLE_32_1_1F,
+)
+
 HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
+TEST_BIG_ENDIAN = sys.byteorder == "little" and HAVE_NP and HAVE_GDCM
 
 
 gdcm_present_message = "GDCM is being tested"
@@ -552,7 +559,7 @@ class TestsWithGDCM:
         arr = ds.pixel_array
         assert 1 == ds.PixelRepresentation
 
-        assert "int16" == arr.dtype
+        assert "<i2" == arr.dtype
         assert (512, 512) == arr.shape
         assert arr.flags.writeable
 
@@ -653,3 +660,65 @@ class TestSupportFunctions:
         assert px_repr == pixel_format.GetPixelRepresentation()
         planar = dataset_3d.PlanarConfiguration
         assert planar == image.GetPlanarConfiguration()
+
+
+@pytest.fixture()
+def enable_be_testing():
+    def foo(*args, **kwargs):
+        return True
+
+    original_fn = gdcm_handler._is_big_endian_system
+    gdcm_handler._is_big_endian_system = foo
+    yield
+
+    gdcm_handler._is_big_endian_system = original_fn
+
+
+@pytest.mark.skipif(not TEST_BIG_ENDIAN, reason="Running on BE system")
+class TestEndiannessConversion:
+    """Test conversion for big endian systems with GDCM"""
+
+    # Ideally we would just run the regular tests on a big endian systems, but
+    #   instead we have specific tests that run on little endian and force the
+    #   system endianness conversion code to run
+    def test_endianness_conversion_08(self, enable_be_testing):
+        """Test no endianness change for 8-bit."""
+        ref = JPGB_08_08_3_0_1F_RGB
+        ds = ref.ds
+
+        assert 8 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
+
+        arr = gdcm_handler.get_pixeldata(ds)
+        arr = reshape_pixel_array(ds, arr)
+
+        ref.test(arr, plugin="gdcm")
+
+    def test_endianness_conversion_16(self, enable_be_testing):
+        """Test that the endianness is changed when required."""
+        # 16-bit: byte swapping required
+        ref = J2KR_16_10_1_0_1F_M1
+        ds = ref.ds
+        assert 16 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+        assert 0 == ds.PixelRepresentation
+
+        arr = gdcm_handler.get_pixeldata(ds)
+        arr = reshape_pixel_array(ds, arr)
+        ref.test(arr.view(">u2"), plugin="gdcm")
+
+    def test_endianness_conversion_32(self, enable_be_testing):
+        """Test that the endianness is changed when required."""
+        # 32-bit: byte swapping required
+        ref = RLE_32_1_1F
+        ds = ref.ds
+        assert 32 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+        assert 0 == ds.PixelRepresentation
+
+        def foo(*args, **kwargs):
+            return True
+
+        arr = gdcm_handler.get_pixeldata(ds)
+        arr = reshape_pixel_array(ds, arr)
+        ref.test(arr.view(">u4"), plugin="gdcm")

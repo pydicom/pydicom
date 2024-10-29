@@ -403,14 +403,14 @@ REFERENCE_DATA_LITTLE = [
     (EXPL_8_1_2F, (EXPL, 8, 1, 0, 2, (2, 600, 800), "uint8")),
     (EXPL_8_3_1F, (EXPL, 8, 3, 0, 1, (100, 100, 3), "uint8")),
     (EXPL_8_3_2F, (EXPL, 8, 3, 0, 2, (2, 100, 100, 3), "uint8")),
-    (EXPL_16_1_1F, (EXPL, 16, 1, 1, 1, (64, 64), "int16")),
-    (EXPL_16_1_10F, (EXPL, 16, 1, 0, 10, (10, 64, 64), "uint16")),
-    (EXPL_16_3_1F, (EXPL, 16, 3, 0, 1, (100, 100, 3), "uint16")),
-    (EXPL_16_3_2F, (EXPL, 16, 3, 0, 2, (2, 100, 100, 3), "uint16")),
-    (IMPL_32_1_1F, (IMPL, 32, 1, 0, 1, (10, 10), "uint32")),
-    (IMPL_32_1_15F, (IMPL, 32, 1, 0, 15, (15, 10, 10), "uint32")),
-    (EXPL_32_3_1F, (EXPL, 32, 3, 0, 1, (100, 100, 3), "uint32")),
-    (EXPL_32_3_2F, (EXPL, 32, 3, 0, 2, (2, 100, 100, 3), "uint32")),
+    (EXPL_16_1_1F, (EXPL, 16, 1, 1, 1, (64, 64), "<i2")),
+    (EXPL_16_1_10F, (EXPL, 16, 1, 0, 10, (10, 64, 64), "<u2")),
+    (EXPL_16_3_1F, (EXPL, 16, 3, 0, 1, (100, 100, 3), "<u2")),
+    (EXPL_16_3_2F, (EXPL, 16, 3, 0, 2, (2, 100, 100, 3), "<u2")),
+    (IMPL_32_1_1F, (IMPL, 32, 1, 0, 1, (10, 10), "<u4")),
+    (IMPL_32_1_15F, (IMPL, 32, 1, 0, 15, (15, 10, 10), "<u4")),
+    (EXPL_32_3_1F, (EXPL, 32, 3, 0, 1, (100, 100, 3), "<u4")),
+    (EXPL_32_3_2F, (EXPL, 32, 3, 0, 2, (2, 100, 100, 3), "<u4")),
 ]
 
 
@@ -811,7 +811,7 @@ class TestNumpy_NumpyHandler:
             arr = ds.pixel_array
 
         assert (64, 64) == arr.shape
-        assert arr.dtype == "int16"
+        assert arr.dtype == "<i2"
 
         assert arr.flags.writeable
 
@@ -1074,7 +1074,7 @@ class TestNumpy_NumpyHandler:
         ds.PixelRepresentation = 0
         ds.SamplesPerPixel = 1
         ds.PhotometricInterpretation = "MONOCHROME2"
-        arr = np.ones((10, 10), dtype="uint16")
+        arr = np.ones((10, 10), dtype="<u2")
         ds.PixelData = arr.tobytes()
 
         assert ds.pixel_array.max() == 1
@@ -1313,7 +1313,7 @@ class TestNumpy_GetPixelData:
         del ds.PixelData
         assert 32 == ds.BitsAllocated
         arr = get_pixeldata(ds)
-        assert "float32" == arr.dtype
+        assert "<f4" == arr.dtype
 
     def test_double_float_pixel_data(self):
         """Test handling of Double Float Pixel Data."""
@@ -1324,7 +1324,7 @@ class TestNumpy_GetPixelData:
         del ds.PixelData
         ds.BitsAllocated = 64
         arr = get_pixeldata(ds)
-        assert "float64" == arr.dtype
+        assert "<f8" == arr.dtype
 
     def test_big_endian_rgb_data(self):
         """RGB data encoded as OW in Big Endian transfer syntax shall

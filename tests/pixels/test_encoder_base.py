@@ -104,7 +104,7 @@ class TestEncodeRunner:
 
         # Test switching byte order to little endian
         arr = arr.astype(">u2")
-        assert arr.dtype.byteorder == ">"
+        assert arr.dtype.byteorder in (">", "=")
         runner.set_source(arr)
         assert runner.is_array
         assert runner.src is not arr
@@ -143,6 +143,12 @@ class TestEncodeRunner:
             "Encoders\n"
             "  foo"
         )
+
+    def test_test_for_raises(self):
+        """Test _test_for('')"""
+        runner = EncodeRunner(RLELossless)
+        with pytest.raises(ValueError, match=r"Unknown test 'foo'"):
+            runner._test_for("foo")
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_validate_array_dimensions(self):

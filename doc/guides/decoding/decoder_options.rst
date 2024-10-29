@@ -146,11 +146,24 @@ The following options are plugin and transfer syntax specific.
 *RLE Lossless*
 --------------
 
-+---------------+---------------------+----------------------------------------+
-| Plugin        | Option              | Description                            |
-| name          |                     |                                        |
-+===============+=====================+========================================+
-| ``pydicom``   |``rle_segment_order``| ``">"`` for big endian segment order   |
-+---------------+---------------------+ (default) or ``"<"`` for little endian |
-| ``pylibjpeg`` |``byteorder``        | segment order                          |
-+---------------+---------------------+----------------------------------------+
++---------------+-------------------------+----------------------------------------+
+| Plugin        | Option                  | Description                            |
+| name          |                         |                                        |
++===============+=========================+========================================+
+| ``pydicom``   |``rle_segment_order``    | ``">"`` for big endian segment order   |
++---------------+-------------------------+ (default) or ``"<"`` for little endian |
+| ``pylibjpeg`` |``byteorder``            | segment order                          |
++---------------+-------------------------+----------------------------------------+
+
+GDCM
+----
+
+The following option applies when using GDCM on big endian systems.
+
++---------------+-------------------------+----------------------------------------+
+| Plugin        | Option                  | Description                            |
+| name          |                         |                                        |
++===============+=========================+========================================+
+| ``gdcm``      | ``gdcm_fix_big_endian`` | ``True`` to enable fixes for GDCM on   |
+|               |                         | big endian systems (default)           |
++---------------+-------------------------+----------------------------------------+
