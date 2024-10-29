@@ -1756,6 +1756,15 @@ class TestDataset:
         ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         assert ds.is_decompressed is False
 
+    def test_pickle_lut(self):
+        """Reversion test for #2160"""
+        ds = Dataset()
+        ds["LUTDescriptor"] = DataElement(0x00283002, "US", [1, 2])
+        s = pickle.dumps({"ds": ds})
+        ds1 = pickle.loads(s)["ds"]
+        assert ds == ds1
+        assert ds1.LUTDescriptor == [1, 2]
+
 
 class TestDatasetSaveAs:
     def test_no_transfer_syntax(self):
