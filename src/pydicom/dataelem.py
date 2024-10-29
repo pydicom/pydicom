@@ -101,6 +101,11 @@ def empty_value_for_VR(
     return None
 
 
+def _pass_through(val: Any) -> Any:
+    """Pass through function to skip DataElement value validation."""
+    return val
+
+
 class DataElement:
     """Contain and manipulate a DICOM Element.
 
@@ -597,15 +602,11 @@ class DataElement:
         # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first and
         #   third values are always US (the third should be <= 16, so SS is OK)
         if self.tag in _LUT_DESCRIPTOR_TAGS and val:
-
-            def _skip_conversion(val: Any) -> Any:
-                return val
-
             validate_value(VR_.US, val[0], self.validation_mode)
             for value in val[1:]:
                 validate_value(self.VR, value, self.validation_mode)
 
-            return MultiValue(_skip_conversion, val)
+            return MultiValue(_pass_through, val)
 
         return MultiValue(self._convert, val)
 
