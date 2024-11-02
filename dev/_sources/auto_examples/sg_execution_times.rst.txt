@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.206** total execution time for 4 files **from auto_examples**:
+**00:00.102** total execution time for 4 files **from auto_examples**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``plot_dicom_difference.py``)
-     - 00:00.206
+     - 00:00.102
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dicomtree.py` (``dicomtree.py``)
      - 00:00.000
