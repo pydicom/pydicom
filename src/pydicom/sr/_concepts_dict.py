@@ -27637,8 +27637,8 @@ concepts["SCT"] = {
     "SouthernUkrainianCattleBreed": {
         "133510004": ("Southern Ukrainian cattle breed (organism)", [])
     },
-    "SouthernUkranianCattleBreed": {
-        "133510004": ("Southern Ukranian cattle breed", [7480])
+    "SouthernUkrainianCattleBreed": {
+        "133510004": ("Southern Ukrainian cattle breed", [7480])
     },
     "SouthwestSpanishMustangHorseBreed": {
         "133089001": ("Southwest Spanish Mustang horse breed", [7480])
@@ -34222,7 +34222,7 @@ concepts["SCT"] = {
     },
     "YucaPig": {"15443006": ("Yuca pig (organism)", [])},
     "YucaPigBreed": {"15443006": ("Yuca pig breed", [7480])},
-    "YucatanMinaturePigBreed": {"132226007": ("Yucatan Minature pig breed", [7480])},
+    "YucatanMiniaturePigBreed": {"132226007": ("Yucatan Miniature pig breed", [7480])},
     "YucatanMiniaturePigBreed": {
         "132226007": ("Yucatan Miniature pig breed (organism)", [])
     },
