@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEGXLJPEGRecompression
+===================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGXLJPEGRecompression

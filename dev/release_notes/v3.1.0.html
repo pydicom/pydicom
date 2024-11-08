@@ -100,6 +100,12 @@
              
   <section id="version-3-1-0">
 <h1>Version 3.1.0<a class="headerlink" href="#version-3-1-0" title="Link to this heading">¶</a></h1>
+<section id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>DICOM dictionary updated to 2024d.</p></li>
+</ul>
+</section>
 <section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -118,12 +124,22 @@ are not aligned with byte boundaries (<a class="extlink-issue reference external
 </section>
 <section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
-<ul class="simple">
+<ul>
 <li><p>Added the option to pass a <code class="docutils literal notranslate"><span class="pre">bool</span></code> ndarray to <a class="reference internal" href="../reference/generated/pydicom.pixels.set_pixel_data.html#pydicom.pixels.set_pixel_data" title="pydicom.pixels.set_pixel_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_pixel_data()</span></code></a>
 to store with <em>Bits Allocated</em> of <code class="docutils literal notranslate"><span class="pre">1</span></code> using bit-packing (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2141">#2141</a>).</p></li>
 <li><p>Added the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_decompressed" title="pydicom.dataset.Dataset.is_decompressed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.is_decompressed</span></code></a>
 convenience property for determining whether a dataset uses a compressed transfer
 syntax or not (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2155">#2155</a>).</p></li>
+<li><p>Updated UIDs to version 2024d of the DICOM Standard</p></li>
+<li><p>The following UID constants have been added:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPEGXLLossless.html#pydicom.uid.JPEGXLLossless" title="pydicom.uid.JPEGXLLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGXLLossless</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPEGXLJPEGRecompression.html#pydicom.uid.JPEGXLJPEGRecompression" title="pydicom.uid.JPEGXLJPEGRecompression"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGXLJPEGRecompression</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPEGXL.html#pydicom.uid.JPEGXL" title="pydicom.uid.JPEGXL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGXL</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </section>
 </section>

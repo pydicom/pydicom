@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEGXLTransferSyntaxes
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGXLTransferSyntaxes

@@ -1,0 +1,6 @@
+﻿pydicom.uid.HeightMapSegmentationStorage
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: HeightMapSegmentationStorage

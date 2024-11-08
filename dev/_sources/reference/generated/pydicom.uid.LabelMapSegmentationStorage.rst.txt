@@ -1,0 +1,6 @@
+﻿pydicom.uid.LabelMapSegmentationStorage
+=======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: LabelMapSegmentationStorage

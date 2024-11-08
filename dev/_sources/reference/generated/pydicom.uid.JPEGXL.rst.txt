@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEGXL
+==================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGXL

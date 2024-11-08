@@ -1,6 +1,11 @@
 Version 3.1.0
 =============
 
+Changes
+-------
+
+* DICOM dictionary updated to 2024d.
+
 Fixes
 -----
 
@@ -23,3 +28,9 @@ Enhancements
 * Added the :attr:`Dataset.is_decompressed<pydicom.dataset.Dataset.is_decompressed>`
   convenience property for determining whether a dataset uses a compressed transfer
   syntax or not (:issue:`2155`).
+* Updated UIDs to version 2024d of the DICOM Standard
+* The following UID constants have been added:
+
+    * :attr:`~pydicom.uid.JPEGXLLossless`
+    * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
+    * :attr:`~pydicom.uid.JPEGXL`

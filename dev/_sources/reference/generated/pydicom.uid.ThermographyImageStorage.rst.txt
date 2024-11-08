@@ -1,0 +1,6 @@
+﻿pydicom.uid.ThermographyImageStorage
+====================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ThermographyImageStorage
