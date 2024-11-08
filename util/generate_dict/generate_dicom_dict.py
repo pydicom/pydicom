@@ -302,6 +302,17 @@ if __name__ == "__main__":
         # replace micro symbol
         attr["Name"] = attr["Name"].replace("µ", "u")
 
+        # Retired placeholder elements that won't be used - note 3 in Part 6 of PS3.6
+        # Examples: (0008,0202), (0018,0061)
+        if not attr["Keyword"] and not attr["Name"]:
+            attr["Name"] = "Retired-blank"
+            attr["Retired"] = "Retired"
+            if not attr["VR"]:
+                attr["VR"] = "OB"
+
+            if not attr["VM"]:
+                attr["VM"] = "1"
+
         # some new tags don't have the retired entry (2019)
         if "Retired" not in attr:
             attr["Retired"] = ""
@@ -317,13 +328,6 @@ if __name__ == "__main__":
 
         # e.g. (0028,1200)
         attr["VM"] = attr["VM"].split(" or ")[0]
-
-        # If blank then add dummy vals
-        # e.g. (0018,9445) and (0028,0020)
-        if attr["VR"] == "" and attr["VM"] == "":
-            attr["VR"] = "OB"
-            attr["VM"] = "1"
-            attr["Name"] = "Retired-blank"
 
         # handle retired 'repeating group' tags
         # e.g. (50xx,eeee) or (gggg,31xx)
