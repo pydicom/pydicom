@@ -14,8 +14,8 @@ jobs:
         # Macos unlikely to fail if ubuntu okay so also cover in merge
         os: [windows]
         python-version: ["3.12", "3.13"]
-        test-extras: [false]
         test-numpy: [true]
+        test-extras: [false]
         upload-coverage: [false]
         include:
           - os: ubuntu
