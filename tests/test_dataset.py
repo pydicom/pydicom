@@ -3012,7 +3012,7 @@ class TestDatasetWithBufferedData:
 
         msg = (
             r"Error deepcopying the buffered element \(7FE0,0010\) 'Pixel Data': "
-            r"cannot (.*) '_io.BufferedReader' object"
+            r"cannot (.*)BufferedReader'"
         )
         with pytest.raises(TypeError, match=msg):
             copy.deepcopy(ds)
