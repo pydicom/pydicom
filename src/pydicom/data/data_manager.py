@@ -330,7 +330,7 @@ def get_testdata_file(
     """
 
     path = _get_testdata_file(name=name, download=download)
-        
+
     if read and path is not None:
         from pydicom.filereader import dcmread
 
@@ -344,9 +344,9 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
 
     if Path(name).anchor:
         raise ValueError(
-                f"'get_testdata_file' does not support absolute paths, as it only works"
-                f" with internal pydicom test data - did you mean 'dcmread(\"{name}\")'?"
-            )
+            f"'get_testdata_file' does not support absolute paths, as it only works"
+            f" with internal pydicom test data - did you mean 'dcmread(\"{name}\")'?"
+        )
     matches = [m for m in data_path.rglob(name)]
     if matches:
         return os.fspath(matches[0])

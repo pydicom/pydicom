@@ -2,6 +2,7 @@
 """Utilities for pixel data handling."""
 
 from collections.abc import Iterable, Iterator
+
 try:
     from collections.abc import Buffer  # type: ignore[attr-defined]
 except ImportError:
