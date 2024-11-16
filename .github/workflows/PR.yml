@@ -13,7 +13,7 @@ jobs:
         # PyPy only has one line in pydicom (as of 2003-07) so cover in merge only
         # Macos unlikely to fail if ubuntu okay so also cover in merge
         os: [windows]
-        python-version: ["3.10"]  # , "3.12" soon
+        python-version: ["3.12", "3.13"]
         test-extras: [false]
         upload-coverage: [false]
         include:
@@ -25,6 +25,13 @@ jobs:
             python-version: "3.10"
             test-extras: true
             upload-coverage: false
+          # Pre-release Python
+          - os: ubuntu
+            python-version: "3.14"  
+            test-numpy: false
+            test-extras: false
+            upload-coverage: false
+
     uses: ./.github/workflows/tests_wf.yml
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
@@ -43,10 +50,10 @@ jobs:
           python-version: ['3.10']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
