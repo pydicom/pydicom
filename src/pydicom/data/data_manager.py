@@ -328,13 +328,9 @@ def get_testdata_file(
     ValueError
         If `name` is an absolute path.
     """
-    if os.path.isabs(name):
-        raise ValueError(
-            f"'get_testdata_file' does not support absolute paths, as it only works"
-            f" with internal pydicom test data - did you mean 'dcmread(\"{name}\")'?"
-        )
 
     path = _get_testdata_file(name=name, download=download)
+
     if read and path is not None:
         from pydicom.filereader import dcmread
 
@@ -345,6 +341,12 @@ def get_testdata_file(
 def _get_testdata_file(name: str, download: bool = True) -> str | None:
     # Check pydicom local
     data_path = Path(DATA_ROOT) / "test_files"
+
+    if Path(name).anchor:
+        raise ValueError(
+            f"'get_testdata_file' does not support absolute paths, as it only works"
+            f" with internal pydicom test data - did you mean 'dcmread(\"{name}\")'?"
+        )
     matches = [m for m in data_path.rglob(name)]
     if matches:
         return os.fspath(matches[0])
@@ -400,7 +402,7 @@ def get_testdata_files(pattern: str = "**/*") -> list[str]:
     ValueError
         If `pattern` matches an absolute path.
     """
-    if os.path.isabs(pattern):
+    if Path(pattern).anchor:
         raise ValueError(
             "'get_testdata_files' does not support absolute paths, as it only works"
             " with internal pydicom test data."

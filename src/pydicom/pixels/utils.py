@@ -1,7 +1,12 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Utilities for pixel data handling."""
 
-from collections.abc import Iterable, Iterator, ByteString
+from collections.abc import Iterable, Iterator
+
+try:
+    from collections.abc import Buffer  # type: ignore[attr-defined]
+except ImportError:
+    from collections.abc import ByteString as Buffer  # Python 3.10, 3.11
 import importlib
 import logging
 from pathlib import Path
@@ -683,7 +688,7 @@ def decompress(
     return ds
 
 
-def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
+def expand_ybr422(src: Buffer, bits_allocated: int) -> bytes:
     """Return ``YBR_FULL_422`` data expanded to ``YBR_FULL``.
 
     Uncompressed datasets with a (0028,0004) *Photometric Interpretation* of

@@ -9,6 +9,10 @@ on:
       python-version:
         required: true
         type: string
+      test-numpy:
+        required: false
+        type: boolean
+        default: true
       test-extras:
         required: false
         type: boolean
@@ -37,11 +41,11 @@ jobs:
     - name: Set env variables
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
     - name: Check-out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 2
     - name: Set up Python ${{ inputs.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
         cache: pip
@@ -56,6 +60,7 @@ jobs:
         python -m pytest --cov-reset ${{ env.PYTEST_ARGS }}
 
     - name: Test with Numpy
+      if: inputs.test-numpy
       run: |
         python -m pip install .[basic]
         python -m pytest ${{ env.PYTEST_ARGS }}
