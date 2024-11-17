@@ -37,8 +37,8 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting dataset values...
     Setting file meta information...
-    Writing dataset to: /tmp/tmpigkohslb.dcm
-    Load dataset from: /tmp/tmpigkohslb.dcm ...
+    Writing dataset to: /tmp/tmpvx6pze0a.dcm
+    Load dataset from: /tmp/tmpvx6pze0a.dcm ...
     Dataset.file_meta -------------------------------
     (0002,0000) File Meta Information Group Length  UL: 128
     (0002,0001) File Meta Information Version       OB: b'\x00\x01'
@@ -49,10 +49,10 @@ have to change UIDs to valid values and add all required DICOM data elements.
     (0002,0013) Implementation Version Name         SH: 'PYDICOM 3.1.0'
     -------------------------------------------------
     (0008,0023) Content Date                        DA: '20241117'
-    (0008,0033) Content Time                        TM: '182419.884237'
+    (0008,0033) Content Time                        TM: '182615.720588'
     (0010,0010) Patient's Name                      PN: 'Test^Firstname'
     (0010,0020) Patient ID                          LO: '123456'
-    Deleting file: /tmp/tmpigkohslb.dcm ...
+    Deleting file: /tmp/tmpvx6pze0a.dcm ...
 
 
 
