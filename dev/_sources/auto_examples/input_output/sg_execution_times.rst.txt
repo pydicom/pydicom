@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.295** total execution time for 5 files **from auto_examples/input_output**:
+**00:00.296** total execution time for 5 files **from auto_examples/input_output**:
 
 .. container::
 
