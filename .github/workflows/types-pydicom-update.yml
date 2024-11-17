@@ -16,7 +16,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - name: Trigger types-pydicom's update-package.yml workflow
-          uses: actions/github-script@v6
+          uses: actions/github-script@v7
           with:
             # Personal Access Token with
             # repo: types-pydicom
