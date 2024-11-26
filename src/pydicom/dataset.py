@@ -1924,8 +1924,8 @@ class Dataset:
         * (7FE0,0001) *Extended Offset Table*
         * (7FE0,0002) *Extended Offset Table Lengths*
 
-        If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
-        Instance UID* value will be generated.
+        If performing lossy compression and `generate_instance_uid` is ``True``
+        (default) then a new (0008,0018) *SOP Instance UID* value will be generated.
 
         **Supported Transfer Syntax UIDs**
 
@@ -1985,9 +1985,9 @@ class Dataset:
             will be added if needed for large amounts of compressed *Pixel
             Data*, otherwise just the basic offset table will be used.
         generate_instance_uid : bool, optional
-            If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
-            value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
-            keep the original value.
+            If ``True`` (default) and a lossy compression method is being used then
+            generate a new (0008,0018) *SOP Instance UID* value for the dataset using
+            :func:`~pydicom.uid.generate_uid`, otherwise keep the original value.
         jls_error : int, optional
             **JPEG-LS Near Lossless only**. The allowed absolute compression error
             in the pixel values.
@@ -2055,8 +2055,9 @@ class Dataset:
           *Pixel Data* element will be set to ``False``.
         * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
           modified as required to match the uncompressed *Pixel Data*.
-        * If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
-          Instance UID* value will be generated.
+        * If the color space has been converted from YCbCr to RGB then a new
+          (0008,0018) *SOP Instance UID* value will be generated unless
+          `generate_instance_uid` is ``False``.
 
         .. versionchanged:: 3.0
 
@@ -2076,9 +2077,9 @@ class Dataset:
             convert pixel data with a YCbCr :ref:`photometric interpretation
             <photometric_interpretation>` such as ``"YBR_FULL_422"`` to RGB.
         generate_instance_uid : bool, optional
-            If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
-            value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
-            keep the original value.
+            If ``False`` and the pixel data has been converted from YCbCr to RGB then
+            keep the original (0008,0018) *SOP Instance UID*, otherwise generate a new
+            one using :func:`~pydicom.uid.generate_uid` (default ``True``).
         decoding_plugin : str, optional
             The name of the decoding plugin to use when decoding compressed
             pixel data. If no `decoding_plugin` is specified (default) then all

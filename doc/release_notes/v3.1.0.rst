@@ -20,12 +20,16 @@ Fixes
   (:issue:`2147`).
 * Fixed being unable to pickle datasets containing LUT descriptor elements such as
   *LUT Descriptor* and *Red Palette Color LUT Descriptor* (:issue:`2160`).
+* Fixed :meth:~pydicom.dataset.Dataset.decompress` and :meth:`~pydicom.dataset.Dataset.compress`
+  changing the *SOP Instance UID* when not required (:issue:`2171`).
 
 Enhancements
 ------------
 * Python 3.12 and 3.13 now supported; limited support for pre-release Python 3.14
 * Added the option to pass a ``bool`` ndarray to :func:`~pydicom.pixels.set_pixel_data`
   to store with *Bits Allocated* of ``1`` using bit-packing (:issue:`2141`).
+* Added a check to :meth:`~pydicom.dataset.Dataset.set_pixel_data` to ensure that the
+  pixel data length doesn't exceed the allowed maximum.
 * Added the :attr:`Dataset.is_decompressed<pydicom.dataset.Dataset.is_decompressed>`
   convenience property for determining whether a dataset uses a compressed transfer
   syntax or not (:issue:`2155`).

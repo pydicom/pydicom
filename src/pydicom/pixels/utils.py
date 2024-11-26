@@ -295,8 +295,8 @@ def compress(
     * (7FE0,0001) *Extended Offset Table*
     * (7FE0,0002) *Extended Offset Table Lengths*
 
-    If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
-    Instance UID* value will be generated.
+    If performing lossy compression and `generate_instance_uid` is ``True`` (default)
+    then a new (0008,0018) *SOP Instance UID* value will be generated.
 
     **Supported Transfer Syntax UIDs**
 
@@ -354,9 +354,9 @@ def compress(
         will be added if needed for large amounts of compressed *Pixel
         Data*, otherwise just the basic offset table will be used.
     generate_instance_uid : bool, optional
-        If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
-        value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
-        keep the original value.
+        If ``True`` (default) and a lossy compression method is being used then
+        generate a new (0008,0018) *SOP Instance UID* value for the dataset using
+        :func:`~pydicom.uid.generate_uid`, otherwise keep the original value.
     jls_error : int, optional
         **JPEG-LS Near Lossless only**. The allowed absolute compression error
         in the pixel values.
@@ -463,10 +463,9 @@ def compress(
 
     ds.file_meta.TransferSyntaxUID = uid
 
-    if generate_instance_uid:
-        instance_uid = generate_uid()
-        ds.SOPInstanceUID = instance_uid
-        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
+    # Lossy compression methods require a new SOP Instance UID
+    if uid in (JPEGLSNearLossless, JPEG2000) and generate_instance_uid:
+        ds.SOPInstanceUID = ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
 
     return ds
 
@@ -566,8 +565,9 @@ def decompress(
       *Pixel Data* element will be set to ``False``.
     * Any :dcm:`image pixel<part03/sect_C.7.6.3.html>` module elements may be
       modified as required to match the uncompressed *Pixel Data*.
-    * If `generate_instance_uid` is ``True`` (default) then a new (0008,0018) *SOP
-      Instance UID* value will be generated.
+    * If the color space has been converted from YCbCr to RGB then a new (0008,0018)
+      *SOP Instance UID* value will be generated unless `generate_instance_uid` is
+      ``False``.
 
     Parameters
     ----------
@@ -581,9 +581,9 @@ def decompress(
         :ref:`photometric interpretation<photometric_interpretation>` such as
         ``"YBR_FULL_422"`` to RGB.
     generate_instance_uid : bool, optional
-        If ``True`` (default) then generate a new (0008,0018) *SOP Instance UID*
-        value for the dataset using :func:`~pydicom.uid.generate_uid`, otherwise
-        keep the original value.
+        If ``False`` and the pixel data has been converted from YCbCr to RGB then
+        keep the original (0008,0018) *SOP Instance UID*, otherwise generate a new one
+        using :func:`~pydicom.uid.generate_uid` (default ``True``).
     decoding_plugin : str, optional
         The name of the decoding plugin to use when decoding compressed
         pixel data. If no `decoding_plugin` is specified (default) then all
@@ -602,6 +602,7 @@ def decompress(
     """
     # TODO: v4.0 remove support for `pixel_data_handlers` module
     from pydicom.pixels import get_decoder
+    from pydicom.pixels.common import PhotometricInterpretation as PI
 
     if "PixelData" not in ds:
         raise AttributeError(
@@ -622,6 +623,7 @@ def decompress(
         raise ValueError("The dataset is already uncompressed")
 
     use_pdh = kwargs.get("use_pdh", False)
+    colorspace_changed = False
     frames: list[bytes]
     if use_pdh:
         ds.convert_pixel_data(decoding_plugin)
@@ -647,6 +649,9 @@ def decompress(
         for arr, image_pixel in frame_generator:
             frames.append(arr.tobytes())
 
+        if ds.PhotometricInterpretation in (PI.YBR_FULL, PI.YBR_FULL_422):
+            colorspace_changed = image_pixel["photometric_interpretation"] == PI.RGB
+
     # Part 5, Section 8.1.1: 32-bit Value Length field
     value_length = sum(len(frame) for frame in frames)
     if value_length >= 2**32 - 1:
@@ -668,10 +673,8 @@ def decompress(
     # Update the transfer syntax
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
-    if generate_instance_uid:
-        instance_uid = generate_uid()
-        ds.SOPInstanceUID = instance_uid
-        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
+    if colorspace_changed and generate_instance_uid:
+        ds.SOPInstanceUID = ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
 
     if not use_pdh:
         # Update the image pixel elements
@@ -876,7 +879,8 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, Any]:
     dict
         A dict containing parameters for the first component sample in the
         JPEG 2000 `codestream`, or an empty dict if unable to parse the data.
-        Available parameters are ``{"precision": int, "is_signed": bool}``.
+        Available parameters are ``{"precision": int, "is_signed": bool,
+        "jp2": bool}``.
     """
     offset = 0
     info: dict[str, Any] = {"jp2": False}
@@ -1865,6 +1869,9 @@ def set_pixel_data(
         * (rows, columns, samples) for a single frame of multi-sample data
           such as RGB.
         * (frames, rows, columns, samples) for multi-frame, multi-sample data.
+
+        Additionally, the length of the encoded array must be no larger than the
+        maximum allowed for uncompressed *Pixel Data* (4294967294 bytes).
     photometric_interpretation : str
         The value to use for (0028,0004) *Photometric Interpretation*. Valid values
         are ``"MONOCHROME1"``, ``"MONOCHROME2"``, ``"PALETTE COLOR"``, ``"RGB"``,
@@ -1906,6 +1913,14 @@ def set_pixel_data(
         raise ValueError(
             f"Unsupported ndarray dtype '{dtype}', must be bool, int8, int16, "
             "uint8, or uint16"
+        )
+
+    # 2**31 - 2 because the added odd length padding would take it above the maximum
+    if arr.nbytes > 2**31 - 2:
+        raise ValueError(
+            f"An ndarray with {dtype.itemsize} byte(s) per pixel and shape {shape} "
+            "will have an encoded length greater than the maximum allowed for "
+            "uncompressed 'Pixel Data'"
         )
 
     # Use `photometric_interpretation` to determine *Samples Per Pixel*

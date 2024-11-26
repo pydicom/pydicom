@@ -286,18 +286,17 @@ Creating *Float Pixel Data* and *Double Float Pixel Data*
 The creation of *Float Pixel Data* or *Double Float Pixel Data* is very similar to
 that of *Pixel Data*, the main differences being:
 
-* *Bits Allocated* and *Bits Stored* are always 32 for *Float Pixel Data* and 64
-  for *Double Float Pixel Data*
-* The *Pixel Representation* element should not be present
+* *Bits Allocated* is always 32 for *Float Pixel Data* and 64 for *Double Float Pixel Data*
+* The *Bits Stored*, *High Bit* and *Pixel Representation* elements should not be present
 * The VR doesn't need to be set manually
 
-+---------------------------+--------+------------------+---------------+-----------------------+
-| Element                   | VR     | *Bits Allocated* | *Bits Stored* | :class:`~numpy.dtype` |
-+===========================+========+==================+===============+=======================+
-| *Float Pixel Data*        | **OF** | 32               | 32            | ``float32``           |
-+---------------------------+--------+------------------+---------------+-----------------------+
-| *Double Float Pixel Data* | **OD** | 64               | 64            | ``float64``           |
-+---------------------------+--------+------------------+---------------+-----------------------+
++---------------------------+--------+------------------+-----------------------+
+| Element                   | VR     | *Bits Allocated* | :class:`~numpy.dtype` |
++===========================+========+==================+=======================+
+| *Float Pixel Data*        | **OF** | 32               | ``float32``           |
++---------------------------+--------+------------------+-----------------------+
+| *Double Float Pixel Data* | **OD** | 64               | ``float64``           |
++---------------------------+--------+------------------+-----------------------+
 
 The example below demonstrates creating *Float Pixel Data*::
 
@@ -309,8 +308,6 @@ The example below demonstrates creating *Float Pixel Data*::
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
     ds.BitsAllocated = 32
-    ds.BitsStored = 32
-    ds.HighBit = ds.BitsStored - 1
     ds.SamplesPerPixel = 1
     ds.PhotometricInterpretation = "MONOCHROME2"
 
