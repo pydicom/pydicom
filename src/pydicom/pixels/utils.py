@@ -251,7 +251,7 @@ def compress(
     *,
     encoding_plugin: str = "",
     encapsulate_ext: bool = False,
-    generate_instance_uid: bool = True,
+    generate_instance_uid: None | bool = None,
     jls_error: int | None = None,
     j2k_cr: list[float] | None = None,
     j2k_psnr: list[float] | None = None,
@@ -295,8 +295,8 @@ def compress(
     * (7FE0,0001) *Extended Offset Table*
     * (7FE0,0002) *Extended Offset Table Lengths*
 
-    If performing lossy compression and `generate_instance_uid` is ``True`` (default)
-    then a new (0008,0018) *SOP Instance UID* value will be generated.
+    If performing lossy compression then a new (0008,0018) *SOP Instance UID* value
+    will be generated unless `generate_instance_uid` is ``False``.
 
     **Supported Transfer Syntax UIDs**
 
@@ -354,9 +354,10 @@ def compress(
         will be added if needed for large amounts of compressed *Pixel
         Data*, otherwise just the basic offset table will be used.
     generate_instance_uid : bool, optional
-        If ``True`` (default) and a lossy compression method is being used then
-        generate a new (0008,0018) *SOP Instance UID* value for the dataset using
-        :func:`~pydicom.uid.generate_uid`, otherwise keep the original value.
+        If ``True`` then  always generate a new (0008,0018) *SOP Instance UID*
+        using :func:`~pydicom.uid.generate_uid`, otherwise ``False`` to always keep the
+        original. The default behavior is to only generate a new *SOP Instance UID*
+        when performing lossy compression.
     jls_error : int, optional
         **JPEG-LS Near Lossless only**. The allowed absolute compression error
         in the pixel values.
@@ -464,7 +465,8 @@ def compress(
     ds.file_meta.TransferSyntaxUID = uid
 
     # Lossy compression methods require a new SOP Instance UID
-    if uid in (JPEGLSNearLossless, JPEG2000) and generate_instance_uid:
+    is_lossy = uid in (JPEGLSNearLossless, JPEG2000)
+    if (is_lossy and generate_instance_uid is None) or generate_instance_uid:
         ds.SOPInstanceUID = ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
 
     return ds
@@ -537,7 +539,7 @@ def decompress(
     ds: "Dataset",
     *,
     as_rgb: bool = True,
-    generate_instance_uid: bool = True,
+    generate_instance_uid: None | bool = None,
     decoding_plugin: str = "",
     **kwargs: Any,
 ) -> "Dataset":
@@ -581,9 +583,10 @@ def decompress(
         :ref:`photometric interpretation<photometric_interpretation>` such as
         ``"YBR_FULL_422"`` to RGB.
     generate_instance_uid : bool, optional
-        If ``False`` and the pixel data has been converted from YCbCr to RGB then
-        keep the original (0008,0018) *SOP Instance UID*, otherwise generate a new one
-        using :func:`~pydicom.uid.generate_uid` (default ``True``).
+        If ``True`` then  always generate a new (0008,0018) *SOP Instance UID*,
+        using :func:`~pydicom.uid.generate_uid`, otherwise ``False`` to always keep the
+        original. The default behavior is to only generate a new *SOP Instance UID*
+        when the image data has had a YCbCr to RGB conversion applied.
     decoding_plugin : str, optional
         The name of the decoding plugin to use when decoding compressed
         pixel data. If no `decoding_plugin` is specified (default) then all
@@ -673,7 +676,7 @@ def decompress(
     # Update the transfer syntax
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
-    if colorspace_changed and generate_instance_uid:
+    if (colorspace_changed and generate_instance_uid is None) or generate_instance_uid:
         ds.SOPInstanceUID = ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
 
     if not use_pdh:
@@ -2032,10 +2035,9 @@ def set_pixel_data(
     if not tsyntax or tsyntax.is_compressed:
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
+    # New pixel data always requires a new UID
     if generate_instance_uid:
-        instance_uid = generate_uid()
-        ds.SOPInstanceUID = instance_uid
-        ds.file_meta.MediaStorageSOPInstanceUID = instance_uid
+        ds.SOPInstanceUID = ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
 
 
 def unpack_bits(src: bytes, as_array: bool = True) -> "np.ndarray | bytes":
