@@ -376,9 +376,8 @@ pixels in the circle.</p>
 <p>The creation of <em>Float Pixel Data</em> or <em>Double Float Pixel Data</em> is very similar to
 that of <em>Pixel Data</em>, the main differences being:</p>
 <ul class="simple">
-<li><p><em>Bits Allocated</em> and <em>Bits Stored</em> are always 32 for <em>Float Pixel Data</em> and 64
-for <em>Double Float Pixel Data</em></p></li>
-<li><p>The <em>Pixel Representation</em> element should not be present</p></li>
+<li><p><em>Bits Allocated</em> is always 32 for <em>Float Pixel Data</em> and 64 for <em>Double Float Pixel Data</em></p></li>
+<li><p>The <em>Bits Stored</em>, <em>High Bit</em> and <em>Pixel Representation</em> elements should not be present</p></li>
 <li><p>The VR doesn’t need to be set manually</p></li>
 </ul>
 <table class="docutils align-default">
@@ -386,7 +385,6 @@ for <em>Double Float Pixel Data</em></p></li>
 <tr class="row-odd"><th class="head"><p>Element</p></th>
 <th class="head"><p>VR</p></th>
 <th class="head"><p><em>Bits Allocated</em></p></th>
-<th class="head"><p><em>Bits Stored</em></p></th>
 <th class="head"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a></p></th>
 </tr>
 </thead>
@@ -394,12 +392,10 @@ for <em>Double Float Pixel Data</em></p></li>
 <tr class="row-even"><td><p><em>Float Pixel Data</em></p></td>
 <td><p><strong>OF</strong></p></td>
 <td><p>32</p></td>
-<td><p>32</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">float32</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><em>Double Float Pixel Data</em></p></td>
 <td><p><strong>OD</strong></p></td>
-<td><p>64</p></td>
 <td><p>64</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">float64</span></code></p></td>
 </tr>
@@ -414,8 +410,6 @@ for <em>Double Float Pixel Data</em></p></li>
 <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
 
 <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="mi">32</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">=</span> <span class="mi">32</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">HighBit</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;MONOCHROME2&quot;</span>
 
