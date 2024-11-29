@@ -1582,12 +1582,13 @@ class TestCompressRLE:
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_instance_uid(self):
-        """Test generating new SOP Instance UID."""
+        """Test new SOP Instance UID is/isn't generated with lossless compression."""
         ds = dcmread(EXPL_16_16_1F.path)
         original = ds.SOPInstanceUID
 
-        compress(ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=True)
-        assert ds.SOPInstanceUID != original
+        # Default for lossless compression is no change to UID
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+        assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(EXPL_16_16_1F.path)
@@ -1595,6 +1596,12 @@ class TestCompressRLE:
             ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=False
         )
         assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        # Forced changed to UID
+        ds = dcmread(EXPL_16_16_1F.path)
+        compress(ds, RLELossless, encoding_plugin="pydicom", generate_instance_uid=True)
+        assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
 
@@ -1605,6 +1612,7 @@ class TestCompressJLS:
     def test_lossless(self):
         """Test JPEG-LS Lossless."""
         ds = dcmread(EXPL_16_16_1F.path)
+        original = ds.SOPInstanceUID
         ref = ds.pixel_array
         compress(ds, JPEGLSLossless, encoding_plugin="pyjpegls")
 
@@ -1612,21 +1620,51 @@ class TestCompressJLS:
         frame = get_frame(ds.PixelData, 0)
         info = _get_jpg_parameters(frame)
         assert info["lossy_error"] == 0
-
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
         assert np.array_equal(ds.pixel_array, ref)
 
     def test_lossy(self):
         """Test JPEG-LS Near Lossless and the jls_error kwarg."""
         ds = dcmread(EXPL_16_16_1F.path)
+        original = ds.SOPInstanceUID
         ref = ds.pixel_array
-        compress(ds, JPEGLSNearLossless, jls_error=3, encoding_plugin="pyjpegls")
+        compress(
+            ds,
+            JPEGLSNearLossless,
+            jls_error=3,
+            encoding_plugin="pyjpegls",
+        )
 
         assert ds.file_meta.TransferSyntaxUID == JPEGLSNearLossless
         frame = get_frame(ds.PixelData, 0)
         info = _get_jpg_parameters(frame)
         assert info["lossy_error"] == 3
-
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
         assert np.allclose(ds.pixel_array, ref, atol=3)
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        compress(
+            ds,
+            JPEGLSNearLossless,
+            jls_error=3,
+            encoding_plugin="pyjpegls",
+            generate_instance_uid=False,
+        )
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        compress(
+            ds,
+            JPEGLSNearLossless,
+            jls_error=3,
+            encoding_plugin="pyjpegls",
+            generate_instance_uid=True,
+        )
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
 
 @pytest.mark.skipif(SKIP_J2K, reason="JPEG 2000 plugins unavailable")
@@ -1636,28 +1674,67 @@ class TestCompressJ2K:
     def test_lossless(self):
         """Test JPEG 2000 Lossless."""
         ds = dcmread(EXPL_16_16_1F.path)
+        original = ds.SOPInstanceUID
         ref = ds.pixel_array
-        compress(ds, JPEG2000Lossless, encoding_plugin="pylibjpeg")
+        compress(
+            ds,
+            JPEG2000Lossless,
+            encoding_plugin="pylibjpeg",
+        )
         assert ds.file_meta.TransferSyntaxUID == JPEG2000Lossless
         assert np.array_equal(ds.pixel_array, ref)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
     def test_lossy(self):
         """Test JPEG 2000 and the j2k_cr and j2k_psnr kwargs."""
         ds = dcmread(EXPL_16_16_1F.path)
+        original = ds.SOPInstanceUID
         ref = ds.pixel_array
-        compress(ds, JPEG2000, j2k_cr=[2], encoding_plugin="pylibjpeg")
+        compress(
+            ds,
+            JPEG2000,
+            j2k_cr=[2],
+            encoding_plugin="pylibjpeg",
+        )
         assert ds.file_meta.TransferSyntaxUID == JPEG2000
         out = ds.pixel_array
         assert not np.array_equal(out, ref)
         assert np.allclose(out, ref, atol=2)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
         ds = dcmread(EXPL_16_16_1F.path)
         ref = ds.pixel_array
-        compress(ds, JPEG2000, j2k_psnr=[100], encoding_plugin="pylibjpeg")
+        compress(
+            ds,
+            JPEG2000,
+            j2k_psnr=[100],
+            encoding_plugin="pylibjpeg",
+            generate_instance_uid=False,
+        )
         assert ds.file_meta.TransferSyntaxUID == JPEG2000
         out = ds.pixel_array
         assert not np.array_equal(out, ref)
         assert np.allclose(out, ref, atol=3)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(EXPL_16_16_1F.path)
+        ref = ds.pixel_array
+        compress(
+            ds,
+            JPEG2000,
+            j2k_psnr=[100],
+            encoding_plugin="pylibjpeg",
+            generate_instance_uid=True,
+        )
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000
+        out = ds.pixel_array
+        assert not np.array_equal(out, ref)
+        assert np.allclose(out, ref, atol=3)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
 
 @pytest.fixture()
@@ -1900,10 +1977,16 @@ class TestDecompress:
 
     @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
     def test_instance_uid(self):
-        """Test generating new SOP Instance UID."""
+        """Test new SOP Instance UID not generated if no change to image data."""
+        # No colorspace change
         ds = dcmread(RLE_8_3_1F.path)
         original = ds.SOPInstanceUID
 
+        decompress(ds, decoding_plugin="pydicom")
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(RLE_8_3_1F.path)
         decompress(ds, decoding_plugin="pydicom", generate_instance_uid=True)
         assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
@@ -1911,6 +1994,39 @@ class TestDecompress:
         ds = dcmread(RLE_8_3_1F.path)
         decompress(ds, decoding_plugin="pydicom", generate_instance_uid=False)
         assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        # With colorspace change
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        original = ds.SOPInstanceUID
+
+        decompress(ds, as_rgb=True)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        decompress(ds, as_rgb=True, generate_instance_uid=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        decompress(ds, as_rgb=True, generate_instance_uid=True)
+        assert ds.SOPInstanceUID != original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        decompress(ds, as_rgb=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        decompress(ds, as_rgb=False, generate_instance_uid=False)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
+        ds = dcmread(JPGB_08_08_3_1F_YBR_FULL.path)
+        decompress(ds, as_rgb=False, generate_instance_uid=True)
+        assert ds.SOPInstanceUID != original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
 
@@ -1959,6 +2075,19 @@ class TestSetPixelData:
         with pytest.raises(ValueError, match=msg):
             set_pixel_data(
                 Dataset(), np.zeros((10, 10), dtype="float32"), "MONOCHROME1", 8
+            )
+
+    def test_too_large_raises(self):
+        """Test exception raised if array is too large"""
+
+        msg = (
+            r"An ndarray with 1 byte\(s\) per pixel and shape \(4294967295,\) will "
+            "have an encoded length greater than the maximum allowed for "
+            "uncompressed 'Pixel Data'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            set_pixel_data(
+                Dataset(), np.empty((2**32 - 1,), dtype="u1"), "MONOCHROME1", 8
             )
 
     def test_unsupported_photometric_interpretation_raises(self):
