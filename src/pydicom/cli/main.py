@@ -25,11 +25,18 @@ subparsers: argparse._SubParsersAction | None = None
 # Restrict the allowed syntax tightly, since use Python `eval`
 # on the expression. Do not allow callables, or assignment, for example.
 re_kywd_or_item = (
+    r"("
     r"\w+"  # Keyword (\w allows underscore, needed for file_meta)
+    r"|"   # or
+    r"\([0-9A-Fa-f]{4},[0-9A-Fa-f]{4}\)"  # DICOM hex tag (gggg,eeee)
+    r")"
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
 )
 
 re_file_spec_object = re.compile(re_kywd_or_item + r"(\." + re_kywd_or_item + r")*$")
+
+re_tag_sub_from = r"\.\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
+re_tag_sub_to = r"[(0x\1,0x\2)].value"
 
 filespec_help = (
     "File specification, in format [pydicom::]filename[::element]. "
@@ -45,8 +52,14 @@ filespec_help = (
 
 
 def eval_element(ds: Dataset, element: str) -> Any:
+    if element[0] != ".":
+        element = "." + element
+
+    # replace all ".(gggg,eeee) hex tags with eval'uable expression"
+    element = re.sub(re_tag_sub_from, re_tag_sub_to, element)
+
     try:
-        return eval("ds." + element, {"ds": ds})
+        return eval("ds" + element, {"ds": ds})
     except AttributeError:
         raise argparse.ArgumentTypeError(
             f"Data element '{element}' is not in the dataset"

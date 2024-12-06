@@ -13,7 +13,10 @@ bad_elem_specs = (
     "no_callable()",
     "no_equals = ",
     "BeamSequence[0]extra",  # must match to end of string
+    "(300a,00b0)[0]extra",  # as above
     "BeamSequence[x]",  # index must be an int
+    "(0010,0010b)",  # bad tag format
+    "BeamSequence[0].(10,10)"  # bad tag format not initial
 )
 
 missing_elements = (
@@ -87,6 +90,14 @@ class TestFilespecElementEval:
         elem_val = eval_element(self.plan, elem_str)
         assert 6.0 == elem_val.NominalBeamEnergy
 
+        elem_str = "(300A,00B0)[0].ControlPointSequence[0]"
+        elem_val = eval_element(self.plan, elem_str)
+        assert 6.0 == elem_val.NominalBeamEnergy
+
+        elem_str = "(300a,00b0)[0].(300a,0111)[0]"
+        elem_val = eval_element(self.plan, elem_str)
+        assert 6.0 == elem_val.NominalBeamEnergy
+
         # A nested Sequence itself
         elem_str = "BeamSequence[0].ControlPointSequence"
         elem_val = eval_element(self.plan, elem_str)
@@ -94,6 +105,10 @@ class TestFilespecElementEval:
 
         # A non-nested data element
         elem_str = "PatientID"
+        elem_val = eval_element(self.plan, elem_str)
+        assert "id00001" == elem_val
+
+        elem_str = "(0010,0020)"
         elem_val = eval_element(self.plan, elem_str)
         assert "id00001" == elem_val
 
