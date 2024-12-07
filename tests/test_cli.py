@@ -16,7 +16,7 @@ bad_elem_specs = (
     "(300a,00b0)[0]extra",  # as above
     "BeamSequence[x]",  # index must be an int
     "(0010,0010b)",  # bad tag format
-    "BeamSequence[0].(10,10)"  # bad tag format not initial
+    "BeamSequence[0].(10,10)",  # bad tag format not initial
 )
 
 missing_elements = (
@@ -79,12 +79,13 @@ class TestFilespecElementEval:
     plan, _ = filespec_parser("pydicom::rtplan.dcm")[0]
 
     # Test basic correct data elements
-    @pytest.mark.parametrize("elem_str, expected",
+    @pytest.mark.parametrize(
+        "elem_str, expected",
         (
             ("BeamSequence[0].ControlPointSequence[0].NominalBeamEnergy", 6.0),
             ("PatientID", "id00001"),
-            ("(0010,0020)", "id00001"),  
-        )                                             
+            ("(0010,0020)", "id00001"),
+        ),
     )
     def test_correct_data_elements(self, elem_str, expected):
         """CLI produces correct evaluation of requested element"""
@@ -97,7 +98,7 @@ class TestFilespecElementEval:
             ("BeamSequence[0].ControlPointSequence[0]", 6.0),
             ("(300A,00B0)[0].ControlPointSequence[0]", 6.0),
             ("(300a,00b0)[0].(300a,0111)[0]", 6.0),
-        )
+        ),
     )
     def test_data_elem_from_sequence_item(self, elem_str, expected):
         elem_val = eval_element(self.plan, elem_str)
@@ -106,7 +107,7 @@ class TestFilespecElementEval:
     def test_nested_sequence(self):
         elem_val = eval_element(self.plan, "BeamSequence[0].ControlPointSequence")
         assert 6.0 == elem_val[0].NominalBeamEnergy
-        
+
     def test_file_meta_or_meta_element(self):
         elem_val = eval_element(self.plan, "file_meta")
         assert "RT Plan Storage" == elem_val.MediaStorageSOPClassUID.name
