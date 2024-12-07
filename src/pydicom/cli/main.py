@@ -46,8 +46,10 @@ filespec_help = (
     "Examples: "
     "path/to/your_file.dcm, "
     "your_file.dcm::StudyDate, "
+    "your_file.dcm::(0001,0001), "
     "pydicom::rtplan.dcm::BeamSequence[0], "
-    "yourplan.dcm::BeamSequence[0].BeamNumber"
+    "yourplan.dcm::BeamSequence[0].BeamNumber, "
+    "pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)"
 )
 
 
@@ -104,12 +106,18 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         in format:
             [pydicom::]<filename>[::<element>]
         If an element is specified, it must be a path to a data element,
-        sequence item (dataset), or a sequence.
+        sequence item (dataset), or a sequence, specified with
+        DICOM keywords, or DICOM tags in the format (gggg,eeee).
+
         Examples:
             your_file.dcm
             your_file.dcm::StudyDate
+            pydicom::ct_small.dcm::(0019,0010)
             pydicom::rtplan.dcm::BeamSequence[0]
             pydicom::rtplan.dcm::BeamSequence[0].BeamLimitingDeviceSequence
+            pydicom::rtplan.dcm::(300A,00B0)[0]
+            pydicom::rtplan.dcm::(300A,00B0)[0].BeamLimitingDeviceSequence
+            pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)
 
     Returns
     -------
