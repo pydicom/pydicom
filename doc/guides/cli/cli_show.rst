@@ -102,7 +102,7 @@ You can also use a tag number in format (group,elem) anywhere a DICOM keyword ca
 
 The ``-q`` quiet argument shows a minimal version of some of the information in the
 file, using just the DICOM keyword and value (not showing the tag numbers
-and VR). The example below shows the quiet mode with an image slice::
+and VR). The example below shows the quiet mode with an image slice:
 
 .. code-block:: console
 
@@ -121,7 +121,7 @@ and VR). The example below shows the quiet mode with an image slice::
     Columns: 128
     SliceLocation: -77.2040634155
 
-And the following example shows an RT Plan in quiet mode::
+And the following example shows an RT Plan in quiet mode:
 
 .. code-block:: console
 
