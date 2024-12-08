@@ -25,11 +25,18 @@ subparsers: argparse._SubParsersAction | None = None
 # Restrict the allowed syntax tightly, since use Python `eval`
 # on the expression. Do not allow callables, or assignment, for example.
 re_kywd_or_item = (
+    r"("
     r"\w+"  # Keyword (\w allows underscore, needed for file_meta)
+    r"|"  # or
+    r"\([0-9A-Fa-f]{4},[0-9A-Fa-f]{4}\)"  # DICOM hex tag (gggg,eeee)
+    r")"
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
 )
 
 re_file_spec_object = re.compile(re_kywd_or_item + r"(\." + re_kywd_or_item + r")*$")
+
+re_tag_sub_from = r"\.\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
+re_tag_sub_to = r"[(0x\1,0x\2)].value"
 
 filespec_help = (
     "File specification, in format [pydicom::]filename[::element]. "
@@ -39,14 +46,22 @@ filespec_help = (
     "Examples: "
     "path/to/your_file.dcm, "
     "your_file.dcm::StudyDate, "
+    "your_file.dcm::(0001,0001), "
     "pydicom::rtplan.dcm::BeamSequence[0], "
-    "yourplan.dcm::BeamSequence[0].BeamNumber"
+    "yourplan.dcm::BeamSequence[0].BeamNumber, "
+    "pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)"
 )
 
 
 def eval_element(ds: Dataset, element: str) -> Any:
+    if element[0] != ".":
+        element = "." + element
+
+    # replace all ".(gggg,eeee) hex tags with eval'uable expression"
+    element = re.sub(re_tag_sub_from, re_tag_sub_to, element)
+
     try:
-        return eval("ds." + element, {"ds": ds})
+        return eval("ds" + element, {"ds": ds})
     except AttributeError:
         raise argparse.ArgumentTypeError(
             f"Data element '{element}' is not in the dataset"
@@ -91,12 +106,18 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         in format:
             [pydicom::]<filename>[::<element>]
         If an element is specified, it must be a path to a data element,
-        sequence item (dataset), or a sequence.
+        sequence item (dataset), or a sequence, specified with
+        DICOM keywords, or DICOM tags in the format (gggg,eeee).
+
         Examples:
             your_file.dcm
             your_file.dcm::StudyDate
+            pydicom::ct_small.dcm::(0019,0010)
             pydicom::rtplan.dcm::BeamSequence[0]
             pydicom::rtplan.dcm::BeamSequence[0].BeamLimitingDeviceSequence
+            pydicom::rtplan.dcm::(300A,00B0)[0]
+            pydicom::rtplan.dcm::(300A,00B0)[0].BeamLimitingDeviceSequence
+            pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)
 
     Returns
     -------
