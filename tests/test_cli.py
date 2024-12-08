@@ -16,7 +16,7 @@ bad_elem_specs = (
     "(300a,00b0)[0]extra",  # as above
     "BeamSequence[x]",  # index must be an int
     "(0010,0010b)",  # bad tag format
-    "BeamSequence[0].(10,10)"  # bad tag format not initial
+    "BeamSequence[0].(10,10)"  # nested bad tag format
 )
 
 missing_elements = (

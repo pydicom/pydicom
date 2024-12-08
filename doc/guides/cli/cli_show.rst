@@ -90,6 +90,8 @@ using the usual pydicom keyword notation:
 
 You can also use a tag number in format (group,elem) anywhere a DICOM keyword can be used:
 
+.. code-block:: console
+
     $ pydicom show pydicom::ct_small.dcm::(0043,1013)
     [107, 21, 4, 2, 20]
 
@@ -102,7 +104,9 @@ The ``-q`` quiet argument shows a minimal version of some of the information in 
 file, using just the DICOM keyword and value (not showing the tag numbers
 and VR). The example below shows the quiet mode with an image slice::
 
-    pydicom show -q pydicom::ct_small.dcm
+.. code-block:: console
+
+    $ pydicom show -q pydicom::ct_small.dcm
 
     SOPClassUID: CT Image Storage
     PatientName: CompressedSamples^CT1
@@ -119,7 +123,9 @@ and VR). The example below shows the quiet mode with an image slice::
 
 And the following example shows an RT Plan in quiet mode::
 
-    pydicom show -q pydicom::rtplan.dcm
+.. code-block:: console
+
+    $ pydicom show -q pydicom::rtplan.dcm
 
     SOPClassUID: RT Plan Storage
     PatientName: Last^First^mid^pre

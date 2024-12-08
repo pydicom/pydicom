@@ -60,12 +60,11 @@ was specified. To see the available command options, use the ``help`` command:
     Read a DICOM file and produce the *pydicom* (Python) code which can create that file
 
     positional arguments:
-    filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
-                            prefix is used, then use the pydicom test file with that name. If `element`
-                            is given, use only that data element within the file. Examples:
-                            path/to/your_file.dcm, your_file.dcm::StudyDate,
-                            pydicom::rtplan.dcm::BeamSequence[0],
-                            yourplan.dcm::BeamSequence[0].BeamNumber
+    filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,
+                        then use the pydicom test file with that name. If `element` is given, use only that data element
+                        within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,
+                        your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],
+                        yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)
     outfile               Filename to write python code to. If not specified, code is written to
                             stdout
 
