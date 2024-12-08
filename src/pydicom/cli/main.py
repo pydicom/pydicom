@@ -27,7 +27,7 @@ subparsers: argparse._SubParsersAction | None = None
 re_kywd_or_item = (
     r"("
     r"\w+"  # Keyword (\w allows underscore, needed for file_meta)
-    r"|"   # or
+    r"|"  # or
     r"\([0-9A-Fa-f]{4},[0-9A-Fa-f]{4}\)"  # DICOM hex tag (gggg,eeee)
     r")"
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
