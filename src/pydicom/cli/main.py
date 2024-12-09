@@ -169,8 +169,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         # Special message if a tag with spaces
         if m := re.search(re_tag_with_spaces, element):
             msg = (
-                f"Tag '{m.group()}' is not valid syntax for a "
-                "tag: no spaces allowed"
+                f"Tag '{m.group()}' is not valid syntax for a " "tag: no spaces allowed"
             )
         else:
             msg = (
