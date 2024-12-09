@@ -37,6 +37,7 @@ re_file_spec_object = re.compile(re_kywd_or_item + r"(\." + re_kywd_or_item + r"
 
 re_tag_sub_from = r"\.\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
 re_tag_sub_to = r"[(0x\1,0x\2)].value"
+re_tag_with_spaces = r"\([0-9A-Fa-f]{4}, +[0-9A-Fa-f]{4}\)"
 
 filespec_help = (
     "File specification, in format [pydicom::]filename[::element]. "
@@ -57,7 +58,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
     if element[0] != ".":
         element = "." + element
 
-    # replace all ".(gggg,eeee) hex tags with eval'uable expression"
+    # replace all ".(gggg,eeee)" hex tags with `eval`uable expression
     element = re.sub(re_tag_sub_from, re_tag_sub_to, element)
 
     try:
@@ -165,10 +166,18 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
 
     # Check element syntax first to avoid unnecessary load of file
     if element and not re_file_spec_object.match(element):
-        raise argparse.ArgumentTypeError(
-            f"Component '{element}' is not valid syntax for a "
-            "data element, sequence, or sequence item"
-        )
+        # Special message if a tag with spaces
+        if m := re.search(re_tag_with_spaces, element):
+            msg = (
+                f"Tag '{m.group()}' is not valid syntax for a "
+                "tag: no spaces allowed"
+            )
+        else:
+            msg = (
+                f"Component '{element}' is not valid syntax for a "
+                "data element, sequence, or sequence item"
+            )
+        raise argparse.ArgumentTypeError(msg)
 
     # Read DICOM file
     try:

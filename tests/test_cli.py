@@ -16,6 +16,8 @@ bad_elem_specs = (
     "(300a,00b0)[0]extra",  # as above
     "BeamSequence[x]",  # index must be an int
     "(0010,0010b)",  # bad tag format
+    "(0010, 0010)",  # space in tag
+    "(0010,  0010)",  # spaces in tag
     "BeamSequence[0].(10,10)",  # nested bad tag format
 )
 
@@ -34,8 +36,11 @@ bad_indexes = (
 class TestFilespec:
     @pytest.mark.parametrize("bad_spec", bad_elem_specs)
     def test_syntax(self, bad_spec):
-        """Invalid syntax for for CLI file:element spec raises error"""
-        with pytest.raises(ArgumentTypeError, match=r".* syntax .*"):
+        """Invalid syntax for CLI file:element spec raises error"""
+        match = r".* syntax .*"
+        if ", " in bad_spec:
+            match += "tag: no spaces allowed"
+        with pytest.raises(ArgumentTypeError, match=match):
             filespec_parser(f"pydicom::rtplan.dcm::{bad_spec}")
 
     @pytest.mark.parametrize("missing_element", missing_elements)
