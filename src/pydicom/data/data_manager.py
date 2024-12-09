@@ -6,8 +6,8 @@ External Data Sources
 ---------------------
 
 *pydicom* can also search third-party data sources for matching data. To do so
-your project should register its entry points in its `setup.py` file. For
-example, a project named "mydata" with the interface class ``MyInterface``
+your project should register its entry points in its `pyproject.toml` or `setup.py` file. For
+example, a project named "mydata" using `setup.py` with the interface class ``MyInterface``
 should register:
 
 .. codeblock: python
