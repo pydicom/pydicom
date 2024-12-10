@@ -19,11 +19,11 @@ or ``pydicom show -h``.
     Display all or part of a DICOM file
 
     positional arguments:
-    filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
-                            prefix is present, then use the pydicom test file with that name. If `element`
-                            is given, use only that data element within the file. Examples:
-                            path/to/your_file.dcm, your_file.dcm::StudyDate,
-                            pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber
+    filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,
+                        then use the pydicom test file with that name. If `element` is given, use only that data element
+                        within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,
+                        your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],
+                        yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)
 
     optional arguments:
     -h, --help            show this help message and exit
@@ -88,11 +88,25 @@ using the usual pydicom keyword notation:
     (300c, 0006) Referenced Beam Number              IS: "1"
     ---------]
 
+You can also use a tag number in format (group,elem) anywhere a DICOM keyword can be used:
+
+.. code-block:: console
+
+    $ pydicom show pydicom::ct_small.dcm::(0043,1013)
+    [107, 21, 4, 2, 20]
+
+    $ pydicom show pydicom::rtplan.dcm::(300A,00B0)[0].(300a,0111)
+    [(300A,0112) Control Point Index                 IS: '0'
+    (300A,0114) Nominal Beam Energy                 DS: '6.00000000000000'
+    ...
+
 The ``-q`` quiet argument shows a minimal version of some of the information in the
 file, using just the DICOM keyword and value (not showing the tag numbers
-and VR). The example below shows the quiet mode with an image slice::
+and VR). The example below shows the quiet mode with an image slice:
 
-    pydicom show -q pydicom::ct_small.dcm
+.. code-block:: console
+
+    $ pydicom show -q pydicom::ct_small.dcm
 
     SOPClassUID: CT Image Storage
     PatientName: CompressedSamples^CT1
@@ -107,9 +121,11 @@ and VR). The example below shows the quiet mode with an image slice::
     Columns: 128
     SliceLocation: -77.2040634155
 
-And the following example shows an RT Plan in quiet mode::
+And the following example shows an RT Plan in quiet mode:
 
-    pydicom show -q pydicom::rtplan.dcm
+.. code-block:: console
+
+    $ pydicom show -q pydicom::rtplan.dcm
 
     SOPClassUID: RT Plan Storage
     PatientName: Last^First^mid^pre

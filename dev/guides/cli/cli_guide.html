@@ -198,11 +198,12 @@ by typing <code class="docutils literal notranslate"><span class="pre">pydicom</
 <span class="go">Display all or part of a DICOM file</span>
 
 <span class="go">positional arguments:</span>
-<span class="go">filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`</span>
-<span class="go">                        prefix is used, then show the pydicom test file with that name. If `element`</span>
-<span class="go">                        is given, use only that data element within the file. Examples:</span>
-<span class="go">                        path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
-<span class="go">                        pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber</span>
+<span class="go">filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,</span>
+<span class="go">                    then use the pydicom test file with that name. If `element` is given, use only that data element</span>
+<span class="go">                    within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
+<span class="go">                    your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],</span>
+<span class="go">                    yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)</span>
+
 
 <span class="go">optional arguments:</span>
 <span class="go">-h, --help            show this help message and exit</span>
@@ -218,9 +219,9 @@ by typing <code class="docutils literal notranslate"><span class="pre">pydicom</
 <cite>pip install pydicom</cite>.  It should not require any updates to the system
 path or environment variables.</p>
 <p>If you are helping develop <em>pydicom</em> code, and are using git clones,
-you will have to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code> from
+you will have to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> from
 the <cite>pydicom</cite> repository root. This has to be repeated for any changes to
-<cite>setup.py</cite> (e.g. to add a new subcommand).</p>
+<cite>pyproject.toml</cite> (e.g. to add a new subcommand).</p>
 <p>If you are developing subcommands within your own package, you will need to
 reinstall your package similar to the above as you add entry points.</p>
 </section>
@@ -291,11 +292,11 @@ or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <
 <span class="go">Display all or part of a DICOM file</span>
 
 <span class="go">positional arguments:</span>
-<span class="go">filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`</span>
-<span class="go">                        prefix is present, then use the pydicom test file with that name. If `element`</span>
-<span class="go">                        is given, use only that data element within the file. Examples:</span>
-<span class="go">                        path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
-<span class="go">                        pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber</span>
+<span class="go">filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,</span>
+<span class="go">                    then use the pydicom test file with that name. If `element` is given, use only that data element</span>
+<span class="go">                    within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
+<span class="go">                    your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],</span>
+<span class="go">                    yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)</span>
 
 <span class="go">optional arguments:</span>
 <span class="go">-h, --help            show this help message and exit</span>
@@ -356,40 +357,50 @@ using the usual pydicom keyword notation:</p>
 <span class="go">---------]</span>
 </pre></div>
 </div>
+<p>You can also use a tag number in format (group,elem) anywhere a DICOM keyword can be used:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>pydicom::ct_small.dcm::<span class="o">(</span><span class="m">0043</span>,1013<span class="o">)</span>
+<span class="go">[107, 21, 4, 2, 20]</span>
+
+<span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>pydicom::rtplan.dcm::<span class="o">(</span>300A,00B0<span class="o">)[</span><span class="m">0</span><span class="o">]</span>.<span class="o">(</span>300a,0111<span class="o">)</span>
+<span class="go">[(300A,0112) Control Point Index                 IS: &#39;0&#39;</span>
+<span class="gp gp-VirtualEnv">(300A,0114)</span> <span class="go">Nominal Beam Energy                 DS: &#39;6.00000000000000&#39;</span>
+<span class="go">...</span>
+</pre></div>
+</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">-q</span></code> quiet argument shows a minimal version of some of the information in the
 file, using just the DICOM keyword and value (not showing the tag numbers
 and VR). The example below shows the quiet mode with an image slice:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="n">show</span> <span class="o">-</span><span class="n">q</span> <span class="n">pydicom</span><span class="p">::</span><span class="n">ct_small</span><span class="o">.</span><span class="n">dcm</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>-q<span class="w"> </span>pydicom::ct_small.dcm
 
-<span class="n">SOPClassUID</span><span class="p">:</span> <span class="n">CT</span> <span class="n">Image</span> <span class="n">Storage</span>
-<span class="n">PatientName</span><span class="p">:</span> <span class="n">CompressedSamples</span><span class="o">^</span><span class="n">CT1</span>
-<span class="n">PatientID</span><span class="p">:</span> <span class="mi">1</span><span class="n">CT1</span>
-<span class="n">StudyID</span><span class="p">:</span> <span class="mi">1</span><span class="n">CT1</span>
-<span class="n">StudyDate</span><span class="p">:</span> <span class="mi">20040119</span>
-<span class="n">StudyTime</span><span class="p">:</span> <span class="mi">072730</span>
-<span class="n">StudyDescription</span><span class="p">:</span> <span class="n">e</span><span class="o">+</span><span class="mi">1</span>
-<span class="n">BitsStored</span><span class="p">:</span> <span class="mi">16</span>
-<span class="n">Modality</span><span class="p">:</span> <span class="n">CT</span>
-<span class="n">Rows</span><span class="p">:</span> <span class="mi">128</span>
-<span class="n">Columns</span><span class="p">:</span> <span class="mi">128</span>
-<span class="n">SliceLocation</span><span class="p">:</span> <span class="o">-</span><span class="mf">77.2040634155</span>
+<span class="go">SOPClassUID: CT Image Storage</span>
+<span class="go">PatientName: CompressedSamples^CT1</span>
+<span class="go">PatientID: 1CT1</span>
+<span class="go">StudyID: 1CT1</span>
+<span class="go">StudyDate: 20040119</span>
+<span class="go">StudyTime: 072730</span>
+<span class="go">StudyDescription: e+1</span>
+<span class="go">BitsStored: 16</span>
+<span class="go">Modality: CT</span>
+<span class="go">Rows: 128</span>
+<span class="go">Columns: 128</span>
+<span class="go">SliceLocation: -77.2040634155</span>
 </pre></div>
 </div>
 <p>And the following example shows an RT Plan in quiet mode:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="n">show</span> <span class="o">-</span><span class="n">q</span> <span class="n">pydicom</span><span class="p">::</span><span class="n">rtplan</span><span class="o">.</span><span class="n">dcm</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>-q<span class="w"> </span>pydicom::rtplan.dcm
 
-<span class="n">SOPClassUID</span><span class="p">:</span> <span class="n">RT</span> <span class="n">Plan</span> <span class="n">Storage</span>
-<span class="n">PatientName</span><span class="p">:</span> <span class="n">Last</span><span class="o">^</span><span class="n">First</span><span class="o">^</span><span class="n">mid</span><span class="o">^</span><span class="n">pre</span>
-<span class="n">PatientID</span><span class="p">:</span> <span class="n">id00001</span>
-<span class="n">StudyID</span><span class="p">:</span> <span class="n">study1</span>
-<span class="n">StudyDate</span><span class="p">:</span> <span class="mi">20030716</span>
-<span class="n">StudyTime</span><span class="p">:</span> <span class="mi">153557</span>
-<span class="n">StudyDescription</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span>
-<span class="n">Plan</span> <span class="n">Label</span><span class="p">:</span> <span class="n">Plan1</span>  <span class="n">Plan</span> <span class="n">Name</span><span class="p">:</span> <span class="n">Plan1</span>
-<span class="n">Fraction</span> <span class="n">Group</span> <span class="mi">1</span>  <span class="mi">30</span> <span class="n">fraction</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">planned</span>
-<span class="n">Brachy</span> <span class="n">Application</span> <span class="n">Setups</span><span class="p">:</span> <span class="mi">0</span>
-<span class="n">Beam</span> <span class="mi">1</span> <span class="n">Dose</span> <span class="mf">1.02754010000000</span> <span class="n">Meterset</span> <span class="mf">116.003669700000</span>
-<span class="n">Beam</span> <span class="mi">1</span> <span class="s1">&#39;Field 1&#39;</span> <span class="n">TREATMENT</span> <span class="n">STATIC</span> <span class="n">PHOTON</span> <span class="n">energy</span> <span class="mf">6.00000000000000</span> <span class="n">gantry</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">coll</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">couch</span> <span class="mf">0.0</span> <span class="p">(</span><span class="mi">0</span> <span class="n">wedges</span><span class="p">,</span> <span class="mi">0</span> <span class="n">comps</span><span class="p">,</span> <span class="mi">0</span> <span class="n">boli</span><span class="p">,</span> <span class="mi">0</span> <span class="n">blocks</span><span class="p">)</span>
+<span class="go">SOPClassUID: RT Plan Storage</span>
+<span class="go">PatientName: Last^First^mid^pre</span>
+<span class="go">PatientID: id00001</span>
+<span class="go">StudyID: study1</span>
+<span class="go">StudyDate: 20030716</span>
+<span class="go">StudyTime: 153557</span>
+<span class="go">StudyDescription: N/A</span>
+<span class="go">Plan Label: Plan1  Plan Name: Plan1</span>
+<span class="go">Fraction Group 1  30 fraction(s) planned</span>
+<span class="go">Brachy Application Setups: 0</span>
+<span class="go">Beam 1 Dose 1.02754010000000 Meterset 116.003669700000</span>
+<span class="go">Beam 1 &#39;Field 1&#39; TREATMENT STATIC PHOTON energy 6.00000000000000 gantry 0.0, coll 0.0, couch 0.0 (0 wedges, 0 comps, 0 boli, 0 blocks)</span>
 </pre></div>
 </div>
 <p>Quiet modes always show the SOP Class UID, patient and study information as
@@ -451,12 +462,11 @@ usage: pydicom codify [-h] [-e EXCLUDE_SIZE] [-p] [-s SAVE_AS] filespec [outfile
 Read a DICOM file and produce the *pydicom* (Python) code which can create that file
 
 positional arguments:
-filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
-                        prefix is used, then use the pydicom test file with that name. If `element`
-                        is given, use only that data element within the file. Examples:
-                        path/to/your_file.dcm, your_file.dcm::StudyDate,
-                        pydicom::rtplan.dcm::BeamSequence[0],
-                        yourplan.dcm::BeamSequence[0].BeamNumber
+filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,
+                    then use the pydicom test file with that name. If `element` is given, use only that data element
+                    within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,
+                    your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],
+                    yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)
 outfile               Filename to write python code to. If not specified, code is written to
                         stdout
 

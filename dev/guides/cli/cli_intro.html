@@ -156,11 +156,12 @@ by typing <code class="docutils literal notranslate"><span class="pre">pydicom</
 <span class="go">Display all or part of a DICOM file</span>
 
 <span class="go">positional arguments:</span>
-<span class="go">filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`</span>
-<span class="go">                        prefix is used, then show the pydicom test file with that name. If `element`</span>
-<span class="go">                        is given, use only that data element within the file. Examples:</span>
-<span class="go">                        path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
-<span class="go">                        pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber</span>
+<span class="go">filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,</span>
+<span class="go">                    then use the pydicom test file with that name. If `element` is given, use only that data element</span>
+<span class="go">                    within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
+<span class="go">                    your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],</span>
+<span class="go">                    yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)</span>
+
 
 <span class="go">optional arguments:</span>
 <span class="go">-h, --help            show this help message and exit</span>
@@ -176,9 +177,9 @@ by typing <code class="docutils literal notranslate"><span class="pre">pydicom</
 <cite>pip install pydicom</cite>.  It should not require any updates to the system
 path or environment variables.</p>
 <p>If you are helping develop <em>pydicom</em> code, and are using git clones,
-you will have to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code> from
+you will have to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> from
 the <cite>pydicom</cite> repository root. This has to be repeated for any changes to
-<cite>setup.py</cite> (e.g. to add a new subcommand).</p>
+<cite>pyproject.toml</cite> (e.g. to add a new subcommand).</p>
 <p>If you are developing subcommands within your own package, you will need to
 reinstall your package similar to the above as you add entry points.</p>
 </section>
