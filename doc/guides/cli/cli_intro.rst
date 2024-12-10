@@ -69,11 +69,12 @@ by typing ``pydicom help [subcommand]``.  For example:
     Display all or part of a DICOM file
 
     positional arguments:
-    filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
-                            prefix is used, then show the pydicom test file with that name. If `element`
-                            is given, use only that data element within the file. Examples:
-                            path/to/your_file.dcm, your_file.dcm::StudyDate,
-                            pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber
+    filespec           File specification, in format [pydicom::]filename[::element]. If `pydicom::` prefix is present,
+                        then use the pydicom test file with that name. If `element` is given, use only that data element
+                        within the file. Examples: path/to/your_file.dcm, your_file.dcm::StudyDate,
+                        your_file.dcm::(0001,0001), pydicom::rtplan.dcm::BeamSequence[0],
+                        yourplan.dcm::BeamSequence[0].BeamNumber, pydicom::rtplan.dcm::(300A,00B0)[0].(300A,00B6)
+
 
     optional arguments:
     -h, --help            show this help message and exit
@@ -91,9 +92,9 @@ The ``pydicom`` command should automatically be available after you
 path or environment variables.
 
 If you are helping develop *pydicom* code, and are using git clones,
-you will have to ``pip install -e .`` or ``python setup.py develop`` from
+you will have to ``pip install -e .`` from
 the `pydicom` repository root. This has to be repeated for any changes to
-`setup.py` (e.g. to add a new subcommand).
+`pyproject.toml` (e.g. to add a new subcommand).
 
 If you are developing subcommands within your own package, you will need to
 reinstall your package similar to the above as you add entry points.

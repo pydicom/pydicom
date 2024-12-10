@@ -13,7 +13,12 @@ bad_elem_specs = (
     "no_callable()",
     "no_equals = ",
     "BeamSequence[0]extra",  # must match to end of string
+    "(300a,00b0)[0]extra",  # as above
     "BeamSequence[x]",  # index must be an int
+    "(0010,0010b)",  # bad tag format
+    "(0010, 0010)",  # space in tag
+    "(0010,  0010)",  # spaces in tag
+    "BeamSequence[0].(10,10)",  # nested bad tag format
 )
 
 missing_elements = (
@@ -31,8 +36,11 @@ bad_indexes = (
 class TestFilespec:
     @pytest.mark.parametrize("bad_spec", bad_elem_specs)
     def test_syntax(self, bad_spec):
-        """Invalid syntax for for CLI file:element spec raises error"""
-        with pytest.raises(ArgumentTypeError, match=r".* syntax .*"):
+        """Invalid syntax for CLI file:element spec raises error"""
+        match = r".* syntax .*"
+        if ", " in bad_spec:
+            match += "tag: no spaces allowed"
+        with pytest.raises(ArgumentTypeError, match=match):
             filespec_parser(f"pydicom::rtplan.dcm::{bad_spec}")
 
     @pytest.mark.parametrize("missing_element", missing_elements)
@@ -75,35 +83,41 @@ class TestFilespecElementEval:
     # Load plan once
     plan, _ = filespec_parser("pydicom::rtplan.dcm")[0]
 
-    def test_correct_values(self):
+    # Test basic correct data elements
+    @pytest.mark.parametrize(
+        "elem_str, expected",
+        (
+            ("BeamSequence[0].ControlPointSequence[0].NominalBeamEnergy", 6.0),
+            ("PatientID", "id00001"),
+            ("(0010,0020)", "id00001"),
+        ),
+    )
+    def test_correct_data_elements(self, elem_str, expected):
         """CLI produces correct evaluation of requested element"""
-        # A nested data element
-        elem_str = "BeamSequence[0].ControlPointSequence[0].NominalBeamEnergy"
-        elem_val = eval_element(self.plan, elem_str)
-        assert 6.0 == elem_val
+        assert eval_element(self.plan, elem_str) == expected
 
-        # A nested Sequence item
-        elem_str = "BeamSequence[0].ControlPointSequence[0]"
+    # Test data elements in sequence items
+    @pytest.mark.parametrize(
+        "elem_str, expected",
+        (
+            ("BeamSequence[0].ControlPointSequence[0]", 6.0),
+            ("(300A,00B0)[0].ControlPointSequence[0]", 6.0),
+            ("(300a,00b0)[0].(300a,0111)[0]", 6.0),
+        ),
+    )
+    def test_data_elem_from_sequence_item(self, elem_str, expected):
         elem_val = eval_element(self.plan, elem_str)
-        assert 6.0 == elem_val.NominalBeamEnergy
+        assert elem_val.NominalBeamEnergy == expected
 
-        # A nested Sequence itself
-        elem_str = "BeamSequence[0].ControlPointSequence"
-        elem_val = eval_element(self.plan, elem_str)
+    def test_nested_sequence(self):
+        elem_val = eval_element(self.plan, "BeamSequence[0].ControlPointSequence")
         assert 6.0 == elem_val[0].NominalBeamEnergy
 
-        # A non-nested data element
-        elem_str = "PatientID"
-        elem_val = eval_element(self.plan, elem_str)
-        assert "id00001" == elem_val
-
-        # The file_meta or file_meta data element
-        elem_str = "file_meta"
-        elem_val = eval_element(self.plan, elem_str)
+    def test_file_meta_or_meta_element(self):
+        elem_val = eval_element(self.plan, "file_meta")
         assert "RT Plan Storage" == elem_val.MediaStorageSOPClassUID.name
 
-        elem_str = "file_meta.MediaStorageSOPClassUID"
-        elem_val = eval_element(self.plan, elem_str)
+        elem_val = eval_element(self.plan, "file_meta.MediaStorageSOPClassUID")
         assert "RT Plan Storage" == elem_val.name
 
 
