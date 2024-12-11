@@ -53,6 +53,7 @@ def data_element_generator(
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
+    get_pixels_position: bool = False,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -80,6 +81,8 @@ def data_element_generator(
         Encoding scheme
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
+    get_pixels_position: bool
+        See: :func:`dcmread` for parameter info.
 
     Yields
     -------
@@ -208,6 +211,8 @@ def data_element_generator(
                 if not is_implicit_VR and vr in EXPLICIT_VR_LENGTH_32:
                     rewind_length += 4
                 fp_seek(value_tell - rewind_length)
+                if get_pixels_position:
+                    yield value_tell
                 return
 
         # Reading the value
@@ -414,6 +419,8 @@ def read_dataset(
     parent_encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
+    get_pixels_position: bool = False,
+    pixel_position_tag: BaseTag = Tag(0x0011, 0x1010),
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
@@ -443,6 +450,11 @@ def read_dataset(
     at_top_level: bool
         If dataset is top level (not within a sequence).
         Used to turn off explicit VR heuristic within sequences
+    get_pixels_position: bool
+        If ``True``, the pixels position is added to the dataset.
+        Note that this will only work if bytelength is ``None``.
+    pixel_position_tag: BaseTag
+        The tag to use for the pixels position.
 
     Returns
     -------
@@ -461,6 +473,8 @@ def read_dataset(
     is_implicit_VR = _is_implicit_vr(
         fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=not at_top_level
     )
+    if bytelength is not None:
+        get_pixels_position = False
     fp.seek(fp_start)
     de_gen = data_element_generator(
         fp,
@@ -470,10 +484,22 @@ def read_dataset(
         defer_size,
         parent_encoding,
         specific_tags,
+        get_pixels_position=get_pixels_position,
     )
+    pixels_position = -1
     try:
         if bytelength is None:
-            raw_data_elements = {e.tag: e for e in de_gen}
+            if get_pixels_position:
+                raw_data_elements = {}
+                for element in de_gen:
+                    if isinstance(element, int):
+                        # TODO: it may not a formal solution, only pixels position will be yeilded
+                        # as an int in the generator
+                        pixels_position = element
+                    else:
+                        raw_data_elements[element.tag] = element
+            else:
+                raw_data_elements = {e.tag: e for e in de_gen}
         else:
             while fp_tell() - fp_start < bytelength:
                 raw_data_element = next(de_gen)
@@ -489,6 +515,8 @@ def read_dataset(
         logger.error(details)
 
     ds = Dataset(raw_data_elements, parent_encoding=parent_encoding)
+    if get_pixels_position:
+        ds.add_new(pixel_position_tag, "IS", pixels_position)
 
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:
@@ -802,6 +830,8 @@ def read_partial(
     defer_size: int | str | float | None = None,
     force: bool = False,
     specific_tags: list[BaseTag | int] | None = None,
+    get_pixels_position: bool = False,
+    pixel_position_tag: BaseTag = Tag(0x0011, 0x1010),
 ) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 
@@ -817,6 +847,11 @@ def read_partial(
         See :func:`dcmread` for parameter info.
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
+    get_pixels_position: bool
+        See :func:`dcmread` for parameter info.
+    pixel_position_tag: BaseTag
+        See :func:`dcmread` for parameter info.
+
 
     Notes
     -----
@@ -928,6 +963,8 @@ def read_partial(
             stop_when=stop_when,
             defer_size=defer_size,
             specific_tags=specific_tags,
+            get_pixels_position=get_pixels_position,
+            pixel_position_tag=pixel_position_tag,
         )
     except EOFError:
         if config.settings.reading_validation_mode == config.RAISE:
@@ -957,6 +994,8 @@ def dcmread(
     stop_before_pixels: bool = False,
     force: bool = False,
     specific_tags: TagListType | None = None,
+    get_pixels_position: bool = False,
+    pixel_position_tag: BaseTag = Tag(0x0011, 0x1010),
 ) -> FileDataset:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
@@ -1011,6 +1050,10 @@ def dcmread(
         elements can be tags or keywords. Note that the element (0008,0005)
         *Specific Character Set* is always returned if present - this ensures
         correct decoding of returned text values.
+    get_pixels_position: bool, optional
+        If ``True``, the position of the pixel data is added to the dataset.
+    pixel_position_tag: BaseTag, optional
+        The tag to use for the pixels position. Default is (0011,1010).
 
     Returns
     -------
@@ -1081,6 +1124,8 @@ def dcmread(
             defer_size=size_in_bytes(defer_size),
             force=force,
             specific_tags=specific_tags,
+            get_pixels_position=get_pixels_position,
+            pixel_position_tag=pixel_position_tag,
         )
     finally:
         if not caller_owns_file:
