@@ -493,7 +493,7 @@ def read_dataset(
                 raw_data_elements = {}
                 for element in de_gen:
                     if isinstance(element, int):
-                        # TODO: it may not a formal solution, only pixels position will be yeilded
+                        # TODO: it may not a formal solution, only pixels position will be yielded
                         # as an int in the generator
                         pixels_position = element
                     else:
