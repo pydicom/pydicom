@@ -126,7 +126,7 @@
 <span id="guide-decoder-options"></span><h1>Pixel Data Decoder Options<a class="headerlink" href="#pixel-data-decoder-options" title="Link to this heading">¶</a></h1>
 <p>The following applies to the functions and class methods that use the
 <a class="reference internal" href="../../reference/pixels.html"><span class="doc">pixels</span></a> backend for decoding pixel data.</p>
-<p>When decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+<p>When decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p>The <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property
 (configurable via <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array_options" title="pydicom.dataset.Dataset.pixel_array_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.pixel_array_options()</span></code></a>)</p></li>
@@ -235,7 +235,7 @@ the pixel data. One of <code class="docutils literal notranslate"><span class="p
 <section id="image-processing-options">
 <h2>Image Processing Options<a class="headerlink" href="#image-processing-options" title="Link to this heading">¶</a></h2>
 <p>The following options may be used with any transfer syntax for controlling the
-processing applied after decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+processing applied after decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>as_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then convert pixel data with a
 YCbCr <a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">photometric interpretation</span></a>
@@ -249,7 +249,7 @@ conversion on the array (default <code class="docutils literal notranslate"><spa
 <section id="miscellaneous-options">
 <h2>Miscellaneous Options<a class="headerlink" href="#miscellaneous-options" title="Link to this heading">¶</a></h2>
 <p>The following options may be used with both native (uncompressed) and encapsulated
-(compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+(compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>correct_unused_bits</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <em>Bits Stored</em>
 doesn’t equal <em>Bits Allocated</em> then apply bit-shifting operations to correct
@@ -262,7 +262,7 @@ be necessary as the unused bits are typically filled with values that will
 produce the correct interpretation.</p></li>
 </ul>
 <p>The following options may be used with both native (uncompressed) and encapsulated
-(compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
+(compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
 buffer-like object:</p>
 <ul class="simple">
 <li><p><cite>allow_excess_frames</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <cite>src</cite> contains
@@ -271,16 +271,16 @@ include those extra frames in the returned data, otherwise return only the numbe
 of frames given by <em>Number of Frames</em>.</p></li>
 </ul>
 <p>The following options may be used with native (uncompressed) transfer syntaxes
-when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>view_only</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> and <cite>src</cite> is a
 <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or buffer-like then make a best effort
-attempt to return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> that’s a <a class="reference external" href="https://numpy.org/doc/stable/user/basics.copies.html#view">view</a> on the original
+attempt to return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> that’s a <a class="reference external" href="https://numpy.org/doc/stable/user/basics.copies.html#view">view</a> on the original
 buffer (default <code class="docutils literal notranslate"><span class="pre">False</span></code>). Note that if the original buffer is immutable then
-the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will be read-only.</p></li>
+the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will be read-only.</p></li>
 </ul>
 <p>The following options may be used with encapsulated (compressed) transfer syntaxes
-of the corresponding type when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
+of the corresponding type when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>apply_jls_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
 JPEG-LS compressed pixel data and the pixel representation is 1, then convert
@@ -351,7 +351,7 @@ big endian systems (default)</p></td>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2025, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

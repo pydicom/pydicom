@@ -269,7 +269,7 @@ the use of different interleave modes. While a <em>Planar Configuration</em> of
 <code class="docutils literal notranslate"><span class="pre">1</span></code> (interleave mode 0) may result in better compression ratios, its also
 more likely to result in downstream issues with decoders that expect the more
 common <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> (interleave mode 2) pixel ordering.</p>
-<p>For either case, if the pixel data being encoded is in an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+<p>For either case, if the pixel data being encoded is in an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
 then each frame should be shaped as (rows, columns, samples). If the pixel data
 being encoded is <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> then with <em>Planar Configuration</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> the data
 is ordered as color-by-pixel:</p>
@@ -430,7 +430,7 @@ intensity units:</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2025, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
