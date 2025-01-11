@@ -120,7 +120,8 @@ def eval_element(ds: Dataset, element: str) -> Any:
                 )
         else:
             raise argparse.ArgumentTypeError(
-                f"'{identifier}' is not a DICOM keyword, tag or allowed class property"
+                f"'{identifier}' is not a known DICOM keyword, "
+                "tag or allowed class property"
             )
 
         # If here, then have the new object, handle indexing if there

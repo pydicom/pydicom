@@ -49,7 +49,10 @@ class TestFilespec:
     @pytest.mark.parametrize("missing_element", not_dicom_keywords)
     def test_elem_not_keyword(self, missing_element):
         """CLI filespec elements not in the dataset raise an error"""
-        with pytest.raises(ArgumentTypeError, match=r".*not a known DICOM keyword or tag number"):
+        with pytest.raises(
+            ArgumentTypeError, 
+            match=r".*not a known DICOM keyword, tag or allowed class property"
+        ):
             filespec_parser(f"pydicom::rtplan.dcm::{missing_element}")
 
     @pytest.mark.parametrize("missing_element", not_in_parent)
@@ -101,6 +104,7 @@ class TestFilespecElementEval:
             ("PatientID", "id00001"),
             ("(0010,0020)", "id00001"),
             ("file_meta.TransferSyntaxUID.name", "Implicit VR Little Endian"),
+            ("PatientName.family_name", "Last"),
         ),
     )
     def test_correct_data_elements(self, elem_str, expected):
