@@ -9,7 +9,6 @@ attributes, and calls set_defaults(func=callback_function)
 
 import argparse
 from importlib.metadata import entry_points
-from pathlib import Path
 import re
 import sys
 from typing import cast, Any
@@ -95,9 +94,9 @@ def eval_element(ds: Dataset, element: str) -> Any:
     for sub_elem in element.split("."):
         # e.g. match "BeamSequence[1]" --> groups: ['BeamSequence', '1']
         m = re.match(re_kywd_or_item, sub_elem)
-        identifier = m.groups()[0]  # type: ignore     
+        identifier = m.groups()[0]  # type: ignore
 
-        if tag_for_keyword(identifier) is not None: # Standard DICOM keyword
+        if tag_for_keyword(identifier) is not None:  # Standard DICOM keyword
             obj = getattr(obj, identifier, None)
             if obj is None:
                 raise argparse.ArgumentTypeError(
