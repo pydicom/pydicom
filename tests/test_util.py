@@ -51,7 +51,6 @@ except ImportError:
 # For Python >=3.11, this can be imported from contextlib
 @contextmanager
 def chdir(new_dir):
-    import os
 
     old_dir = os.getcwd()
     try:

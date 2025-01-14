@@ -26,9 +26,7 @@ not_dicom_keywords = (
     "BeamSequenceXX",
 )
 
-not_in_parent = (
-    "BeamDose",  # valid keyword but not at top level
-)
+not_in_parent = ("BeamDose",)  # valid keyword but not at top level
 
 bad_indexes = (
     "BeamSequence[42]",
@@ -50,8 +48,8 @@ class TestFilespec:
     def test_elem_not_keyword(self, missing_element):
         """CLI filespec elements not in the dataset raise an error"""
         with pytest.raises(
-            ArgumentTypeError, 
-            match=r".*not a known DICOM keyword, tag or allowed class property"
+            ArgumentTypeError,
+            match=r".*not a known DICOM keyword, tag or allowed class property",
         ):
             filespec_parser(f"pydicom::rtplan.dcm::{missing_element}")
 
@@ -60,7 +58,6 @@ class TestFilespec:
         """CLI filespec elements not in the dataset raise an error"""
         with pytest.raises(ArgumentTypeError, match=r".*not in the parent object"):
             filespec_parser(f"pydicom::rtplan.dcm::{missing_element}")
-
 
     @pytest.mark.parametrize("bad_index", bad_indexes)
     def test_bad_index(self, bad_index):
