@@ -91,7 +91,7 @@ filespec_help = (
 def eval_element(ds: Dataset, element: str) -> Any:
     # replace all ".(gggg,eeee)" hex tags with `eval`uable expression
 
-    obj = ds
+    obj: Dataset|None = ds
     for sub_elem in element.split("."):
         # e.g. match "BeamSequence[1]" --> groups: ['BeamSequence', '1']
         m = re.match(re_kywd_or_item, sub_elem)
@@ -106,7 +106,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
         # Try (gggg,eee) tag
         elif match := re.match(re_match_tag, identifier):
             try:
-                obj = obj[match.groups()[0:2]].value
+                obj = cast(Dataset, obj)["".join(match.groups()[0:2])].value
             except KeyError:
                 raise argparse.ArgumentTypeError(
                     f"'{identifier}' is not in the parent object"
