@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Element VRs and Python types &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
@@ -368,8 +368,8 @@ MutableSequence[T]</p></td>
 as the <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedReader" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedReader</span></code></a> instances returned by the <a class="reference external" href="https://docs.python.org/3/library/functions.html#open" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> built-in when
 in read mode. This allows you to avoid having to read a large amount of data into
 memory when creating datasets:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;a_large_amount_of_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
@@ -383,9 +383,9 @@ memory when creating datasets:</p>
 syntax such as <em>JPEG 2000 Lossles</em>, the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_buffer()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended_buffer()</span></code></a> functions can be used to encapsulate
 the buffered frames:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate_buffer</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.encaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">encapsulate_buffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;a_large_jpeg2000_file.j2k&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>

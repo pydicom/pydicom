@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Compressing Pixel Data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -208,8 +208,8 @@ you with the specific requirements of the encoding method.</p>
 <p>The <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> method or
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.compress.html#pydicom.pixels.compress" title="pydicom.pixels.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">compress()</span></code></a> function can be used to compress an uncompressed
 dataset in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLELossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
@@ -254,11 +254,11 @@ encoding</p></li>
 </ul>
 <p>See the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">relevant sections of the DICOM Standard</a>
 for more information.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGBaseline8Bit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.encaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGBaseline8Bit</span>
 
 <span class="c1"># Fetch an example dataset</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>

@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RLE Lossless Encoding &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -265,8 +265,8 @@ usage of your dataset in mind.</p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
 <p>Compressing grayscale pixel data in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLELossless</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span>
 <span class="go">1</span>
@@ -280,7 +280,7 @@ usage of your dataset in mind.</p>
 </pre></div>
 </div>
 <p>Compressing RGB pixel data in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span>
 <span class="go">3</span>
@@ -300,9 +300,9 @@ usage of your dataset in mind.</p>
 <p>Convert RGB pixel data to YCbCr (requires <a class="reference internal" href="../../tutorials/installation.html#tut-install-np"><span class="std std-ref">NumPy</span></a>), then
 compress in-place. Because the color space has changed we need to generate a
 new <em>SOP Instance UID</em>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">convert_color_space</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">generate_uid</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_color_space</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_uid</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rgb</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ybr</span> <span class="o">=</span> <span class="n">convert_color_space</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">,</span> <span class="s1">&#39;YBR_FULL&#39;</span><span class="p">)</span>

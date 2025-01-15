@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Core elements in pydicom &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -136,7 +136,7 @@ dictionary instead of the keys normally yielded by iterating a <a class="referen
 <p>A <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> can be created directly, but you’ll
 usually get one by reading an existing DICOM dataset from file using
 <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Returns the path to pydicom&#39;s examples.rt_plan dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;rt_plan&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -354,7 +354,7 @@ so in effect it’s just a number with some extra behavior:</p>
 enforces the expected 4-byte (group, element) structure.</p></li>
 <li><p>A <a class="reference internal" href="../../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> instance can be created from an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or a
 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> containing the (group, element), or from the DICOM keyword:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="kn">import</span> <span class="n">Tag</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.tag</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tag</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">)</span> <span class="c1"># all of these are equivalent</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">((</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">))</span>

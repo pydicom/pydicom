@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JPEG 2000 Encoding &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -253,8 +253,8 @@ for a given image quality. If you don’t wish to use MCT then keep the
 <h3>JPEG 2000 Lossless<a class="headerlink" href="#jpeg-2000-lossless" title="Link to this heading">¶</a></h3>
 <p>Losslessly compress unsigned RGB pixel data in-place, without the use of the
 multiple-component transformation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPE2000Lossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPE2000Lossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -271,8 +271,8 @@ multiple-component transformation:</p>
 </div>
 <p>Losslessly compress unsigned RGB pixel data in-place with multiple-component
 transformation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPE2000Lossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPE2000Lossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -290,8 +290,8 @@ transformation:</p>
 </pre></div>
 </div>
 <p>Losslessly compress signed greyscale pixel data in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPE2000Lossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPE2000Lossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -347,8 +347,8 @@ left to right:</p>
 </li>
 </ul>
 <p>Lossy compression of unsigned RGB pixel data without multiple-component transformation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEG2000</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -364,8 +364,8 @@ left to right:</p>
 </pre></div>
 </div>
 <p>Lossy compression of unsigned RGB pixel data with multiple-component transformation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEG2000</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -384,8 +384,8 @@ left to right:</p>
 </pre></div>
 </div>
 <p>Lossy compression of signed greyscale pixel data:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEG2000</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>

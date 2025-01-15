@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contributing a source code change &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
@@ -236,9 +236,9 @@ asking for help.</p>
 <p>Let’s say we wanted to add a new <a class="reference external" href="https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids">pre-defined UID</a>
 to <em>pydicom</em> with a value of <code class="docutils literal notranslate"><span class="pre">1.2.3.4.500</span></code>. We’d first add a new test at the
 bottom of <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/tests/test_uid.py">test_uid.py</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_new_uid</span><span class="p">():</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_new_uid</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test uid.NewDefinedUID.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">NewDefinedUID</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewDefinedUID</span>
     <span class="k">assert</span> <span class="s1">&#39;1.2.3.4.500&#39;</span> <span class="o">==</span> <span class="n">NewDefinedUID</span>
 </pre></div>
 </div>
@@ -247,10 +247,10 @@ run the tests we should get a failure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest test_uid.py
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">test_new_uid</span><span class="p">():</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">test_new_uid</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test uid.NewDefinedUID.&quot;&quot;&quot;</span>
-<span class="o">&gt;</span>       <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">NewDefinedUID</span>
-<span class="n">E</span>       <span class="ne">ImportError</span><span class="p">:</span> <span class="n">cannot</span> <span class="kn">import</span> <span class="nn">name</span> <span class="s1">&#39;NewDefinedUID&#39;</span>
+<span class="o">&gt;</span>       <span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewDefinedUID</span>
+<span class="n">E</span>       <span class="ne">ImportError</span><span class="p">:</span> <span class="n">cannot</span> <span class="kn">import</span><span class="w"> </span><span class="nn">name</span> <span class="s1">&#39;NewDefinedUID&#39;</span>
 
 <span class="n">test_uid</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">380</span><span class="p">:</span> <span class="ne">ImportError</span>
 </pre></div>

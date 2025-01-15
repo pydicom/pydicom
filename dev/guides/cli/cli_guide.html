@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Command-line Interface Guide &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -540,7 +540,7 @@ by adding entry points to their package’s setup.py file, specifying a callback
 function to register the subcommand and its arguments.</p>
 <p>If you wanted to create two subcommands, ‘command1’ and ‘command2’,
 your setup.py file should include something like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">setuptools</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">setup</span><span class="p">(</span>
@@ -563,9 +563,9 @@ would be used by convention, and is assumed in the following examples.</p>
 which takes a single argument <code class="docutils literal notranslate"><span class="pre">subparsers</span></code>, and a <code class="docutils literal notranslate"><span class="pre">do_command</span></code> function,
 which will take the call when you subcommand is actually used at the command
 line:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.cli.main</span> <span class="kn">import</span> <span class="n">filespec_help</span><span class="p">,</span> <span class="n">filespec_parser</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.cli.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">filespec_help</span><span class="p">,</span> <span class="n">filespec_parser</span>
 
-<span class="k">def</span> <span class="nf">add_subparser</span><span class="p">(</span><span class="n">subparsers</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_subparser</span><span class="p">(</span><span class="n">subparsers</span><span class="p">):</span>
     <span class="c1"># Register the sub-parser</span>
     <span class="n">subparser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
         <span class="s2">&quot;subcommandname&quot;</span><span class="p">,</span>
@@ -585,7 +585,7 @@ line:</p>
 </pre></div>
 </div>
 <p>And define your command function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">do_command</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">do_command</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">ds</span><span class="p">,</span> <span class="n">element_val</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">filespec</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">yourarg</span><span class="p">:</span>
             <span class="c1"># Do something...</span>

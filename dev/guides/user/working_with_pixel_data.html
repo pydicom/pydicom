@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Working with Pixel Data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -140,7 +140,7 @@ Pixel Data</em> elements. While the examples use <code class="docutils literal n
 interchangeably provided the dataset contains the corresponding element.</p>
 </div>
 <p>By default <em>pydicom</em> reads in pixel data as the raw bytes found in the file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;mr&quot;</span><span class="p">)</span>  <span class="c1"># The path to the examples.mr dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> 
@@ -245,8 +245,8 @@ LUT entry. When a dataset’s (0028,0004) <em>Photometric Interpretation</em> va
 <code class="docutils literal notranslate"><span class="pre">PALETTE</span> <span class="pre">COLOR</span></code> then the
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.apply_color_lut.html#pydicom.pixels.processing.apply_color_lut" title="pydicom.pixels.processing.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> function can be used
 to apply a palette color LUT to the pixel data to produce an RGB image.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_color_lut</span>
 
 <span class="c1"># Fetch an example PALETTE COLOR dataset</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">palette_color</span>
@@ -257,8 +257,8 @@ to apply a palette color LUT to the pixel data to produce an RGB image.</p>
 <p>It’s also possible to apply one of the DICOM
 <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_B.html">well-known color palettes</a> provided the bit-depth
 of the pixel data is 8-bit.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_color_lut</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_color_lut</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">palette_color</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
@@ -283,8 +283,8 @@ used with an input array of raw values and a dataset containing a Modality LUT
 module to return the converted values. When a dataset requires multiple
 grayscale transformations, the Modality LUT transformation is always applied
 first.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_modality_lut</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_modality_lut</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
@@ -303,8 +303,8 @@ multiple VOI or windowing views then a particular view can be returned by
 using the <cite>index</cite> keyword parameter.</p>
 <p>When a dataset requires multiple grayscale transformations, then it’s assumed
 that the modality LUT or rescale operation has already been applied.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">apply_voi_lut</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_voi_lut</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">overlay</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>

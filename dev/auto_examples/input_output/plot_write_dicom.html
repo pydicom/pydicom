@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Write DICOM data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -126,8 +126,8 @@ example does not produce a DICOM standards compliant file as written, you will
 have to change UIDs to valid values and add all required DICOM data elements.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting dataset values...
 Setting file meta information...
-Writing dataset to: /tmp/tmp_8l08x6g.dcm
-Load dataset from: /tmp/tmp_8l08x6g.dcm ...
+Writing dataset to: /tmp/tmpzsjt4gd7.dcm
+Load dataset from: /tmp/tmpzsjt4gd7.dcm ...
 Dataset.file_meta -------------------------------
 (0002,0000) File Meta Information Group Length  UL: 128
 (0002,0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;
@@ -137,11 +137,11 @@ Dataset.file_meta -------------------------------
 (0002,0012) Implementation Class UID            UI: 1.2.3.4
 (0002,0013) Implementation Version Name         SH: &#39;PYDICOM 3.1.0&#39;
 -------------------------------------------------
-(0008,0023) Content Date                        DA: &#39;20250101&#39;
-(0008,0033) Content Time                        TM: &#39;163917.158569&#39;
+(0008,0023) Content Date                        DA: &#39;20250115&#39;
+(0008,0033) Content Time                        TM: &#39;193330.537162&#39;
 (0010,0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010,0020) Patient ID                          LO: &#39;123456&#39;
-Deleting file: /tmp/tmp_8l08x6g.dcm ...
+Deleting file: /tmp/tmpzsjt4gd7.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -150,13 +150,13 @@ Deleting file: /tmp/tmp_8l08x6g.dcm ...
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Darcy Mason, Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class"><span class="n">Path</span></a>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class"><span class="n">Path</span></a>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class"><span class="n">UID</span></a><span class="p">,</span> <a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ExplicitVRLittleEndian</span></a>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydicom</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class"><span class="n">UID</span></a><span class="p">,</span> <a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ExplicitVRLittleEndian</span></a>
 
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting dataset values...&quot;</span><span class="p">)</span>

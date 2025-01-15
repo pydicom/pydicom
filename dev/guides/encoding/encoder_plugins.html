@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pixel Data Encoder Plugins &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -145,7 +145,7 @@ performs the actual conversion.</p>
 <p>An encoding plugin must implement three objects within the same module:</p>
 <ul>
 <li><p>A function that performs the encoding with the following function signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">runner</span><span class="p">:</span> <span class="n">EncodeRunner</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">bytearray</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">runner</span><span class="p">:</span> <span class="n">EncodeRunner</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">bytearray</span><span class="p">:</span>
 </pre></div>
 </div>
 <p>Where:</p>
@@ -205,7 +205,7 @@ data in a format meeting the requirements of the corresponding <em>Transfer
 Syntax UID</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
 </li>
 <li><p>A function named <code class="docutils literal notranslate"><span class="pre">is_available</span></code> with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_available</span><span class="p">(</span><span class="n">uid</span><span class="p">:</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">UID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">is_available</span><span class="p">(</span><span class="n">uid</span><span class="p">:</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">UID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 </pre></div>
 </div>
 <p>Where <cite>uid</cite> is the <em>Transfer Syntax UID</em> for the corresponding encoder as
@@ -215,7 +215,7 @@ return <code class="docutils literal notranslate"><span class="pre">False</span>
 </li>
 <li><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> named <code class="docutils literal notranslate"><span class="pre">ENCODER_DEPENDENCIES</span></code> with the type
 <code class="docutils literal notranslate"><span class="pre">Dict[pydicom.uid.UID,</span> <span class="pre">Tuple[str,</span> <span class="pre">...]</span></code>, such as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span><span class="p">,</span> <span class="n">JPEG2000</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLELossless</span><span class="p">,</span> <span class="n">JPEG2000</span>
 
 <span class="n">ENCODER_DEPENDENCIES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">RLELossless</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;numpy&#39;</span><span class="p">,</span> <span class="s1">&#39;pillow&#39;</span><span class="p">,</span> <span class="s1">&#39;imagecodecs&#39;</span><span class="p">),</span>
@@ -238,7 +238,7 @@ a unique <a class="reference external" href="https://docs.python.org/3/library/s
 example, if you’d import your encoder function <cite>my_encoder_func</cite> with
 <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">my_package.encoders</span> <span class="pre">import</span> <span class="pre">my_encoder_func</span></code>, then you’d do the
 following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.pixels.encoders</span> <span class="kn">import</span> <span class="n">RLELosslessEncoder</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels.encoders</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLELosslessEncoder</span>
 
 <span class="n">RLELosslessEncoder</span><span class="o">.</span><span class="n">add_plugin</span><span class="p">(</span>
     <span class="s1">&#39;my_encoder&#39;</span><span class="p">,</span>  <span class="c1"># the plugin&#39;s label</span>

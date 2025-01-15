@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pixel Data - Part 1: Introduction and accessing &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -181,7 +181,7 @@ only one may be present in any given dataset.</p>
 <p>All three elements use <strong>O*</strong> <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">VRs</a> (such as <strong>OB</strong> and
 <strong>OD</strong>), which in <em>pydicom</em> are <a class="reference internal" href="../../guides/element_value_types.html"><span class="doc">stored as</span></a>
 (and should be set using) <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">group_dataset</span><span class="p">(</span><span class="mh">0x7FE0</span><span class="p">)</span>
 <span class="go">(7FE0,0010) Pixel Data                          OB: Array of 152326 elements</span>
@@ -210,7 +210,7 @@ and the encapsulated data used to set the <em>Pixel Data</em> value</p></li>
 </ul>
 <p>To access the encapsulated frames you can use <a class="reference internal" href="../../reference/generated/pydicom.encaps.get_frame.html#pydicom.encaps.get_frame" title="pydicom.encaps.get_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame()</span></code></a>
 or the <a class="reference internal" href="../../reference/generated/pydicom.encaps.generate_frames.html#pydicom.encaps.generate_frames" title="pydicom.encaps.generate_frames"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_frames()</span></code></a> iterator:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">get_frame</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.encaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_frame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">get_frame</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">number_of_frames</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
 <span class="go">152294</span>
@@ -256,10 +256,10 @@ JPEG compression schemes. For this reason <em>pydicom</em> offers a number of me
 for converting the pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, the most high-level
 of which are the <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
 functions:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 
 <span class="c1"># Get an example dataset as a FileDataset instance</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
@@ -278,8 +278,8 @@ functions:</p>
 <a class="reference external" href="https://matplotlib.org/">matplotlib</a> to display it. If the dataset has multiple
 frames but you’re only interested in a particular one, then you can use the <cite>index</cite> parameter
 to return it:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 
 <span class="c1"># Get an example multi-frame dataset</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rt_dose</span>
@@ -296,8 +296,8 @@ to return it:</p>
 </div>
 <p><a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> can be used to iterate through either all
 the available frames or those specified by the <cite>indices</cite> parameter:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">iter_pixels</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">iter_pixels</span>
 
 <span class="c1"># Iterate through all frames</span>
 <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">iter_pixels</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">rt_dose</span><span class="p">):</span>
@@ -317,10 +317,10 @@ by default. Datasets with pixel data in <a class="reference external" href="http
 color space are converted using <a class="reference internal" href="../../reference/generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> prior
 to the array being returned. If you’d like to skip this conversion and return the
 data as found in the dataset you can pass <code class="docutils literal notranslate"><span class="pre">raw=True</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL_422&quot;</span>
@@ -346,8 +346,8 @@ passing one or more <a class="reference internal" href="../../guides/decoding/de
 packages are needed to perform the actual decompression (via their corresponding decoding
 plugins). By default, all available plugins will be tried and the first successful
 one will have its results returned:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
 
@@ -377,8 +377,8 @@ you’ll get an exception:</p>
 be identical no matter which plugin is used, there may be slight differences for lossy
 compression methods. To ensure consistency you can use the <cite>decoding_plugin</cite> argument
 to use the specified <a class="reference internal" href="../../guides/plugin_table.html"><span class="doc">decompression plugin</span></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
 
@@ -387,8 +387,8 @@ to use the specified <a class="reference internal" href="../../guides/plugin_tab
 </pre></div>
 </div>
 <p>And of course if the specified plugin isn’t available you’ll get an exception:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_array</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span><span class="p">,</span> <span class="n">decoding_plugin</span><span class="o">=</span><span class="s2">&quot;pillow&quot;</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
@@ -412,8 +412,8 @@ of frames and you’d like to avoid having the entire thing read into memory.
 By passing the path to the dataset (as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>) to
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> only the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements and the minimum amount of required
 pixel data will be loaded:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
 
 <span class="c1"># Get the path to the &#39;examples.rt_dose&#39; dataset</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;rt_dose&quot;</span><span class="p">)</span>
@@ -423,11 +423,11 @@ pixel data will be loaded:</p>
 </pre></div>
 </div>
 <p>The same is true for <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">iter_pixels</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">iter_pixels</span>
 
 <span class="c1"># Get the path to the &#39;examples.ybr_color&#39; dataset</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ybr_color&quot;</span><span class="p">)</span>
@@ -448,8 +448,8 @@ the array (such as <a class="reference internal" href="../../reference/generated
 an empty <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance via the <cite>ds_out</cite> argument,
 or alternatively by using <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> with
 <code class="docutils literal notranslate"><span class="pre">stop_before_pixels=True</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pixel_array</span><span class="p">,</span> <span class="n">apply_rescale</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span><span class="p">,</span> <span class="n">apply_rescale</span>
 
 <span class="c1"># Get the path to the &#39;examples.ct&#39; dataset</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
@@ -480,8 +480,8 @@ describing the corresponding <a class="reference external" href="https://numpy.o
 <p>The <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class should not be used
 directly, instead use the class instance returned by <a class="reference internal" href="../../reference/generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_decoder()</span></code></a>.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">get_decoder</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_decoder</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s2">&quot;YBR_FULL_422&quot;</span>

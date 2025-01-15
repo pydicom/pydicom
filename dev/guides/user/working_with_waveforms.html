@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Working with Waveform Data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -132,7 +132,7 @@ Standard.</p>
 common sampling frequency (in Hz), which is given by the (003A,001A) <em>Sampling
 Frequency</em>. The waveform data for each multiplex is encoded in the
 corresponding (5400,1010) <em>Waveform Data</em> element.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">waveform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span>
 <span class="go">&lt;Sequence, length 2&gt;</span>
@@ -179,7 +179,7 @@ then it will be applied to the raw channel data. If you need the raw data
 without any corrections then you can use the
 <a class="reference internal" href="../../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.multiplex_array" title="pydicom.waveforms.numpy_handler.multiplex_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiplex_array()</span></code></a>
 function with the <em>as_raw</em> keyword parameter instead:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveforms</span> <span class="kn">import</span> <span class="n">multiplex_array</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.waveforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiplex_array</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">multiplex_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
 <span class="go">array([[  80,   90,   10, ...,  -20,  -55,  -40],</span>

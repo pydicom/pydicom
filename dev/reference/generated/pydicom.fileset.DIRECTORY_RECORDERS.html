@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pydicom.fileset.DIRECTORY_RECORDERS &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -146,9 +146,9 @@ the allowable values - except PRIVATE - for (0004,1430) <em>Directory Record
 Type</em>. By overriding the function for a given record type you can customize
 the directory records that will be included in the DICOMDIR file.</p>
 <p class="rubric">Example</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.fileset</span> <span class="kn">import</span> <span class="n">DIRECTORY_RECORDERS</span><span class="p">,</span> <span class="n">FileSet</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.fileset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DIRECTORY_RECORDERS</span><span class="p">,</span> <span class="n">FileSet</span>
 
-<span class="k">def</span> <span class="nf">my_recorder</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_recorder</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
     <span class="n">record</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
     <span class="n">record</span><span class="o">.</span><span class="n">OffsetOfTheNextDirectoryRecord</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">record</span><span class="o">.</span><span class="n">RecordInUseFlag</span> <span class="o">=</span> <span class="mh">0xFFFF</span>

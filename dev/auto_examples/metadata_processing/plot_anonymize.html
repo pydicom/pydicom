@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Anonymize DICOM data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -131,9 +131,9 @@ optionally remove curves and private tags, and write the results in a new file.<
 <span class="c1">#           Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">mr</span>
 
@@ -148,12 +148,12 @@ optionally remove curves and private tags, and write the results in a new file.<
 <p>We can define a callback function to find all tags corresponding to a person
 names inside the dataset. We can also define a callback function to remove
 curves tags.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">person_names_callback</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">person_names_callback</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
         <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;anonymous&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">curves_callback</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">curves_callback</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a><span class="o">.</span><span class="n">group</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">==</span> <span class="mh">0x5000</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="n">elem</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a><span class="p">]</span>
 </pre></div>

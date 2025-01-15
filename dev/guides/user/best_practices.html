@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Best Practices &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -155,7 +155,7 @@ validations from the DICOM Standard are checked. Included are checks for
 correct value length, contained character set and for predefined formats where
 applicable (such as for date/time related values).</p>
 <p>To change a flag in your code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 
 <span class="n">config</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">reading_validation_mode</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">RAISE</span>
 </pre></div>
@@ -190,7 +190,7 @@ operating system documentation for more details on setting or removing
 environment variables.</p>
 <p>The other way to enable the future behavior is to turn it on at run-time
 using the <a class="reference internal" href="../../reference/generated/pydicom.config.future_behavior.html#pydicom.config.future_behavior" title="pydicom.config.future_behavior"><code class="xref py py-func docutils literal notranslate"><span class="pre">future_behavior()</span></code></a> function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 <span class="n">config</span><span class="o">.</span><span class="n">future_behavior</span><span class="p">()</span>
 </pre></div>
 </div>

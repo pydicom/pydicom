@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pydicom.config.INVALID_KEY_BEHAVIOR &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -170,7 +170,7 @@ element tags like <code class="docutils literal notranslate"><span class="pre">0
 then raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception. If <code class="docutils literal notranslate"><span class="pre">&quot;IGNORE&quot;</span></code> then neither warn
 nor raise.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">INVALID_KEY_BEHAVIOR</span> <span class="o">=</span> <span class="s2">&quot;RAISE&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;PatientName&#39;</span> <span class="ow">in</span> <span class="n">ds</span>  <span class="c1"># OK</span>
@@ -179,7 +179,7 @@ nor raise.</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">494</span>, in <span class="n">__contains__</span>
-<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <span class="gr">ValueError</span>: <span class="n">Invalid value used with the &#39;in&#39; operator: must be an</span>
 <span class="x">element tag as a 2-tuple or int, or an element keyword</span>
 </pre></div>

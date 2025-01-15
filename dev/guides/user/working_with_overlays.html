@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Working with Overlay Data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -130,7 +130,7 @@ example, the tag’s group number for (60xx,3000) <em>Overlay Data</em> may be (
 include multiple overlays, where the related elements for each overlay use the
 same group number. Because of this, the only way to access a particular
 element from an overlay is to use the <code class="docutils literal notranslate"><span class="pre">Dataset[group,</span> <span class="pre">elem]</span></code> method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">overlay</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">]</span>  <span class="c1"># returns a DataElement</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
@@ -182,7 +182,7 @@ and written back to the correct element:</p>
 <span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Pack the data</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">pack_bits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack_bits</span>
 <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pack_bits</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
 <span class="c1"># Update the element value</span>

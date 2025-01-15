@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pydicom.config.INVALID_KEYWORD_BEHAVIOR &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -168,7 +168,7 @@ attribute that’s not a known element keyword.</p>
 known DICOM element keyword. If <code class="docutils literal notranslate"><span class="pre">&quot;RAISE&quot;</span></code> then raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a>
 exception. If <code class="docutils literal notranslate"><span class="pre">&quot;IGNORE&quot;</span></code> then neither warn nor raise.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">INVALID_KEYWORD_BEHAVIOR</span> <span class="o">=</span> <span class="s2">&quot;WARN&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s2">&quot;Citizen^Jan&quot;</span>  <span class="c1"># OK</span>

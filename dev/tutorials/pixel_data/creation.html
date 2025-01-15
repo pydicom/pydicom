@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pixel Data - Part 2: Creation of pixel data &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -150,9 +150,9 @@ pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg<span class="
 <h2>Creating <em>Pixel Data</em><a class="headerlink" href="#creating-pixel-data" title="Link to this heading">¶</a></h2>
 <p>We’ll be using NumPy to create an array containing the pixel data and converting
 it to little-endian ordered <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="(in NumPy v2.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ndarray.tobytes()</span></code></a>. This is the function we’ll be using to create the array:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="k">def</span> <span class="nf">draw_circle</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draw_circle</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an ndarray containing a circle.&quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="p">),</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">shape</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
 
@@ -203,10 +203,10 @@ If instead we were to use something like <code class="docutils literal notransla
 and require either setting <code class="docutils literal notranslate"><span class="pre">ds.BitsAllocated</span> <span class="pre">=</span> <span class="pre">16</span></code> (and roughly doubling the
 final size of the dataset) or keeping <em>Bits Stored</em> as <code class="docutils literal notranslate"><span class="pre">8</span></code> and stripping out the
 unused bytes with <code class="docutils literal notranslate"><span class="pre">ds.PixelData</span> <span class="pre">==</span> <span class="pre">arr.tobytes()[1::2]</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
@@ -270,11 +270,11 @@ displayed images:</p>
 separately then all the encoded pixels are concatenated together. This matches how
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="(in NumPy v2.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ndarray.tobytes()</span></code></a> will encode an array that’s ordered as
 (rows, columns, samples) or (frames, rows, columns, samples).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixels</span> <span class="kn">import</span> <span class="n">iter_pixels</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">iter_pixels</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
@@ -337,10 +337,10 @@ the results.</p></li>
 <p>We need a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> sufficient for containing 12-bit integers, so
 to minimize memory usage we’ll go with <code class="docutils literal notranslate"><span class="pre">int16</span></code> and use a <em>Bits Allocated</em> value
 of <code class="docutils literal notranslate"><span class="pre">16</span></code> to match.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
@@ -402,8 +402,8 @@ that of <em>Pixel Data</em>, the main differences being:</p>
 </tbody>
 </table>
 <p>The example below demonstrates creating <em>Float Pixel Data</em>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplicitVRLittleEndian</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>

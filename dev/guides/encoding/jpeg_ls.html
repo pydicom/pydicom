@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JPEG-LS Encoding &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
@@ -293,8 +293,8 @@ is ordered as color-by-pixel:</p>
 <section id="jpeg-ls-lossless">
 <h3>JPEG-LS Lossless<a class="headerlink" href="#jpeg-ls-lossless" title="Link to this heading">¶</a></h3>
 <p>Losslessly compress unsigned RGB pixel data in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSLossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGLSLossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -310,8 +310,8 @@ is ordered as color-by-pixel:</p>
 </pre></div>
 </div>
 <p>Losslessly compress signed greyscale pixel data in-place:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSLossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGLSLossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -341,8 +341,8 @@ NEAR parameter, which is the allowed absolute error in pixel intensity units fro
 the compression process and should be in the range <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">2**BitsStored</span> <span class="pre">-</span> <span class="pre">1)</span></code>.</p>
 <p>Lossy compression of unsigned pixel data with a maximum error of 2 pixel
 intensity units:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
@@ -359,8 +359,8 @@ intensity units:</p>
 </div>
 <p>Lossy compression of signed pixel data with a maximum error of 3 pixel
 intensity units:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">examples</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
