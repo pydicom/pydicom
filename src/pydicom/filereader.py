@@ -242,14 +242,7 @@ def data_element_generator(
                     dotdot = "..." if length > 20 else "   "
                     displayed_value = value[:20] if value else b""
                     logger_debug(
-                        "%08x: %-34s %s %r %s"
-                        % (
-                            value_tell,
-                            bytes2hex(displayed_value),
-                            dotdot,
-                            displayed_value,
-                            dotdot,
-                        )
+                        f"{value_tell:08x}: {bytes2hex(displayed_value):<34} {dotdot} {displayed_value!r} {dotdot}"
                     )
 
             # If the tag is (0008,0005) Specific Character Set, then store it
