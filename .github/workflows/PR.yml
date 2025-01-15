@@ -30,7 +30,7 @@ jobs:
             upload-coverage: false
           # Pre-release Python
           - os: ubuntu
-            python-version: "3.14"  
+            python-version: "3.14"
             test-numpy: false
             test-extras: false
             upload-coverage: false

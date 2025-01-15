@@ -62,7 +62,7 @@ GitHub, clone, and develop on a branch. Steps:
    -  closes #1016
    ```
    ```
-   Add warning when saving compressed without encapsulation  
+   Add warning when saving compressed without encapsulation
    ```
    ```
    Add optional handler argument to Dataset.decompress()

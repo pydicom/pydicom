@@ -55,4 +55,3 @@ Fixes
   assigning the single value (:issue:`1606`)
 * Fixed an exception with multiple deferred reads with file-like objects
   (:issue:`1609`)
-

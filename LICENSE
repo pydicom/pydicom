@@ -22,7 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-Portions of pydicom (private dictionary file(s)) were generated from the 
+Portions of pydicom (private dictionary file(s)) were generated from the
 private dictionary of the GDCM library, released under the following license:
 
   Program: GDCM (Grassroots DICOM). A DICOM library
