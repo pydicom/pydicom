@@ -16,7 +16,10 @@ from collections.abc import Callable
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_charset_files, get_testdata_file
-from pydicom.dataset import Dataset
+from pydicom.datadict import tag_for_keyword
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.uid import UID
+from pydicom.valuerep import PersonName
 
 
 subparsers: argparse._SubParsersAction | None = None
@@ -30,14 +33,44 @@ re_kywd_or_item = (
     r"|"  # or
     r"\([0-9A-Fa-f]{4},[0-9A-Fa-f]{4}\)"  # DICOM hex tag (gggg,eeee)
     r")"
-    r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
+    r"(?:\[(-?\d+)\])?"  # Optional [index] or [-index], keep inside brackets
 )
 
 re_file_spec_object = re.compile(re_kywd_or_item + r"(\." + re_kywd_or_item + r")*$")
 
-re_tag_sub_from = r"\.\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
-re_tag_sub_to = r"[(0x\1,0x\2)].value"
+re_match_tag = r"\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
 re_tag_with_spaces = r"\([0-9A-Fa-f]{4}, +[0-9A-Fa-f]{4}\)"
+
+EXTRA_ALLOWED_IDENTIFIERS = {
+    # selected properties via {v[0] for v in inspect.getmembers(UID, inspect.isdatadescriptor)}
+    FileDataset: ("file_meta",),
+    Dataset: ("file_meta",),
+    UID: (
+        "keyword",
+        "is_compressed",
+        "info",
+        "is_encapsulated",
+        "is_retired",
+        "is_valid",
+        "is_little_endian",
+        "is_private",
+        "is_implicit_VR",
+        "name",
+        "is_transfer_syntax",
+        "is_deflated",
+    ),
+    PersonName: (
+        "family_name",
+        "ideographic",
+        "name_suffix",
+        "given_name",
+        "components",
+        "phonetic",
+        "middle_name",
+        "alphabetic",
+        "name_prefix",
+    ),
+}
 
 filespec_help = (
     "File specification, in format [pydicom::]filename[::element]. "
@@ -55,20 +88,51 @@ filespec_help = (
 
 
 def eval_element(ds: Dataset, element: str) -> Any:
-    if element[0] != ".":
-        element = "." + element
-
     # replace all ".(gggg,eeee)" hex tags with `eval`uable expression
-    element = re.sub(re_tag_sub_from, re_tag_sub_to, element)
 
-    try:
-        return eval("ds" + element, {"ds": ds})
-    except AttributeError:
-        raise argparse.ArgumentTypeError(
-            f"Data element '{element}' is not in the dataset"
-        )
-    except IndexError as e:
-        raise argparse.ArgumentTypeError(f"'{element}' has an index error: {e}")
+    obj: Dataset | None = ds
+    for sub_elem in element.split("."):
+        # e.g. match "BeamSequence[1]" --> groups: ['BeamSequence', '1']
+        m = re.match(re_kywd_or_item, sub_elem)
+        identifier = m.groups()[0]  # type: ignore
+
+        if tag_for_keyword(identifier) is not None:  # Standard DICOM keyword
+            obj = getattr(obj, identifier, None)
+            if obj is None:
+                raise argparse.ArgumentTypeError(
+                    f"'{identifier}' is not in the parent object"
+                )
+        # Try (gggg,eee) tag
+        elif match := re.match(re_match_tag, identifier):
+            try:
+                obj = cast(Dataset, obj)["".join(match.groups()[0:2])].value
+            except KeyError:
+                raise argparse.ArgumentTypeError(
+                    f"'{identifier}' is not in the parent object"
+                )
+        # Try other identifiers
+        elif identifier in EXTRA_ALLOWED_IDENTIFIERS.get(type(obj), []):
+            obj = getattr(obj, identifier, None)
+            if obj is None:
+                raise argparse.ArgumentTypeError(
+                    f"'{identifier}' is not in the parent object"
+                )
+        else:
+            raise argparse.ArgumentTypeError(
+                f"'{identifier}' is not a known DICOM keyword, "
+                "tag or allowed class property"
+            )
+
+        # If here, then have the new object, handle indexing if there
+        if (index := m.groups()[1]) is not None:  # type: ignore
+            try:
+                obj = obj[int(index)]
+            except (IndexError, TypeError) as e:
+                raise argparse.ArgumentTypeError(
+                    f"'{index}' gave an index error: {str(e)}"
+                )
+
+    return obj
 
 
 def filespec_parts(filespec: str) -> tuple[str, str, str]:

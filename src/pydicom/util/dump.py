@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Utility functions used in debugging writing and reading"""
 
 from io import BytesIO
@@ -128,8 +128,8 @@ if __name__ == "__main__":  # pragma: no cover
     start_address = 0
     stop_address = None
     if len(sys.argv) > 2:  # then have start address
-        start_address = eval(sys.argv[2])
+        start_address = int(sys.argv[2], 16)
     if len(sys.argv) > 3:
-        stop_address = eval(sys.argv[3])
+        stop_address = int(sys.argv[3], 16)
 
     print(filedump(filename, start_address, stop_address))

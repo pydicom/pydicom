@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
 import copy
 from contextlib import contextmanager
@@ -39,6 +39,7 @@ from pydicom.util.dump import (
 )
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.util.leanread import dicomfile
+from ._write_stds import impl_LE_deflen_std_hex
 
 have_numpy = True
 try:
@@ -46,15 +47,10 @@ try:
 except ImportError:
     have_numpy = False
 
-test_dir = os.path.dirname(__file__)
-raw_hex_module = os.path.join(test_dir, "_write_stds.py")
-raw_hex_code = open(raw_hex_module, "rb").read()
-
 
 # For Python >=3.11, this can be imported from contextlib
 @contextmanager
 def chdir(new_dir):
-    import os
 
     old_dir = os.getcwd()
     try:
@@ -377,9 +373,7 @@ class TestHexUtil:
 class TestDataElementCallbackTests:
     def setup_method(self):
         # Set up a dataset with commas in one item instead of backslash
-        namespace = {}
-        exec(raw_hex_code, {}, namespace)
-        ds_bytes = hexutil.hex2bytes(namespace["impl_LE_deflen_std_hex"])
+        ds_bytes = hexutil.hex2bytes(impl_LE_deflen_std_hex)
         # Change "2\4\8\16" to "2,4,8,16"
         ds_bytes = ds_bytes.replace(
             b"\x32\x5c\x34\x5c\x38\x5c\x31\x36", b"\x32\x2c\x34\x2c\x38\x2c\x31\x36"

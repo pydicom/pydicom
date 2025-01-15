@@ -21,11 +21,12 @@ bad_elem_specs = (
     "BeamSequence[0].(10,10)",  # nested bad tag format
 )
 
-missing_elements = (
+not_dicom_keywords = (
     "NotThere",
     "BeamSequenceXX",
-    "BeamDose",  # valid keyword but not at top level
 )
+
+not_in_parent = ("BeamDose",)  # valid keyword but not at top level
 
 bad_indexes = (
     "BeamSequence[42]",
@@ -43,16 +44,25 @@ class TestFilespec:
         with pytest.raises(ArgumentTypeError, match=match):
             filespec_parser(f"pydicom::rtplan.dcm::{bad_spec}")
 
-    @pytest.mark.parametrize("missing_element", missing_elements)
-    def test_elem_not_exists(self, missing_element):
+    @pytest.mark.parametrize("missing_element", not_dicom_keywords)
+    def test_elem_not_keyword(self, missing_element):
         """CLI filespec elements not in the dataset raise an error"""
-        with pytest.raises(ArgumentTypeError, match=r".* is not in the dataset"):
+        with pytest.raises(
+            ArgumentTypeError,
+            match=r".*not a known DICOM keyword, tag or allowed class property",
+        ):
+            filespec_parser(f"pydicom::rtplan.dcm::{missing_element}")
+
+    @pytest.mark.parametrize("missing_element", not_in_parent)
+    def test_elem_not_in_parent(self, missing_element):
+        """CLI filespec elements not in the dataset raise an error"""
+        with pytest.raises(ArgumentTypeError, match=r".*not in the parent object"):
             filespec_parser(f"pydicom::rtplan.dcm::{missing_element}")
 
     @pytest.mark.parametrize("bad_index", bad_indexes)
     def test_bad_index(self, bad_index):
         """CLI filespec elements with an invalid index raise an error"""
-        with pytest.raises(ArgumentTypeError, match=r".* index error"):
+        with pytest.raises(ArgumentTypeError, match=r".*index error"):
             filespec_parser(f"pydicom::rtplan.dcm::{bad_index}")
 
     def test_offers_pydicom_testfile(self):
@@ -90,6 +100,8 @@ class TestFilespecElementEval:
             ("BeamSequence[0].ControlPointSequence[0].NominalBeamEnergy", 6.0),
             ("PatientID", "id00001"),
             ("(0010,0020)", "id00001"),
+            ("file_meta.TransferSyntaxUID.name", "Implicit VR Little Endian"),
+            ("PatientName.family_name", "Last"),
         ),
     )
     def test_correct_data_elements(self, elem_str, expected):

@@ -40,3 +40,4 @@ Enhancements
     * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
     * :attr:`~pydicom.uid.JPEGXL`
 * Added ability to specify tag numbers in the CLI commands (allows private tags to be specified)
+* Removed `exec` and `eval` from tests, CLI, and scripts for improved security (:issue:`2193`)
