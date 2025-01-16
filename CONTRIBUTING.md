@@ -109,19 +109,21 @@ submit a pull request:
 -  All public methods should have informative docstrings with sample
    usage presented as doctests when appropriate.
 
--  Please prefix the title of your pull request with `[MRG]` (Ready for Merge),
-   if the contribution is complete and ready for a detailed review. Some of the
+-  If your pull request is not ready for review and merge, please create it as a
+   [draft pull request](https://github.blog/news-insights/product-news/introducing-draft-pull-requests/)
+   (use "Create Draft Pull Request" instead of "Create Pull Request").
+   You can also convert your pull request to draft status later ("convert to draft"),
+   if you realize that you have more work to do before it is ready for review.
+   Draft pull requests may be useful to indicate you are working on something to
+   avoid duplicated work, request broad review of functionality or API, or seek
+   collaborators. Draft pull requests often benefit from the inclusion of a
+   [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
+   in the PR description.
+   As soon as your pull request is complete and ready for a detailed review, you can
+   remove the draft status by clicking "Ready for review". Some of the
    core developers will review your code, make suggestions for changes, and
    approve it as soon as it is ready for merge. Pull requests are usually merged
    after two approvals by core developers, or other developers asked to review the code.
-   An incomplete contribution -- where you expect to do more work before receiving a full
-   review -- should be prefixed with `[WIP]` (to indicate a work in progress) and
-   changed to `[MRG]` when it matures. WIPs may be useful to: indicate you are
-   working on something to avoid duplicated work, request broad review of
-   functionality or API, or seek collaborators. WIPs often benefit from the
-   inclusion of a
-   [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
-   in the PR description.
 
 -  When adding additional functionality, check if it makes sense to add one or
    more example scripts in the ``examples/`` folder. Have a look at other
