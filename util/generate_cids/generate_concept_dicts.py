@@ -939,10 +939,12 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
                     f"used for different codes {previous}"
                 )
 
-    for scheme in kw_codes:
-        for codes in kw_codes[scheme].values():
-            if len(set(codes)) != 1:
-                duplicates = True
+    if any(
+        len(set(codes)) != 1
+        for scheme_codes in kw_codes.values()
+        for codes in scheme_codes.values()
+    ):
+        duplicates = True
 
     if duplicates:
         raise ValueError("Each keyword must correspond to one and only one code")
