@@ -880,8 +880,8 @@ BAD_SEGMENT_DATA = [
     (b"\x07\x00\x00\x00", 3, 16),  # 7 segments, 6 expected
     (b"\x03\x00\x00\x00", 1, 32),  # 3 segments, 4 expected
     (b"\x05\x00\x00\x00", 1, 32),  # 5 segments, 4 expected
-    (b"\x0B\x00\x00\x00", 3, 32),  # 11 segments, 12 expected
-    (b"\x0D\x00\x00\x00", 3, 32),  # 13 segments, 12 expected
+    (b"\x0b\x00\x00\x00", 3, 32),  # 11 segments, 12 expected
+    (b"\x0d\x00\x00\x00", 3, 32),  # 13 segments, 12 expected
     (b"\x07\x00\x00\x00", 1, 64),  # 7 segments, 8 expected
     (b"\x09\x00\x00\x00", 1, 64),  # 9 segments, 8 expected
 ]
@@ -986,7 +986,7 @@ class TestNumpy_RLEDecodeFrame:
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         # 0, 64, 128, 160, 192, 255
-        data = b"\x05\x00\x40\x80\xA0\xC0\xFF"
+        data = b"\x05\x00\x40\x80\xa0\xc0\xff"
         decoded = _rle_decode_frame(header + data, 2, 3, 1, 8)
         arr = np.frombuffer(decoded, np.dtype("|u1"))
         assert arr.tolist() == [0, 64, 128, 160, 192, 255]
@@ -997,15 +997,15 @@ class TestNumpy_RLEDecodeFrame:
             b"\x03\x00\x00\x00"  # 3 segments
             b"\x40\x00\x00\x00"  # 64
             b"\x47\x00\x00\x00"  # 71
-            b"\x4E\x00\x00\x00"  # 78
+            b"\x4e\x00\x00\x00"  # 78
         )
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         # 0, 64, 128, 160, 192, 255
         data = (
-            b"\x05\x00\x40\x80\xA0\xC0\xFF"  # R
-            b"\x05\xFF\xC0\x80\x40\x00\xFF"  # B
-            b"\x05\x01\x40\x80\xA0\xC0\xFE"  # G
+            b"\x05\x00\x40\x80\xa0\xc0\xff"  # R
+            b"\x05\xff\xc0\x80\x40\x00\xff"  # B
+            b"\x05\x01\x40\x80\xa0\xc0\xfe"  # G
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 3, 8)
         arr = np.frombuffer(decoded, np.dtype("|u1"))
@@ -1021,8 +1021,8 @@ class TestNumpy_RLEDecodeFrame:
         # 2 x 3 data
         data = (
             # 0, 1, 256, 255, 65280, 65535
-            b"\x05\x00\x00\x01\x00\xFF\xFF"  # MSB
-            b"\x05\x00\x01\x00\xFF\x00\xFF"  # LSB
+            b"\x05\x00\x00\x01\x00\xff\xff"  # MSB
+            b"\x05\x00\x01\x00\xff\x00\xff"  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 1, 16)
         arr = np.frombuffer(decoded, np.dtype("<u2"))
@@ -1034,21 +1034,21 @@ class TestNumpy_RLEDecodeFrame:
             b"\x06\x00\x00\x00"  # 6 segments
             b"\x40\x00\x00\x00"  # 64
             b"\x47\x00\x00\x00"  # 71
-            b"\x4E\x00\x00\x00"  # 78
+            b"\x4e\x00\x00\x00"  # 78
             b"\x55\x00\x00\x00"  # 85
-            b"\x5C\x00\x00\x00"  # 92
+            b"\x5c\x00\x00\x00"  # 92
             b"\x63\x00\x00\x00"  # 99
         )
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         data = (
             # 0, 1, 256, 255, 65280, 65535
-            b"\x05\x00\x00\x01\x00\xFF\xFF"  # MSB
-            b"\x05\x00\x01\x00\xFF\x00\xFF"  # LSB
-            b"\x05\xFF\x00\x01\x00\xFF\x00"  # MSB
-            b"\x05\xFF\x01\x00\xFF\x00\x00"  # LSB
-            b"\x05\x00\x00\x01\x00\xFF\xFF"  # MSB
-            b"\x05\x01\x01\x00\xFF\x00\xFE"  # LSB
+            b"\x05\x00\x00\x01\x00\xff\xff"  # MSB
+            b"\x05\x00\x01\x00\xff\x00\xff"  # LSB
+            b"\x05\xff\x00\x01\x00\xff\x00"  # MSB
+            b"\x05\xff\x01\x00\xff\x00\x00"  # LSB
+            b"\x05\x00\x00\x01\x00\xff\xff"  # MSB
+            b"\x05\x01\x01\x00\xff\x00\xfe"  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 3, 16)
         arr = np.frombuffer(decoded, np.dtype("<u2"))
@@ -1062,17 +1062,17 @@ class TestNumpy_RLEDecodeFrame:
             b"\x04\x00\x00\x00"  # 4 segments
             b"\x40\x00\x00\x00"  # 64 offset
             b"\x47\x00\x00\x00"  # 71 offset
-            b"\x4E\x00\x00\x00"  # 78 offset
+            b"\x4e\x00\x00\x00"  # 78 offset
             b"\x55\x00\x00\x00"  # 85 offset
         )
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         data = (
             # 0, 16777216, 65536, 256, 4294967295
-            b"\x05\x00\x01\x00\x00\x00\xFF"  # MSB
-            b"\x05\x00\x00\x01\x00\x00\xFF"
-            b"\x05\x00\x00\x00\x01\x00\xFF"
-            b"\x05\x00\x00\x00\x00\x01\xFF"  # LSB
+            b"\x05\x00\x01\x00\x00\x00\xff"  # MSB
+            b"\x05\x00\x00\x01\x00\x00\xff"
+            b"\x05\x00\x00\x00\x01\x00\xff"
+            b"\x05\x00\x00\x00\x00\x01\xff"  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 1, 32)
         arr = np.frombuffer(decoded, np.dtype("<u4"))
@@ -1081,36 +1081,36 @@ class TestNumpy_RLEDecodeFrame:
     def test_32bit_3sample(self):
         """Test decoding 32-bit, 3 sample/pixel."""
         header = (
-            b"\x0C\x00\x00\x00"  # 12 segments
+            b"\x0c\x00\x00\x00"  # 12 segments
             b"\x40\x00\x00\x00"  # 64
             b"\x47\x00\x00\x00"  # 71
-            b"\x4E\x00\x00\x00"  # 78
+            b"\x4e\x00\x00\x00"  # 78
             b"\x55\x00\x00\x00"  # 85
-            b"\x5C\x00\x00\x00"  # 92
+            b"\x5c\x00\x00\x00"  # 92
             b"\x63\x00\x00\x00"  # 99
-            b"\x6A\x00\x00\x00"  # 106
+            b"\x6a\x00\x00\x00"  # 106
             b"\x71\x00\x00\x00"  # 113
             b"\x78\x00\x00\x00"  # 120
-            b"\x7F\x00\x00\x00"  # 127
+            b"\x7f\x00\x00\x00"  # 127
             b"\x86\x00\x00\x00"  # 134
-            b"\x8D\x00\x00\x00"  # 141
+            b"\x8d\x00\x00\x00"  # 141
         )
         header += (64 - len(header)) * b"\x00"
         # 2 x 3 data
         data = (
             # 0, 16777216, 65536, 256, 4294967295
-            b"\x05\x00\x01\x00\x00\x00\xFF"  # MSB
-            b"\x05\x00\x00\x01\x00\x00\xFF"
-            b"\x05\x00\x00\x00\x01\x00\xFF"
-            b"\x05\x00\x00\x00\x00\x01\xFF"  # LSB
-            b"\x05\xFF\x01\x00\x00\x00\x00"  # MSB
-            b"\x05\xFF\x00\x01\x00\x00\x00"
-            b"\x05\xFF\x00\x00\x01\x00\x00"
-            b"\x05\xFF\x00\x00\x00\x01\x00"  # LSB
-            b"\x05\x00\x01\x00\x00\x00\xFF"  # MSB
-            b"\x05\x00\x00\x01\x00\x00\xFF"
-            b"\x05\x00\x00\x00\x01\x00\xFF"
-            b"\x05\x01\x00\x00\x00\x01\xFE"  # LSB
+            b"\x05\x00\x01\x00\x00\x00\xff"  # MSB
+            b"\x05\x00\x00\x01\x00\x00\xff"
+            b"\x05\x00\x00\x00\x01\x00\xff"
+            b"\x05\x00\x00\x00\x00\x01\xff"  # LSB
+            b"\x05\xff\x01\x00\x00\x00\x00"  # MSB
+            b"\x05\xff\x00\x01\x00\x00\x00"
+            b"\x05\xff\x00\x00\x01\x00\x00"
+            b"\x05\xff\x00\x00\x00\x01\x00"  # LSB
+            b"\x05\x00\x01\x00\x00\x00\xff"  # MSB
+            b"\x05\x00\x00\x01\x00\x00\xff"
+            b"\x05\x00\x00\x00\x01\x00\xff"
+            b"\x05\x01\x00\x00\x00\x01\xfe"  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 3, 32)
         arr = np.frombuffer(decoded, np.dtype("<u4"))
@@ -1157,7 +1157,7 @@ class TestNumpy_RLEDecodeSegment:
         data = (
             b"\x80\x80"  # No operation
             b"\x05\x01\x02\x03\x04\x05\x06"  # Literal
-            b"\xFE\x01"  # Copy
+            b"\xfe\x01"  # Copy
             b"\x80"
         )
         assert bytes(_rle_decode_segment(data)) == (
@@ -1168,7 +1168,7 @@ class TestNumpy_RLEDecodeSegment:
         data = (
             b"\x05\x01\x02\x03\x04\x05\x06"  # Literal
             b"\x80"  # No operation
-            b"\xFE\x01"  # Copy
+            b"\xfe\x01"  # Copy
             b"\x80"
         )
         assert bytes(_rle_decode_segment(data)) == (
@@ -1177,7 +1177,7 @@ class TestNumpy_RLEDecodeSegment:
 
         # data at start, noop end
         # Copy 6 bytes literally, then 3 x 0x01
-        data = b"\x05\x01\x02\x03\x04\x05\x06\xFE\x01\x80"
+        data = b"\x05\x01\x02\x03\x04\x05\x06\xfe\x01\x80"
         assert bytes(_rle_decode_segment(data)) == (
             b"\x01\x02\x03\x04\x05\x06\x01\x01\x01"
         )
@@ -1199,10 +1199,10 @@ class TestNumpy_RLEDecodeSegment:
         """Test copy output."""
         # For n > 128, copy the next byte (257 - n) times
         # n = 255, copy x2 (0x80 is 128 -> no operation)
-        data = b"\xFF\x02\x80"
+        data = b"\xff\x02\x80"
         assert bytes(_rle_decode_segment(data)) == b"\x02\x02"
         # n = 254, copy x3
-        data = b"\xFE\x02\x80"
+        data = b"\xfe\x02\x80"
         assert bytes(_rle_decode_segment(data)) == b"\x02\x02\x02"
         # n = 129, copy x128
         data = b"\x81\x02\x80"

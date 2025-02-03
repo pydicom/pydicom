@@ -387,7 +387,7 @@ class TestCharset:
         encoded = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
             b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
-            b"\x1b\x2d\x4C"
+            b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
         )
         elem = DataElement(0x00100060, "PN", encoded)
@@ -412,7 +412,7 @@ class TestCharset:
             "LO",
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
             b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
-            b"\x1b\x2d\x4C"
+            b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3",
         )
         pydicom.charset.decode_element(

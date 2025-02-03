@@ -61,7 +61,7 @@ class TestDicomIO:
     def test_read_us(self):
         """Test DicomIO.read_US"""
         # US are 2 bytes fixed
-        bytestream = b"\x00\x00\xFF\x00\xFE\xFF"
+        bytestream = b"\x00\x00\xff\x00\xfe\xff"
         # Little endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -85,9 +85,9 @@ class TestDicomIO:
         fp.write_US(0)
         assert fp.getvalue() == b"\x00\x00"
         fp.write_US(255)
-        assert fp.getvalue() == b"\x00\x00\xFF\x00"
+        assert fp.getvalue() == b"\x00\x00\xff\x00"
         fp.write_US(65534)
-        assert fp.getvalue() == b"\x00\x00\xFF\x00\xFE\xFF"
+        assert fp.getvalue() == b"\x00\x00\xff\x00\xfe\xff"
 
         # Big endian
         fp = DicomBytesIO()
@@ -96,14 +96,14 @@ class TestDicomIO:
         fp.write_US(0)
         assert fp.getvalue() == b"\x00\x00"
         fp.write_US(255)
-        assert fp.getvalue() == b"\x00\x00\x00\xFF"
+        assert fp.getvalue() == b"\x00\x00\x00\xff"
         fp.write_US(65534)
-        assert fp.getvalue() == b"\x00\x00\x00\xFF\xFF\xFE"
+        assert fp.getvalue() == b"\x00\x00\x00\xff\xff\xfe"
 
     def test_read_ul(self):
         """Test DicomIO.read_UL"""
         # UL are 4 bytes fixed
-        bytestream = b"\x00\x00\x00\x00\xFF\xFF\x00\x00\xFE\xFF\xFF\xFF"
+        bytestream = b"\x00\x00\x00\x00\xff\xff\x00\x00\xfe\xff\xff\xff"
         # Little endian
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -112,7 +112,7 @@ class TestDicomIO:
         assert fp.read_UL() == 0xFFFFFFFE
 
         # Big endian
-        bytestream = b"\x00\x00\x00\x00\x00\x00\xFF\xFF\xFF\xFF\xFF\xFE"
+        bytestream = b"\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xfe"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         assert fp.read_UL() == 0
@@ -128,9 +128,9 @@ class TestDicomIO:
         fp.write_UL(0)
         assert fp.getvalue() == b"\x00\x00\x00\x00"
         fp.write_UL(65535)
-        assert fp.getvalue() == b"\x00\x00\x00\x00\xFF\xFF\x00\x00"
+        assert fp.getvalue() == b"\x00\x00\x00\x00\xff\xff\x00\x00"
         fp.write_UL(4294967294)
-        assert fp.getvalue() == (b"\x00\x00\x00\x00\xFF\xFF\x00\x00\xFE\xFF\xFF\xFF")
+        assert fp.getvalue() == (b"\x00\x00\x00\x00\xff\xff\x00\x00\xfe\xff\xff\xff")
 
         # Big endian
         fp = DicomBytesIO()
@@ -139,9 +139,9 @@ class TestDicomIO:
         fp.write_UL(0)
         assert fp.getvalue() == b"\x00\x00\x00\x00"
         fp.write_UL(65535)
-        assert fp.getvalue() == b"\x00\x00\x00\x00\x00\x00\xFF\xFF"
+        assert fp.getvalue() == b"\x00\x00\x00\x00\x00\x00\xff\xff"
         fp.write_UL(4294967294)
-        assert fp.getvalue() == (b"\x00\x00\x00\x00\x00\x00\xFF\xFF\xFF\xFF\xFF\xFE")
+        assert fp.getvalue() == (b"\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xfe")
 
     def test_read(self):
         """Test DicomIO.read entire length"""

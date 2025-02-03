@@ -688,7 +688,7 @@ class TestRawDataElement:
             Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, True, True
         )
         ds[0x00411001] = RawDataElement(
-            Tag(0x00411001), "US", 2, b"\x2A\x00", 0, True, True
+            Tag(0x00411001), "US", 2, b"\x2a\x00", 0, True, True
         )
         ds[0x00431001] = RawDataElement(
             Tag(0x00431001), "SH", 8, b"Unknown ", 0, True, True
@@ -698,7 +698,7 @@ class TestRawDataElement:
         elem = ds[0x00411001]
         assert elem.VR == "UN"
         assert elem.name == "Private tag data"
-        assert elem.value == b"\x2A\x00"
+        assert elem.value == b"\x2a\x00"
 
         with save_private_dict():
             add_private_dict_entry("ACME 3.2", 0x00410001, "US", "Some Number")
@@ -878,7 +878,7 @@ class TestConvertRawDataElementHooks:
     def test_value_fix_separator(self, reset_hooks):
         """Test the 'raw_element_value_fix_separator' function"""
         raw = RawDataElement(
-            Tag(0x00000902), None, 4, b"\x41\x42\x2C\x43\x44\x2C\x45\x46", 0, True, True
+            Tag(0x00000902), None, 4, b"\x41\x42\x2c\x43\x44\x2c\x45\x46", 0, True, True
         )
 
         elem = convert_raw_data_element(raw)
@@ -897,7 +897,7 @@ class TestConvertRawDataElementHooks:
         assert elem.value == ["AB", "CD", "EF"]
 
         kwargs["separator"] = ":"
-        raw = raw._replace(value=raw.value.replace(b"\x2C", b":"))
+        raw = raw._replace(value=raw.value.replace(b"\x2c", b":"))
         elem = convert_raw_data_element(raw)
         assert elem.value == ["AB", "CD", "EF"]
 

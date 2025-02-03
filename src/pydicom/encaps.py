@@ -611,7 +611,7 @@ def get_frame(
 
     # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker which should be the
     #   last two bytes of a frame
-    eoi_marker = b"\xFF\xD9"
+    eoi_marker = b"\xff\xd9"
     frame_fragments = []
     frame_nr = 0
     for fragment in fragments:
@@ -676,7 +676,7 @@ class _BufferedItem:
         # The item tag and length
         self._item = b"".join(
             (
-                b"\xFE\xFF\x00\xE0",
+                b"\xfe\xff\x00\xe0",
                 (self.length - 8).to_bytes(length=4, byteorder="little"),
             )
         )
@@ -789,10 +789,10 @@ class EncapsulatedBuffer(BufferedIOBase):
     def basic_offset_table(self) -> bytes:
         """Return an encoded Basic Offset Table."""
         if not self._use_bot:
-            return b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+            return b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
 
         # The item tag for the offset table
-        bot = [b"\xFE\xFF\x00\xE0"]
+        bot = [b"\xfe\xff\x00\xe0"]
         # Add the item length
         bot.append(pack("<I", 4 * len(self.offsets)))
         # Add the item value
@@ -1011,7 +1011,7 @@ def itemize_fragment(fragment: bytes) -> bytes:
       a 4 byte length.
     """
     # item tag (FFFE,E000)
-    item = b"\xFE\xFF\x00\xE0"
+    item = b"\xfe\xff\x00\xe0"
     # fragment length '<I' little endian, 4 byte unsigned int
     item += pack("<I", len(fragment))
     # fragment data
@@ -1117,7 +1117,7 @@ def encapsulate(
 
     # Add the Basic Offset Table Item
     # Add the tag
-    output.extend(b"\xFE\xFF\x00\xE0")
+    output.extend(b"\xfe\xff\x00\xe0")
     if has_bot:
         # Check that the 2**32 - 1 limit in BOT item lengths won't be exceeded
         total = (nr_frames - 1) * 8 + sum([len(f) for f in frames[:-1]])
@@ -1133,7 +1133,7 @@ def encapsulate(
         # Add the length
         output.extend(pack("<I", 4 * nr_frames))
         # Reserve 4 x len(frames) bytes for the offsets
-        output.extend(b"\xFF\xFF\xFF\xFF" * nr_frames)
+        output.extend(b"\xff\xff\xff\xff" * nr_frames)
     else:
         # Add the length
         output.extend(pack("<I", 0))

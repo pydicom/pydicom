@@ -72,20 +72,20 @@ _UNPACK_LUT: dict[int, bytes] = {
 
 # JPEG/JPEG-LS SOF markers
 _SOF = {
-    b"\xFF\xC0",
-    b"\xFF\xC1",
-    b"\xFF\xC2",
-    b"\xFF\xC3",
-    b"\xFF\xC5",
-    b"\xFF\xC6",
-    b"\xFF\xC7",
-    b"\xFF\xC9",
-    b"\xFF\xCA",
-    b"\xFF\xCB",
-    b"\xFF\xCD",
-    b"\xFF\xCE",
-    b"\xFF\xCF",
-    b"\xFF\xF7",
+    b"\xff\xc0",
+    b"\xff\xc1",
+    b"\xff\xc2",
+    b"\xff\xc3",
+    b"\xff\xc5",
+    b"\xff\xc6",
+    b"\xff\xc7",
+    b"\xff\xc9",
+    b"\xff\xca",
+    b"\xff\xcb",
+    b"\xff\xcd",
+    b"\xff\xce",
+    b"\xff\xcf",
+    b"\xff\xf7",
 }
 # JPEG APP markers, all in range (0xFFE0, 0xFFEF)
 _APP = {x.to_bytes(length=2, byteorder="big") for x in range(0xFFE0, 0xFFF0)}
@@ -890,14 +890,14 @@ def get_j2k_parameters(codestream: bytes) -> dict[str, Any]:
 
     # Account for the JP2 header (if present)
     # The first box is always 12 bytes long
-    if codestream.startswith(b"\x00\x00\x00\x0C\x6A\x50\x20\x20"):
+    if codestream.startswith(b"\x00\x00\x00\x0c\x6a\x50\x20\x20"):
         info["jp2"] = True
         total_length = len(codestream)
         offset = 12
         # Iterate through the boxes, looking for the jp2c box
         while offset < total_length:
             length = int.from_bytes(codestream[offset : offset + 4], byteorder="big")
-            if codestream[offset + 4 : offset + 8] == b"\x6A\x70\x32\x63":
+            if codestream[offset + 4 : offset + 8] == b"\x6a\x70\x32\x63":
                 # The offset to the start of the J2K codestream
                 offset += 8
                 break
@@ -957,7 +957,7 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
     try:
         # First 2 bytes should be the SOI marker - otherwise wrong format
         #   or non-conformant (JFIF or SPIFF header)
-        if src[0:2] != b"\xFF\xD8":
+        if src[0:2] != b"\xff\xd8":
             return info
 
         # Skip to the SOF0 to SOF15 (JPEG) or SOF55 (JPEG-LS) marker
@@ -1004,11 +1004,11 @@ def _get_jpg_parameters(src: bytes) -> dict[str, Any]:
         # `offset` is at the start of the next marker
 
         # If JPEG then return
-        if marker != b"\xFF\xF7":
+        if marker != b"\xff\xf7":
             return info
 
         # Skip to the SOS marker
-        while src[offset : offset + 2] != b"\xFF\xDA":
+        while src[offset : offset + 2] != b"\xff\xda":
             offset += _UNPACK_SHORT(src[offset + 2 : offset + 4])[0] + 2
 
         # `offset` is at the start of the SOS marker
