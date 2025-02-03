@@ -1,6 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Functions for converting values of DICOM
-   data elements to proper python types
+data elements to proper python types
 """
 
 import re

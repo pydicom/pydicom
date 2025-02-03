@@ -43,7 +43,7 @@ class TestGetFrameOffsets:
     def test_bad_tag(self):
         """Test raises exception if no item tag."""
         # (FFFE,E100)
-        bytestream = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+        bytestream = b"\xfe\xff\x00\xe1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(
@@ -57,9 +57,9 @@ class TestGetFrameOffsets:
         """Test raises exception if the item length is not a multiple of 4."""
         # Length 10
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0A\x00\x00\x00"
-            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A"
+            b"\xfe\xff\x00\xe0"
+            b"\x0a\x00\x00\x00"
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -71,7 +71,7 @@ class TestGetFrameOffsets:
 
     def test_zero_length(self):
         """Test reading BOT with zero length"""
-        bytestream = b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert (False, [0]) == self.func(fp)
@@ -79,12 +79,12 @@ class TestGetFrameOffsets:
     def test_multi_frame(self):
         """Test reading multi-frame BOT item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x10\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x66\x13\x00\x00"
-            b"\xF4\x25\x00\x00"
-            b"\xFE\x37\x00\x00"
+            b"\xf4\x25\x00\x00"
+            b"\xfe\x37\x00\x00"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -92,14 +92,14 @@ class TestGetFrameOffsets:
 
     def test_single_frame(self):
         """Test reading single-frame BOT item"""
-        bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x00\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert (True, [0]) == self.func(fp)
 
     def test_not_little_endian(self):
         """Test reading big endian raises exception"""
-        bytestream = b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         with pytest.raises(ValueError, match="'fp.is_little_endian' must be True"):
@@ -115,7 +115,7 @@ class TestGetNrFragments:
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
-        bytestream = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        bytestream = b"\xfe\xff\x00\xe0\xff\xff\xff\xff\x00\x00\x00\x01"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(ValueError):
@@ -124,12 +124,12 @@ class TestGetNrFragments:
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -140,12 +140,12 @@ class TestGetNrFragments:
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\x10\x00\x10\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -160,7 +160,7 @@ class TestGetNrFragments:
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
-        bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert 1 == self.func(fp)
@@ -168,10 +168,10 @@ class TestGetNrFragments:
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -182,10 +182,10 @@ class TestGetNrFragments:
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -194,13 +194,13 @@ class TestGetNrFragments:
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -208,7 +208,7 @@ class TestGetNrFragments:
 
     def test_not_little_endian(self):
         """Test reading big endian raises exception"""
-        bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         with pytest.raises(ValueError, match="'fp.is_little_endian' must be True"):
@@ -224,7 +224,7 @@ class TestGeneratePixelDataFragment:
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
-        bytestream = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        bytestream = b"\xfe\xff\x00\xe0\xff\xff\xff\xff\x00\x00\x00\x01"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         fragments = self.func(fp)
@@ -240,12 +240,12 @@ class TestGeneratePixelDataFragment:
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -258,12 +258,12 @@ class TestGeneratePixelDataFragment:
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\x10\x00\x10\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -282,7 +282,7 @@ class TestGeneratePixelDataFragment:
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
-        bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         fragments = self.func(fp)
@@ -292,10 +292,10 @@ class TestGeneratePixelDataFragment:
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -309,10 +309,10 @@ class TestGeneratePixelDataFragment:
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -323,13 +323,13 @@ class TestGeneratePixelDataFragment:
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -340,7 +340,7 @@ class TestGeneratePixelDataFragment:
 
     def test_not_little_endian(self):
         """Test reading big endian raises exception"""
-        bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         fragments = self.func(fp)
@@ -359,9 +359,9 @@ class TestGeneratePixelDataFrames:
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -373,15 +373,15 @@ class TestGeneratePixelDataFrames:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -393,10 +393,10 @@ class TestGeneratePixelDataFrames:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -408,16 +408,16 @@ class TestGeneratePixelDataFrames:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -429,18 +429,18 @@ class TestGeneratePixelDataFrames:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -454,20 +454,20 @@ class TestGeneratePixelDataFrames:
         """Test a multi-frame image where each frame is three fragments"""
         # 2 frames, each 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x24\x00\x00\x00"
             b"\x48\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
         frames = self.func(bytestream)
         assert next(frames) == b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
@@ -479,22 +479,22 @@ class TestGeneratePixelDataFrames:
         """Test a multi-frame image where each frames is random fragments"""
         # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0E\x00\x00\x00"
+            b"\x0e\x00\x00\x00"
             b"\x32\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x04"
         )
         frames = self.func(bytestream)
@@ -527,9 +527,9 @@ class TestGeneratePixelData:
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -541,15 +541,15 @@ class TestGeneratePixelData:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -565,15 +565,15 @@ class TestGeneratePixelData:
         """Test parsing raises if not BOT and no number_of_frames."""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -602,13 +602,13 @@ class TestGeneratePixelData:
         """Test parsing with multiple fragments per frame."""
         # 4 frames in 6 fragments with JPEG EOI marker
         bytestream = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
         )
 
         frames = self.func(bytestream, 4)
@@ -622,13 +622,13 @@ class TestGeneratePixelData:
         """Test parsing not BOT and no final marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         bytestream = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\x00\x00"
         )
 
         frames = self.func(bytestream, 4)
@@ -650,13 +650,13 @@ class TestGeneratePixelData:
         """Test parsing no BOT and missing marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         bytestream = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
         )
 
         msg = (
@@ -673,10 +673,10 @@ class TestGeneratePixelData:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -688,16 +688,16 @@ class TestGeneratePixelData:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -713,18 +713,18 @@ class TestGeneratePixelData:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -738,20 +738,20 @@ class TestGeneratePixelData:
         """Test a multi-frame image where each frame is three fragments"""
         # 2 frames, each 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x24\x00\x00\x00"
             b"\x48\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
         frames = self.func(bytestream)
         assert next(frames) == (
@@ -775,22 +775,22 @@ class TestGeneratePixelData:
         """Test a multi-frame image where each frames is random fragments"""
         # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0E\x00\x00\x00"
+            b"\x0e\x00\x00\x00"
             b"\x32\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x04"
         )
         frames = self.func(bytestream)
@@ -815,9 +815,9 @@ class TestDecodeDataSequence:
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -828,15 +828,15 @@ class TestDecodeDataSequence:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -847,10 +847,10 @@ class TestDecodeDataSequence:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -861,16 +861,16 @@ class TestDecodeDataSequence:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -881,18 +881,18 @@ class TestDecodeDataSequence:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -903,20 +903,20 @@ class TestDecodeDataSequence:
         """Test a multi-frame image where each frame is three fragments"""
         # 2 frames, each 3 fragments long
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x20\x00\x00\x00"
             b"\x40\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
         frames = self.func(bytestream)
         assert frames == [
@@ -935,22 +935,22 @@ class TestDecodeDataSequence:
         """Test a multi-frame image where each frames is random fragments"""
         # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0E\x00\x00\x00"
+            b"\x0e\x00\x00\x00"
             b"\x32\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x04"
         )
         frames = self.func(bytestream)
@@ -974,16 +974,16 @@ class TestDefragmentData:
     def test_defragment(self):
         """Test joining fragmented data works"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -1000,7 +1000,7 @@ class TestReadItem:
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
-        bytestream = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        bytestream = b"\xfe\xff\x00\xe0\xff\xff\xff\xff\x00\x00\x00\x01"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(
@@ -1013,12 +1013,12 @@ class TestReadItem:
     def test_item_sequence_delimiter(self):
         """Test non-zero length seq delimiter reads correctly."""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
             b"\x04\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1031,12 +1031,12 @@ class TestReadItem:
     def test_item_sequence_delimiter_zero_length(self):
         """Test that the fragments are returned if seq delimiter hit."""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1050,25 +1050,25 @@ class TestReadItem:
         """Test item is read if it has an unexpected tag"""
         # This should raise an exception instead
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\x10\x00\x10\x00"
             b"\x04\x00\x00\x00"
-            b"\xFF\x00\xFF\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xff\x00\xff\x00"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert self.func(fp) == b"\x01\x00\x00\x00"
-        assert self.func(fp) == b"\xFF\x00\xFF\x00"
+        assert self.func(fp) == b"\xff\x00\xff\x00"
         assert self.func(fp) == b"\x02\x00\x00\x00"
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
-        bytestream = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert self.func(fp) == b"\x01\x00\x00\x00"
@@ -1076,10 +1076,10 @@ class TestReadItem:
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -1091,10 +1091,10 @@ class TestReadItem:
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -1103,13 +1103,13 @@ class TestReadItem:
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
         bytestream = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
@@ -1122,7 +1122,7 @@ class TestFragmentFrame:
 
     def test_single_fragment_even_data(self):
         """Test 1 fragment from even data"""
-        bytestream = b"\xFE\xFF\x00\xE1"
+        bytestream = b"\xfe\xff\x00\xe1"
         fragments = fragment_frame(bytestream, nr_fragments=1)
         fragment = next(fragments)
         assert pytest.raises(StopIteration, next, fragments)
@@ -1133,7 +1133,7 @@ class TestFragmentFrame:
 
     def test_single_fragment_odd_data(self):
         """Test 1 fragment from odd data"""
-        bytestream = b"\xFE\xFF\x00"
+        bytestream = b"\xfe\xff\x00"
         fragments = fragment_frame(bytestream, nr_fragments=1)
         fragment = next(fragments)
         assert pytest.raises(StopIteration, next, fragments)
@@ -1142,7 +1142,7 @@ class TestFragmentFrame:
 
     def test_even_fragment_even_data(self):
         """Test even fragments from even data"""
-        bytestream = b"\xFE\xFF\x00\xE1"
+        bytestream = b"\xfe\xff\x00\xe1"
         # Each fragment should be 2 bytes
         fragments = fragment_frame(bytestream, nr_fragments=2)
         fragment = next(fragments)
@@ -1153,19 +1153,19 @@ class TestFragmentFrame:
 
     def test_even_fragment_odd_data(self):
         """Test even fragments from odd data"""
-        bytestream = b"\xFE\xFF\x00"
+        bytestream = b"\xfe\xff\x00"
         # First fragment should be 1.5 -> 2 bytes, with the final
         #   fragment 1 byte + 1 byte padding
         fragments = fragment_frame(bytestream, nr_fragments=2)
         fragment = next(fragments)
-        assert fragment == b"\xFE\xFF"
+        assert fragment == b"\xfe\xff"
         fragment = next(fragments)
         assert fragment == b"\x00\x00"
         assert pytest.raises(StopIteration, next, fragments)
 
     def test_odd_fragments_even_data(self):
         """Test odd fragments from even data"""
-        bytestream = b"\xFE\xFF\x00\xE1" * 31  # 124 bytes
+        bytestream = b"\xfe\xff\x00\xe1" * 31  # 124 bytes
         assert len(bytestream) % 2 == 0
         # Each fragment should be 17.7 -> 18 bytes, with the final
         #   fragment 16 bytes
@@ -1180,7 +1180,7 @@ class TestFragmentFrame:
 
     def test_odd_fragments_odd_data(self):
         """Test odd fragments from odd data"""
-        bytestream = b"\xFE\xFF\x00" * 31  # 93 bytes
+        bytestream = b"\xfe\xff\x00" * 31  # 93 bytes
         assert len(bytestream) % 2 == 1
         # Each fragment should be 13.3 -> 14 bytes, with the final
         #   fragment 9 bytes + 1 byte padding
@@ -1194,7 +1194,7 @@ class TestFragmentFrame:
 
     def test_too_many_fragments_raises(self):
         """Test exception raised if too many fragments."""
-        bytestream = b"\xFE\xFF\x00" * 31  # 93 bytes
+        bytestream = b"\xfe\xff\x00" * 31  # 93 bytes
         # At most we can have 47 fragments
         for fragment in fragment_frame(bytestream, nr_fragments=47):
             pass
@@ -1209,21 +1209,21 @@ class TestEncapsulateFrame:
 
     def test_single_item(self):
         """Test encapsulating into one fragment"""
-        bytestream = b"\xFE\xFF\x00\xE1"
+        bytestream = b"\xfe\xff\x00\xe1"
         item_generator = itemize_frame(bytestream, nr_fragments=1)
         item = next(item_generator)
 
-        assert item == (b"\xfe\xff\x00\xe0\x04\x00\x00\x00\xFE\xFF\x00\xE1")
+        assert item == (b"\xfe\xff\x00\xe0\x04\x00\x00\x00\xfe\xff\x00\xe1")
 
         pytest.raises(StopIteration, next, item_generator)
 
     def test_two_items(self):
         """Test encapsulating into two fragments"""
-        bytestream = b"\xFE\xFF\x00\xE1"
+        bytestream = b"\xfe\xff\x00\xe1"
         item_generator = itemize_frame(bytestream, nr_fragments=2)
 
         item = next(item_generator)
-        assert item == (b"\xfe\xff\x00\xe0\x02\x00\x00\x00\xFE\xFF")
+        assert item == (b"\xfe\xff\x00\xe0\x02\x00\x00\x00\xfe\xff")
 
         item = next(item_generator)
         assert item == (b"\xfe\xff\x00\xe0\x02\x00\x00\x00\x00\xe1")
@@ -1390,7 +1390,7 @@ class TestParseBasicOffsets:
     def test_bad_tag(self):
         """Test raises exception if no item tag."""
         # (FFFE,E100)
-        buffer = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+        buffer = b"\xfe\xff\x00\xe1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         msg = (
             r"Found unexpected tag \(FFFE,E100\) instead of \(FFFE,E000\) when "
             r"parsing the Basic Offset Table item"
@@ -1400,7 +1400,7 @@ class TestParseBasicOffsets:
             with pytest.raises(ValueError, match=msg):
                 parse_basic_offsets(src)
 
-        buffer = b"\xFE\xFF\x00\xE1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+        buffer = b"\xfe\xff\x00\xe1\x08\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08"
         msg = (
             r"Found unexpected tag \(FEFF,00E1\) instead of \(FFFE,E000\) when "
             r"parsing the Basic Offset Table item"
@@ -1414,9 +1414,9 @@ class TestParseBasicOffsets:
         """Test raises exception if the item length is not a multiple of 4."""
         # Length 10
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0A\x00\x00\x00"
-            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A"
+            b"\xfe\xff\x00\xe0"
+            b"\x0a\x00\x00\x00"
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
         )
         msg = "The length of the Basic Offset Table item is not a multiple of 4"
         for func in (bytes, as_bytesio):
@@ -1425,9 +1425,9 @@ class TestParseBasicOffsets:
                 parse_basic_offsets(src)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
-            b"\x00\x00\x00\x0A"
-            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A"
+            b"\xff\xfe\xe0\x00"
+            b"\x00\x00\x00\x0a"
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1437,7 +1437,7 @@ class TestParseBasicOffsets:
     def test_zero_length(self):
         """Test reading BOT with zero length"""
         # Little endian
-        buffer = b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        buffer = b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert [] == parse_basic_offsets(src)
@@ -1445,7 +1445,7 @@ class TestParseBasicOffsets:
         assert src.tell() == 8
 
         # Big endian
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x00"
+        buffer = b"\xff\xfe\xe0\x00\x00\x00\x00\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert [] == parse_basic_offsets(src, endianness=">")
@@ -1456,13 +1456,13 @@ class TestParseBasicOffsets:
         """Test reading multi-frame BOT item"""
         # Little endian
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x10\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x66\x13\x00\x00"
-            b"\xF4\x25\x00\x00"
-            b"\xFE\x37\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xf4\x25\x00\x00"
+            b"\xfe\x37\x00\x00"
+            b"\xfe\xff\x00\xe0"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1472,13 +1472,13 @@ class TestParseBasicOffsets:
 
         # Big endian
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x10"
             b"\x00\x00\x00\x00"
             b"\x00\x00\x13\x66"
-            b"\x00\x00\x25\xF4"
-            b"\x00\x00\x37\xFE"
-            b"\xFF\xFE\xE0\x00"
+            b"\x00\x00\x25\xf4"
+            b"\x00\x00\x37\xfe"
+            b"\xff\xfe\xe0\x00"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1489,7 +1489,7 @@ class TestParseBasicOffsets:
     def test_single_frame(self):
         """Test reading single-frame BOT item"""
         # Little endian
-        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00\xFE\xFF\x00\xE0"
+        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x00\x00\x00\x00\xfe\xff\x00\xe0"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert [0] == parse_basic_offsets(src)
@@ -1497,7 +1497,7 @@ class TestParseBasicOffsets:
         assert src.tell() == 12
 
         # Big endian
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x00\x00\x00\x00\xFF\xFE\xE0\x00"
+        buffer = b"\xff\xfe\xe0\x00\x00\x00\x00\x04\x00\x00\x00\x00\xff\xfe\xe0\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert [0] == parse_basic_offsets(src, endianness=">")
@@ -1510,7 +1510,7 @@ class TestParseFragments:
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
-        buffer = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        buffer = b"\xfe\xff\x00\xe0\xff\xff\xff\xff\x00\x00\x00\x01"
 
         msg = (
             "Undefined item length at offset 4 when "
@@ -1521,7 +1521,7 @@ class TestParseFragments:
             with pytest.raises(ValueError, match=msg):
                 parse_fragments(src)
 
-        buffer = b"\xFF\xFE\xE0\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        buffer = b"\xff\xfe\xe0\x00\xff\xff\xff\xff\x00\x00\x00\x01"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1530,12 +1530,12 @@ class TestParseFragments:
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"  # sequence delimiter
+            b"\xfe\xff\xdd\xe0"  # sequence delimiter
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1544,12 +1544,12 @@ class TestParseFragments:
             assert parse_fragments(src) == (1, [0])
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
-            b"\xFF\xFE\xE0\xDD"  # sequence delimiter
+            b"\xff\xfe\xe0\xdd"  # sequence delimiter
             b"\x00\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04`"
             b"\x00\x00\x00\x02"
         )
@@ -1560,12 +1560,12 @@ class TestParseFragments:
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\x10\x00\x10\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1579,12 +1579,12 @@ class TestParseFragments:
                 parse_fragments(src)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
             b"\x00\x10\x00\x10"
             b"\x00\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x02"
         )
@@ -1595,7 +1595,7 @@ class TestParseFragments:
 
     def test_item_invalid(self):
         """Test exception raised if sequence is too short"""
-        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00"
+        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00"
         msg = (
             "Unable to determine the length of the item at offset 0 as the end "
             "of the data has been reached - the encapsulated pixel data may "
@@ -1606,7 +1606,7 @@ class TestParseFragments:
             with pytest.raises(ValueError, match=msg):
                 parse_fragments(src)
 
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x04"
+        buffer = b"\xff\xfe\xe0\x00\x00\x00\x04"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1614,14 +1614,14 @@ class TestParseFragments:
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
-        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert parse_fragments(src) == (1, [0])
 
         assert src.tell() == 0
 
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x00\x00\x00\x01"
+        buffer = b"\xff\xfe\xe0\x00\x00\x00\x00\x04\x00\x00\x00\x01"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert parse_fragments(src, endianness=">") == (1, [0])
@@ -1631,10 +1631,10 @@ class TestParseFragments:
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -1645,10 +1645,10 @@ class TestParseFragments:
         assert src.tell() == 0
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x06"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -1661,10 +1661,10 @@ class TestParseFragments:
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1673,10 +1673,10 @@ class TestParseFragments:
         assert src.tell() == 0
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
-            b"\xFF\xFE\xE0\xDD"
+            b"\xff\xfe\xe0\xdd"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1687,13 +1687,13 @@ class TestParseFragments:
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1702,13 +1702,13 @@ class TestParseFragments:
         assert src.tell() == 0
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x06"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFF\xFE\xE0\xDD"
+            b"\xff\xfe\xe0\xdd"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1722,7 +1722,7 @@ class TestGenerateFragments:
 
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
-        buffer = b"\xFE\xFF\x00\xE0\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        buffer = b"\xfe\xff\x00\xe0\xff\xff\xff\xff\x00\x00\x00\x01"
         msg = (
             "Undefined item length at offset 4 when parsing the encapsulated "
             "pixel data fragments"
@@ -1735,7 +1735,7 @@ class TestGenerateFragments:
 
             pytest.raises(StopIteration, next, fragments)
 
-        buffer = b"\xFF\xFE\xE0\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x01"
+        buffer = b"\xff\xfe\xe0\x00\xff\xff\xff\xff\x00\x00\x00\x01"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")
@@ -1747,12 +1747,12 @@ class TestGenerateFragments:
     def test_item_sequence_delimiter(self):
         """Test that the fragments are returned if seq delimiter hit."""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1763,12 +1763,12 @@ class TestGenerateFragments:
             pytest.raises(StopIteration, next, fragments)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
-            b"\xFF\xFE\xE0\xDD"
+            b"\xff\xfe\xe0\xdd"
             b"\x00\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x02"
         )
@@ -1781,12 +1781,12 @@ class TestGenerateFragments:
     def test_item_bad_tag(self):
         """Test exception raised if item has unexpected tag"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\x10\x00\x10\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1803,12 +1803,12 @@ class TestGenerateFragments:
             pytest.raises(StopIteration, next, fragments)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
             b"\x00\x10\x00\x10"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
         )
@@ -1822,7 +1822,7 @@ class TestGenerateFragments:
 
     def test_item_invalid(self):
         """Test exception raised if item is invalid"""
-        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00"
+        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00"
         msg = (
             "Unable to determine the length of the item at offset 0 as the end "
             "of the data has been reached - the encapsulated pixel data may "
@@ -1835,7 +1835,7 @@ class TestGenerateFragments:
                 next(fragments)
             pytest.raises(StopIteration, next, fragments)
 
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x04"
+        buffer = b"\xff\xfe\xe0\x00\x00\x00\x04"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")
@@ -1845,14 +1845,14 @@ class TestGenerateFragments:
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
-        buffer = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
+        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src)
             assert next(fragments) == b"\x01\x00\x00\x00"
             pytest.raises(StopIteration, next, fragments)
 
-        buffer = b"\xFF\xFE\xE0\x00\x00\x00\x00\x04\x01\x00\x00\x00"
+        buffer = b"\xff\xfe\xe0\x00\x00\x00\x00\x04\x01\x00\x00\x00"
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")
@@ -1862,10 +1862,10 @@ class TestGenerateFragments:
     def test_multi_fragments_no_delimiter(self):
         """Test multi fragments are returned OK"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -1877,10 +1877,10 @@ class TestGenerateFragments:
             pytest.raises(StopIteration, next, fragments)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x01\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x06"
             b"\x01\x02\x03\x04\x05\x06"
         )
@@ -1894,10 +1894,10 @@ class TestGenerateFragments:
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1906,10 +1906,10 @@ class TestGenerateFragments:
             pytest.raises(StopIteration, next, fragments)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x01\x00\x00\x00"
-            b"\xFF\xFE\xE0\xDD"
+            b"\xff\xfe\xe0\xdd"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1920,13 +1920,13 @@ class TestGenerateFragments:
     def test_multi_fragments_delimiter(self):
         """Test multi fragments are returned OK with sequence delimiter item"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFE\xFF\xDD\xE0"
+            b"\xfe\xff\xdd\xe0"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1936,13 +1936,13 @@ class TestGenerateFragments:
             pytest.raises(StopIteration, next, fragments)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x01\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x06"
             b"\x01\x02\x03\x04\x05\x06"
-            b"\xFF\xFE\xE0\xDD"
+            b"\xff\xfe\xe0\xdd"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1959,9 +1959,9 @@ class TestGenerateFragmentedFrames:
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -1972,9 +1972,9 @@ class TestGenerateFragmentedFrames:
             pytest.raises(StopIteration, next, frames)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x01\x00\x00\x00"
         )
@@ -1988,15 +1988,15 @@ class TestGenerateFragmentedFrames:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2011,15 +2011,15 @@ class TestGenerateFragmentedFrames:
             pytest.raises(StopIteration, next, frames)
 
         buffer = (
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x01\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x02\x00\x00\x00"
-            b"\xFF\xFE\xE0\x00"
+            b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x04"
             b"\x03\x00\x00\x00"
         )
@@ -2039,15 +2039,15 @@ class TestGenerateFragmentedFrames:
         """Test parsing raises if not BOT and no number_of_frames."""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2080,13 +2080,13 @@ class TestGenerateFragmentedFrames:
         """Test parsing with multiple fragments per frame."""
         # 4 frames in 6 fragments with JPEG EOI marker
         buffer = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -2100,13 +2100,13 @@ class TestGenerateFragmentedFrames:
         """Test parsing not BOT and no final marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         buffer = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\x00\x00"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -2128,13 +2128,13 @@ class TestGenerateFragmentedFrames:
         """Test parsing no BOT and missing marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         buffer = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
         )
 
         msg = (
@@ -2155,10 +2155,10 @@ class TestGenerateFragmentedFrames:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2172,16 +2172,16 @@ class TestGenerateFragmentedFrames:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2199,18 +2199,18 @@ class TestGenerateFragmentedFrames:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2226,20 +2226,20 @@ class TestGenerateFragmentedFrames:
         """Test a multi-frame image where each frame is three fragments"""
         # 2 frames, each 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x24\x00\x00\x00"
             b"\x48\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -2265,22 +2265,22 @@ class TestGenerateFragmentedFrames:
         """Test a multi-frame image where each frame is random fragments"""
         # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0E\x00\x00\x00"
+            b"\x0e\x00\x00\x00"
             b"\x32\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x04"
         )
         for func in (bytes, as_bytesio):
@@ -2299,10 +2299,10 @@ class TestGenerateFragmentedFrames:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2327,18 +2327,18 @@ class TestGenerateFragmentedFrames:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"  # 0
+            b"\xfe\xff\x00\xe0"  # 0
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"  # 12
+            b"\xfe\xff\x00\xe0"  # 12
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"  # 24
+            b"\xfe\xff\x00\xe0"  # 24
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2353,7 +2353,7 @@ class TestGenerateFragmentedFrames:
 
         eot = (  # unsigned long, 8 bytes
             b"\x00\x00\x00\x00\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00\x00\x00\x00\x00"
+            b"\x0c\x00\x00\x00\x00\x00\x00\x00"
             b"\x18\x00\x00\x00\x00\x00\x00\x00",
             b"\x04\x00\x00\x00\x00\x00\x00\x00" * 3,
         )
@@ -2373,9 +2373,9 @@ class TestGenerateFrames:
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2389,15 +2389,15 @@ class TestGenerateFrames:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2411,10 +2411,10 @@ class TestGenerateFrames:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2428,16 +2428,16 @@ class TestGenerateFrames:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2451,18 +2451,18 @@ class TestGenerateFrames:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2478,20 +2478,20 @@ class TestGenerateFrames:
         """Test a multi-frame image where each frame is three fragments"""
         # 2 frames, each 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x24\x00\x00\x00"
             b"\x48\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -2505,22 +2505,22 @@ class TestGenerateFrames:
         """Test a multi-frame image where each frames is random fragments"""
         # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0E\x00\x00\x00"
+            b"\x0e\x00\x00\x00"
             b"\x32\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x04"
         )
         for func in (bytes, as_bytesio):
@@ -2569,7 +2569,7 @@ class TestGenerateFrames:
             "no JPEG EOI/EOC marker was found, the final frame may be "
             "be invalid"
         )
-        excess = b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x01\x02\x03"
+        excess = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x00\x01\x02\x03"
         for func in (bytes, as_bytesio):
             src = func(b"".join([ds.PixelData, excess]))
             # Note that we will yield 10 frames, not 8
@@ -2593,7 +2593,7 @@ class TestGenerateFrames:
             for ii in range(8):
                 next(frames)
             reference = next(frames)
-            assert reference[-10:] == b"\x56\xF7\xFF\x4E\x60\xE3\xDA\x0F\xFF\xD9"
+            assert reference[-10:] == b"\x56\xf7\xff\x4e\x60\xe3\xda\x0f\xff\xd9"
 
         with open(JP2K_10FRAME_NOBOT, "rb") as f:
             mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
@@ -2615,9 +2615,9 @@ class TestGetFrame:
         """Test a single-frame image where the frame is one fragments"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2629,15 +2629,15 @@ class TestGetFrame:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2651,15 +2651,15 @@ class TestGetFrame:
         """Test parsing raises if not BOT and no number_of_frames."""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2686,13 +2686,13 @@ class TestGetFrame:
         """Test parsing with multiple fragments per frame."""
         # 4 frames in 6 fragments with JPEG EOI marker
         buffer = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
         )
         msg = "There is insufficient pixel data to contain 5 frames"
         for func in (bytes, as_bytesio):
@@ -2701,13 +2701,13 @@ class TestGetFrame:
             # Note that we can access a single "extra" frame
             assert (
                 get_frame(src, 0, number_of_frames=3)
-                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+                == b"\x01\x00\x00\x00\x01\xff\xd9\x00"
             )
-            assert get_frame(src, 1, number_of_frames=3) == b"\x01\x00\xFF\xD9"
-            assert get_frame(src, 2, number_of_frames=3) == b"\x01\xFF\xD9\x00"
+            assert get_frame(src, 1, number_of_frames=3) == b"\x01\x00\xff\xd9"
+            assert get_frame(src, 2, number_of_frames=3) == b"\x01\xff\xd9\x00"
             assert (
                 get_frame(src, 3, number_of_frames=3)
-                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+                == b"\x01\x00\x00\x00\x01\xff\xd9\x00"
             )
 
             with pytest.raises(ValueError, match=msg):
@@ -2717,33 +2717,33 @@ class TestGetFrame:
         """Test parsing no BOT and no final marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         buffer = (
-            b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00"
+            b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xd9\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\xff\xd9"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\xff\x00\x00"
         )
 
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert (
                 get_frame(src, 0, number_of_frames=3)
-                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+                == b"\x01\x00\x00\x00\x01\xff\xd9\x00"
             )
             assert (
                 get_frame(src, 1, number_of_frames=3)
-                == b"\x01\x00\x00\x00\x01\xFF\xD9\x00"
+                == b"\x01\x00\x00\x00\x01\xff\xd9\x00"
             )
-            assert get_frame(src, 2, number_of_frames=3) == b"\x01\xFF\xFF\xD9"
+            assert get_frame(src, 2, number_of_frames=3) == b"\x01\xff\xff\xd9"
 
             msg = (
                 "The end of the encapsulated pixel data has been reached but no "
                 "JPEG EOI/EOC marker was found, the returned frame data may be invalid"
             )
             with pytest.warns(UserWarning, match=msg):
-                assert get_frame(src, 3, number_of_frames=3) == b"\x01\xFF\x00\x00"
+                assert get_frame(src, 3, number_of_frames=3) == b"\x01\xff\x00\x00"
 
             msg = "There is insufficient pixel data to contain 5 frames"
             with pytest.raises(ValueError, match=msg):
@@ -2752,12 +2752,12 @@ class TestGetFrame:
     def test_empty_bot_index_greater_than_frames_raises(self):
         """Test multiple fragments, 1 frame raises if index > 0"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2770,12 +2770,12 @@ class TestGetFrame:
     def test_empty_bot_index_greater_than_multi_frames_raises(self):
         """Test 1:1 fragments:frames raises if index > number of frames"""
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2792,10 +2792,10 @@ class TestGetFrame:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2810,16 +2810,16 @@ class TestGetFrame:
         """Test a single-frame image where the frame is three fragments"""
         # 1 frame, 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2836,18 +2836,18 @@ class TestGetFrame:
         """Test a multi-frame image where each frame is one fragment"""
         # 3 frames, each 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00"
+            b"\x0c\x00\x00\x00"
             b"\x18\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2864,20 +2864,20 @@ class TestGetFrame:
         """Test a multi-frame image where each frame is three fragments"""
         # 3 frames, each 3 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
             b"\x24\x00\x00\x00"
             b"\x48\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x02\x00\x00\x00"
+            b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x03\x00\x00\x00"
         )
         msg = "There aren't enough offsets in the Basic Offset Table for 4 frames"
         for func in (bytes, as_bytesio):
@@ -2898,22 +2898,22 @@ class TestGetFrame:
         """Test a multi-frame image where each frames is random fragments"""
         # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
         buffer = (
-            b"\xFE\xFF\x00\xE0"
-            b"\x0C\x00\x00\x00"
+            b"\xfe\xff\x00\xe0"
+            b"\x0c\x00\x00\x00"
             b"\x00\x00\x00\x00"
-            b"\x0E\x00\x00\x00"
+            b"\x0e\x00\x00\x00"
             b"\x32\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00\x03\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x02\x00\x00\x00\x02\x04"
         )
         msg = "There aren't enough offsets in the Basic Offset Table for 4 frames"
@@ -2931,9 +2931,9 @@ class TestGetFrame:
         """Test a single-frame image where the frame is one fragment"""
         # 1 frame, 1 fragment long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
         )
@@ -2959,15 +2959,15 @@ class TestGetFrame:
         """Test a single-frame image where the frame is three fragments"""
         # 3 frames, 1 fragments long
         buffer = (
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x00\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x02\x00\x00\x00"
-            b"\xFE\xFF\x00\xE0"
+            b"\xfe\xff\x00\xe0"
             b"\x04\x00\x00\x00"
             b"\x03\x00\x00\x00"
         )
@@ -2983,7 +2983,7 @@ class TestGetFrame:
 
         eot = (  # unsigned long, 8 bytes
             b"\x00\x00\x00\x00\x00\x00\x00\x00"
-            b"\x0C\x00\x00\x00\x00\x00\x00\x00"
+            b"\x0c\x00\x00\x00\x00\x00\x00\x00"
             b"\x18\x00\x00\x00\x00\x00\x00\x00",
             b"\x04\x00\x00\x00\x00\x00\x00\x00" * 3,
         )
@@ -3001,11 +3001,11 @@ class TestGetFrame:
         with dcmread(JP2K_10FRAME_NOBOT) as ds:
             elem = ds["PixelData"]
             references.append(get_frame(ds.PixelData, 0, number_of_frames=10))
-            assert references[-1][-10:] == b"\x35\x6C\xDC\x6F\x8F\xF9\x43\xBF\xFF\xD9"
+            assert references[-1][-10:] == b"\x35\x6c\xdc\x6f\x8f\xf9\x43\xbf\xff\xd9"
             references.append(get_frame(ds.PixelData, 4, number_of_frames=10))
-            assert references[-1][-10:] == b"\x68\xFA\x46\x3C\xF9\xC6\xBF\xFF\xD9\x00"
+            assert references[-1][-10:] == b"\x68\xfa\x46\x3c\xf9\xc6\xbf\xff\xd9\x00"
             references.append(get_frame(ds.PixelData, 9, number_of_frames=10))
-            assert references[-1][-10:] == b"\xA5\x23\x00\x7B\xD9\x62\x13\x21\xFF\xD9"
+            assert references[-1][-10:] == b"\xa5\x23\x00\x7b\xd9\x62\x13\x21\xff\xd9"
 
         with open(JP2K_10FRAME_NOBOT, "rb") as f:
             mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
@@ -3030,7 +3030,7 @@ class TestBufferedFrame:
         bf = _BufferedItem(b)
         assert bf.buffer == b
         assert bf.length == 28
-        assert bf._item == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert bf._item == b"\xfe\xff\x00\xe0\x14\x00\x00\x00"
         assert not bf._padding
 
         # Odd-length frame gets padded
@@ -3038,7 +3038,7 @@ class TestBufferedFrame:
         bf = _BufferedItem(b)
         assert bf.buffer == b
         assert bf.length == 18
-        assert bf._item == b"\xFE\xFF\x00\xE0\x0A\x00\x00\x00"
+        assert bf._item == b"\xfe\xff\x00\xe0\x0a\x00\x00\x00"
         assert bf._padding
 
     def test_read_even(self):
@@ -3047,12 +3047,12 @@ class TestBufferedFrame:
         bf = _BufferedItem(b)
         out = bf.read(0, 8192)
         assert b.tell() == 0
-        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:8] == b"\xfe\xff\x00\xe0\x14\x00\x00\x00"
         assert out[8:] == b"\x00\x01" * 10
 
         out = bf.read(1, 8192)
         assert b.tell() == 0
-        assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:7] == b"\xff\x00\xe0\x14\x00\x00\x00"
         assert out[7:] == b"\x00\x01" * 10
 
         # Offset at end of item value
@@ -3091,12 +3091,12 @@ class TestBufferedFrame:
         bf = _BufferedItem(b)
         out = bf.read(0, 8192)
         assert b.tell() == 0
-        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:8] == b"\xfe\xff\x00\xe0\x14\x00\x00\x00"
         assert out[8:] == b"\x01\x02" * 9 + b"\x01\x00"
 
         out = bf.read(1, 8192)
         assert b.tell() == 0
-        assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:7] == b"\xff\x00\xe0\x14\x00\x00\x00"
         assert out[7:] == b"\x01\x02" * 9 + b"\x01\x00"
 
         # Offset at end of item value
@@ -3142,16 +3142,16 @@ class TestBufferedFrame:
         assert out == b""
 
         out = bf.read(0, size=1)
-        assert out == b"\xFE"
+        assert out == b"\xfe"
 
         out = bf.read(0, size=5)
-        assert out == b"\xFE\xFF\x00\xE0\x14"
+        assert out == b"\xfe\xff\x00\xe0\x14"
 
         out = bf.read(0, size=8)
-        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:8] == b"\xfe\xff\x00\xe0\x14\x00\x00\x00"
 
         out = bf.read(0, size=9)
-        assert out[:8] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:8] == b"\xfe\xff\x00\xe0\x14\x00\x00\x00"
         assert out[8:] == b"\x00"
 
         out = bf.read(1, size=0)
@@ -3159,11 +3159,11 @@ class TestBufferedFrame:
 
         # Read to end of item value
         out = bf.read(1, size=7)
-        assert out == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out == b"\xff\x00\xe0\x14\x00\x00\x00"
 
         # Read past end of item value
         out = bf.read(1, size=8)
-        assert out[:7] == b"\xFF\x00\xE0\x14\x00\x00\x00"
+        assert out[:7] == b"\xff\x00\xe0\x14\x00\x00\x00"
         assert out[7:] == b"\x00"
 
         # Offset at end of item
@@ -3268,55 +3268,55 @@ class TestEncapsulatedBuffer:
         b = BytesIO(b"\x00\x01" * 10)
         eb = EncapsulatedBuffer([b])
         bot = eb.basic_offset_table
-        assert bot == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        assert bot == b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
 
     def test_bot(self):
         """Test a non-empty Basic Offset Table"""
-        eb = EncapsulatedBuffer([BytesIO(b"\xFF")], use_bot=True)
+        eb = EncapsulatedBuffer([BytesIO(b"\xff")], use_bot=True)
         bot = eb.basic_offset_table
-        assert bot == b"\xFE\xFF\x00\xE0\x04\x00\x00\x00\x00\x00\x00\x00"
+        assert bot == b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x00\x00\x00\x00"
 
-        eb = EncapsulatedBuffer([BytesIO(b"\xFF"), BytesIO(b"\xFE" * 99)], use_bot=True)
+        eb = EncapsulatedBuffer([BytesIO(b"\xff"), BytesIO(b"\xfe" * 99)], use_bot=True)
         bot = eb.basic_offset_table
-        assert bot[:8] == b"\xFE\xFF\x00\xE0\x08\x00\x00\x00"
-        assert bot[8:] == b"\x00\x00\x00\x00\x0A\x00\x00\x00"
+        assert bot[:8] == b"\xfe\xff\x00\xe0\x08\x00\x00\x00"
+        assert bot[8:] == b"\x00\x00\x00\x00\x0a\x00\x00\x00"
 
         eb = EncapsulatedBuffer(
-            [BytesIO(b"\xFF"), BytesIO(b"\xFE" * 99), BytesIO(b"\xFD" * 1024)],
+            [BytesIO(b"\xff"), BytesIO(b"\xfe" * 99), BytesIO(b"\xfd" * 1024)],
             use_bot=True,
         )
         bot = eb.basic_offset_table
-        assert bot[:8] == b"\xFE\xFF\x00\xE0\x0C\x00\x00\x00"
-        assert bot[8:] == b"\x00\x00\x00\x00\x0A\x00\x00\x00\x76\x00\x00\x00"
+        assert bot[:8] == b"\xfe\xff\x00\xe0\x0c\x00\x00\x00"
+        assert bot[8:] == b"\x00\x00\x00\x00\x0a\x00\x00\x00\x76\x00\x00\x00"
 
         eb = EncapsulatedBuffer(
             [
-                BytesIO(b"\xFF"),
-                BytesIO(b"\xFE" * 99),
-                BytesIO(b"\xFD" * 1024),
-                BytesIO(b"\xFC" * 18),
+                BytesIO(b"\xff"),
+                BytesIO(b"\xfe" * 99),
+                BytesIO(b"\xfd" * 1024),
+                BytesIO(b"\xfc" * 18),
             ],
             use_bot=True,
         )
         bot = eb.basic_offset_table
-        assert bot[:8] == b"\xFE\xFF\x00\xE0\x10\x00\x00\x00"
+        assert bot[:8] == b"\xfe\xff\x00\xe0\x10\x00\x00\x00"
         assert bot[8:] == (
-            b"\x00\x00\x00\x00\x0A\x00\x00\x00\x76\x00\x00\x00\x7E\x04\x00\x00"
+            b"\x00\x00\x00\x00\x0a\x00\x00\x00\x76\x00\x00\x00\x7e\x04\x00\x00"
         )
 
     def test_closed(self):
         """Test the closed property"""
-        b = BytesIO(b"\xFF")
+        b = BytesIO(b"\xff")
         eb = EncapsulatedBuffer([b])
         assert not eb.closed
 
         b.close()
         assert eb.closed
 
-        b = BytesIO(b"\xFF")
-        c = BytesIO(b"\xFF")
-        d = BytesIO(b"\xFF")
-        e = BytesIO(b"\xFF")
+        b = BytesIO(b"\xff")
+        c = BytesIO(b"\xff")
+        d = BytesIO(b"\xff")
+        e = BytesIO(b"\xff")
         eb = EncapsulatedBuffer([b, c, d, e])
         assert not eb.closed
 
@@ -3502,15 +3502,15 @@ class TestEncapsulatedBuffer:
         assert eb.encapsulated_length == 36
 
         out = eb.read(8)
-        assert out == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        assert out == b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
 
         eb.seek(0)
         out = eb.read(8192)
         assert len(out) == 36
         # Basic Offset Table with no values
-        assert out[:8] == b"\xFE\xFF\x00\xE0\x00\x00\x00\x00"
+        assert out[:8] == b"\xfe\xff\x00\xe0\x00\x00\x00\x00"
         # Encapsulated buffer item
-        assert out[8:] == b"\xFE\xFF\x00\xE0\x14\x00\x00\x00" + b"\x01\x02" * 10
+        assert out[8:] == b"\xfe\xff\x00\xe0\x14\x00\x00\x00" + b"\x01\x02" * 10
         assert eb.tell() == 36
 
         eb = EncapsulatedBuffer(
@@ -3521,23 +3521,23 @@ class TestEncapsulatedBuffer:
             ],
         )
         assert eb.encapsulated_length == 670
-        assert eb.read(6) == b"\xFE\xFF\x00\xE0\x00\x00"
+        assert eb.read(6) == b"\xfe\xff\x00\xe0\x00\x00"
         assert eb.tell() == 6
         # End of first item tag, first item tag, start of first item value
         assert eb.read(13) == (
-            b"\x00\x00" + b"\xFE\xFF\x00\xE0\x2C\x01\x00\x00" + b"\x00\x01\x00"
+            b"\x00\x00" + b"\xfe\xff\x00\xe0\x2c\x01\x00\x00" + b"\x00\x01\x00"
         )
         assert eb.tell() == 19
         eb.read(294)
         assert eb.tell() == 313
         # End of first item value, second item tag, start of second item value
         assert eb.read(12) == (
-            b"\x01\x00\x01" + b"\xFE\xFF\x00\xE0\x04\x00\x00\x00" + b"\x02"
+            b"\x01\x00\x01" + b"\xfe\xff\x00\xe0\x04\x00\x00\x00" + b"\x02"
         )
         assert eb.tell() == 325
         # End of second item value, third item tag, start of third item value
         assert eb.read(12) == (
-            b"\x03\x04\x05" + b"\xFE\xFF\x00\xE0\x4E\x01\x00\x00" + b"\x06"
+            b"\x03\x04\x05" + b"\xfe\xff\x00\xe0\x4e\x01\x00\x00" + b"\x06"
         )
         assert eb.tell() == 337
         eb.read(108)
@@ -3606,9 +3606,9 @@ class TestEncapsulatedBuffer:
             ],
         )
         out = eb.extended_lengths
-        assert out[:8] == b"\x2C\x01" + b"\x00" * 6
+        assert out[:8] == b"\x2c\x01" + b"\x00" * 6
         assert out[8:16] == b"\x04" + b"\x00" * 7
-        assert out[16:] == b"\x4E\x01" + b"\x00" * 6
+        assert out[16:] == b"\x4e\x01" + b"\x00" * 6
 
     def test_extended_offsets(self):
         """Test the extended_offsets property"""
@@ -3617,7 +3617,7 @@ class TestEncapsulatedBuffer:
         eb = EncapsulatedBuffer([BytesIO(), BytesIO()])
         assert eb.extended_offsets == b"\x00" * 8 + b"\x08" + b"\x00" * 7
         eb = EncapsulatedBuffer([BytesIO(b"\x00"), BytesIO()])
-        assert eb.extended_offsets == b"\x00" * 8 + b"\x0A" + b"\x00" * 7
+        assert eb.extended_offsets == b"\x00" * 8 + b"\x0a" + b"\x00" * 7
         eb = EncapsulatedBuffer(
             [
                 BytesIO(b"\x00\x01" * 150),

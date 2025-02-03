@@ -1,6 +1,5 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
-"""Code to fix non-standard dicom issues in files
-"""
+"""Code to fix non-standard dicom issues in files"""
 
 from typing import TYPE_CHECKING, Any
 

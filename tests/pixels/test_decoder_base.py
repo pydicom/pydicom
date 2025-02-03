@@ -1299,9 +1299,9 @@ class TestDecoder_Array:
         src = (  #                            | 2_1 | 1_9
             b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
             # 2_2 | 2_3
-            b"\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
+            b"\x0b\x0a\x0d\x0c\x0f\x0e\x11\x10"
             # 3_1                             | pad | 3_9
-            b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
+            b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1a"
         )
         # Test by frame - odd-length
         arr, _ = decoder.as_array(src, **opts, index=0)
@@ -1324,11 +1324,11 @@ class TestDecoder_Array:
 
         # Test by frame - even length
         opts["number_of_frames"] = 3
-        arr, _ = decoder.as_array(src + b"\x1D\x1C", **opts, index=0)
+        arr, _ = decoder.as_array(src + b"\x1d\x1c", **opts, index=0)
         assert arr.ravel().tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        arr, _ = decoder.as_array(src + b"\x1D\x1C", **opts, index=1)
+        arr, _ = decoder.as_array(src + b"\x1d\x1c", **opts, index=1)
         assert arr.ravel().tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-        arr, _ = decoder.as_array(src + b"\x1D\x1C", **opts, index=2)
+        arr, _ = decoder.as_array(src + b"\x1d\x1c", **opts, index=2)
         assert arr.ravel().tolist() == [20, 21, 22, 23, 24, 25, 26, 0, 28, 29]
 
     def test_iter_native_indices(self):
@@ -1763,19 +1763,19 @@ class TestDecoder_Buffer:
         src = (  #                            | 2_1 | 1_9
             b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
             # 2_2 | 2_3
-            b"\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
+            b"\x0b\x0a\x0d\x0c\x0f\x0e\x11\x10"
             # 3_1                             | pad | 3_9
-            b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
+            b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1a"
         )
         # Includes +1 at end
         buffer, _ = decoder.as_buffer(src, **opts, index=0)
         assert buffer == b"\x01\x00\x03\x02\x05\x04\x07\x06\x09\x08"
         # Includes -1 at start
         buffer, _ = decoder.as_buffer(src, **opts, index=1)
-        assert buffer == b"\x09\x08\x0B\x0A\x0D\x0C\x0F\x0E\x11\x10"
+        assert buffer == b"\x09\x08\x0b\x0a\x0d\x0c\x0f\x0e\x11\x10"
         # Includes +1 at end
         buffer, _ = decoder.as_buffer(src, **opts, index=2)
-        assert buffer == b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1A"
+        assert buffer == b"\x13\x12\x15\x14\x17\x16\x19\x18\x00\x1a"
 
     def test_iter_native_indices(self):
         """Test `index`"""

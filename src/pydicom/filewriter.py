@@ -681,7 +681,7 @@ def write_data_element(
             pixel_data_bytes = cast(bytes, elem.value)[:4]
 
         # Big endian encapsulation is non-conformant
-        tag = b"\xFE\xFF\x00\xE0" if fp.is_little_endian else b"\xFF\xFE\xE0\x00"
+        tag = b"\xfe\xff\x00\xe0" if fp.is_little_endian else b"\xff\xfe\xe0\x00"
         if not pixel_data_bytes.startswith(tag):
             raise ValueError(
                 "The (7FE0,0010) 'Pixel Data' element value hasn't been "

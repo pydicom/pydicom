@@ -332,7 +332,7 @@ def raw_element_value_fix_separator(
         if isinstance(separator, str):
             separator = separator.encode("ascii")
 
-        raw = raw._replace(value=raw.value.replace(separator, b"\x5C"))
+        raw = raw._replace(value=raw.value.replace(separator, b"\x5c"))
 
     raw_element_value(raw, data, encoding=encoding, ds=ds, **kwargs)
 

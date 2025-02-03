@@ -522,8 +522,8 @@ class TestGetJpgParameters:
         assert info["width"] == 256
         assert info["components"] == 3
         assert info["component_ids"] == [0, 1, 2]
-        assert info["app"][b"\xFF\xEE"] == (
-            b"\x41\x64\x6F\x62\x65\x00\x65\x00\x00\x00\x00\x00"
+        assert info["app"][b"\xff\xee"] == (
+            b"\x41\x64\x6f\x62\x65\x00\x65\x00\x00\x00\x00\x00"
         )
         assert "lossy_error" not in info
         assert "interleave_mode" not in info
@@ -537,7 +537,7 @@ class TestGetJpgParameters:
         assert info["width"] == 100
         assert info["components"] == 3
         assert info["component_ids"] == [82, 71, 66]  # R, G, B
-        assert isinstance(info["app"][b"\xFF\xEE"], bytes)
+        assert isinstance(info["app"][b"\xff\xee"], bytes)
         assert "lossy_error" not in info
         assert "interleave_mode" not in info
 
@@ -1206,12 +1206,12 @@ class TestGetJ2KParameters:
     def test_not_j2k(self):
         """Test result when no JPEG2K SOF marker present"""
         base = b"\xff\x4e\xff\x51" + b"\x00" * 38
-        assert {} == get_j2k_parameters(base + b"\x8F")
+        assert {} == get_j2k_parameters(base + b"\x8f")
 
     def test_no_siz(self):
         """Test result when no SIZ box present"""
         base = b"\xff\x4f\xff\x52" + b"\x00" * 38
-        assert {} == get_j2k_parameters(base + b"\x8F")
+        assert {} == get_j2k_parameters(base + b"\x8f")
 
     def test_short_bytestream(self):
         """Test result when no SIZ box present"""
@@ -1281,18 +1281,18 @@ REFERENCE_PACK_UNPACK = [
     (b"\x20", [0, 0, 0, 0, 0, 1, 0, 0]),
     (b"\x40", [0, 0, 0, 0, 0, 0, 1, 0]),
     (b"\x80", [0, 0, 0, 0, 0, 0, 0, 1]),
-    (b"\xAA", [0, 1, 0, 1, 0, 1, 0, 1]),
-    (b"\xF0", [0, 0, 0, 0, 1, 1, 1, 1]),
-    (b"\x0F", [1, 1, 1, 1, 0, 0, 0, 0]),
-    (b"\xFF", [1, 1, 1, 1, 1, 1, 1, 1]),
+    (b"\xaa", [0, 1, 0, 1, 0, 1, 0, 1]),
+    (b"\xf0", [0, 0, 0, 0, 1, 1, 1, 1]),
+    (b"\x0f", [1, 1, 1, 1, 0, 0, 0, 0]),
+    (b"\xff", [1, 1, 1, 1, 1, 1, 1, 1]),
     #              | 1st byte              | 2nd byte
     (b"\x00\x00", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
     (b"\x00\x01", [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]),
     (b"\x00\x80", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
-    (b"\x00\xFF", [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]),
+    (b"\x00\xff", [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]),
     (b"\x01\x80", [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
     (b"\x80\x80", [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
-    (b"\xFF\x80", [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b"\xff\x80", [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
 ]
 
 

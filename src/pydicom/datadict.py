@@ -99,7 +99,7 @@ def add_dict_entry(
 
 
 def add_dict_entries(
-    new_entries_dict: dict[int, tuple[str, str, str, str, str]]
+    new_entries_dict: dict[int, tuple[str, str, str, str, str]],
 ) -> None:
     """Update the DICOM dictionary with new non-private entries.
 

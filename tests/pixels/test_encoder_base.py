@@ -776,7 +776,7 @@ class TestEncodeRunner_GetFrame:
             self.runner.set_source(arr)
             out = self.runner.get_frame(None)
             assert len(out) == 6
-            assert out == b"\x80\xFF\x00\x00\x7f\x00"
+            assert out == b"\x80\xff\x00\x00\x7f\x00"
 
     def test_arr_i32(self):
         """Test get_frame() using 32-bit samples with i4 and i8."""
@@ -793,7 +793,7 @@ class TestEncodeRunner_GetFrame:
             self.runner.set_source(arr)
             out = self.runner.get_frame(None)
             assert len(out) == 12
-            assert out == b"\x80\xFF\xFF\xFF\x00\x00\x00\x00\x7f\x00\x00\x00"
+            assert out == b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00"
 
     def test_arr_i64(self):
         """Test get_frame() using 64-bit samples with i8."""
@@ -810,7 +810,7 @@ class TestEncodeRunner_GetFrame:
         out = self.runner.get_frame(None)
         assert len(out) == 24
         assert out == (
-            b"\x80\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00\x00\x00\x00\x00\x00"
+            b"\x80\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00"
             b"\x7f\x00\x00\x00\x00\x00\x00\x00"
         )
 
@@ -865,7 +865,7 @@ class TestEncodeRunner_GetFrame:
         arr = np.asarray([0, 1, 2, -3, -4, -5], dtype="i2")
         runner.set_source(arr.reshape(1, 2, 3))
         assert runner.get_frame(None) == (
-            b"\x00\x00\x01\x00\x02\x00\xFD\xFF\xFC\xFF\xFB\xFF"
+            b"\x00\x00\x01\x00\x02\x00\xfd\xff\xfc\xff\xfb\xff"
         )
 
         # i1, RGB, 3 frames, odd length, planar conf 1
@@ -879,8 +879,8 @@ class TestEncodeRunner_GetFrame:
         x.extend([0, 1, 2, 3, 4, 5, 6, 7, 8])
         arr = np.asarray(x, dtype="i1")
         runner.set_source(arr.reshape(3, 1, 3, 3))
-        assert runner.get_frame(0) == b"\x00\x01\x02\xFD\xFC\xFB\x06\x07\x08"
-        assert runner.get_frame(1) == b"\x00\xFF\xFE\x03\x04\x05\xFA\xF9\xF8"
+        assert runner.get_frame(0) == b"\x00\x01\x02\xfd\xfc\xfb\x06\x07\x08"
+        assert runner.get_frame(1) == b"\x00\xff\xfe\x03\x04\x05\xfa\xf9\xf8"
         assert runner.get_frame(2) == b"\x00\x01\x02\x03\x04\x05\x06\x07\x08"
 
         # JPEL-LS, 1 frame, planar conf 1
@@ -909,8 +909,8 @@ class TestEncodeRunner_GetFrame:
         )
         runner.set_source(arr.reshape(3, 1, 2, 3))
         assert runner.get_frame(0) == b"\x00\x03\x01\x04\x02\x05"
-        assert runner.get_frame(1) == b"\x06\x09\x07\x0A\x08\x0B"
-        assert runner.get_frame(2) == b"\x0C\x0F\x0D\x10\x0E\x11"
+        assert runner.get_frame(1) == b"\x06\x09\x07\x0a\x08\x0b"
+        assert runner.get_frame(2) == b"\x0c\x0f\x0d\x10\x0e\x11"
 
     def test_buffer_08(self):
         """Test get_frame() using [0, 8)-bit samples with N-bit containers."""

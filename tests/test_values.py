@@ -73,7 +73,7 @@ class TestConvertText:
         bytestring = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
             b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
-            b"\x1b\x2d\x4C"
+            b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
         )
         encodings = ["latin_1", "iso_ir_144", "iso_ir_126"]
@@ -86,7 +86,7 @@ class TestConvertText:
         bytestring = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
             b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
-            b"\x1b\x2d\x4C"
+            b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
         )
         encodings = ["latin_1", "iso_ir_144", "iso_ir_126"]
@@ -121,7 +121,7 @@ class TestConvertText:
             b"\x1b\x2d\x46"
             b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
             b"\r\nJ\xe9r\xf4me/"
-            b"\x1b\x2d\x4C"
+            b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
             b"\tJ\xe9r\xf4me"
         )
