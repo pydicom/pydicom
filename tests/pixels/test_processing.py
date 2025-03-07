@@ -36,6 +36,7 @@ from pydicom.pixels.processing import (
     create_icc_transform,
 )
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian
+from .pixels_reference import EXPL_16_3_1F
 
 
 # PAL: PALETTE COLOR Photometric Interpretation
@@ -72,7 +73,7 @@ TEST_CMS = HAVE_NP and HAVE_PIL
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestConvertColourSpace:
+class TestConvertColorSpace:
     """Tests for convert_color_space()."""
 
     def test_unknown_current_raises(self):
@@ -83,7 +84,7 @@ class TestConvertColourSpace:
             convert_color_space(np.ones((1, 2), dtype="u1"), "TEST", "RGB")
 
     def test_unknown_desired_raises(self):
-        """Test an unknown desdired color space raises exception."""
+        """Test an unknown desired color space raises exception."""
         with pytest.raises(
             NotImplementedError, match="Conversion from RGB to TEST is not suppo"
         ):
@@ -97,6 +98,8 @@ class TestConvertColourSpace:
             ("YBR_FULL", "YBR_FULL_422"),
             ("YBR_FULL_422", "YBR_FULL_422"),
             ("YBR_FULL_422", "YBR_FULL"),
+            ("YBR_PARTIAL_420", "YBR_PARTIAL_422"),
+            ("YBR_PARTIAL_422", "YBR_PARTIAL_420"),
         ],
     )
     def test_current_is_desired(self, current, desired):
@@ -104,8 +107,8 @@ class TestConvertColourSpace:
         arr = np.ones((2, 3), dtype="u1")
         assert np.array_equal(arr, convert_color_space(arr, current, desired))
 
-    def test_rgb_ybr_rgb_single_frame(self):
-        """Test round trip conversion of single framed pixel data."""
+    def test_rgb_ybr_rgb_single_frame_8(self):
+        """Test round trip conversion with 8-bit YBR_FULL."""
         ds = dcmread(RGB_8_3_1F)
 
         arr = ds.pixel_array
@@ -138,7 +141,7 @@ class TestConvertColourSpace:
         assert np.allclose(rgb, arr, atol=1)
         assert rgb.shape == arr.shape
 
-    def test_rgb_ybr_rgb_multi_frame(self):
+    def test_rgb_ybr_rgb_multi_frame_8(self):
         """Test round trip conversion of multi-framed pixel data."""
         ds = dcmread(RGB_8_3_2F)
 
@@ -214,20 +217,128 @@ class TestConvertColourSpace:
         assert (0, 128, 128) == tuple(ybr[1, 95, 50, :])
 
     def test_unsuitable_dtype_raises(self):
-        """Test that non u1 dtypes raise an exception."""
+        """Test that non u1/u2 dtypes raise an exception."""
         msg = (
             "Invalid ndarray.dtype 'int8' for color space conversion, "
-            "must be 'uint8' or an equivalent"
+            "must be 'uint8', 'uint16' or an equivalent"
         )
         with pytest.raises(ValueError, match=msg):
             convert_color_space(np.ones((2, 3), dtype="i1"), "RGB", "YBR_FULL")
 
         msg = (
-            "Invalid ndarray.dtype 'uint16' for color space conversion, "
-            "must be 'uint8'"
+            "Invalid ndarray.dtype 'uint32' for color space conversion, "
+            "must be 'uint8', 'uint16' or an equivalent"
         )
         with pytest.raises(ValueError, match=msg):
-            convert_color_space(np.ones((2, 3), dtype="u2"), "RGB", "YBR_FULL")
+            convert_color_space(np.ones((2, 3), dtype="u4"), "RGB", "YBR_FULL")
+
+    def test_invalid_conversion_raises(self):
+        """Test an invalid conversion raises exception."""
+        with pytest.raises(
+            NotImplementedError, match="Conversion from YBR_FULL to YBR_PARTIAL_420 is"
+        ):
+            convert_color_space(
+                np.ones((1, 2), dtype="u1"), "YBR_FULL", "YBR_PARTIAL_420"
+            )
+
+    def test_ybr_partial_bit_depth(self):
+        """Test YBR_PARTIAL with bit-depth > 8"""
+        msg = "Invalid bit-depth '9' for YBR_PARTIAL_420, must be 8"
+        with pytest.raises(ValueError, match=msg):
+            convert_color_space(
+                np.ones((1, 2), dtype="u1"), "RGB", "YBR_PARTIAL_420", bit_depth=9
+            )
+
+    def test_ybr_full_bit_depth(self):
+        """Test YBR_FULL with bit-depth > 16"""
+        msg = (
+            "Invalid bit-depth '17' for YBR_FULL, must be in the closed interval "
+            r"\[1, 16\]"
+        )
+        with pytest.raises(ValueError, match=msg):
+            convert_color_space(
+                np.ones((1, 2), dtype="u1"), "RGB", "YBR_FULL", bit_depth=17
+            )
+
+    def test_value_bit_depth_mismatch(self):
+        """Test array values larger than specified bit-depth"""
+        msg = (
+            "The input array contains values greater than that allowed for unsigned "
+            "8-bit integers"
+        )
+        with pytest.raises(ValueError, match=msg):
+            convert_color_space(
+                np.ones((1, 2), dtype="u2") * 256, "RGB", "YBR_FULL", bit_depth=8
+            )
+
+    def test_rgb_ybr_full_rgb_16(self):
+        """Test round trip conversion with 16-bit YBR_FULL."""
+        ds = dcmread(RGB_8_3_1F)
+
+        arr = ds.pixel_array.astype("f4") / 255 * (2**16 - 1)
+        arr = arr.astype("u2")
+        assert (65535, 0, 0) == tuple(arr[5, 50, :])
+        assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
+        assert (0, 65535, 0) == tuple(arr[25, 50, :])
+        assert (32896, 65535, 32896) == tuple(arr[35, 50, :])
+        assert (0, 0, 65535) == tuple(arr[45, 50, :])
+        assert (32896, 32896, 65535) == tuple(arr[55, 50, :])
+        assert (0, 0, 0) == tuple(arr[65, 50, :])
+        assert (16448, 16448, 16448) == tuple(arr[75, 50, :])
+        assert (49344, 49344, 49344) == tuple(arr[85, 50, :])
+        assert (65535, 65535, 65535) == tuple(arr[95, 50, :])
+
+        ybr = convert_color_space(arr, "RGB", "YBR_FULL")
+        assert (19595, 21710, 65535) == tuple(ybr[5, 50, :])
+        assert (42655, 27261, 49088) == tuple(ybr[15, 50, :])
+        assert (38469, 11059, 5329) == tuple(ybr[25, 50, :])
+        assert (52055, 21956, 19102) == tuple(ybr[35, 50, :])
+        assert (7471, 65535, 27439) == tuple(ybr[45, 50, :])
+        assert (36617, 49088, 30114) == tuple(ybr[55, 50, :])
+        assert (0, 32768, 32768) == tuple(ybr[65, 50, :])
+        assert (16448, 32768, 32768) == tuple(ybr[75, 50, :])
+        assert (49344, 32768, 32768) == tuple(ybr[85, 50, :])
+        assert (65535, 32768, 32768) == tuple(ybr[95, 50, :])
+
+        # Round trip -> rounding errors get compounded
+        rgb = convert_color_space(ybr, "YBR_FULL", "RGB")
+        # All pixels within +/- 1 units
+        assert np.allclose(rgb, arr, atol=1)
+        assert rgb.shape == arr.shape
+
+    def test_rgb_ybr_partial_rgb(self):
+        """Test round trip conversion with YBR_PARTIAL."""
+        ds = dcmread(RGB_8_3_1F)
+
+        arr = ds.pixel_array
+        assert (255, 0, 0) == tuple(arr[5, 50, :])
+        assert (255, 128, 128) == tuple(arr[15, 50, :])
+        assert (0, 255, 0) == tuple(arr[25, 50, :])
+        assert (128, 255, 128) == tuple(arr[35, 50, :])
+        assert (0, 0, 255) == tuple(arr[45, 50, :])
+        assert (128, 128, 255) == tuple(arr[55, 50, :])
+        assert (0, 0, 0) == tuple(arr[65, 50, :])
+        assert (64, 64, 64) == tuple(arr[75, 50, :])
+        assert (192, 192, 192) == tuple(arr[85, 50, :])
+        assert (255, 255, 255) == tuple(arr[95, 50, :])
+
+        ybr = convert_color_space(arr, "RGB", "YBR_PARTIAL_420")
+        assert (81, 90, 240) == tuple(ybr[5, 50, :])
+        assert (159, 109, 184) == tuple(ybr[15, 50, :])
+        assert (145, 54, 34) == tuple(ybr[25, 50, :])
+        assert (190, 91, 81) == tuple(ybr[35, 50, :])
+        assert (41, 240, 110) == tuple(ybr[45, 50, :])
+        assert (138, 184, 119) == tuple(ybr[55, 50, :])
+        assert (16, 128, 128) == tuple(ybr[65, 50, :])
+        assert (71, 128, 128) == tuple(ybr[75, 50, :])
+        assert (181, 128, 128) == tuple(ybr[85, 50, :])
+        assert (235, 128, 128) == tuple(ybr[95, 50, :])
+
+        # Round trip -> rounding errors get compounded
+        rgb = convert_color_space(ybr, "YBR_PARTIAL_420", "RGB")
+        # All pixels within +/- 1 units
+        assert np.allclose(rgb, arr, atol=1)
+        assert rgb.shape == arr.shape
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")

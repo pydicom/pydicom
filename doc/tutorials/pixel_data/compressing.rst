@@ -382,7 +382,7 @@ you can pass its name via the `decoding_plugin` argument::
     >>> ds.decompress(decoding_plugin="pylibjpeg")
 
 If the dataset's *Pixel Data* is in the YCbCr color space it will also be converted
-to RGB by default. This can be disabled by passing ``as_rgb=False``::
+to RGB by default. This can be disabled by passing ``as_rgb=False`` or ``raw=True``::
 
     import numpy as np
 

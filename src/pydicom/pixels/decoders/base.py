@@ -100,8 +100,8 @@ class DecodeOptions(RunnerOptions, total=False):
 
     ## Processing options (ndarray only)
     as_rgb: bool  # Make best effort to return RGB output
-    force_rgb: bool  # Force YBR to RGB conversion
-    force_ybr: bool  # Force RGB to YBR conversion
+    force_rgb: bool  # Force YBR_FULL to RGB conversion
+    force_ybr: bool  # Force RGB to YBR_FULL conversion
 
     ## GDCM options
     gdcm_fix_big_endian: bool  # Apply fixes for GDCM on big endian systems
@@ -117,9 +117,9 @@ def _process_color_space(
     if force_ybr and force_rgb:
         raise ValueError("'force_ybr' and 'force_rgb' cannot both be True")
 
+    ybr = (PI.YBR_FULL, PI.YBR_FULL_422, PI.YBR_PARTIAL_420, PI.YBR_PARTIAL_422)
     to_rgb = (
-        runner.photometric_interpretation in (PI.YBR_FULL, PI.YBR_FULL_422)
-        and runner.get_option("as_rgb", False)
+        runner.photometric_interpretation in ybr and runner.get_option("as_rgb", False)
     ) or force_rgb
 
     if not arr.flags.writeable and (to_rgb or force_ybr):
@@ -133,10 +133,20 @@ def _process_color_space(
 
     # Converting to/from YBR_FULL and YBR_FULL_422 uses the same transformation
     if force_ybr:
-        arr = convert_color_space(arr, PI.RGB, PI.YBR_FULL)
+        arr = convert_color_space(
+            arr,
+            PI.RGB,
+            PI.YBR_FULL,
+            bit_depth=runner.bits_stored,
+        )
         changes["photometric_interpretation"] = PI.YBR_FULL
     elif to_rgb:
-        arr = convert_color_space(arr, PI.YBR_FULL, PI.RGB)
+        arr = convert_color_space(
+            arr,
+            PI.YBR_FULL if force_rgb else runner.photometric_interpretation,
+            PI.RGB,
+            bit_depth=runner.bits_stored,
+        )
         changes["photometric_interpretation"] = PI.RGB
 
     return arr
