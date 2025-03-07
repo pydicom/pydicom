@@ -884,6 +884,9 @@ def convert_color_space(
       Section 7
     * `ITU BT 601-2 (1990)<https://www.itu.int/rec/R-REC-BT.601/>`_
     """
+    if not HAVE_NP:
+        raise RuntimeError("NumPy is required for 'convert_color_space()'")
+
     if current == desired:
         return arr
 
@@ -954,34 +957,35 @@ def convert_color_space(
     return converter(arr, bit_depth)
 
 
-# Colorspace conversion matrices - ITU T.871
-_RGB_TO_YBR_FULL = np.asarray(
-    [
-        [+0.299, -0.299 / 1.772, +0.701 / 1.402],
-        [+0.587, -0.587 / 1.772, -0.587 / 1.402],
-        [+0.114, +0.886 / 1.772, -0.114 / 1.402],
-    ],
-    dtype=np.float32,
-)
-_YBR_FULL_TO_RGB = np.asarray(
-    [
-        [1.000, 1.000, 1.000],
-        [0.000, -0.114 * 1.772 / 0.587, 1.772],
-        [1.402, -0.299 * 1.402 / 0.587, 0.000],
-    ],
-    dtype=np.float32,
-)
+if HAVE_NP:
+    # Colorspace conversion matrices - ITU T.871
+    _RGB_TO_YBR_FULL = np.asarray(
+        [
+            [+0.299, -0.299 / 1.772, +0.701 / 1.402],
+            [+0.587, -0.587 / 1.772, -0.587 / 1.402],
+            [+0.114, +0.886 / 1.772, -0.114 / 1.402],
+        ],
+        dtype=np.float32,
+    )
+    _YBR_FULL_TO_RGB = np.asarray(
+        [
+            [1.000, 1.000, 1.000],
+            [0.000, -0.114 * 1.772 / 0.587, 1.772],
+            [1.402, -0.299 * 1.402 / 0.587, 0.000],
+        ],
+        dtype=np.float32,
+    )
 
-# ITU T.601
-# The RGB to YBR_PARTIAL matrix is the same as RGB to YBR_FULL, only
-# corrected for the reduced value ranges allowed by YBR_PARTIAL:
-#   Y is [16, 235] and Cb/Cr are [16, 240]
-_cf = np.asarray(
-    [(235 - 16) / 255, (240 - 16) / 255, (240 - 16) / 255],
-    dtype=np.float32,
-)
-_RGB_TO_YBR_PARTIAL = _RGB_TO_YBR_FULL * _cf
-_YBR_PARTIAL_TO_RGB = _YBR_FULL_TO_RGB / _cf.reshape(-1, 1)
+    # ITU T.601
+    # The RGB to YBR_PARTIAL matrix is the same as RGB to YBR_FULL, only
+    # corrected for the reduced value ranges allowed by YBR_PARTIAL:
+    #   Y is [16, 235] and Cb/Cr are [16, 240]
+    _cf = np.asarray(
+        [(235 - 16) / 255, (240 - 16) / 255, (240 - 16) / 255],
+        dtype=np.float32,
+    )
+    _RGB_TO_YBR_PARTIAL = _RGB_TO_YBR_FULL * _cf
+    _YBR_PARTIAL_TO_RGB = _YBR_FULL_TO_RGB / _cf.reshape(-1, 1)
 
 
 def _convert_RGB_to_YBR_FULL(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
