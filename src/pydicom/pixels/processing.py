@@ -823,7 +823,11 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
 
 
 def convert_color_space(
-    arr: "np.ndarray", current: str, desired: str, per_frame: bool = False
+    arr: "np.ndarray",
+    current: str,
+    desired: str,
+    per_frame: bool = False,
+    bit_depth: int | None = None,
 ) -> "np.ndarray":
     """Convert the image(s) in `arr` from one color space to another.
 
@@ -831,24 +835,37 @@ def convert_color_space(
 
         Added `per_frame` keyword parameter.
 
+    .. versionchanged:: 3.1
+
+        Added the `bit_depth` keyword parameter, as well as support for up to 16-bit
+        input arrays and YBR_PARTIAL color spaces.
+
+    Note that conversion is only supported for YCbCr to RGB (or vice versa), not
+    between different YCbCr color spaces.
+
     Parameters
     ----------
     arr : numpy.ndarray
         The image(s) as :class:`numpy.ndarray` with :attr:`~numpy.ndarray.shape`
         (frames, rows, columns, 3) or (rows, columns, 3) and a 'uint8'
-        :class:`~numpy.dtype` (unsigned 8-bit).
+        or 'uint16' :class:`~numpy.dtype`. uint16 is only supported when converting to
+        or from ``YBR_FULL`` or ``YBR_FULL_422``.
     current : str
         The current color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
-        ``'YBR_FULL_422'``.
+        ``'YBR_FULL_422'``, ``'YBR_PARTIAL_420'``, ``'YBR_PARTIAL_422'``.
     desired : str
         The desired color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
-        ``'YBR_FULL_422'``.
+        ``'YBR_FULL_422'``, ``'YBR_PARTIAL_420'``, ``'YBR_PARTIAL_422'``.
     per_frame : bool, optional
         If ``True`` and the input array contains multiple frames then process
         each frame individually and update `arr` in-place to reduce memory
         usage. Default ``False``.
+    bit_depth : int, optional
+        The bit-depth of the values in `arr`. Must be 8 for ``YBR_PARTIAL_420`` and
+        ``YBR_PARTIAL_422``, or in the closed interval [1, 16] for ``YBR_FULL`` and
+        ``YBR_FULL_422``. Defaults to the maximum bit-depth of `arr`.
 
     Returns
     -------
@@ -865,31 +882,42 @@ def convert_color_space(
     * ISO/IEC 10918-5:2012 (`ITU T.871
       <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
       Section 7
+    * `ITU BT 601-2 (1990)<https://www.itu.int/rec/R-REC-BT.601/>`_
     """
-    if arr.dtype != np.dtype("u1"):
+    if current == desired:
+        return arr
+
+    if arr.dtype.kind != "u" or arr.dtype.itemsize not in (1, 2):
         raise ValueError(
             f"Invalid ndarray.dtype '{arr.dtype}' for color space conversion, "
-            "must be 'uint8' or an equivalent"
+            "must be 'uint8', 'uint16' or an equivalent"
         )
 
-    def _no_change(arr: "np.ndarray") -> "np.ndarray":
+    def _no_change(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
         return arr
 
     _converters = {
         "YBR_FULL_422": {
-            "YBR_FULL_422": _no_change,
             "YBR_FULL": _no_change,
             "RGB": _convert_YBR_FULL_to_RGB,
         },
         "YBR_FULL": {
-            "YBR_FULL": _no_change,
             "YBR_FULL_422": _no_change,
             "RGB": _convert_YBR_FULL_to_RGB,
         },
+        "YBR_PARTIAL_420": {
+            "YBR_PARTIAL_422": _no_change,
+            "RGB": _convert_YBR_PARTIAL_to_RGB,
+        },
+        "YBR_PARTIAL_422": {
+            "YBR_PARTIAL_420": _no_change,
+            "RGB": _convert_YBR_PARTIAL_to_RGB,
+        },
         "RGB": {
-            "RGB": _no_change,
             "YBR_FULL": _convert_RGB_to_YBR_FULL,
             "YBR_FULL_422": _convert_RGB_to_YBR_FULL,
+            "YBR_PARTIAL_422": _convert_RGB_to_YBR_PARTIAL,
+            "YBR_PARTIAL_420": _convert_RGB_to_YBR_PARTIAL,
         },
     }
     try:
@@ -899,22 +927,72 @@ def convert_color_space(
             f"Conversion from {current} to {desired} is not supported."
         )
 
+    bit_depth = bit_depth if bit_depth is not None else arr.dtype.itemsize * 8
+
+    ybr = current if "YBR" in current else desired
+    if "PARTIAL" in ybr and bit_depth != 8:
+        raise ValueError(f"Invalid bit-depth '{bit_depth}' for {ybr}, must be 8")
+
+    if "FULL" in ybr and not 0 < bit_depth < 17:
+        raise ValueError(
+            f"Invalid bit-depth '{bit_depth}' for {ybr}, must be in the closed "
+            "interval [1, 16]"
+        )
+
+    if arr.max() > 2**bit_depth - 1:
+        raise ValueError(
+            "The input array contains values greater than that allowed for "
+            f"unsigned {bit_depth}-bit integers"
+        )
+
     if len(arr.shape) == 4 and per_frame:
         for idx, frame in enumerate(arr):
-            arr[idx] = converter(frame)
+            arr[idx] = converter(frame, bit_depth)
 
         return arr
 
-    return converter(arr)
+    return converter(arr, bit_depth)
 
 
-def _convert_RGB_to_YBR_FULL(arr: "np.ndarray") -> "np.ndarray":
+# Colorspace conversion matrices - ITU T.871
+_RGB_TO_YBR_FULL = np.asarray(
+    [
+        [+0.299, -0.299 / 1.772, +0.701 / 1.402],
+        [+0.587, -0.587 / 1.772, -0.587 / 1.402],
+        [+0.114, +0.886 / 1.772, -0.114 / 1.402],
+    ],
+    dtype=np.float32,
+)
+_YBR_FULL_TO_RGB = np.asarray(
+    [
+        [1.000, 1.000, 1.000],
+        [0.000, -0.114 * 1.772 / 0.587, 1.772],
+        [1.402, -0.299 * 1.402 / 0.587, 0.000],
+    ],
+    dtype=np.float32,
+)
+
+# ITU T.601
+# The RGB to YBR_PARTIAL matrix is the same as RGB to YBR_FULL, only
+# corrected for the reduced value ranges allowed by YBR_PARTIAL:
+#   Y is [16, 235] and Cb/Cr are [16, 240]
+_cf = np.asarray(
+    [(235 - 16) / 255, (240 - 16) / 255, (240 - 16) / 255],
+    dtype=np.float32,
+)
+_RGB_TO_YBR_PARTIAL = _RGB_TO_YBR_FULL * _cf
+_YBR_PARTIAL_TO_RGB = _YBR_FULL_TO_RGB / _cf.reshape(-1, 1)
+
+
+def _convert_RGB_to_YBR_FULL(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
     """Return an ndarray converted from RGB to YBR_FULL color space.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        An ndarray of an 8-bit per channel images in RGB color space.
+        An ndarray of a 1 to 16-bits per channel image in RGB color space.
+    bit_depth : int, optional
+        The bit-depth of the input array.
 
     Returns
     -------
@@ -932,33 +1010,60 @@ def _convert_RGB_to_YBR_FULL(arr: "np.ndarray") -> "np.ndarray":
     """
     orig_dtype = arr.dtype
 
-    rgb_to_ybr = np.asarray(
-        [
-            [+0.299, -0.299 / 1.772, +0.701 / 1.402],
-            [+0.587, -0.587 / 1.772, -0.587 / 1.402],
-            [+0.114, +0.886 / 1.772, -0.114 / 1.402],
-        ],
-        dtype=np.float32,
-    )
-
-    arr = np.matmul(arr, rgb_to_ybr, dtype=np.float32)
-    arr += [0.5, 128.5, 128.5]
+    arr = np.matmul(arr, _RGB_TO_YBR_FULL, dtype=np.float32)
+    arr += [0.5, 2 ** (bit_depth - 1) + 0.5, 2 ** (bit_depth - 1) + 0.5]
     # Round(x) -> floor of (arr + 0.5) : 0.5 added in previous step
     np.floor(arr, out=arr)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
-    # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
-    np.clip(arr, 0, 255, out=arr)
+    # Min(arr, 255) -> arr if arr <= 255, 255 otherwise (for 8-bit)
+    np.clip(arr, 0, 2**bit_depth - 1, out=arr)
 
     return arr.astype(orig_dtype)
 
 
-def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
+def _convert_RGB_to_YBR_PARTIAL(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
+    """Return an ndarray converted from RGB to YBR_PARTIAL color space.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        An ndarray of an  8-bit per channel image in RGB color space.
+    bit_depth : int, optional
+        The bit-depth of the input array.
+
+    Returns
+    -------
+    numpy.ndarray
+        The array in YBR_PARTIAL color space.
+
+    References
+    ----------
+
+    * DICOM Standard, Part 3, Annex C.7.6.3.1.2 (`2017b
+      <https://dicom.nema.org/MEDICAL/Dicom/2017b/output/pdf/part03.pdf>`_)
+    * `ITU BT 601-2 (1990) <https://www.itu.int/rec/R-REC-BT.601/>`_
+    * `YCbCr on Wikipedia <https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion>`_
+    """
+    orig_dtype = arr.dtype
+
+    arr = np.matmul(arr, _RGB_TO_YBR_PARTIAL, dtype=np.float32)
+    arr += [16.5, 128.5, 128.5]
+    np.floor(arr, out=arr)
+    np.clip(arr[..., 0], 16, 235, out=arr[..., 0])
+    np.clip(arr[..., 1:], 16, 240, out=arr[..., 1:])
+
+    return arr.astype(orig_dtype)
+
+
+def _convert_YBR_FULL_to_RGB(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
     """Return an ndarray converted from YBR_FULL to RGB color space.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        An ndarray of an 8-bit per channel images in YBR_FULL color space.
+        An ndarray of a 1 to 16-bits per channel image in YBR_FULL color space.
+    bit_depth : int, optional
+        The bit-depth of the input array.
 
     Returns
     -------
@@ -974,20 +1079,52 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
     """
     orig_dtype = arr.dtype
 
-    ybr_to_rgb = np.asarray(
-        [
-            [1.000, 1.000, 1.000],
-            [0.000, -0.114 * 1.772 / 0.587, 1.772],
-            [1.402, -0.299 * 1.402 / 0.587, 0.000],
-        ],
-        dtype=np.float32,
-    )
-
     arr = arr.astype(np.float32)
-    arr -= [0, 128, 128]
+    arr -= [0, 2 ** (bit_depth - 1), 2 ** (bit_depth - 1)]
 
     # Round(x) -> floor of (arr + 0.5)
-    np.matmul(arr, ybr_to_rgb, out=arr)
+    np.matmul(arr, _YBR_FULL_TO_RGB, out=arr)
+    arr += 0.5
+    np.floor(arr, out=arr)
+    # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
+    # Min(arr, 255) -> arr if arr <= 255, 255 otherwise (for 8-bit)
+    np.clip(arr, 0, 2**bit_depth - 1, out=arr)
+
+    return arr.astype(orig_dtype)
+
+
+def _convert_YBR_PARTIAL_to_RGB(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
+    """Return an ndarray converted from YBR_PARTIAL_* to RGB color space.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        An ndarray of an 8-bit per channel image in YBR_PARTIAL_422 or
+        YBR_PARTIAL_420 color space.
+    bit_depth : int, optional
+        The bit-depth of the input array.
+
+    Returns
+    -------
+    numpy.ndarray
+        The array in RGB color space.
+
+    References
+    ----------
+
+    * DICOM Standard, Part 3, Annex C.7.6.3.1.2 (`2017b
+      <https://dicom.nema.org/MEDICAL/Dicom/2017b/output/pdf/part03.pdf>`_)
+    * `ITU BT 601-2 (1990) <https://www.itu.int/rec/R-REC-BT.601/>`_
+    * `YCbCr on Wikipedia
+      <https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion>`_
+    """
+    orig_dtype = arr.dtype
+
+    arr = arr.astype(np.float32)
+    arr -= [16, 128, 128]
+
+    # Round(x) -> floor of (arr + 0.5)
+    np.matmul(arr, _YBR_PARTIAL_TO_RGB, out=arr)
     arr += 0.5
     np.floor(arr, out=arr)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise

@@ -73,8 +73,9 @@ pixel data should already be in the corresponding color space:
 
   * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` or ``YBR_RCT``; nothing
     else is required.
-  * For *Photometric Interpretation* ``YBR_FULL`` the pixel data must first be
-    converted into RGB color space, however the conversion operation is lossy.
+  * For *Photometric Interpretation* ``YBR_FULL``; data must be :func:`converted into
+    YCbCr color space <pydicom.pixels.processing.convert_color_space>`. However
+    you should keep in mind that the conversion operation is lossy.
 
 * If your uncompressed pixel data is in `YCbCr
   <https://en.wikipedia.org/wiki/YCbCr>`_ color space:
@@ -93,7 +94,8 @@ for a given image quality. If you don't wish to use MCT then keep the
 
 Bits Stored
 ...........
-The maximum supported *Bits Stored* value for encoding is ``24``.
+The maximum supported *Bits Stored* value for encoding is ``24``, however the
+results for lossy compression are quite poor for more than 20-bits or so.
 
 
 Examples
