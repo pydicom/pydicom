@@ -51,16 +51,16 @@ corresponding color space:
 * If your uncompressed pixel data is in RGB color space:
 
   * For *Photometric Interpretation* ``RGB`` nothing else is required.
-  * For *Photometric Interpretation* ``YBR_FULL``; data must be :func:`converted into
-    YCbCr color space <pydicom.pixels.processing.convert_color_space>`. However
-    you should keep in mind that the conversion operation is lossy.
+  * For *Photometric Interpretation* ``YBR_FULL`` data must be :func:`converted into
+    YCbCr color space <pydicom.pixels.processing.convert_color_space>`, however
+    the conversion operation is lossy.
 
 * If your uncompressed pixel data is in `YCbCr
   <https://en.wikipedia.org/wiki/YCbCr>`_ color space:
 
   * For *Photometric Interpretation* ``RGB`` the pixel data must first be
     :func:`converted into RGB color space
-    <pydicom.pixels.processing.convert_color_space>`. However the conversion
+    <pydicom.pixels.processing.convert_color_space>`, however the conversion
     operation is lossy.
   * For *Photometric Interpretation* ``YBR_FULL`` nothing else is required.
 

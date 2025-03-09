@@ -42,5 +42,5 @@ Enhancements
 * Added ability to specify tag numbers in the CLI commands (allows private tags to be specified)
 * Removed `exec` and `eval` from tests, CLI, and scripts for improved security (:issue:`2193`)
 * Added support for up to 16-bit input images to :func:`~pydicom.pixels.convert_color_space`
-* Added support for ``YBR_PARTIAL_410`` and ``YBR_PARTIAL_422`` to
+* Added support for ``YBR_PARTIAL_420`` and ``YBR_PARTIAL_422`` to
   :func:`~pydicom.pixels.convert_color_space` (:issue:`2210`)

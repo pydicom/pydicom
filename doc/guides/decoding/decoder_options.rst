@@ -82,7 +82,7 @@ processing applied after decoding to a NumPy :class:`~numpy.ndarray`:
 
 * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel data with a
   :ref:`photometric interpretation<photometric_interpretation>` of ``"YBR_FULL"``,
-   ``"YBR_FULL_422"``,``"YBR_PARTIAL_420"`` or ``"YBR_PARTIAL_422"`` to RGB.
+  ``"YBR_FULL_422"``, ``"YBR_PARTIAL_420"`` or ``"YBR_PARTIAL_422"`` to RGB.
 * `force_rgb`: :class:`bool` - if ``True`` then force a YBR_FULL to RGB color space
   conversion on the array (default ``False``).
 * `force_ybr`: :class:`bool` - if ``True`` then force an RGB to YBR_FULL color space
