@@ -80,7 +80,7 @@ pixel data should already be in the corresponding color space:
 * If your uncompressed pixel data is in `YCbCr
   <https://en.wikipedia.org/wiki/YCbCr>`_ color space:
 
-  * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` or ``YBR_RCT``the pixel data
+  * For *Photometric Interpretation* ``RGB``, ``YBR_ICT`` or ``YBR_RCT`` the pixel data
     must first be :func:`converted into RGB color space
     <pydicom.pixels.processing.convert_color_space>`, however the conversion
     operation is lossy.
