@@ -98,7 +98,7 @@ Glossary
 
     Allowed values: ``'MONOCHROME1'``, ``'MONOCHROME2'``, ``'PALETTE COLOR'``,
     ``'RGB'``, ``'YBR_FULL'``, ``'YBR_FULL_422'``, ``'YBR_PARTIAL_420'``,
-    ``'YBR_ICT'``, ``'YBR_RCT'``, however restrictions apply based on
+    ``'YBR_ICT'``, ``'YBR_RCT'``, ``'XYB'``, however restrictions apply based on
     the *Transfer Syntax UID*, and further constraints may be required by the
     :dcm:`IOD<part03/ps3.3.html>`.
 
