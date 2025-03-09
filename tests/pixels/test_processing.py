@@ -216,6 +216,34 @@ class TestConvertColorSpace:
         assert (63, 128, 128) == tuple(ybr[1, 85, 50, :])
         assert (0, 128, 128) == tuple(ybr[1, 95, 50, :])
 
+    def test_multiframe_partial(self):
+        """Test processing all frames with YBR_PARTIAL."""
+        ds = dcmread(RGB_8_3_2F)
+
+        arr = ds.pixel_array
+        ybr = convert_color_space(arr, "RGB", "YBR_PARTIAL_420", per_frame=False)
+        assert (81, 90, 240) == tuple(ybr[0, 5, 50, :])
+        assert (159, 109, 184) == tuple(ybr[0, 15, 50, :])
+        assert (145, 54, 34) == tuple(ybr[0, 25, 50, :])
+        assert (190, 91, 81) == tuple(ybr[0, 35, 50, :])
+        assert (41, 240, 110) == tuple(ybr[0, 45, 50, :])
+        assert (138, 184, 119) == tuple(ybr[0, 55, 50, :])
+        assert (16, 128, 128) == tuple(ybr[0, 65, 50, :])
+        assert (71, 128, 128) == tuple(ybr[0, 75, 50, :])
+        assert (181, 128, 128) == tuple(ybr[0, 85, 50, :])
+        assert (235, 128, 128) == tuple(ybr[0, 95, 50, :])
+        # Frame 2
+        assert (170, 166, 16) == tuple(ybr[1, 5, 50, :])
+        assert (92, 147, 72) == tuple(ybr[1, 15, 50, :])
+        assert (106, 202, 222) == tuple(ybr[1, 25, 50, :])
+        assert (61, 165, 175) == tuple(ybr[1, 35, 50, :])
+        assert (210, 16, 146) == tuple(ybr[1, 45, 50, :])
+        assert (113, 72, 137) == tuple(ybr[1, 55, 50, :])
+        assert (235, 128, 128) == tuple(ybr[1, 65, 50, :])
+        assert (180, 128, 128) == tuple(ybr[1, 75, 50, :])
+        assert (70, 128, 128) == tuple(ybr[1, 85, 50, :])
+        assert (16, 128, 128) == tuple(ybr[1, 95, 50, :])
+
     def test_unsuitable_dtype_raises(self):
         """Test that non u1/u2 dtypes raise an exception."""
         msg = (
