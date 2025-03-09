@@ -501,7 +501,7 @@ class TestsWithGDCM:
 
         assert a.flags.writeable
         assert (120, 480, 640, 3) == a.shape
-        a = _convert_YBR_FULL_to_RGB(a)
+        a = _convert_YBR_FULL_to_RGB(a, bit_depth=8)
         # this test points were manually identified in Osirix viewer
         assert (41, 41, 41) == tuple(a[3, 159, 290, :])
         assert (57, 57, 57) == tuple(a[3, 169, 290, :])
@@ -520,7 +520,7 @@ class TestsWithGDCM:
 
         assert (100, 100, 3) == a.shape
         if convert_yuv_to_rgb:
-            a = _convert_YBR_FULL_to_RGB(a)
+            a = _convert_YBR_FULL_to_RGB(a, bit_depth=8)
         # this test points are from the ImageComments tag
         assert results[0] == tuple(a[5, 50, :])
         assert results[1] == tuple(a[15, 50, :])

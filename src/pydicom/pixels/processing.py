@@ -849,7 +849,8 @@ def convert_color_space(
         The image(s) as :class:`numpy.ndarray` with :attr:`~numpy.ndarray.shape`
         (frames, rows, columns, 3) or (rows, columns, 3) and a 'uint8'
         or 'uint16' :class:`~numpy.dtype`. uint16 is only supported when converting to
-        or from ``YBR_FULL`` or ``YBR_FULL_422``.
+        or from ``YBR_FULL`` or ``YBR_FULL_422``. For subsampled YCbCr data, such as
+        ``YBR_FULL_422``, the subsampling must be removed prior to conversion.
     current : str
         The current color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
@@ -882,11 +883,9 @@ def convert_color_space(
     * ISO/IEC 10918-5:2012 (`ITU T.871
       <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
       Section 7
-    * `ITU BT 601-2 (1990)<https://www.itu.int/rec/R-REC-BT.601/>`_
+    * `ITU BT 601-2 (1990) <https://www.itu.int/rec/R-REC-BT.601/>`_
+    * `YCbCr on Wikipedia <https://en.wikipedia.org/wiki/YCbCr>`_
     """
-    if not HAVE_NP:
-        raise RuntimeError("NumPy is required for 'convert_color_space()'")
-
     if current == desired:
         return arr
 
@@ -931,7 +930,6 @@ def convert_color_space(
         )
 
     bit_depth = bit_depth if bit_depth is not None else arr.dtype.itemsize * 8
-
     ybr = current if "YBR" in current else desired
     if "PARTIAL" in ybr and bit_depth != 8:
         raise ValueError(f"Invalid bit-depth '{bit_depth}' for {ybr}, must be 8")
@@ -995,7 +993,7 @@ def _convert_RGB_to_YBR_FULL(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
     ----------
     arr : numpy.ndarray
         An ndarray of a 1 to 16-bits per channel image in RGB color space.
-    bit_depth : int, optional
+    bit_depth : int
         The bit-depth of the input array.
 
     Returns
@@ -1032,7 +1030,7 @@ def _convert_RGB_to_YBR_PARTIAL(arr: "np.ndarray", bit_depth: int) -> "np.ndarra
     ----------
     arr : numpy.ndarray
         An ndarray of an  8-bit per channel image in RGB color space.
-    bit_depth : int, optional
+    bit_depth : int
         The bit-depth of the input array.
 
     Returns
@@ -1066,7 +1064,7 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray", bit_depth: int) -> "np.ndarray":
     ----------
     arr : numpy.ndarray
         An ndarray of a 1 to 16-bits per channel image in YBR_FULL color space.
-    bit_depth : int, optional
+    bit_depth : int
         The bit-depth of the input array.
 
     Returns
@@ -1105,7 +1103,7 @@ def _convert_YBR_PARTIAL_to_RGB(arr: "np.ndarray", bit_depth: int) -> "np.ndarra
     arr : numpy.ndarray
         An ndarray of an 8-bit per channel image in YBR_PARTIAL_422 or
         YBR_PARTIAL_420 color space.
-    bit_depth : int, optional
+    bit_depth : int
         The bit-depth of the input array.
 
     Returns
