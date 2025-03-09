@@ -85,7 +85,6 @@ jobs:
     - name: Send coverage results
       if: success() && inputs.upload-coverage
       uses: codecov/codecov-action@v5
-      env:
-        codecov_token: ${{ secrets.codecov_token }}
       with:
-        env_vars: inputs.os, inputs.python-version
+        token: ${{ secrets.codecov_token }}
+        env_vars: inputs.os,inputs.python-version

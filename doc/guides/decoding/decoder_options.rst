@@ -53,14 +53,15 @@ is a :class:`~pydicom.dataset.Dataset`:
 | `bits_allocated`             |:class:`int`|(0028,0100)| *Bits         | The number of bits used to :ref:`contain each pixel      |
 |                              |            |           | Allocated*    | <bits_allocated>`                                        |
 +------------------------------+------------+-----------+---------------+----------------------------------------------------------+
-| `bits_stored`                |:class:`int`|(0028,0101)|*Bits Stored*  | The number of bits actually :ref:`used by each pixel     |
+| `bits_stored`                |:class:`int`|(0028,0101)|*Bits Stored*  | Required if `pixel_keyword` is ``'PixelData'``, the      |
+|                              |            |           |               | number of bits actually :ref:`used by each pixel         |
 |                              |            |           |               | <bits_stored>`                                           |
 +------------------------------+------------+-----------+---------------+----------------------------------------------------------+
 | `photometric_interpretation` |:class:`str`|(0028,0004)|*Photometric   | The :ref:`color space<photometric_interpretation>`       |
 |                              |            |           |Interpretation*| of the encoded pixel data                                |
 +------------------------------+------------+-----------+---------------+----------------------------------------------------------+
-| `pixel_representation`       |:class:`int`|(0028,0103)|*Pixel         | Required if `pixel_keyword` is ``'PixelData'``, whether  |
-|                              |            |           |Representation*| the pixels are :ref:`signed or unsigned                  |
+| `pixel_representation`       |:class:`int`|(0028,0103)|*Pixel         | Required if `pixel_keyword` is ``'PixelData'``,          |
+|                              |            |           |Representation*| whether the pixels are :ref:`signed or unsigned          |
 |                              |            |           |               | <pixel_representation>`                                  |
 +------------------------------+------------+-----------+---------------+----------------------------------------------------------+
 | `planar_configuration`       |:class:`int`|(0028,0006)|*Planar        | Required if `samples_per_pixel` > 1, the :ref:`pixel     |
@@ -80,11 +81,11 @@ The following options may be used with any transfer syntax for controlling the
 processing applied after decoding to a NumPy :class:`~numpy.ndarray`:
 
 * `as_rgb`: :class:`bool` - if ``True`` (default) then convert pixel data with a
-  YCbCr :ref:`photometric interpretation<photometric_interpretation>`
-  such as ``"YBR_FULL_422"`` to RGB.
-* `force_rgb`: :class:`bool` - if ``True`` then force a YCbCr to RGB color space
+  :ref:`photometric interpretation<photometric_interpretation>` of ``"YBR_FULL"``,
+  ``"YBR_FULL_422"``, ``"YBR_PARTIAL_420"`` or ``"YBR_PARTIAL_422"`` to RGB.
+* `force_rgb`: :class:`bool` - if ``True`` then force a YBR_FULL to RGB color space
   conversion on the array (default ``False``).
-* `force_ybr`: :class:`bool` - if ``True`` then force an RGB to YCbCr color space
+* `force_ybr`: :class:`bool` - if ``True`` then force an RGB to YBR_FULL color space
   conversion on the array (default ``False``).
 
 
