@@ -220,16 +220,12 @@ data to graphics libraries for viewing. See <a class="reference internal" href="
 </section>
 <section id="color-space">
 <span id="colorspace"></span><h2>Color space<a class="headerlink" href="#color-space" title="Link to this heading">¶</a></h2>
-<p>When using <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
-with <em>Pixel Data</em> that has an (0028,0002) <em>Samples per Pixel</em> value
-of <code class="docutils literal notranslate"><span class="pre">3</span></code> then the returned pixel data will be in the color space as given by
-(0028,0004) <em>Photometric Interpretation</em> (e.g. <code class="docutils literal notranslate"><span class="pre">RGB</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code>,
-<code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code>, etc).</p>
-<p><em>pydicom</em> offers a limited ability to convert between 8-bits/channel YBR and
-RGB color spaces through the
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a>
-function. When changing the color space you should also change the value
-of <em>Photometric Interpretation</em> to match.</p>
+<p>When using <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a> with <em>Pixel Data</em> that has an
+(0028,0002) <em>Samples per Pixel</em> value of <code class="docutils literal notranslate"><span class="pre">3</span></code> then the returned pixel data will be in
+RGB color space by default.</p>
+<p><em>pydicom</em> offers the ability to convert between YCbCr and RGB color spaces through the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> function. When changing the
+color space you should also change the value of <em>Photometric Interpretation</em> to match.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>See the DICOM Standard, Part 3,

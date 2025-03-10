@@ -196,7 +196,8 @@ Allocated</em></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0101)</p></td>
 <td><p><em>Bits Stored</em></p></td>
-<td><p>The number of bits actually <a class="reference internal" href="../glossary.html#bits-stored"><span class="std std-ref">used by each pixel</span></a></p></td>
+<td><p>Required if <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>, the
+number of bits actually <a class="reference internal" href="../glossary.html#bits-stored"><span class="std std-ref">used by each pixel</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>photometric_interpretation</cite></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
@@ -211,8 +212,8 @@ of the encoded pixel data</p></td>
 <td><p>(0028,0103)</p></td>
 <td><p><em>Pixel
 Representation</em></p></td>
-<td><p>Required if <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>, whether
-the pixels are <a class="reference internal" href="../glossary.html#pixel-representation"><span class="std std-ref">signed or unsigned</span></a></p></td>
+<td><p>Required if <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>,
+whether the pixels are <a class="reference internal" href="../glossary.html#pixel-representation"><span class="std std-ref">signed or unsigned</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>planar_configuration</cite></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
@@ -238,11 +239,11 @@ the pixel data. One of <code class="docutils literal notranslate"><span class="p
 processing applied after decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
 <li><p><cite>as_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then convert pixel data with a
-YCbCr <a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">photometric interpretation</span></a>
-such as <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code> to RGB.</p></li>
-<li><p><cite>force_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force a YCbCr to RGB color space
+<a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">photometric interpretation</span></a> of <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;YBR_PARTIAL_420&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;YBR_PARTIAL_422&quot;</span></code> to RGB.</p></li>
+<li><p><cite>force_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force a YBR_FULL to RGB color space
 conversion on the array (default <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
-<li><p><cite>force_ybr</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force an RGB to YCbCr color space
+<li><p><cite>force_ybr</cite>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force an RGB to YBR_FULL color space
 conversion on the array (default <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </section>

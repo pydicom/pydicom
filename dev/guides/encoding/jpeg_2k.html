@@ -222,15 +222,16 @@ to the <a class="extlink-dcm reference external" href="http://dicom.nema.org/med
 <ul>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_ICT</span></code> or <code class="docutils literal notranslate"><span class="pre">YBR_RCT</span></code>; nothing
 else is required.</p></li>
-<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> the pixel data must first be
-converted into RGB color space, however the conversion operation is lossy.</p></li>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> data must be <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span>
+<span class="pre">YCbCr</span> <span class="pre">color</span> <span class="pre">space</span></code></a>, however
+the conversion operation is lossy.</p></li>
 </ul>
 </li>
 <li><p>If your uncompressed pixel data is in <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space:</p>
 <ul>
-<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_ICT</span></code> or <code class="docutils literal notranslate"><span class="pre">YBR_RCT</span></code>; the
-pixel data must first be converted into RGB color space, however the
-conversion operation is lossy.</p></li>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_ICT</span></code> or <code class="docutils literal notranslate"><span class="pre">YBR_RCT</span></code> the pixel data
+must first be <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">RGB</span> <span class="pre">color</span> <span class="pre">space</span></code></a>, however the conversion
+operation is lossy.</p></li>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> nothing else is required.</p></li>
 </ul>
 </li>
@@ -244,7 +245,8 @@ for a given image quality. If you don’t wish to use MCT then keep the
 </section>
 <section id="bits-stored">
 <h3>Bits Stored<a class="headerlink" href="#bits-stored" title="Link to this heading">¶</a></h3>
-<p>The maximum supported <em>Bits Stored</em> value for encoding is <code class="docutils literal notranslate"><span class="pre">24</span></code>.</p>
+<p>The maximum supported <em>Bits Stored</em> value for encoding is <code class="docutils literal notranslate"><span class="pre">24</span></code>, however the
+results for lossy compression are quite poor for more than ~20 bits.</p>
 </section>
 </section>
 <section id="examples">

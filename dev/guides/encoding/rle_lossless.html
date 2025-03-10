@@ -195,23 +195,15 @@ to the <a class="extlink-dcm reference external" href="http://dicom.nema.org/med
 <li><p>If your uncompressed pixel data is in RGB color space:</p>
 <ul>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code> nothing else is required.</p></li>
-<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code></p>
-<ul>
-<li><p>For <em>Bits Allocated</em> and <em>Bits Stored</em> less than or equal to 8: pixel
-data must be <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">YCbCr</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However
-you should keep in mind that the conversion operation is lossy.</p></li>
-<li><p>For <em>Bits Allocated</em> and <em>Bits Stored</em> between 9 and 16 (inclusive):
-pixel data should be downscaled to 8-bit (with <em>Bits Stored</em>, <em>Bits
-Allocated</em> and <em>High Bit</em> updated accordingly) and converted to <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space. Both of these
-operations are lossy.</p></li>
-</ul>
-</li>
+<li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> data must be <a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span>
+<span class="pre">YCbCr</span> <span class="pre">color</span> <span class="pre">space</span></code></a>, however
+the conversion operation is lossy.</p></li>
 </ul>
 </li>
 <li><p>If your uncompressed pixel data is in <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space:</p>
 <ul>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">RGB</span></code> the pixel data must first be
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">RGB</span> <span class="pre">color</span> <span class="pre">space</span></code></a>. However the conversion
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.processing.convert_color_space.html#pydicom.pixels.processing.convert_color_space" title="pydicom.pixels.processing.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">converted</span> <span class="pre">into</span> <span class="pre">RGB</span> <span class="pre">color</span> <span class="pre">space</span></code></a>, however the conversion
 operation is lossy.</p></li>
 <li><p>For <em>Photometric Interpretation</em> <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> nothing else is required.</p></li>
 </ul>
