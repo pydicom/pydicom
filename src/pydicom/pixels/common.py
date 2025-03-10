@@ -283,7 +283,8 @@ class PhotometricInterpretation(str, Enum):
     ARGB = "ARGB"  # Retired
     CMYK = "CMYK"  # Retired
     YBR_PARTIAL_422 = "YBR_PARTIAL_422"  # Retired
-    YBR_PARTIAL_420 = "YBR_PARTIAL_420"  # Retired
+    YBR_PARTIAL_420 = "YBR_PARTIAL_420"
+    XYB = "XYB"
 
     # TODO: no longer needed if StrEnum
     def __str__(self) -> str:
