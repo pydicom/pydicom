@@ -2,13 +2,12 @@
 Deflated Image Frame Compression
 ================================
 
-The requirements for *Deflate Image Frame Compression* encoding are defined in
+The requirements for *Deflated Image Frame Compression* encoding are defined in
 :dcm:`Section 8.2.16<part05/sect_8.2.16.html>` and Annex :dcm:`A.4.13
-<part05/sect_A.4.13.html>` in Part 5 of the DICOM Standard. The
-underlying algorithm is based on the `Deflate <https://en.wikipedia.org/wiki/Deflate>`_
-compression algorithm.
+<part05/sect_A.4.13.html>` in Part 5 of the DICOM Standard. The underlying algorithm
+is the `Deflate <https://en.wikipedia.org/wiki/Deflate>`_ compression method.
 
-*Deflate Image Frame Compression* is primary intended for single bit segmentation
+*Deflated Image Frame Compression* is primary intended for single-bit segmentation
 encoding, however there are no restrictions on using it with other types of pixel data.
 
 Valid Image Pixel Parameters
@@ -55,7 +54,7 @@ Available Plugins
 
    <br />
 
-+--------------------------------------------------------------------+------------------+
++---------------------------------------------------------------------+-----------------+
 | Encoder                                                             | Plugins         |
 |                                                                     +---------+-------+
 |                                                                     | Name    | Added |

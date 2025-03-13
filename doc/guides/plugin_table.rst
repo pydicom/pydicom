@@ -136,8 +136,8 @@ Plugins for Compression
 |                         |                         +---------------+                                            |
 |                         |                         | ``pydicom``   |                                            |
 +-------------------------+-------------------------+---------------+--------------------------------------------+
-| *Deflated Image Frame   | 1.2.840.10008.1.2.8.1   | ``pydicom``   | :doc:`RLE</guides/encoding/defl_image>`    |
-| Compression*            |                         |               |                                            |
+| *Deflated Image Frame   | 1.2.840.10008.1.2.8.1   | ``pydicom``   | :doc:`Deflated Image                       |
+| Compression*            |                         |               | </guides/encoding/defl_image>`             |
 +-------------------------+-------------------------+---------------+--------------------------------------------+
 
 
