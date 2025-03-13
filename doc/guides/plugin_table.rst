@@ -43,6 +43,9 @@ The table below lists the plugins available for decompressing pixel data that's 
 +-------------------------+-------------------------+-----------------+----------+-----------------+--------------+-------------+
 | *RLE Lossless*          | 1.2.840.10008.1.2.5     | |chk|\ :sup:`3` | |chk|    |                 |              | |chk|       |
 +-------------------------+-------------------------+-----------------+----------+-----------------+--------------+-------------+
+| *Deflated Image Frame   | 1.2.840.10008.1.2.8.1   |                 |          |                 |              | |chk|       |
+| Compression*            |                         |                 |          |                 |              |             |
++-------------------------+-------------------------+-----------------+----------+-----------------+--------------+-------------+
 
 | :sup:`1` with ``pylibjpeg-libjpeg``
 | :sup:`2` with ``pylibjpeg-openjpeg``
@@ -105,7 +108,7 @@ Requires `pydicom <https://github.com/pydicom/pydicom>`_.
 
 **Known limitations**
 
-* Slower than the other plugins by 3-4x
+* *RLE Lossless*: Slower than the other plugins by 3-4x
 
 
 
@@ -132,6 +135,9 @@ Plugins for Compression
 | *RLE Lossless*          | 1.2.840.10008.1.2.5     | ``pylibjpeg`` | :doc:`RLE</guides/encoding/rle_lossless>`  |
 |                         |                         +---------------+                                            |
 |                         |                         | ``pydicom``   |                                            |
++-------------------------+-------------------------+---------------+--------------------------------------------+
+| *Deflated Image Frame   | 1.2.840.10008.1.2.8.1   | ``pydicom``   | :doc:`RLE</guides/encoding/defl_image>`    |
+| Compression*            |                         |               |                                            |
 +-------------------------+-------------------------+---------------+--------------------------------------------+
 
 
@@ -164,4 +170,4 @@ Requires `pydicom <https://github.com/pydicom/pydicom>`_.
 
 **Known limitations**
 
-* Much slower than the other plugins
+* *RLE Lossless*: Much slower than the other plugins

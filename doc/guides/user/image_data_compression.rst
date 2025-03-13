@@ -46,25 +46,31 @@ transfer syntaxes:
 |                       |                        +------------------+-----------------------------+
 |                       |                        | gdcm             | `gdcm <gdcm_>`_             |
 +-----------------------+------------------------+------------------+-----------------------------+
+| Deflated Image Frame  | 1.2.840.10008.1.2.8.1  | pydicom          |                             |
+| Compression           |                        |                  |                             |
++-----------------------+------------------------+------------------+-----------------------------+
 
 | :sup:`1` *~20x slower than the other plugins*
 
 Each of the supported transfer syntaxes has a corresponding encoding guide to help
 you with the specific requirements of the encoding method.
 
-+-------------------------+-----------------------------------------------------+
-| Transfer Syntax         | Encoding guide                                      |
-+=========================+=====================================================+
-| JPEG-LS Lossless        | :doc:`JPEG-LS Encoding</guides/encoding/jpeg_ls>`   |
-+-------------------------+                                                     |
-| JPEG-LS Near Lossless   |                                                     |
-+-------------------------+-----------------------------------------------------+
-| JPEG 2000 Lossless      | :doc:`JPEG 2000 Encoding</guides/encoding/jpeg_2k>` |
-+-------------------------+                                                     |
-| JPEG 2000               |                                                     |
-+-------------------------+-----------------------------------------------------+
-| RLE Lossless            | :doc:`RLE Encoding</guides/encoding/rle_lossless>`  |
-+-------------------------+-----------------------------------------------------+
++-------------------------+-------------------------------------------------------+
+| Transfer Syntax         | Encoding guide                                        |
++=========================+=======================================================+
+| JPEG-LS Lossless        | :doc:`JPEG-LS Encoding</guides/encoding/jpeg_ls>`     |
++-------------------------+                                                       |
+| JPEG-LS Near Lossless   |                                                       |
++-------------------------+-------------------------------------------------------+
+| JPEG 2000 Lossless      | :doc:`JPEG 2000 Encoding</guides/encoding/jpeg_2k>`   |
++-------------------------+                                                       |
+| JPEG 2000               |                                                       |
++-------------------------+-------------------------------------------------------+
+| RLE Lossless            | :doc:`RLE Encoding</guides/encoding/rle_lossless>`    |
++-------------------------+-------------------------------------------------------+
+| Deflated Image Frame    | :doc:`Deflated Encoding</guides/encoding/defl_image>` |
+| Compression             |                                                       |
++-------------------------+-------------------------------------------------------+
 
 
 Compressing with ``Dataset.compress()``

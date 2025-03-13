@@ -471,20 +471,20 @@ class TestCoderBase:
     def test_add_plugin(self):
         """Test add_plugin()"""
         coder = CoderBase(RLELossless, decoder=True)
-        coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+        coder.add_plugin("foo", ("pydicom.pixels.decoders.native", "_decode_frame"))
         assert coder.is_available
 
         msg = "'CoderBase' already has a plugin named 'foo'"
         with pytest.raises(ValueError, match=msg):
-            coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+            coder.add_plugin("foo", ("pydicom.pixels.decoders.native", "_decode_frame"))
 
         coder = CoderBase(RLELossless, decoder=False)
-        coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+        coder.add_plugin("foo", ("pydicom.pixels.decoders.native", "_decode_frame"))
         assert coder.is_available
 
         msg = "'CoderBase' already has a plugin named 'foo'"
         with pytest.raises(ValueError, match=msg):
-            coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+            coder.add_plugin("foo", ("pydicom.pixels.decoders.native", "_decode_frame"))
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_add_plugin_unavailable(self):
@@ -493,7 +493,7 @@ class TestCoderBase:
         # UID isn't supported by decoder
         msg = "The 'foo' plugin doesn't support 'Explicit VR Little Endian'"
         with pytest.raises(ValueError, match=msg):
-            coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+            coder.add_plugin("foo", ("pydicom.pixels.decoders.native", "_decode_frame"))
 
         # UID is supported but dependencies not met
         coder = CoderBase(JPEGLSLossless, decoder=True)
@@ -530,12 +530,10 @@ class TestCoderBase:
     def test_add_plugin_function_missing(self):
         """Test decoding function missing when adding a plugin."""
         coder = CoderBase(RLELossless, decoder=True)
-        msg = (
-            r"module 'pydicom.pixels.decoders.rle' has no attribute 'bad_function_name'"
-        )
+        msg = r"module 'pydicom.pixels.decoders.native' has no attribute 'bad_function_name'"
         with pytest.raises(AttributeError, match=msg):
             coder.add_plugin(
-                "foo", ("pydicom.pixels.decoders.rle", "bad_function_name")
+                "foo", ("pydicom.pixels.decoders.native", "bad_function_name")
             )
         assert {} == coder._available
         assert {} == coder._unavailable
@@ -543,8 +541,8 @@ class TestCoderBase:
     def test_remove_plugin(self):
         """Test removing a plugin."""
         coder = CoderBase(RLELossless, decoder=True)
-        coder.add_plugin("foo", ("pydicom.pixels.decoders.rle", "_decode_frame"))
-        coder.add_plugin("bar", ("pydicom.pixels.decoders.rle", "_decode_frame"))
+        coder.add_plugin("foo", ("pydicom.pixels.decoders.native", "_decode_frame"))
+        coder.add_plugin("bar", ("pydicom.pixels.decoders.native", "_decode_frame"))
         assert "foo" in coder._available
         assert "bar" in coder._available
         assert {} == coder._unavailable
