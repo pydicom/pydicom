@@ -9,7 +9,7 @@ from pydicom.data import get_testdata_file
 from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.encoders.gdcm import _rle_encode as gdcm_rle_encode
-from pydicom.pixels.decoders.rle import _rle_decode_frame
+from pydicom.pixels.decoders.native import _rle_decode_frame
 from pydicom.pixels.utils import reshape_pixel_array, _convert_rle_endianness
 from pydicom.uid import RLELossless, JPEG2000, ExplicitVRLittleEndian
 

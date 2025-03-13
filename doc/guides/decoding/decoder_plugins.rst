@@ -77,9 +77,6 @@ An decoding plugin must implement three objects within the same module:
     contained in `src`
   * ``bits_allocated``: :class:`int` - the number of bits used to contain
     each pixel in `src`, should be a multiple of 8.
-  * ``bits_stored``: :class:`int` - the number of bits actually used by
-    each pixel in `src`, e.g. 12-bit pixel data (range 0 to 4095) will be
-    contained by 16-bits (range 0 to 65535).
   * ``photometric_interpretation``: :class:`str` - the color space
     of the encoded data, such as ``'YBR_FULL'``
   * ``pixel_keyword``: :class:`str` - one of ``"PixelData"``, ``"FloatPixelData"``,
@@ -87,6 +84,9 @@ An decoding plugin must implement three objects within the same module:
 
   And conditionally:
 
+  * ``bits_stored``: :class:`int` - required when `pixel_keyword` is ``"PixelData"``,
+    the number of bits actually used by each pixel in `src`, e.g. 12-bit pixel data
+    (range 0 to 4095) will be contained by 16-bits (range 0 to 65535).
   * ``pixel_representation``: :class:`int` - required when
     `pixel_keyword` is ``"PixelData"``, ``0`` for unsigned integers,
     ``1`` for signed.

@@ -11,6 +11,7 @@ Pixel Data Encoding
    jpeg_ls
    jpeg_2k
    rle_lossless
+   defl_image
 
 
 Encoding plugin information:

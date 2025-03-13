@@ -4,12 +4,16 @@
 from itertools import groupby
 import math
 from struct import pack
+import zlib
 
 from pydicom.pixels.encoders.base import EncodeRunner
-from pydicom.uid import RLELossless
+from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
 
-ENCODER_DEPENDENCIES = {RLELossless: ()}
+ENCODER_DEPENDENCIES = {
+    RLELossless: (),
+    DeflatedImageFrameCompression: (),
+}
 
 
 def is_available(uid: str) -> bool:
@@ -19,7 +23,28 @@ def is_available(uid: str) -> bool:
     return True
 
 
-def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes:
+def _encode_deflated_frame(src: bytes, runner: EncodeRunner) -> bytes:
+    """Use the deflate algorithm to compress `src`.
+
+    Parameters
+    ----------
+    src : bytes
+        A single frame of little-endian ordered image data to be encoded.
+    runner : pydicom.pixels.encoders.base.EncodeRunner
+        The runner managing the encoding process.
+
+    Returns
+    -------
+    bytes
+        A deflate encoded frame.
+    """
+    # TODO: Python 3.11 switch to using zlib.compress() instead
+    enc = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+
+    return b"".join((enc.compress(src), enc.flush()))
+
+
+def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
     """Wrapper for use with the encoder interface.
 
     Parameters
@@ -53,7 +78,7 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes:
     for sample_nr in range(runner.samples_per_pixel):
         for byte_offset in reversed(range(bytes_allocated)):
             idx = byte_offset + bytes_allocated * sample_nr
-            segment = _encode_segment(src[idx::nr_segments], columns)
+            segment = _encode_rle_segment(src[idx::nr_segments], columns)
             rle_data.extend(segment)
             seg_lengths.append(len(segment))
 
@@ -73,7 +98,7 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes:
     return bytes(rle_header + rle_data)
 
 
-def _encode_segment(src: bytes, columns: int) -> bytearray:
+def _encode_rle_segment(src: bytes, columns: int) -> bytearray:
     """Return `src` as an RLE encoded bytearray.
 
     Each row of the image is encoded separately as required by the DICOM
@@ -97,7 +122,7 @@ def _encode_segment(src: bytes, columns: int) -> bytearray:
     """
     out = bytearray()
     for idx in range(0, len(src), columns):
-        out.extend(_encode_row(src[idx : idx + columns]))
+        out.extend(_encode_rle_row(src[idx : idx + columns]))
 
     # Pad odd length data with a trailing 0x00 byte
     out.extend(b"\x00" * (len(out) % 2))
@@ -105,7 +130,7 @@ def _encode_segment(src: bytes, columns: int) -> bytearray:
     return out
 
 
-def _encode_row(src: bytes) -> bytes:
+def _encode_rle_row(src: bytes) -> bytes:
     """Return `src` as RLE encoded bytes.
 
     Parameters

@@ -18,6 +18,7 @@ Pixel Data Encoders (:mod:`pydicom.pixels.encoders`)
    JPEG2000LosslessEncoder
    JPEG2000Encoder
    RLELosslessEncoder
+   DeflatedImageFrameCompressionEncoder
 
 
 Base encoder classes used by all encoders

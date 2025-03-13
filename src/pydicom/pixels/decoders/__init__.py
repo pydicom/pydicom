@@ -17,4 +17,5 @@ from pydicom.pixels.decoders.base import (
     HTJ2KLosslessRPCLDecoder,
     HTJ2KDecoder,
     RLELosslessDecoder,
+    DeflatedImageFrameCompressionDecoder,
 )

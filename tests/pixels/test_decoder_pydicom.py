@@ -1,4 +1,4 @@
-"""Tests for the RLELosslessDecoder and the pydicom RLE plugin."""
+"""Tests for the pydicom plugin decoders."""
 
 from io import BytesIO
 from struct import pack, unpack
@@ -10,7 +10,7 @@ from pydicom.config import debug
 from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.pixels import get_decoder
 from pydicom.pixels.decoders import RLELosslessDecoder
-from pydicom.pixels.decoders.rle import (
+from pydicom.pixels.decoders.native import (
     _rle_parse_header,
     _rle_decode_segment,
     _rle_decode_frame,
@@ -531,7 +531,7 @@ HEADER_DATA = [
 ]
 
 
-class TestParseHeader:
+class TestParseRLEHeader:
     """Tests for _rle_parse_header()."""
 
     def test_invalid_header_length(self):
@@ -561,7 +561,7 @@ class TestParseHeader:
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
-class TestDecodeFrame:
+class TestDecodeRLEFrame:
     """Tests for _rle_decode_frame()."""
 
     def test_unsupported_bits_allocated_raises(self):
@@ -749,7 +749,7 @@ class TestDecodeFrame:
         assert arr[12:].tolist() == [1, 16777216, 65536, 256, 1, 4294967294]
 
 
-class TestDecodeSegment:
+class TestDecodeRLESegment:
     """Tests for _rle_decode_segment().
 
     Using int8
@@ -854,3 +854,7 @@ def test_dataset_decompress():
     assert ds._pixel_array is None
     assert ds._pixel_id == {}
     assert np.array_equal(ds.pixel_array, ref)
+
+
+# Deflated Image Frame Compression
+# See pixels/test_encoders_pydicom.py::TestEncodeDeflatedFrame for decoding tests

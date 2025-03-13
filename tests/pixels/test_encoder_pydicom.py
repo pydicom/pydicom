@@ -15,16 +15,30 @@ from pydicom import dcmread, Dataset
 from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import get_frame
-from pydicom.pixels.encoders import RLELosslessEncoder
+from pydicom.pixels.encoders import (
+    RLELosslessEncoder,
+    DeflatedImageFrameCompressionEncoder,
+)
 from pydicom.pixels.encoders.base import EncodeRunner
-from pydicom.pixels.encoders.native import _encode_frame, _encode_segment, _encode_row
-from pydicom.pixels.decoders.rle import _rle_decode_frame, _rle_decode_segment
-from pydicom.pixels.utils import reshape_pixel_array
-from pydicom.uid import RLELossless
+from pydicom.pixels.encoders.native import (
+    _encode_rle_frame,
+    _encode_rle_segment,
+    _encode_rle_row,
+    _encode_deflated_frame,
+)
+from pydicom.pixels.decoders.native import (
+    _rle_decode_frame,
+    _rle_decode_segment,
+    _deflated_decode_frame,
+)
+from pydicom.pixels.utils import reshape_pixel_array, unpack_bits
+from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
 
 # EXPL: Explicit VR Little Endian
 # RLE: RLE Lossless
+# 1/1-bit, 1 sample/pixel, 1 frame
+EXPL_1_1_1F = get_testdata_file("liver_1frame.dcm")
 # 8/8-bit, 1 sample/pixel, 1 frame
 EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
 RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
@@ -94,18 +108,18 @@ REFERENCE_ENCODE_ROW = [
 ]
 
 
-class TestEncodeRow:
-    """Tests for rle_handler._encode_row."""
+class TestEncodeRLERow:
+    """Tests for _encode_rle_row."""
 
     @pytest.mark.parametrize("src, output", REFERENCE_ENCODE_ROW)
     def test_encode(self, src, output):
         """Test encoding an empty row."""
-        assert output == _encode_row(src)
+        assert output == _encode_rle_row(src)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-class TestEncodeFrame:
-    """Tests for rle_handler._encode_frame."""
+class TestEncodeRLEFrame:
+    """Tests for _encode_rle_frame."""
 
     def setup_method(self):
         """Setup the tests."""
@@ -139,7 +153,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -170,7 +184,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -201,7 +215,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -232,7 +246,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -263,7 +277,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -294,7 +308,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -327,7 +341,7 @@ class TestEncodeFrame:
             r"a maximum of 15 segments in RLE encoded data"
         )
         with pytest.raises(ValueError, match=msg):
-            _encode_frame(arr.tobytes(), runner)
+            _encode_rle_frame(arr.tobytes(), runner)
 
     def test_15_segment(self):
         """Test encoding 15 segments works as expected."""
@@ -346,7 +360,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(arr.tobytes(), runner)
+        encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = (
             b"\x0f\x00\x00\x00"
             b"\x40\x00\x00\x00"
@@ -385,7 +399,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(arr.tobytes(), runner)
+        encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = b"\x01\x00\x00\x00\x40\x00\x00\x00" + b"\x00" * 56
         assert header == encoded[:64]
         assert b"\x04\x00\x01\x02\x03\x04" == encoded[64:]
@@ -406,7 +420,7 @@ class TestEncodeFrame:
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
 
-        encoded = _encode_frame(arr.tobytes(), runner)
+        encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = (
             b"\x03\x00\x00\x00"
             b"\x40\x00\x00\x00"
@@ -435,11 +449,11 @@ class TestEncodeFrame:
 
         msg = r"Unsupported option \"byteorder = '>'\""
         with pytest.raises(ValueError, match=msg):
-            _encode_frame(b"", runner)
+            _encode_rle_frame(b"", runner)
 
 
-class TestEncodeSegment:
-    """Tests for rle_handler._encode_segment."""
+class TestEncodeRLESegment:
+    """Tests for _encode_rle_segment."""
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_one_row(self):
@@ -453,7 +467,7 @@ class TestEncodeSegment:
         # Re-encode a single row of the decoded data
         row = arr[0]
         assert (ds.Columns,) == row.shape
-        encoded = _encode_segment(row.tobytes(), columns=ds.Columns)
+        encoded = _encode_rle_segment(row.tobytes(), columns=ds.Columns)
 
         # Decode the re-encoded data and check that it's the same
         redecoded = _rle_decode_segment(encoded)
@@ -467,9 +481,230 @@ class TestEncodeSegment:
         decoded = _rle_decode_segment(pixel_data[64:])
         assert ds.Rows * ds.Columns == len(decoded)
         # Re-encode the decoded data
-        encoded = _encode_segment(decoded, columns=ds.Columns)
+        encoded = _encode_rle_segment(decoded, columns=ds.Columns)
 
         # Decode the re-encoded data and check that it's the same
         redecoded = _rle_decode_segment(encoded)
         assert ds.Rows * ds.Columns == len(redecoded)
         assert decoded == redecoded
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+class TestEncodeDeflatedFrame:
+    """Tests for _encode_deflated_frame."""
+
+    def setup_method(self):
+        """Setup the tests."""
+        # Create a dataset skeleton for use in the cycle tests
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = "1.2.840.10008.1.2"
+        ds.Rows = 2
+        ds.Columns = 4
+        ds.SamplesPerPixel = 3
+        ds.PlanarConfiguration = 1
+        self.ds = ds
+
+    def test_cycle_1bit_1sample(self):
+        """Test an encode/decode cycle for 1-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_1_1_1F)
+        ref = ds.pixel_array
+        assert 1 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+        # Bit-packed data
+        arr = unpack_bits(decoded)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_8bit_1sample(self):
+        """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_8_1_1F)
+        ref = ds.pixel_array
+        assert 8 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+        arr = np.frombuffer(decoded, "|u1")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_8bit_3sample(self):
+        """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
+        ds = dcmread(EXPL_8_3_1F)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 8
+        assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+
+        # The planar configuration of the decoded data should match the input
+        arr = np.frombuffer(decoded, "|u1")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_16bit_1sample(self):
+        """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_16_1_1F)
+        ref = ds.pixel_array
+        assert 16 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+
+        arr = np.frombuffer(decoded, "<u2")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_16bit_3sample(self):
+        """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
+        ds = dcmread(EXPL_16_3_1F)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 16
+        assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+
+        # The planar configuration of the decoded data should match the input
+        arr = np.frombuffer(decoded, "<u2")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_32bit_1sample(self):
+        """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_32_1_1F)
+        ref = ds.pixel_array
+        assert 32 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+
+        arr = np.frombuffer(decoded, "<u4")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_32bit_3sample(self):
+        """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
+        ds = dcmread(EXPL_32_3_1F)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 32
+        assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": 1,
+            "planar_configuration": ds.PlanarConfiguration,
+        }
+        runner = EncodeRunner(DeflatedImageFrameCompression)
+        runner.set_options(**kwargs)
+
+        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        decoded = _deflated_decode_frame(encoded)
+
+        # The planar configuration of the decoded data should match the input
+        arr = np.frombuffer(decoded, "<u4")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)

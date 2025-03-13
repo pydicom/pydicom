@@ -63,6 +63,7 @@ UID_dictionary = {
     '1.2.840.10008.1.2.7.1': ('SMPTE ST 2110-20 Uncompressed Progressive Active Video', 'Transfer Syntax', '', '', 'SMPTEST211020UncompressedProgressiveActiveVideo'),
     '1.2.840.10008.1.2.7.2': ('SMPTE ST 2110-20 Uncompressed Interlaced Active Video', 'Transfer Syntax', '', '', 'SMPTEST211020UncompressedInterlacedActiveVideo'),
     '1.2.840.10008.1.2.7.3': ('SMPTE ST 2110-30 PCM Digital Audio', 'Transfer Syntax', '', '', 'SMPTEST211030PCMDigitalAudio'),
+    '1.2.840.10008.1.2.8.1': ('Deflated Image Frame Compression', 'Transfer Syntax', '', '', 'DeflatedImageFrameCompression'),
     '1.2.840.10008.1.3.10': ('Media Storage Directory Storage', 'SOP Class', '', '', 'MediaStorageDirectoryStorage'),
     '1.2.840.10008.1.5.1': ('Hot Iron Color Palette SOP Instance', 'Well-known SOP Instance', '', '', 'HotIronPalette'),
     '1.2.840.10008.1.5.2': ('PET Color Palette SOP Instance', 'Well-known SOP Instance', '', '', 'PETPalette'),

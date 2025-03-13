@@ -30,6 +30,7 @@ native and compressed (7FE0,0010) *Pixel Data*, (7FE0,0008) *Float Pixel Data* a
    HTJ2KLosslessRPCLDecoder
    HTJ2KDecoder
    RLELosslessDecoder
+   DeflatedImageFrameCompressionDecoder
 
 
 Base decoder classes used by all decoders

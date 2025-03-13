@@ -6,4 +6,5 @@ from pydicom.pixels.encoders.base import (
     JPEGLSNearLosslessEncoder,
     JPEG2000LosslessEncoder,
     JPEG2000Encoder,
+    DeflatedImageFrameCompressionEncoder,
 )

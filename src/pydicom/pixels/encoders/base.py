@@ -26,6 +26,7 @@ from pydicom.uid import (
     JPEG2000,
     RLELossless,
     JPEGLSTransferSyntaxes,
+    DeflatedImageFrameCompression,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -780,6 +781,7 @@ ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
         ("YBR_FULL", 3, (0,), (8,), range(1, 9)),
         ("RGB", 3, (0,), (8, 16), range(1, 17)),
     ],
+    # DeflatedImageFrameCompression: [],  No defined limitations in PS3.5 8.2.16
 }
 
 # Encoder names should be f"{UID.keyword}Encoder"
@@ -788,7 +790,7 @@ RLELosslessEncoder.add_plugins(
     [
         ("gdcm", ("pydicom.pixels.encoders.gdcm", "encode_pixel_data")),
         ("pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame")),
-        ("pydicom", ("pydicom.pixels.encoders.native", "_encode_frame")),
+        ("pydicom", ("pydicom.pixels.encoders.native", "_encode_rle_frame")),
     ],
 )
 
@@ -812,6 +814,12 @@ JPEG2000Encoder.add_plugin(
     "pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame")
 )
 
+DeflatedImageFrameCompressionEncoder = Encoder(DeflatedImageFrameCompression)
+DeflatedImageFrameCompressionEncoder.add_plugin(
+    "pydicom",
+    ("pydicom.pixels.encoders.native", "_encode_deflated_frame"),
+)
+
 
 # Available pixel data encoders
 _PIXEL_DATA_ENCODERS = {
@@ -821,6 +829,7 @@ _PIXEL_DATA_ENCODERS = {
     JPEGLSNearLossless: (JPEGLSNearLosslessEncoder, "3.0"),
     JPEG2000Lossless: (JPEG2000LosslessEncoder, "3.0"),
     JPEG2000: (JPEG2000Encoder, "3.0"),
+    DeflatedImageFrameCompression: (DeflatedImageFrameCompressionEncoder, "3.1"),
 }
 
 
@@ -876,6 +885,9 @@ def get_encoder(uid: str) -> Encoder:
     | *JPEG 2000*             | 1.2.840.10008.1.2.4.91 | 3.0            |
     +-------------------------+------------------------+----------------+
     | *RLE Lossless*          | 1.2.840.10008.1.2.5    | 2.2            |
+    +-------------------------+------------------------+----------------+
+    | *Deflated Image Frame   | 1.2.840.10008.1.2.5    | 3.1            |
+    | Compression*            |                        |                |
     +-------------------------+------------------------+----------------+
     """
     uid = UID(uid)

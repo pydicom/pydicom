@@ -1946,11 +1946,19 @@ class Dataset:
         |                        |                      | pylibjpeg,| </guides/encoding/rle_lossless>` |
         |                        |                      | gdcm      |                                  |
         +------------------------+----------------------+-----------+----------------------------------+
+        | *Deflated Image Frame  | 1.2.840.10008.1.2.8.1| pydicom   | :doc:`Deflated Image             |
+        | Compression*           |                      |           | </guides/encoding/defl_image>`   |
+        |                        |                      |           |                                  |
+        +------------------------+----------------------+-----------+----------------------------------+
 
         .. versionchanged:: 3.0
 
             Added the `jls_error`, `j2k_cr`, `j2k_psnr` and `generate_instance_uid`
             keyword parameters.
+
+        .. versionchanged:: 3.1
+
+            Added support for *Deflated Image Frame Compression*
 
         Examples
         --------

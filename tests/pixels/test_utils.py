@@ -25,8 +25,8 @@ from pydicom.pixels import pixel_array, iter_pixels, convert_color_space
 from pydicom.pixels.decoders.base import _PIXEL_DATA_DECODERS
 from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.encoders.base import EncodeRunner
-from pydicom.pixels.encoders.native import _encode_frame
-from pydicom.pixels.decoders.rle import _rle_decode_frame
+from pydicom.pixels.encoders.native import _encode_rle_frame
+from pydicom.pixels.decoders.native import _rle_decode_frame
 from pydicom.pixels.utils import (
     as_pixel_options,
     _passes_version_check,
@@ -58,6 +58,7 @@ from pydicom.uid import (
     JPEGLSLossless,
     UID,
     MPEG2MPHLF,
+    DeflatedImageFrameCompression,
 )
 
 from .pixels_reference import (
@@ -1737,6 +1738,37 @@ class TestCompressJ2K:
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
 
+class TestCompressDeflated:
+    """Tests for compress() with Deflated Image Frame Compression"""
+
+    def test_compress_bytes(self):
+        """Test compressing a dataset."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OW"
+        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert len(ds.PixelData) == 22288
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_compress_arr(self):
+        """Test compressing using pixel data from an arr."""
+        ds = dcmread(EXPL_16_16_1F.path)
+        assert hasattr(ds, "file_meta")
+        ref = ds.pixel_array
+        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert np.array_equal(ds.pixel_array, ref)
+
+
 @pytest.fixture()
 def add_dummy_decoder():
     """Add a dummy decoder to the pixel data decoders"""
@@ -2525,7 +2557,7 @@ class TestConvertRLEEndianness:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
-        encoded = _encode_frame(ds.PixelData, runner)
+        encoded = _encode_rle_frame(ds.PixelData, runner)
 
         # Only the header should be changed
         converted = _convert_rle_endianness(encoded, 1, ">")
@@ -2556,7 +2588,7 @@ class TestConvertRLEEndianness:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
-        encoded = _encode_frame(ref.tobytes(), runner)
+        encoded = _encode_rle_frame(ref.tobytes(), runner)
 
         # Original encoded lengths are 4454, 16840, 3600, 16840, 4428, 16840
         header = unpack("<16L", encoded[:64])
