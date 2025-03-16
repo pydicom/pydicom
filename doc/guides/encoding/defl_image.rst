@@ -81,3 +81,5 @@ Compressing grayscale pixel data in-place:
     >>> ds.PixelRepresentation
     1
     >>> ds.compress(DeflatedImageFrameCompression)
+    >>> len(ds.PixelData)
+    22288

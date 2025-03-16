@@ -318,7 +318,7 @@ Deflated Image Frame Compression is a lossless compression method based on the
 `Deflate algorithm <https://en.wikipedia.org/wiki/Deflate>`_ and `RFC 1951
 <https://datatracker.ietf.org/doc/html/rfc1951>`_. The format was introduced in the
 2025a version of the DICOM Standard and so may not be well supported by
-third-party applications. While its primarily intended to provide a good
+third-party applications. While it's primarily intended to provide a good
 compression method for single-bit segmentation data, there are no restrictions on its
 use with other data.
 
