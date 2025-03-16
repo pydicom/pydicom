@@ -5,13 +5,17 @@ This module is not intended to be used directly.
 """
 
 from struct import unpack
+import zlib
 
 from pydicom.misc import warn_and_log
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.uid import RLELossless
+from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
 
-DECODER_DEPENDENCIES = {RLELossless: ()}
+DECODER_DEPENDENCIES = {
+    RLELossless: (),
+    DeflatedImageFrameCompression: (),
+}
 
 
 def is_available(uid: str) -> bool:
@@ -27,9 +31,8 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     Parameters
     ----------
     src : bytes
-        A single frame of RLE encoded data.
+        A single frame of RLE or Deflate encoded data.
     runner : pydicom.pixels.decoders.base.DecodeRunner
-
 
         Required parameters:
 
@@ -40,7 +43,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
 
         Optional parameters:
 
-        * `rle_segment_order`: str, "<" for little endian segment order, or
+        * RLE: `rle_segment_order`: str, "<" for little endian segment order, or
           ">" for big endian (default)
 
     Returns
@@ -48,19 +51,39 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     bytearray
         The decoded frame, ordered as planar configuration 1.
     """
-    frame = _rle_decode_frame(
-        src,
-        runner.rows,
-        runner.columns,
-        runner.samples_per_pixel,
-        runner.bits_allocated,
-        runner.get_option("rle_segment_order", ">"),
-    )
-    # Update the runner options to ensure the reshaping is correct
-    # Only do this if we successfully decoded the frame
-    runner.set_option("planar_configuration", 1)
+    if runner.transfer_syntax == RLELossless:
+        frame = _rle_decode_frame(
+            src,
+            runner.rows,
+            runner.columns,
+            runner.samples_per_pixel,
+            runner.bits_allocated,
+            runner.get_option("rle_segment_order", ">"),
+        )
 
-    return frame
+        # Update the runner options to ensure the reshaping is correct
+        # Only do this if we successfully decoded the frame
+        runner.set_option("planar_configuration", 1)
+
+        return frame
+
+    return _deflated_decode_frame(src)
+
+
+def _deflated_decode_frame(src: bytes) -> bytearray:
+    """Decode a single frame of deflate encoded data.
+
+    Parameters
+    ----------
+    src : bytes
+        A single frame of deflate encoded data.
+
+    Returns
+    -------
+    bytearray
+        The decoded frame.
+    """
+    return bytearray(zlib.decompress(src, wbits=-zlib.MAX_WBITS))
 
 
 def _rle_decode_frame(
