@@ -74,6 +74,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="rle_lossless.html">RLE Lossless Encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="defl_image.html">Deflated Image Frame Compression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugin_options.html">Encoder Plugins Options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugins.html">Pixel Data Encoder Plugins</a></li>
 </ul>
@@ -399,7 +400,7 @@ left to right:</p>
 
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEG2000</span><span class="p">,</span> <span class="n">j2k_cr</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">])</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>  <span class="c1"># ~1582</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~1582</span>
 </pre></div>
 </div>
 </section>

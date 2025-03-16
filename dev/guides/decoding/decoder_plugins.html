@@ -186,9 +186,6 @@ pixel, e.g. 1 for grayscale images or 3 for RGB.</p></li>
 contained in <cite>src</cite></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bits_allocated</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain
 each pixel in <cite>src</cite>, should be a multiple of 8.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bits_stored</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits actually used by
-each pixel in <cite>src</cite>, e.g. 12-bit pixel data (range 0 to 4095) will be
-contained by 16-bits (range 0 to 65535).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">photometric_interpretation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the color space
 of the encoded data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pixel_keyword</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - one of <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;FloatPixelData&quot;</span></code>,
@@ -196,6 +193,9 @@ of the encoded data, such as <code class="docutils literal notranslate"><span cl
 </ul>
 <p>And conditionally:</p>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bits_stored</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>,
+the number of bits actually used by each pixel in <cite>src</cite>, e.g. 12-bit pixel data
+(range 0 to 4095) will be contained by 16-bits (range 0 to 65535).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pixel_representation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when
 <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code> for unsigned integers,
 <code class="docutils literal notranslate"><span class="pre">1</span></code> for signed.</p></li>

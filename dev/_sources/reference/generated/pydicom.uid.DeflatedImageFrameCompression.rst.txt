@@ -1,0 +1,6 @@
+﻿pydicom.uid.DeflatedImageFrameCompression
+=========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DeflatedImageFrameCompression

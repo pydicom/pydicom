@@ -148,6 +148,7 @@ pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg<span class="
 <li><p><em>JPEG 2000 Lossless</em> and <em>JPEG 2000</em> compression with <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> and <a class="reference external" href="https://github.com/pydicom/pylibjpeg-openjpeg">pylibjpeg-openjpeg</a>.</p></li>
 <li><p><em>RLE Lossless</em>, which doesn’t need any additional packages but can be sped up
 if <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> and <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> are available.</p></li>
+<li><p><em>Deflated Image Frame Compression</em>, which also doesn’t need any additional packages.</p></li>
 </ul>
 <p>For all other transfer syntaxes it’s entirely up to you to compress the <em>Pixel
 Data</em> in a manner conformant to the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">requirements of the DICOM Standard</a>:</p>
@@ -378,6 +379,22 @@ tutorial, but whatever you end up selecting should be thoroughly tested with a
 representative sample of expected pixel data.</p>
 <p>More information on performing compression with JPEG 2000 can be found in
 the <a class="reference internal" href="../../guides/encoding/jpeg_2k.html"><span class="doc">JPEG 2000 encoding guide</span></a>.</p>
+</section>
+<section id="compressing-with-deflated-image-frame-compression">
+<h3>Compressing with Deflated Image Frame Compression<a class="headerlink" href="#compressing-with-deflated-image-frame-compression" title="Link to this heading">¶</a></h3>
+<p>Deflated Image Frame Compression is a lossless compression method based on the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Deflate">Deflate algorithm</a> and <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1951">RFC 1951</a>. The format was introduced in the
+2025a version of the DICOM Standard and so may not be well supported by
+third-party applications. While it’s primarily intended to provide a good
+compression method for single-bit segmentation data, there are no restrictions on its
+use with other data.</p>
+<p>As with the other lossless compression methods its use is straightforward:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeflatedImageFrameCompression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">DeflatedImageFrameCompression</span><span class="p">)</span>
+</pre></div>
+</div>
 <section id="encapsulating-data-compressed-by-third-party-packages">
 <h4>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Link to this heading">¶</a></h4>
 <p>You can also use <em>pydicom</em> with third-party compression packages to encapsulate

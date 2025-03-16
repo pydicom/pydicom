@@ -116,6 +116,8 @@ Compressing grayscale pixel data in-place:
     >>> ds.PixelRepresentation
     1
     >>> ds.compress(RLELossless)
+    >>> len(ds.PixelData)
+    21020
 
 Compressing RGB pixel data in-place:
 

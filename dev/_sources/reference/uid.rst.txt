@@ -55,6 +55,7 @@ Transfer Syntax UIDs
    SMPTEST211020UncompressedProgressiveActiveVideo
    SMPTEST211020UncompressedInterlacedActiveVideo
    SMPTEST211030PCMDigitalAudio
+   DeflatedImageFrameCompression
 
 
 Transfer Syntax Lists

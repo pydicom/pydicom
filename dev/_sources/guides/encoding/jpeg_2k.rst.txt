@@ -265,7 +265,7 @@ Lossy compression of signed greyscale pixel data:
 
     ds.compress(JPEG2000, j2k_cr=[20])
 
-    print(ds.PixelData)  # ~1582
+    print(len(ds.PixelData))  # ~1582
 
 
 Available Plugins

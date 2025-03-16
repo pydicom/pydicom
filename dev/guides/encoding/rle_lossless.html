@@ -28,7 +28,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Encoder Plugins Options" href="encoder_plugin_options.html" />
+    <link rel="next" title="Deflated Image Frame Compression" href="defl_image.html" />
     <link rel="prev" title="JPEG 2000 Encoding" href="jpeg_2k.html" /> 
 </head>
 
@@ -74,6 +74,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="defl_image.html">Deflated Image Frame Compression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugin_options.html">Encoder Plugins Options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="encoder_plugins.html">Pixel Data Encoder Plugins</a></li>
 </ul>
@@ -269,6 +270,8 @@ usage of your dataset in mind.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+<span class="go">21020</span>
 </pre></div>
 </div>
 <p>Compressing RGB pixel data in-place:</p>
@@ -313,7 +316,7 @@ new <em>SOP Instance UID</em>:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="jpeg_2k.html" class="btn btn-neutral float-left" title="JPEG 2000 Encoding" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="encoder_plugin_options.html" class="btn btn-neutral float-right" title="Encoder Plugins Options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="defl_image.html" class="btn btn-neutral float-right" title="Deflated Image Frame Compression" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -42,6 +42,7 @@ Compression of *Pixel Data*
 * *RLE Lossless*, which doesn't need any additional packages but can be sped up
   if `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ and `pylibjpeg-rle
   <https://github.com/pydicom/pylibjpeg-rle>`_ are available.
+* *Deflated Image Frame Compression*, which also doesn't need any additional packages.
 
 For all other transfer syntaxes it's entirely up to you to compress the *Pixel
 Data* in a manner conformant to the :dcm:`requirements of the DICOM Standard
@@ -309,6 +310,24 @@ representative sample of expected pixel data.
 
 More information on performing compression with JPEG 2000 can be found in
 the :doc:`JPEG 2000 encoding guide</guides/encoding/jpeg_2k>`.
+
+Compressing with Deflated Image Frame Compression
+-------------------------------------------------
+
+Deflated Image Frame Compression is a lossless compression method based on the
+`Deflate algorithm <https://en.wikipedia.org/wiki/Deflate>`_ and `RFC 1951
+<https://datatracker.ietf.org/doc/html/rfc1951>`_. The format was introduced in the
+2025a version of the DICOM Standard and so may not be well supported by
+third-party applications. While it's primarily intended to provide a good
+compression method for single-bit segmentation data, there are no restrictions on its
+use with other data.
+
+As with the other lossless compression methods its use is straightforward::
+
+    >>> from pydicom import examples
+    >>> from pydicom.uid import DeflatedImageFrameCompression
+    >>> ds = examples.ct
+    >>> ds.compress(DeflatedImageFrameCompression)
 
 
 Encapsulating data compressed by third-party packages

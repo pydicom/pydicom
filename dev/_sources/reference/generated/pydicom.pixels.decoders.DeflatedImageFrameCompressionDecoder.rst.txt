@@ -1,0 +1,6 @@
+﻿pydicom.pixels.decoders.DeflatedImageFrameCompressionDecoder
+============================================================
+
+.. currentmodule:: pydicom.pixels.decoders
+
+.. autodata:: DeflatedImageFrameCompressionDecoder
