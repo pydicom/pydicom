@@ -32,7 +32,7 @@ with the *Pixel Data* see the :doc:`glossary of Image Pixel elements<../glossary
 | *Samples   | *Photometric          | *Pixel          | *Planar        | *Bits      | *Bits   |
 | per Pixel* | Interpretation*       | Representation* | Configuration* | Allocated* | Stored* |
 +============+=======================+=================+================+============+=========+
-| 1          | MONOCHROME1           | 0 or 1          | (absent)       | 8, 16, 24, | 1 to 38 |
+| 1          | MONOCHROME1           | 0 or 1          | (absent)       | 1, 8, 16,  | 1 to 38 |
 |            +-----------------------+                 |                | 32 or 40   |         |
 |            | MONOCHROME2           |                 |                |            |         |
 |            +-----------------------+-----------------+----------------+------------+---------+
