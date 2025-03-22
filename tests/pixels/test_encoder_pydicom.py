@@ -525,7 +525,9 @@ class TestEncodeDeflatedFrame:
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
 
-        encoded = _encode_deflated_frame(ds.PixelData, runner)
+        # Unpack pixel data before passing to encode function
+        unpacked_pixel_data = unpack_bits(ds.PixelData, as_array=False)
+        encoded = _encode_deflated_frame(unpacked_pixel_data, runner)
         decoded = _deflated_decode_frame(encoded)
         # Bit-packed data
         arr = unpack_bits(decoded)
