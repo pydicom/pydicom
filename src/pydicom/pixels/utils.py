@@ -1286,6 +1286,66 @@ def iter_pixels(
             f.seek(file_offset)
 
 
+def _pack_bits_builtin(src: "bytes | bytearray", pad: bool = True) -> bytearray:
+    """Pack a binary array of bytes for use with *Pixel Data*, without numpy.
+
+    Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
+
+    This implementation uses pure python objects and functions in contrast to
+    the `pack_bits` function, which relies on NumPy. `pack_bits` should
+    be preferred whenever NumPy is installed, as it is much more efficient.
+
+    Parameters
+    ----------
+    arr : bytes | bytearray
+        The `bytes`, or `bytesarray` containing 1-bit data as bytes. Each byte
+        represents a pixel and must have a value of either 0 or 1 (i.e.
+        `b'\x00'` or `b'\x01'`). For `bytes` or `bytesarray`, pixels should be
+        ordered such that column index changes most frequently, then row index,
+        then frame index.
+    pad : bool, optional
+        If ``True`` (default) then add a null byte to the end of the packed
+        data to ensure even length, otherwise no padding will be added.
+
+    Returns
+    -------
+    bytearray
+        The bit packed data.
+
+    Raises
+    ------
+    ValueError
+        If `arr` contains anything other than 0 or 1.
+
+    References
+    ----------
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
+    """
+    out_array = bytearray()
+    for offset in range(0, len(src), 8):
+        packed_int = 0
+        for i in range(8):
+            byte_index = offset + i
+            if byte_index >= len(src):
+                break
+            b = src[byte_index]
+            if b == 1:
+                packed_int |= 1 << i
+            elif b != 0:
+                raise ValueError(
+                    "Only binary arrays (containing ones or zeroes) " "can be packed."
+                )
+
+        out_array.append(packed_int)
+
+    if pad and len(out_array) % 2 == 1:
+        out_array.append(0)
+
+    return out_array
+
+
 def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
     """Pack a binary :class:`numpy.ndarray` or bytes for use with *Pixel Data*.
 
@@ -1303,8 +1363,8 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
 
     Parameters
     ----------
-    arr : numpy.ndarray | bytes
-        The :class:`numpy.ndarray`, `bytes`, or `bytesarray` containing 1-bit
+    arr : numpy.ndarray | bytes | bytearray
+        The :class:`numpy.ndarray`, `bytes`, or `bytearray` containing 1-bit
         data as ints/bytes. If it is a :class:`numpy.ndarray`, `arr` must only
         contain integer values of 0 and 1 and must have an 'uint'  or 'int'
         :class:`numpy.dtype`. If it is a `bytes` or `bytesarray`, each byte
@@ -1346,28 +1406,7 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
             arr = np.frombuffer(arr, dtype=np.uint8)
         else:
             # Fallback for when numpy is not installed (slower)
-            out_array = bytearray()
-            for offset in range(0, len(arr), 8):
-                packed_int = 0
-                for i in range(8):
-                    byte_index = offset + i
-                    if byte_index >= len(arr):
-                        break
-                    b = arr[byte_index]
-                    if b not in (0, 1):
-                        raise ValueError(
-                            "Only binary arrays (containing ones or zeroes) "
-                            "can be packed."
-                        )
-                    if b == 1:
-                        packed_int |= 1 << i
-
-                out_array.append(packed_int)
-
-            if pad and len(out_array) % 2 == 1:
-                out_array.append(0)
-
-            return bytes(out_array)
+            return bytes(_pack_bits_builtin(arr, pad=pad))
 
     if arr.shape == (0,):
         return b""
