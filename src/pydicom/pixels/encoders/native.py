@@ -71,7 +71,7 @@ def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
         raise ValueError("Unsupported option \"byteorder = '>'\"")
 
     # In the case of single bit images, the data must first be bit-packed
-    # before being encoded with Deflate
+    # before being encoded with RLE
     if runner.get_option("bits_allocated") == 1:
         src = pack_bits(src)
 
