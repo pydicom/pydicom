@@ -4,6 +4,7 @@
 This module is not intended to be used directly.
 """
 
+import math
 from struct import unpack
 import zlib
 
@@ -70,7 +71,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
 
     # Unpack bit-packed data
     if runner.bits_allocated == 1:
-        frame = bytearray(unpack_bits(frame))
+        frame = bytearray(unpack_bits(frame, as_array=False))
 
     return frame
 
@@ -139,7 +140,7 @@ def _rle_decode_frame(
     # Check that the actual number of segments is as expected
     if nr_bits == 1:
         if nr_samples != 1:
-            raise ValueError(
+            raise NotImplementedError(
                 "Cannot decode RLE pixel data with Bits Allocated = 1 "
                 "and SamplesPerPixel > 1."
             )
@@ -150,7 +151,7 @@ def _rle_decode_frame(
         # Since there can only be one segment, the length of the segment, the
         # stride and total decoded length are all the same, and equal to the
         # decoded length n bytes of the bit-packed array
-        decoded_segment_length = (rows * columns - 1) // 8 + 1
+        decoded_segment_length = math.ceil(rows * columns / 8)
         decoded_total_length = decoded_segment_length
 
         # `stride` is the total number of bytes of each sample plane

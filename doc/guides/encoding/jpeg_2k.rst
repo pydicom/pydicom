@@ -33,8 +33,8 @@ with the *Pixel Data* see the :doc:`glossary of Image Pixel elements<../glossary
 | per Pixel* | Interpretation*       | Representation* | Configuration* | Allocated* | Stored* |
 +============+=======================+=================+================+============+=========+
 | 1          | MONOCHROME1           | 0 or 1          | (absent)       | 1, 8, 16,  | 1 to 38 |
-|            +-----------------------+                 |                | 32 or 40   |         |
-|            | MONOCHROME2           |                 |                |            |         |
+|            +-----------------------+                 |                | 24, 32     |         |
+|            | MONOCHROME2           |                 |                | or 40      |         |
 |            +-----------------------+-----------------+----------------+------------+---------+
 |            | PALETTE COLOR :sup:`1`| 0               | (absent)       | 8 or 16    | 1 to 16 |
 +------------+-----------------------+-----------------+----------------+------------+---------+
