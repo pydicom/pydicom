@@ -8,6 +8,7 @@ import math
 import io
 import platform
 import re
+import struct
 import tempfile
 
 import pytest
@@ -34,8 +35,14 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from .test_util import save_private_dict
 from pydicom.uid import UID
-from pydicom.valuerep import BUFFERABLE_VRS, DSfloat, validate_value
-
+from pydicom.valuerep import (
+    BUFFERABLE_VRS,
+    DSfloat,
+    validate_value,
+    STR_VR,
+    ALLOW_BACKSLASH,
+    VR,
+)
 
 IS_WINDOWS = platform.system() == "Windows"
 
@@ -648,6 +655,39 @@ class TestRawDataElement:
         raw = RawDataElement(Tag(0x00080000), "AA", 8, b"20170101", 0, False, True)
         with pytest.raises(NotImplementedError):
             convert_raw_data_element(raw, encoding=default_encoding)
+
+    @pytest.mark.parametrize("vr", STR_VR - ALLOW_BACKSLASH - {VR.UR})
+    def test_multi_value_from_string_vr(self, vr):
+        """The value of multi-valued strings is of type MultiValue"""
+        raw = RawDataElement(Tag(0x00090001), vr, 8, b"42\\43 ", 0, False, True)
+        value = convert_raw_data_element(raw).value
+        assert isinstance(value, MultiValue)
+        assert len(value), 2
+        assert value == ["42", "43"]
+
+    @pytest.mark.parametrize(
+        "vr, dtype",
+        (
+            (VR.US, "H"),
+            (VR.SS, "h"),
+            (VR.UL, "I"),
+            (VR.SL, "i"),
+            (VR.UV, "Q"),
+            (VR.SV, "q"),
+            (VR.FL, "f"),
+            (VR.FD, "d"),
+        ),
+    )
+    def test_multi_value_from_numeric_vr(self, vr, dtype):
+        """The value of multi-valued numerical values is of type MultiValue"""
+        byte_data = struct.pack(f"<{dtype}", 42) * 2
+        raw = RawDataElement(
+            Tag(0x00090001), vr, len(byte_data), byte_data, 0, False, True
+        )
+        value = convert_raw_data_element(raw).value
+        assert isinstance(value, MultiValue)
+        assert len(value), 2
+        assert value == [42, 42]
 
     @pytest.fixture
     def accept_wrong_length(self, request):

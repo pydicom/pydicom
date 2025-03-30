@@ -7,6 +7,7 @@ from pydicom import config
 from pydicom.datadict import dictionary_VR, private_dictionary_VR
 from pydicom.errors import BytesLengthException
 from pydicom.misc import warn_and_log
+from pydicom.multival import MultiValue
 from pydicom.tag import BaseTag, _LUT_DESCRIPTOR_TAGS
 from pydicom.valuerep import VR
 
@@ -264,7 +265,7 @@ def raw_element_value(
 
     if raw.tag in _LUT_DESCRIPTOR_TAGS:
         # We only fix the first value as the third value is 8 or 16
-        if value and isinstance(value, list):
+        if value and isinstance(value, MultiValue):
             try:
                 if value[0] < 0:
                     value[0] += 65536

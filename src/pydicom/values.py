@@ -432,7 +432,7 @@ def convert_numbers(
         return value[0]
 
     # convert from tuple to a list so can modify if need to
-    return list(value)
+    return MultiValue(type(value[0]), value)
 
 
 def convert_OBvalue(
