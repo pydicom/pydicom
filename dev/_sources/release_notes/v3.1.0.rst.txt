@@ -22,6 +22,8 @@ Fixes
   *LUT Descriptor* and *Red Palette Color LUT Descriptor* (:issue:`2160`).
 * Fixed :meth:`~pydicom.dataset.Dataset.decompress` and :meth:`~pydicom.dataset.Dataset.compress`
   changing the *SOP Instance UID* when not required (:issue:`2171`).
+* Make sure the value of multi-valued tags is always returned as an instance of
+  :class:`~pydicom.multival.MultiValue`.
 
 Enhancements
 ------------

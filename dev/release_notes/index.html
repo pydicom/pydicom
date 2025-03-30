@@ -267,6 +267,8 @@ are not aligned with byte boundaries (<a class="extlink-issue reference external
 <em>LUT Descriptor</em> and <em>Red Palette Color LUT Descriptor</em> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2160">#2160</a>).</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> and <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a>
 changing the <em>SOP Instance UID</em> when not required (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2171">#2171</a>).</p></li>
+<li><p>Make sure the value of multi-valued tags is always returned as an instance of
+<a class="reference internal" href="../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a>.</p></li>
 </ul>
 </section>
 <section id="enhancements">
