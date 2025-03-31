@@ -14,6 +14,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.pixels.common import Buffer, RunnerBase, CoderBase, RunnerOptions
+from pydicom.pixels.utils import unpack_bits
 from pydicom.uid import (
     UID,
     JPEGBaseline8Bit,
@@ -91,6 +92,7 @@ class EncodeRunner(RunnerBase):
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword", "byteorder")
         self._encoders: dict[str, EncodeFunction] = {}
+        self._src_unpacked = False
 
     def encode(self, index: int | None) -> bytes:
         """Return an encoded frame of pixel data as :class:`bytes`.
@@ -180,7 +182,17 @@ class EncodeRunner(RunnerBase):
         #    8 < precision <= 16: a 16-bit container (short)
         #   16 < precision <= 32: a 32-bit container (int/long)
         #   32 < precision <= 64: a 64-bit container (long long)
-        bytes_per_frame = cast(int, self.frame_length(unit="bytes"))
+        if self.bits_allocated == 1:
+
+            if self._src_type in ("Dataset", "Buffer") and not self._src_unpacked:
+                # Unpack the packed bits
+                self._src = unpack_bits(self._src, as_array=False)
+                self._src_unpacked = True
+
+            # Bytes have already been unpacked to give 1 byte per pixel
+            bytes_per_frame = cast(int, self.frame_length(unit="pixels"))
+        else:
+            bytes_per_frame = cast(int, self.frame_length(unit="bytes"))
         start = 0 if index is None else index * bytes_per_frame
         src = cast(bytes, self.src[start : start + bytes_per_frame])
 
@@ -295,6 +307,8 @@ class EncodeRunner(RunnerBase):
                 "'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
                 f"not '{src.__class__.__name__}'"
             )
+
+        self._src_unpacked = False
 
     @property
     def src(self) -> "Buffer | np.ndarray":
@@ -425,8 +439,12 @@ class EncodeRunner(RunnerBase):
     def _validate_buffer(self) -> None:
         """Validate the supplied pixel data buffer."""
         # Check the length is at least as long as required
-        length_bytes = self.frame_length(unit="bytes")
-        expected = length_bytes * self.number_of_frames
+        if self.bits_allocated == 1:
+            expected = self.frame_length(unit="pixels") / 8
+        else:
+            length_bytes = self.frame_length(unit="bytes")
+            expected = length_bytes * self.number_of_frames
+
         if (actual := len(self.src)) < expected:
             raise ValueError(
                 "The length of the uncompressed pixel data doesn't match the "
@@ -760,23 +778,23 @@ ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
         ("RGB", 3, (0,), (8, 16), range(2, 17)),
     ],
     JPEG2000Lossless: [  # 1.2.840.10008.1.2.4.90: Table 8.2.4-1 in PS3.5
-        ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME1", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME2", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
         ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
         ("YBR_RCT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
     ],
     JPEG2000: [  # 1.2.840.10008.1.2.4.91: Table 8.2.4-1 in PS3.5
-        ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME1", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME2", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_ICT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
     ],
     RLELossless: [  # 1.2.840.10008.1.2.5: Table 8.2.2-1 in PS3.5
-        ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
-        ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
+        ("MONOCHROME1", 1, (0, 1), (1, 8, 16), range(1, 17)),
+        ("MONOCHROME2", 1, (0, 1), (1, 8, 16), range(1, 17)),
         ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
         ("YBR_FULL", 3, (0,), (8,), range(1, 9)),
         ("RGB", 3, (0,), (8, 16), range(1, 17)),

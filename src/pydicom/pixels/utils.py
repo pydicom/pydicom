@@ -69,6 +69,9 @@ _PIXEL_KEYWORDS = {
 _UNPACK_LUT: dict[int, bytes] = {
     k: bytes(int(s) for s in reversed(f"{k:08b}")) for k in range(256)
 }
+_PACK_LUT: dict[bytes, bytes] = {
+    v: k.to_bytes(length=1, byteorder="little") for k, v in _UNPACK_LUT.items()
+}
 
 # JPEG/JPEG-LS SOF markers
 _SOF = {
@@ -681,6 +684,9 @@ def decompress(
     elem.is_undefined_length = False
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
 
+    if ds.BitsAllocated == 1:
+        elem.value = pack_bits(elem.value)
+
     # Update the transfer syntax
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
@@ -1283,8 +1289,8 @@ def iter_pixels(
             f.seek(file_offset)
 
 
-def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
-    """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
+def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
+    """Pack a binary :class:`numpy.ndarray` or bytes for use with *Pixel Data*.
 
     Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
 
@@ -1293,17 +1299,27 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
         Added the `pad` keyword parameter and changed to allow `arr` to be
         2 or 3D.
 
+    .. versionchanged:: 3.1
+
+        Allow packing of bytes and bytearray objects when numpy is not
+        installed.
+
     Parameters
     ----------
-    arr : numpy.ndarray
-        The :class:`numpy.ndarray` containing 1-bit data as ints. `arr` must
-        only contain integer values of 0 and 1 and must have an 'uint'  or
-        'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
+    arr : numpy.ndarray | bytes | bytearray
+        The :class:`numpy.ndarray`, `bytes`, or `bytearray` containing 1-bit
+        data as ints/bytes. If it is a :class:`numpy.ndarray`, `arr` must only
+        contain integer values of 0 and 1 and must have an 'uint'  or 'int'
+        :class:`numpy.dtype`. If it is a `bytes` or `bytearray`, each byte
+        represents a pixel and must have a value of either 0 or 1 (i.e.
+        `b'\x00'` or `b'\x01'`). For the sake of efficiency it's recommended
         that the length of `arr` be a multiple of 8 (i.e. that any empty
-        bit-padding to round out the byte has already been added). The input
-        `arr` should either be shaped as (rows, columns) or (frames, rows,
-        columns) or the equivalent 1D array used to ensure that the packed
-        data is in the correct order.
+        bit-padding to round out the byte has already been added). For arrays,
+        the input `arr` should either be shaped as (rows, columns) or (frames,
+        rows, columns) or the equivalent 1D array used to ensure that the
+        packed data is in the correct order. For `bytes` or `bytearray`,
+        pixels should be ordered in the same order as a 1D array, i.e. column
+        index changes most frequently, then row index, then frame index.
     pad : bool, optional
         If ``True`` (default) then add a null byte to the end of the packed
         data to ensure even length, otherwise no padding will be added.
@@ -1324,6 +1340,35 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
     :dcm:`Annex D<part05/chapter_D.html>`
     """
+    if isinstance(arr, bytes | bytearray):
+        if len(arr) == 0:
+            return b""
+
+        if HAVE_NP:
+            # Form an array because the numpy implementation is more efficient
+            arr = np.frombuffer(arr, dtype=np.uint8)
+        else:
+            # Fallback for when numpy is not installed (slower)
+
+            # Pad with zeros to ensure output has length that is multiple of
+            # two bytes
+            if remainder := len(arr) % 16:
+                arr += b"\x00" * (16 - remainder)
+
+            try:
+                out = b"".join(
+                    map(
+                        _PACK_LUT.__getitem__,
+                        (arr[i : i + 8] for i in range(0, len(arr), 8)),
+                    )
+                )
+            except KeyError:
+                raise ValueError(
+                    "Only binary arrays (containing ones or zeroes) can be packed."
+                )
+
+            return out
+
     if arr.shape == (0,):
         return b""
 
