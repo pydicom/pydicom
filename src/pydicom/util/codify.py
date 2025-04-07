@@ -316,7 +316,7 @@ def code_dataset(
         if dataelem.VR == VR.SQ:
             lines.append("")
     # If sequence was end of this dataset, remove the extra blank line
-    if len(lines) and lines[-1] == "":
+    if lines and lines[-1] == "":
         lines.pop()
 
     # Join all the code lines and return them
