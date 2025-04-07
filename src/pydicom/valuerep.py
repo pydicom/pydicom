@@ -1452,7 +1452,7 @@ def _decode_personname(
     comps = [decode_bytes(c, encodings, PN_DELIMS) for c in components]
 
     # Remove empty elements from the end to avoid trailing '='
-    while len(comps) and not comps[-1]:
+    while comps and not comps[-1]:
         comps.pop()
 
     return tuple(comps)
@@ -1485,7 +1485,7 @@ def _encode_personname(components: Sequence[str], encodings: Sequence[str]) -> b
         encoded_comps.append(encoded_comp)
 
     # Remove empty elements from the end
-    while len(encoded_comps) and not encoded_comps[-1]:
+    while encoded_comps and not encoded_comps[-1]:
         encoded_comps.pop()
     return b"=".join(encoded_comps)
 
@@ -1496,7 +1496,7 @@ class PersonName:
     def __new__(  # type: ignore[misc]
         cls: type["PersonName"], *args: Any, **kwargs: Any
     ) -> Optional["PersonName"]:
-        if len(args) and args[0] is None:
+        if args and args[0] is None:
             return None
 
         return super().__new__(cls)
