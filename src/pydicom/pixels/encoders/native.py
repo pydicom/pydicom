@@ -42,8 +42,10 @@ def _encode_deflated_frame(src: bytes, runner: EncodeRunner) -> bytes:
     """
     # In the case of single bit images, the data must first be bit-packed
     # before being encoded with Deflate
-    if runner.get_option("bits_allocated") == 1:
-        src = pack_bits(src)
+    if runner.get_option("bits_allocated") == 1 and not runner.get_option(
+        "is_bitpacked", False
+    ):
+        src = pack_bits(src, pad=False)
 
     # TODO: Python 3.11 switch to using zlib.compress() instead
     enc = zlib.compressobj(wbits=-zlib.MAX_WBITS)
@@ -72,8 +74,10 @@ def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
 
     # In the case of single bit images, the data must first be bit-packed
     # before being encoded with RLE
-    if runner.get_option("bits_allocated") == 1:
-        src = pack_bits(src)
+    if runner.get_option("bits_allocated") == 1 and not runner.get_option(
+        "is_bitpacked", False
+    ):
+        src = pack_bits(src, pad=False)
 
     bytes_allocated = math.ceil(runner.bits_allocated / 8)
 

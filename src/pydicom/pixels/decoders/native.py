@@ -10,7 +10,6 @@ import zlib
 
 from pydicom.misc import warn_and_log
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.utils import unpack_bits
 from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
 
@@ -69,9 +68,9 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     else:
         frame = _deflated_decode_frame(src)
 
-    # Unpack bit-packed data
+    # Signal that single bit data is represented in bit-packed form
     if runner.bits_allocated == 1:
-        frame = bytearray(unpack_bits(frame, as_array=False))
+        runner.set_option("is_bitpacked", True)
 
     return frame
 

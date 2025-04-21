@@ -28,7 +28,10 @@ from pydicom.pixels.common import (
 from pydicom.pixels.processing import convert_color_space
 from pydicom.pixels.utils import (
     _get_jpg_parameters,
+    concatenate_packed_frames,
     get_j2k_parameters,
+    pack_bits,
+    unpack_bits,
 )
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -264,6 +267,7 @@ class DecodeRunner(RunnerBase):
             "transfer_syntax_uid": tsyntax,
             "as_rgb": True,
             "allow_excess_frames": True,
+            "is_bitpacked": False,
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword")
         self._decoders: dict[str, DecodeFunction] = {}
@@ -442,6 +446,7 @@ class DecodeRunner(RunnerBase):
 
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data."""
+        original_bits_allocated = self.bits_allocated
         if self.is_binary:
             file_offset = cast(BinaryIO, self.src).tell()
 
@@ -455,6 +460,10 @@ class DecodeRunner(RunnerBase):
         )
         for index, src in enumerate(encoded_frames):
             self._get_frame_info(src)
+
+            # This may have been overridden by the plugin by the previous
+            # frame
+            self.set_option("bits_allocated", original_bits_allocated)
 
             # Try the previously successful decoder first (if available)
             name, func = getattr(self, "_previous", (None, None))
@@ -994,6 +1003,9 @@ class Decoder(CoderBase):
         if index is not None and index < 0:
             raise ValueError("'index' must be greater than or equal to 0")
 
+        if kwargs.get("is_bitpacked", False):
+            raise ValueError("Cannot return an array in bit-packed format.")
+
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
@@ -1057,7 +1069,9 @@ class Decoder(CoderBase):
         Returns
         -------
         numpy.ndarray
-            A 1D array containing the pixel data.
+            A 1D array containing the pixel data. For single bit images (Bits
+            Allocated of 1), pixels are always returned "unpacked", with a
+            single pixel in each byte.
         """
         # The initial preallocated array uses an itemsize based off the dataset's
         #   bits allocated value, however each decoded frame may use a smaller
@@ -1077,19 +1091,26 @@ class Decoder(CoderBase):
         if index is not None:
             # The decoding plugin may alter runner.bits_allocated to give a
             #   different dtype itemsize
-            arr[:] = np.frombuffer(runner.decode(index=index), dtype=runner.pixel_dtype)
+            frame = np.frombuffer(runner.decode(index=index), dtype=runner.pixel_dtype)
             runner.set_option("bits_allocated", original_bits_allocated)
+
+            if runner.get_option("is_bitpacked"):
+                frame = unpack_bits(frame)[:pixels_per_frame]
+
+            arr[:] = frame
 
             return arr
 
         # Return all frames
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
-            frame = next(frame_generator)
+            frame = np.frombuffer(next(frame_generator), dtype=runner.pixel_dtype)
+
+            if runner.get_option("is_bitpacked"):
+                frame = unpack_bits(frame)[:pixels_per_frame]
+
             start = idx * pixels_per_frame
-            arr[start : start + pixels_per_frame] = np.frombuffer(
-                frame, dtype=runner.pixel_dtype
-            )
+            arr[start : start + pixels_per_frame] = frame
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
@@ -1349,6 +1370,11 @@ class Decoder(CoderBase):
             <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
+        if kwargs.get("is_bitpacked", False):
+            raise ValueError("Cannot return a buffer in unpacked format.")
+
+        kwargs["is_bitpacked"] = False
+
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
@@ -1386,18 +1412,25 @@ class Decoder(CoderBase):
         Returns
         -------
         bytes | bytearray
-            A buffer-like containing the decoded pixel data.
-        """
+            A buffer-like containing the decoded pixel data. For single bit
+            images (Bits Allocated of 1), pixels are always returned
+            "packed", with 8 pixels in a single byte.
 
-        # Return the specified frame only
+        """
+        original_bits_allocated = runner.bits_allocated
+
         if index is not None:
             frame = runner.decode(index=index)
+
             length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
                     f"{index} ({actual} bytes actual vs {length_bytes} expected)"
                 )
+
+            if original_bits_allocated == 1 and not runner.get_option("is_bitpacked"):
+                frame = pack_bits(frame, pad=False)
 
             return frame
 
@@ -1407,7 +1440,9 @@ class Decoder(CoderBase):
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
+
             bits_allocated.append(runner.bits_allocated)
+
             length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
@@ -1415,7 +1450,13 @@ class Decoder(CoderBase):
                     f"{idx} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
+            if original_bits_allocated == 1 and not runner.get_option("is_bitpacked"):
+                frame = pack_bits(frame, pad=False)
+
             frames.append(frame)
+
+            # Reset bits allocated so it is correct for the next frame
+            runner.set_option("bits_allocated", original_bits_allocated)
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
@@ -1460,6 +1501,16 @@ class Decoder(CoderBase):
                     frames[idx] = out
 
             runner.set_option("bits_allocated", target)
+        else:
+            # The bits allocated may have been reset above, so return it to the
+            # value actually set by the decoding function
+            runner.set_option("bits_allocated", bits_allocated[0])
+
+        if original_bits_allocated == 1:
+            return concatenate_packed_frames(
+                frames,
+                frame_length=runner.rows * runner.columns,
+            )
 
         return b"".join(b for b in frames)
 
@@ -1667,6 +1718,11 @@ class Decoder(CoderBase):
                 "NumPy is required when converting pixel data to an ndarray"
             )
 
+        if kwargs.get("is_bitpacked", False):
+            raise ValueError("Cannot return an array in bit-packed format.")
+
+        kwargs["is_bitpacked"] = False
+
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
@@ -1823,6 +1879,11 @@ class Decoder(CoderBase):
             <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
+        if not kwargs.get("is_bitpacked", True):
+            raise ValueError(
+                "Buffers of single bit data are always in bit-packed format."
+            )
+
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
@@ -1833,11 +1894,15 @@ class Decoder(CoderBase):
             ),
         )
 
+        bits_allocated = runner.bits_allocated
+
         if validate:
             runner.validate()
 
         if self.is_encapsulated and not indices:
             for buffer in runner.iter_decode():
+                if bits_allocated == 1 and not runner.get_option("is_bitpacked"):
+                    buffer = pack_bits(buffer)
                 yield buffer, runner.pixel_properties(as_frame=True)
 
             return
