@@ -14,7 +14,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.pixels.common import Buffer, RunnerBase, CoderBase, RunnerOptions
-from pydicom.pixels.utils import unpack_bits
+from pydicom.pixels.utils import get_packed_frame
 from pydicom.uid import (
     UID,
     JPEGBaseline8Bit,
@@ -89,10 +89,10 @@ class EncodeRunner(RunnerBase):
             "transfer_syntax_uid": tsyntax,
             "byteorder": "<",
             "pixel_keyword": "PixelData",
+            "is_bitpacked": False,
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword", "byteorder")
         self._encoders: dict[str, EncodeFunction] = {}
-        self._src_unpacked = False
 
     def encode(self, index: int | None) -> bytes:
         """Return an encoded frame of pixel data as :class:`bytes`.
@@ -178,18 +178,31 @@ class EncodeRunner(RunnerBase):
         #   needed: e.g. 32 bits allocated with 7 bits stored
         # However the encoders typically expect data to be sized appropriately
         # for the sample precision, so we need to downscale to:
+        #   precision = 1:        an 8-bit container (char) or bit-packed (8
+        #                         pixels/char)
         #    0 < precision <=  8: an 8-bit container (char)
         #    8 < precision <= 16: a 16-bit container (short)
         #   16 < precision <= 32: a 32-bit container (int/long)
         #   32 < precision <= 64: a 64-bit container (long long)
         if self.bits_allocated == 1:
 
-            if self._src_type in ("Dataset", "Buffer") and not self._src_unpacked:
-                # Unpack the packed bits
-                self._src = unpack_bits(self._src, as_array=False)
-                self._src_unpacked = True
+            # Data *may* be bit-packed, use length and source type to infer
+            total_pixels = self.frame_length(unit="pixels") * self.number_of_frames
 
-            # Bytes have already been unpacked to give 1 byte per pixel
+            if self._src_type == "Dataset" or (
+                self._src_type == "Buffer" and len(self._src) < total_pixels
+            ):
+                # Pass to the encoder in a bitpacked form
+                self.set_option("is_bitpacked", True)
+                return get_packed_frame(
+                    src=cast(bytes, self._src),
+                    index=0 if index is None else index,
+                    frame_length=cast(int, self.frame_length(unit="pixels")),
+                    pad=False,
+                )
+
+            # Array or non-bitpacked buffer
+            self.set_option("is_bitpacked", False)
             bytes_per_frame = cast(int, self.frame_length(unit="pixels"))
         else:
             bytes_per_frame = cast(int, self.frame_length(unit="bytes"))
@@ -209,13 +222,13 @@ class EncodeRunner(RunnerBase):
         # 2 bytes/px actual
         if 8 < self.bits_stored <= 16:
             if bytes_per_pixel == 2:
-                return src
-
-            # If not 2 bytes/px then must be 3, 4, 5, 6, 7 or 8
-            #   but only the first 2 bytes are relevant
-            out = bytearray(expected_length * 2)
-            out[::2] = src[::bytes_per_pixel]
-            out[1::2] = src[1::bytes_per_pixel]
+                out = src
+            else:
+                # If not 2 bytes/px then must be 3, 4, 5, 6, 7 or 8
+                #   but only the first 2 bytes are relevant
+                out = bytearray(expected_length * 2)
+                out[::2] = src[::bytes_per_pixel]
+                out[1::2] = src[1::bytes_per_pixel]
             return out
 
         # 3 or 4 bytes/px actual
@@ -274,7 +287,9 @@ class EncodeRunner(RunnerBase):
         ----------
         src : bytes | bytearray | memoryview | pydicom.dataset.Dataset | numpy.ndarray
 
-            * If a buffer-like then the encoded pixel data
+            * If a buffer-like then the encoded pixel data. When bits allocated
+              is 1, this may be bit-packed (8 pixels within a byte) or unpacked (1
+              byte per pixel). The length of the buffer will be used to infer which.
             * If a :class:`~pydicom.dataset.Dataset` then a dataset containing
               the pixel data and associated group ``0x0028`` elements.
             * If a :class:`numpy.ndarray` then an array containing the image data.
@@ -307,8 +322,6 @@ class EncodeRunner(RunnerBase):
                 "'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
                 f"not '{src.__class__.__name__}'"
             )
-
-        self._src_unpacked = False
 
     @property
     def src(self) -> "Buffer | np.ndarray":

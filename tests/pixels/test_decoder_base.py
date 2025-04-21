@@ -169,6 +169,7 @@ class TestDecodeRunner:
             "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
             "  as_rgb: True\n"
             "  allow_excess_frames: True\n"
+            "  is_bitpacked: False\n"
             "  pixel_keyword: PixelData\n"
             "  correct_unused_bits: True\n"
             "Decoders\n"
