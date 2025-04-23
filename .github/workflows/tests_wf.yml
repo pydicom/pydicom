@@ -26,7 +26,7 @@ on:
             required: true
 
 env:
-  PYTEST_ARGS: ""
+  PYTEST_ARGS: "--junitxml=test-results.xml"
 
 jobs:
   tests:
@@ -88,3 +88,10 @@ jobs:
       with:
         token: ${{ secrets.codecov_token }}
         env_vars: inputs.os,inputs.python-version
+
+    # Upload test results for Codecov Test Analytics
+    - name: Upload test results to Codecov
+      if: success() && inputs.upload-coverage
+      uses: codecov/test-results-action@v1
+      with:
+        files: test-results.xml
