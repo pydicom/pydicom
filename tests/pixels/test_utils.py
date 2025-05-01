@@ -29,6 +29,7 @@ from pydicom.pixels.encoders.native import _encode_rle_frame
 from pydicom.pixels.decoders.native import _rle_decode_frame
 from pydicom.pixels.utils import (
     as_pixel_options,
+    concatenate_packed_frames,
     _passes_version_check,
     _get_jpg_parameters,
     reshape_pixel_array,
@@ -36,6 +37,7 @@ from pydicom.pixels.utils import (
     get_expected_length,
     get_j2k_parameters,
     get_nr_frames,
+    get_packed_frame,
     pack_bits,
     set_pixel_data,
     unpack_bits,
@@ -1342,7 +1344,6 @@ REFERENCE_PACK_PARTIAL = [
 ]
 
 
-@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestPackBits:
     """Tests for pack_bits()."""
 
@@ -1351,6 +1352,7 @@ class TestPackBits:
         """Test packing data."""
         assert output == pack_bits(np.asarray(input), pad=False)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
         with pytest.raises(
@@ -1358,6 +1360,7 @@ class TestPackBits:
         ):
             pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_ndarray_input(self):
         """Test non 1D input gets ravelled."""
         arr = np.asarray(
@@ -1371,6 +1374,73 @@ class TestPackBits:
         b = pack_bits(arr, pad=False)
         assert b"\x00\x55\xff" == b
 
+    def test_bytes_input(self):
+        """Repeat above test with bytes input."""
+        inp = bytes(
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+            ]
+        )
+        b = pack_bits(inp, pad=False)
+        assert b"\x00\x55\xff" == b
+
+    def test_bytearry_input(self):
+        """Repeat above test with bytearray input."""
+        inp = bytearray(
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+            ]
+        )
+        b = pack_bits(inp, pad=False)
+        assert b"\x00\x55\xff" == b
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_padding(self):
         """Test odd length packed data is padded."""
         arr = np.asarray(
@@ -1385,11 +1455,58 @@ class TestPackBits:
         assert 4 == len(b)
         assert 0 == b[-1]
 
+    def test_padding_bytes(self):
+        """Test odd length packed data is padded with byte input."""
+        inp = bytes(
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+            ]
+        )
+        assert 3 == len(pack_bits(inp, pad=False))
+        b = pack_bits(inp, pad=True)
+        assert 4 == len(b)
+        assert 0 == b[-1]
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     @pytest.mark.parametrize("output, input", REFERENCE_PACK_PARTIAL)
     def test_pack_partial(self, input, output):
         """Test packing data that isn't a full byte long."""
         assert output == pack_bits(np.asarray(input), pad=False)
 
+    @pytest.mark.parametrize("output, input", REFERENCE_PACK_PARTIAL)
+    def test_pack_partial_bytes(self, input, output):
+        """Test packing data that isn't a full byte long."""
+        assert output == pack_bits(bytes(input), pad=False)
+
+    @pytest.mark.parametrize("output, input", REFERENCE_PACK_PARTIAL)
+    def test_pack_partial_bytearray(self, input, output):
+        """Test packing data that isn't a full byte long."""
+        assert output == pack_bits(bytearray(input), pad=False)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_functional(self):
         """Test against a real dataset."""
         ds = EXPL_1_1_3F.ds
@@ -1397,12 +1514,114 @@ class TestPackBits:
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_functional_nonaligned(self):
         """Test against a real dataset."""
         ds = EXPL_1_1_3F_NONALIGNED.ds
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
+
+
+REFERENCE_BINARY_PIXELS = [
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+]
+
+
+class TestGetPackedFrame:
+
+    @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
+    @pytest.mark.parametrize("pad", [True, False])
+    def test_get_packed_frame(self, pixels_per_frame, pad):
+        """Get every possible frame from reference pixels."""
+        n_frames = len(REFERENCE_BINARY_PIXELS) // pixels_per_frame
+        packed_data = pack_bits(bytes(REFERENCE_BINARY_PIXELS))
+
+        for f in range(n_frames):
+            frame = get_packed_frame(
+                packed_data,
+                f,
+                pixels_per_frame,
+                pad=pad,
+            )
+            ref = REFERENCE_BINARY_PIXELS[
+                f * pixels_per_frame : (f + 1) * pixels_per_frame
+            ]
+            assert frame == pack_bits(bytes(ref), pad=pad)
+
+
+class TestConcatenatePackedFrames:
+
+    @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
+    @pytest.mark.parametrize("pad", [True, False])
+    def test_get_packed_frame(self, pixels_per_frame, pad):
+        n_frames = len(REFERENCE_BINARY_PIXELS) // pixels_per_frame
+        ref = pack_bits(
+            bytes(REFERENCE_BINARY_PIXELS[: n_frames * pixels_per_frame]),
+            pad=pad,
+        )
+
+        packed_frames = []
+        for f in range(n_frames):
+            unpacked_frame = REFERENCE_BINARY_PIXELS[
+                f * pixels_per_frame : (f + 1) * pixels_per_frame
+            ]
+            packed_frames.append(pack_bits(bytes(unpacked_frame), pad=False))
+
+        concatenated = concatenate_packed_frames(
+            packed_frames,
+            pixels_per_frame,
+            pad=pad,
+        )
+
+        assert concatenated == ref
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
