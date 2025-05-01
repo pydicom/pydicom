@@ -1373,9 +1373,14 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
             # Fallback for when numpy is not installed (slower)
 
             # Pad with zeros to ensure output has length that is multiple of
-            # two bytes
-            if remainder := len(arr) % 16:
-                arr += b"\x00" * (16 - remainder)
+            # one byte (pad is False) or two bytes (pad is True)
+            pad_multiple = 16 if pad else 8
+            if remainder := len(arr) % pad_multiple:
+                arr += b"\x00" * (pad_multiple - remainder)
+
+            # Ensure bytes for hashability
+            if isinstance(arr, bytearray):
+                arr = bytes(arr)
 
             try:
                 out = b"".join(
@@ -2285,7 +2290,7 @@ def get_packed_frame(
         unpacked = unpack_bits(frame_bytes, as_array=False)
 
         unpacked_frame = unpacked[pixel_start % 8 : pixel_start % 8 + frame_length]
-        out = pack_bits(unpacked_frame)
+        out = pack_bits(unpacked_frame, pad=pad)
 
     # Pad to multiple of 2 bytes
     if pad and len(out) % 2 == 1:
