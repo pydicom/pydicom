@@ -10,19 +10,19 @@ from pydicom.filereader import dcmread
 # All datasets included here must be available in the package itself
 #   NOT via the pydicom-data download method
 _DATASETS: dict[str, str] = {
-    "ct": cast(str, get_testdata_file("CT_small.dcm")),
-    "dicomdir": cast(str, get_testdata_file("DICOMDIR")),
-    "jpeg2k": cast(str, get_testdata_file("examples_jpeg2k.dcm")),
-    "mr": cast(str, get_testdata_file("MR_small.dcm")),
-    "no_meta": cast(str, get_testdata_file("no_meta.dcm")),
-    "overlay": cast(str, get_testdata_file("examples_overlay.dcm")),
-    "palette_color": cast(str, get_testdata_file("examples_palette.dcm")),
-    "rgb_color": cast(str, get_testdata_file("examples_rgb_color.dcm")),
-    "rt_dose": cast(str, get_testdata_file("rtdose.dcm")),
-    "rt_plan": cast(str, get_testdata_file("rtplan.dcm")),
-    "rt_ss": cast(str, get_testdata_file("rtstruct.dcm")),
-    "waveform": cast(str, get_testdata_file("waveform_ecg.dcm")),
-    "ybr_color": cast(str, get_testdata_file("examples_ybr_color.dcm")),
+    "ct": cast(str, get_testdata_file("CT_small.dcm", download=False)),
+    "dicomdir": cast(str, get_testdata_file("DICOMDIR", download=False)),
+    "jpeg2k": cast(str, get_testdata_file("examples_jpeg2k.dcm", download=False)),
+    "mr": cast(str, get_testdata_file("MR_small.dcm", download=False)),
+    "no_meta": cast(str, get_testdata_file("no_meta.dcm", download=False)),
+    "overlay": cast(str, get_testdata_file("examples_overlay.dcm", download=False)),
+    "palette_color": cast(str, get_testdata_file("examples_palette.dcm", download=False)),
+    "rgb_color": cast(str, get_testdata_file("examples_rgb_color.dcm", download=False)),
+    "rt_dose": cast(str, get_testdata_file("rtdose.dcm", download=False)),
+    "rt_plan": cast(str, get_testdata_file("rtplan.dcm", download=False)),
+    "rt_ss": cast(str, get_testdata_file("rtstruct.dcm", download=False)),
+    "waveform": cast(str, get_testdata_file("waveform_ecg.dcm", download=False)),
+    "ybr_color": cast(str, get_testdata_file("examples_ybr_color.dcm", download=False)),
 }
 
 
