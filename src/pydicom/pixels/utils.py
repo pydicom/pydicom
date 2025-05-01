@@ -2232,7 +2232,7 @@ def get_packed_frame(
         # The initial frame boundary is aligned with a byte boundary, so no
         # need to shift bits between bytes
 
-        if frame_length % 8 == 0 or byte_end == len(src):
+        if frame_length % 8 == 0:
             # The end is also byte aligned so we can simply take a slice
             out = src[byte_start:byte_end]
 
