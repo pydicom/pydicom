@@ -16,7 +16,9 @@ _DATASETS: dict[str, str] = {
     "mr": cast(str, get_testdata_file("MR_small.dcm", download=False)),
     "no_meta": cast(str, get_testdata_file("no_meta.dcm", download=False)),
     "overlay": cast(str, get_testdata_file("examples_overlay.dcm", download=False)),
-    "palette_color": cast(str, get_testdata_file("examples_palette.dcm", download=False)),
+    "palette_color": cast(
+        str, get_testdata_file("examples_palette.dcm", download=False)
+    ),
     "rgb_color": cast(str, get_testdata_file("examples_rgb_color.dcm", download=False)),
     "rt_dose": cast(str, get_testdata_file("rtdose.dcm", download=False)),
     "rt_plan": cast(str, get_testdata_file("rtplan.dcm", download=False)),
