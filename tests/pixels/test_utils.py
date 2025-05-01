@@ -1409,6 +1409,7 @@ class TestPackBits:
                 1, 1, 1, 1, 1, 1, 1, 1,
             ]
         )
+        # fmt: on
         b = pack_bits(inp, pad=False)
         assert b"\x00\x55\xff" == b
 
@@ -1429,34 +1430,15 @@ class TestPackBits:
 
     def test_padding_bytes(self):
         """Test odd length packed data is padded with byte input."""
+        # fmt: off
         inp = bytes(
             [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                1,
-                0,
-                1,
-                0,
-                1,
-                0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                1, 1, 1, 1, 1, 1, 1, 1,
             ]
         )
+        # fmt: on
         assert 3 == len(pack_bits(inp, pad=False))
         b = pack_bits(inp, pad=True)
         assert 4 == len(b)
