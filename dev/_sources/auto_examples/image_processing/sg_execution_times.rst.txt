@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.200** total execution time for 3 files **from auto_examples/image_processing**:
+**00:00.199** total execution time for 3 files **from auto_examples/image_processing**:
 
 .. container::
 
@@ -36,7 +36,7 @@ Computation times
      - 00:00.194
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` (``plot_downsize_image.py``)
-     - 00:00.006
+     - 00:00.005
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_reslice.py` (``reslice.py``)
      - 00:00.000
