@@ -1599,6 +1599,31 @@ class TestCompressRLE:
         assert ds._pixel_array is None
         assert ds._pixel_id == {}
 
+    @pytest.mark.parametrize(
+        "path,length",
+        [
+            (EXPL_1_1_3F.path, 6366),
+            (EXPL_1_1_3F_NONALIGNED.path, 6390),
+        ],
+    )
+    def test_compress_1bit(self, path, length):
+        """Test compressing a single bit image dataset."""
+        ds = dcmread(path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        assert ds.BitsAllocated == 1
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == length
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
     def test_no_file_meta_raises(self):
         """Test compressing a dataset with no file meta."""
         ds = dcmread(EXPL_16_16_1F.path)
@@ -1820,6 +1845,23 @@ class TestCompressJ2K:
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
+    @pytest.mark.parametrize("path", [EXPL_1_1_3F.path, EXPL_1_1_3F_NONALIGNED.path])
+    def test_lossless_1bit(self, path):
+        """Test JPEG 2000 Lossless on single bit image."""
+        ds = dcmread(path)
+        original = ds.SOPInstanceUID
+        ref = ds.pixel_array
+        compress(
+            ds,
+            JPEG2000Lossless,
+            encoding_plugin="pylibjpeg",
+        )
+        assert ds.BitsAllocated == 1
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000Lossless
+        assert np.array_equal(ds.pixel_array, ref)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
     def test_lossy(self):
         """Test JPEG 2000 and the j2k_cr and j2k_psnr kwargs."""
         ds = dcmread(EXPL_16_16_1F.path)
@@ -1891,10 +1933,45 @@ class TestCompressDeflated:
         assert ds._pixel_array is None
         assert ds._pixel_id == {}
 
+    @pytest.mark.parametrize(
+        "path,length",
+        [
+            (EXPL_1_1_3F.path, 2920),
+            (EXPL_1_1_3F_NONALIGNED.path, 3386),
+        ],
+    )
+    def test_compress_bytes_1bit(self, path, length):
+        """Test compressing a single bit dataset."""
+        ds = dcmread(path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert len(ds.PixelData) == length
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
         """Test compressing using pixel data from an arr."""
         ds = dcmread(EXPL_16_16_1F.path)
+        assert hasattr(ds, "file_meta")
+        ref = ds.pixel_array
+        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+        assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    @pytest.mark.parametrize("path", [EXPL_1_1_3F.path, EXPL_1_1_3F_NONALIGNED.path])
+    def test_compress_arr_1bit(self, path):
+        """Test compressing using pixel data from an arr."""
+        ds = dcmread(path)
         assert hasattr(ds, "file_meta")
         ref = ds.pixel_array
         compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")

@@ -39,6 +39,7 @@ from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 # RLE: RLE Lossless
 # 1/1-bit, 1 sample/pixel, 1 frame
 EXPL_1_1_1F = get_testdata_file("liver_1frame.dcm")
+EXPL_1_1_3F_NONALIGNED = get_testdata_file("liver_nonbyte_aligned.dcm")
 # 8/8-bit, 1 sample/pixel, 1 frame
 EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
 RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
@@ -132,6 +133,47 @@ class TestEncodeRLEFrame:
         ds.SamplesPerPixel = 3
         ds.PlanarConfiguration = 1
         self.ds = ds
+
+    @pytest.mark.parametrize("pass_as_packed", [True, False])
+    def test_cycle_1bit_1sample(self, pass_as_packed: bool):
+        """Test an encode/decode cycle for 1-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_1_1_1F)
+        ref = ds.pixel_array
+        n_frames = ds.get("NumberOfFrames", 1)
+        n_pixels = ds.Rows * ds.Columns * n_frames
+        assert 1 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        kwargs = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": ds.PixelRepresentation,
+            "bits_allocated": ds.BitsAllocated,
+            "bits_stored": ds.BitsStored,
+            "number_of_frames": n_frames,
+            "is_bitpacked": pass_as_packed,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+
+        if pass_as_packed:
+            input_arr = ds.PixelData
+        else:
+            input_arr = unpack_bits(ds.PixelData, as_array=False)
+
+        encoded = _encode_rle_frame(input_arr, runner)
+        decoded = _rle_decode_frame(
+            encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
+        )
+
+        decoded = unpack_bits(decoded, as_array=False)[:n_pixels]
+
+        arr = np.frombuffer(decoded, "|u1")
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
 
     def test_cycle_8bit_1sample(self):
         """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
@@ -505,7 +547,8 @@ class TestEncodeDeflatedFrame:
         ds.PlanarConfiguration = 1
         self.ds = ds
 
-    def test_cycle_1bit_1sample(self):
+    @pytest.mark.parametrize("pass_as_packed", [True, False])
+    def test_cycle_1bit_1sample(self, pass_as_packed: bool):
         """Test an encode/decode cycle for 1-bit 1 sample/pixel."""
         ds = dcmread(EXPL_1_1_1F)
         ref = ds.pixel_array
@@ -521,15 +564,20 @@ class TestEncodeDeflatedFrame:
             "bits_allocated": ds.BitsAllocated,
             "bits_stored": ds.BitsStored,
             "number_of_frames": 1,
+            "is_bitpacked": pass_as_packed,
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
 
-        # Unpack pixel data before passing to encode function
-        unpacked_pixel_data = unpack_bits(ds.PixelData, as_array=False)
-        encoded = _encode_deflated_frame(unpacked_pixel_data, runner)
+        input_pixel_data = ds.PixelData
+        if not pass_as_packed:
+            # Unpack pixel data before passing to encode function
+            input_pixel_data = unpack_bits(input_pixel_data, as_array=False)
+
+        encoded = _encode_deflated_frame(input_pixel_data, runner)
         decoded = _deflated_decode_frame(encoded)
         # Bit-packed data
+        n_pixels = ds.Rows * ds.Columns
         arr = unpack_bits(decoded)
         arr = reshape_pixel_array(ds, arr)
 
