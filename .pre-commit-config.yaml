@@ -23,7 +23,7 @@ repos:
       - id: typos
         exclude: _.*_dict.py
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.4
+    rev: v0.11.8
     hooks:
       - id: ruff
         files: src
