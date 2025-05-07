@@ -1749,7 +1749,10 @@ class Decoder(CoderBase):
         log_warning = True
         if self.is_encapsulated and not indices:
             for frame in runner.iter_decode():
-                arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
+                if runner.get_option("is_bitpacked"):
+                    arr = unpack_bits(frame)[: cast(int, runner.frame_length("pixels"))]
+                else:
+                    arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
                 arr = runner.reshape(arr, as_frame=True)
                 if runner._test_for("sign_correction"):
                     arr = _apply_sign_correction(arr, runner)

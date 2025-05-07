@@ -69,6 +69,8 @@ from .pixels_reference import (
     RLE_16_1_1F,
     RLE_16_1_10F,
     RLE_32_3_2F,
+    DEFL_1_1_3F,
+    DEFL_1_1_3F_NONALIGNED,
     EXPL_16_1_10F,
     EXPL_16_1_1F,
     EXPL_16_16_1F,
@@ -2216,6 +2218,25 @@ class TestDecompress:
         ds.pixel_array_options(as_rgb=False)
         rgb = convert_color_space(ds.pixel_array, "YBR_FULL", "RGB")
         assert np.array_equal(rgb, ref)
+
+    @pytest.mark.parametrize("path", [DEFL_1_1_3F.path, DEFL_1_1_3F_NONALIGNED.path])
+    def test_single_bit_deflated(self, path):
+        """Test a single bit image is unpacked correctly."""
+        ds = dcmread(path)
+        ref = ds.pixel_array
+
+        assert ds.BitsAllocated == 1
+        decompress(ds)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.BitsAllocated == 1
+        elem = ds["PixelData"]
+        assert len(elem.value) == np.ceil(ds.Rows * ds.Columns * ds.NumberOfFrames / 8)
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+        assert np.array_equal(ds.pixel_array, ref)
 
     @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
     def test_instance_uid(self):
