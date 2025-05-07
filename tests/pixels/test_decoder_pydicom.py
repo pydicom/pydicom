@@ -15,6 +15,7 @@ from pydicom.pixels.decoders.native import (
     _rle_decode_segment,
     _rle_decode_frame,
 )
+from pydicom.pixels.utils import unpack_bits
 from pydicom.uid import RLELossless, ExplicitVRLittleEndian
 
 try:
@@ -25,9 +26,19 @@ except ImportError:
     HAVE_NP = False
 
 
-from .pixels_reference import PIXEL_REFERENCE, RLE_16_1_1F, RLE_16_1_10F
+from .pixels_reference import (
+    PIXEL_REFERENCE,
+    RLE_1_1_3F,
+    RLE_1_1_3F_NONALIGNED,
+    RLE_16_1_1F,
+    RLE_16_1_10F,
+)
 
-RLE_REFERENCE = PIXEL_REFERENCE[RLELossless]
+RLE_REFERENCE = [
+    *PIXEL_REFERENCE[RLELossless],
+    RLE_1_1_3F,
+    RLE_1_1_3F_NONALIGNED,
+]
 
 
 def name(ref):
@@ -234,7 +245,14 @@ class TestAsBuffer:
         )
         buffer, meta = self.decoder.as_buffer(reference.ds)
 
-        frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+        if ds.BitsAllocated == 1:
+            # Compare the bits unpacked (simplifies indexing)
+            buffer = unpack_bits(buffer, False)
+            frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel
+        else:
+            frame_len = (
+                ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+            )
 
         for index in range(reference.number_of_frames):
             if reference.number_of_frames == 1:
@@ -290,9 +308,14 @@ class TestAsBuffer:
             buffer, _ = self.decoder.as_buffer(f, **opts)
             assert f.tell() == file_offset
 
-            frame_len = (
-                ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
-            )
+            if ds.BitsAllocated == 1:
+                # Compare the bits unpacked (simplifies indexing)
+                buffer = unpack_bits(buffer, False)
+                frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel
+            else:
+                frame_len = (
+                    ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+                )
 
             for index in range(reference.number_of_frames):
                 if reference.number_of_frames == 1:
@@ -331,6 +354,11 @@ class TestAsBuffer:
             buffer, _ = self.decoder.as_buffer(
                 reference.ds, index=index, decoding_plugin="pydicom"
             )
+
+            if ds.BitsAllocated == 1:
+                # Compare the bits unpacked (simplifies indexing)
+                frame_len = ds.Rows * ds.Columns
+                buffer = unpack_bits(buffer, False)[:frame_len]
 
             if ds.SamplesPerPixel == 1:
                 assert arr.tobytes() == buffer
@@ -379,6 +407,11 @@ class TestAsBuffer:
                 )
                 assert f.tell() == file_offset
 
+                if ds.BitsAllocated == 1:
+                    # Compare the bits unpacked (simplifies indexing)
+                    frame_len = ds.Rows * ds.Columns
+                    buffer = unpack_bits(buffer, False)[:frame_len]
+
                 if ds.SamplesPerPixel == 1:
                     assert arr.tobytes() == buffer
                 else:
@@ -415,6 +448,11 @@ class TestIterBuffer:
         )
 
         for (arr, _), (buf, meta) in zip(arr_func, buf_func):
+            if reference.ds.BitsAllocated == 1:
+                # Compare the bits unpacked (simplifies indexing)
+                frame_len = reference.ds.Rows * reference.ds.Columns
+                buf = unpack_bits(buf, False)[:frame_len]
+
             if reference.ds.SamplesPerPixel == 3:
                 # If samples per pixel is 3 then bytes are planar configuration 1
                 assert meta["planar_configuration"] == 1
@@ -465,6 +503,11 @@ class TestIterBuffer:
                 f, raw=True, decoding_plugin="pydicom", **opts
             )
             for (arr, _), (buf, _) in zip(arrays, buf_func):
+                if reference.ds.BitsAllocated == 1:
+                    # Compare the bits unpacked (simplifies indexing)
+                    frame_len = reference.ds.Rows * reference.ds.Columns
+                    buf = unpack_bits(buf, False)[:frame_len]
+
                 if reference.ds.SamplesPerPixel == 3:
                     # If samples per pixel is 3 then bytes are planar configuration 1
                     # Red
