@@ -2219,6 +2219,7 @@ class TestDecompress:
         rgb = convert_color_space(ds.pixel_array, "YBR_FULL", "RGB")
         assert np.array_equal(rgb, ref)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     @pytest.mark.parametrize("path", [DEFL_1_1_3F.path, DEFL_1_1_3F_NONALIGNED.path])
     def test_single_bit_deflated(self, path):
         """Test a single bit image is unpacked correctly."""
