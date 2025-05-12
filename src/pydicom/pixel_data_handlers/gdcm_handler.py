@@ -4,9 +4,7 @@ decode pixel transfer syntaxes.
 """
 
 from copy import deepcopy
-import os
 import sys
-from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -25,10 +23,8 @@ try:
     from gdcm import DataElement
 
     HAVE_GDCM = True
-    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, "SetByteStringValue")
 except ImportError:
     HAVE_GDCM = False
-    HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
 from pydicom import config
 from pydicom.encaps import generate_frames, generate_fragmented_frames
@@ -117,28 +113,22 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     gdcm.DataElement
         The converted *Pixel Data* element.
     """
-    tsyntax = ds.file_meta.TransferSyntaxUID
-    data_element = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
-    if tsyntax.is_compressed:
-        fragments = gdcm.SequenceOfFragments.New()
-        nr_frames = get_nr_frames(ds, warn=False)
-        fragment_gen = generate_fragmented_frames(
-            ds.PixelData, number_of_frames=nr_frames
-        )
-        for frame_fragments in fragment_gen:
-            for fragment_data in frame_fragments:
-                fragment = gdcm.Fragment()
-                fragment.SetByteStringValue(fragment_data)
-                fragments.AddFragment(fragment)
+    elem = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
+    fragments = gdcm.SequenceOfFragments.New()
+    nr_frames = get_nr_frames(ds, warn=False)
+    fragment_gen = generate_fragmented_frames(ds.PixelData, number_of_frames=nr_frames)
+    for frame_fragments in fragment_gen:
+        for fragment_data in frame_fragments:
+            fragment = gdcm.Fragment()
+            fragment.SetByteStringValue(fragment_data)
+            fragments.AddFragment(fragment)
 
-        data_element.SetValue(fragments.__ref__())
-    else:
-        data_element.SetByteStringValue(ds.PixelData)
+    elem.SetValue(fragments.GetPointer())
 
-    return data_element
+    return elem
 
 
-def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
+def create_image(ds: "Dataset") -> "gdcm.Image":
     """Return a ``gdcm.Image``.
 
     Parameters
@@ -146,8 +136,6 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     ds : dataset.Dataset
         The :class:`~pydicom.dataset.Dataset` containing the Image
         Pixel module.
-    data_element : gdcm.DataElement
-        The ``gdcm.DataElement`` *Pixel Data* element.
 
     Returns
     -------
@@ -157,7 +145,6 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     number_of_frames = get_nr_frames(ds, warn=False)
     image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
     image.SetDimensions((ds.Columns, ds.Rows, number_of_frames))
-    image.SetDataElement(data_element)
 
     pi_type = gdcm.PhotometricInterpretation.GetPIType(ds.PhotometricInterpretation)
     image.SetPhotometricInterpretation(gdcm.PhotometricInterpretation(pi_type))
@@ -179,50 +166,13 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     return image
 
 
-def _get_pixel_str_fileio(ds: "Dataset") -> str:
-    """Return the pixel data from `ds` as a str.
-
-    Used for GDCM < 2.8.8.
-
-    Parameters
-    ----------
-    ds : pydicom.dataset.Dataset
-        The dataset to create the str from.
-
-    Returns
-    -------
-    str
-        The UTF-8 encoded pixel data.
-    """
-    reader = gdcm.ImageReader()
-    fname = getattr(ds, "filename", None)
-    if fname and isinstance(fname, str):
-        reader.SetFileName(fname)
-        if not reader.Read():
-            raise TypeError("GDCM could not read DICOM image")
-
-        return cast(str, reader.GetImage().GetBuffer())
-
-    # Copy the relevant elements and write to a temporary file to avoid
-    #   having to deal with all the possible objects the dataset may
-    #   originate with
-    new = ds.group_dataset(0x0028)
-    new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
-    new.file_meta = ds.file_meta
-    with NamedTemporaryFile("wb", delete=False) as t:
-        new.save_as(t)
-
-    reader.SetFileName(t.name)
-    if not reader.Read():
-        raise TypeError("GDCM could not read DICOM image")
-
-    pixel_str: str = reader.GetImage().GetBuffer()
-
-    # Need to kill the gdcm.ImageReader to free file access
-    reader = None
-    os.remove(t.name)
-
-    return pixel_str
+# Due to SWIG issues, it appears that GDCM cannot return more than (typically)
+#   2**31 - 1 bytes when using gdcm.Image.GetBuffer(), although this may actually
+#   be as low as 2**15 - 1 bytes depending on the system architecture.
+# Because of this we cannot guarantee that GDCM will succeed as a single frame of
+#   data may be larger - however in most cases its only multi-frame data that will
+#   exceed that limit.
+_GDCM_MAX_BUFFER_SIZE = 2**31 - 1
 
 
 def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
@@ -246,21 +196,70 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     if not HAVE_GDCM:
         raise ImportError("The GDCM handler requires both gdcm and numpy")
 
-    if HAVE_GDCM_IN_MEMORY_SUPPORT:
-        gdcm_data_element = create_data_element(ds)
-        gdcm_image = create_image(ds, gdcm_data_element)
-        pixel_str = gdcm_image.GetBuffer()
-    else:
-        pixel_str = _get_pixel_str_fileio(ds)
+    # Check to see if it's possible to decode any of the pixel data
+    frame_length = ds.Columns * ds.Rows * ds.SamplesPerPixel * ds.BitsAllocated // 8
+    if frame_length > _GDCM_MAX_BUFFER_SIZE:
+        raise ValueError(
+            "GDCM cannot decode the pixel data as each frame will be larger than "
+            "GDCM's maximum buffer size"
+        )
 
-    # GDCM returns char* as type str. Python decodes this to
-    # unicode strings by default.
-    # The SWIG docs mention that they always decode byte streams
-    # as utf-8 strings, with the `surrogateescape`
-    # error handler configured.
-    # Therefore, we can encode them back to a bytearray
-    # by using the same parameters.
-    pixel_bytearray = cast(bytes, pixel_str.encode("utf-8", "surrogateescape"))
+    expected_length_bytes = get_expected_length(ds)
+    if ds.PhotometricInterpretation == "YBR_FULL_422":
+        # GDCM has already resampled the pixel data, see PS3.3 C.7.6.3.1.2
+        expected_length_bytes = expected_length_bytes // 2 * 3
+
+    # Create the gdcm.Image that will hold the encapsulated pixel data
+    image = create_image(ds)
+
+    # GDCM returns char* as type str, Python decodes this to unicode strings by default
+    # The SWIG docs mention that they always decode byte streams as utf-8 strings,
+    #   with the `surrogateescape` error handler configured.
+    # Therefore, we can encode them back to a bytearray by using the same parameters.
+    if expected_length_bytes > _GDCM_MAX_BUFFER_SIZE:
+        # Decode the pixel data in parts of no greater than _GDCM_MAX_BUFFER_SIZE
+        elem = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
+        fragments = gdcm.SequenceOfFragments.New()
+        elem.SetValue(fragments.GetPointer())
+
+        buffer = bytearray()
+        frame_count = 0
+        number_of_frames = get_nr_frames(ds, warn=False)
+        frame_generator = generate_fragmented_frames(
+            ds.PixelData, number_of_frames=number_of_frames
+        )
+        for idx, frame_fragments in enumerate(frame_generator):
+            for fragment_data in frame_fragments:
+                fragment = gdcm.Fragment()
+                fragment.SetByteStringValue(fragment_data)
+                fragments.AddFragment(fragment)
+
+            frame_count += 1
+
+            # Do a decode and reset if either:
+            # * The length of decoded pixel data will be greater than the limit on the
+            #   next iteration, or
+            # * We are at the end of the pixel data
+            if (
+                idx == number_of_frames - 1
+                or (frame_count + 1) * frame_length > _GDCM_MAX_BUFFER_SIZE
+            ):
+                image.SetNumberOfDimensions(2 if frame_count == 1 else 3)
+                image.SetDimensions((ds.Columns, ds.Rows, frame_count))
+                image.SetDataElement(elem)
+                data = cast(bytes, image.GetBuffer().encode("utf-8", "surrogateescape"))
+                buffer.extend(data)
+
+                fragments.Clear()
+                frame_count = 0
+
+        pixel_bytearray = bytes(buffer)
+    else:
+        # Decode the entire pixel data in one go
+        elem = create_data_element(ds)
+        image.SetDataElement(elem)
+        pixel_str = image.GetBuffer()
+        pixel_bytearray = cast(bytes, pixel_str.encode("utf-8", "surrogateescape"))
 
     # On big endian systems GDCM returns data as big endian :(
     if _is_big_endian_system() and ds.BitsAllocated > 8:
@@ -275,11 +274,6 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
-    expected_length_bytes = get_expected_length(ds)
-    if ds.PhotometricInterpretation == "YBR_FULL_422":
-        # GDCM has already resampled the pixel data, see PS3.3 C.7.6.3.1.2
-        expected_length_bytes = expected_length_bytes // 2 * 3
-
     if len(pixel_bytearray) > expected_length_bytes:
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[expected_length_bytes:]
