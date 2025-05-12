@@ -628,14 +628,6 @@ class TestSupportFunctions:
     def dataset_3d(self):
         return dcmread(color_3d_jpeg_baseline)
 
-    def test_create_data_element_from_uncompressed_2d_dataset(self, dataset_2d):
-        data_element = gdcm_handler.create_data_element(dataset_2d)
-
-        assert 0x7FE0 == data_element.GetTag().GetGroup()
-        assert 0x0010 == data_element.GetTag().GetElement()
-        assert data_element.GetSequenceOfFragments() is None
-        assert data_element.GetByteValue() is not None
-
     def test_create_data_element_from_compressed_2d_dataset(
         self, dataset_2d_compressed
     ):
@@ -654,29 +646,9 @@ class TestSupportFunctions:
         assert data_element.GetSequenceOfFragments() is not None
         assert data_element.GetByteValue() is None
 
-    def test_create_image_from_2d_dataset(self, dataset_2d):
-        data_element = gdcm_handler.create_data_element(dataset_2d)
-        image = gdcm_handler.create_image(dataset_2d, data_element)
-        assert 2 == image.GetNumberOfDimensions()
-        assert [dataset_2d.Rows, dataset_2d.Columns] == image.GetDimensions()
-        pi_type = gdcm.PhotometricInterpretation.GetPIType(
-            dataset_2d.PhotometricInterpretation
-        )
-        assert pi_type == image.GetPhotometricInterpretation().GetType()
-
-        uid = str.__str__(dataset_2d.file_meta.TransferSyntaxUID)
-        assert uid == image.GetTransferSyntax().GetString()
-        pixel_format = image.GetPixelFormat()
-        assert dataset_2d.SamplesPerPixel == pixel_format.GetSamplesPerPixel()
-        assert dataset_2d.BitsAllocated == pixel_format.GetBitsAllocated()
-        assert dataset_2d.BitsStored == pixel_format.GetBitsStored()
-        assert dataset_2d.HighBit == pixel_format.GetHighBit()
-        px_repr = dataset_2d.PixelRepresentation
-        assert px_repr == pixel_format.GetPixelRepresentation()
-
     def test_create_image_from_3d_dataset(self, dataset_3d):
         data_element = gdcm_handler.create_data_element(dataset_3d)
-        image = gdcm_handler.create_image(dataset_3d, data_element)
+        image = gdcm_handler.create_image(dataset_3d)
         assert 3 == image.GetNumberOfDimensions()
         assert [
             dataset_3d.Columns,
