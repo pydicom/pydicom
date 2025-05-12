@@ -16,6 +16,7 @@ except ImportError:
 from pydicom import dcmread, config
 from pydicom.encaps import get_frame
 from pydicom.pixels import get_decoder
+from pydicom.pixels.decoders import gdcm
 from pydicom.pixels.decoders.gdcm import _decode_frame
 from pydicom.pixels.decoders.base import DecodeRunner
 from pydicom.pixels.utils import _passes_version_check
@@ -49,6 +50,15 @@ SKIP_TEST = not HAVE_NP or not HAVE_GDCM
 
 def name(ref):
     return f"{ref.name}"
+
+
+@pytest.fixture()
+def set_gdcm_max_buffer_size_10k():
+    original = gdcm._GDCM_MAX_BUFFER_SIZE
+    gdcm._GDCM_MAX_BUFFER_SIZE = 10000
+    yield
+
+    gdcm._GDCM_MAX_BUFFER_SIZE = original
 
 
 @pytest.mark.skipif(SKIP_TEST, reason="Test is missing dependencies")
@@ -345,6 +355,20 @@ class TestDecoding:
             converted[::4],
         )
         assert converted == unconverted
+
+    def test_too_large_raises(self, set_gdcm_max_buffer_size_10k):
+        """Test exception raised if the frame is too large for GDCM to decode."""
+        # Single frame is 8192 bytes with 64 x 64 x 2
+        ds = dcmread(JPGB_08_08_3_0_1F_RGB.path)
+        ds.Rows = 100
+        ds.pixel_array_options(decoding_plugin="gdcm")
+        msg = (
+            "Unable to decode as exceptions were raised by all available plugins:\n"
+            "  gdcm: GDCM cannot decode the pixel data as each frame will be larger "
+            "than GDCM's maximum buffer size"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.pixel_array
 
 
 @pytest.fixture()

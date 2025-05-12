@@ -31,6 +31,14 @@ DECODER_DEPENDENCIES = {
     uid.JPEG2000: ("gdcm>=3.0.10",),
 }
 
+# Due to SWIG issues, it appears that GDCM cannot return more than (typically)
+#   2**31 - 1 bytes when using gdcm.Image.GetBuffer(). Note that this may actually
+#   be as low as 2**15 - 1 bytes depending on the system architecture.
+# Because of this we cannot guarantee that GDCM will succeed as a single frame of
+#   data may be larger. However in most cases only multi-frame data that will
+#   exceed that limit.
+_GDCM_MAX_BUFFER_SIZE = 2**31 - 1
+
 
 def is_available(uid: str) -> bool:
     """Return ``True`` if a pixel data decoder for `uid` is available for use,
@@ -81,6 +89,12 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
             "precision of 6 or 7 bits"
         )
 
+    if runner.frame_length() > _GDCM_MAX_BUFFER_SIZE:
+        raise ValueError(
+            "GDCM cannot decode the pixel data as each frame will be larger than "
+            "GDCM's maximum buffer size"
+        )
+
     fragment = gdcm.Fragment()
     fragment.SetByteStringValue(src)
 
@@ -88,7 +102,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     fragments.AddFragment(fragment)
 
     elem = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
-    elem.SetValue(fragments.__ref__())
+    elem.SetValue(fragments.GetPointer())
 
     img = gdcm.Image()
     img.SetNumberOfDimensions(2)
@@ -132,6 +146,9 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     img.SetPixelFormat(pixel_format)
 
     # GDCM returns char* as str, so re-encode it to bytes
+    # On architectures where the C++ `int` type is 16-bit this may raise an exception
+    #   if the decoded pixel data is more than 2**15 - 1 bytes:
+    #       AttributeError: 'SwigPyObject' object has no attribute 'encode'
     frame = cast(bytes, img.GetBuffer().encode("utf-8", "surrogateescape"))
 
     # On big endian systems GDCM returns decoded data as big endian :(

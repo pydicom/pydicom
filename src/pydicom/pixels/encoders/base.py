@@ -788,8 +788,8 @@ ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
 RLELosslessEncoder = Encoder(RLELossless)
 RLELosslessEncoder.add_plugins(
     [
-        ("gdcm", ("pydicom.pixels.encoders.gdcm", "encode_pixel_data")),
         ("pylibjpeg", ("pydicom.pixels.encoders.pylibjpeg", "_encode_frame")),
+        ("gdcm", ("pydicom.pixels.encoders.gdcm", "encode_pixel_data")),
         ("pydicom", ("pydicom.pixels.encoders.native", "_encode_rle_frame")),
     ],
 )

@@ -19,7 +19,7 @@ except ImportError:
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.encaps import get_frame
+from pydicom.encaps import get_frame, encapsulate
 from pydicom.pixel_data_handlers import numpy_handler, gdcm_handler
 from pydicom.pixels.processing import _convert_YBR_FULL_to_RGB
 from pydicom.pixels.utils import get_j2k_parameters, reshape_pixel_array
@@ -38,7 +38,7 @@ from .pixels.pixels_reference import (
     RLE_32_1_1F,
 )
 
-HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
+# HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
 TEST_BIG_ENDIAN = sys.byteorder == "little" and HAVE_NP and HAVE_GDCM
 
 
@@ -312,31 +312,27 @@ pi_rgb_testdata = [
     ),
 ]
 
-with_gdcm_params = [
-    pytest.param(
-        "File", marks=pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
-    ),
-    pytest.param(
-        "InMemory",
-        marks=pytest.mark.skipif(
-            not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message
-        ),
-    ),
-]
+
+@pytest.fixture()
+def set_gdcm_max_buffer_size_10k():
+    original = gdcm_handler._GDCM_MAX_BUFFER_SIZE
+    gdcm_handler._GDCM_MAX_BUFFER_SIZE = 10000
+    yield
+
+    gdcm_handler._GDCM_MAX_BUFFER_SIZE = original
 
 
+@pytest.fixture()
+def set_gdcm_max_buffer_size_25k():
+    original = gdcm_handler._GDCM_MAX_BUFFER_SIZE
+    gdcm_handler._GDCM_MAX_BUFFER_SIZE = 25000
+    yield
+
+    gdcm_handler._GDCM_MAX_BUFFER_SIZE = original
+
+
+@pytest.mark.skipif(not HAVE_GDCM, reason="GDCM not available")
 class TestsWithGDCM:
-    @pytest.fixture(params=with_gdcm_params, scope="class", autouse=True)
-    def with_gdcm(self, request):
-        original_value = HAVE_GDCM_IN_MEMORY_SUPPORT
-        if request.param == "File":
-            gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT = False
-        original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = [numpy_handler, gdcm_handler]
-        yield
-        gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT = original_value
-        pydicom.config.pixel_data_handlers = original_handlers
-
     @pytest.fixture(scope="class")
     def unicode_filename(self):
         unicode_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
@@ -571,7 +567,54 @@ class TestsWithGDCM:
             arr[328:338, 106].tolist()
         )
 
+    def test_too_large_raises(self, set_gdcm_max_buffer_size_10k):
+        """Test exception raised if the frame is too large for GDCM to decode."""
+        # Single frame is 8192 bytes with 64 x 64 x 2
+        ds = dcmread(jpeg2000_lossless_name)
+        ds.Rows = 100
+        ds.pixel_array_options(use_v2_backend=True, decoding_plugin="gdcm")
+        msg = (
+            "GDCM cannot decode the pixel data as each frame will be larger than "
+            "GDCM's maximum buffer size"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.pixel_array
 
+    def test_multi_frame_too_large_single_frame(self, set_gdcm_max_buffer_size_10k):
+        """Test decoding a multi-frame image where the total pixel data is too large
+        for GDCM to decode but each individual frame is just small enough to decode
+        separately.
+        """
+        # Single frame is 8192 bytes with 64 x 64 x 2
+        ds = dcmread(jpeg2000_lossless_name)
+        ds.NumberOfFrames = 2
+        frame = get_frame(ds.PixelData, 0, number_of_frames=1)
+        ds.PixelData = encapsulate([frame, frame])
+        ds.pixel_array_options(use_v2_backend=True, decoding_plugin="gdcm")
+        arr = ds.pixel_array
+
+        assert arr.shape == (2, 64, 64)
+        assert numpy.array_equal(arr[0], arr[1])
+
+    def test_multi_frame_too_large_multi_frame(self, set_gdcm_max_buffer_size_25k):
+        """Test decoding a multi-frame image where the total pixel data is too large
+        for GDCM to decode but multiple individual frames are small enough that many
+        frames can be decoded in one go.
+        """
+        ds = dcmread(jpeg2000_lossless_name)
+        # 11 frames will be decoded as (3, 3, 3, 2)
+        ds.NumberOfFrames = 11
+        frame = get_frame(ds.PixelData, 0, number_of_frames=1)
+        ds.PixelData = encapsulate([frame] * 11)
+        ds.pixel_array_options(use_v2_backend=True, decoding_plugin="gdcm")
+        arr = ds.pixel_array
+
+        assert arr.shape == (11, 64, 64)
+        for idx in range(11):
+            assert numpy.array_equal(arr[idx], arr[1])
+
+
+@pytest.mark.skipif(not HAVE_GDCM, reason="GDCM not available")
 class TestSupportFunctions:
     @pytest.fixture(scope="class")
     def dataset_2d(self):
@@ -585,16 +628,6 @@ class TestSupportFunctions:
     def dataset_3d(self):
         return dcmread(color_3d_jpeg_baseline)
 
-    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message)
-    def test_create_data_element_from_uncompressed_2d_dataset(self, dataset_2d):
-        data_element = gdcm_handler.create_data_element(dataset_2d)
-
-        assert 0x7FE0 == data_element.GetTag().GetGroup()
-        assert 0x0010 == data_element.GetTag().GetElement()
-        assert data_element.GetSequenceOfFragments() is None
-        assert data_element.GetByteValue() is not None
-
-    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message)
     def test_create_data_element_from_compressed_2d_dataset(
         self, dataset_2d_compressed
     ):
@@ -605,7 +638,6 @@ class TestSupportFunctions:
         assert data_element.GetSequenceOfFragments() is not None
         assert data_element.GetByteValue() is None
 
-    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message)
     def test_create_data_element_from_3d_dataset(self, dataset_3d):
         data_element = gdcm_handler.create_data_element(dataset_3d)
 
@@ -614,31 +646,9 @@ class TestSupportFunctions:
         assert data_element.GetSequenceOfFragments() is not None
         assert data_element.GetByteValue() is None
 
-    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message)
-    def test_create_image_from_2d_dataset(self, dataset_2d):
-        data_element = gdcm_handler.create_data_element(dataset_2d)
-        image = gdcm_handler.create_image(dataset_2d, data_element)
-        assert 2 == image.GetNumberOfDimensions()
-        assert [dataset_2d.Rows, dataset_2d.Columns] == image.GetDimensions()
-        pi_type = gdcm.PhotometricInterpretation.GetPIType(
-            dataset_2d.PhotometricInterpretation
-        )
-        assert pi_type == image.GetPhotometricInterpretation().GetType()
-
-        uid = str.__str__(dataset_2d.file_meta.TransferSyntaxUID)
-        assert uid == image.GetTransferSyntax().GetString()
-        pixel_format = image.GetPixelFormat()
-        assert dataset_2d.SamplesPerPixel == pixel_format.GetSamplesPerPixel()
-        assert dataset_2d.BitsAllocated == pixel_format.GetBitsAllocated()
-        assert dataset_2d.BitsStored == pixel_format.GetBitsStored()
-        assert dataset_2d.HighBit == pixel_format.GetHighBit()
-        px_repr = dataset_2d.PixelRepresentation
-        assert px_repr == pixel_format.GetPixelRepresentation()
-
-    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message)
     def test_create_image_from_3d_dataset(self, dataset_3d):
         data_element = gdcm_handler.create_data_element(dataset_3d)
-        image = gdcm_handler.create_image(dataset_3d, data_element)
+        image = gdcm_handler.create_image(dataset_3d)
         assert 3 == image.GetNumberOfDimensions()
         assert [
             dataset_3d.Columns,
