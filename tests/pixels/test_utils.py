@@ -1524,8 +1524,8 @@ class TestCompressRLE:
         msg = (
             r"The pixel data encoder for 'RLE Lossless' is unavailable because "
             r"all of its plugins are missing dependencies:\n"
-            r"    gdcm - requires gdcm>=3.0.10\n"
-            r"    pylibjpeg - requires numpy, pylibjpeg>=2.0 and pylibjpeg-rle>=2.0"
+            r"    pylibjpeg - requires numpy, pylibjpeg>=2.0 and pylibjpeg-rle>=2.0\n"
+            r"    gdcm - requires gdcm>=3.0.10"
         )
         with pytest.raises(RuntimeError, match=msg):
             compress(ds, RLELossless)

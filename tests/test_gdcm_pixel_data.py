@@ -331,6 +331,7 @@ def set_gdcm_max_buffer_size_25k():
     gdcm_handler._GDCM_MAX_BUFFER_SIZE = original
 
 
+@pytest.mark.skipif(not HAVE_GDCM, reason="GDCM not available")
 class TestsWithGDCM:
     @pytest.fixture(scope="class")
     def unicode_filename(self):
@@ -613,6 +614,7 @@ class TestsWithGDCM:
             assert numpy.array_equal(arr[idx], arr[1])
 
 
+@pytest.mark.skipif(not HAVE_GDCM, reason="GDCM not available")
 class TestSupportFunctions:
     @pytest.fixture(scope="class")
     def dataset_2d(self):
