@@ -249,6 +249,7 @@
 <h3>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>DICOM dictionary updated to 2024d.</p></li>
+<li><p>Prefer using pylibjpeg over GDCM when encoding <em>RLE Lossless</em>.</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -271,6 +272,8 @@ changing the <em>SOP Instance UID</em> when not required (<a class="extlink-issu
 <a class="reference internal" href="../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a>.</p></li>
 <li><p>Make sure that no download of examples is attempted on importing examples if the example
 data is not found locally (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2223">#2223</a>).</p></li>
+<li><p>Add mitigation and better error messaging for SWIG errors when using GDCM to decompress
+datasets with more than 2**31 - 1 bytes (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2227">#2227</a>)</p></li>
 </ul>
 </section>
 <section id="enhancements">
