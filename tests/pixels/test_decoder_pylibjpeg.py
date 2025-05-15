@@ -41,6 +41,7 @@ from .pixels_reference import (
     JLSL_08_07_1_0_1F,
     JLSL_16_15_1_1_1F,
     JPGB_08_08_3_0_120F_YBR_FULL_422,
+    RLE_1_1_3F,
 )
 
 
@@ -377,3 +378,16 @@ class TestRleDecoder:
         )
         if meta["samples_per_pixel"] > 1:
             assert meta["planar_configuration"] == 1
+
+    def test_singlebit_raises(self):
+        """Currently single bit is not supported, check error raised."""
+        reference = RLE_1_1_3F
+        decoder = get_decoder(RLELossless)
+        msg = (
+            "Unable to decode as exceptions were raised by all "
+            "available plugins:\n  pylibjpeg: pylibjpeg cannot "
+            "decompress RLELossless encoded data with bits "
+            "allocated = 1."
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            decoder.as_array(reference.ds, decoding_plugin="pylibjpeg")

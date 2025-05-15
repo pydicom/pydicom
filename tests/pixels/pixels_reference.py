@@ -201,14 +201,14 @@ def test(ref, arr, **kwargs):
 EXPL_1_1_3F = PixelReference("liver.dcm", "u1", test)
 DEFL_1_1_3F = PixelReference("liver_deflate.dcm", "u1", test)
 RLE_1_1_3F = PixelReference("liver_rle.dcm", "u1", test)
-J2K_1_1_3F = PixelReference("liver_j2k.dcm", "u1", test)
+J2KR_1_1_3F = PixelReference("liver_j2k.dcm", "u1", test)
 
 # Same image cropped from 512 x 512 to 510 x 511 such that frame boundaries are
 # no longer aligned with byte boundaries
 EXPL_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned.dcm", "u1", test)
 DEFL_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned_deflate.dcm", "u1", test)
 RLE_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned_rle.dcm", "u1", test)
-J2K_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned_j2k.dcm", "u1", test)
+J2KR_1_1_3F_NONALIGNED = PixelReference("liver_nonbyte_aligned_j2k.dcm", "u1", test)
 
 
 # DEFL, (8, 8), (1, 512, 512, 1), OB, MONOCHROME2, 0
@@ -1331,6 +1331,15 @@ PIXEL_REFERENCE[RLELossless] = [
 ]
 
 
+# Some RLE decoders cannot handle single bit cases, so keep a separate list
+# including single bit cases to use with those that can
+RLE_PIXEL_REFERENCE_WITH_1BIT = [
+    *PIXEL_REFERENCE[RLELossless],
+    RLE_1_1_3F,
+    RLE_1_1_3F_NONALIGNED,
+]
+
+
 # JPEG - ISO/IEC 10918 Standard
 # JPGB: JPEGBaseline8Bit
 # JPGE: JPEGExtended12Bit
@@ -2256,6 +2265,8 @@ PIXEL_REFERENCE[JPEG2000Lossless] = [
     J2KR_16_16_1_1_1F_M2,
     J2KR_16_13_1_1_1F_M2_MISMATCH,
     J2KR_08_08_3_0_1F_YBR_RCT,
+    J2KR_1_1_3F,
+    J2KR_1_1_3F_NONALIGNED,
 ]
 PIXEL_REFERENCE[JPEG2000] = [
     J2KI_08_08_3_0_1F_RGB,
@@ -2266,6 +2277,7 @@ PIXEL_REFERENCE[JPEG2000] = [
     J2KI_16_14_1_1_1F_M2,
     J2KI_16_16_1_1_1F_M2,
 ]
+
 PIXEL_REFERENCE[HTJ2KLossless] = [HTJR_08_08_1_1_1F_RGB]
 PIXEL_REFERENCE[HTJ2KLosslessRPCL] = []
 PIXEL_REFERENCE[HTJ2K] = [HTJI_08_08_1_1_1F_RGB]
