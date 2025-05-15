@@ -935,8 +935,9 @@ class TestDecoder:
         with pytest.raises(ValueError, match=msg):
             decoder._validate_plugins("foo")
 
-    def test_bitpack_option(self):
-        """Test compatibility of options with different methods."""
+    @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
+    def test_bitpack_option_array(self):
+        """Test compatibility of "is_bitpacked" option with array methods."""
         decoder = get_decoder(RLELossless)
         source = RLE_1_1_3F.ds
 
@@ -947,6 +948,11 @@ class TestDecoder:
         list(decoder.iter_array(source, is_bitpacked=False))
         with pytest.raises(ValueError, match=msg):
             list(decoder.iter_array(source, is_bitpacked=True))
+
+    def test_bitpack_option_buffer(self):
+        """Test compatibility of "is_bitpacked" option with buffer methods."""
+        decoder = get_decoder(RLELossless)
+        source = RLE_1_1_3F.ds
 
         decoder.as_buffer(source, is_bitpacked=True, decoding_plugin="pydicom")
         msg = "Buffers of single bit data are always in bit-packed format."
