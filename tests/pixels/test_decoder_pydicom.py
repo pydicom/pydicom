@@ -613,6 +613,15 @@ class TestDecodeRLEFrame:
         with pytest.raises(NotImplementedError, match=msg):
             _rle_decode_frame(b"\x00\x00\x00\x00", 1, 1, 1, 12)
 
+    def test_single_bits_multiple_sample_raises(self):
+        """Test exception raised for BitsAllocated 1 with multiple samples."""
+        msg = (
+            "Unable to decode RLE encoded pixel data with Bits Allocated = 1 "
+            "and SamplesPerPixel > 1."
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            _rle_decode_frame(b"\x00\x00\x00\x00", 1, 1, 3, 1)
+
     @pytest.mark.parametrize("header,samples,bits", BAD_SEGMENT_DATA)
     def test_invalid_nr_segments_raises(self, header, samples, bits):
         """Test having too many segments in the data raises exception."""

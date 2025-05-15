@@ -1370,14 +1370,17 @@ class Decoder(CoderBase):
             <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
-        if kwargs.get("is_bitpacked", False):
-            raise ValueError("Cannot return a buffer in unpacked format.")
-
-        kwargs["is_bitpacked"] = False
-
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
+
+        if runner.get_option("bits_allocated") == 1 and not kwargs.get(
+            "is_bitpacked", True
+        ):
+            raise ValueError(
+                "Buffers of single bit data are always in bit-packed format."
+            )
+
         runner.set_decoders(
             cast(
                 dict[str, "DecodeFunction"],
