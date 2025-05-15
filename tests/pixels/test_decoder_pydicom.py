@@ -32,13 +32,8 @@ from .pixels_reference import (
     RLE_1_1_3F_NONALIGNED,
     RLE_16_1_1F,
     RLE_16_1_10F,
+    RLE_PIXEL_REFERENCE_WITH_1BIT,
 )
-
-RLE_REFERENCE = [
-    *PIXEL_REFERENCE[RLELossless],
-    RLE_1_1_3F,
-    RLE_1_1_3F_NONALIGNED,
-]
 
 
 def name(ref):
@@ -52,7 +47,7 @@ class TestAsArray:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless using dataset."""
         arr, _ = self.decoder.as_array(
@@ -80,7 +75,7 @@ class TestAsArray:
                 # The returned array is always planar configuration 0
                 assert meta["planar_configuration"] == 0
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless using binary IO."""
         ds = reference.ds
@@ -159,7 +154,7 @@ class TestIterArray:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         func = self.decoder.iter_array(
@@ -179,7 +174,7 @@ class TestIterArray:
                 # The returned array is always planar configuration 0
                 assert meta["planar_configuration"] == 0
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless for binary IO."""
         ds = reference.ds
@@ -236,7 +231,7 @@ class TestAsBuffer:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         ds = reference.ds
@@ -281,7 +276,7 @@ class TestAsBuffer:
                 buf_plane = buffer_frame[2 * plane_length :]
                 assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless for binary IO."""
         ds = reference.ds
@@ -343,7 +338,7 @@ class TestAsBuffer:
                     buf_plane = buffer_frame[2 * plane_length :]
                     assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_index(self, reference):
         """Test by `index` for RLE lossless"""
         ds = reference.ds
@@ -377,7 +372,7 @@ class TestAsBuffer:
                 buf_plane = buffer[2 * plane_length :]
                 assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_index_binary(self, reference):
         """Test by `index` for RLE lossless for binary IO"""
         ds = reference.ds
@@ -437,7 +432,7 @@ class TestIterBuffer:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         arr_func = self.decoder.iter_array(
@@ -472,7 +467,7 @@ class TestIterBuffer:
             else:
                 assert arr.tobytes() == buf
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless for binary IO."""
         ds = reference.ds
