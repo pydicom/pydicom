@@ -1373,6 +1373,14 @@ class TestPackBits:
         ):
             pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
+    def test_non_binary_input_no_numpy(self):
+        """Test non-binary input raises exception."""
+        with pytest.raises(
+            ValueError, match=r"Only binary arrays \(containing ones or"
+        ):
+            pack_bits(b"\x00\x00\x02\x00\x00\x00\x00\x00")
+
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_ndarray_input(self):
         """Test non 1D input gets ravelled."""
@@ -2218,6 +2226,18 @@ class TestDecompress:
         ds.pixel_array_options(as_rgb=False)
         rgb = convert_color_space(ds.pixel_array, "YBR_FULL", "RGB")
         assert np.array_equal(rgb, ref)
+
+    def test_single_bit_with_pdh_raises(self):
+        """Test a single bit image is unpacked correctly."""
+        ds = dcmread(DEFL_1_1_3F.path)
+
+        assert ds.BitsAllocated == 1
+        msg = (
+            "Decompression of single-bit images is not supported with the "
+            " 'use_pdh' option."
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            decompress(ds, use_pdh=True)
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     @pytest.mark.parametrize("path", [DEFL_1_1_3F.path, DEFL_1_1_3F_NONALIGNED.path])

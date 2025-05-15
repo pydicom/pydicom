@@ -122,7 +122,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
         # Signal whether single-bit data is represented in unpacked form
         if original_bits_allocated == 1:
             if tsyntax == uid.RLELossless:
-                # In cases pylibjpeg supports this case in the future
+                # In case pylibjpeg supports this case in the future
                 runner.set_option("is_bitpacked", True)
             else:
                 runner.set_option("is_bitpacked", False)
