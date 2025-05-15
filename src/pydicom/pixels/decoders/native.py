@@ -127,6 +127,11 @@ def _rle_decode_frame(
         green then all blue, with the bytes for each pixel ordered from
         MSB to LSB when reading left to right).
     """
+    if nr_bits == 1 and nr_samples != 1:
+        raise NotImplementedError(
+            "Unable to decode RLE encoded pixel data with Bits Allocated = 1 "
+            "and SamplesPerPixel > 1."
+        )
     if nr_bits % 8 and nr_bits != 1:
         raise NotImplementedError(
             f"Unable to decode RLE encoded pixel data with {nr_bits} bits allocated"
@@ -138,12 +143,6 @@ def _rle_decode_frame(
 
     # Check that the actual number of segments is as expected
     if nr_bits == 1:
-        if nr_samples != 1:
-            raise NotImplementedError(
-                "Cannot decode RLE pixel data with Bits Allocated = 1 "
-                "and SamplesPerPixel > 1."
-            )
-
         bytes_per_sample = 1
         expected_nr_segments = 1
 

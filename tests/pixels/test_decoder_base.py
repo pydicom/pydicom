@@ -37,6 +37,7 @@ except ImportError:
 from .pixels_reference import (
     EXPL_1_1_3F_NONALIGNED,
     PIXEL_REFERENCE,
+    RLE_1_1_3F,
     RLE_16_1_1F,
     RLE_16_1_10F,
     EXPL_16_1_10F,
@@ -933,6 +934,40 @@ class TestDecoder:
         )
         with pytest.raises(ValueError, match=msg):
             decoder._validate_plugins("foo")
+
+    def test_bitpack_option(self):
+        """Test compatibility of options with different methods."""
+        decoder = get_decoder(RLELossless)
+        source = RLE_1_1_3F.ds
+
+        decoder.as_array(source, is_bitpacked=False)
+        msg = "Cannot return an array in bit-packed format."
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_array(source, is_bitpacked=True)
+        list(decoder.iter_array(source, is_bitpacked=False))
+        with pytest.raises(ValueError, match=msg):
+            list(decoder.iter_array(source, is_bitpacked=True))
+
+        decoder.as_buffer(source, is_bitpacked=True, decoding_plugin="pydicom")
+        msg = "Buffers of single bit data are always in bit-packed format."
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(source, is_bitpacked=False, decoding_plugin="pydicom")
+
+        list(
+            decoder.iter_buffer(
+                source,
+                is_bitpacked=True,
+                decoding_plugin="pydicom",
+            )
+        )
+        with pytest.raises(ValueError, match=msg):
+            list(
+                decoder.iter_buffer(
+                    source,
+                    is_bitpacked=False,
+                    decoding_plugin="pydicom",
+                )
+            )
 
 
 @pytest.fixture()
