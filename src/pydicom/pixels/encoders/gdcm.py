@@ -70,6 +70,8 @@ def _rle_encode(src: bytes, runner: EncodeRunner) -> bytes:
     """
     if runner.bits_allocated > 32:
         raise ValueError("Unable to encode more than 32-bit data")
+    elif runner.bits_allocated == 1:
+        raise ValueError("Unable to encode single bit data")
 
     # Create a gdcm.Image with the uncompressed `src` data
     pi = gdcm.PhotometricInterpretation.GetPIType(runner.photometric_interpretation)
