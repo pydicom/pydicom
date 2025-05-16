@@ -1908,7 +1908,7 @@ class Decoder(CoderBase):
         if self.is_encapsulated and not indices:
             for buffer in runner.iter_decode():
                 if bits_allocated == 1 and not runner.get_option("is_bitpacked"):
-                    buffer = pack_bits(buffer)
+                    buffer = pack_bits(buffer, pad=False)
                 yield buffer, runner.pixel_properties(as_frame=True)
 
             return

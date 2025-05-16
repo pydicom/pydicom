@@ -88,6 +88,8 @@ from .pixels_reference import (
     JLSL_08_08_3_0_1F_ILV2,
     JLSN_08_01_1_0_1F,
     J2KR_08_08_3_0_1F_YBR_RCT,
+    J2KR_1_1_3F,
+    J2KR_1_1_3F_NONALIGNED,
     EXPL_1_1_3F,
     EXPL_1_1_3F_NONALIGNED,
 )
@@ -2192,6 +2194,26 @@ class TestDecompress:
         assert "NumberOfFrames" not in ds
         assert ds.PlanarConfiguration == 0
         assert ds.PhotometricInterpretation == "RGB"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(SKIP_J2K, reason="J2K plugins unavailable")
+    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
+    def test_j2k_1bit(self, path):
+        """Test decoding J2K YBR_RCT -> RGB"""
+        ds = dcmread(path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 1
+        decompress(ds, decoding_plugin="pylibjpeg")
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert ds.NumberOfFrames == 3
+        assert ds.PhotometricInterpretation == "MONOCHROME2"
         assert ds._pixel_array is None
         assert ds._pixel_id == {}
 
