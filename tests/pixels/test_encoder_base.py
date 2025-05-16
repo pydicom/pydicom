@@ -18,7 +18,7 @@ from pydicom.dataset import Dataset
 from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.encoders.base import Encoder, EncodeRunner
-from pydicom.pixels.utils import get_expected_length
+from pydicom.pixels.utils import get_expected_length, unpack_bits
 from pydicom.uid import (
     UID,
     RLELossless,
@@ -450,6 +450,47 @@ class TestEncodeRunner_GetFrame:
             "|u1",
         )
         assert self.arr_3s.shape == (4, 2, 3)
+
+    def test_arr_u01_1s(self):
+        """Test processing u1/1s"""
+        self.ds.BitsAllocated = 1
+        self.ds.BitsStored = 1
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 0
+        self.ds.Rows = 1
+        self.ds.Columns = 8
+
+        arr = np.asarray([5], dtype="|u1")
+        assert arr.dtype.itemsize == 1
+        self.runner._set_options_ds(self.ds)
+        self.runner.set_source(arr)
+        out = self.runner.get_frame(None)
+
+        # Output data should be bitpacked
+        assert len(out) == 1
+        assert b"\x05" == out
+        assert not self.runner.get_option("is_bitpacked")
+
+    def test_arr_u01_1s_unpacked_source(self):
+        """Test processing u1/1s with unpacked source"""
+        self.ds.BitsAllocated = 1
+        self.ds.BitsStored = 1
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 0
+        self.ds.Rows = 1
+        self.ds.Columns = 8
+
+        # The fact that data are not bitpacked should be inferred from the
+        # length
+        arr = np.asarray([1, 0, 1, 0, 0, 0, 0, 0], dtype="|u1")
+        assert arr.dtype.itemsize == 1
+        self.runner._set_options_ds(self.ds)
+        self.runner.set_source(arr)
+        out = self.runner.get_frame(None)
+
+        assert len(out) == 8
+        assert b"\x01\x00\x01\x00\x00\x00\x00\x00" == out
+        assert not self.runner.get_option("is_bitpacked")
 
     def test_arr_u08_1s(self):
         """Test processing u8/1s"""
@@ -912,6 +953,52 @@ class TestEncodeRunner_GetFrame:
         assert runner.get_frame(0) == b"\x00\x03\x01\x04\x02\x05"
         assert runner.get_frame(1) == b"\x06\x09\x07\x0a\x08\x0b"
         assert runner.get_frame(2) == b"\x0c\x0f\x0d\x10\x0e\x11"
+
+    def test_buffer_01(self):
+        """Test get_frame() using 1-bit samples with 1-bit containers."""
+        opts = {
+            "rows": 4,
+            "columns": 4,
+            "number_of_frames": 3,
+            "samples_per_pixel": 1,
+            "pixel_representation": 0,
+            "photometric_interpretation": PI.MONOCHROME1,
+            "planar_configuration": 0,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+        }
+
+        # Bit-packed data representation of frames
+        f1 = b"\x05\x02"
+        f2 = b"\xa3\x07"
+        f3 = b"\xff\xfe"
+
+        src = f1 + f2 + f3
+
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**opts)
+        runner.set_source(src)
+        assert runner.get_frame(0) == f1
+        assert runner.get_frame(1) == f2
+        assert runner.get_frame(2) == f3
+        assert runner.get_option("is_bitpacked")
+
+        # Repeated with unpacked single bit data
+        f1 = unpack_bits(f1, as_array=False)
+        f2 = unpack_bits(f2, as_array=False)
+        f3 = unpack_bits(f3, as_array=False)
+        src = unpack_bits(src, as_array=False)
+
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**opts)
+        runner.set_source(src)
+        assert runner.get_frame(0) == f1
+        assert runner.get_frame(1) == f2
+        assert runner.get_frame(2) == f3
+
+        # The fact that the data are not bit packed should have been deduced
+        # from the length
+        assert not runner.get_option("is_bitpacked")
 
     def test_buffer_08(self):
         """Test get_frame() using [0, 8)-bit samples with N-bit containers."""
