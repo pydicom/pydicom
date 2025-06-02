@@ -2652,7 +2652,7 @@ class Dataset:
 
             use_little: bool | None = None
             try:
-                use_little = syntax.is_little_endian
+                use_little = cast(Any, syntax).is_little_endian
             except (AttributeError, ValueError):
                 if little_endian is not None:
                     use_little = little_endian
