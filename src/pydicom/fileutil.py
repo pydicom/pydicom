@@ -30,7 +30,7 @@ def absorb_delimiter_item(
     group, elem, length = unpack(struct_format, fp.read(8))
     tag = TupleTag((group, elem))
     if tag != delimiter:
-        logger.warn(
+        logger.warning(
             "Did not find expected delimiter "
             f"'{dictionary_description(delimiter)}', instead found "
             f"{tag} at file position 0x{fp.tell() - 8:X}"
