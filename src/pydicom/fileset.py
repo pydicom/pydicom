@@ -2069,7 +2069,8 @@ class FileSet:
             return
 
         # Path to the DICOMDIR file
-        p = cast(Path, self._path) / "DICOMDIR"
+        root = cast(Path, self._path)
+        p = root / "DICOMDIR"
 
         # Re-use the existing directory structure if only moves or removals
         #   are required and `use_existing` is True
@@ -2123,17 +2124,21 @@ class FileSet:
         for instance in [ii for ii in self if ii.node._file_id in collisions]:
             self._stage["+"][instance.SOPInstanceUID] = instance
             instance._apply_stage("+")
-            shutil.copyfile(self._path / instance.node._file_id, instance.path)
+            shutil.copyfile(
+                root / cast(Path, instance.node._file_id),
+                instance.path,
+            )
 
         for instance in self:
-            dst = self._path / instance.FileID
+            dst = root / instance.FileID
             dst.parent.mkdir(parents=True, exist_ok=True)
             fn: Callable
+            src: Path | str
             if instance.SOPInstanceUID in self._stage["+"]:
                 src = instance.path
                 fn = shutil.copyfile
             else:
-                src = self._path / instance.node._file_id
+                src = root / cast(Path, instance.node._file_id)
                 fn = shutil.move
 
             fn(os.fspath(src), os.fspath(dst))

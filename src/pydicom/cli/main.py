@@ -126,7 +126,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
         # If here, then have the new object, handle indexing if there
         if (index := m.groups()[1]) is not None:  # type: ignore
             try:
-                obj = obj[int(index)]
+                obj = obj[int(index)]  # type: ignore
             except (IndexError, TypeError) as e:
                 raise argparse.ArgumentTypeError(
                     f"'{index}' gave an index error: {str(e)}"

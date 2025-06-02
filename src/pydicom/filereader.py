@@ -889,7 +889,7 @@ def read_partial(
         #  All that is needed here is to decompress and then
         #     use as normal in a file-like object
         zipped = fileobj.read()
-        name = getattr(fileobj, "name", None)
+        name = cast(str, getattr(fileobj, "name", None))
 
         # -MAX_WBITS part is from comp.lang.python answer:
         # groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
