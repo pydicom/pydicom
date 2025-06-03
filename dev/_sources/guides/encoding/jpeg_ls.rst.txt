@@ -151,16 +151,16 @@ Losslessly compress unsigned RGB pixel data in-place:
     from pydicom.uid import JPEGLSLossless
 
     ds = examples.rgb_color
-    assert ds.SamplesPerPixel == 1
+    assert ds.SamplesPerPixel == 3
     assert ds.PhotometricInterpretation == 'RGB'
     assert ds.BitsAllocated == 8
     assert ds.BitsStored == 8
     assert ds.PixelRepresentation == 0
-    assert len(ds.PixelData) == 921600
+    assert len(ds.PixelData) == 230400
 
     ds.compress(JPEGLSLossless)
 
-    print(len(ds.PixelData))  # ~261792
+    print(len(ds.PixelData))  # ~87006
 
 
 Losslessly compress signed greyscale pixel data in-place:
@@ -207,16 +207,16 @@ intensity units:
     from pydicom.uid import JPEGLSNearLossless
 
     ds = examples.rgb_color
-    assert ds.SamplesPerPixel == 1
+    assert ds.SamplesPerPixel == 3
     assert ds.PhotometricInterpretation == 'RGB'
     assert ds.BitsAllocated == 8
     assert ds.BitsStored == 8
     assert ds.PixelRepresentation == 0
-    assert len(ds.PixelData) == 921600
+    assert len(ds.PixelData) == 230400
 
     ds.compress(JPEGLSNearLossless, jls_error=2)
 
-    print(len(ds.PixelData))  # ~149188
+    print(len(ds.PixelData))  # ~52780
 
 
 Lossy compression of signed pixel data with a maximum error of 3 pixel

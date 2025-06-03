@@ -290,16 +290,16 @@ is ordered as color-by-pixel:</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGLSLossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
-<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">3</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s1">&#39;RGB&#39;</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">8</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">8</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span>
-<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">921600</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">230400</span>
 
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSLossless</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~261792</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~87006</span>
 </pre></div>
 </div>
 <p>Losslessly compress signed greyscale pixel data in-place:</p>
@@ -338,16 +338,16 @@ intensity units:</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.uid</span><span class="w"> </span><span class="kn">import</span> <span class="n">JPEGLSNearLossless</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">rgb_color</span>
-<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">==</span> <span class="mi">3</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">==</span> <span class="s1">&#39;RGB&#39;</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">8</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">8</span>
 <span class="k">assert</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span>
-<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">921600</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">230400</span>
 
 <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">JPEGLSNearLossless</span><span class="p">,</span> <span class="n">jls_error</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~149188</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">))</span>  <span class="c1"># ~52780</span>
 </pre></div>
 </div>
 <p>Lossy compression of signed pixel data with a maximum error of 3 pixel
