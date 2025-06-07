@@ -1625,9 +1625,11 @@ class TestDeferredRead:
 
     def test_file_exists(self):
         """Deferred read raises error if file no longer exists."""
-        with tempfile.NamedTemporaryFile("wb") as t:
-            shutil.copy(ct_name, t.name)
-            ds = dcmread(t.name, defer_size=2000)
+        with tempfile.TemporaryDirectory() as tdir:
+            p = Path(tdir) / "foo.dcm"
+            shutil.copy(ct_name, p)
+            ds = dcmread(p, defer_size=2000)
+            os.remove(p)
 
         with pytest.raises(OSError):
             ds.PixelData
