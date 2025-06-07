@@ -26,7 +26,7 @@ on:
             required: true
 
 env:
-  PYTEST_ARGS: ""
+  PYTEST_ARGS: "-n auto"
 
 jobs:
   tests:
