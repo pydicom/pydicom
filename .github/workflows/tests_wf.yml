@@ -26,7 +26,7 @@ on:
             required: true
 
 env:
-  PYTEST_ARGS: "-n auto"
+  PYTEST_ARGS: ""
 
 jobs:
   tests:
@@ -39,7 +39,7 @@ jobs:
       if: startsWith(inputs.python-version, 'pypy')
       run: sudo apt install -y libopenblas-dev
     - name: Set env variables
-      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
+      run: echo "PYTEST_ARGS=--cov-append --cov=pydicom -n auto" >> "$GITHUB_ENV"
     - name: Check-out code
       uses: actions/checkout@v4
       with:
