@@ -51,6 +51,7 @@ dev = [
     "pydicom-data",
     "pytest",
     "pytest-cov",
+    "pytest-xdist",
     "types-requests",
     "pre-commit",
 ]

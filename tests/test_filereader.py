@@ -11,6 +11,7 @@ from pathlib import Path
 from struct import unpack
 import sys
 import tempfile
+from time import sleep
 
 import pytest
 
@@ -1607,40 +1608,35 @@ class TestDeferredRead:
     works as expected
     """
 
-    # Copy one of test files and use temporarily, then later remove.
-    def setup_method(self):
-        self.testfile_name = ct_name + ".tmp"
-        shutil.copyfile(ct_name, self.testfile_name)
-
-    def teardown_method(self):
-        if os.path.exists(self.testfile_name):
-            os.remove(self.testfile_name)
-
     def test_time_check(self):
         """Deferred read warns if file has been modified"""
-        ds = dcmread(self.testfile_name, defer_size="2 kB")
-        from time import sleep
+        with tempfile.TemporaryDirectory() as tdir:
+            p = Path(tdir) / "foo.dcm"
+            shutil.copy(ct_name, p)
+            ds = dcmread(p, defer_size="2 kB")
 
-        sleep(0.1)
-        with open(self.testfile_name, "r+") as f:
-            f.write("\0")  # "touch" the file
+            sleep(0.1)
+            with p.open("r+") as f:
+                f.write("\0")  # "touch" the file
 
-        msg = r"Deferred read warning -- file modification time has changed"
-        with pytest.warns(UserWarning, match=msg):
-            ds.PixelData
+            msg = r"Deferred read warning -- file modification time has changed"
+            with pytest.warns(UserWarning, match=msg):
+                ds.PixelData
 
     def test_file_exists(self):
         """Deferred read raises error if file no longer exists."""
-        ds = dcmread(self.testfile_name, defer_size=2000)
-        os.remove(self.testfile_name)
+        with tempfile.NamedTemporaryFile("wb") as t:
+            shutil.copy(ct_name, t.name)
+            ds = dcmread(t.name, defer_size=2000)
+
         with pytest.raises(OSError):
             ds.PixelData
 
     def test_values_identical(self, enable_debugging, caplog):
         """Deferred values exactly matches normal read."""
-        ds_norm = dcmread(self.testfile_name)
+        ds_norm = dcmread(ct_name)
         with caplog.at_level(logging.DEBUG, logger="pydicom"):
-            ds_defer = dcmread(self.testfile_name, defer_size=2000)
+            ds_defer = dcmread(ct_name, defer_size=2000)
 
         for data_elem in ds_norm:
             tag = data_elem.tag
@@ -1657,23 +1653,22 @@ class TestDeferredRead:
     def test_zipped_deferred(self):
         """Deferred values from a gzipped file works."""
         # Arose from issue 103 "Error for defer_size read of gzip file object"
-        fobj = gzip.open(gzip_name)
-        ds = dcmread(fobj, defer_size=1)
-        fobj.close()
+        with gzip.open(gzip_name) as f:
+            ds = dcmread(f, defer_size=1)
+
         # before the fix, this threw an error as file reading was not in
         # the right place, it was re-opened as a normal file, not a zip file
         ds.InstanceNumber
 
     def test_filelike_deferred(self):
         """Deferred values work with file-like objects."""
-        f = open(ct_name, "rb")
-        dataset = pydicom.dcmread(f, defer_size=1024)
-        assert 32768 == len(dataset.PixelData)
-        # The 'Histogram tables' private data element is also > 1024 bytes so
-        # pluck this out to confirm multiple deferred reads work (#1609).
-        private_block = dataset.private_block(0x43, "GEMS_PARM_01")
-        assert 2068 == len(private_block[0x29].value)
-        f.close()
+        with open(ct_name, "rb") as f:
+            dataset = pydicom.dcmread(f, defer_size=1024)
+            assert 32768 == len(dataset.PixelData)
+            # The 'Histogram tables' private data element is also > 1024 bytes so
+            # pluck this out to confirm multiple deferred reads work (#1609).
+            private_block = dataset.private_block(0x43, "GEMS_PARM_01")
+            assert 2068 == len(private_block[0x29].value)
 
     def test_buffer_deferred(self):
         """Deferred values work with buffer-like objects."""
