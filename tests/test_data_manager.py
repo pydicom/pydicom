@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
 
+from pyfakefs.fake_filesystem import FakeFilesystem
 import pytest
 
 from pydicom.data import (
@@ -136,7 +137,7 @@ class TestGetData:
 def data_fs(fs):
     # Note: when using pyfakefs you must use open() not Path.open()
     # Add home directory so the cache can be created on the GitHub runner
-    fs.add_real_directory(Path.home(), read_only=False)
+    Path.home().mkdir(parents=True, exist_ok=True)
 
     # Add the installation test data directory
     fs.add_real_directory(Path(DATA_ROOT) / "test_files", read_only=False)
