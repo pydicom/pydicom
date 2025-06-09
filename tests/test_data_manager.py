@@ -135,7 +135,9 @@ class TestGetData:
 @pytest.fixture
 def data_fs(fs):
     # Note: when using pyfakefs you must use open() not Path.open()
-    #   and os.remove() not Path.unlink()
+    # Add home directory so the cache can be created on the GitHub runner
+    fs.add_read_directory(pathlib.Path.home(), read_only=False)
+
     # Add the installation test data directory
     fs.add_real_directory(Path(DATA_ROOT) / "test_files", read_only=False)
 
