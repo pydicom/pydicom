@@ -53,3 +53,4 @@ Enhancements
 * Added support for ``YBR_PARTIAL_420`` and ``YBR_PARTIAL_422`` to
   :func:`~pydicom.pixels.convert_color_space` (:issue:`2210`)
 * Added support for compressing and decompressing *Deflated Image Frame Compression* (:issue:`2213`)
+* Suggest an element keyword when an unknown camel case dataset attribute is used.

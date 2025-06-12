@@ -647,7 +647,6 @@ class TestSupportFunctions:
         assert data_element.GetByteValue() is None
 
     def test_create_image_from_3d_dataset(self, dataset_3d):
-        data_element = gdcm_handler.create_data_element(dataset_3d)
         image = gdcm_handler.create_image(dataset_3d)
         assert 3 == image.GetNumberOfDimensions()
         assert [
