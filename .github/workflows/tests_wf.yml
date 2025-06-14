@@ -55,6 +55,10 @@ jobs:
       run: |
         python -m pip install .[dev]
 
+    - name: Ensure the pydicom data cache is up to date
+      run: |
+        python -c "from pydicom.data.data_manager import fetch_data_files; fetch_data_files()"
+
     - name: Test without numpy or handlers, incl pydicom-data (in [dev])
       run: |
         python -m pytest --cov-reset ${{ env.PYTEST_ARGS }}

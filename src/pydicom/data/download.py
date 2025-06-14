@@ -42,47 +42,53 @@ from pydicom.misc import warn_and_log
 
 HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
-_CONFIG_DIRECTORY = None  # For setting an alternative config directory
 
 
-def calculate_file_hash(fpath: pathlib.Path) -> str:
+def calculate_file_hash(fpath: pathlib.Path, blocksize: int = 65536) -> str:
     """Return the SHA256 checksum for the file at `fpath`.
+
+    ..versionchanged:: 3.1
+
+        Added the `blocksize` optional argument.
 
     Parameters
     ----------
     fpath : pathlib.Path
         The absolute path to the file that is to be checksummed.
+    blocksize : int, optional
+        The blocksize to use when reading the file, default ``65536``.
 
     Returns
     -------
     str
         The SHA256 checksum of the file.
     """
-    BLOCKSIZE = 65536
     hasher = hashlib.sha256()
-    with open(fpath, "rb") as f:
-        buf = f.read(BLOCKSIZE)
+    with fpath.open("rb") as f:
+        buf = f.read(blocksize)
         while len(buf) > 0:
             hasher.update(buf)
-            buf = f.read(BLOCKSIZE)
+            buf = f.read(blocksize)
 
     return hasher.hexdigest()
 
 
-def get_config_dir() -> pathlib.Path:
-    """Return the path to the pydicom config directory, creating it if required
+def get_config_dir(path: pathlib.Path = pathlib.Path.home()) -> pathlib.Path:
+    """Return the path to the ``.pydicom`` configuration directory, creating it if
+    required.
 
-    The config directory will be named ``.pydicom`` and will be created in the
-    local user's home directory.
+    ..versionchanged:: 3.1
+
+        Added the `path` optional argument.
+
+    Parameters
+    ----------
+    path : pathlib.Path, optional
+        The directory where the ``.pydicom`` config directory will be created, defaults
+        to the user's home directory.
     """
-    if _CONFIG_DIRECTORY is not None:
-        p = pathlib.Path(_CONFIG_DIRECTORY)
-        p.mkdir(exist_ok=True)
-
-        return p
-
-    config_dir = pathlib.Path.home() / ".pydicom"
-    config_dir.mkdir(exist_ok=True)
+    config_dir = path / ".pydicom"
+    config_dir.mkdir(exist_ok=True, parents=True)
 
     return config_dir
 
@@ -107,7 +113,7 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
         if USE_PROGRESS_BAR:
             r = requests.get(url, stream=True)
             total_size_in_bytes = int(r.headers.get("content-length", 0))
-            with open(fpath, "wb") as file:
+            with open(fpath, "wb") as f:
                 for data in tqdm.tqdm(
                     r.iter_content(chunk_size=4096),
                     total=total_size_in_bytes,
@@ -116,7 +122,7 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
                     miniters=1,
                     desc=url.split("/")[-1],
                 ):
-                    file.write(data)
+                    f.write(data)
         else:
             r = requests.get(url)
             with open(filename, "wb") as f:
@@ -131,9 +137,25 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
             urllib.request.urlretrieve(url, filename)
 
 
-def get_data_dir() -> pathlib.Path:
-    """Return the path to the cache directory, creating it if required."""
-    data_dir = get_config_dir() / "data"
+def get_data_dir(config_dir: pathlib.Path = get_config_dir()) -> pathlib.Path:
+    """Return the path to the data cache directory, creating it if required.
+
+    ..versionchanged:: 3.1
+
+        Added the `config_dir` optional argument.
+
+    Parameters
+    ----------
+    path : pathlib.Path, optional
+        The path to the parent directory of the data cache, defaults to the path
+        returned from :func:`~pydicom.data.download.get_config_dir`.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the data cache directory.
+    """
+    data_dir = config_dir / "data"
     data_dir.mkdir(exist_ok=True)
 
     return data_dir
@@ -181,10 +203,15 @@ def data_path_with_download(
     redownload_on_hash_mismatch: bool = True,
     url: str | None = None,
     quiet: bool = True,
+    data_dir: pathlib.Path = get_data_dir(),
 ) -> pathlib.Path:
     """Return the absolute path to the cached file with `filename`.
 
     If the file isn't available in the cache then it will be downloaded.
+
+    ..versionchanged:: 3.1
+
+        Added the `data_dir` optional argument.
 
     Parameters
     ----------
@@ -197,6 +224,9 @@ def data_path_with_download(
         otherwise.
     url : str, optional
         The file's corresponding download URL
+    data_dir : pathlib.Path, optional
+        The path to the data cache directory, defaults to the directory returned by
+        :func:`~pydicom.data.download.get_data_dir`.
 
     Returns
     -------
@@ -206,12 +236,11 @@ def data_path_with_download(
     if _SIMULATE_NETWORK_OUTAGE:
         raise RuntimeError("No network!")
 
-    filepath = get_data_dir().joinpath(filename)
-
+    filepath = data_dir.joinpath(filename)
     if check_hash and filepath.exists():
         try:
             get_cached_filehash(filename)
-        except NoHashFound:
+        except KeyError:
             filepath.unlink()  # Force a redownload
 
     if not filepath.exists():
@@ -222,15 +251,17 @@ def data_path_with_download(
 
     if check_hash:
         try:
-            hash_agrees = data_file_hash_check(filename)
-        except NoHashFound:
+            hash_agrees = data_file_hash_check(filename, data_dir)
+        except KeyError:
             return filepath.resolve()
 
         if not hash_agrees:
             if redownload_on_hash_mismatch:
                 filepath.unlink()
                 return data_path_with_download(
-                    filename, redownload_on_hash_mismatch=False
+                    filename,
+                    redownload_on_hash_mismatch=False,
+                    data_dir=data_dir,
                 )
 
             raise ValueError("The file on disk does not match the recorded hash.")
@@ -267,13 +298,22 @@ def get_cached_filehash(filename: str) -> str:
         raise NoHashFound
 
 
-def data_file_hash_check(filename: str) -> bool:
+def data_file_hash_check(
+    filename: str, data_dir: pathlib.Path = get_data_dir()
+) -> bool:
     """Return ``True`` if the SHA256 checksum of the cached file is correct.
+
+    ..versionchanged:: 3.1
+
+        Added the `data_dir` optional argument.
 
     Parameters
     ----------
     filename : str
         The filename of the cached file to check.
+    data_dir : pathlib.Path, optional
+        The path to the data cache directory, defaults to the directory returned by
+        :func:`~pydicom.data.download.get_data_dir`.
 
     Returns
     -------
@@ -282,7 +322,7 @@ def data_file_hash_check(filename: str) -> bool:
         otherwise.
     """
     filename = os.fspath(filename)
-    filepath = get_data_dir().joinpath(filename)
+    filepath = data_dir.joinpath(filename)
     calculated_filehash = calculate_file_hash(filepath)
 
     try:
