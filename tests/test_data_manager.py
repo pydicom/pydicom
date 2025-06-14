@@ -146,7 +146,7 @@ def data_fs(fs):
     fs.add_real_file(Path(DATA_ROOT) / "urls.json")
 
     # Add the local user's cache
-    fs.add_real_directory(Path(get_data_dir()), read_only=False)
+    fs.add_real_directory(get_data_dir(Path.home()), read_only=False)
 
     # Add the external data source from pydicom-data (if available)
     if EXT_PYDICOM:
