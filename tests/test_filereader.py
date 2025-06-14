@@ -11,6 +11,7 @@ from pathlib import Path
 from struct import unpack
 import sys
 import tempfile
+from time import sleep
 
 import pytest
 
@@ -1614,8 +1615,8 @@ class TestDeferredRead:
             shutil.copy(ct_name, p)
             ds = dcmread(p, defer_size="2 kB")
 
-            with p.open("r+") as f:
-                f.write("\0")
+            time.sleep(0.1)  # Needed by windows
+            p.touch()
 
             msg = r"Deferred read warning -- file modification time has changed"
             with pytest.warns(UserWarning, match=msg):
