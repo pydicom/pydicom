@@ -159,16 +159,28 @@ def online_test_file_dummy_paths() -> dict[str, str]:
     return dummy_path_map
 
 
-def fetch_data_files() -> None:
-    """Download missing test files to the local cache."""
-    cache = get_data_dir()
-    paths = {cache / fname: fname for fname in list(get_url_map().keys())}
+def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
+    """Download missing test files to the local cache.
+
+    ..versionchanged:: 3.1
+
+        Added the `data_dir` optional argument.
+
+    Parameters
+    ----------
+    data_dir : pathlib.Path, optional
+        The path to the data cache directory, defaults to the directory returned by
+        ``get_data_dir()``.
+
+
+    """
+    paths = {data_dir / fname: fname for fname in list(get_url_map().keys())}
 
     error = []
     for p in paths:
         # Download missing files or files that don't match the hash
         try:
-            data_path_with_download(p.name)
+            data_path_with_download(p.name, data_dir=data_dir)
         except Exception:
             error.append(p.name)
 

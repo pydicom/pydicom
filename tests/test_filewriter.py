@@ -3279,7 +3279,7 @@ class TestWritingBufferedPixelData:
             #   memory usage # usage be less than prev peak + the size of the file
             assert memory_usage < (baseline_memory_usage + limit)
 
-    @pytest.mark.parametrize("vr", sorted(list(BUFFERABLE_VRS)))
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
     def test_all_supported_VRS_can_write_a_buffered_value(self, vr):
         data = b"\x00\x01\x02\x03"
         buffer = BytesIO(data)

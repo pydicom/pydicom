@@ -6,9 +6,7 @@ import os
 from os.path import basename
 from pathlib import Path
 import shutil
-from tempfile import TemporaryDirectory
 
-from pyfakefs.fake_filesystem import FakeFilesystem
 import pytest
 
 from pydicom.data import (
@@ -135,8 +133,9 @@ class TestGetData:
 
 @pytest.fixture
 def data_fs(fs):
-    # Note: when using pyfakefs you must use open() not Path.open()
-    # Add home directory so the cache can be created on the GitHub runner
+    # Note: when using pyfakefs you must use open() with externally defined
+    # pathlib.Path instances (such as DATA_SRC), not Path.open()
+    # Add the home directory so the cache can be created on the GitHub runner
     Path.home().mkdir(parents=True, exist_ok=True)
 
     # Add the installation test data directory
@@ -149,7 +148,7 @@ def data_fs(fs):
     # Add the local user's cache
     fs.add_real_directory(get_data_dir(), read_only=False)
 
-    # Add the external data source from pydicom-data
+    # Add the external data source from pydicom-data (if available)
     if EXT_PYDICOM:
         fs.add_real_directory(DATA_SRC, read_only=False)
 
@@ -180,7 +179,7 @@ class TestExternalDataSource:
 
     def test_get_testdata_file_external_hash_mismatch(self, data_fs):
         """Test that the external source is not used when hash is not OK."""
-        p = DATA_SRC / "693_UNCI.dcm"
+        p = Path(DATA_SRC / "693_UNCI.dcm")
         with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
@@ -192,7 +191,7 @@ class TestExternalDataSource:
 
     def test_get_testdata_file_external_hash_match(self):
         """Test that external source is used when hash is OK."""
-        p = DATA_SRC / "693_UNCI.dcm"
+        p = Path(DATA_SRC / "693_UNCI.dcm")
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash == ref_hash
@@ -202,7 +201,7 @@ class TestExternalDataSource:
     def test_get_testdata_file_external_ignore_hash(self, data_fs):
         """Test that non-pydicom-data external source ignores hash check."""
         external_data_sources()["mylib"] = external_data_sources()["pydicom-data"]
-        p = DATA_SRC / "693_UNCI.dcm"
+        p = Path(DATA_SRC / "693_UNCI.dcm")
         with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
@@ -236,7 +235,7 @@ class TestExternalDataSource:
 
     def test_get_testdata_files_hash_match(self):
         """Test that the external source is not used when hash is not OK."""
-        p = DATA_SRC / "693_UNCI.dcm"
+        p = Path(DATA_SRC / "693_UNCI.dcm")
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash == ref_hash
@@ -248,7 +247,7 @@ class TestExternalDataSource:
 
     def test_get_testdata_files_hash_mismatch(self, data_fs):
         """Test that the external source is not used when hash is not OK."""
-        p = DATA_SRC / "693_UNCI.dcm"
+        p = Path(DATA_SRC / "693_UNCI.dcm")
         with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
@@ -263,7 +262,7 @@ class TestExternalDataSource:
     def test_get_testdata_files_external_ignore_hash(self, data_fs):
         """Test that non-pydicom-data external source ignores hash check."""
         external_data_sources()["mylib"] = external_data_sources()["pydicom-data"]
-        p = DATA_SRC / "693_UNCI.dcm"
+        p = Path(DATA_SRC / "693_UNCI.dcm")
         with open(p, "wb") as f:
             f.write(b"\x00\x01")
 
@@ -308,13 +307,13 @@ class TestDownload:
 def test_fetch_data_files(data_fs):
     """Test fetch_data_files()."""
     # Remove a single file from the temporary cache
-    cache = get_data_dir()
-    path = cache / "693_J2KR.dcm"
+    cache = Path(get_data_dir())
+    path = cache / "SC_rgb_expb.dcm"  # smallest file in cache
     if path.exists():
         path.unlink()
 
     assert not path.exists()
-    fetch_data_files()
+    fetch_data_files(data_dir=cache)
     assert path.exists()
 
 

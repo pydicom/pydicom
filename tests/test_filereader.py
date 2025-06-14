@@ -1614,10 +1614,7 @@ class TestDeferredRead:
             p = Path(tdir) / "foo.dcm"
             shutil.copy(ct_name, p)
             ds = dcmread(p, defer_size="2 kB")
-
-            sleep(0.1)
-            with p.open("r+") as f:
-                f.write("\0")  # "touch" the file
+            p.touch()
 
             msg = r"Deferred read warning -- file modification time has changed"
             with pytest.warns(UserWarning, match=msg):
@@ -1629,7 +1626,7 @@ class TestDeferredRead:
             p = Path(tdir) / "foo.dcm"
             shutil.copy(ct_name, p)
             ds = dcmread(p, defer_size=2000)
-            os.remove(p)
+            p.unlink()
 
         with pytest.raises(OSError):
             ds.PixelData

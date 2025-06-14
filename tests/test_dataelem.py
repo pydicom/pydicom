@@ -656,7 +656,7 @@ class TestRawDataElement:
         with pytest.raises(NotImplementedError):
             convert_raw_data_element(raw, encoding=default_encoding)
 
-    @pytest.mark.parametrize("vr", sorted(list(STR_VR - ALLOW_BACKSLASH - {VR.UR})))
+    @pytest.mark.parametrize("vr", STR_VR - ALLOW_BACKSLASH - {VR.UR})
     def test_multi_value_from_string_vr(self, vr):
         """The value of multi-valued strings is of type MultiValue"""
         raw = RawDataElement(Tag(0x00090001), vr, 8, b"42\\43 ", 0, False, True)
@@ -1476,7 +1476,7 @@ class TestDataElementValidation:
 class TestBufferedDataElement:
     """Tests setting a DataElement value to a buffer"""
 
-    @pytest.mark.parametrize("vr", sorted(list(BUFFERABLE_VRS)))
+    @pytest.mark.parametrize("vr", BUFFERABLE_VRS)
     def test_reading_dataelement_buffer(self, vr):
         value = b"\x00\x01\x02\x03"
         buffer = io.BytesIO(value)

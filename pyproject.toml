@@ -52,7 +52,6 @@ dev = [
     "pyfakefs",
     "pytest",
     "pytest-cov",
-    "pytest-xdist",
     "types-requests",
     "pre-commit",
 ]
