@@ -135,8 +135,8 @@ class TestGetData:
 def data_fs(fs):
     # Note: when using pyfakefs you must use open() with externally defined
     # pathlib.Path instances (such as DATA_SRC), not Path.open()
-    # Add the home directory so the cache can be created on the GitHub runner
-    Path.home().mkdir(parents=True, exist_ok=True)
+    # Add the cache directory so it can be created on the GitHub runner
+    (Path.home() / ".pydicom" / "data").mkdir(parents=True, exist_ok=True)
 
     # Add the installation test data directory
     fs.add_real_directory(Path(DATA_ROOT) / "test_files", read_only=False)
@@ -146,7 +146,7 @@ def data_fs(fs):
     fs.add_real_file(Path(DATA_ROOT) / "urls.json")
 
     # Add the local user's cache
-    fs.add_real_directory(get_data_dir(Path.home()), read_only=False)
+    fs.add_real_directory(get_data_dir(), read_only=False)
 
     # Add the external data source from pydicom-data (if available)
     if EXT_PYDICOM:
