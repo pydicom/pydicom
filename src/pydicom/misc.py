@@ -42,6 +42,52 @@ def size_in_bytes(expr: int | float | str | None) -> None | float | int:
     raise ValueError(f"Unable to parse length with unit '{unit}'")
 
 
+def _double_edits(keyword: str) -> set[str]:
+    """Return candidates that are two edits away from `keyword`."""
+    return set(e2 for e1 in _single_edits(keyword) for e2 in _single_edits(e1))
+
+
+def find_keyword_candidates(
+    keyword: str,
+    allowed_edits: int = 1,
+    max_candidates: None | int = 1,
+) -> list[str]:
+    """Generate possible spelling corrections for `keyword`.
+
+    ..versionadded:: 3.1
+
+    Parameters
+    ----------
+    keyword : str
+        The misspelled element keyword to find candidates for.
+    allowed_edits : int, optional
+        The number of edits allowable when searching for candidates, default ``1``.
+    max_candidates : int | None, optional
+        The maximum number of candidates to return, default ``1``. If ``None`` then
+        return all candidates.
+
+    Returns
+    -------
+    list[str]
+        The candidates for the keyword, may be an empty string if no candidates are
+        found.
+    """
+    from pydicom.datadict import keyword_dict
+
+    keywords = keyword_dict.keys()
+
+    # Adapted from https://www.norvig.com/spell-correct.html
+    candidates = [w for w in _single_edits(keyword) if w in keywords]
+    if candidates and allowed_edits == 1:
+        return sorted(candidates)[:max_candidates]
+
+    candidates.extend([w for w in _double_edits(keyword) if w in keywords])
+    if candidates:
+        return sorted(list(set(candidates)))[:max_candidates]
+
+    return []
+
+
 def is_dicom(file_path: str | Path) -> bool:
     """Return ``True`` if the file at `file_path` is a DICOM file.
 
@@ -63,6 +109,17 @@ def is_dicom(file_path: str | Path) -> bool:
     with open(file_path, "rb") as fp:
         fp.read(128)  # preamble
         return fp.read(4) == b"DICM"
+
+
+def _single_edits(keyword: str) -> set[str]:
+    """Return candidates that are a single edit away from `keyword`."""
+    letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY"
+    splits = [(keyword[:i], keyword[i:]) for i in range(len(keyword) + 1)]
+    deletes = [L + R[1:] for L, R in splits if R]
+    transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R) > 1]
+    replaces = [L + c + R[1:] for L, R in splits if R for c in letters]
+    inserts = [L + c + R for L, R in splits for c in letters]
+    return set(deletes + transposes + replaces + inserts)
 
 
 def warn_and_log(

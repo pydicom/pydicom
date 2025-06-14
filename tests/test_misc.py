@@ -7,7 +7,7 @@ import os
 import pytest
 
 from pydicom.data import get_testdata_file
-from pydicom.misc import is_dicom, size_in_bytes, warn_and_log
+from pydicom.misc import is_dicom, size_in_bytes, warn_and_log, find_keyword_candidates
 
 
 test_file = get_testdata_file("CT_small.dcm")
@@ -66,3 +66,23 @@ class TestMisc:
                 warn_and_log("Foo!")
 
             assert "Foo" in caplog.text
+
+    def test_find_keyword_candidates(self):
+        """Test find_keyword_candidates()"""
+        results = find_keyword_candidates(
+            "Patientnae", allowed_edits=2, max_candidates=None
+        )
+        assert results == ["PatientAge", "PatientName"]
+
+        results = find_keyword_candidates(
+            "SelectorULValue", allowed_edits=1, max_candidates=None
+        )
+        assert len(results) == 11
+        results = find_keyword_candidates(
+            "SelectorULValue", allowed_edits=2, max_candidates=None
+        )
+        assert len(results) == 33
+        results = find_keyword_candidates(
+            "SelectorULValue", allowed_edits=2, max_candidates=2
+        )
+        assert len(results) == 2

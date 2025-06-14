@@ -64,7 +64,7 @@ from pydicom.datadict import (
 from pydicom.dataelem import DataElement, convert_raw_data_element, RawDataElement
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
-from pydicom.misc import warn_and_log
+from pydicom.misc import warn_and_log, find_keyword_candidates
 from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
 from pydicom.pixels.utils import (
     reshape_pixel_array,
@@ -2731,9 +2731,12 @@ class Dataset:
             # Warn if `name` is camel case but not a keyword
             if _RE_CAMEL_CASE.match(name):
                 msg = (
-                    f"Camel case attribute '{name}' used which is not in the "
-                    "element keyword data dictionary"
+                    f"Camel case attribute '{name}' used which is not a known public "
+                    "element keyword"
                 )
+                if candidates := find_keyword_candidates(name):
+                    msg += f", did you mean '{candidates[0]}'?"
+
                 if config.INVALID_KEYWORD_BEHAVIOR == "WARN":
                     warn_and_log(msg)
                 elif config.INVALID_KEYWORD_BEHAVIOR == "RAISE":

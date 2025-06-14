@@ -186,8 +186,8 @@ class TestDataset:
         """Dataset: can set class instance property (non-dicom)."""
         ds = Dataset()
         msg = (
-            r"Camel case attribute 'SomeVariableName' used which is not in "
-            r"the element keyword data dictionary"
+            r"Camel case attribute 'SomeVariableName' used which is not a "
+            r"known public element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
             ds.SomeVariableName = 42
@@ -477,8 +477,8 @@ class TestDataset:
         ds.PatientName = "name"
         ds.PatientID = "id"
         msg = (
-            r"Camel case attribute 'NonDicomVariable' used which is not in "
-            r"the element keyword data dictionary"
+            r"Camel case attribute 'NonDicomVariable' used which is not a "
+            r"known public element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
             ds.NonDicomVariable = "junk"
@@ -498,8 +498,8 @@ class TestDataset:
         ds.PatientName = "name"
         ds.PatientID = "id"
         msg = (
-            r"Camel case attribute 'NonDicomVariable' used which is not in "
-            r"the element keyword data dictionary"
+            r"Camel case attribute 'NonDicomVariable' used which is not a "
+            r"known public element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
             ds.NonDicomVariable = "junk"
@@ -658,8 +658,8 @@ class TestDataset:
         # Non-element class members are ignored in equality testing
         d = Dataset()
         msg = (
-            r"Camel case attribute 'SOPEustaceUID' used which is not in "
-            r"the element keyword data dictionary"
+            r"Camel case attribute 'SOPEustaceUID' used which is not a "
+            r"known public element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
             d.SOPEustaceUID = "1.2.3.4"
@@ -2773,12 +2773,12 @@ CAMEL_CASE = (
         "PatientName",
     ],
     [  # Should warn
-        "bitsStored",
-        "BitSStored",
-        "TwelveLeadECG",
-        "SOPInstanceUId",
-        "PatientsName",
-        "Rowds",
+        ("bitsStored", "BitsStored"),
+        ("BitSStored", "BitsStored"),
+        ("TwelveLeadECG", ""),
+        ("SOPInstanceUId", "SOPInstanceUID"),
+        ("PatientsName", "PatientName"),
+        ("Rowds", "Rows"),
     ],
 )
 
@@ -2831,11 +2831,14 @@ def test_setattr_warns(setattr_warn):
                 val = getattr(ds, s, None)
                 setattr(ds, s, val)
 
-    for s in CAMEL_CASE[1]:
+    for s, kw in CAMEL_CASE[1]:
         msg = (
-            r"Camel case attribute '" + s + r"' used which is not in the "
-            r"element keyword data dictionary"
+            r"Camel case attribute '" + s + r"' used which is not a known public "
+            r"element keyword"
         )
+        if kw:
+            msg += f", did you mean '{kw}'"
+
         with pytest.warns(UserWarning, match=msg):
             val = getattr(ds, s, None)
             setattr(ds, s, None)
@@ -2862,11 +2865,14 @@ def test_setattr_raises(setattr_raise):
                 val = getattr(ds, s, None)
                 setattr(ds, s, val)
 
-    for s in CAMEL_CASE[1]:
+    for s, kw in CAMEL_CASE[1]:
         msg = (
-            r"Camel case attribute '" + s + r"' used which is not in the "
-            r"element keyword data dictionary"
+            r"Camel case attribute '" + s + r"' used which is not a known public "
+            r"element keyword"
         )
+        if kw:
+            msg += f", did you mean '{kw}'"
+
         with pytest.raises(ValueError, match=msg):
             val = getattr(ds, s, None)
             setattr(ds, s, None)
@@ -2894,7 +2900,7 @@ def test_setattr_ignore(setattr_ignore):
                 setattr(ds, s, val)
 
     ds = Dataset()
-    for s in CAMEL_CASE[1]:
+    for s, kw in CAMEL_CASE[1]:
         with assert_no_warning():
             getattr(ds, s, None)
             setattr(ds, s, None)
