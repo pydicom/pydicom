@@ -44,7 +44,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
 
 
-def calculate_file_hash(path: pathlib.Path, blocksize: int = 65536) -> str:
+def calculate_file_hash(fpath: pathlib.Path, blocksize: int = 65536) -> str:
     """Return the SHA256 checksum for the file at `fpath`.
 
     ..versionchanged:: 3.1
@@ -53,7 +53,7 @@ def calculate_file_hash(path: pathlib.Path, blocksize: int = 65536) -> str:
 
     Parameters
     ----------
-    path : pathlib.Path
+    fpath : pathlib.Path
         The absolute path to the file that is to be checksummed.
     blocksize : int, optional
         The blocksize to use when reading the file, default ``65536``.
@@ -64,8 +64,7 @@ def calculate_file_hash(path: pathlib.Path, blocksize: int = 65536) -> str:
         The SHA256 checksum of the file.
     """
     hasher = hashlib.sha256()
-    print(path, type(path))
-    with path.open("rb") as f:
+    with fpath.open("rb") as f:
         buf = f.read(blocksize)
         while len(buf) > 0:
             hasher.update(buf)
@@ -149,7 +148,7 @@ def get_data_dir(config_dir: pathlib.Path = get_config_dir()) -> pathlib.Path:
     ----------
     path : pathlib.Path, optional
         The path to the parent directory of the data cache, defaults to the path
-        returned from ``get_config_dir()``.
+        returned from :func:`~pydicom.data.download.get_config_dir`.
 
     Returns
     -------
@@ -227,7 +226,7 @@ def data_path_with_download(
         The file's corresponding download URL
     data_dir : pathlib.Path, optional
         The path to the data cache directory, defaults to the directory returned by
-        ``get_data_dir()``.
+        :func:`~pydicom.data.download.get_data_dir`.
 
     Returns
     -------
@@ -314,7 +313,7 @@ def data_file_hash_check(
         The filename of the cached file to check.
     data_dir : pathlib.Path, optional
         The path to the data cache directory, defaults to the directory returned by
-        ``get_data_dir()``.
+        :func:`~pydicom.data.download.get_data_dir`.
 
     Returns
     -------

@@ -11,7 +11,6 @@ from pathlib import Path
 from struct import unpack
 import sys
 import tempfile
-from time import sleep
 
 import pytest
 

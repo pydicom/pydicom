@@ -170,9 +170,7 @@ def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
     ----------
     data_dir : pathlib.Path, optional
         The path to the data cache directory, defaults to the directory returned by
-        ``get_data_dir()``.
-
-
+        :func:`~pydicom.data.download.get_data_dir`.
     """
     paths = {data_dir / fname: fname for fname in list(get_url_map().keys())}
 
