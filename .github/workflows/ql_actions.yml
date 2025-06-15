@@ -1,6 +1,0 @@
-on:
-  push:
-    branches: [main, protected]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.txt'
