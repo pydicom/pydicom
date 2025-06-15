@@ -180,15 +180,15 @@ def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
         try:
             data_path_with_download(p.name, data_dir=data_dir)
         except Exception as exc:
-            filenames = errors.setdefault(str(exc), [])
+            filenames = errors.setdefault(f"{type(exc).__name__}: {exc}", [])
             filenames.append(p.name)
 
     if not errors:
         return
 
-    msg = ["The following error(s) occurred attempting to download the data files"]
+    msg = ["The following exception(s) occurred trying to download the data files"]
     for err, filenames in errors.items():
-        err_msg = f"  {err}: " + ", ".join(filenames[:2])
+        err_msg = f"  '{err}' for " + ", ".join(filenames[:2])
         if len(filenames) > 2:
             err_msg += f" and {len(filenames) - 2} others"
 
