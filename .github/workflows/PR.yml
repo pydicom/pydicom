@@ -34,6 +34,11 @@ jobs:
             test-numpy: false
             test-extras: false
             upload-coverage: false
+          - os: ubuntu
+            python-version: "pypy3.10"
+            test-numpy: true
+            test-extras: false
+            upload-coverage: false
 
     uses: ./.github/workflows/tests_wf.yml
     secrets:

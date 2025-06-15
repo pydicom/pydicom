@@ -174,18 +174,27 @@ def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
     """
     paths = {data_dir / fname: fname for fname in list(get_url_map().keys())}
 
-    error = []
+    errors: dict[str, list[str]] = {}
     for p in paths:
         # Download missing files or files that don't match the hash
         try:
             data_path_with_download(p.name, data_dir=data_dir)
-        except Exception:
-            error.append(p.name)
+        except Exception as exc:
+            filenames = errors.setdefault(str(exc), [])
+            filenames.append(p.name)
 
-    if error:
-        raise RuntimeError(
-            f"An error occurred downloading the following files: {', '.join(error)}"
-        )
+    if not errors:
+        return
+
+    msg = ["The following error(s) occurred attempting to download the data files"]
+    for err, filenames in errors.items():
+        err_msg = f"  {err}: " + ", ".join(filenames[:2])
+        if len(filenames) > 2:
+            err_msg += f" and {len(filenames) - 2} others"
+
+        msg.append(err_msg)
+
+    raise RuntimeError("\n".join(msg))
 
 
 def get_files(

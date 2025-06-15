@@ -319,7 +319,10 @@ def test_fetch_data_files(data_fs):
 
 def test_fetch_data_files_download_failure(download_failure):
     """Test fetch_data_files() with download failures."""
-    msg = r"An error occurred downloading the following files:"
+    msg = (
+        r"The following error\(s\) occurred attempting to download the data files\n"
+        r"  No network\!: 693_J2KR.dcm, 693_UNCI.dcm and 77 others"
+    )
     with pytest.raises(RuntimeError, match=msg):
         fetch_data_files()
 
