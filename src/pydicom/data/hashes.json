@@ -64,7 +64,14 @@
   "gdcm-US-ALOKA-16.dcm": "f1a2d5f7c4ffe87dc589b12738084099fe44a436f6980f5d7e96a026ad356d65",
   "gdcm-US-ALOKA-16_big.dcm": "2a801cbd7bd04ed28b9c14c7a8edb04b43384e38f00574e27c0fab8f4aa62db4",
   "liver.dcm": "4f8fb316b6df067bdf2ef7bc2385fd571ad5be67e171aed3ed902a71293d9d5c",
+  "liver_deflate.dcm": "125601ebad68bed95b2e726557a3732397604b171ad84e808818b92019b13e42",
   "liver_expb.dcm": "fe3323f3f4a2166e4c5305a2380a035a66504197f3f01a6e2b50bbd9814721d5",
+  "liver_j2k.dcm": "49f63dc1dd039d6cb535021b54d1c20791ac5aa24ec138bf309fa1728c1ec98c",
+  "liver_nonbyte_aligned.dcm": "9f45d4a7775834180c5dc19ad141de1dc2439d26f3ac1f9aa869ccb91296a8ec",
+  "liver_nonbyte_aligned_deflate.dcm": "986863c4472c8d3d3a421b04fc9b526aebc15db827f2f497dbcb7e544eb78dc3",
+  "liver_nonbyte_aligned_j2k.dcm": "9e249e56499594b64b75662f950a02e1e84a012830980c65eb9263fe63c06070",
+  "liver_nonbyte_aligned_rle.dcm": "bbea7fa203eb01213b945c3d13e4916d175689983fce489e25b99490f7e8aefa",
+  "liver_rle.dcm": "2eba8df906c66ebb66baf749ea38bb547bf005d08226c5ed73262f95a9f273ce",
   "mlut_18.dcm": "9c65b39df55dc46a4670f76e0ec1093d097206ed46c2d7e23b8051c87ef0228b",
   "vlut_04.dcm": "64f54c0f490ce3fa2faac0a90a7ca0166caa025f8fdcfbe181906387a7867c27",
   "HTJ2KLossless_08_RGB.dcm": "38f8e8adf46b928a12f1905df1405bc8a32c10286733c47562c75be84ceae00e",
@@ -76,6 +83,5 @@
   "JLSL_08_07_0_1F.dcm": "308fb028c8fbdd1e9a93e731978ea4da6b15cb55b40451cf6f21e7c9ba35dd8a",
   "JLSL_16_15_1_1F.dcm": "61f38f250a7dc82c44529c0face2eeab3ffd02ca8b9dfc756dd818eb252104b6",
   "parametric_map_float.dcm": "957f34397c26d82f7a90cad7a653ce0f7238f4be6aa9dfa9a33bae5dc2ce7e23",
-  "parametric_map_double_float.dcm": "a41e0b78b05e543a2448e22435858f9ca8d5f94807d7b391b93b4bca80e23a22",
-  "liver_nonbyte_aligned.dcm": "530c6af2a2a0caa6033d99ad407fe1f6e3942c64a8fcfc5649d4d06c26473862"
+  "parametric_map_double_float.dcm": "a41e0b78b05e543a2448e22435858f9ca8d5f94807d7b391b93b4bca80e23a22"
 }

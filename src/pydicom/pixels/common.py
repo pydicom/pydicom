@@ -688,3 +688,9 @@ class RunnerOptions(TypedDict, total=False):
     # Optional
     # The Extended Offset Table values
     extended_offsets: tuple[bytes, bytes] | tuple[list[int], list[int]]
+
+    # Whether or not single bit data (with Bits Allocated = 1) is passed
+    # to/from encoder/decoder functions in a bit-packed format (if True) or
+    # unpacked format (if False). The unpacked stores each pixel in a uint8
+    # with value 0 or 1. Ignored if BitsAllocated > 1.
+    is_bitpacked: bool
