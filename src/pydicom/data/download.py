@@ -86,6 +86,11 @@ def get_config_dir(path: pathlib.Path = pathlib.Path.home()) -> pathlib.Path:
     path : pathlib.Path, optional
         The directory where the ``.pydicom`` config directory will be created, defaults
         to the user's home directory.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the configuration directory.
     """
     config_dir = path / ".pydicom"
     config_dir.mkdir(exist_ok=True, parents=True)

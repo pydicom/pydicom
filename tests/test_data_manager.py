@@ -5,6 +5,7 @@ import json
 import os
 from os.path import basename
 from pathlib import Path
+import platform
 import shutil
 
 import pytest
@@ -151,6 +152,11 @@ def data_fs(fs):
     # Add the external data source from pydicom-data (if available)
     if EXT_PYDICOM:
         fs.add_real_directory(DATA_SRC, read_only=False)
+
+    # Add SSL certificate for PyPy
+    if platform.python_implementation() == "PyPy":
+        # Location for cert store on Ubuntu
+        fs.add_real_file("/etc/ssl/certs/ca-certificates.crt", read_only=True)
 
     yield fs
 
@@ -319,7 +325,10 @@ def test_fetch_data_files(data_fs):
 
 def test_fetch_data_files_download_failure(download_failure):
     """Test fetch_data_files() with download failures."""
-    msg = r"An error occurred downloading the following files:"
+    msg = (
+        r"The following exception\(s\) occurred trying to download the data files\n"
+        r"  'RuntimeError: No network!' for 693_J2KR.dcm, 693_UNCI.dcm and 77 others"
+    )
     with pytest.raises(RuntimeError, match=msg):
         fetch_data_files()
 
