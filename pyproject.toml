@@ -27,7 +27,7 @@ description = "A pure Python package for reading and writing DICOM data"
 # dynamic = ["version"]
 keywords = ["dicom, python, medical, imaging"]
 license = {text = "MIT"}
-name = "pydicom"
+name = "pydicom_v3_0_1"
 readme = "README.md"
 requires-python = ">=3.10"
 version = "3.1.0.dev0"
