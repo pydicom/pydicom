@@ -106,7 +106,7 @@ def _pass_through(val: Any) -> Any:
     return val
 
 
-class DataElement:
+class DataElement:  # noqa: PLW1641
     """Contain and manipulate a DICOM Element.
 
     Examples

@@ -11,7 +11,7 @@ T = TypeVar("T")
 Self = TypeVar("Self", bound="ConstrainedList")
 
 
-class ConstrainedList(MutableSequence[T]):
+class ConstrainedList(MutableSequence[T]):  # noqa: PLW1641
     """A list of items that must all be of the same type."""
 
     def __init__(self, iterable: Iterable[T] | None = None) -> None:
