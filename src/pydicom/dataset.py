@@ -246,7 +246,7 @@ _DatasetValue = DataElement | RawDataElement
 _DatasetType: TypeAlias = "Dataset | MutableMapping[BaseTag, _DatasetValue]"
 
 
-class Dataset:
+class Dataset:  # noqa: PLW1641
     """A DICOM dataset as a mutable mapping of DICOM Data Elements.
 
     Examples
