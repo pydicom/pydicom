@@ -20,7 +20,7 @@ syntax. For an explanation of each parameter and its relationship with the
 | *Samples   | *Photometric    | *Pixel          | *Bits      | *Bits   |
 | per Pixel* | Interpretation* | Representation* | Allocated* | Stored* |
 +============+=================+=================+============+=========+
-| 1          | MONOCHROME1     | 0 or 1          | 8 or 16    | 1 to 16 |
+| 1          | MONOCHROME1     | 0 or 1          | 1, 8 or 16 | 1 to 16 |
 |            +-----------------+                 |            |         |
 |            | MONOCHROME2     |                 |            |         |
 |            +-----------------+-----------------+            |         |
