@@ -456,6 +456,23 @@ def write_PN(
     fp.write(enc)
 
 
+def _default_encoded(val: str) -> bytes:
+    """Return an encoded string using the default encoding.
+    Depending on :attr:`~pydicom.config.settings.writing_validation_mode`,
+    an encoding error is either propagated, or replacement characters are used
+    and a warning is logged."""
+    try:
+        return val.encode(default_encoding)
+    except UnicodeEncodeError:
+        if config.settings.writing_validation_mode == config.RAISE:
+            raise
+        warn_and_log(
+            "Not a valid ASCII string "
+            "- using replacement characters in encoded string"
+        )
+        return val.encode(default_encoding, errors="replace")
+
+
 def write_string(fp: DicomIO, elem: DataElement, padding: str = " ") -> None:
     """Write a single or multivalued ASCII string."""
     val = multi_string(cast(str | Iterable[str], elem.value))
@@ -464,7 +481,7 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = " ") -> None:
             val += padding  # pad to even length
 
         if isinstance(val, str):
-            val = val.encode(default_encoding)  # type: ignore[assignment]
+            val = _default_encoded(val)  # type: ignore[assignment]
 
         fp.write(val)  # type: ignore[arg-type]
 
@@ -545,7 +562,7 @@ def write_DA(fp: DicomIO, elem: DataElement) -> None:
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = val.encode(default_encoding)
+            val = _default_encoded(val)
 
         fp.write(val)
 
@@ -578,7 +595,7 @@ def write_DT(fp: DicomIO, elem: DataElement) -> None:
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = val.encode(default_encoding)
+            val = _default_encoded(val)
 
         fp.write(val)
 
@@ -611,7 +628,7 @@ def write_TM(fp: DicomIO, elem: DataElement) -> None:
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = val.encode(default_encoding)
+            val = _default_encoded(val)
 
         fp.write(val)
 
