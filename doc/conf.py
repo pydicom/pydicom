@@ -14,9 +14,11 @@
 
 from datetime import datetime
 import os
+from pathlib import Path
 import sys
 
-import sphinx_rtd_theme
+import pydata_sphinx_theme
+
 import pydicom
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -39,7 +41,12 @@ except ImportError:
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.insert(0, os.path.abspath("../build_tools/sphinx"))
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(os.fspath(BASE_DIR))
+
+
 from github_link import make_linkcode_resolve
+
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -66,7 +73,6 @@ extensions = [
     "sphinx.ext.napoleon",  # Numpy style docstrings
     "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
-    "sphinxcontrib.jquery",  # Needed by sphinx_rtd_theme
     # Custom
     "sphinx_copybutton",
 ]
@@ -102,7 +108,7 @@ intersphinx_mapping = {
 }
 
 sphinx_gallery_conf = {
-    "default_thumb_file": "assets/img/pydicom_flat_black_alpha.png",
+    "default_thumb_file": "_static/img/pydicom_flat_black_alpha.png",
     # path to your examples scripts
     "examples_dirs": "../examples",
     # path where to save gallery generated examples
@@ -187,7 +193,7 @@ html_style = "css/pydicom.css"
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -195,7 +201,63 @@ html_theme = "sphinx_rtd_theme"
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# Define the version we use for matching in the version switcher.
+version_match = os.environ.get("READTHEDOCS_VERSION")
+# If READTHEDOCS_VERSION doesn't exist, we're not on RTD
+# If it is an integer, we're in a PR build and the version isn't correct.
+# If it's "latest" → change to "dev" (that's what we want the switcher to call it)
+json_url = "https://pydicom.github.io/pydicom/dev/_static/switcher.json"
+if not version_match or version_match.isdigit() or version_match == "latest":
+    # For local development, infer the version to match from the package.
+    if "dev" in release or "rc" in release:
+        version_match = "dev"
+        # We want to keep the relative reference if we are in dev mode
+        # but we want the whole url if we are effectively in a released version
+        json_url = "_static/switcher.json"
+    else:
+        version_match = f"v{release}"
+elif version_match == "stable":
+    version_match = f"v{release}"
+
+html_theme_options = {
+    "logo": {
+        "text": "pydicom",
+        "image_dark": "_static/img/logo.png",
+    },
+    "navbar_align": "content",
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "navbar_persistent": ["search-button"],
+    "header_links_before_dropdown": 5,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/pydicom/pydicom/",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/pydicom/",
+            "icon": "fa-custom fa-pypi",
+        },
+    ],
+    "show_version_warning_banner": True,
+    "switcher": {
+        "json_url": json_url,
+        "version_match": version_match,
+    },
+    "show_nav_level": 1,
+    # "navigation_depth": 2,
+    # "collapse_navigation": True,  # Turn off expandable navigation
+}
+
+html_sidebars = {"**": ["sidebar-nav-bs"]}
+html_js_files = [
+    ("custom-icons.js", {"defer": "defer"}),
+]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -206,12 +268,12 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "assets/img/pydicom_flat_black.svg"
+html_logo = "_static/img/pydicom_flat_black.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = "assets/img/favicon.ico"
+html_favicon = "_static/img/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
