@@ -39,12 +39,11 @@ docs = [
     "numpydoc",
     "matplotlib",
     "pillow",
+    "pydata-sphinx-theme",
     "sphinx",
-    "sphinx_rtd_theme",
     "sphinx-gallery",
     "sphinxcontrib-napoleon",
-    "sphinxcontrib-jquery",
-    "sphinx-copybutton"
+    "sphinx-copybutton",
 ]
 
 dev = [
