@@ -45,6 +45,7 @@ from pydicom.filewriter import (
     write_OWvalue,
     writers,
     dcmwrite,
+    write_string,
 )
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
@@ -2985,7 +2986,7 @@ class TestWriteText:
         with pytest.warns(UserWarning, match=msg):
             # encode with one invalid encoding
             write_text(fp, elem, encodings=["iso-2022-jp"])
-            assert expected == fp.getvalue()
+            assert fp.getvalue() == expected
 
         fp = DicomBytesIO()
         fp.is_little_endian = True
@@ -2995,7 +2996,16 @@ class TestWriteText:
         with pytest.warns(UserWarning, match=msg):
             # encode with two invalid encodings
             write_text(fp, elem, encodings=["iso-2022-jp", "iso_ir_58"])
-            assert expected == fp.getvalue()
+            assert fp.getvalue() == expected
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with invalid ASCII value
+        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        msg = "Not a valid ASCII string - using replacement characters"
+        with pytest.warns(UserWarning, match=msg):
+            write_string(fp, elem)
+            assert fp.getvalue() == b"Dionysios ????????? "
 
     def test_invalid_encoding_enforce_standard(self, enforce_writing_invalid_values):
         """Test encoding text with invalid encodings with
@@ -3019,6 +3029,17 @@ class TestWriteText:
         with pytest.raises(UnicodeEncodeError, match=msg):
             # encode with two invalid encodings
             write_text(fp, elem, encodings=["iso-2022-jp", "iso_ir_58"])
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with invalid ASCII value
+        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        msg = (
+            r"'latin-?1' codec can't encode characters in position 10-18:"
+            r" ordinal not in range\(256\)"
+        )
+        with pytest.raises(UnicodeEncodeError, match=msg):
+            write_string(fp, elem)
 
     def test_single_value_with_delimiters(self):
         """Test that text with delimiters encodes correctly"""

@@ -28,7 +28,9 @@ Fixes
 * Make sure that no download of examples is attempted on importing examples if the example
   data is not found locally (:issue:`2223`).
 * Add mitigation and better error messaging for SWIG errors when using GDCM to decompress
-  datasets with more than 2**31 - 1 bytes (:issue:`2227`)
+  datasets with more than 2**31 - 1 bytes (:issue:`2227`).
+* Use the setting :attr:`~pydicom.config.settings.writing_validation_mode` also for writing
+  values with VRs supporting only ASCII characters (:issue:`2243`).
 
 Enhancements
 ------------
