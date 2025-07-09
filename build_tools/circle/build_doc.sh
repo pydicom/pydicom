@@ -86,9 +86,9 @@ fi
 
 # Installing required system packages to support the rendering of math
 # notation in the HTML documentation
-apt-get -yq update
-apt-get -yq remove texlive-binaries --purge
-apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
+sudo apt-get -yq update
+sudo apt-get -yq remove texlive-binaries --purge
+sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
     install dvipng texlive-latex-base texlive-latex-extra \
     texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended\
     latexmk
