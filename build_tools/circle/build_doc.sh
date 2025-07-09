@@ -83,6 +83,10 @@ else
     MAKE_TARGET=html
 fi
 
+
+# Allocated memory
+grep hierarchical_memory_limit /sys/fs/cgroup/memory/memory.stat
+
 # Installing required system packages to support the rendering of math
 # notation in the HTML documentation
 apt-get -yq update
@@ -97,8 +101,6 @@ python3 -m venv venv
 python --version
 pip install -e .[docs]
 
-ulimit -Sv
-free | grep Mem | awk '{print $4/$2 * 100}'
 # The pipefail is requested to propagate exit code
 set -o pipefail && cd doc && make $MAKE_TARGET 2>&1 | tee ~/log.txt
 
