@@ -38,7 +38,7 @@ docs = [
     "numpy",
     "numpydoc",
     "matplotlib",
-    "pillow==11.2.1",
+    "pillow",
     "pydata-sphinx-theme",
     "sphinx",
     "sphinx-gallery",
