@@ -1,5 +1,5 @@
-Version 0.9.5
-=============
+0.9.5
+=====
 
 pydicom 0.9.5 is primarily a bug-fix release but includes some contrib files
 also.

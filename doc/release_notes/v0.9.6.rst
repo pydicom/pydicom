@@ -1,5 +1,5 @@
-Version 0.9.6
-=============
+0.9.6
+=====
 
 pydicom 0.9.6 updates the dictionary to the DICOM 2011 standard, and has a
 number of bug fixes

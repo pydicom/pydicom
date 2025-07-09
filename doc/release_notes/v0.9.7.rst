@@ -1,5 +1,5 @@
-Version 0.9.7
-=============
+0.9.7
+=====
 
 pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
 compatibility. ** It is the last version which will run with Python < 2.6 **

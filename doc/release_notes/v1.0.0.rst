@@ -1,6 +1,5 @@
-
-Version 1.0.0
-=============
+1.0.0
+=====
 
 This is a major release, with major changes, including backwards-incompatible
 changes.

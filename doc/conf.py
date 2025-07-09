@@ -184,7 +184,7 @@ exclude_trees = ["_build"]
 pygments_style = "sphinx"
 
 # Custom style
-html_style = "css/pydicom.css"
+# html_style = "css/pydicom.css"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
