@@ -84,9 +84,6 @@ else
 fi
 
 
-# Allocated memory
-grep hierarchical_memory_limit /sys/fs/cgroup/memory/memory.stat
-
 # Installing required system packages to support the rendering of math
 # notation in the HTML documentation
 apt-get -yq update
