@@ -45,7 +45,7 @@ you'll also need to install `Pillow <https://pillow.readthedocs.io/>`_::
 
   $ pip install numpy pillow
 
-See the :doc:`installation page<installation>` for details on installing
+See the `installation page</guides/user/installation>` for details on installing
 the optional libraries.
 
 

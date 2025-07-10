@@ -1,5 +1,5 @@
-Version 0.9.8
-=============
+0.9.8
+=====
 
 pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
 compatibility in pydicom 1.0.  It also reverts the change to using Decimal for

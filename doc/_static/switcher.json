@@ -11,6 +11,18 @@
     "preferred": true
   },
   {
+    "name": "2.4",
+    "version": "2.4.*",
+    "url": "https://pydicom.github.io/pydicom/2.4/"
+  },  {
+    "name": "2.3",
+    "version": "2.3.*",
+    "url": "https://pydicom.github.io/pydicom/2.3/"
+  },  {
+    "name": "2.2",
+    "version": "2.2.*",
+    "url": "https://pydicom.github.io/pydicom/2.2/"
+  },  {
     "name": "2.1",
     "version": "2.1.*",
     "url": "https://pydicom.github.io/pydicom/2.1/"

@@ -1,7 +1,7 @@
 .. _api_reference:
 
-API Reference
-=============
+API
+===
 
 :Release: |version|
 :Date: |today|

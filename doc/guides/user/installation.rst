@@ -1,6 +1,6 @@
-======================
-How to install pydicom
-======================
+============
+Installation
+============
 
 .. note::
 
@@ -23,20 +23,16 @@ Install using pip
 -----------------
 
 *pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`__, the
-official third-party Python software repository. The simplest way to install
+official third-party Python software repository. The simplest way to install the latest version
 from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
 
-  pip install pydicom
-
-You may need to use this instead, depending on your operating system::
-
-  python -m pip install pydicom
+  python -m pip install -U pydicom
 
 You can also perform an offline installation by
 :gh:`downloading <pydicom/releases>` and installing
-one of the release ``*.whl`` files. For example, with the v2.0 release::
+one of the release ``*.whl`` files. For example, with the v3.0 release::
 
-  pip install pydicom-2.0.0-py3-none-any.whl
+  pip install pydicom-3.0.0-py3-none-any.whl
 
 
 Install using conda
@@ -67,28 +63,13 @@ through :class:`~pydicom.dataset.Dataset`::
 
 To add extra type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
 
-    pip install types-pydicom
+    python -m pip install -U types-pydicom
 
 .. code-block:: shell
 
     $ mypy foo.py
     foo.py:5: error: Incompatible types in assignment (expression has type "int", variable has type "str | PersonName | None")  [assignment]
     Found 1 error in 1 file (checked 1 source file)
-
-
-Downloading example/test DICOM files
-------------------------------------
-
-To keep the package size small, a number of the larger DICOM files are not
-distributed with *pydicom* and are instead kept in the
-:gh:`pydicom-data <pydicom-data>` repository. To get the complete set of
-testing and example files you can either install the *pydicom-data* repository::
-
-    pip install git+https://github.com/pydicom/pydicom-data
-
-Or download the missing files to the local cache (after installing *pydicom*)::
-
-    python -c "import pydicom; pydicom.data.fetch_data_files()"
 
 
 .. _tut_install_libs:
@@ -102,7 +83,7 @@ If you're going to be manipulating pixel data then
 
 Using pip::
 
-  pip install numpy
+  python -m pip install -U numpy
 
 Through conda::
 
@@ -127,7 +108,7 @@ Using pip; you may need to make sure that the
 `openjpeg <https://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
 beforehand::
 
-  pip install pillow
+  python -m pip install -U pillow
 
 Through conda::
 
@@ -145,12 +126,12 @@ created to provide compatibility with the latest Python versions.
 
 Using pip::
 
-  pip install pyjpegls
+  python -m pip install -U pyjpegls
 
 Through conda::
 
   conda install cython
-  pip install git+https://github.com/pydicom/pyjpegls
+  python -m pip install git+https://github.com/pydicom/pyjpegls
 
 
 .. _tut_install_gdcm:
@@ -165,7 +146,7 @@ The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`__ are built by the
 `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
 versions of Python on Windows, MacOS and Linux, and can be installed using pip::
 
-  pip install python-gdcm
+  python -m pip install -U python-gdcm
 
 The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`__
 tend to be older versions and not as well supported. They're available on conda using::
@@ -184,7 +165,7 @@ RLE images provided a suitable plugin is installed.
 
 Using pip::
 
-  pip install -U pylibjpeg[all]
+  python -m pip install -U pylibjpeg[all]
 
 
 .. _tut_install_dev:

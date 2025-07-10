@@ -1,5 +1,5 @@
-Version 0.9.9
-=============
+0.9.9
+=====
 
 In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
 dictionaries.  New features include DICOMDIR handling, and a utility module

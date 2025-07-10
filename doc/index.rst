@@ -6,13 +6,6 @@ pydicom documentation
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Getting started
-
-   tutorials/installation
-
-.. toctree::
-   :maxdepth: 2
-   :hidden:
    :caption: Documentation
 
    guides/user/index
@@ -41,7 +34,7 @@ Getting Started
 ===============
 If you're new to *pydicom* then start here:
 
-* :doc:`Installation<tutorials/installation>` |
+* :doc:`Installation<guides/user/installation>` |
   :doc:`Plugins for Pixel Data</guides/plugin_table>` |
   :doc:`What Python types do I use for each VR<guides/element_value_types>`
 * **Basics**: :doc:`Dataset: read, access, modify, write</tutorials/dataset_basics>`
@@ -68,8 +61,21 @@ A set of examples illustrating the use of the different core elements. It
 complements the :doc:`User Guide <guides/user/index>`.
 
 
-:doc:`API Reference <reference/index>`
-======================================
+Reference
+=========
 
-The API Reference provides technical documentation for the *pydicom* API's
-functions, variables and classes.
+Documentation for *pydicom's* public functions, classes and other objects.
+
+.. toctree::
+   :maxdepth: 1
+
+   reference/index
+
+
+Releases
+========
+
+.. toctree::
+   :maxdepth: 1
+
+   release_notes/index
