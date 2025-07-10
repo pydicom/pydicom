@@ -6,6 +6,7 @@ pydicom User Guide
 
 .. toctree::
 
+   installation
    base_element
    writing_files
    working_with_pixel_data

@@ -1,259 +1,590 @@
 
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Release notes &#8212; pydicom 3.1.0.dev0 documentation</title>
   
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
-      <script src="../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d3077db3"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="../_static/copybutton.js?v=ccdb6887"></script>
-    <script src="../_static/js/theme.js"></script>
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=d3077db3"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'release_notes/index';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../_static/custom-icons.js?v=1cb01586"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Frequently asked questions" href="../faq/index.html" /> 
-</head>
+    <link rel="next" title="3.1.0" href="v3.1.0.html" />
+    <link rel="prev" title="Frequently asked questions" href="../faq/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="3.1.0.dev0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-          
-          
-          <a href="../index.html" class="icon icon-home">
-            pydicom
-              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guides/user/index.html">pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#version-3-1-0">Version 3.1.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fixes">Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#enhancements">Enhancements</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-3-0-0">Version 3.0.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Changes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#removals">Removals</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#deprecations">Deprecations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pydicom-internals">Pydicom Internals</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-2-4-0">Version 2.4.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id5">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id6">Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id7">Pydicom Internals</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-2-3-0">Version 2.3.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id8">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id9">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id10">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-2-2-0">Version 2.2.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id11">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id12">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id13">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-2-1-1">Version 2.1.1</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id14">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-2-1-0">Version 2.1.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id15">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id16">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id17">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-2-0-0">Version 2.0.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#changelog">Changelog</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id18">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id19">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-4-1">Version 1.4.1</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id20">Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id21">Changes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-4-0">Version 1.4.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id22">Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id23">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id24">Changes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-3-0">Version 1.3.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id25">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id26">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id27">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-2-0">Version 1.2.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id28">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id29">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id30">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-1-0">Version 1.1.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id31">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id32">Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other">Other</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0">Version 1.0.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#major-changes">Major changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other-enhancements">Other enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#infrastructure">Infrastructure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id33">Fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-9">Version 0.9.9</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id34">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#contrib-file-changes">Contrib file changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other-contributors">Other Contributors</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-8">Version 0.9.8</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id35">Major changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id36">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id37">Contrib file changes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-7">Version 0.9.7</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id38">Major changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id39">Bug fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id40">Other Enhancements</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-6">Version 0.9.6</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id41">Major changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id42">Bug fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id43">Other</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-5">Version 0.9.5</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#major-fixes-in-this-release">Major fixes in this release</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other-fixes-in-this-release">Other fixes in this release</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#new-contrib-files">New ‘Contrib’ files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id44">Other</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-4">Version 0.9.4</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#major-changes-additions-in-this-version">Major changes/additions in this version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other-changes-and-bug-fixes">Other changes and bug fixes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-3">Version 0.9.3</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id45">Major changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id46">Other Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id47">Bug Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id48">Other</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#version-0-9-2">Version 0.9.2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id49">Major changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id50">Other Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id51">Bug Fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id52">Other</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
 
-        </div>
-      </div>
-    </nav>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">pydicom</a>
-      </nav>
+  
+    
+  
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Release notes</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pydicom_flat_black.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">pydicom</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guides/user/index.html">
+    pydicom User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guides/index.html">
+    Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    General examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../tutorials/contributing.html">
+    Contributing to pydicom
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
+    Frequently asked questions
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    Release notes
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    Release notes
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
-  <hr/>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pydicom/pydicom/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pydicom/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guides/user/index.html">
+    pydicom User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guides/index.html">
+    Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    General examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/contributing.html">
+    Contributing to pydicom
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../faq/index.html">
+    Frequently asked questions
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Release notes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Release notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pydicom/pydicom/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pydicom/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="v3.1.0.html">3.1.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v3.0.1.html">3.0.1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v3.0.0.html">3.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v2.4.0.html">2.4.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v2.3.0.html">2.3.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v2.2.0.html">2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v2.1.1.html">2.1.1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v2.1.0.html">2.1.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v2.0.0.html">2.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v1.4.1.html">1.4.1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v1.4.0.html">1.4.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v1.3.0.html">1.3.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v1.2.0.html">1.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v1.1.0.html">1.1.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v1.0.0.html">1.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.9.html">0.9.9</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.8.html">0.9.8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.7.html">0.9.7</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.6.html">0.9.6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.5.html">0.9.5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.4.html">0.9.4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.3.html">0.9.3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.9.2.html">0.9.2</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Release notes</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="release-notes">
-<h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
-<section id="version-3-1-0">
-<h2>Version 3.1.0<a class="headerlink" href="#version-3-1-0" title="Link to this heading">¶</a></h2>
+<h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="id1">
+<h2>3.1.0<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <section id="changes">
-<h3>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h3>
+<h3>Changes<a class="headerlink" href="#changes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>DICOM dictionary updated to 2024d.</p></li>
 <li><p>Prefer using pylibjpeg over GDCM when encoding <em>RLE Lossless</em>.</p></li>
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h3>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Changed logging of missing plugin imports to use <code class="xref py py-attr docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2128">#2128</a>).</p></li>
 <li><p>Include all <a class="reference internal" href="../reference/examples.html#module-pydicom.examples" title="pydicom.examples"><code class="xref py py-mod docutils literal notranslate"><span class="pre">examples</span></code></a> module datasets with the package (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2128">#2128</a>, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2131">#2131</a>).</p></li>
@@ -273,11 +604,13 @@ changing the <em>SOP Instance UID</em> when not required (<a class="extlink-issu
 <li><p>Make sure that no download of examples is attempted on importing examples if the example
 data is not found locally (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2223">#2223</a>).</p></li>
 <li><p>Add mitigation and better error messaging for SWIG errors when using GDCM to decompress
-datasets with more than 2**31 - 1 bytes (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2227">#2227</a>)</p></li>
+datasets with more than 2**31 - 1 bytes (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2227">#2227</a>).</p></li>
+<li><p>Use the setting <code class="xref py py-attr docutils literal notranslate"><span class="pre">writing_validation_mode</span></code> also for writing
+values with VRs supporting only ASCII characters (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2243">#2243</a>).</p></li>
 </ul>
 </section>
 <section id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h3>
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">#</a></h3>
 <ul>
 <li><p>Python 3.12 and 3.13 now supported; limited support for pre-release Python 3.14</p></li>
 <li><p>Added the option to pass a <code class="docutils literal notranslate"><span class="pre">bool</span></code> ndarray to <a class="reference internal" href="../reference/generated/pydicom.pixels.set_pixel_data.html#pydicom.pixels.set_pixel_data" title="pydicom.pixels.set_pixel_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_pixel_data()</span></code></a>
@@ -308,8 +641,22 @@ syntax or not (<a class="extlink-issue reference external" href="https://github.
 </ul>
 </section>
 </section>
-<section id="version-3-0-0">
-<h2>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Link to this heading">¶</a></h2>
+<section id="id2">
+<h2>3.0.1<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h3>Fixes<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Changed logging of missing plugin imports to use <code class="xref py py-attr docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2128">#2128</a>).</p></li>
+<li><p>Include all <a class="reference internal" href="../reference/examples.html#module-pydicom.examples" title="pydicom.examples"><code class="xref py py-mod docutils literal notranslate"><span class="pre">examples</span></code></a> module datasets with the package (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2128">#2128</a>, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2131">#2131</a>)</p></li>
+<li><p>Fixed an invalid VR value in the private data dictionary (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2132">#2132</a>).</p></li>
+<li><p>Fixed checking for <em>Bits Stored</em> when converting <em>Float Pixel Data</em> and <em>Double Float
+Pixel Data</em> using the <a class="reference internal" href="../reference/pixels.html#module-pydicom.pixels" title="pydicom.pixels"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pixels</span></code></a> backend (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2135">#2135</a>).</p></li>
+<li><p>Fixed decoding of pixel data for images with <em>Bits Allocated</em> of 1 when frame boundaries are not aligned with byte boundaries (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2134">#2134</a>).</p></li>
+</ul>
+</section>
+</section>
+<section id="id4">
+<h2>3.0.0<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
 <p>The major breaking changes with the version 3.0 release are:</p>
 <blockquote>
 <div><ul class="simple">
@@ -320,8 +667,8 @@ syntax or not (<a class="extlink-issue reference external" href="https://github.
 <li><p><code class="docutils literal notranslate"><span class="pre">read_file</span></code> and <code class="docutils literal notranslate"><span class="pre">write_file</span></code> have been removed.</p></li>
 </ul>
 </div></blockquote>
-<section id="id1">
-<h3>Changes<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<section id="id5">
+<h3>Changes<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Removed support for Python &lt;= 3.9.</p></li>
 <li><p>All tag formats changed to upper case, no space e.g. “(7FE0,0010)” rather than “(7fe0, 0010)”.</p></li>
@@ -395,7 +742,7 @@ exception as Pillow cannot decode such data correctly (<a class="extlink-issue r
 filename the dataset was read from (if any) (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1937">#1937</a>).</p></li>
 </ul>
 <section id="removals">
-<h4>Removals<a class="headerlink" href="#removals" title="Link to this heading">¶</a></h4>
+<h4>Removals<a class="headerlink" href="#removals" title="Link to this heading">#</a></h4>
 <ul>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">compat</span></code> module has been removed.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module and <code class="docutils literal notranslate"><span class="pre">DicomDir</span></code> class have been removed and reading a
@@ -460,8 +807,8 @@ transfer syntax instead of the other way around.</p></li>
 </ul>
 </section>
 </section>
-<section id="id2">
-<h3>Enhancements<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<section id="id6">
+<h3>Enhancements<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <ul>
 <li><p>Added details of missing required tag information when adding a dataset to a
 File-set (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1752">#1752</a>).</p></li>
@@ -586,8 +933,8 @@ alternative convenience callbacks for <a class="reference internal" href="../ref
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1556">#1556</a>).</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Fixes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<section id="id7">
+<h3>Fixes<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed the GDCM and pylibjpeg handlers changing the <em>Pixel Representation</em> value to 0
 when the J2K stream disagrees with the dataset and
@@ -633,7 +980,7 @@ value is greater than 32767 (<a class="extlink-issue reference external" href="h
 </ul>
 </section>
 <section id="deprecations">
-<h3>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">¶</a></h3>
+<h3>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">#</a></h3>
 <ul>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_little_endian" title="pydicom.dataset.Dataset.is_little_endian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.is_little_endian</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_implicit_VR" title="pydicom.dataset.Dataset.is_implicit_VR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.is_implicit_VR</span></code></a> will be removed in v4.0.</p></li>
@@ -714,7 +1061,7 @@ in the <a class="reference internal" href="../reference/hooks.html#module-pydico
 </ul>
 </section>
 <section id="pydicom-internals">
-<h3>Pydicom Internals<a class="headerlink" href="#pydicom-internals" title="Link to this heading">¶</a></h3>
+<h3>Pydicom Internals<a class="headerlink" href="#pydicom-internals" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Repository folder structure refactored.</p></li>
 <li><p>Renamed top level <code class="docutils literal notranslate"><span class="pre">source</span></code> folder to <code class="docutils literal notranslate"><span class="pre">util</span></code>.</p></li>
@@ -722,16 +1069,16 @@ in the <a class="reference internal" href="../reference/hooks.html#module-pydico
 </ul>
 </section>
 </section>
-<section id="version-2-4-0">
-<h2>Version 2.4.0<a class="headerlink" href="#version-2-4-0" title="Link to this heading">¶</a></h2>
-<section id="id4">
-<h3>Changes<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<section id="id8">
+<h2>2.4.0<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<section id="id9">
+<h3>Changes<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Removed support for Python 3.6 (EOL since December 2021)</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Enhancements<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<section id="id10">
+<h3>Enhancements<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.alphabetic" title="pydicom.valuerep.PersonName.alphabetic"><code class="xref py py-attr docutils literal notranslate"><span class="pre">alphabetic</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1634">#1634</a>)</p></li>
 <li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.json_key" title="pydicom.tag.BaseTag.json_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">json_key</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1648">#1648</a>)</p></li>
@@ -748,8 +1095,8 @@ existing files with float IS values (<a class="extlink-issue reference external"
 <li><p>Updated DICOM and UID dicts to DICOM 2023b (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1803">#1803</a>)</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3>Fixes<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<section id="id11">
+<h3>Fixes<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed length validation of DS values with maximum length without a leading
 zero (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1632">#1632</a>)</p></li>
@@ -770,8 +1117,8 @@ syntax using VR <code class="docutils literal notranslate"><span class="pre">OW<
 <li><p>Fixed handling of AT VRs when codifying data elements (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1738">#1738</a>)</p></li>
 </ul>
 </section>
-<section id="id7">
-<h3>Pydicom Internals<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<section id="id12">
+<h3>Pydicom Internals<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>In test suites, renamed ‘setup’ and ‘teardown’ methods, deprecated starting
 in pytest 7.2</p></li>
@@ -779,10 +1126,10 @@ in pytest 7.2</p></li>
 </ul>
 </section>
 </section>
-<section id="version-2-3-0">
-<h2>Version 2.3.0<a class="headerlink" href="#version-2-3-0" title="Link to this heading">¶</a></h2>
-<section id="id8">
-<h3>Changes<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<section id="id13">
+<h2>2.3.0<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<section id="id14">
+<h3>Changes<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataElement.description</span></code> is
 deprecated and will be removed in v3.0, use
@@ -794,8 +1141,8 @@ deprecated and will be removed in v3.0, use
 to allow skipping downloading the file if missed locally (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1617">#1617</a>)</p></li>
 </ul>
 </section>
-<section id="id9">
-<h3>Enhancements<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<section id="id15">
+<h3>Enhancements<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Values are now validated for valid length, allowed character set and format
 on reading and writing. Depending on the value of
@@ -818,8 +1165,8 @@ uncompressed <code class="docutils literal notranslate"><span class="pre">YBR_FU
 <li><p>Updated dictionaries to DICOM 2022a</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Fixes<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<section id="id16">
+<h3>Fixes<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed odd-length <strong>OB</strong> values not being padded during write (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1511">#1511</a>)</p></li>
 <li><p>Fixed Hologic private dictionary entry (0019xx43)</p></li>
@@ -842,10 +1189,10 @@ assigning the single value (<a class="extlink-issue reference external" href="ht
 </ul>
 </section>
 </section>
-<section id="version-2-2-0">
-<h2>Version 2.2.0<a class="headerlink" href="#version-2-2-0" title="Link to this heading">¶</a></h2>
-<section id="id11">
-<h3>Changes<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<section id="id17">
+<h2>2.2.0<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
+<section id="id18">
+<h3>Changes<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Data elements with a VR of <strong>AT</strong> must now be set with values
 acceptable to <a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a>, and are always stored as a
@@ -875,8 +1222,8 @@ v3.0, use <a class="reference internal" href="../reference/generated/pydicom.fil
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> no longer inherits from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>Enhancements<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<section id="id19">
+<h3>Enhancements<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
 <ul>
 <li><p>Added a command-line interface for pydicom.  Current subcommands are:</p>
 <blockquote>
@@ -946,8 +1293,8 @@ to allow reading and returning the corresponding dataset (<a class="extlink-pr r
 <li><p>Added hash function to SR <a class="reference internal" href="../reference/generated/pydicom.sr.Code.html#pydicom.sr.Code" title="pydicom.sr.Code"><code class="xref py py-class docutils literal notranslate"><span class="pre">Code</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1434">#1434</a>)</p></li>
 </ul>
 </section>
-<section id="id13">
-<h3>Fixes<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<section id="id20">
+<h3>Fixes<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed pickling a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance with sequences
 after the sequence had been read (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1278">#1278</a>)</p></li>
@@ -973,10 +1320,10 @@ segmented LUTs (<a class="extlink-issue reference external" href="https://github
 </ul>
 </section>
 </section>
-<section id="version-2-1-1">
-<h2>Version 2.1.1<a class="headerlink" href="#version-2-1-1" title="Link to this heading">¶</a></h2>
-<section id="id14">
-<h3>Fixes<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<section id="id21">
+<h2>2.1.1<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<section id="id22">
+<h3>Fixes<a class="headerlink" href="#id22" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Remove <code class="docutils literal notranslate"><span class="pre">py.typed</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1251">#1251</a>)</p></li>
 <li><p>Fix <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> with Python 3.6.0 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1253">#1253</a>)</p></li>
@@ -985,10 +1332,10 @@ segmented LUTs (<a class="extlink-issue reference external" href="https://github
 </ul>
 </section>
 </section>
-<section id="version-2-1-0">
-<h2>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Link to this heading">¶</a></h2>
-<section id="id15">
-<h3>Enhancements<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<section id="id23">
+<h2>2.1.0<a class="headerlink" href="#id23" title="Link to this heading">#</a></h2>
+<section id="id24">
+<h3>Enhancements<a class="headerlink" href="#id24" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Large testing data is no longer distributed within the pydicom package
 with the aim to reduce the package download size. These test files
@@ -1061,8 +1408,8 @@ are convertible to integers without loss, e.g. “1.0” (<a class="extlink-pr r
 an Extended Offset Table is required (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1178">#1178</a>)</p></li>
 </ul>
 </section>
-<section id="id16">
-<h3>Changes<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<section id="id25">
+<h3>Changes<a class="headerlink" href="#id25" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
@@ -1114,8 +1461,8 @@ instead</p></li>
 deprecated, the default handler will always be used.</p></li>
 </ul>
 </section>
-<section id="id17">
-<h3>Fixes<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<section id="id26">
+<h3>Fixes<a class="headerlink" href="#id26" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.copy()</span></code></a> now works as expected
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1146">#1146</a>)</p></li>
@@ -1140,10 +1487,10 @@ adding private elements when <a class="reference internal" href="../reference/ge
 </ul>
 </section>
 </section>
-<section id="version-2-0-0">
-<h2>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h2>2.0.0<a class="headerlink" href="#id27" title="Link to this heading">#</a></h2>
 <section id="changelog">
-<h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h3>
+<h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Dropped support for Python 2 (only Python 3.5+ supported)</p></li>
 <li><p>Changes to <cite>Dataset.file_meta</cite></p>
@@ -1165,8 +1512,8 @@ are deprecated and will be removed in version 2.1</p></li>
 Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</p></li>
 </ul>
 </section>
-<section id="id18">
-<h3>Enhancements<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<section id="id28">
+<h3>Enhancements<a class="headerlink" href="#id28" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Allow PathLike objects for filename argument in <cite>dcmread</cite>, <cite>dcmwrite</cite> and
 <cite>Dataset.save_as</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1047">#1047</a>)</p></li>
@@ -1180,8 +1527,8 @@ data elements with VR of <strong>DS</strong> or <strong>IS</strong> return a num
 behavior</p></li>
 </ul>
 </section>
-<section id="id19">
-<h3>Fixes<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<section id="id29">
+<h3>Fixes<a class="headerlink" href="#id29" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed reading of datasets with an empty <cite>Specific Character Set</cite> tag
 (regression, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
@@ -1206,16 +1553,16 @@ in <a class="reference internal" href="../reference/generated/pydicom.config.DS_
 </ul>
 </section>
 </section>
-<section id="version-1-4-1">
-<h2>Version 1.4.1<a class="headerlink" href="#version-1-4-1" title="Link to this heading">¶</a></h2>
-<section id="id20">
-<h3>Fixes<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
+<section id="id30">
+<h2>1.4.1<a class="headerlink" href="#id30" title="Link to this heading">#</a></h2>
+<section id="id31">
+<h3>Fixes<a class="headerlink" href="#id31" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed writing of empty sequences (regression, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1030">#1030</a>)</p></li>
 </ul>
 </section>
-<section id="id21">
-<h3>Changes<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h3>
+<section id="id32">
+<h3>Changes<a class="headerlink" href="#id32" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>In <cite>Dataset.to_json</cite> and <cite>Dataset.to_json_dict</cite>, the default of the
 <cite>bulk_data_threshold</cite> argument has changed to 1024, and is now ignored if
@@ -1223,10 +1570,10 @@ no bulk data handler is set (see <a class="extlink-issue reference external" hre
 </ul>
 </section>
 </section>
-<section id="version-1-4-0">
-<h2>Version 1.4.0<a class="headerlink" href="#version-1-4-0" title="Link to this heading">¶</a></h2>
-<section id="id22">
-<h3>Fixes<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<section id="id33">
+<h2>1.4.0<a class="headerlink" href="#id33" title="Link to this heading">#</a></h2>
+<section id="id34">
+<h3>Fixes<a class="headerlink" href="#id34" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed handling of VRs AT and PN in json encoding (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/915">#915</a>)</p></li>
 <li><p>Fixed handling of binary values in json encoding (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/887">#887</a>)</p></li>
@@ -1261,8 +1608,8 @@ the Pillow handler (<a class="extlink-issue reference external" href="https://gi
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1004">#1004</a>)</p></li>
 </ul>
 </section>
-<section id="id23">
-<h3>Enhancements<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<section id="id35">
+<h3>Enhancements<a class="headerlink" href="#id35" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added support for converting (60xx,3000) <em>Overlay Data</em> to a numpy ndarray
 using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/912">#912</a>)</p></li>
@@ -1301,17 +1648,17 @@ based on whether the Dataset’s Transfer Syntax is compressed (<a class="extlin
 information</p></li>
 </ul>
 </section>
-<section id="id24">
-<h3>Changes<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h3>
+<section id="id36">
+<h3>Changes<a class="headerlink" href="#id36" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/generated/pydicom.encaps.get_frame_offsets.html#pydicom.encaps.get_frame_offsets" title="pydicom.encaps.get_frame_offsets"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame_offsets()</span></code></a> now returns whether the Basic Offset Table is empty and a list of the offsets.</p></li>
 </ul>
 </section>
 </section>
-<section id="version-1-3-0">
-<h2>Version 1.3.0<a class="headerlink" href="#version-1-3-0" title="Link to this heading">¶</a></h2>
+<section id="id37">
+<h2>1.3.0<a class="headerlink" href="#id37" title="Link to this heading">#</a></h2>
 <section id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h3>
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New User Guide page for Python 2 support timeline</p></li>
 <li><p>New User Guide page for working with private data elements</p></li>
@@ -1319,8 +1666,8 @@ information</p></li>
 and coronal (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/789">#789</a>)</p></li>
 </ul>
 </section>
-<section id="id25">
-<h3>Changes<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<section id="id38">
+<h3>Changes<a class="headerlink" href="#id38" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Removed deprecated uid variables, config.image_handlers and DeferredDataElement (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/760">#760</a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isMultiValue</span></code> is deprecated and will be removed in v1.4.
@@ -1333,8 +1680,8 @@ trying to add a private tag</p></li>
 non-binary VRs (by number of items) (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/666">#666</a>)</p></li>
 </ul>
 </section>
-<section id="id26">
-<h3>Enhancements<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h3>
+<section id="id39">
+<h3>Enhancements<a class="headerlink" href="#id39" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entry</span></code> and
 <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entries</span></code> to add custom private tags
@@ -1355,8 +1702,8 @@ data set (<a class="extlink-issue reference external" href="https://github.com/p
 <li><p>Added alpha conversion of Datasets to/from JSON format (Python 3 only)</p></li>
 </ul>
 </section>
-<section id="id27">
-<h3>Fixes<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h3>
+<section id="id40">
+<h3>Fixes<a class="headerlink" href="#id40" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Correctly handle <cite>Dataset.pop</cite> and <cite>Dataset.setdefault</cite> for tuple and
 keyword arguments (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/852">#852</a>)</p></li>
@@ -1384,10 +1731,10 @@ immutable (<a class="extlink-issue reference external" href="https://github.com/
 </ul>
 </section>
 </section>
-<section id="version-1-2-0">
-<h2>Version 1.2.0<a class="headerlink" href="#version-1-2-0" title="Link to this heading">¶</a></h2>
-<section id="id28">
-<h3>Changes<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h3>
+<section id="id41">
+<h2>1.2.0<a class="headerlink" href="#id41" title="Link to this heading">#</a></h2>
+<section id="id42">
+<h3>Changes<a class="headerlink" href="#id42" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>PIL removed as a fallback if Pillow is not available in the pillow pixel data
 handler (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/722">#722</a>)</p></li>
@@ -1410,8 +1757,8 @@ handler’s <code class="docutils literal notranslate"><span class="pre">is_avai
 <li><p>The use of NumPyPy with PyPy is no longer supported, use NumPy instead.</p></li>
 </ul>
 </section>
-<section id="id29">
-<h3>Enhancements<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h3>
+<section id="id43">
+<h3>Enhancements<a class="headerlink" href="#id43" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Updated DICOM dictionary for 2018c edition (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/677">#677</a>)</p></li>
 <li><p>Added possibility to set byte strings as value for VRs that use only the
@@ -1435,8 +1782,8 @@ SamplesPerPixel &gt; 1 (<a class="extlink-issue reference external" href="https:
 <li><p>Added support for non-conformant RLE segment ordering (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/729">#729</a>)</p></li>
 </ul>
 </section>
-<section id="id30">
-<h3>Fixes<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h3>
+<section id="id44">
+<h3>Fixes<a class="headerlink" href="#id44" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Removed unused <code class="docutils literal notranslate"><span class="pre">original_string</span></code> attribute from the <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> class
 (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/660">#660</a>)</p></li>
@@ -1459,10 +1806,10 @@ help reduce memory consumption if required. (<a class="extlink-issue reference e
 </ul>
 </section>
 </section>
-<section id="version-1-1-0">
-<h2>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Link to this heading">¶</a></h2>
-<section id="id31">
-<h3>Enhancements<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h3>
+<section id="id45">
+<h2>1.1.0<a class="headerlink" href="#id45" title="Link to this heading">#</a></h2>
+<section id="id46">
+<h3>Enhancements<a class="headerlink" href="#id46" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">UID.__str__</span></code> no longer returns the UID name (when known). The UID name is
 still available using the <code class="docutils literal notranslate"><span class="pre">UID.name</span></code> property.</p></li>
@@ -1477,8 +1824,8 @@ be better than in pydicom 0.9.9 (<a class="extlink-issue reference external" hre
 <li><p>added full API documentation to pydicom documentation (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/649">#649</a>)</p></li>
 </ul>
 </section>
-<section id="id32">
-<h3>Fixes<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<section id="id47">
+<h3>Fixes<a class="headerlink" href="#id47" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">UID</span></code> should behave as expected for a python <code class="docutils literal notranslate"><span class="pre">str</span></code> subclass
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/256">#256</a>)</p></li>
@@ -1497,7 +1844,7 @@ present (<a class="extlink-issue reference external" href="https://github.com/py
 </ul>
 </section>
 <section id="other">
-<h3>Other<a class="headerlink" href="#other" title="Link to this heading">¶</a></h3>
+<h3>Other<a class="headerlink" href="#other" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
 comparing <code class="docutils literal notranslate"><span class="pre">UID</span> <span class="pre">==</span> <span class="pre">[UID</span> <span class="pre">name]</span></code> and <code class="docutils literal notranslate"><span class="pre">UID</span> <span class="pre">!=</span> <span class="pre">[UID</span> <span class="pre">name]</span></code>. Starting in v1.2,
@@ -1508,12 +1855,12 @@ return False. Use <code class="docutils literal notranslate"><span class="pre">U
 </ul>
 </section>
 </section>
-<section id="version-1-0-0">
-<h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Link to this heading">¶</a></h2>
+<section id="id48">
+<h2>1.0.0<a class="headerlink" href="#id48" title="Link to this heading">#</a></h2>
 <p>This is a major release, with major changes, including backwards-incompatible
 changes.</p>
 <section id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Link to this heading">¶</a></h3>
+<h3>Major changes<a class="headerlink" href="#major-changes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>full Python 3 compatibility - one code base for both Python 2 and Python 3</p></li>
 <li><p>package name and import name now match – use <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code>
@@ -1532,7 +1879,7 @@ files</p></li>
 </ul>
 </section>
 <section id="other-enhancements">
-<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Link to this heading">¶</a></h3>
+<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>added <code class="docutils literal notranslate"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
 values before exceptions thrown</p></li>
@@ -1563,7 +1910,7 @@ greater clarity. Previous names still available for backwards compatibility.</p>
 </ul>
 </section>
 <section id="infrastructure">
-<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Link to this heading">¶</a></h3>
+<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
 <a class="reference external" href="https://ci.appveyor.com/project/pydicom/pydicom">AppVeyor</a> builds for
@@ -1577,8 +1924,8 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <li><p>removed support for Python 2.6, added support for Python 3.6</p></li>
 </ul>
 </section>
-<section id="id33">
-<h3>Fixes<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h3>
+<section id="id49">
+<h3>Fixes<a class="headerlink" href="#id49" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>correctly handle PlanarConfiguration==0 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
 <li><p>updated uid generation to ensure uniqueness (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</p></li>
@@ -1593,13 +1940,13 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 </ul>
 </section>
 </section>
-<section id="version-0-9-9">
-<h2>Version 0.9.9<a class="headerlink" href="#version-0-9-9" title="Link to this heading">¶</a></h2>
+<section id="id50">
+<h2>0.9.9<a class="headerlink" href="#id50" title="Link to this heading">#</a></h2>
 <p>In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
 dictionaries.  New features include DICOMDIR handling, and a utility module
 which produces python/pydicom source code to recreate a DICOM file.</p>
-<section id="id34">
-<h3>Enhancements<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h3>
+<section id="id51">
+<h3>Enhancements<a class="headerlink" href="#id51" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>All DICOM dictionaries updated (standard dictionary, UID dictionary, and
 private dictionaries)</p></li>
@@ -1613,27 +1960,27 @@ class. Example file <code class="docutils literal notranslate"><span class="pre"
 </ul>
 </section>
 <section id="contrib-file-changes">
-<h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Link to this heading">¶</a></h3>
+<h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>pydicom_series:  force parameter added (Nil Goyette)</p></li>
 <li><p>dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)</p></li>
 </ul>
 </section>
 <section id="other-contributors">
-<h3>Other Contributors<a class="headerlink" href="#other-contributors" title="Link to this heading">¶</a></h3>
+<h3>Other Contributors<a class="headerlink" href="#other-contributors" title="Link to this heading">#</a></h3>
 <p>Other than Jonathan and myself, other contributors were: Rickard Holmberg,
 Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri
 Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
 </section>
 </section>
-<section id="version-0-9-8">
-<h2>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Link to this heading">¶</a></h2>
+<section id="id52">
+<h2>0.9.8<a class="headerlink" href="#id52" title="Link to this heading">#</a></h2>
 <p>pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
 compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
 VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
 available, but is off by default.</p>
-<section id="id35">
-<h3>Major changes<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h3>
+<section id="id53">
+<h3>Major changes<a class="headerlink" href="#id53" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Requires Python 2.6 or later, in preparation for Python 3 compatibility</p></li>
 <li><p>experimental Python 3 compatibility (unofficial at this point) – uncomment
@@ -1648,7 +1995,7 @@ constructs: decorators, generators, etc</p></li>
 </ul>
 </section>
 <section id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h3>
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
 774b7a55db33)</p></li>
@@ -1656,16 +2003,16 @@ constructs: decorators, generators, etc</p></li>
 <li><p>Fix error in nested private sequences (issue 113, revision 84af4b240add)</p></li>
 </ul>
 </section>
-<section id="id36">
-<h3>Enhancements<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h3>
+<section id="id54">
+<h3>Enhancements<a class="headerlink" href="#id54" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
 3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</p></li>
 <li><p>new PersonName3 class for Python 3: (revision 9b92b336e7d4)</p></li>
 </ul>
 </section>
-<section id="id37">
-<h3>Contrib file changes<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h3>
+<section id="id55">
+<h3>Contrib file changes<a class="headerlink" href="#id55" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix for pydicom_series for DS decimal (revision e830f30b6781)</p></li>
 <li><p>new dcm_qt_tree.py module - tree display of DICOM files using PySide and
@@ -1675,13 +2022,13 @@ Qt. Contributed by Padraig Looney.</p></li>
 work and many bug fixes.</p>
 </section>
 </section>
-<section id="version-0-9-7">
-<h2>Version 0.9.7<a class="headerlink" href="#version-0-9-7" title="Link to this heading">¶</a></h2>
+<section id="id56">
+<h2>0.9.7<a class="headerlink" href="#id56" title="Link to this heading">#</a></h2>
 <p>pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
 compatibility. ** It is the last version which will run with Python &lt; 2.6 **
 (it will run with Python 2.4 to Python 2.7)</p>
-<section id="id38">
-<h3>Major changes<a class="headerlink" href="#id38" title="Link to this heading">¶</a></h3>
+<section id="id57">
+<h3>Major changes<a class="headerlink" href="#id57" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added DICOM 2011 keywords. Old “named tags” still work, but will be
 deprecated in future versions. Most names are identical, but some have changed.
@@ -1706,8 +2053,8 @@ dicom.config.&lt;parameter&gt;={True|False}’ before setting values of data ele
 part of the standard, and promote consistency across programming languages and
 libraries.</p>
 </section>
-<section id="id39">
-<h3>Bug fixes<a class="headerlink" href="#id39" title="Link to this heading">¶</a></h3>
+<section id="id58">
+<h3>Bug fixes<a class="headerlink" href="#id58" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New way to read file meta information, not using the group length, instead
 reading until end of group 2 data elements. If group length dose not match,
@@ -1719,8 +2066,8 @@ log a warning (revision b6b3658f3b14).</p></li>
 <li><p>Japanese and Korean encoding fixes (issue 110)</p></li>
 </ul>
 </section>
-<section id="id40">
-<h3>Other Enhancements<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h3>
+<section id="id59">
+<h3>Other Enhancements<a class="headerlink" href="#id59" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New Sequence class which verifies items are Datasets (issue 52)</p></li>
 <li><p>Assignment to SQ data element checks value is a Sequence or can be converted
@@ -1736,18 +2083,18 @@ only on Python &gt;= 2.6 as previous versions do not call __dir__ method
 those who contributed.</p>
 </section>
 </section>
-<section id="version-0-9-6">
-<h2>Version 0.9.6<a class="headerlink" href="#version-0-9-6" title="Link to this heading">¶</a></h2>
+<section id="id60">
+<h2>0.9.6<a class="headerlink" href="#id60" title="Link to this heading">#</a></h2>
 <p>pydicom 0.9.6 updates the dictionary to the DICOM 2011 standard, and has a
 number of bug fixes</p>
-<section id="id41">
-<h3>Major changes<a class="headerlink" href="#id41" title="Link to this heading">¶</a></h3>
+<section id="id61">
+<h3>Major changes<a class="headerlink" href="#id61" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>updated the dictionary to the DICOM 2011 standard’s dictionary.</p></li>
 </ul>
 </section>
-<section id="id42">
-<h3>Bug fixes<a class="headerlink" href="#id42" title="Link to this heading">¶</a></h3>
+<section id="id62">
+<h3>Bug fixes<a class="headerlink" href="#id62" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed bug in Dataset.file_metadata() and deprecated in favor of FileDataset
 (issue 93)</p></li>
@@ -1757,8 +2104,8 @@ issue 97)</p></li>
 <li><p>Fixed bug in raising exception for unknown tag</p></li>
 </ul>
 </section>
-<section id="id43">
-<h3>Other<a class="headerlink" href="#id43" title="Link to this heading">¶</a></h3>
+<section id="id63">
+<h3>Other<a class="headerlink" href="#id63" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>added example file write_new.py to show how to create DICOM files from scratch</p></li>
 <li><p>updated other example files</p></li>
@@ -1766,12 +2113,12 @@ issue 97)</p></li>
 </ul>
 </section>
 </section>
-<section id="version-0-9-5">
-<h2>Version 0.9.5<a class="headerlink" href="#version-0-9-5" title="Link to this heading">¶</a></h2>
+<section id="id64">
+<h2>0.9.5<a class="headerlink" href="#id64" title="Link to this heading">#</a></h2>
 <p>pydicom 0.9.5 is primarily a bug-fix release but includes some contrib files
 also.</p>
 <section id="major-fixes-in-this-release">
-<h3>Major fixes in this release<a class="headerlink" href="#major-fixes-in-this-release" title="Link to this heading">¶</a></h3>
+<h3>Major fixes in this release<a class="headerlink" href="#major-fixes-in-this-release" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>fix for incorrect pixel integer types which could lead to numeric errors
 (issue 79)</p></li>
@@ -1782,7 +2129,7 @@ fc790f01f5)</p></li>
 </ul>
 </section>
 <section id="other-fixes-in-this-release">
-<h3>Other fixes in this release<a class="headerlink" href="#other-fixes-in-this-release" title="Link to this heading">¶</a></h3>
+<h3>Other fixes in this release<a class="headerlink" href="#other-fixes-in-this-release" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix for unicode decode failing with VM &gt; 1 (issue 78)</p></li>
 <li><p>fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
@@ -1793,15 +2140,15 @@ fc790f01f5)</p></li>
 </ul>
 </section>
 <section id="new-contrib-files">
-<h3>New ‘Contrib’ files<a class="headerlink" href="#new-contrib-files" title="Link to this heading">¶</a></h3>
+<h3>New ‘Contrib’ files<a class="headerlink" href="#new-contrib-files" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>dicom_dao.py by Mike Wallace – CouchDB storage of DICOM info and binary data</p></li>
 <li><p>pydicom_series.py by Almar Klein – Reads files and separates into distinct
 series.</p></li>
 </ul>
 </section>
-<section id="id44">
-<h3>Other<a class="headerlink" href="#id44" title="Link to this heading">¶</a></h3>
+<section id="id65">
+<h3>Other<a class="headerlink" href="#id65" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>switch to Distribute for packaging</p></li>
 <li><p>preliminary work on Python 3 compatibility</p></li>
@@ -1810,8 +2157,8 @@ series.</p></li>
 </ul>
 </section>
 </section>
-<section id="version-0-9-4">
-<h2>Version 0.9.4<a class="headerlink" href="#version-0-9-4" title="Link to this heading">¶</a></h2>
+<section id="id66">
+<h2>0.9.4<a class="headerlink" href="#id66" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
@@ -1822,7 +2169,7 @@ Python 2.3)</p></li>
 </ul>
 </div>
 <section id="major-changes-additions-in-this-version">
-<h3>Major changes/additions in this version<a class="headerlink" href="#major-changes-additions-in-this-version" title="Link to this heading">¶</a></h3>
+<h3>Major changes/additions in this version<a class="headerlink" href="#major-changes-additions-in-this-version" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>file reading code reorganized substantially</p></li>
 <li><p>significant speed increase for reading DICOM files – approx 3 times faster
@@ -1856,7 +2203,7 @@ CP805/916; Supp 43 and 117 (and UID dict), Supp 119 and 122</p></li>
 </ul>
 </section>
 <section id="other-changes-and-bug-fixes">
-<h3>Other changes and bug fixes<a class="headerlink" href="#other-changes-and-bug-fixes" title="Link to this heading">¶</a></h3>
+<h3>Other changes and bug fixes<a class="headerlink" href="#other-changes-and-bug-fixes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Tag is now a factory function; the class is called !BaseTag. This was part of
 the file reading speed-up process – a new class !TupleTag was also created,
@@ -1876,10 +2223,10 @@ elem). Allow lists as well as tuples (issue 47). Fix arg2=0 bug (issue 64).</p><
 </ul>
 </section>
 </section>
-<section id="version-0-9-3">
-<h2>Version 0.9.3<a class="headerlink" href="#version-0-9-3" title="Link to this heading">¶</a></h2>
-<section id="id45">
-<h3>Major changes<a class="headerlink" href="#id45" title="Link to this heading">¶</a></h3>
+<section id="id67">
+<h2>0.9.3<a class="headerlink" href="#id67" title="Link to this heading">#</a></h2>
+<section id="id68">
+<h3>Major changes<a class="headerlink" href="#id68" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>changed to MIT-style license</p></li>
 <li><p>option to defer reading of large data element values using read_file()’s new
@@ -1891,8 +2238,8 @@ pixel_array rather than !ReadFile(), !SaveAs(), !PixelArray. Old names kept
 for now as aliases.</p></li>
 </ul>
 </section>
-<section id="id46">
-<h3>Other Enhancements<a class="headerlink" href="#id46" title="Link to this heading">¶</a></h3>
+<section id="id69">
+<h3>Other Enhancements<a class="headerlink" href="#id69" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>added DicomFileLike class to simplify and generalize access. Any object that
 has read, write, seek, tell, and close can now be used. (r105)</p></li>
@@ -1904,8 +2251,8 @@ r113)</p></li>
 dataset read to that point (r95)</p></li>
 </ul>
 </section>
-<section id="id47">
-<h3>Bug Fixes<a class="headerlink" href="#id47" title="Link to this heading">¶</a></h3>
+<section id="id70">
+<h3>Bug Fixes<a class="headerlink" href="#id70" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>fixed issue38, name collision for ‘Other Patient Ids’ as both data element
 and sequence name in DICOM standard (r95, r96)</p></li>
@@ -1918,8 +2265,8 @@ header (r109)</p></li>
 <li><p>fixed print recursion bug when printing a UID (r111)</p></li>
 </ul>
 </section>
-<section id="id48">
-<h3>Other<a class="headerlink" href="#id48" title="Link to this heading">¶</a></h3>
+<section id="id71">
+<h3>Other<a class="headerlink" href="#id71" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>many of the example files updated</p></li>
 <li><p>updated anonymize example file to also deal with ‘OtherPatientIDs’ and
@@ -1927,10 +2274,10 @@ header (r109)</p></li>
 </ul>
 </section>
 </section>
-<section id="version-0-9-2">
-<h2>Version 0.9.2<a class="headerlink" href="#version-0-9-2" title="Link to this heading">¶</a></h2>
-<section id="id49">
-<h3>Major changes<a class="headerlink" href="#id49" title="Link to this heading">¶</a></h3>
+<section id="id72">
+<h2>0.9.2<a class="headerlink" href="#id72" title="Link to this heading">#</a></h2>
+<section id="id73">
+<h3>Major changes<a class="headerlink" href="#id73" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Renamed Attribute class and related modules to !DataElement. Old code will
 continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
@@ -1941,8 +2288,8 @@ Japanese, Chinese etc characters in environments which support unicode
 (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</p></li>
 </ul>
 </section>
-<section id="id50">
-<h3>Other Enhancements<a class="headerlink" href="#id50" title="Link to this heading">¶</a></h3>
+<section id="id74">
+<h3>Other Enhancements<a class="headerlink" href="#id74" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added support for auto-completion of dataset elements in ipython; also all
 environments using Python 2.6 (r69, r70)</p></li>
@@ -1958,8 +2305,8 @@ UID_dictionary used (r51).</p></li>
 function</p></li>
 </ul>
 </section>
-<section id="id51">
-<h3>Bug Fixes<a class="headerlink" href="#id51" title="Link to this heading">¶</a></h3>
+<section id="id75">
+<h3>Bug Fixes<a class="headerlink" href="#id75" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed issue27, sequence with a single empty item read incorrectly</p></li>
 <li><p>Fixed bug that read_OW did not handle !UndefinedLength (r50)</p></li>
@@ -1969,8 +2316,8 @@ function</p></li>
 <li><p>Fixed issue18, util directory not installed (r45)</p></li>
 </ul>
 </section>
-<section id="id52">
-<h3>Other<a class="headerlink" href="#id52" title="Link to this heading">¶</a></h3>
+<section id="id76">
+<h3>Other<a class="headerlink" href="#id76" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added example file myprint.py – shows how to custom format DICOM file
 information (r67)</p></li>
@@ -1985,33 +2332,254 @@ information (r67)</p></li>
 </section>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../faq/index.html" class="btn btn-neutral float-left" title="Frequently asked questions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2008-2025, Darcy Mason and pydicom contributors.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../faq/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Frequently asked questions</p>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    </a>
+    <a class="right-next"
+       href="v3.1.0.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">3.1.0</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-</body>
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.1.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changes">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#enhancements">Enhancements</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.0.1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">3.0.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Changes</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#removals">Removals</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydicom-internals">Pydicom Internals</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">2.4.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Pydicom Internals</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">2.3.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">2.2.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">2.1.1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">2.1.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">2.0.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changelog">Changelog</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">1.4.1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">Changes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">1.4.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Changes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">1.3.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">1.2.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id45">1.1.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id46">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id47">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id48">1.0.0</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#major-changes">Major changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-enhancements">Other enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#infrastructure">Infrastructure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id49">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id50">0.9.9</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id51">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contrib-file-changes">Contrib file changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-contributors">Other Contributors</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id52">0.9.8</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id53">Major changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id54">Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id55">Contrib file changes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id56">0.9.7</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id57">Major changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id58">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id59">Other Enhancements</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id60">0.9.6</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id61">Major changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id62">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id63">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id64">0.9.5</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#major-fixes-in-this-release">Major fixes in this release</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fixes-in-this-release">Other fixes in this release</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-contrib-files">New ‘Contrib’ files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id65">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id66">0.9.4</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#major-changes-additions-in-this-version">Major changes/additions in this version</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-changes-and-bug-fixes">Other changes and bug fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id67">0.9.3</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id68">Major changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id69">Other Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id70">Bug Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id71">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id72">0.9.2</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id73">Major changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id74">Other Enhancements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id75">Bug Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id76">Other</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2008-2025, Darcy Mason and pydicom contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
 </html>

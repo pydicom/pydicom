@@ -1,364 +1,1284 @@
 
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom.uid.DigitalXRayImageStorageForProcessing &mdash; pydicom 3.1.0.dev0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pydicom.uid.DigitalXRayImageStorageForProcessing &#8212; pydicom 3.1.0.dev0 documentation</title>
   
-    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-      <script src="../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=d3077db3"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="../../_static/copybutton.js?v=ccdb6887"></script>
-    <script src="../../_static/js/theme.js"></script>
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=d3077db3"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/generated/pydicom.uid.DigitalXRayImageStorageForProcessing';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../_static/custom-icons.js?v=1cb01586"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.uid.EddyCurrentImageStorage" href="pydicom.uid.EddyCurrentImageStorage.html" />
-    <link rel="prev" title="pydicom.uid.DigitalXRayImageStorageForPresentation" href="pydicom.uid.DigitalXRayImageStorageForPresentation.html" /> 
-</head>
+    <link rel="prev" title="pydicom.uid.DigitalXRayImageStorageForPresentation" href="pydicom.uid.DigitalXRayImageStorageForPresentation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="3.1.0.dev0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            pydicom
-              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../guides/user/index.html">pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../uid.html#transfer-syntax-uids">Transfer Syntax UIDs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../uid.html#transfer-syntax-lists">Transfer Syntax Lists</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../uid.html#uid-utilities">UID Utilities</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../uid.html#storage-sop-class-uids">Storage SOP Class UIDs</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.AcquisitionContextSRStorage.html">pydicom.uid.AcquisitionContextSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.AdvancedBlendingPresentationStateStorage.html">pydicom.uid.AdvancedBlendingPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.AmbulatoryECGWaveformStorage.html">pydicom.uid.AmbulatoryECGWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ArterialPulseWaveformStorage.html">pydicom.uid.ArterialPulseWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.AutorefractionMeasurementsStorage.html">pydicom.uid.AutorefractionMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BasicStructuredDisplayStorage.html">pydicom.uid.BasicStructuredDisplayStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BasicTextSRStorage.html">pydicom.uid.BasicTextSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BasicVoiceAudioWaveformStorage.html">pydicom.uid.BasicVoiceAudioWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BlendingSoftcopyPresentationStateStorage.html">pydicom.uid.BlendingSoftcopyPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BodyPositionWaveformStorage.html">pydicom.uid.BodyPositionWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BreastProjectionXRayImageStorageForPresentation.html">pydicom.uid.BreastProjectionXRayImageStorageForPresentation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BreastProjectionXRayImageStorageForProcessing.html">pydicom.uid.BreastProjectionXRayImageStorageForProcessing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.BreastTomosynthesisImageStorage.html">pydicom.uid.BreastTomosynthesisImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CArmPhotonElectronRadiationRecordStorage.html">pydicom.uid.CArmPhotonElectronRadiationRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CArmPhotonElectronRadiationStorage.html">pydicom.uid.CArmPhotonElectronRadiationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CTDefinedProcedureProtocolStorage.html">pydicom.uid.CTDefinedProcedureProtocolStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CTImageStorage.html">pydicom.uid.CTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CTPerformedProcedureProtocolStorage.html">pydicom.uid.CTPerformedProcedureProtocolStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CardiacElectrophysiologyWaveformStorage.html">pydicom.uid.CardiacElectrophysiologyWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ChestCADSRStorage.html">pydicom.uid.ChestCADSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ColonCADSRStorage.html">pydicom.uid.ColonCADSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ColorPaletteStorage.html">pydicom.uid.ColorPaletteStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ColorSoftcopyPresentationStateStorage.html">pydicom.uid.ColorSoftcopyPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CompositingPlanarMPRVolumetricPresentationStateStorage.html">pydicom.uid.CompositingPlanarMPRVolumetricPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.Comprehensive3DSRStorage.html">pydicom.uid.Comprehensive3DSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ComprehensiveSRStorage.html">pydicom.uid.ComprehensiveSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ComputedRadiographyImageStorage.html">pydicom.uid.ComputedRadiographyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ConfocalMicroscopyImageStorage.html">pydicom.uid.ConfocalMicroscopyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ConfocalMicroscopyTiledPyramidalImageStorage.html">pydicom.uid.ConfocalMicroscopyTiledPyramidalImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ContentAssessmentResultsStorage.html">pydicom.uid.ContentAssessmentResultsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.CornealTopographyMapStorage.html">pydicom.uid.CornealTopographyMapStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOS2DAITStorage.html">pydicom.uid.DICOS2DAITStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOS3DAITStorage.html">pydicom.uid.DICOS3DAITStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOSCTImageStorage.html">pydicom.uid.DICOSCTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOSDigitalXRayImageStorageForPresentation.html">pydicom.uid.DICOSDigitalXRayImageStorageForPresentation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOSDigitalXRayImageStorageForProcessing.html">pydicom.uid.DICOSDigitalXRayImageStorageForProcessing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOSQuadrupoleResonanceStorage.html">pydicom.uid.DICOSQuadrupoleResonanceStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DICOSThreatDetectionReportStorage.html">pydicom.uid.DICOSThreatDetectionReportStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DeformableSpatialRegistrationStorage.html">pydicom.uid.DeformableSpatialRegistrationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DermoscopicPhotographyImageStorage.html">pydicom.uid.DermoscopicPhotographyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DigitalIntraOralXRayImageStorageForPresentation.html">pydicom.uid.DigitalIntraOralXRayImageStorageForPresentation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DigitalIntraOralXRayImageStorageForProcessing.html">pydicom.uid.DigitalIntraOralXRayImageStorageForProcessing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DigitalMammographyXRayImageStorageForPresentation.html">pydicom.uid.DigitalMammographyXRayImageStorageForPresentation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DigitalMammographyXRayImageStorageForProcessing.html">pydicom.uid.DigitalMammographyXRayImageStorageForProcessing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DigitalXRayImageStorageForPresentation.html">pydicom.uid.DigitalXRayImageStorageForPresentation</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.uid.DigitalXRayImageStorageForProcessing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EddyCurrentImageStorage.html">pydicom.uid.EddyCurrentImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EddyCurrentMultiFrameImageStorage.html">pydicom.uid.EddyCurrentMultiFrameImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ElectromyogramWaveformStorage.html">pydicom.uid.ElectromyogramWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ElectrooculogramWaveformStorage.html">pydicom.uid.ElectrooculogramWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EncapsulatedCDAStorage.html">pydicom.uid.EncapsulatedCDAStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EncapsulatedMTLStorage.html">pydicom.uid.EncapsulatedMTLStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EncapsulatedOBJStorage.html">pydicom.uid.EncapsulatedOBJStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EncapsulatedPDFStorage.html">pydicom.uid.EncapsulatedPDFStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EncapsulatedSTLStorage.html">pydicom.uid.EncapsulatedSTLStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedCTImageStorage.html">pydicom.uid.EnhancedCTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedContinuousRTImageStorage.html">pydicom.uid.EnhancedContinuousRTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedMRColorImageStorage.html">pydicom.uid.EnhancedMRColorImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedMRImageStorage.html">pydicom.uid.EnhancedMRImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedPETImageStorage.html">pydicom.uid.EnhancedPETImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedRTImageStorage.html">pydicom.uid.EnhancedRTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedSRStorage.html">pydicom.uid.EnhancedSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedUSVolumeStorage.html">pydicom.uid.EnhancedUSVolumeStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedXAImageStorage.html">pydicom.uid.EnhancedXAImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedXRFImageStorage.html">pydicom.uid.EnhancedXRFImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.EnhancedXRayRadiationDoseSRStorage.html">pydicom.uid.EnhancedXRayRadiationDoseSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ExtensibleSRStorage.html">pydicom.uid.ExtensibleSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.General32bitECGWaveformStorage.html">pydicom.uid.General32bitECGWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.GeneralAudioWaveformStorage.html">pydicom.uid.GeneralAudioWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.GeneralECGWaveformStorage.html">pydicom.uid.GeneralECGWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.GenericImplantTemplateStorage.html">pydicom.uid.GenericImplantTemplateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.GrayscalePlanarMPRVolumetricPresentationStateStorage.html">pydicom.uid.GrayscalePlanarMPRVolumetricPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.GrayscaleSoftcopyPresentationStateStorage.html">pydicom.uid.GrayscaleSoftcopyPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.HangingProtocolStorage.html">pydicom.uid.HangingProtocolStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.HeightMapSegmentationStorage.html">pydicom.uid.HeightMapSegmentationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.HemodynamicWaveformStorage.html">pydicom.uid.HemodynamicWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ImplantAssemblyTemplateStorage.html">pydicom.uid.ImplantAssemblyTemplateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ImplantTemplateGroupStorage.html">pydicom.uid.ImplantTemplateGroupStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ImplantationPlanSRStorage.html">pydicom.uid.ImplantationPlanSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.IntraocularLensCalculationsStorage.html">pydicom.uid.IntraocularLensCalculationsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForPresentation.html">pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForPresentation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForProcessing.html">pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForProcessing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.InventoryStorage.html">pydicom.uid.InventoryStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.KeratometryMeasurementsStorage.html">pydicom.uid.KeratometryMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.KeyObjectSelectionDocumentStorage.html">pydicom.uid.KeyObjectSelectionDocumentStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.LabelMapSegmentationStorage.html">pydicom.uid.LabelMapSegmentationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.LegacyConvertedEnhancedCTImageStorage.html">pydicom.uid.LegacyConvertedEnhancedCTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.LegacyConvertedEnhancedMRImageStorage.html">pydicom.uid.LegacyConvertedEnhancedMRImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.LegacyConvertedEnhancedPETImageStorage.html">pydicom.uid.LegacyConvertedEnhancedPETImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.LensometryMeasurementsStorage.html">pydicom.uid.LensometryMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MRImageStorage.html">pydicom.uid.MRImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MRSpectroscopyStorage.html">pydicom.uid.MRSpectroscopyStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MacularGridThicknessAndVolumeReportStorage.html">pydicom.uid.MacularGridThicknessAndVolumeReportStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MammographyCADSRStorage.html">pydicom.uid.MammographyCADSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MediaStorageDirectoryStorage.html">pydicom.uid.MediaStorageDirectoryStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MicroscopyBulkSimpleAnnotationsStorage.html">pydicom.uid.MicroscopyBulkSimpleAnnotationsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MultiFrameGrayscaleByteSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameGrayscaleByteSecondaryCaptureImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MultiFrameGrayscaleWordSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameGrayscaleWordSecondaryCaptureImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MultiFrameSingleBitSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameSingleBitSecondaryCaptureImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MultiFrameTrueColorSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameTrueColorSecondaryCaptureImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MultichannelRespiratoryWaveformStorage.html">pydicom.uid.MultichannelRespiratoryWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MultipleVolumeRenderingVolumetricPresentationStateStorage.html">pydicom.uid.MultipleVolumeRenderingVolumetricPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.NuclearMedicineImageStorage.html">pydicom.uid.NuclearMedicineImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicAxialMeasurementsStorage.html">pydicom.uid.OphthalmicAxialMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage.html">pydicom.uid.OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicOpticalCoherenceTomographyEnFaceImageStorage.html">pydicom.uid.OphthalmicOpticalCoherenceTomographyEnFaceImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicPhotography16BitImageStorage.html">pydicom.uid.OphthalmicPhotography16BitImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicPhotography8BitImageStorage.html">pydicom.uid.OphthalmicPhotography8BitImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicThicknessMapStorage.html">pydicom.uid.OphthalmicThicknessMapStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicTomographyImageStorage.html">pydicom.uid.OphthalmicTomographyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage.html">pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ParametricMapStorage.html">pydicom.uid.ParametricMapStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PatientRadiationDoseSRStorage.html">pydicom.uid.PatientRadiationDoseSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PerformedImagingAgentAdministrationSRStorage.html">pydicom.uid.PerformedImagingAgentAdministrationSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PhotoacousticImageStorage.html">pydicom.uid.PhotoacousticImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PlannedImagingAgentAdministrationSRStorage.html">pydicom.uid.PlannedImagingAgentAdministrationSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PositronEmissionTomographyImageStorage.html">pydicom.uid.PositronEmissionTomographyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ProcedureLogStorage.html">pydicom.uid.ProcedureLogStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ProtocolApprovalStorage.html">pydicom.uid.ProtocolApprovalStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PseudoColorSoftcopyPresentationStateStorage.html">pydicom.uid.PseudoColorSoftcopyPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTBeamsDeliveryInstructionStorage.html">pydicom.uid.RTBeamsDeliveryInstructionStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTBeamsTreatmentRecordStorage.html">pydicom.uid.RTBeamsTreatmentRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTBrachyApplicationSetupDeliveryInstructionStorage.html">pydicom.uid.RTBrachyApplicationSetupDeliveryInstructionStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTBrachyTreatmentRecordStorage.html">pydicom.uid.RTBrachyTreatmentRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTDoseStorage.html">pydicom.uid.RTDoseStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTImageStorage.html">pydicom.uid.RTImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTIonBeamsTreatmentRecordStorage.html">pydicom.uid.RTIonBeamsTreatmentRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTIonPlanStorage.html">pydicom.uid.RTIonPlanStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTPatientPositionAcquisitionInstructionStorage.html">pydicom.uid.RTPatientPositionAcquisitionInstructionStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTPhysicianIntentStorage.html">pydicom.uid.RTPhysicianIntentStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTPlanStorage.html">pydicom.uid.RTPlanStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTRadiationRecordSetStorage.html">pydicom.uid.RTRadiationRecordSetStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTRadiationSalvageRecordStorage.html">pydicom.uid.RTRadiationSalvageRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTRadiationSetDeliveryInstructionStorage.html">pydicom.uid.RTRadiationSetDeliveryInstructionStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTRadiationSetStorage.html">pydicom.uid.RTRadiationSetStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTSegmentAnnotationStorage.html">pydicom.uid.RTSegmentAnnotationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTStructureSetStorage.html">pydicom.uid.RTStructureSetStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTTreatmentPreparationStorage.html">pydicom.uid.RTTreatmentPreparationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RTTreatmentSummaryRecordStorage.html">pydicom.uid.RTTreatmentSummaryRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RadiopharmaceuticalRadiationDoseSRStorage.html">pydicom.uid.RadiopharmaceuticalRadiationDoseSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RawDataStorage.html">pydicom.uid.RawDataStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RealWorldValueMappingStorage.html">pydicom.uid.RealWorldValueMappingStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RespiratoryWaveformStorage.html">pydicom.uid.RespiratoryWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RoboticArmRadiationStorage.html">pydicom.uid.RoboticArmRadiationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RoboticRadiationRecordStorage.html">pydicom.uid.RoboticRadiationRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage.html">pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SecondaryCaptureImageStorage.html">pydicom.uid.SecondaryCaptureImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SegmentationStorage.html">pydicom.uid.SegmentationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SegmentedVolumeRenderingVolumetricPresentationStateStorage.html">pydicom.uid.SegmentedVolumeRenderingVolumetricPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SimplifiedAdultEchoSRStorage.html">pydicom.uid.SimplifiedAdultEchoSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SleepElectroencephalogramWaveformStorage.html">pydicom.uid.SleepElectroencephalogramWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SpatialFiducialsStorage.html">pydicom.uid.SpatialFiducialsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SpatialRegistrationStorage.html">pydicom.uid.SpatialRegistrationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SpectaclePrescriptionReportStorage.html">pydicom.uid.SpectaclePrescriptionReportStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.StereometricRelationshipStorage.html">pydicom.uid.StereometricRelationshipStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SubjectiveRefractionMeasurementsStorage.html">pydicom.uid.SubjectiveRefractionMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SurfaceScanMeshStorage.html">pydicom.uid.SurfaceScanMeshStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SurfaceScanPointCloudStorage.html">pydicom.uid.SurfaceScanPointCloudStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.SurfaceSegmentationStorage.html">pydicom.uid.SurfaceSegmentationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ThermographyImageStorage.html">pydicom.uid.ThermographyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ThermographyMultiFrameImageStorage.html">pydicom.uid.ThermographyMultiFrameImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.TomotherapeuticRadiationRecordStorage.html">pydicom.uid.TomotherapeuticRadiationRecordStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.TomotherapeuticRadiationStorage.html">pydicom.uid.TomotherapeuticRadiationStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.TractographyResultsStorage.html">pydicom.uid.TractographyResultsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.TwelveLeadECGWaveformStorage.html">pydicom.uid.TwelveLeadECGWaveformStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.UltrasoundImageStorage.html">pydicom.uid.UltrasoundImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.UltrasoundMultiFrameImageStorage.html">pydicom.uid.UltrasoundMultiFrameImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VLEndoscopicImageStorage.html">pydicom.uid.VLEndoscopicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VLMicroscopicImageStorage.html">pydicom.uid.VLMicroscopicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VLPhotographicImageStorage.html">pydicom.uid.VLPhotographicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VLSlideCoordinatesMicroscopicImageStorage.html">pydicom.uid.VLSlideCoordinatesMicroscopicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VLWholeSlideMicroscopyImageStorage.html">pydicom.uid.VLWholeSlideMicroscopyImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VariableModalityLUTSoftcopyPresentationStateStorage.html">pydicom.uid.VariableModalityLUTSoftcopyPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VideoEndoscopicImageStorage.html">pydicom.uid.VideoEndoscopicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VideoMicroscopicImageStorage.html">pydicom.uid.VideoMicroscopicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VideoPhotographicImageStorage.html">pydicom.uid.VideoPhotographicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VisualAcuityMeasurementsStorage.html">pydicom.uid.VisualAcuityMeasurementsStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.VolumeRenderingVolumetricPresentationStateStorage.html">pydicom.uid.VolumeRenderingVolumetricPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.WaveformAnnotationSRStorage.html">pydicom.uid.WaveformAnnotationSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.WideFieldOphthalmicPhotography3DCoordinatesImageStorage.html">pydicom.uid.WideFieldOphthalmicPhotography3DCoordinatesImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.WideFieldOphthalmicPhotographyStereographicProjectionImageStorage.html">pydicom.uid.WideFieldOphthalmicPhotographyStereographicProjectionImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XADefinedProcedureProtocolStorage.html">pydicom.uid.XADefinedProcedureProtocolStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XAPerformedProcedureProtocolStorage.html">pydicom.uid.XAPerformedProcedureProtocolStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XAXRFGrayscaleSoftcopyPresentationStateStorage.html">pydicom.uid.XAXRFGrayscaleSoftcopyPresentationStateStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XRay3DAngiographicImageStorage.html">pydicom.uid.XRay3DAngiographicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XRay3DCraniofacialImageStorage.html">pydicom.uid.XRay3DCraniofacialImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XRayAngiographicImageStorage.html">pydicom.uid.XRayAngiographicImageStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XRayRadiationDoseSRStorage.html">pydicom.uid.XRayRadiationDoseSRStorage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.XRayRadiofluoroscopicImageStorage.html">pydicom.uid.XRayRadiofluoroscopicImageStorage</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
-</ul>
 
-        </div>
-      </div>
-    </nav>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">pydicom</a>
-      </nav>
+  
+    
+  
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
-      <li class="breadcrumb-item active">pydicom.uid.DigitalXRayImageStorageForProcessing</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pydicom_flat_black.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">pydicom</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../guides/user/index.html">
+    pydicom User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../guides/index.html">
+    Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    General examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
+    Contributing to pydicom
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
+    Frequently asked questions
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
+    Release notes
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../index.html">
+    API
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
+    Release notes
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
-  <hr/>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pydicom/pydicom/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pydicom/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../guides/user/index.html">
+    pydicom User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../guides/index.html">
+    Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    General examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
+    Contributing to pydicom
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../faq/index.html">
+    Frequently asked questions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Release notes
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Release notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pydicom/pydicom/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pydicom/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.charset.convert_encodings.html">pydicom.charset.convert_encodings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.charset.decode_element.html">pydicom.charset.decode_element</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.charset.decode_bytes.html">pydicom.charset.decode_bytes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.charset.encode_string.html">pydicom.charset.encode_string</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.settings.html">pydicom.config.settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.datetime_conversion.html">pydicom.config.datetime_conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.debug.html">pydicom.config.debug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.enforce_valid_values.html">pydicom.config.enforce_valid_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.future_behavior.html">pydicom.config.future_behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.IGNORE.html">pydicom.config.IGNORE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.WARN.html">pydicom.config.WARN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.config.RAISE.html">pydicom.config.RAISE</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.data.get_charset_files.html">pydicom.data.get_charset_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.data.get_palette_files.html">pydicom.data.get_palette_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.data.get_testdata_file.html">pydicom.data.get_testdata_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.data.get_testdata_files.html">pydicom.data.get_testdata_files</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.add_dict_entries.html">pydicom.datadict.add_dict_entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.add_dict_entry.html">pydicom.datadict.add_dict_entry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.dictionary_description.html">pydicom.datadict.dictionary_description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.dictionary_has_tag.html">pydicom.datadict.dictionary_has_tag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.dictionary_is_retired.html">pydicom.datadict.dictionary_is_retired</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.dictionary_keyword.html">pydicom.datadict.dictionary_keyword</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.dictionary_VM.html">pydicom.datadict.dictionary_VM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.dictionary_VR.html">pydicom.datadict.dictionary_VR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.get_entry.html">pydicom.datadict.get_entry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.keyword_for_tag.html">pydicom.datadict.keyword_for_tag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.mask_match.html">pydicom.datadict.mask_match</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.repeater_has_keyword.html">pydicom.datadict.repeater_has_keyword</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.repeater_has_tag.html">pydicom.datadict.repeater_has_tag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.tag_for_keyword.html">pydicom.datadict.tag_for_keyword</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.add_private_dict_entries.html">pydicom.datadict.add_private_dict_entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.add_private_dict_entry.html">pydicom.datadict.add_private_dict_entry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.get_private_entry.html">pydicom.datadict.get_private_entry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.private_dictionary_description.html">pydicom.datadict.private_dictionary_description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.private_dictionary_VM.html">pydicom.datadict.private_dictionary_VM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.datadict.private_dictionary_VR.html">pydicom.datadict.private_dictionary_VR</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.dataset.Dataset.html">pydicom.dataset.Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.dataset.FileDataset.html">pydicom.dataset.FileDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.dataset.FileMetaDataset.html">pydicom.dataset.FileMetaDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.dataset.PrivateBlock.html">pydicom.dataset.PrivateBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.dataset.validate_file_meta.html">pydicom.dataset.validate_file_meta</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataelem.convert_raw_data_element.html">pydicom.dataelem.convert_raw_data_element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataelem.DataElement.html">pydicom.dataelem.DataElement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataelem.DataElement_from_raw.html">pydicom.dataelem.DataElement_from_raw</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataelem.RawDataElement.html">pydicom.dataelem.RawDataElement</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.tag.BaseTag.html">pydicom.tag.BaseTag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.tag.Tag.html">pydicom.tag.Tag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.tag.tag_in_exception.html">pydicom.tag.tag_in_exception</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.tag.TupleTag.html">pydicom.tag.TupleTag</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_AE_string.html">pydicom.values.convert_AE_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_ATvalue.html">pydicom.values.convert_ATvalue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_DA_string.html">pydicom.values.convert_DA_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_DS_string.html">pydicom.values.convert_DS_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_DT_string.html">pydicom.values.convert_DT_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_IS_string.html">pydicom.values.convert_IS_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_numbers.html">pydicom.values.convert_numbers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_OBvalue.html">pydicom.values.convert_OBvalue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_OWvalue.html">pydicom.values.convert_OWvalue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_PN.html">pydicom.values.convert_PN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_single_string.html">pydicom.values.convert_single_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_SQ.html">pydicom.values.convert_SQ</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_string.html">pydicom.values.convert_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_tag.html">pydicom.values.convert_tag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_text.html">pydicom.values.convert_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_TM_string.html">pydicom.values.convert_TM_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_UI.html">pydicom.values.convert_UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_UN.html">pydicom.values.convert_UN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_UR_string.html">pydicom.values.convert_UR_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.convert_value.html">pydicom.values.convert_value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.values.multi_string.html">pydicom.values.multi_string</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.multival.MultiValue.html">pydicom.multival.MultiValue</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.sequence.Sequence.html">pydicom.sequence.Sequence</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.DA.html">pydicom.valuerep.DA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.is_valid_ds.html">pydicom.valuerep.is_valid_ds</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.format_number_as_ds.html">pydicom.valuerep.format_number_as_ds</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.DS.html">pydicom.valuerep.DS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.DSdecimal.html">pydicom.valuerep.DSdecimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.DSfloat.html">pydicom.valuerep.DSfloat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.DT.html">pydicom.valuerep.DT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.ISfloat.html">pydicom.valuerep.ISfloat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.valuerep.VR.html">pydicom.valuerep.VR</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Example Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.examples</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.examples.get_path.html">pydicom.examples.get_path</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.decode_data_sequence.html">pydicom.encaps.decode_data_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.defragment_data.html">pydicom.encaps.defragment_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.generate_pixel_data.html">pydicom.encaps.generate_pixel_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.generate_pixel_data_fragment.html">pydicom.encaps.generate_pixel_data_fragment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.generate_pixel_data_frame.html">pydicom.encaps.generate_pixel_data_frame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.get_frame_offsets.html">pydicom.encaps.get_frame_offsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.read_item.html">pydicom.encaps.read_item</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.parse_basic_offsets.html">pydicom.encaps.parse_basic_offsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.parse_fragments.html">pydicom.encaps.parse_fragments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.generate_fragments.html">pydicom.encaps.generate_fragments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.generate_fragmented_frames.html">pydicom.encaps.generate_fragmented_frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.generate_frames.html">pydicom.encaps.generate_frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.get_frame.html">pydicom.encaps.get_frame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.encapsulate_buffer.html">pydicom.encaps.encapsulate_buffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.encapsulate_extended.html">pydicom.encaps.encapsulate_extended</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.encapsulate_extended_buffer.html">pydicom.encaps.encapsulate_extended_buffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.errors.InvalidDicomError.html">pydicom.errors.InvalidDicomError</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../fileio.html">Dataset IO</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.data_element_generator.html">pydicom.filereader.data_element_generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.data_element_offset_to_value.html">pydicom.filereader.data_element_offset_to_value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.dcmread.html">pydicom.filereader.dcmread</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_dataset.html">pydicom.filereader.read_dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_deferred_data_element.html">pydicom.filereader.read_deferred_data_element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_file_meta_info.html">pydicom.filereader.read_file_meta_info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_partial.html">pydicom.filereader.read_partial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_preamble.html">pydicom.filereader.read_preamble</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_sequence.html">pydicom.filereader.read_sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filereader.read_sequence_item.html">pydicom.filereader.read_sequence_item</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.correct_ambiguous_vr.html">pydicom.filewriter.correct_ambiguous_vr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.correct_ambiguous_vr_element.html">pydicom.filewriter.correct_ambiguous_vr_element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.dcmwrite.html">pydicom.filewriter.dcmwrite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.multi_string.html">pydicom.filewriter.multi_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_ATvalue.html">pydicom.filewriter.write_ATvalue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_DA.html">pydicom.filewriter.write_DA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_dataset.html">pydicom.filewriter.write_dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_data_element.html">pydicom.filewriter.write_data_element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_DT.html">pydicom.filewriter.write_DT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_file_meta_info.html">pydicom.filewriter.write_file_meta_info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_numbers.html">pydicom.filewriter.write_numbers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_number_string.html">pydicom.filewriter.write_number_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_OBvalue.html">pydicom.filewriter.write_OBvalue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_OWvalue.html">pydicom.filewriter.write_OWvalue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_PN.html">pydicom.filewriter.write_PN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_sequence.html">pydicom.filewriter.write_sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_sequence_item.html">pydicom.filewriter.write_sequence_item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_string.html">pydicom.filewriter.write_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_text.html">pydicom.filewriter.write_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_TM.html">pydicom.filewriter.write_TM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_UI.html">pydicom.filewriter.write_UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filewriter.write_UN.html">pydicom.filewriter.write_UN</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filebase.DicomBytesIO.html">pydicom.filebase.DicomBytesIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filebase.DicomFile.html">pydicom.filebase.DicomFile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filebase.DicomFileLike.html">pydicom.filebase.DicomFileLike</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.filebase.DicomIO.html">pydicom.filebase.DicomIO</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.fileutil.absorb_delimiter_item.html">pydicom.fileutil.absorb_delimiter_item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.fileutil.find_bytes.html">pydicom.fileutil.find_bytes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.fileutil.find_delimiter.html">pydicom.fileutil.find_delimiter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.fileutil.length_of_undefined_length.html">pydicom.fileutil.length_of_undefined_length</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.fileutil.read_undefined_length_value.html">pydicom.fileutil.read_undefined_length_value</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.fileset.RecordNode.html">pydicom.fileset.RecordNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.fileset.FileInstance.html">pydicom.fileset.FileInstance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.fileset.FileSet.html">pydicom.fileset.FileSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.fileset.generate_filename.html">pydicom.fileset.generate_filename</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.fileset.is_conformant_file_id.html">pydicom.fileset.is_conformant_file_id</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.fileset.DIRECTORY_RECORDERS.html">pydicom.fileset.DIRECTORY_RECORDERS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.gdcm_handler.html">pydicom.pixel_data_handlers.gdcm_handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.jpeg_ls_handler.html">pydicom.pixel_data_handlers.jpeg_ls_handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.numpy_handler.html">pydicom.pixel_data_handlers.numpy_handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.pillow_handler.html">pydicom.pixel_data_handlers.pillow_handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.pylibjpeg_handler.html">pydicom.pixel_data_handlers.pylibjpeg_handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.rle_handler.html">pydicom.pixel_data_handlers.rle_handler</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../hooks.html">User Hooks (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.hooks</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.hooks.hooks.html">pydicom.hooks.hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.hooks.Hooks.html">pydicom.hooks.Hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.hooks.raw_element_vr.html">pydicom.hooks.raw_element_vr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.hooks.raw_element_value.html">pydicom.hooks.raw_element_value</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.hooks.raw_element_value_fix_separator.html">pydicom.hooks.raw_element_value_fix_separator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.hooks.raw_element_value_retry.html">pydicom.hooks.raw_element_value_retry</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.misc.is_dicom.html">pydicom.misc.is_dicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.misc.size_in_bytes.html">pydicom.misc.size_in_bytes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../overlays.html">Overlay Data Handling (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.overlays.numpy_handler.html">pydicom.overlays.numpy_handler</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pixels.html">Pixel Data (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_color_lut.html">pydicom.pixels.apply_color_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_icc_profile.html">pydicom.pixels.apply_icc_profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_modality_lut.html">pydicom.pixels.apply_modality_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_presentation_lut.html">pydicom.pixels.apply_presentation_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_rescale.html">pydicom.pixels.apply_rescale</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_voi_lut.html">pydicom.pixels.apply_voi_lut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_voi.html">pydicom.pixels.apply_voi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.apply_windowing.html">pydicom.pixels.apply_windowing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.convert_color_space.html">pydicom.pixels.convert_color_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.create_icc_transform.html">pydicom.pixels.create_icc_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.set_pixel_data.html">pydicom.pixels.set_pixel_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.pixels.unpack_bits.html">pydicom.pixels.unpack_bits</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../pixels.decoders.html">Pixel Data Decoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.decoders</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.ExplicitVRLittleEndianDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.ImplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.ImplicitVRLittleEndianDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.DeflatedExplicitVRLittleEndianDecoder.html">pydicom.pixels.decoders.DeflatedExplicitVRLittleEndianDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.ExplicitVRBigEndianDecoder.html">pydicom.pixels.decoders.ExplicitVRBigEndianDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEGBaseline8BitDecoder.html">pydicom.pixels.decoders.JPEGBaseline8BitDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEGExtended12BitDecoder.html">pydicom.pixels.decoders.JPEGExtended12BitDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEGLosslessDecoder.html">pydicom.pixels.decoders.JPEGLosslessDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEGLosslessSV1Decoder.html">pydicom.pixels.decoders.JPEGLosslessSV1Decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEGLSLosslessDecoder.html">pydicom.pixels.decoders.JPEGLSLosslessDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEGLSNearLosslessDecoder.html">pydicom.pixels.decoders.JPEGLSNearLosslessDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEG2000LosslessDecoder.html">pydicom.pixels.decoders.JPEG2000LosslessDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.JPEG2000Decoder.html">pydicom.pixels.decoders.JPEG2000Decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.HTJ2KLosslessDecoder.html">pydicom.pixels.decoders.HTJ2KLosslessDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.HTJ2KLosslessRPCLDecoder.html">pydicom.pixels.decoders.HTJ2KLosslessRPCLDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.HTJ2KDecoder.html">pydicom.pixels.decoders.HTJ2KDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.RLELosslessDecoder.html">pydicom.pixels.decoders.RLELosslessDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.DeflatedImageFrameCompressionDecoder.html">pydicom.pixels.decoders.DeflatedImageFrameCompressionDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.base.DecodeRunner.html">pydicom.pixels.decoders.base.DecodeRunner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.decoders.base.Decoder.html">pydicom.pixels.decoders.base.Decoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../pixels.encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.encoders</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.JPEGLSLosslessEncoder.html">pydicom.pixels.encoders.JPEGLSLosslessEncoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.JPEGLSNearLosslessEncoder.html">pydicom.pixels.encoders.JPEGLSNearLosslessEncoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.JPEG2000LosslessEncoder.html">pydicom.pixels.encoders.JPEG2000LosslessEncoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.JPEG2000Encoder.html">pydicom.pixels.encoders.JPEG2000Encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.RLELosslessEncoder.html">pydicom.pixels.encoders.RLELosslessEncoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.DeflatedImageFrameCompressionEncoder.html">pydicom.pixels.encoders.DeflatedImageFrameCompressionEncoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.base.Encoder.html">pydicom.pixels.encoders.base.Encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.encoders.base.EncodeRunner.html">pydicom.pixels.encoders.base.EncodeRunner</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../pixels.processing.html">Pixel Data Processing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.processing</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_color_lut.html">pydicom.pixels.processing.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_icc_profile.html">pydicom.pixels.processing.apply_icc_profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_modality_lut.html">pydicom.pixels.processing.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_presentation_lut.html">pydicom.pixels.processing.apply_presentation_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_rescale.html">pydicom.pixels.processing.apply_rescale</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_voi_lut.html">pydicom.pixels.processing.apply_voi_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_voi.html">pydicom.pixels.processing.apply_voi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.apply_windowing.html">pydicom.pixels.processing.apply_windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.convert_color_space.html">pydicom.pixels.processing.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.processing.create_icc_transform.html">pydicom.pixels.processing.create_icc_transform</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../pixels.utils.html">Pixel Data Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixels.utils</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.as_pixel_options.html">pydicom.pixels.utils.as_pixel_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.compress.html">pydicom.pixels.utils.compress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.decompress.html">pydicom.pixels.utils.decompress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.expand_ybr422.html">pydicom.pixels.utils.expand_ybr422</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.get_expected_length.html">pydicom.pixels.utils.get_expected_length</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.get_image_pixel_ids.html">pydicom.pixels.utils.get_image_pixel_ids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.get_j2k_parameters.html">pydicom.pixels.utils.get_j2k_parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.get_nr_frames.html">pydicom.pixels.utils.get_nr_frames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.iter_pixels.html">pydicom.pixels.utils.iter_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.pack_bits.html">pydicom.pixels.utils.pack_bits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.pixel_array.html">pydicom.pixels.utils.pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.pixel_dtype.html">pydicom.pixels.utils.pixel_dtype</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.reshape_pixel_array.html">pydicom.pixels.utils.reshape_pixel_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.set_pixel_data.html">pydicom.pixels.utils.set_pixel_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixels.utils.unpack_bits.html">pydicom.pixels.utils.unpack_bits</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sr.html">Concepts and Context Groups (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sr</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.sr.Collection.html">pydicom.sr.Collection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.sr.Concepts.html">pydicom.sr.Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.sr.Code.html">pydicom.sr.Code</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../waveforms.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.waveforms.numpy_handler.html">pydicom.waveforms.numpy_handler</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ImplicitVRLittleEndian.html">pydicom.uid.ImplicitVRLittleEndian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ExplicitVRLittleEndian.html">pydicom.uid.ExplicitVRLittleEndian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DeflatedExplicitVRLittleEndian.html">pydicom.uid.DeflatedExplicitVRLittleEndian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ExplicitVRBigEndian.html">pydicom.uid.ExplicitVRBigEndian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGBaseline8Bit.html">pydicom.uid.JPEGBaseline8Bit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGExtended12Bit.html">pydicom.uid.JPEGExtended12Bit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGLossless.html">pydicom.uid.JPEGLossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGLosslessSV1.html">pydicom.uid.JPEGLosslessSV1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGLSLossless.html">pydicom.uid.JPEGLSLossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGLSNearLossless.html">pydicom.uid.JPEGLSNearLossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEG2000Lossless.html">pydicom.uid.JPEG2000Lossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEG2000.html">pydicom.uid.JPEG2000</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEG2000MCLossless.html">pydicom.uid.JPEG2000MCLossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEG2000MC.html">pydicom.uid.JPEG2000MC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG2MPML.html">pydicom.uid.MPEG2MPML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG2MPMLF.html">pydicom.uid.MPEG2MPMLF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG2MPHL.html">pydicom.uid.MPEG2MPHL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG2MPHLF.html">pydicom.uid.MPEG2MPHLF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP41.html">pydicom.uid.MPEG4HP41</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP41F.html">pydicom.uid.MPEG4HP41F</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP41BD.html">pydicom.uid.MPEG4HP41BD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP41BDF.html">pydicom.uid.MPEG4HP41BDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP422D.html">pydicom.uid.MPEG4HP422D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP422DF.html">pydicom.uid.MPEG4HP422DF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP423D.html">pydicom.uid.MPEG4HP423D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP423DF.html">pydicom.uid.MPEG4HP423DF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP42STEREO.html">pydicom.uid.MPEG4HP42STEREO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEG4HP42STEREOF.html">pydicom.uid.MPEG4HP42STEREOF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HEVCMP51.html">pydicom.uid.HEVCMP51</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HEVCM10P51.html">pydicom.uid.HEVCM10P51</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGXLLossless.html">pydicom.uid.JPEGXLLossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGXLJPEGRecompression.html">pydicom.uid.JPEGXLJPEGRecompression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGXL.html">pydicom.uid.JPEGXL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HTJ2KLossless.html">pydicom.uid.HTJ2KLossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HTJ2KLosslessRPCL.html">pydicom.uid.HTJ2KLosslessRPCL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HTJ2K.html">pydicom.uid.HTJ2K</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPIPHTJ2KReferenced.html">pydicom.uid.JPIPHTJ2KReferenced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPIPHTJ2KReferencedDeflate.html">pydicom.uid.JPIPHTJ2KReferencedDeflate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RLELossless.html">pydicom.uid.RLELossless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo.html">pydicom.uid.SMPTEST211020UncompressedProgressiveActiveVideo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo.html">pydicom.uid.SMPTEST211020UncompressedInterlacedActiveVideo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SMPTEST211030PCMDigitalAudio.html">pydicom.uid.SMPTEST211030PCMDigitalAudio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DeflatedImageFrameCompression.html">pydicom.uid.DeflatedImageFrameCompression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.AllTransferSyntaxes.html">pydicom.uid.AllTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGTransferSyntaxes.html">pydicom.uid.JPEGTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGLSTransferSyntaxes.html">pydicom.uid.JPEGLSTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEG2000TransferSyntaxes.html">pydicom.uid.JPEG2000TransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.JPEGXLTransferSyntaxes.html">pydicom.uid.JPEGXLTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MPEGTransferSyntaxes.html">pydicom.uid.MPEGTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RLETransferSyntaxes.html">pydicom.uid.RLETransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.UncompressedTransferSyntaxes.html">pydicom.uid.UncompressedTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PrivateTransferSyntaxes.html">pydicom.uid.PrivateTransferSyntaxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.generate_uid.html">pydicom.uid.generate_uid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.register_transfer_syntax.html">pydicom.uid.register_transfer_syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PYDICOM_ROOT_UID.html">pydicom.uid.PYDICOM_ROOT_UID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PYDICOM_IMPLEMENTATION_UID.html">pydicom.uid.PYDICOM_IMPLEMENTATION_UID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RE_VALID_UID.html">pydicom.uid.RE_VALID_UID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RE_VALID_UID_PREFIX.html">pydicom.uid.RE_VALID_UID_PREFIX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.UID.html">pydicom.uid.UID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.AcquisitionContextSRStorage.html">pydicom.uid.AcquisitionContextSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.AdvancedBlendingPresentationStateStorage.html">pydicom.uid.AdvancedBlendingPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.AmbulatoryECGWaveformStorage.html">pydicom.uid.AmbulatoryECGWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ArterialPulseWaveformStorage.html">pydicom.uid.ArterialPulseWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.AutorefractionMeasurementsStorage.html">pydicom.uid.AutorefractionMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BasicStructuredDisplayStorage.html">pydicom.uid.BasicStructuredDisplayStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BasicTextSRStorage.html">pydicom.uid.BasicTextSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BasicVoiceAudioWaveformStorage.html">pydicom.uid.BasicVoiceAudioWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BlendingSoftcopyPresentationStateStorage.html">pydicom.uid.BlendingSoftcopyPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BodyPositionWaveformStorage.html">pydicom.uid.BodyPositionWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BreastProjectionXRayImageStorageForPresentation.html">pydicom.uid.BreastProjectionXRayImageStorageForPresentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BreastProjectionXRayImageStorageForProcessing.html">pydicom.uid.BreastProjectionXRayImageStorageForProcessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.BreastTomosynthesisImageStorage.html">pydicom.uid.BreastTomosynthesisImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CArmPhotonElectronRadiationRecordStorage.html">pydicom.uid.CArmPhotonElectronRadiationRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CArmPhotonElectronRadiationStorage.html">pydicom.uid.CArmPhotonElectronRadiationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CTDefinedProcedureProtocolStorage.html">pydicom.uid.CTDefinedProcedureProtocolStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CTImageStorage.html">pydicom.uid.CTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CTPerformedProcedureProtocolStorage.html">pydicom.uid.CTPerformedProcedureProtocolStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CardiacElectrophysiologyWaveformStorage.html">pydicom.uid.CardiacElectrophysiologyWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ChestCADSRStorage.html">pydicom.uid.ChestCADSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ColonCADSRStorage.html">pydicom.uid.ColonCADSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ColorPaletteStorage.html">pydicom.uid.ColorPaletteStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ColorSoftcopyPresentationStateStorage.html">pydicom.uid.ColorSoftcopyPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CompositingPlanarMPRVolumetricPresentationStateStorage.html">pydicom.uid.CompositingPlanarMPRVolumetricPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.Comprehensive3DSRStorage.html">pydicom.uid.Comprehensive3DSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ComprehensiveSRStorage.html">pydicom.uid.ComprehensiveSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ComputedRadiographyImageStorage.html">pydicom.uid.ComputedRadiographyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ConfocalMicroscopyImageStorage.html">pydicom.uid.ConfocalMicroscopyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ConfocalMicroscopyTiledPyramidalImageStorage.html">pydicom.uid.ConfocalMicroscopyTiledPyramidalImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ContentAssessmentResultsStorage.html">pydicom.uid.ContentAssessmentResultsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.CornealTopographyMapStorage.html">pydicom.uid.CornealTopographyMapStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOS2DAITStorage.html">pydicom.uid.DICOS2DAITStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOS3DAITStorage.html">pydicom.uid.DICOS3DAITStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOSCTImageStorage.html">pydicom.uid.DICOSCTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOSDigitalXRayImageStorageForPresentation.html">pydicom.uid.DICOSDigitalXRayImageStorageForPresentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOSDigitalXRayImageStorageForProcessing.html">pydicom.uid.DICOSDigitalXRayImageStorageForProcessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOSQuadrupoleResonanceStorage.html">pydicom.uid.DICOSQuadrupoleResonanceStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DICOSThreatDetectionReportStorage.html">pydicom.uid.DICOSThreatDetectionReportStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DeformableSpatialRegistrationStorage.html">pydicom.uid.DeformableSpatialRegistrationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DermoscopicPhotographyImageStorage.html">pydicom.uid.DermoscopicPhotographyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DigitalIntraOralXRayImageStorageForPresentation.html">pydicom.uid.DigitalIntraOralXRayImageStorageForPresentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DigitalIntraOralXRayImageStorageForProcessing.html">pydicom.uid.DigitalIntraOralXRayImageStorageForProcessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DigitalMammographyXRayImageStorageForPresentation.html">pydicom.uid.DigitalMammographyXRayImageStorageForPresentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DigitalMammographyXRayImageStorageForProcessing.html">pydicom.uid.DigitalMammographyXRayImageStorageForProcessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.DigitalXRayImageStorageForPresentation.html">pydicom.uid.DigitalXRayImageStorageForPresentation</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">pydicom.uid.DigitalXRayImageStorageForProcessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EddyCurrentImageStorage.html">pydicom.uid.EddyCurrentImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EddyCurrentMultiFrameImageStorage.html">pydicom.uid.EddyCurrentMultiFrameImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ElectromyogramWaveformStorage.html">pydicom.uid.ElectromyogramWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ElectrooculogramWaveformStorage.html">pydicom.uid.ElectrooculogramWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EncapsulatedCDAStorage.html">pydicom.uid.EncapsulatedCDAStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EncapsulatedMTLStorage.html">pydicom.uid.EncapsulatedMTLStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EncapsulatedOBJStorage.html">pydicom.uid.EncapsulatedOBJStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EncapsulatedPDFStorage.html">pydicom.uid.EncapsulatedPDFStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EncapsulatedSTLStorage.html">pydicom.uid.EncapsulatedSTLStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedCTImageStorage.html">pydicom.uid.EnhancedCTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedContinuousRTImageStorage.html">pydicom.uid.EnhancedContinuousRTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedMRColorImageStorage.html">pydicom.uid.EnhancedMRColorImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedMRImageStorage.html">pydicom.uid.EnhancedMRImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedPETImageStorage.html">pydicom.uid.EnhancedPETImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedRTImageStorage.html">pydicom.uid.EnhancedRTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedSRStorage.html">pydicom.uid.EnhancedSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedUSVolumeStorage.html">pydicom.uid.EnhancedUSVolumeStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedXAImageStorage.html">pydicom.uid.EnhancedXAImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedXRFImageStorage.html">pydicom.uid.EnhancedXRFImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.EnhancedXRayRadiationDoseSRStorage.html">pydicom.uid.EnhancedXRayRadiationDoseSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ExtensibleSRStorage.html">pydicom.uid.ExtensibleSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.General32bitECGWaveformStorage.html">pydicom.uid.General32bitECGWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.GeneralAudioWaveformStorage.html">pydicom.uid.GeneralAudioWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.GeneralECGWaveformStorage.html">pydicom.uid.GeneralECGWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.GenericImplantTemplateStorage.html">pydicom.uid.GenericImplantTemplateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.GrayscalePlanarMPRVolumetricPresentationStateStorage.html">pydicom.uid.GrayscalePlanarMPRVolumetricPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.GrayscaleSoftcopyPresentationStateStorage.html">pydicom.uid.GrayscaleSoftcopyPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HangingProtocolStorage.html">pydicom.uid.HangingProtocolStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HeightMapSegmentationStorage.html">pydicom.uid.HeightMapSegmentationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.HemodynamicWaveformStorage.html">pydicom.uid.HemodynamicWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ImplantAssemblyTemplateStorage.html">pydicom.uid.ImplantAssemblyTemplateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ImplantTemplateGroupStorage.html">pydicom.uid.ImplantTemplateGroupStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ImplantationPlanSRStorage.html">pydicom.uid.ImplantationPlanSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.IntraocularLensCalculationsStorage.html">pydicom.uid.IntraocularLensCalculationsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForPresentation.html">pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForPresentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForProcessing.html">pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForProcessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.InventoryStorage.html">pydicom.uid.InventoryStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.KeratometryMeasurementsStorage.html">pydicom.uid.KeratometryMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.KeyObjectSelectionDocumentStorage.html">pydicom.uid.KeyObjectSelectionDocumentStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.LabelMapSegmentationStorage.html">pydicom.uid.LabelMapSegmentationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.LegacyConvertedEnhancedCTImageStorage.html">pydicom.uid.LegacyConvertedEnhancedCTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.LegacyConvertedEnhancedMRImageStorage.html">pydicom.uid.LegacyConvertedEnhancedMRImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.LegacyConvertedEnhancedPETImageStorage.html">pydicom.uid.LegacyConvertedEnhancedPETImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.LensometryMeasurementsStorage.html">pydicom.uid.LensometryMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MRImageStorage.html">pydicom.uid.MRImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MRSpectroscopyStorage.html">pydicom.uid.MRSpectroscopyStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MacularGridThicknessAndVolumeReportStorage.html">pydicom.uid.MacularGridThicknessAndVolumeReportStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MammographyCADSRStorage.html">pydicom.uid.MammographyCADSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MediaStorageDirectoryStorage.html">pydicom.uid.MediaStorageDirectoryStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MicroscopyBulkSimpleAnnotationsStorage.html">pydicom.uid.MicroscopyBulkSimpleAnnotationsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MultiFrameGrayscaleByteSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameGrayscaleByteSecondaryCaptureImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MultiFrameGrayscaleWordSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameGrayscaleWordSecondaryCaptureImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MultiFrameSingleBitSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameSingleBitSecondaryCaptureImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MultiFrameTrueColorSecondaryCaptureImageStorage.html">pydicom.uid.MultiFrameTrueColorSecondaryCaptureImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MultichannelRespiratoryWaveformStorage.html">pydicom.uid.MultichannelRespiratoryWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.MultipleVolumeRenderingVolumetricPresentationStateStorage.html">pydicom.uid.MultipleVolumeRenderingVolumetricPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.NuclearMedicineImageStorage.html">pydicom.uid.NuclearMedicineImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicAxialMeasurementsStorage.html">pydicom.uid.OphthalmicAxialMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage.html">pydicom.uid.OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicOpticalCoherenceTomographyEnFaceImageStorage.html">pydicom.uid.OphthalmicOpticalCoherenceTomographyEnFaceImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicPhotography16BitImageStorage.html">pydicom.uid.OphthalmicPhotography16BitImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicPhotography8BitImageStorage.html">pydicom.uid.OphthalmicPhotography8BitImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicThicknessMapStorage.html">pydicom.uid.OphthalmicThicknessMapStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicTomographyImageStorage.html">pydicom.uid.OphthalmicTomographyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage.html">pydicom.uid.OphthalmicVisualFieldStaticPerimetryMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ParametricMapStorage.html">pydicom.uid.ParametricMapStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PatientRadiationDoseSRStorage.html">pydicom.uid.PatientRadiationDoseSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PerformedImagingAgentAdministrationSRStorage.html">pydicom.uid.PerformedImagingAgentAdministrationSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PhotoacousticImageStorage.html">pydicom.uid.PhotoacousticImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PlannedImagingAgentAdministrationSRStorage.html">pydicom.uid.PlannedImagingAgentAdministrationSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PositronEmissionTomographyImageStorage.html">pydicom.uid.PositronEmissionTomographyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ProcedureLogStorage.html">pydicom.uid.ProcedureLogStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ProtocolApprovalStorage.html">pydicom.uid.ProtocolApprovalStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.PseudoColorSoftcopyPresentationStateStorage.html">pydicom.uid.PseudoColorSoftcopyPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTBeamsDeliveryInstructionStorage.html">pydicom.uid.RTBeamsDeliveryInstructionStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTBeamsTreatmentRecordStorage.html">pydicom.uid.RTBeamsTreatmentRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTBrachyApplicationSetupDeliveryInstructionStorage.html">pydicom.uid.RTBrachyApplicationSetupDeliveryInstructionStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTBrachyTreatmentRecordStorage.html">pydicom.uid.RTBrachyTreatmentRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTDoseStorage.html">pydicom.uid.RTDoseStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTImageStorage.html">pydicom.uid.RTImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTIonBeamsTreatmentRecordStorage.html">pydicom.uid.RTIonBeamsTreatmentRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTIonPlanStorage.html">pydicom.uid.RTIonPlanStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTPatientPositionAcquisitionInstructionStorage.html">pydicom.uid.RTPatientPositionAcquisitionInstructionStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTPhysicianIntentStorage.html">pydicom.uid.RTPhysicianIntentStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTPlanStorage.html">pydicom.uid.RTPlanStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTRadiationRecordSetStorage.html">pydicom.uid.RTRadiationRecordSetStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTRadiationSalvageRecordStorage.html">pydicom.uid.RTRadiationSalvageRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTRadiationSetDeliveryInstructionStorage.html">pydicom.uid.RTRadiationSetDeliveryInstructionStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTRadiationSetStorage.html">pydicom.uid.RTRadiationSetStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTSegmentAnnotationStorage.html">pydicom.uid.RTSegmentAnnotationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTStructureSetStorage.html">pydicom.uid.RTStructureSetStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTTreatmentPreparationStorage.html">pydicom.uid.RTTreatmentPreparationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RTTreatmentSummaryRecordStorage.html">pydicom.uid.RTTreatmentSummaryRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RadiopharmaceuticalRadiationDoseSRStorage.html">pydicom.uid.RadiopharmaceuticalRadiationDoseSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RawDataStorage.html">pydicom.uid.RawDataStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RealWorldValueMappingStorage.html">pydicom.uid.RealWorldValueMappingStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RespiratoryWaveformStorage.html">pydicom.uid.RespiratoryWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RoboticArmRadiationStorage.html">pydicom.uid.RoboticArmRadiationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RoboticRadiationRecordStorage.html">pydicom.uid.RoboticRadiationRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage.html">pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SecondaryCaptureImageStorage.html">pydicom.uid.SecondaryCaptureImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SegmentationStorage.html">pydicom.uid.SegmentationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SegmentedVolumeRenderingVolumetricPresentationStateStorage.html">pydicom.uid.SegmentedVolumeRenderingVolumetricPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SimplifiedAdultEchoSRStorage.html">pydicom.uid.SimplifiedAdultEchoSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SleepElectroencephalogramWaveformStorage.html">pydicom.uid.SleepElectroencephalogramWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SpatialFiducialsStorage.html">pydicom.uid.SpatialFiducialsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SpatialRegistrationStorage.html">pydicom.uid.SpatialRegistrationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SpectaclePrescriptionReportStorage.html">pydicom.uid.SpectaclePrescriptionReportStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.StereometricRelationshipStorage.html">pydicom.uid.StereometricRelationshipStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SubjectiveRefractionMeasurementsStorage.html">pydicom.uid.SubjectiveRefractionMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SurfaceScanMeshStorage.html">pydicom.uid.SurfaceScanMeshStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SurfaceScanPointCloudStorage.html">pydicom.uid.SurfaceScanPointCloudStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.SurfaceSegmentationStorage.html">pydicom.uid.SurfaceSegmentationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ThermographyImageStorage.html">pydicom.uid.ThermographyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.ThermographyMultiFrameImageStorage.html">pydicom.uid.ThermographyMultiFrameImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.TomotherapeuticRadiationRecordStorage.html">pydicom.uid.TomotherapeuticRadiationRecordStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.TomotherapeuticRadiationStorage.html">pydicom.uid.TomotherapeuticRadiationStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.TractographyResultsStorage.html">pydicom.uid.TractographyResultsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.TwelveLeadECGWaveformStorage.html">pydicom.uid.TwelveLeadECGWaveformStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.UltrasoundImageStorage.html">pydicom.uid.UltrasoundImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.UltrasoundMultiFrameImageStorage.html">pydicom.uid.UltrasoundMultiFrameImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VLEndoscopicImageStorage.html">pydicom.uid.VLEndoscopicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VLMicroscopicImageStorage.html">pydicom.uid.VLMicroscopicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VLPhotographicImageStorage.html">pydicom.uid.VLPhotographicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VLSlideCoordinatesMicroscopicImageStorage.html">pydicom.uid.VLSlideCoordinatesMicroscopicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VLWholeSlideMicroscopyImageStorage.html">pydicom.uid.VLWholeSlideMicroscopyImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VariableModalityLUTSoftcopyPresentationStateStorage.html">pydicom.uid.VariableModalityLUTSoftcopyPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VideoEndoscopicImageStorage.html">pydicom.uid.VideoEndoscopicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VideoMicroscopicImageStorage.html">pydicom.uid.VideoMicroscopicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VideoPhotographicImageStorage.html">pydicom.uid.VideoPhotographicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VisualAcuityMeasurementsStorage.html">pydicom.uid.VisualAcuityMeasurementsStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.VolumeRenderingVolumetricPresentationStateStorage.html">pydicom.uid.VolumeRenderingVolumetricPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.WaveformAnnotationSRStorage.html">pydicom.uid.WaveformAnnotationSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.WideFieldOphthalmicPhotography3DCoordinatesImageStorage.html">pydicom.uid.WideFieldOphthalmicPhotography3DCoordinatesImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.WideFieldOphthalmicPhotographyStereographicProjectionImageStorage.html">pydicom.uid.WideFieldOphthalmicPhotographyStereographicProjectionImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XADefinedProcedureProtocolStorage.html">pydicom.uid.XADefinedProcedureProtocolStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XAPerformedProcedureProtocolStorage.html">pydicom.uid.XAPerformedProcedureProtocolStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XAXRFGrayscaleSoftcopyPresentationStateStorage.html">pydicom.uid.XAXRFGrayscaleSoftcopyPresentationStateStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XRay3DAngiographicImageStorage.html">pydicom.uid.XRay3DAngiographicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XRay3DCraniofacialImageStorage.html">pydicom.uid.XRay3DCraniofacialImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XRayAngiographicImageStorage.html">pydicom.uid.XRayAngiographicImageStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XRayRadiationDoseSRStorage.html">pydicom.uid.XRayRadiationDoseSRStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pydicom.uid.XRayRadiofluoroscopicImageStorage.html">pydicom.uid.XRayRadiofluoroscopicImageStorage</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../uid.html" class="nav-link">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pydicom.uid.DigitalXRayImageStorageForProcessing</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="pydicom-uid-digitalxrayimagestorageforprocessing">
-<h1>pydicom.uid.DigitalXRayImageStorageForProcessing<a class="headerlink" href="#pydicom-uid-digitalxrayimagestorageforprocessing" title="Link to this heading">¶</a></h1>
+<h1>pydicom.uid.DigitalXRayImageStorageForProcessing<a class="headerlink" href="#pydicom-uid-digitalxrayimagestorageforprocessing" title="Link to this heading">#</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.uid.DigitalXRayImageStorageForProcessing">
-<span class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></span><span class="sig-name descname"><span class="pre">DigitalXRayImageStorageForProcessing</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.2.840.10008.5.1.4.1.1.1.1.1'</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fd8bdd7df/src/pydicom/uid.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.DigitalXRayImageStorageForProcessing" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></span><span class="sig-name descname"><span class="pre">DigitalXRayImageStorageForProcessing</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.2.840.10008.5.1.4.1.1.1.1.1'</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/893609e17/src/pydicom/uid.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.DigitalXRayImageStorageForProcessing" title="Link to this definition">#</a></dt>
 <dd><p>1.2.840.10008.5.1.4.1.1.1.1.1</p>
 </dd></dl>
 
 </section>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pydicom.uid.DigitalXRayImageStorageForPresentation.html" class="btn btn-neutral float-left" title="pydicom.uid.DigitalXRayImageStorageForPresentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pydicom.uid.EddyCurrentImageStorage.html" class="btn btn-neutral float-right" title="pydicom.uid.EddyCurrentImageStorage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2008-2025, Darcy Mason and pydicom contributors.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pydicom.uid.DigitalXRayImageStorageForPresentation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">pydicom.uid.DigitalXRayImageStorageForPresentation</p>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    </a>
+    <a class="right-next"
+       href="pydicom.uid.EddyCurrentImageStorage.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pydicom.uid.EddyCurrentImageStorage</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-</body>
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydicom.uid.DigitalXRayImageStorageForProcessing"><code class="docutils literal notranslate"><span class="pre">DigitalXRayImageStorageForProcessing</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2008-2025, Darcy Mason and pydicom contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
 </html>

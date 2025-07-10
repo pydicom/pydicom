@@ -60,6 +60,7 @@
       ~VR.format
       ~VR.format_map
       ~VR.maketrans
+      ~VR.__init__
    
    
 

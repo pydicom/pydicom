@@ -34,7 +34,7 @@ This example shows how to read and interact with a DICOM File-set.
  .. code-block:: none
 
     DICOM File-set
-      Root directory: /root/project/src/pydicom/data/test_files/dicomdirtests
+      Root directory: /home/circleci/project/src/pydicom/data/test_files/dicomdirtests
       File-set ID: PYDICOM_TEST
       File-set UID: 1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187
       Descriptor file ID: (no value available)
@@ -100,12 +100,12 @@ This example shows how to read and interact with a DICOM File-set.
         Modality=MR - 7 SOP Instances
 
     Found 7 instances for SeriesInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.118
-    /root/project/src/pydicom/fileset.py:1476: UserWarning: None of the records in the DICOMDIR dataset contain all the query elements, consider using the 'load' parameter to expand the search to the corresponding SOP instances
+    /home/circleci/project/src/pydicom/fileset.py:1476: UserWarning: None of the records in the DICOMDIR dataset contain all the query elements, consider using the 'load' parameter to expand the search to the corresponding SOP instances
       warn_and_log(
     Found 0 instances with PhotometricInterpretation='MONOCHROME1' without loading the stored instances and 3 instances with loading
 
-    Original File-set still at /root/project/src/pydicom/data/test_files/dicomdirtests
-    File-set copied to /tmp/tmpkdcmh92f and contains the following files:
+    Original File-set still at /home/circleci/project/src/pydicom/data/test_files/dicomdirtests
+    File-set copied to /tmp/tmpty6n7dpx and contains the following files:
       DICOMDIR
       PT000000/ST000000/SE000000/IM000000
       PT000000/ST000000/SE000001/IM000000
@@ -264,7 +264,7 @@ This example shows how to read and interact with a DICOM File-set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.196 seconds)
+   **Total running time of the script:** (0 minutes 0.186 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_fileset.py:

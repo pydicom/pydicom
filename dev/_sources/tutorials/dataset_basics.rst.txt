@@ -10,7 +10,7 @@ In this tutorial we're going to cover the basics of using *pydicom*:
 * Writing our modifications back to file
 
 If you haven't installed *pydicom* yet, follow the instructions in our
-:doc:`installation guide</tutorials/installation>`.
+:doc:`installation guide</guides/user/installation>`.
 
 
 Getting the path to the example dataset
