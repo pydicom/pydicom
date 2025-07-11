@@ -4,8 +4,7 @@
 Guides
 ======
 
-These guides contain higher-level information for those already familiar with
-pydicom:
+These guides contain more detailed information on specific topics:
 
 .. toctree::
    :maxdepth: 1
@@ -17,4 +16,3 @@ pydicom:
    encoding/index
    cli/cli_guide
    glossary
-   writing_documentation

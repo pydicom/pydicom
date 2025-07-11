@@ -47,8 +47,8 @@ Install using conda
 Additional type hints
 ---------------------
 
-The default *pydicom* type hinting doesn't cover standard element keywords accessed
-through :class:`~pydicom.dataset.Dataset`::
+The default *pydicom's* type hinting doesn't cover standard elements accessed via their
+keyword through :class:`~pydicom.dataset.Dataset`::
 
     # foo.py
     from pydicom import Dataset

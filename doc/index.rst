@@ -3,33 +3,6 @@
 pydicom documentation
 =====================
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Documentation
-
-   guides/user/index
-   tutorials/index
-   guides/index
-   reference/index
-
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Examples
-
-   auto_examples/index
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: Additional Information
-
-   tutorials/contributing
-   faq/index
-   release_notes/index
-
-
 Getting Started
 ===============
 If you're new to *pydicom* then start here:
@@ -47,18 +20,46 @@ If you're new to *pydicom* then start here:
   :doc:`Compression and decompression</tutorials/pixel_data/compressing>`
 
 
-:doc:`User Guide <guides/user/index>`
-==========================================
+User Guide
+==========
 
-The main documentation. This contains an in-depth description of all
-core elements of *pydicom* and how to use them.
+The
+
+.. toctree::
+   :maxdepth: 2
+
+   guides/user/index
 
 
-:doc:`Examples <auto_examples/index>`
-=====================================
+Tutorials and guides
+====================
 
-A set of examples illustrating the use of the different core elements. It
-complements the :doc:`User Guide <guides/user/index>`.
+.. toctree::
+   :maxdepth: 1
+
+   tutorials/index
+   guides/index
+
+
+Examples
+========
+
+A set of examples illustrating the use of the different core elements.
+
+.. toctree::
+   :maxdepth: 2
+
+   auto_examples/index
+
+Utilities
+=========
+
+Some CLI utilities
+
+.. toctree::
+   :maxdepth: 2
+
+   guides/cli/cli_guide
 
 
 Reference
