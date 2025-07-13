@@ -9,6 +9,7 @@ User Guide
    :caption: Get started
 
    installation
+   quick_start
 
 .. toctree::
    :maxdepth: 2
@@ -40,3 +41,4 @@ User Guide
    :caption: Miscellaneous
 
    best_practices
+   faq

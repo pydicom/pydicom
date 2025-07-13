@@ -17,29 +17,30 @@ Install the official release
 
 *pydicom*, being a Python library, requires `Python
 <https://www.python.org/>`_. If you're not sure whether or not your version of
-Python is supported, check :ref:`this table<faq_install_version>`.
+Python is supported, you can check :ref:`this table<faq_install_version>`.
 
 Install using pip
 -----------------
 
-*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`__, the
+*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`_, the
 official third-party Python software repository. The simplest way to install the latest version
 from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
 
   python -m pip install -U pydicom
 
 You can also perform an offline installation by
-:gh:`downloading <pydicom/releases>` and installing
-one of the release ``*.whl`` files. For example, with the v3.0 release::
+`downloading <https://pypi.org/project/pydicom/#files>`_ and installing
+one of the release ``*.whl`` files. For example, with the `file for the v3.0
+release <https://pypi.org/project/pydicom/3.0.1/#files>`_::
 
-  pip install pydicom-3.0.0-py3-none-any.whl
+  python -m pip install pydicom-3.0.1-py3-none-any.whl
 
 
 Install using conda
 -------------------
 
-*pydicom* is also available for `conda <https://docs.conda.io/>`_ at
-`conda-forge <https://anaconda.org/conda-forge/pydicom>`__::
+*pydicom* is also available for `conda <https://docs.conda.io/>`_ using
+`conda-forge <https://anaconda.org/conda-forge/pydicom>`_::
 
   conda install -c conda-forge pydicom
 
@@ -47,7 +48,7 @@ Install using conda
 Additional type hints
 ---------------------
 
-The default *pydicom's* type hinting doesn't cover standard elements accessed via their
+*pydicom's* default type hinting doesn't cover standard elements accessed via their
 keyword through :class:`~pydicom.dataset.Dataset`::
 
     # foo.py
@@ -61,7 +62,7 @@ keyword through :class:`~pydicom.dataset.Dataset`::
     $ mypy foo.py
     Success: no issues found in 1 source file
 
-To add extra type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
+To add type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
 
     python -m pip install -U types-pydicom
 
@@ -90,8 +91,8 @@ Through conda::
   conda install numpy
 
 To decode JPEG compressed pixel data one or more additional libraries will
-need to be installed. See :ref:`this page <guide_compressed>` for a list of
-which library is needed to handle a given JPEG format, as specified by
+need to be installed. See :doc:`this page </guides/plugin_table>` for a list of
+which library is needed to encode or decode a given compression method, as specified by
 the dataset's (0002,0010) *Transfer Syntax UID* value.
 
 
@@ -116,13 +117,32 @@ Through conda::
   conda install pillow
 
 
+.. _tut_install_pylj:
+
+Installing pylibjpeg
+--------------------
+
+:gh:`pylibjpeg <pylibjpeg>` is a Python framework for
+decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
+RLE images provided a suitable plugin is installed.
+
+Using pip::
+
+  python -m pip install -U pylibjpeg[all]
+
+Through conda::
+
+  conda install -c conda-forge pylibjpeg pylibjpeg-rle pylibjpeg-libjpeg pylibjpeg-openjpeg
+
+
 Installing pyjpegls
 -------------------
 
 `pyjpegls <https://github.com/pydicom/pyjpegls>`_ is a Python interface to
 the `CharLS <https://github.com/team-charls/charls>`_ C++ library and can
-decompress JPEG-LS images. It is a fork of `CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_
-created to provide compatibility with the latest Python versions.
+compress and decompress JPEG-LS images. It's a fork of `CharPyLS
+<https://github.com/Who8MyLunch/CharPyLS>`_ created to provide compatibility with the
+latest Python versions.
 
 Using pip::
 
@@ -130,8 +150,7 @@ Using pip::
 
 Through conda::
 
-  conda install cython
-  python -m pip install git+https://github.com/pydicom/pyjpegls
+  conda install -c conda-forge pyjpegls
 
 
 .. _tut_install_gdcm:
@@ -149,23 +168,9 @@ versions of Python on Windows, MacOS and Linux, and can be installed using pip::
   python -m pip install -U python-gdcm
 
 The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`__
-tend to be older versions and not as well supported. They're available on conda using::
+tend to be older versions and are not as well supported. They're available on conda using::
 
-  conda install gdcm -c conda-forge
-
-
-.. _tut_install_pylj:
-
-Installing pylibjpeg
---------------------
-
-:gh:`pylibjpeg <pylibjpeg>` is a Python framework for
-decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
-RLE images provided a suitable plugin is installed.
-
-Using pip::
-
-  python -m pip install -U pylibjpeg[all]
+  conda install -c conda-forge gdcm
 
 
 .. _tut_install_dev:
@@ -176,9 +181,9 @@ Install the development version
 To install a snapshot of the latest code (the ``main`` branch) from
 :gh:`GitHub <pydicom>`::
 
-  pip install git+https://github.com/pydicom/pydicom
+  python -m pip install git+https://github.com/pydicom/pydicom
 
-The ``main`` branch is under active development and while it is usually
+The ``main`` branch is under active development and while it's usually
 stable, it may have undocumented changes or bugs.
 
 If you want to keep up-to-date with the latest code, make sure you have
@@ -189,7 +194,7 @@ branch (this will create a ``pydicom`` directory in your current directory)::
 
 Then install using pip in editable (``-e``) mode::
 
-  pip install -e pydicom/
+  python -m pip install -e pydicom/
 
 When you want to update your copy of the source code, run ``git pull`` from
 within the ``pydicom`` directory and Git will download and apply any changes.
