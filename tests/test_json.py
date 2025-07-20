@@ -49,6 +49,9 @@ class TestPersonName:
         ds.add_new(0x00091005, "PN", "==やまだ^たろう")
         ds.add_new(0x00091006, "PN", "=山田^太郎")
         ds.add_new(0x00091007, "PN", "Yamada^Tarou=山田^太郎")
+        ds.add_new(0x00091008, "PN", None)
+        ds.add_new(0x00091009, "PN", "")
+        ds.add_new(0x00091010, "PN", [])
         ds_json = ds.to_json_dict()
         check_name("00100010", ["Yamada^Tarou", "山田^太郎", "やまだ^たろう"])
         check_name("00091001", ["Yamada^Tarou"])
@@ -58,6 +61,9 @@ class TestPersonName:
         check_name("00091005", ["", "", "やまだ^たろう"])
         check_name("00091006", ["", "山田^太郎"])
         check_name("00091007", ["Yamada^Tarou", "山田^太郎"])
+        assert "Value" not in ds_json["00091008"]
+        assert "Value" not in ds_json["00091009"]
+        assert "Value" not in ds_json["00091010"]
 
     def test_pn_components_from_json(self):
         # this is the encoded dataset from the previous test, with some
@@ -129,12 +135,18 @@ class TestAT:
         ds.add_new(0x00091002, "AT", Tag(0x28, 0x02))
         ds.add_new(0x00091003, "AT", BaseTag(0x00280002))
         ds.add_new(0x00091004, "AT", [0x00280002, Tag("PatientName")])
+        ds.add_new(0x00091005, "AT", None)
+        ds.add_new(0x00091006, "AT", "")
+        ds.add_new(0x00091007, "AT", [])
         ds_json = ds.to_json_dict()
 
         assert ["00100010", "00100020"] == ds_json["00091001"]["Value"]
         assert ["00280002"] == ds_json["00091002"]["Value"]
         assert ["00280002"] == ds_json["00091003"]["Value"]
         assert ["00280002", "00100010"] == ds_json["00091004"]["Value"]
+        assert "Value" not in ds_json["00091005"]
+        assert "Value" not in ds_json["00091006"]
+        assert "Value" not in ds_json["00091007"]
 
     def test_from_json(self):
         ds_json = (
@@ -319,6 +331,49 @@ class TestDataSetToJson:
         ) in caplog.text
 
 
+class TestEmptyJsonValues:
+    @pytest.fixture
+    def test_json(self):
+        yield Dataset.from_json(
+            """{
+            "00091000": { "vr": "CS", "Value": [ "" ] },
+            "00091001": { "vr": "CS", "Value": [ null ] },
+            "00091002": { "vr": "LO", "Value": [ "" ] },
+            "00091003": { "vr": "LO", "Value": [ null ] },
+            "00091004": { "vr": "LT", "Value": [ "" ] },
+            "00091005": { "vr": "LT", "Value": [ null ] },
+            "00091006": { "vr": "UI", "Value": [ "" ] },
+            "00091007": { "vr": "UI", "Value": [ null ] },
+            "00091008": { "vr": "DA", "Value": [ "" ] },
+            "00091009": { "vr": "DA", "Value": [ null ] },
+            "00091020": { "vr": "DS", "Value": [ "" ] },
+            "00091021": { "vr": "DS", "Value": [ null ] },
+            "00091022": { "vr": "US", "Value": [ "" ] },
+            "00091023": { "vr": "US", "Value": [ null ] },
+            "00091024": { "vr": "FL", "Value": [ "" ] },
+            "00091025": { "vr": "FL", "Value": [ null ] }
+        }"""
+        )
+
+    def empty_data_from_json_with_none(
+        self, test_json, use_none_as_empty_text_VR_value
+    ):
+        for offset in range(10):
+            assert test_json[0x00091000 + offset].value is None
+
+        for offset in range(20, 16):
+            assert test_json[0x00091000 + offset].value is None
+
+    def empty_data_from_json_with_str(self, test_json, use_str_as_empty_text_VR_value):
+        for offset in range(10):
+            assert test_json[0x00091000 + offset].value == ""
+
+        # for non-text VRs (including text VRs converted to other types like DS)
+        # None is used as the empty value regardless of the config setting
+        for offset in range(20, 16):
+            assert test_json[0x00091000 + offset].value is None
+
+
 class TestSequence:
     def test_nested_sequences(self, disable_value_validation):
         test1_json = get_testdata_file("test1.json")
@@ -478,6 +533,9 @@ class TestNumeric:
         ds.add_new(0x00091014, "IS", "42")
         ds.add_new(0x00091015, "DS", "3.14159265")
         ds.add_new(0x00091102, "US", 2)
+        ds.add_new(0x00091103, "US", None)
+        ds.add_new(0x00091104, "US", "")
+        ds.add_new(0x00091105, "US", [])
 
         ds_json = ds.to_json_dict()
 
@@ -490,6 +548,9 @@ class TestNumeric:
         assert ds_json["00091014"]["Value"] == [42]
         assert ds_json["00091015"]["Value"] == [3.14159265]
         assert ds_json["00091102"]["Value"] == [2]
+        assert not "Value" in ds_json["00091103"]
+        assert not "Value" in ds_json["00091104"]
+        assert not "Value" in ds_json["00091105"]
 
     def test_numeric_types(self):
         ds = Dataset()
