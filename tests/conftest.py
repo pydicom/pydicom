@@ -89,6 +89,22 @@ def raise_on_writing_invalid_value():
 
 
 @pytest.fixture
+def use_none_as_empty_text_VR_value():
+    old_value = config.use_none_as_empty_text_VR_value
+    config.use_none_as_empty_text_VR_value = True
+    yield
+    config.use_none_as_empty_text_VR_value = old_value
+
+
+@pytest.fixture
+def use_str_as_empty_text_VR_value():
+    old_value = config.use_none_as_empty_text_VR_value
+    config.use_none_as_empty_text_VR_value = False
+    yield
+    config.use_none_as_empty_text_VR_value = old_value
+
+
+@pytest.fixture
 def disable_value_validation():
     with config.disable_value_validation():
         yield

@@ -31,7 +31,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     -------
     Any
 
-        * If `value` is empty then returns the `value` unchanged.
+        * If `value` is empty or None the empty value for `vr` is returned.
         * If `vr` is an integer-like VR type then returns ``int`` or
           ``List[int]``
         * If `vr` is a float-like VR type then returns ``float`` or
@@ -41,8 +41,8 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     """
     from pydicom.dataelem import empty_value_for_VR
 
-    if value is None or "":
-        return value
+    if value in (None, ""):
+        return empty_value_for_VR(vr)
 
     number_type: type[int] | type[float] | None = None
     if vr in (INT_VR - {VR.AT}) | {VR.US_SS}:

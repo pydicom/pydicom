@@ -31,6 +31,8 @@ Fixes
   datasets with more than 2**31 - 1 bytes (:issue:`2227`).
 * Use the setting :attr:`~pydicom.config.settings.writing_validation_mode` also for writing
   values with VRs supporting only ASCII characters (:issue:`2243`).
+* Correctly handle empty values represented as empty strings in json while converting them
+  to a dataset (:issue:`2221`).
 
 Enhancements
 ------------
