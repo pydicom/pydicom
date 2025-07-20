@@ -13,21 +13,24 @@ If you haven't installed *pydicom* yet, follow the instructions in our
 :doc:`installation guide</guides/user/installation>`.
 
 
-Getting the path to the example dataset
-=======================================
+Reading a dataset
+=================
 
-In the tutorial we're going to be using one of the example DICOM datasets included with
-*pydicom*: :gh:`CT_small.dcm<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
-You can get the file path to the dataset by using the :func:`~pydicom.examples.get_path`
-function to return the path as a :class:`pathlib.Path` (your path may vary)::
+.. note::
 
-    >>> from pydicom import examples
-    >>> path = examples.get_path("ct")
-    >>> path
-    PosixPath('/path/to/pydicom/data/test_files/CT_small.dcm')
+    In this tutorial we're going to be using example DICOM datasets that are included with
+    *pydicom*, such as :gh:`CT_small.dcm<pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm>`.
+    You can get the local file path to these datasets by using the :func:`~pydicom.examples.get_path`
+    function to return the path as a :class:`pathlib.Path` (your path may vary)::
 
-Reading
-=======
+        >>> from pydicom import examples
+        >>> path = examples.get_path("ct")
+        >>> path
+        PosixPath('/path/to/pydicom/data/test_files/CT_small.dcm')
+
+    When using *pydicom* to read your own data, use the path to those files directly
+    instead.
+
 
 To read the DICOM dataset at a given file path (as a :class:`str` or :class:`pathlib.Path`)
 we use :func:`~pydicom.filereader.dcmread`, which returns a
@@ -39,10 +42,10 @@ we use :func:`~pydicom.filereader.dcmread`, which returns a
 
 :func:`~pydicom.filereader.dcmread` can also handle file-likes::
 
-    >>> with open(path, 'rb') as infile:
-    ...     ds = dcmread(infile)
+    >>> with open(path, 'rb') as f:
+    ...     ds = dcmread(f)
 
-And can even be used as a context manager::
+And can also be used as a context manager::
 
     >>> with dcmread(path) as ds:
     ...    type(ds)
@@ -51,7 +54,7 @@ And can even be used as a context manager::
 
 By default, :func:`~pydicom.filereader.dcmread` will read any DICOM dataset
 stored in accordance with the :dcm:`DICOM File Format<part10/chapter_7.html>`.
-However, occasionally you may try to read a file that gives you the following
+However, you may occasionally read a file that gives you the following
 exception:
 
 .. code-block:: pycon
@@ -66,14 +69,15 @@ exception:
         preamble = read_preamble(fileobj, force)
       File ".../pydicom/filereader.py", line 631, in read_preamble
         raise InvalidDicomError("File is missing DICOM File Meta Information "
-      pydicom.errors.InvalidDicomError: File is missing DICOM File Meta Information header or the 'DICM' prefix is missing from the header. Use force=True to force reading.
+      pydicom.errors.InvalidDicomError: File is missing DICOM File Meta Information
+      header or the 'DICM' prefix is missing from the header. Use force=True to force reading.
 
 This indicates that either:
 
 * The file isn't a DICOM file, or
-* The file isn't in the DICOM File Format but contains DICOM data
+* The file contains DICOM data but isn't in the DICOM File Format
 
-If you're sure that the file contains DICOM data then you can use the `force`
+If you're sure the file contains DICOM data, you can use the `force`
 keyword parameter to force reading::
 
   >>> ds = dcmread(no_meta_path, force=True)
@@ -86,6 +90,7 @@ no matter what the contents of the file are:
 
     >>> with open('not_dicom.txt', 'w') as not_dicom:
     ...    not_dicom.write('This is not a DICOM file!')
+    ...
     >>> ds = dcmread('not_dicom.txt', force=True)
 
 You'll only run into problems when trying to use the dataset::
@@ -109,7 +114,7 @@ You'll only run into problems when trying to use the dataset::
 Viewing and accessing
 =====================
 
-The ``CT_small.dcm`` dataset is also included as an example dataset:
+The ``CT_small.dcm`` dataset is also included directly, as an example dataset:
 
     >>> from pydicom import examples
     >>> ds = examples.ct
@@ -120,44 +125,47 @@ You can view the contents of the entire dataset by using :func:`print`::
 
     >>> print(ds)
     Dataset.file_meta -------------------------------
-    (0002, 0000) File Meta Information Group Length  UL: 192
-    (0002, 0001) File Meta Information Version       OB: b'\x00\x01'
-    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
-    (0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
-    (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
-    (0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
-    (0002, 0013) Implementation Version Name         SH: 'DCTOOL100'
-    (0002, 0016) Source Application Entity Title     AE: 'CLUNIE1'
+    (0002,0000) File Meta Information Group Length  UL: 192
+    (0002,0001) File Meta Information Version       OB: b'\x00\x01'
+    (0002,0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002,0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
+    (0002,0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+    (0002,0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
+    (0002,0013) Implementation Version Name         SH: 'DCTOOL100'
+    (0002,0016) Source Application Entity Title     AE: 'CLUNIE1'
     -------------------------------------------------
-    (0008, 0005) Specific Character Set              CS: 'ISO_IR 100'
-    (0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
-    (0008, 0012) Instance Creation Date              DA: '20040119'
-    (0008, 0013) Instance Creation Time              TM: '072731'
-    (0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
-    (0008, 0016) SOP Class UID                       UI: CT Image Storage
+    (0008,0005) Specific Character Set              CS: 'ISO_IR 100'
+    (0008,0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+    (0008,0012) Instance Creation Date              DA: '20040119'
+    (0008,0013) Instance Creation Time              TM: '072731'
+    (0008,0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
+    (0008,0016) SOP Class UID                       UI: CT Image Storage
     ...
-    (0010, 1002)  Other Patient IDs Sequence   2 item(s) ----
-        (0010, 0020) Patient ID                          LO: 'ABCD1234'
-        (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+    (0010,1002)  Other Patient IDs Sequence   2 item(s) ----
+        (0010,0020) Patient ID                          LO: 'ABCD1234'
+        (0010,0022) Type of Patient ID                  CS: 'TEXT'
         ---------
-        (0010, 0020) Patient ID                          LO: '1234ABCD'
-        (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+        (0010,0020) Patient ID                          LO: '1234ABCD'
+        (0010,0022) Type of Patient ID                  CS: 'TEXT'
         ---------
     ...
-    (0043, 104e) [Duration of X-ray on]              FL: 10.60060977935791
-    (7fe0, 0010) Pixel Data                          OW: Array of 32768 elements
-    (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 elements
+    (0043,0010) Private Creator                     LO: 'GEMS_PARM_01'
+    (0043,1010) [Window value]                      US: 400
+    ...
+    (7FE0,0010) Pixel Data                          OW: Array of 32768 elements
+    (FFFC,FFFC) Data Set Trailing Padding           OB: Array of 126 elements
 
 The print output shows a list of the :dcm:`data elements
 <part05/chapter_7.html#sect_7.1>` (or *elements* for short) present in the
 dataset, one element per line. The format of each line is:
 
-* **(0008, 0005)**: The element's :dcm:`tag<part05/chapter_7.html#sect_7.1.1>`,
+* **(0008,0005)**: The element's :dcm:`tag<part05/chapter_7.html#sect_7.1.1>`,
   as (group number, element number) in hexadecimal
 * **Specific Character Set**: the element's name, if known
 * **CS**: The element's :dcm:`Value Representation<part05/sect_6.2.html>` (VR),
   if known
-* **'ISO_IR_100'**: the element's stored value
+* **'ISO_IR_100'**: the element's stored value, or the length of the value if it's too
+  long to show concisely
 
 Elements
 --------
@@ -165,24 +173,24 @@ Elements
 There are three categories of elements:
 
 * **Standard elements** such as (0008,0016) *SOP Class UID*. These elements
-  are registered in the official DICOM Standard, have an even group
-  number and are unique at each level of the dataset.
+  are registered in :dcm:`Part 6<part06/chapter_6.html>` of the official DICOM Standard,
+  have a tag with an even group number and are unique at each level of the dataset.
 * **Repeating group elements** such as (60xx,3000) *Overlay Data* (not found
   in this dataset). :dcm:`Repeating group<part05/sect_7.6.html>` elements are
-  also registered in the official DICOM Standard, however they have a group
+  also registered in the official DICOM Standard, however they have a tag with a group
   number defined over a range rather than a fixed value.
   For example, there may be multiple *Overlay Data* elements at a given level
   of the dataset as long as each has its own unique group number; ``0x6000``,
   ``0x6002``, ``0x6004``, or any even value up to ``0x601E``.
 * **Private elements** such as (0043,104E) *[Duration of X-ray on]*.
-  :dcm:`Private elements<part05/sect_7.8.html>` have an odd group number,
+  :dcm:`Private elements<part05/sect_7.8.html>` have a tag with an odd group number,
   aren't registered in the official DICOM Standard, and are instead created
   privately, as specified by the (gggg,0010) *Private Creator* element.
 
   * If the private creator is unknown then the element name will be *Private
     tag data* and the VR **UN**.
   * If the private creator is known then the element name will be surrounded
-    by square brackets, e.g. *[Duration of X-ray on]* and the VR will be as
+    by square brackets, e.g. *[Window value]* and the VR will be as
     shown.
 
 For all element categories, we can access a particular element in the dataset
@@ -229,10 +237,10 @@ get the value::
 
 This is the recommended method of accessing the value of standard elements.
 It's simpler and more human-friendly then dealing with element tags and later
-on you'll see how you can use the keyword to do more than accessing the value.
+on you'll see how you can use the keyword to do far more than just accessing the value.
 
-Elements may also be multi-valued (have a :dcm:`Value Multiplicity
-<part05/sect_6.4.html>` (VM) > 1)::
+Elements may also be multi-valued - that is, have a :dcm:`Value Multiplicity
+<part05/sect_6.4.html>` (VM) > 1::
 
     >>> ds.ImageType
     ['ORIGINAL', 'PRIMARY', 'AXIAL']
@@ -264,7 +272,7 @@ When viewing a dataset, you may see that some of the elements are indented::
 
 This indicates that those elements are part of a sequence, in this case
 part of the *Other Patient IDs Sequence* element. Sequence elements have a
-VR of **SQ** and they usually have the word *Sequence* in their name.
+VR of **SQ** and have a name that ends in the word *Sequence*.
 DICOM datasets use the `tree data structure
 <https://en.wikipedia.org/wiki/Tree_(data_structure)>`_, with non-sequence
 elements acting as leaves and sequence elements acting as the nodes where
@@ -273,7 +281,7 @@ branches start.
 * The top-level (root) dataset contains 0 or more elements (leaves):
 
   * An element may be non-sequence type (VR is not **SQ**), or
-  * An element may be a sequence type (VR is **SQ**), contains 0 or
+  * An element may be a sequence type (VR is **SQ**) and contains 0 or
     more items (branches):
 
     * Each item in the sequence is another dataset, containing 0 or more
@@ -286,6 +294,7 @@ Sequence elements can be accessed in the same manner as non-sequence ones::
 
     >>> seq = ds[0x0010, 0x1002]
     >>> seq = ds['OtherPatientIDsSequence']
+    >>> seq = ds.OtherPatientIDsSequence
 
 The main difference between sequence and non-sequence elements is that their
 value is a list of zero or more  :class:`~pydicom.dataset.Dataset` objects,
@@ -302,12 +311,12 @@ which can be accessed using the standard Python :class:`list` methods::
     (0010, 0020) Patient ID                          LO: '1234ABCD'
     (0010, 0022) Type of Patient ID                  CS: 'TEXT'
 
-file_meta
----------
+Dataset.file_meta
+-----------------
 
 Earlier we saw that by default :func:`~pydicom.filereader.dcmread` only reads
-files that are in the DICOM File Format. So what's the difference between a
-DICOM dataset written to file and one written in the DICOM File Format?
+files that are in the :dcm:`DICOM File Format<part10/chapter_7.html>`. So what's the
+difference between a DICOM dataset written to file and one written in the DICOM File Format?
 The answer is a file header containing:
 
 * An 128 byte preamble::
@@ -322,17 +331,17 @@ The answer is a file header containing:
   :attr:`~pydicom.dataset.FileDataset.file_meta` attribute::
 
     >>> ds.file_meta
-    (0002, 0000) File Meta Information Group Length  UL: 192
-    (0002, 0001) File Meta Information Version       OB: b'\x00\x01'
-    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
-    (0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
-    (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
-    (0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
-    (0002, 0013) Implementation Version Name         SH: 'DCTOOL100'
-    (0002, 0016) Source Application Entity Title     AE: 'CLUNIE1'
+    (0002,0000) File Meta Information Group Length  UL: 192
+    (0002,0001) File Meta Information Version       OB: b'\x00\x01'
+    (0002,0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002,0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
+    (0002,0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+    (0002,0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
+    (0002,0013) Implementation Version Name         SH: 'DCTOOL100'
+    (0002,0016) Source Application Entity Title     AE: 'CLUNIE1'
 
-As you can see, all the elements in the ``file_meta`` are group ``0x0002``. In
-fact, the DICOM File Format header is the only place you should find group
+As you can see, all the elements in the ``file_meta`` have tags with a group number of
+``0x0002``. In fact, the DICOM File Format header is the only place you should find group
 ``0x0002`` elements as their presence anywhere else is non-conformant.
 
 Out of all of the elements in the ``file_meta``, the most important is
@@ -347,8 +356,8 @@ that at some point you'll need to know it::
     'Explicit VR Little Endian'
 
 
-Modifying
-=========
+Modifying a dataset
+===================
 
 Modifying elements
 ------------------
@@ -519,8 +528,8 @@ preferred :class:`list` method::
     ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
 
 
-Writing
-=======
+Writing a dataset
+=================
 
 After changing the dataset, the final step is to write the modifications back
 to file. This can be done by using :meth:`~pydicom.dataset.Dataset.save_as` to
@@ -530,8 +539,8 @@ write the dataset to the supplied path::
 
 You can also write to any Python file-like::
 
-    >>> with open('out.dcm', 'wb') as outfile:
-    ...    ds.save_as(outfile)
+    >>> with open('out.dcm', 'wb') as f:
+    ...    ds.save_as(f)
     ...
 
 ::
@@ -575,6 +584,7 @@ so get in the habit of making sure it's there and correct.
 Because we deleted the :attr:`~pydicom.dataset.FileDataset.file_meta` dataset
 we need to add it back::
 
+    >>> from pydicom.dataset import FileMetaDataset
     >>> ds.file_meta = FileMetaDataset()
 
 And now we can add our *Transfer Syntax UID* element and save to file::

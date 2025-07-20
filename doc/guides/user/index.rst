@@ -9,11 +9,10 @@ User Guide
    :caption: Get started
 
    installation
-   quick_start
 
 .. toctree::
    :maxdepth: 2
-   :caption: Datasets and elements
+   :caption: Fundamentals
 
    base_element
    private_data_elements
@@ -38,7 +37,7 @@ User Guide
 
 .. toctree::
    :maxdepth: 2
-   :caption: Miscellaneous
+   :caption: Extras
 
    best_practices
    faq

@@ -1,0 +1,14 @@
+
+table {
+    padding: 0.2rem !important;
+}
+
+.table thead tr {
+    border-top: 1px solid var(--pst-color-table-inner-border) !important;
+    border-left: 1px solid var(--pst-color-table-inner-border) !important;
+    border-right: 1px solid var(--pst-color-table-inner-border) !important;
+}
+
+.table td {
+    border: 1px solid var(--pst-color-table-inner-border) !important;
+}
