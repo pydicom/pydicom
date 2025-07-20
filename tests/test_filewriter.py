@@ -15,6 +15,8 @@ from tempfile import TemporaryFile
 from typing import cast
 import zlib
 
+from pydicom.errors import InvalidDicomError
+
 try:
     import resource
 
@@ -1341,6 +1343,26 @@ class TestCorrectAmbiguousVRElement:
         assert isinstance(out, DataElement)
         assert out.VR == "US"
         assert out.value is None
+
+    def test_empty_lut_data(self):
+        """Regression test for #2238: empty LUT data raises exception."""
+        lut_seq_item = Dataset()
+        descriptor = RawDataElement(0x00283002, "US or SS", 0, None, 0, True, True)
+        lut_data = RawDataElement(0x00283006, "OB or OW", 0, None, 0, True, True)
+        lut_seq_item[0x00283002] = descriptor
+        lut_seq_item[0x00283006] = lut_data
+        ds = Dataset()
+        ds.ModalityLUTSequence = Sequence()
+        ds.ModalityLUTSequence.append(lut_seq_item)
+        correct_ambiguous_vr(ds, True)
+        assert ds.ModalityLUTSequence[0]["LUTData"].VR == "OW"
+
+        # saving the dataset implicitly calls correct_ambiguous_vr()
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=False, little_endian=True)
+        ds = dcmread(fp, force=True)
+        assert ds.ModalityLUTSequence[0]["LUTDescriptor"].VR == "US"
+        assert ds.ModalityLUTSequence[0]["LUTData"].VR == "OW"
 
 
 class TestWriteAmbiguousVR:

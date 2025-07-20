@@ -202,7 +202,8 @@ def _correct_ambiguous_vr_element(
         # First value in LUT Descriptor is how many values in
         #   LUTData, if there's only one value then must be US
         # As per PS3.3 C.11.1.1.1
-        if cast(Sequence[int], ds.LUTDescriptor)[0] == 1:
+        lut_descriptor = cast(Sequence[int], ds.LUTDescriptor)
+        if lut_descriptor and lut_descriptor[0] == 1:
             elem.VR = VR.US
             if elem.VM == 0:
                 return elem
@@ -235,7 +236,7 @@ def correct_ambiguous_vr_element(
     """Attempt to correct the ambiguous VR element `elem`.
 
     When it's not possible to correct the VR, the element will be returned
-    unchanged. Currently the only ambiguous VR elements not corrected for are
+    unchanged. Currently, the only ambiguous VR elements not corrected for are
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
@@ -290,7 +291,7 @@ def correct_ambiguous_vr(
     """Iterate through `ds` correcting ambiguous VR elements (if possible).
 
     When it's not possible to correct the VR, the element will be returned
-    unchanged. Currently the only ambiguous VR elements not corrected for are
+    unchanged. Currently, the only ambiguous VR elements not corrected for are
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
