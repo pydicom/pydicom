@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
+requires = ["flit_core >=3.12,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
@@ -7,7 +7,6 @@ authors = [
     {name = "Darcy Mason and contributors", email = "darcymason@gmail.com"}
 ]
 classifiers=[
-    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Intended Audience :: Healthcare Industry",
     "Intended Audience :: Science/Research",
@@ -25,8 +24,9 @@ classifiers=[
 dependencies = []
 description = "A pure Python package for reading and writing DICOM data"
 # dynamic = ["version"]
-keywords = ["dicom, python, medical, imaging"]
-license = {text = "MIT"}
+keywords = ["dicom", "python", "medical", "imaging"]
+license = "MIT"
+license-files = ["LICENSE"]
 name = "pydicom"
 readme = "README.md"
 requires-python = ">=3.10"
