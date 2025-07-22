@@ -70,7 +70,8 @@ exception:
       File ".../pydicom/filereader.py", line 631, in read_preamble
         raise InvalidDicomError("File is missing DICOM File Meta Information "
       pydicom.errors.InvalidDicomError: File is missing DICOM File Meta Information
-      header or the 'DICM' prefix is missing from the header. Use force=True to force reading.
+      header or the 'DICM' prefix is missing from the header. Use force=True to
+      force reading.
 
 This indicates that either:
 
@@ -182,7 +183,7 @@ There are three categories of elements:
   For example, there may be multiple *Overlay Data* elements at a given level
   of the dataset as long as each has its own unique group number; ``0x6000``,
   ``0x6002``, ``0x6004``, or any even value up to ``0x601E``.
-* **Private elements** such as (0043,104E) *[Duration of X-ray on]*.
+* **Private elements** such as (0043,1010) *[Window value]*.
   :dcm:`Private elements<part05/sect_7.8.html>` have a tag with an odd group number,
   aren't registered in the official DICOM Standard, and are instead created
   privately, as specified by the (gggg,0010) *Private Creator* element.
@@ -199,12 +200,12 @@ instance::
 
     >>> elem = ds[0x0008, 0x0016]
     >>> elem
-    (0008, 0016) SOP Class UID                       UI: CT Image Storage
+    (0008,0016) SOP Class UID                       UI: CT Image Storage
     >>> elem.keyword
     'SOPClassUID'
-    >>> private_elem = ds[0x0043, 0x104E]
+    >>> private_elem = ds[0x0043, 0x1010]
     >>> private_elem
-    (0043, 104e) [Duration of X-ray on]              FL: 10.60060977935791
+    (0043,1010) [Window value]                      US: 400
     >>> private_elem.keyword
     ''
 
@@ -218,7 +219,7 @@ exceptions - such as (0010,0010) *Patient's Name* having a keyword of
 
     >>> elem = ds['SOPClassUID']
     >>> elem
-    (0008, 0016) SOP Class UID                       UI: CT Image Storage
+    (0008,0016) SOP Class UID                       UI: CT Image Storage
 
 Because of the lack of a unique keyword, this won't work for private or
 repeating group elements. So for those elements stick to the
@@ -261,12 +262,12 @@ When viewing a dataset, you may see that some of the elements are indented::
 
     >>> print(ds)
     ...
-    (0010, 1002)  Other Patient IDs Sequence   2 item(s) ----
-        (0010, 0020) Patient ID                          LO: 'ABCD1234'
-        (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+    (0010,1002)  Other Patient IDs Sequence   2 item(s) ----
+        (0010,0020) Patient ID                          LO: 'ABCD1234'
+        (0010,0022) Type of Patient ID                  CS: 'TEXT'
         ---------
-        (0010, 0020) Patient ID                          LO: '1234ABCD'
-        (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+        (0010,0020) Patient ID                          LO: '1234ABCD'
+        (0010,0022) Type of Patient ID                  CS: 'TEXT'
         ---------
     ...
 
@@ -305,11 +306,11 @@ which can be accessed using the standard Python :class:`list` methods::
     >>> type(ds.OtherPatientIDsSequence[0])
     <class 'pydicom.dataset.Dataset'>
     >>> ds.OtherPatientIDsSequence[0]
-    (0010, 0020) Patient ID                          LO: 'ABCD1234'
-    (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+    (0010,0020) Patient ID                          LO: 'ABCD1234'
+    (0010,0022) Type of Patient ID                  CS: 'TEXT'
     >>> ds.OtherPatientIDsSequence[1]
-    (0010, 0020) Patient ID                          LO: '1234ABCD'
-    (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+    (0010,0020) Patient ID                          LO: '1234ABCD'
+    (0010,0022) Type of Patient ID                  CS: 'TEXT'
 
 Dataset.file_meta
 -----------------
@@ -370,13 +371,13 @@ value::
     'CompressedSamples^CT1'
     >>> elem.value = 'Citizen^Jan'
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'Citizen^Jan'
+    (0010,0010) Patient's Name                      PN: 'Citizen^Jan'
 
 But for standard elements it's simpler to use the keyword::
 
     >>> ds.PatientName = 'Citizen^Snips'
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'Citizen^Snips'
+    (0010,0010) Patient's Name                      PN: 'Citizen^Snips'
 
 Multi-valued elements can be set using a :class:`list` or modified using the
 :class:`list` methods::
@@ -417,7 +418,7 @@ will automatically be converted to an empty list when you do so)::
 
     >>> ds.PatientName = None
     >>> elem
-    (0010, 0010) Patient's Name                      PN: None
+    (0010,0010) Patient's Name                      PN: None
     >>> ds.OtherPatientIDsSequence = None
     >>> len(ds.OtherPatientIDsSequence)
     0
@@ -459,7 +460,7 @@ The Python type to use for a given VR is given by :doc:`this table
     >>> ds.add_new([0x0028, 0x1050], 'DS', "100.0")
     >>> elem = ds[0x0028, 0x1050]
     >>> elem
-    (0028, 1050) Window Center                       DS: "100.0"
+    (0028,1050) Window Center                       DS: "100.0"
 
 
 Standard elements
@@ -472,14 +473,14 @@ and *pydicom* will do the lookup for you::
     False
     >>> ds.WindowWidth = 500
     >>> ds['WindowWidth']
-    (0028, 1051) Window Width                        DS: "500.0"
+    (0028,1051) Window Width                        DS: "500.0"
 
 Notice how we can also use the element keyword with the Python
 :func:`in<operator.__contains__>` operator to see if a standard element is in
 the dataset? This also works with element tags, so private and repeating group
 elements are also covered::
 
-    >>> [0x0043, 0x104E] in ds
+    >>> [0x0043, 0x1010] in ds
     True
 
 Sequences
@@ -494,11 +495,11 @@ you can use the same methods on them as well.
     >>> seq[1].PatientID = 'CompressedSamples^CT1'
     >>> seq[1].TypeOfPatientID = 'TEXT'
     >>> seq[0]
-    (0010, 0020) Patient ID                          LO: 'Citizen^Jan'
-    (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+    (0010,0020) Patient ID                          LO: 'Citizen^Jan'
+    (0010,0022) Type of Patient ID                  CS: 'TEXT'
     >>> seq[1]
-    (0010, 0020) Patient ID                          LO: 'CompressedSamples^CT1'
-    (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+    (0010,0020) Patient ID                          LO: 'CompressedSamples^CT1'
+    (0010,0022) Type of Patient ID                  CS: 'TEXT'
 
 
 Deleting elements
@@ -507,8 +508,8 @@ Deleting elements
 All elements can be deleted with the :func:`del<operator.__delitem__>`
 operator in combination with the element tag::
 
-    >>> del ds[0x0043, 0x104E]
-    >>> [0x0043, 0x104E] in ds
+    >>> del ds[0x0043, 0x1010]
+    >>> [0x0043, 0x1010] in ds
     False
 
 For standard elements you can use the keyword instead::

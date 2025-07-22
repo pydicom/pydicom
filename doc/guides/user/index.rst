@@ -8,11 +8,16 @@ User Guide
    :maxdepth: 2
    :caption: Get started
 
+   what_is_dicom
    installation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Fundamentals
+   :caption: Core objects
+
+    data_element
+    dataset
+    file_set
 
    base_element
    private_data_elements

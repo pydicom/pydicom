@@ -12,3 +12,44 @@ table {
 .table td {
     border: 1px solid var(--pst-color-table-inner-border) !important;
 }
+
+html {
+    --pst-font-size-h1: 2.5rem !important;
+    --pst-font-size-h2: 2.0rem !important;
+    --pst-font-size-h3: 1.75rem !important;
+    --pst-font-size-h4: 1.5rem !important;
+    --pst-font-size-h5: 1.25rem !important;
+    --pst-font-size-h6: 1.1rem !important;
+    --pst-font-weight-heading: 400 !important;
+}
+
+.sd-card .sd-card-img-top {
+    height: 60px;
+    width: 60px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+
+html[data-theme="dark"] .sd-card img[src*=".svg"] {
+    filter: invert(67%) sepia(9%) saturate(345%) hue-rotate(175deg) brightness(95%) contrast(93%);
+    background: rgba(0, 0, 0, 0);
+}
+
+html[data-theme="light"] .sd-card img[src*=".svg"] {
+    filter: invert(35%) sepia(9%) saturate(1265%) hue-rotate(177deg) brightness(90%) contrast(94%);
+}
+
+.sd-card-footer {
+    display: flex !important;
+    column-gap: 5px;
+}
+
+.sd-card-footer p {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.sd-card-footer a {
+    width: 100%;
+}

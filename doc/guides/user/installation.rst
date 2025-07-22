@@ -19,30 +19,30 @@ Install the official release
 <https://www.python.org/>`_. If you're not sure whether or not your version of
 Python is supported, you can check :ref:`this table<faq_install_version>`.
 
-Install using pip
------------------
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`_, the
-official third-party Python software repository. The simplest way to install the latest version
-from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
+    .. tab-item:: pip
+        :sync: pip
 
-  python -m pip install -U pydicom
+        .. code-block:: bash
+
+            pip install -U pydicom
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pydicom
 
 You can also perform an offline installation by
 `downloading <https://pypi.org/project/pydicom/#files>`_ and installing
 one of the release ``*.whl`` files. For example, with the `file for the v3.0
 release <https://pypi.org/project/pydicom/3.0.1/#files>`_::
 
-  python -m pip install pydicom-3.0.1-py3-none-any.whl
-
-
-Install using conda
--------------------
-
-*pydicom* is also available for `conda <https://docs.conda.io/>`_ using
-`conda-forge <https://anaconda.org/conda-forge/pydicom>`_::
-
-  conda install -c conda-forge pydicom
+  pip install pydicom-3.0.1-py3-none-any.whl
 
 
 Additional type hints
@@ -64,7 +64,7 @@ keyword through :class:`~pydicom.dataset.Dataset`::
 
 To add type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
 
-    python -m pip install -U types-pydicom
+    pip install -U types-pydicom
 
 .. code-block:: shell
 
@@ -79,21 +79,33 @@ To add type hints for these attributes you can install the `types-pydicom <https
 Install the optional libraries
 ==============================
 
-If you're going to be manipulating pixel data then
-`NumPy <https://numpy.org/>`_ is required.
+If you're going to be manipulating pixel data as anything other than raw :class:`bytes`
+then `NumPy <https://numpy.org/>`_ is required.
 
-Using pip::
 
-  python -m pip install -U numpy
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-Through conda::
+    .. tab-item:: pip
+        :sync: pip
 
-  conda install numpy
+        .. code-block:: bash
+
+            pip install -U numpy
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install numpy
+
 
 To decode JPEG compressed pixel data one or more additional libraries will
-need to be installed. See :doc:`this page </guides/plugin_table>` for a list of
-which library is needed to encode or decode a given compression method, as specified by
-the dataset's (0002,0010) *Transfer Syntax UID* value.
+need to be installed. See :doc:`this page </guides/plugin_table>` for details of
+which library is needed to compress or decompress using a given compression
+method, as specified by the dataset's (0002,0010) *Transfer Syntax UID* value.
 
 
 .. _tut_install_pil:
@@ -102,19 +114,28 @@ Installing Pillow
 -----------------
 
 `Pillow <https://pillow.readthedocs.io/>`_ is a popular Python imaging library
-that can handle the decompression of some JPEG and JPEG 2000 images.
+that can handle the decompression of some JPEG and JPEG 2000 images. It includes
+JPEG support by default, however JPEG 2000 requires the
+`openjpeg <https://www.openjpeg.org/>`_  library be installed beforehand.
 
-Using pip; you may need to make sure that the
-`libjpeg <https://libjpeg.sourceforge.net/>`_ (for JPEG) and
-`openjpeg <https://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
-beforehand::
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-  python -m pip install -U pillow
+    .. tab-item:: pip
+        :sync: pip
 
-Through conda::
+        .. code-block:: bash
 
-  conda install -c conda-forge openjpeg jpeg
-  conda install pillow
+            pip install -U pillow
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge openjpeg jpeg
+            conda install pillow
 
 
 .. _tut_install_pylj:
@@ -123,16 +144,26 @@ Installing pylibjpeg
 --------------------
 
 :gh:`pylibjpeg <pylibjpeg>` is a Python framework for
-decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
-RLE images provided a suitable plugin is installed.
+decompressing JPEG, JPEG-LS images and compressing or decompressing JPEG 2000 and
+RLE images, provided a suitable plugin is installed.
 
-Using pip::
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-  python -m pip install -U pylibjpeg[all]
+    .. tab-item:: pip
+        :sync: pip
 
-Through conda::
+        .. code-block:: bash
 
-  conda install -c conda-forge pylibjpeg pylibjpeg-rle pylibjpeg-libjpeg pylibjpeg-openjpeg
+            pip install -U pylibjpeg[all]
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pylibjpeg[all]
 
 
 Installing pyjpegls
@@ -144,13 +175,24 @@ compress and decompress JPEG-LS images. It's a fork of `CharPyLS
 <https://github.com/Who8MyLunch/CharPyLS>`_ created to provide compatibility with the
 latest Python versions.
 
-Using pip::
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-  python -m pip install -U pyjpegls
+    .. tab-item:: pip
+        :sync: pip
 
-Through conda::
+        .. code-block:: bash
 
-  conda install -c conda-forge pyjpegls
+            pip install -U pyjpegls
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pyjpegls
+
 
 
 .. _tut_install_gdcm:
@@ -163,14 +205,28 @@ with DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
 The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`__ are built by the
 `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
-versions of Python on Windows, MacOS and Linux, and can be installed using pip::
-
-  python -m pip install -U python-gdcm
+versions of Python on Windows, MacOS and Linux, and can be installed using pip.
 
 The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`__
-tend to be older versions and are not as well supported. They're available on conda using::
+tend to be older versions and may not be as well supported.
 
-  conda install -c conda-forge gdcm
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
+
+    .. tab-item:: pip
+        :sync: pip
+
+        .. code-block:: bash
+
+            pip install -U python-gdcm
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge gdcm
 
 
 .. _tut_install_dev:
@@ -181,7 +237,7 @@ Install the development version
 To install a snapshot of the latest code (the ``main`` branch) from
 :gh:`GitHub <pydicom>`::
 
-  python -m pip install git+https://github.com/pydicom/pydicom
+  pip install git+https://github.com/pydicom/pydicom
 
 The ``main`` branch is under active development and while it's usually
 stable, it may have undocumented changes or bugs.
@@ -194,7 +250,7 @@ branch (this will create a ``pydicom`` directory in your current directory)::
 
 Then install using pip in editable (``-e``) mode::
 
-  python -m pip install -e pydicom/
+  pip install -e pydicom/
 
 When you want to update your copy of the source code, run ``git pull`` from
 within the ``pydicom`` directory and Git will download and apply any changes.
