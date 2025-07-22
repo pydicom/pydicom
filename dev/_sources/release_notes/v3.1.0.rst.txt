@@ -33,6 +33,7 @@ Fixes
   values with VRs supporting only ASCII characters (:issue:`2243`).
 * Correctly handle empty values represented as empty strings in json while converting them
   to a dataset (:issue:`2221`).
+* Correctly handle empty LUT data (:issue:`2238`).
 
 Enhancements
 ------------
