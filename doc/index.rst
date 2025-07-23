@@ -5,7 +5,7 @@
 pydicom
 =======
 
-An easy to use Python package for creating, reading, modifying and writing
+An easy to use `Python <https://www.python.org/>`_ package for creating, reading, modifying and writing
 `DICOM <https://www.dicomstandard.org/>`_ files, with optional support for converting compressed
 and uncompressed *Pixel Data* to `NumPy <https://www.numpy.org>`_
 `ndarrays <https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html>`_ (and back again).
@@ -117,12 +117,12 @@ Documentation
         **Quick start**
         ^^^
 
-        If you're new to *pydicom*, start here for an introduction to our
-        main features. Blah.
+        If you're new to *pydicom*, start here for an introduction to reading
+        and manipulating DICOM datasets and accessing *Pixel Data* as a NumPy ndarray.
 
         +++
 
-        .. button-ref:: tutorials/dataset_basics
+        .. button-ref:: /guides/user/quick_start
             :expand:
             :color: primary
             :click-parent:
@@ -136,8 +136,8 @@ Documentation
         **User guide**
         ^^^
 
-        The user guide covers usage of *pydicom's* core classes and functions as
-        well as explanations of the relevant parts of the DICOM Standard.
+        The user guide covers usage of *pydicom's* core classes and functions and
+        how they're related to the relevant parts of the DICOM Standard.
 
         +++
 

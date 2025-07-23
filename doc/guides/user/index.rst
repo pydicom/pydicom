@@ -10,18 +10,22 @@ User Guide
 
    what_is_dicom
    installation
+   quick_start
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Dataset I/O
+
+   read_data
+   write_data
 
 .. toctree::
    :maxdepth: 2
    :caption: Core objects
 
-    data_element
-    dataset
-    file_set
-
-   base_element
-   private_data_elements
-   writing_files
+   data_element
+   dataset
+   file_set
 
 .. toctree::
    :maxdepth: 2
@@ -45,4 +49,5 @@ User Guide
    :caption: Extras
 
    best_practices
-   faq
+   /tutorials/contributing
+   /guides/faq
