@@ -5,7 +5,7 @@ User Guide
 ==========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Get started
 
    what_is_dicom
@@ -14,18 +14,11 @@ User Guide
 
 .. toctree::
    :maxdepth: 2
-   :caption: Dataset I/O
+   :caption: Datasets and elements
 
-   read_data
-   write_data
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Core objects
-
-   data_element
-   dataset
-   file_set
+   base_element
+   private_data_elements
+   writing_files
 
 .. toctree::
    :maxdepth: 2
@@ -37,7 +30,7 @@ User Guide
    viewing_images
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Overlays and waveforms
 
    working_with_overlays
@@ -45,9 +38,10 @@ User Guide
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Extras
 
+   /guides/element_value_types
    best_practices
    /tutorials/contributing
    /guides/faq

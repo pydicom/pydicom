@@ -170,8 +170,7 @@ it to be included in the API reference documentation we'll also need to update
 When making changes, and especially when adding new features, it's important
 that they're documented. It's very difficult for users to find and
 understand how to use code that hasn't been documented, or whose documentation
-contains errors. For more information on how to properly document *pydicom*
-see :doc:`writing documentation</guides/writing_documentation>`.
+contains errors.
 
 Now we run the tests again so we can see whether or not the code we added is
 working::

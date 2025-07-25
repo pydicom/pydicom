@@ -67,7 +67,7 @@ through it::
 
     >>> block = ds.private_block(0x0009, 'GEMS_IDEN_01')
     >>> block[0x01]
-    (0009, 1001) [Full fidelity]                     LO: 'GE_GENESIS_FF'
+    (0009,1001) [Full fidelity]                     LO: 'GE_GENESIS_FF'
     >>> block[0x01].value
     'GE_GENESIS_FF'
 
@@ -104,7 +104,7 @@ with a private block object::
 Since v3.0, there's also a convenience method to add a private tag without creating a private
 block first::
 
-    >>> block = ds.add_new_private("My company 001", 0x000B, 0x01, "my value", VR.SH)
+    >>> ds.add_new_private("My company 001", 0x000B, 0x01, "my value", "SH")
     >>> ds
     ...
     (000b, 0010) Private Creator                     LO: 'My company 001'

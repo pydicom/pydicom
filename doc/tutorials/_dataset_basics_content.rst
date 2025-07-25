@@ -182,6 +182,17 @@ There are three categories of elements:
     by square brackets, e.g. *[Window value]* and the VR will be as
     shown.
 
+Elements have a few main attributes:
+
+DataElement.tag
+    The element's tag.
+DataElement.VR
+    The element's *Value Representation*.
+DataElement.keyword
+    The element's *keyword* (for standard elements).
+DataElement.value
+    The element's value.
+
 For all element categories, we can access a particular element in the dataset
 through its tag, which returns a :class:`~pydicom.dataelem.DataElement`
 instance::
@@ -352,10 +363,17 @@ Modifying a dataset
 Modifying elements
 ------------------
 
-We can modify the value of any element by retrieving it and setting the
-value::
+.. note::
 
-    >>> elem = ds[0x0010, 0x0010]
+    The allowed object type to use for an element's value depends on its :dcm:`Value Representation
+    <part05/sect_6.2.html>`. For example, we can see below that *Patient's Name* has a VR of
+    **PN**. By using the :doc:`Element VR and Python types</guides/element_value_types>` guide,
+    we see that elements with a VR of **PN** can be set using ``None`` | :class:`str` |
+    :class:`~pydicom.valuerep.PersonName` if the VM is 1, or ``list[str | PersonName]`` for VM > 1.
+
+We can modify the value of any element by retrieving it and setting the value::
+
+    >>> elem = ds[0x0010, 0x0010]  # VR 'PN'
     >>> elem.value
     'CompressedSamples^CT1'
     >>> elem.value = 'Citizen^Jan'
@@ -371,7 +389,7 @@ But for standard elements it's simpler to use the keyword::
 Multi-valued elements can be set using a :class:`list` or modified using the
 :class:`list` methods::
 
-    >>> ds.ImageType = ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
+    >>> ds.ImageType = ['ORIGINAL', 'PRIMARY', 'LOCALIZER']  # VR 'CS'
     >>> ds.ImageType
     ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
     >>> ds.ImageType[1] = 'DERIVED'
@@ -384,7 +402,7 @@ Multi-valued elements can be set using a :class:`list` or modified using the
 Similarly, for sequence elements::
 
     >>> from pydicom.dataset import Dataset
-    >>> ds.OtherPatientIDsSequence = [Dataset(), Dataset()]
+    >>> ds.OtherPatientIDsSequence = [Dataset(), Dataset()]  # VR is 'SQ'
     >>> ds.OtherPatientIDsSequence.append(Dataset())
     >>> len(ds.OtherPatientIDsSequence)
     3
@@ -442,14 +460,19 @@ There are two ways to get an element's VR:
     >>> dictionary_VR([0x0028, 0x1050])
     'DS'
 
-The Python type to use for a given VR is given by :doc:`this table
-</guides/element_value_types>`. For **DS** we can use a :class:`str`,
-:class:`int` or :class:`float`, so to add the new element::
+As we saw earlier, you can use the :doc:`Element VR and Python types
+</guides/element_value_types>` guide to find the Python type to use for a given VR.
+For **DS** we can use a :class:`str`, :class:`int` or :class:`float`, so to add the new element::
 
     >>> ds.add_new([0x0028, 0x1050], 'DS', "100.0")
     >>> elem = ds[0x0028, 0x1050]
     >>> elem
     (0028,1050) Window Center                       DS: "100.0"
+
+Some VRs also require the value be formatted correctly. For example, elements with
+a VR of **DA** should use the YYYYMMDD format and only allow ASCII characters 0 to 9 (unless
+used for query matching). The full list of VRs and their formatting requirements can be found in
+:dcm:`Section 6.2 of Part 5 of the DICOM Standard<part05/sect_6.2.html>`.
 
 
 Alternative for standard elements
