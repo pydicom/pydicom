@@ -1,7 +1,7 @@
 [
   {
-    "name": "dev",
-    "version": "3.1.*.dev0",
+    "name": "3.1 (dev)",
+    "version": "dev",
     "url": "https://pydicom.github.io/pydicom/dev/"
   },
   {

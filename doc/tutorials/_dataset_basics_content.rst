@@ -174,24 +174,13 @@ There are three categories of elements:
 * **Private elements** such as (0043,1010) *[Window value]*.
   :dcm:`Private elements<part05/sect_7.8.html>` have a tag with an odd group number,
   aren't registered in the official DICOM Standard, and are instead created
-  privately, as specified by the (gggg,0010) *Private Creator* element.
+  privately, as specified by the (gggg,0010-00FF) *Private Creator* element.
 
   * If the private creator is unknown then the element name will be *Private
     tag data* and the VR **UN**.
   * If the private creator is known then the element name will be surrounded
     by square brackets, e.g. *[Window value]* and the VR will be as
     shown.
-
-Elements have a few main attributes:
-
-DataElement.tag
-    The element's tag.
-DataElement.VR
-    The element's *Value Representation*.
-DataElement.keyword
-    The element's *keyword* (for standard elements).
-DataElement.value
-    The element's value.
 
 For all element categories, we can access a particular element in the dataset
 through its tag, which returns a :class:`~pydicom.dataelem.DataElement`
@@ -200,6 +189,8 @@ instance::
     >>> elem = ds[0x0008, 0x0016]
     >>> elem
     (0008,0016) SOP Class UID                       UI: CT Image Storage
+    >>> elem.tag
+    (0008,0016)
     >>> elem.keyword
     'SOPClassUID'
     >>> private_elem = ds[0x0043, 0x1010]
@@ -278,10 +269,10 @@ DICOM datasets use the `tree data structure
 elements acting as leaves and sequence elements acting as the nodes where
 branches start.
 
-* The top-level (root) dataset contains 0 or more elements (leaves):
+* The top-level (root) dataset contains 0 or more elements:
 
-  * An element may be non-sequence type (VR is not **SQ**), or
-  * An element may be a sequence type (VR is **SQ**) and contains 0 or
+  * An element may be non-sequence type; its VR is not **SQ** (leaf), or
+  * An element may be a sequence type; its VR is **SQ** and it contains 0 or
     more items (branches):
 
     * Each item in the sequence is another dataset, containing 0 or more
@@ -292,12 +283,11 @@ branches start.
 
 Sequence elements can be accessed in the same manner as non-sequence ones::
 
-    >>> seq = ds[0x0010, 0x1002]
-    >>> seq = ds['OtherPatientIDsSequence']
-    >>> seq = ds.OtherPatientIDsSequence
+    >>> elem = ds[0x0010, 0x1002]
+    >>> elem = ds['OtherPatientIDsSequence']
 
-The main difference between sequence and non-sequence elements is that their
-value is a list of zero or more  :class:`~pydicom.dataset.Dataset` objects,
+The main difference between sequence and non-sequence elements is that their value is
+a list-like object containing zero or more :class:`~pydicom.dataset.Dataset` instances,
 which can be accessed using the standard Python :class:`list` methods::
 
     >>> len(ds.OtherPatientIDsSequence)
@@ -363,24 +353,36 @@ Modifying a dataset
 Modifying elements
 ------------------
 
-.. note::
-
-    The allowed object type to use for an element's value depends on its :dcm:`Value Representation
-    <part05/sect_6.2.html>`. For example, we can see below that *Patient's Name* has a VR of
-    **PN**. By using the :doc:`Element VR and Python types</guides/element_value_types>` guide,
-    we see that elements with a VR of **PN** can be set using ``None`` | :class:`str` |
-    :class:`~pydicom.valuerep.PersonName` if the VM is 1, or ``list[str | PersonName]`` for VM > 1.
-
 We can modify the value of any element by retrieving it and setting the value::
 
-    >>> elem = ds[0x0010, 0x0010]  # VR 'PN'
+    >>> elem = ds[0x0010, 0x0010]
     >>> elem.value
     'CompressedSamples^CT1'
     >>> elem.value = 'Citizen^Jan'
     >>> elem
     (0010,0010) Patient's Name                      PN: 'Citizen^Jan'
 
-But for standard elements it's simpler to use the keyword::
+Which raises the question; what *kind* of value should be used to set an element's value?
+In the above example we used a :class:`str` to set the *Patient's Name*, but what about
+for other elements? Should they all be strings too? (Hint: no).
+
+The allowed object type to use for an element's value depends on its :dcm:`Value Representation
+<part05/sect_6.2.html>`. We saw that *Patient's Name* has a VR of **PN**. By checking the
+:doc:`Element VR and Python types</guides/element_value_types>` guide,
+we see that elements with a VR of **PN** can be set using:
+
+* ``None``, :class:`str` or :class:`~pydicom.valuerep.PersonName` if the *Value
+  Multiplicity* (VM) is 1, or
+* ``list[str]`` or ``list[PersonName]`` for VM > 1.
+
+Each standard element also has restrictions on its allowed VM, given in :dcm:`Part 6
+<part06/chapter_6.html>`. For *Patient's Name* the VM must always be 1, so the
+allowed types are ``None``, ``str`` or ``PersonName``. If instead we look up
+(0018,106C) *Synchronization Channel*, we see the VR is **US** and the allowed VM 2,
+so using the *Element VR and Python types* guide, we see the only type that may be
+used is ``list[int]``.
+
+For standard elements it's simpler to use the keyword to set the value::
 
     >>> ds.PatientName = 'Citizen^Snips'
     >>> elem
@@ -402,14 +404,13 @@ Multi-valued elements can be set using a :class:`list` or modified using the
 Similarly, for sequence elements::
 
     >>> from pydicom.dataset import Dataset
-    >>> ds.OtherPatientIDsSequence = [Dataset(), Dataset()]  # VR is 'SQ'
+    >>> ds.OtherPatientIDsSequence = [Dataset(), Dataset()]  # VR 'SQ'
     >>> ds.OtherPatientIDsSequence.append(Dataset())
     >>> len(ds.OtherPatientIDsSequence)
     3
 
-As mentioned before, the items in a sequence are
-:class:`~pydicom.dataset.Dataset` instances. If you try to add any other type
-to a sequence you'll get an exception::
+The items in a sequence are always :class:`~pydicom.dataset.Dataset` instances, if you
+try to add any other type to a sequence you'll get an exception::
 
     >>> ds.OtherPatientIDsSequence.append('Hello world?')
     Traceback (most recent call last):

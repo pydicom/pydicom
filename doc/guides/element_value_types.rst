@@ -24,13 +24,16 @@ ensure that the value gets written correctly?
 
   * Can also be set using a :class:`list` of their *set using* type - for
     :dcm:`Value Multiplicity<part05/sect_6.4.html>` (VM) > 1, the value will
-    be stored as a :class:`~multival.MultiValue` of their *stored as* type
-  * However, according to the DICOM Standard, elements with VR **LT**, **OB**,
-    **OD**, **OF**, **OL**, **OW**, **ST**, **UN**, **UR** and **UT** should
-    never have a VM greater than 1.
+    be stored as a :class:`~multival.MultiValue` of their *stored as* type.
+
+  * However, all standard elements have restrictions on what their VM may be,
+    given in :dcm:`Part 6 of the DICOM Standard<part06/chapter_6.html>`.
+    In particular, elements with VR **LT**, **OB**, **OD**, **OF**, **OL**, **OW**,
+    **ST**, **UN**, **UR** and **UT** should never have a VM greater than 1.
 
 * **SQ** element values should be set using a :class:`list` of zero or more
   :class:`~dataset.Dataset` instances.
+
 
 
 +----+------------------+----------------------------+-----------------------------------+-----------------------------+
@@ -150,7 +153,7 @@ memory when creating datasets::
         ds.save_as("large_dataset.dcm")
 
 To use a buffered *Pixel Data* value with a dataset that has a compressed transfer
-syntax such as *JPEG 2000 Lossles*, the :func:`~pydicom.encaps.encapsulate_buffer` and
+syntax such as *JPEG 2000 Lossless*, the :func:`~pydicom.encaps.encapsulate_buffer` and
 :func:`~pydicom.encaps.encapsulate_extended_buffer` functions can be used to encapsulate
 the buffered frames::
 

@@ -116,7 +116,7 @@ Installing Pillow
 `Pillow <https://pillow.readthedocs.io/>`_ is a popular Python imaging library
 that can handle the decompression of some JPEG and JPEG 2000 images. It includes
 JPEG support by default, however JPEG 2000 requires the
-`openjpeg <https://www.openjpeg.org/>`_  library be installed beforehand.
+`openjpeg <https://www.openjpeg.org/>`_  library be installed.
 
 .. tab-set::
     :sync-group: install

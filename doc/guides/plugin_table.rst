@@ -8,7 +8,7 @@ The default installation of *pydicom* doesn't support decompression or compressi
 Support for other compressed transfer syntaxes is added through plugins, each of which
 requires installing `NumPy <https://numpy.org/>`_ and one or more third-party packages.
 
-To determine that transfer syntax used by a dataset you can use the following snippet::
+To determine the transfer syntax used by a dataset you can use the following snippet::
 
     from pydicom import dcmread
 

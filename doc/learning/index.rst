@@ -1,41 +1,35 @@
 Learning resources
 ==================
 
-Code examples
--------------
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 1
+
+   /tutorials/dataset_basics
+   /tutorials/pixel_data/index
+   /tutorials/waveforms
+   /tutorials/filesets
+   /tutorials/sr_basics
+   /tutorials/dicom_json
+   /tutorials/contributing_code
+   /tutorials/contributing_docs
 
 
-Tutorials and guides
---------------------
+Guides
+------
 
-* The pydicom User Guide
-* Guide to the CLI applications
-* An introduction to structured reports
-* Contributing source code and documentation
+.. toctree::
+   :maxdepth: 1
 
-.. grid:: 1 1 2 2
-    :gutter: 2 3 4 4
+   /guides/user/index
+   /guides/element_value_types
+   /guides/plugin_table
+   /guides/decoding/index
+   /guides/encoding/index
+   /guides/cli/cli_guide
 
-    .. grid-item-card::
-        :img-top: ../_static/img/pixel-data.svg
-        :text-align: center
 
-        **Datasets and File-sets**
-        ^^^
-
-        | Dataset: reading, accessing, modifying and writing.
-        | Converting datasets to and from JSON
-        | Using pydicom with DICOM File-sets
-
-    .. grid-item-card::
-        :img-top: ../_static/img/pixel-data.svg
-        :text-align: center
-
-        **Pixel Data**
-        ^^^
-
-        | The Pixel Data tutorial
-        | Pixel Data encoding guides
-        | Plugins for Pixel Data encoding
-        | Plugins for Pixel Data decoding
-        | Converting Waveform Data to an ndarray
+Examples
+--------

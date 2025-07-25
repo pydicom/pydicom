@@ -20,27 +20,27 @@ a CT scan acquisition. Each dataset is made up of a collection of :dcm:`Data Ele
 <part05/chapter_7.html#sect_7.1>`, with each Data Element representing an *attribute* of
 the object. A Data Element is itself made of a unique identifier called the *Element Tag*,
 has a format specifier called the *Value Representation* and contains the *Value* of the
-attribute. The DICOM Standard groups Data Elements that describe related attributes
+attribute. The ICOM Standard groups Data Elements that describe related attributes
 into *modules*.
 
 In :dcm:`Part 3<part03/ps3.3.html>`, the DICOM Standard defines the many different types
-of dataset, using something called an Information Object Definition (IOD). Each IOD contains
+of dataset using something called an Information Object Definition (IOD). Each IOD contains
 a table of optional (U) and mandatory (M) modules that a dataset must have in order to meet
 that definition. This means you can use the IOD that corresponds to a given dataset to see
 what Data Elements it should contain.
 
-As an example, the :dcm:`CT Image IOD<part03/sect_A.3.html>` contains :dcm:`this table
-<part03/sect_A.3.3.html>` listing the modules that are required for a dataset to be
-considered a valid *CT Image* instance. This includes a
-:dcm:`Patient<part03/sect_C.7.html#sect_C.7.1.1>` module, which contains patient
-demographic attributes, a :dcm:`CT Image<part03/sect_C.8.2.html#sect_C.8.2.1>` module,
-which describes the CT image data, as well as all the other mandatory modules.
+As an example, the :dcm:`CT Image IOD<part03/sect_A.3.html>` contains :dcm:`a table
+<part03/sect_A.3.3.html>` with the modules that are required for a dataset to be
+considered a valid *CT Image* instance. This includes the *Patient* module, which
+contains patient demographic information. If we look at :dcm:`the Patient module
+<part03/sect_C.7.html#sect_C.7.1.1>` itself, we see that it contains
+attributes for the *Patient's Name*, *Patient ID* and *Patient's Birth Date*, all of
+which are considered *Type* 2.
 
-If we look at :dcm:`the page<part03/sect_C.7.html#sect_C.7.1.1>` for the *Patient* module
-we see that it contains a *Patient's Name* attribute, with a *Type* of 2. This means
-that in any given *CT Image* dataset we should be able to find a *Patient's Name* Data
-Element - although it may not have a useful value, as Type 2 means :dcm:`it must be present but
-may have an empty value<part05/sect_7.4.3.html>`.
+Because Type 2 means that :dcm:`the attribute must be present<part05/sect_7.4.3.html>`,
+this means that in any given *CT Image* dataset we should be able to find three Data
+Elements corresponding to those attributes (however they may not have a useful value,
+as Type 2 also means the value may be empty).
 
 .. include:: /tutorials/_dataset_basics_content.rst
 
@@ -59,10 +59,10 @@ Data* element. If present, the data will either be available as uncompressed raw
 or as an encapsulated and compressed image codestream, depending on the *Transfer Syntax UID*::
 
     >>> ds = examples.ct
-    >>> ds.file_meta.TransferSyntaxUID.is_compressed
+    >>> ds.file_meta.TransferSyntaxUID.is_compressed  # raw binary
     False
     >>> ds = examples.jpeg2k
-    >>> ds.file_meta.TransferSyntaxUID.is_compressed
+    >>> ds.file_meta.TransferSyntaxUID.is_compressed  # encapsulated codestreams
     True
 
 As :class:`bytes`
@@ -114,8 +114,9 @@ depending on your use case:
    with :meth:`Dataset.pixel_array_options()<Dataset.pixel_array_options>`.
 2. Using the :func:`~pydicom.pixels.pixel_array` or :func:`~pydicom.pixels.iter_pixels`
    functions.
-3. Using :meth:`Decoder.as_array()<pydicom.pixels.decoders.base.Decoder.as_array>` or
-   :meth:`Decoder.iter_array()<pydicom.pixels.decoders.base.Decoder.iter_array>` instance methods.
+3. Using the :meth:`Decoder.as_array()<pydicom.pixels.decoders.base.Decoder.as_array>` or
+   :meth:`Decoder.iter_array()<pydicom.pixels.decoders.base.Decoder.iter_array>` instance
+   methods.
 
 With :attr:`Dataset.pixel_array<Dataset.pixel_array>`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,6 +146,8 @@ process can be done through :meth:`Dataset.pixel_array_options()<Dataset.pixel_a
 The main drawbacks of :attr:`Dataset.pixel_array<Dataset.pixel_array>` are:
 
 * It requires loading the entire *Pixel Data* into memory.
+* The ``ndarray`` is kept as an attribute of the dataset, taking up memory when it might
+  not need to do so.
 * The returned ``ndarray`` lacks any descriptive metadata.
 * The conversion can only be customized using a second function.
 
@@ -154,16 +157,15 @@ The main drawbacks of :attr:`Dataset.pixel_array<Dataset.pixel_array>` are:
 With :func:`~pixel_array` and :func:`~iter_pixels`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`~pixel_array` and :func:`~iter_pixels` behave in much the same way as
-:attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`, only without the need
-for a second function to control the conversion process::
+The :func:`~pixel_array` and :func:`~iter_pixels` functions convert the pixel data data
+to an ``ndarray`` directly::
 
     >>> from pydicom.pixels import pixel_array
     >>> arr = pixel_array(ds, index=0)  # reads all frames into memory
     >>> arr.shape
     (240, 320, 3)
 
-If you're concerned about memory usage then both functions can be used with the path to
+If you're concerned about memory usage, both functions can be used with the path to
 the dataset instead. This will reduce the amount of *Pixel Data* read into memory to the
 minimum required::
 
@@ -279,7 +281,7 @@ A summary of the File-set's contents is shown when printing::
               IMAGE: 5 SOP Instances
           ...
 
-The File-set can be searched using the :meth:`~FileSet.find_values` method to
+You can search the File-set with the :meth:`~FileSet.find_values` method to
 return a list of element values found in the DICOMDIR's records::
 
     >>> fs.find_values("PatientID")
@@ -294,9 +296,9 @@ corresponding files::
     >>> fs.find_values("PhotometricInterpretation", load=True)
     ['MONOCHROME1', 'MONOCHROME2']
 
-The File-set can be searched to find instances matching a query using the :meth:`~FileSet.find`
-method, which returns a list of :class:`~FileInstance`. A ``FileInstance`` can then be
-read and decoded using :meth:`FileInstance.load` to return it as a
+The File-set can also be searched to find instances matching a query using the
+:meth:`~FileSet.find` method, which returns a list of :class:`~FileInstance` that
+can be read and decoded using :meth:`FileInstance.load` to return them as a
 :class:`~pydicom.dataset.FileDataset`::
 
     >>> matches = fs.find(PatientID="77654033")

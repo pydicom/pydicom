@@ -32,8 +32,8 @@ of an image processing pipeline for medical data.
   definitions used by code groups and structured reports.
 
 Furthermore, when used with `pynetdicom <https://pydicom.github.io/pynetdicom/stable/>`_, the
-following parts are also implemented, allowing you to easily transfer Data Sets between DICOM
-applications:
+following parts are also implemented, allowing you to easily create code to transfer Data Sets
+between DICOM applications:
 
 * :dcm:`Part 4: Service Class Specifications<part04/ps3.4.html>`, which defines the services
   DICOM applications may implement.

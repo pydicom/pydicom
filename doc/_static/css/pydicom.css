@@ -1,4 +1,7 @@
-
+/* Table changes:
+   * Reduce the padding
+   * Add row borders and set their colour to match the rest of the table
+*/
 table {
     padding: 0.2rem !important;
 }
@@ -13,6 +16,7 @@ table {
     border: 1px solid var(--pst-color-table-inner-border) !important;
 }
 
+/* Font size and weights changed to make them more svelte */
 html {
     --pst-font-size-h1: 2.5rem !important;
     --pst-font-size-h2: 2.0rem !important;
@@ -23,6 +27,7 @@ html {
     --pst-font-weight-heading: 400 !important;
 }
 
+/* Set SVG icon size in the cards and center them */
 .sd-card .sd-card-img-top {
     height: 60px;
     width: 60px;
@@ -31,6 +36,8 @@ html {
     margin-top: 10px;
 }
 
+/* Set SVG icon colours to match default theme colours using
+https://codepen.io/sosuke/pen/Pjoqqp */
 html[data-theme="dark"] .sd-card img[src*=".svg"] {
     filter: invert(67%) sepia(9%) saturate(345%) hue-rotate(175deg) brightness(95%) contrast(93%);
     background: rgba(0, 0, 0, 0);
@@ -40,6 +47,7 @@ html[data-theme="light"] .sd-card img[src*=".svg"] {
     filter: invert(35%) sepia(9%) saturate(1265%) hue-rotate(177deg) brightness(90%) contrast(94%);
 }
 
+/*
 .sd-card-footer {
     display: flex !important;
     column-gap: 5px;
@@ -52,4 +60,4 @@ html[data-theme="light"] .sd-card img[src*=".svg"] {
 
 .sd-card-footer a {
     width: 100%;
-}
+}*/
