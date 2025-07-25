@@ -30,18 +30,18 @@ User Guide
    viewing_images
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Overlays and waveforms
 
    working_with_overlays
    working_with_waveforms
-
 
 .. toctree::
    :maxdepth: 1
    :caption: Extras
 
    /guides/element_value_types
+   /guides/glossary
    best_practices
    /tutorials/contributing
-   /guides/faq
+   /faq

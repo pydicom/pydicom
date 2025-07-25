@@ -311,7 +311,6 @@ representative sample of expected pixel data.
 More information on performing compression with JPEG 2000 can be found in
 the :doc:`JPEG 2000 encoding guide</guides/encoding/jpeg_2k>`.
 
-
 Compressing with Deflated Image Frame Compression
 -------------------------------------------------
 

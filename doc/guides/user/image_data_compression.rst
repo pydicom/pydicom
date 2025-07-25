@@ -5,8 +5,6 @@ Compressing *Pixel Data*
 
 .. currentmodule:: pydicom
 
-.. rubric:: How to compress Pixel Data
-
 Compressing using pydicom
 -------------------------
 

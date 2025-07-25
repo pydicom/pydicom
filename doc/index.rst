@@ -117,8 +117,8 @@ Documentation
         **Quick start**
         ^^^
 
-        If you're new to *pydicom*, start here for an introduction to reading
-        and manipulating DICOM datasets and accessing *Pixel Data* as a NumPy ndarray.
+        If you're new to *pydicom* start here for an introduction to reading
+        and manipulating DICOM datasets, and accessing *Pixel Data* as a NumPy ndarray.
 
         +++
 
@@ -153,22 +153,19 @@ Documentation
         :text-align: center
         :class-item: pydicom-learning
 
-        **Learn**
+        **Learning resources**
         ^^^
 
-        Our collection of tutorials and other usage guides.
+        A collection of code examples, tutorials and usage guides for *pydicom*.
 
         +++
 
-        .. button-ref:: tutorials/index
+        .. button-ref:: learning/index
+            :expand:
             :color: primary
+            :click-parent:
 
-            Tutorials
-
-        .. button-ref:: guides/index
-            :color: primary
-
-            Guides
+            Examples, tutorials and guides
 
     .. grid-item-card::
         :img-top: _static/img/api-reference.svg

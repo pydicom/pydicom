@@ -15,4 +15,3 @@ These guides contain more detailed information on specific topics:
    decoding/index
    encoding/index
    cli/cli_guide
-   glossary

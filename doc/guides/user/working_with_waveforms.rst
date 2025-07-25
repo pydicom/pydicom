@@ -6,11 +6,6 @@ Working with Waveform Data
 
 .. currentmodule:: pydicom
 
-.. rubric:: How to work with waveform data in pydicom.
-
-Introduction
-------------
-
 Some DICOM SOP classes such as :dcm:`Basic Voice Audio Waveform
 <part03/sect_A.34.2.html>` and :dcm:`12-Lead ECG<part03/sect_A.34.3.html>`
 contain a (5400,0100) *Waveform Sequence* element,

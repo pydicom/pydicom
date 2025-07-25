@@ -87,8 +87,6 @@ usage example of data element removal and assignation.
 Sequences
 ---------
 
-Some elements
-
 .. note::
 
    To understand using :class:`~sequence.Sequence` in *pydicom*, please refer
@@ -110,7 +108,7 @@ Some elements
            :class:`~dataelem.DataElement` instances, and so on...
 
 The value of sequence elements is a :class:`~sequence.Sequence`
-instance, which wraps a Python :class:`list<list>`. Items in the sequence are
+instance, which acts like a Python :class:`list`. Items in the sequence are
 referenced by number, beginning at index ``0`` as per Python convention::
 
   >>> ds.BeamSequence[0].BeamName
