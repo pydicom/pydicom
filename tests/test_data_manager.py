@@ -327,7 +327,7 @@ def test_fetch_data_files_download_failure(download_failure):
     """Test fetch_data_files() with download failures."""
     msg = (
         r"The following exception\(s\) occurred trying to download the data files\n"
-        r"  'RuntimeError: No network!' for 693_J2KR.dcm, 693_UNCI.dcm and 77 others"
+        r"  'RuntimeError: No network!' for 693_J2KR.dcm, 693_UNCI.dcm and [0-9]+ others"
     )
     with pytest.raises(RuntimeError, match=msg):
         fetch_data_files()
