@@ -1133,6 +1133,10 @@ class Decoder(CoderBase):
             original_nr_frames = runner.number_of_frames
             for frame in frame_generator:
                 if len(frame) == runner.frame_length(unit="bytes"):
+                    if original_bits_allocated == 1 and runner.get_option(
+                        "is_bitpacked"
+                    ):
+                        frame = unpack_bits(frame)
                     excess.append(np.frombuffer(frame, runner.pixel_dtype))
                     runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
@@ -1486,6 +1490,10 @@ class Decoder(CoderBase):
             original_nr_frames = runner.number_of_frames
             for frame in frame_generator:
                 if len(frame) == runner.frame_length(unit="bytes"):
+                    if original_bits_allocated == 1 and not runner.get_option(
+                        "is_bitpacked"
+                    ):
+                        frame = pack_bits(frame, pad=False)
                     excess.append(frame)
                     runner.set_option("number_of_frames", runner.number_of_frames + 1)
                     bits_allocated.append(runner.bits_allocated)

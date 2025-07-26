@@ -409,7 +409,7 @@ class TestRleDecoder:
         msg = (
             "Unable to decode as exceptions were raised by all "
             "available plugins:\n  pylibjpeg: pylibjpeg cannot "
-            "decompress RLELossless encoded data with bits "
+            "decompress RLE Lossless encoded data with bits "
             "allocated = 1."
         )
         with pytest.raises(RuntimeError, match=msg):

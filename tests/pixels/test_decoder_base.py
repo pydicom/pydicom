@@ -16,6 +16,7 @@ from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.decoders import ExplicitVRLittleEndianDecoder
 from pydicom.pixels.decoders.base import DecodeRunner, Decoder
 from pydicom.pixels.processing import convert_color_space
+from pydicom.pixels.utils import pack_bits
 
 from pydicom.uid import (
     ExplicitVRLittleEndian,
@@ -1245,6 +1246,35 @@ class TestDecoder_Array:
         assert arr.shape == (10, 64, 64)
         assert meta["number_of_frames"] == 10
 
+    def test_encapsulated_excess_frames_singlebit(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_1_1_3F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames.append(frames[-1])
+        src = encapsulate(frames)
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "4 frames have been found in the encapsulated pixel data, which is "
+            r"larger than the given \(0028,0008\) 'Number of Frames' value of 3. "
+            "The returned data will include these extra frames and if it's correct "
+            "then you should update 'Number of Frames' accordingly, otherwise pass "
+            "'allow_excess_frames=False' to return only the first 3 frames."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr, meta = decoder.as_array(src, **runner.options)
+
+        assert arr.shape == (4, 512, 512)
+        assert meta["number_of_frames"] == 4
+
+        runner.set_option("allow_excess_frames", False)
+        arr, meta = decoder.as_array(src, **runner.options)
+        assert arr.shape == (3, 512, 512)
+        assert meta["number_of_frames"] == 3
+
     def test_encapsulated_from_buffer(self):
         """Test decoding a dataset which uses buffered Pixel Data."""
         decoder = get_decoder(RLELossless)
@@ -1777,6 +1807,36 @@ class TestDecoder_Buffer:
         buffer, meta = decoder.as_buffer(src, **runner.options)
         assert len(buffer) == 10 * 64 * 64 * 2
         assert meta["number_of_frames"] == 10
+
+    def test_encapsulated_excess_frames_singlebit(self):
+        """Test returning excess frame data"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_1_1_3F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames.append(frames[-1])
+        src = encapsulate(frames)
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+        runner.set_option("is_bitpacked", True)
+
+        msg = (
+            "4 frames have been found in the encapsulated pixel data, which is "
+            r"larger than the given \(0028,0008\) 'Number of Frames' value of 3. "
+            "The returned data will include these extra frames and if it's correct "
+            "then you should update 'Number of Frames' accordingly, otherwise pass "
+            "'allow_excess_frames=False' to return only the first 3 frames."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            buffer, meta = decoder.as_buffer(src, **runner.options)
+
+        assert len(buffer) == (4 * 512 * 512) // 8
+        assert meta["number_of_frames"] == 4
+
+        runner.set_option("allow_excess_frames", False)
+        buffer, meta = decoder.as_buffer(src, **runner.options)
+        assert len(buffer) == (3 * 512 * 512) // 8
+        assert meta["number_of_frames"] == 3
 
     def test_expb_ow_index_invalid_raises(self):
         """Test invalid index with BE swapped OW raises"""
