@@ -114,7 +114,7 @@ def _rle_decode_frame(
     nr_samples : int
         Number of samples per pixel (e.g. 3 for RGB data).
     nr_bits : int
-        Number of bits per sample - must be a multiple of 8
+        Number of bits per sample - must be 1 or a multiple of 8
     segment_order : str
         The segment order of the `data`, '>' for big endian (default),
         '<' for little endian (non-conformant).
@@ -129,8 +129,8 @@ def _rle_decode_frame(
     """
     if nr_bits == 1 and nr_samples != 1:
         raise NotImplementedError(
-            "Unable to decode RLE encoded pixel data with Bits Allocated = 1 "
-            "and SamplesPerPixel > 1."
+            "Unable to decode RLE encoded pixel data with "
+            "*Bits Allocated* = 1 and *Samples Per Pixel* > 1."
         )
     if nr_bits % 8 and nr_bits != 1:
         raise NotImplementedError(
@@ -193,8 +193,6 @@ def _rle_decode_frame(
     #    Pxl 1   Pxl 2   ... Pxl N   | Pxl 1   Pxl 2   ... Pxl N   | ...
     #    LSB MSB LSB MSB ... LSB MSB | LSB MSB LSB MSB ... LSB MSB | ...
 
-    # `stride` is the total number of bytes of each sample plane
-    stride = bytes_per_sample * rows * columns
     for sample_number in range(nr_samples):
         le_gen = range(bytes_per_sample)
         byte_offsets = le_gen if segment_order == "<" else reversed(le_gen)

@@ -704,7 +704,7 @@ def decompress(
         if value_length % 2:
             frames.append(b"\x00")
 
-        elem.value = b"".join(frame for frame in frames)
+        elem.value = b"".join(frames)
 
     elem.is_undefined_length = False
     elem.VR = VR.OB if ds.BitsAllocated <= 8 else VR.OW
@@ -1329,19 +1329,18 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
     Parameters
     ----------
     arr : numpy.ndarray | bytes | bytearray
-        The :class:`numpy.ndarray`, `bytes`, or `bytearray` containing 1-bit
-        data as ints/bytes. If it is a :class:`numpy.ndarray`, `arr` must only
-        contain integer values of 0 and 1 and must have an 'uint'  or 'int'
-        :class:`numpy.dtype`. If it is a `bytes` or `bytearray`, each byte
-        represents a pixel and must have a value of either 0 or 1 (i.e.
-        `b'\x00'` or `b'\x01'`). For the sake of efficiency it's recommended
-        that the length of `arr` be a multiple of 8 (i.e. that any empty
-        bit-padding to round out the byte has already been added). For arrays,
-        the input `arr` should either be shaped as (rows, columns) or (frames,
-        rows, columns) or the equivalent 1D array used to ensure that the
-        packed data is in the correct order. For `bytes` or `bytearray`,
-        pixels should be ordered in the same order as a 1D array, i.e. column
-        index changes most frequently, then row index, then frame index.
+        The :class:`numpy.ndarray`, :class:`bytes`, or :class:`bytearray` containing 1-bit
+        data as ints/bytes:
+
+        * For a :class:`numpy.ndarray`, `arr` must only contain integer values of 0 and
+          1 and must have an 'uint'  or 'int' :class:`numpy.dtype`. The input `arr`
+          should either be shaped as (rows, columns) or (frames, rows, columns) or the
+          equivalent flattened 1D array used to ensure that the packed data is
+          in the correct order.
+        * For `bytes` or `bytearray`, each byte represents a single pixel and must have
+          a value of either 0 or 1 (i.e. ``b'\x00'`` or ``b'\x01'```). Pixels should be
+          orderedin the same order as a 1D array, i.e. column index changes most
+          frequently, then row index, then frame index.
     pad : bool, optional
         If ``True`` (default) then add a null byte to the end of the packed
         data to ensure even length, otherwise no padding will be added.
@@ -1368,35 +1367,34 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
 
         if HAVE_NP:
             # Form an array because the numpy implementation is more efficient
-            arr = np.frombuffer(arr, dtype=np.uint8)
-        else:
-            # Fallback for when numpy is not installed (slower)
+            return pack_bits(np.frombuffer(arr, dtype=np.uint8), pad=pad)
 
-            # Pad with zeros to ensure output has length that is multiple of
-            # one byte (pad is False) or two bytes (pad is True)
-            pad_multiple = 16 if pad else 8
-            if remainder := len(arr) % pad_multiple:
-                arr += b"\x00" * (pad_multiple - remainder)
+        # Otherwise, fallback for when numpy is not installed (slower)
+        # Pad with zeros to ensure output has length that is multiple of
+        # one byte (pad is False) or two bytes (pad is True)
+        pad_multiple = 16 if pad else 8
+        if remainder := len(arr) % pad_multiple:
+            arr += b"\x00" * (pad_multiple - remainder)
 
-            # Ensure bytes for hashability
-            if isinstance(arr, bytearray):
-                arr = bytes(arr)
+        # Ensure bytes for hashability
+        if isinstance(arr, bytearray):
+            arr = bytes(arr)
 
-            try:
-                out = b"".join(
-                    map(
-                        _PACK_LUT.__getitem__,
-                        (arr[i : i + 8] for i in range(0, len(arr), 8)),
-                    )
+        try:
+            out = b"".join(
+                map(
+                    _PACK_LUT.__getitem__,
+                    (arr[i : i + 8] for i in range(0, len(arr), 8)),
                 )
-            except KeyError:
-                raise ValueError(
-                    "Only binary arrays (containing ones or zeroes) can be packed."
-                )
+            )
+        except KeyError:
+            raise ValueError(
+                "Only binary arrays (containing ones or zeroes) can be packed."
+            )
 
-            return out
+        return out
 
-    if arr.shape == (0,):
+    if arr.size == 0:
         return b""
 
     # Test array
@@ -1405,7 +1403,7 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
             "Only binary arrays (containing ones or zeroes) can be packed."
         )
 
-    if len(arr.shape) > 1:
+    if arr.ndim > 1:
         arr = arr.ravel()
 
     # The array length must be a multiple of 8, pad the end
@@ -2180,26 +2178,32 @@ def get_packed_frame(
 ) -> bytes:
     """Retrieve a single bit-packed frame from a bit-packed buffer.
 
-    This should only be used for single bit data (Bits Allocated = 1) in a
-    "bit-packed" representation (one byte containing 8 pixels). The pixel data
-    of such images may have pixel data from multiple frames within a single
-    byte.
+    .. versionadded:: 3.1
+
+    This should only be used for natively-encoded single bit data (*Bits
+    Allocated* = 1) in a "bit-packed" representation (one byte containing 8
+    pixels). The pixel data of such images may have pixel data from multiple
+    frames within a single byte.
+
+    See :dcm:`Chapter 5, 8.1.1<part05/chapter_8.html#sect_8.1.1>`, particularly
+    the note about multi-frame images with *Bits Allocated* = 1.
 
     Parameters
     ----------
     src : bytes
-        The native bit-packed representation of a full PixelData element,
-        potentially including multiple frames.
+        The natively encoded bit-packed representation of a full *Pixel Data*
+        element value, potentially including multiple frames.
     index : int
-        Zero-based index of the frame to extract.
+        Non-negative, zero-based index of the frame to extract.
     frame_length : int
         Number of pixels in each frame.
     pad : bool
-        Whether to zero-pad the resulting bytes to a multiple of 2 bytes.
+        Whether to zero-pad the resulting bytes to a multiple of 2 bytes
+        (default ``True``).
 
     Returns
     -------
-    bytes | bytearray
+    bytes
         Bit-packed representation of the single frame requested.
 
     Note
@@ -2208,6 +2212,9 @@ def get_packed_frame(
     NumPy is installed. Otherwise, it will fall back to a slower method using
     native Python functions.
     """
+    if index < 0:
+        raise ValueError("'index' must be non-negative")
+
     # Pixel index of first pixel in requested frame
     pixel_start = index * frame_length
 
@@ -2221,16 +2228,23 @@ def get_packed_frame(
     # frame
     byte_end = math.floor((pixel_end - 1) / 8) + 1
 
+    if byte_end > len(src):
+        raise IndexError(
+            f"Length of 'src' ({len(src)}) bytes is insufficient to contain "
+            f"frame with index {index} with given 'frame_length' "
+            f"({frame_length} pixels)"
+        )
+
     # Mask for the final byte of the frame
     final_byte_mask = [
-        b"\xff",  # should never be used
-        b"\x01",
-        b"\x03",
-        b"\x07",
-        b"\x0f",
-        b"\x1f",
-        b"\x3f",
-        b"\x7f",
+        0b11111111,  # should never be used
+        0b00000001,
+        0b00000011,
+        0b00000111,
+        0b00001111,
+        0b00011111,
+        0b00111111,
+        0b01111111,
     ][frame_length % 8]
 
     if pixel_start % 8 == 0:
@@ -2247,9 +2261,7 @@ def get_packed_frame(
             out = b"".join(
                 [
                     src[byte_start : byte_end - 1],
-                    (
-                        src[byte_end - 1] & int.from_bytes(final_byte_mask, "big")
-                    ).to_bytes(1, "big"),
+                    (src[byte_end - 1] & final_byte_mask).to_bytes(1, "big"),
                 ]
             )
 
@@ -2274,11 +2286,7 @@ def get_packed_frame(
         np.bitwise_or(shifted[: len(ms_bytes)], ms_bytes, out=shifted[: len(ms_bytes)])
 
         # Mask out any bits at the end that are not in this frame
-        np.bitwise_and(
-            shifted[-1:],
-            np.frombuffer(final_byte_mask, np.uint8),
-            out=shifted[-1:],
-        )
+        shifted[-1] &= final_byte_mask
 
         out = shifted.tobytes()
 
@@ -2306,10 +2314,15 @@ def concatenate_packed_frames(
 ) -> bytes:
     """Concatenate individual bit-packed frames.
 
-    This should only be used for single bit data (Bits Allocated = 1) in a
-    "bit-packed" representation (one byte containing 8 pixels). Concatenating
-    such frames may require combining pixels from multiple frames within a
-    single byte.
+    .. versionadded:: 3.1
+
+    This should only be used for natively-encoded single bit data (*Bits
+    Allocated* = 1) in a "bit-packed" representation (one byte containing 8
+    pixels). Concatenating such frames may require combining pixels from
+    multiple frames within a single byte.
+
+    See :dcm:`Chapter 5, 8.1.1<part05/chapter_8.html#sect_8.1.1>`, particularly
+    the note about multi-frame images with *Bits Allocated* = 1.
 
     Parameters
     ----------
@@ -2318,7 +2331,8 @@ def concatenate_packed_frames(
     frame_length : int
         Number of pixels in each frame.
     pad : bool
-        Whether to zero-pad the resulting bytes to a multiple of 2 bytes.
+        Whether to zero-pad the resulting bytes to a multiple of 2 bytes
+        (default ``True``).
 
     Returns
     -------
@@ -2331,85 +2345,87 @@ def concatenate_packed_frames(
     NumPy is installed. Otherwise, it will fall back to a slower method using
     native Python functions.
     """
+    bytes_per_frame = math.ceil(frame_length / 8)
+
+    for frame in frames:
+        if len(frame) != bytes_per_frame:
+            raise ValueError(
+                f"Expected frames with length {bytes_per_frame} bytes, "
+                f"got {len(frame)} bytes"
+            )
+
     if frame_length % 8 == 0:
         # Simple concatenation since frame boundaries occur on byte boundaries
-        out = b"".join(frames)
-    else:
-        if HAVE_NP:
-            # Efficient implementation using NumPy to shift bits between bytes
+        return b"".join(frames)
 
-            # Pre-allocate an output array
-            total_bytes = math.ceil(len(frames) * frame_length / 8)
-            bytes_per_frame = math.ceil(frame_length / 8)
-            if pad and total_bytes % 2 == 1:
-                total_bytes += 1
-            out_arr = np.zeros(total_bytes, dtype=np.uint8)
+    if not HAVE_NP:
+        # Fall back to unpacking all frames and repacking the resulting array
+        # (slow and high memory usage)
+        out = bytearray()
 
-            # Temporary buffer re-used in the loop
-            tmp = np.empty(bytes_per_frame, dtype=np.uint8)
+        for frame in frames:
+            unpacked_frame = unpack_bits(frame, as_array=False)
+            out.extend(unpacked_frame[:frame_length])
 
-            for i, frame in enumerate(frames):
-                pixel_start = i * frame_length
-                bit_offset = pixel_start % 8
+        return pack_bits(out, pad=pad)
 
-                # Index of the byte containing the first pixel of this frame
-                b = math.floor(pixel_start / 8)
+    # Efficient implementation using NumPy to shift bits between bytes
 
-                # Input frames may be padded. Reading the whole buffer may take
-                # us beyond the end of the output array later, so only read the
-                # necessary bytes
-                frame_array = np.frombuffer(
-                    frame,
-                    count=bytes_per_frame,
-                    dtype=np.uint8,
-                )
+    # Pre-allocate an output array
+    total_bytes = math.ceil(len(frames) * frame_length / 8)
+    if pad and total_bytes % 2 == 1:
+        total_bytes += 1
+    out_arr = np.zeros(total_bytes, dtype=np.uint8)
 
-                if bit_offset != 0:
-                    # Need to shift bits between bytes
+    # Temporary buffer re-used in the loop
+    tmp = np.empty(bytes_per_frame, dtype=np.uint8)
 
-                    # Combine most significant bytes of this frame's first byte
-                    # with least significant bits of the previous frame's last
-                    # byte
-                    np.bitwise_or(
-                        out_arr[b : b + 1],
-                        np.left_shift(frame_array[:1], bit_offset),
-                        out=out_arr[b : b + 1],
-                    )
+    for idx, frame in enumerate(frames):
+        pixel_start = idx * frame_length
+        bit_offset = pixel_start % 8
 
-                    # Write the most significant bits from remaining bytes to
-                    # the output
-                    np.left_shift(
-                        frame_array[1:],
-                        bit_offset,
-                        out=out_arr[b + 1 : b + len(frame_array)],
-                    )
+        # Index of the byte containing the first pixel of this frame
+        first_byte_index = math.floor(pixel_start / 8)
 
-                    # Combine (logical OR) the least significant bits
-                    if frame_length % 8 - (8 - bit_offset) > 0:
-                        n_bytes = len(frame_array)
-                    else:
-                        n_bytes = len(frame_array) - 1
-                    np.right_shift(frame_array, 8 - bit_offset, out=tmp)
-                    np.bitwise_or(
-                        out_arr[b + 1 : b + 1 + n_bytes],
-                        tmp[:n_bytes],
-                        out=out_arr[b + 1 : b + 1 + n_bytes],
-                    )
-                else:
-                    # No shifting needed, just write straight to the output array
-                    out_arr[b : b + len(frame_array)] = frame_array
+        # Input frames may be padded. Reading the whole buffer may take us
+        # beyond the end of the output array later, so only read the necessary
+        # bytes
+        frame_array = np.frombuffer(
+            frame,
+            count=bytes_per_frame,
+            dtype=np.uint8,
+        )
 
-            out = out_arr.tobytes()
+        if bit_offset != 0:
+            # Need to shift bits between bytes
 
+            # Combine most significant bytes of this frame's first byte with
+            # least significant bits of the previous frame's last byte
+            out_arr[first_byte_index] |= frame_array[0] << bit_offset
+
+            # Write the most significant bits from remaining bytes to the
+            # output
+            np.left_shift(
+                frame_array[1:],
+                bit_offset,
+                out=out_arr[first_byte_index + 1 : first_byte_index + len(frame_array)],
+            )
+
+            # Combine (logical OR) the least significant bits
+            if frame_length % 8 - (8 - bit_offset) > 0:
+                n_bytes = len(frame_array)
+            else:
+                n_bytes = len(frame_array) - 1
+            np.right_shift(frame_array, 8 - bit_offset, out=tmp)
+            np.bitwise_or(
+                out_arr[first_byte_index + 1 : first_byte_index + 1 + n_bytes],
+                tmp[:n_bytes],
+                out=out_arr[first_byte_index + 1 : first_byte_index + 1 + n_bytes],
+            )
         else:
-            # Fall back to unpacking all frames and repacking the resulting
-            # array (slow and high memory usage)
-            out = bytearray()
+            # No shifting needed, just write straight to the output array
+            out_arr[first_byte_index : first_byte_index + len(frame_array)] = (
+                frame_array
+            )
 
-            for frame in frames:
-                unpacked_frame = unpack_bits(frame, as_array=False)
-                out.extend(unpacked_frame[:frame_length])
-
-            out = pack_bits(out, pad=pad)
-
-    return out
+    return cast(bytes, out_arr.tobytes())

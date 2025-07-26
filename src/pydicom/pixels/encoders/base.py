@@ -547,6 +547,10 @@ class Encoder(CoderBase):
             data encoding. See the :doc:`encoding documentation
             </guides/user/image_data_compression>` for more information.
 
+        .. versionchanged:: 3.1
+
+            Add support for encoding single bit images (*Bits Allocated* = 1)
+
         Parameters
         ----------
         src : bytes, numpy.ndarray or pydicom.dataset.Dataset
@@ -655,6 +659,10 @@ class Encoder(CoderBase):
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
             </guides/user/image_data_compression>` for more information.
+
+        .. versionchanged:: 3.1
+
+            Add support for encoding single bit images (*Bits Allocated* = 1)
 
         Parameters
         ----------

@@ -445,7 +445,13 @@ class DecodeRunner(RunnerBase):
             self._conform_jpg_colorspace(jpg_info)
 
     def iter_decode(self) -> Iterator[bytes | bytearray]:
-        """Yield decoded frames from the encoded pixel data."""
+        """Yield decoded frames from the encoded pixel data.
+
+        ..versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
+        """
         original_bits_allocated = self.bits_allocated
         if self.is_binary:
             file_offset = cast(BinaryIO, self.src).tell()
@@ -896,6 +902,10 @@ class Decoder(CoderBase):
     ) -> tuple["np.ndarray", dict[str, str | int]]:
         """Return decoded pixel data as :class:`~numpy.ndarray`.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         .. warning::
 
             This method requires `NumPy <https://numpy.org/>`_ and may require
@@ -1058,6 +1068,10 @@ class Decoder(CoderBase):
     def _as_array_encapsulated(runner: DecodeRunner, index: int | None) -> "np.ndarray":
         """Return compressed and encapsulated pixel data as :class:`~numpy.ndarray`.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         Parameters
         ----------
         runner : pydicom.pixels.decoders.base.DecodeRunner
@@ -1069,8 +1083,8 @@ class Decoder(CoderBase):
         Returns
         -------
         numpy.ndarray
-            A 1D array containing the pixel data. For single bit images (Bits
-            Allocated of 1), pixels are always returned "unpacked", with a
+            A 1D array containing the pixel data. For single bit images (*Bits
+            Allocated* of 1), pixels are always returned "unpacked", with a
             single pixel in each byte.
         """
         # The initial preallocated array uses an itemsize based off the dataset's
@@ -1404,6 +1418,10 @@ class Decoder(CoderBase):
     ) -> bytes | bytearray:
         """ "Return the raw decoded pixel data as a buffer-like.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         Parameters
         ----------
         runner : pydicom.pixels.decoders.base.DecodeRunner
@@ -1416,7 +1434,7 @@ class Decoder(CoderBase):
         -------
         bytes | bytearray
             A buffer-like containing the decoded pixel data. For single bit
-            images (Bits Allocated of 1), pixels are always returned
+            images (*Bits Allocated* of 1), pixels are always returned
             "packed", with 8 pixels in a single byte.
 
         """
@@ -1628,6 +1646,10 @@ class Decoder(CoderBase):
             data decoding. See the :doc:`pixel data decompression documentation
             </guides/user/image_data_handlers>` for more information.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         **Processing**
 
         The following processing operations on the raw pixel data are always
@@ -1824,6 +1846,10 @@ class Decoder(CoderBase):
             perform the actual pixel data decoding (see the :doc:`pixel data
             decompression documentation</guides/user/image_data_handlers>` for more
             information).
+
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
 
         Parameters
         ----------

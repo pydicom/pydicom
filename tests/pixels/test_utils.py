@@ -6,6 +6,7 @@ from io import BytesIO
 import logging
 import os
 import random
+import re
 from struct import pack, unpack
 from sys import byteorder
 
@@ -1522,6 +1523,29 @@ class TestGetPackedFrame:
             ]
             assert frame == pack_bits(bytes(ref), pad=pad)
 
+        # Try to access one beyond the last valid frame
+        if pixels_per_frame > 8:
+            msg = (
+                f"Length of 'src' ({len(packed_data)}) bytes is insufficient to "
+                f"contain frame with index {n_frames} with given "
+                f"'frame_length' ({pixels_per_frame} pixels)"
+            )
+            with pytest.raises(IndexError, match=re.escape(msg)):
+                frame = get_packed_frame(
+                    packed_data,
+                    n_frames,  # beyond end
+                    pixels_per_frame,
+                    pad=pad,
+                )
+
+    def test_negative_index(self):
+        packed_data = pack_bits(bytes(REFERENCE_BINARY_PIXELS))
+
+        # Negative index is not allowed
+        msg = "'index' must be non-negative"
+        with pytest.raises(ValueError, match=msg):
+            get_packed_frame(packed_data, -1, 8)
+
 
 class TestConcatenatePackedFrames:
 
@@ -1548,6 +1572,17 @@ class TestConcatenatePackedFrames:
         )
 
         assert concatenated == ref
+
+    def test_wrong_frame_lengths(self):
+
+        frames = [
+            b"\x00\x01",
+            b"\x00\x03",
+            b"\x00\x01\x45",
+        ]
+        msg = "Expected frames with length 2 bytes, got 3 bytes"
+        with pytest.raises(ValueError, match=msg):
+            concatenate_packed_frames(frames, frame_length=16)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -1975,7 +2010,12 @@ class TestCompressDeflated:
         ds = dcmread(EXPL_16_16_1F.path)
         assert hasattr(ds, "file_meta")
         ref = ds.pixel_array
-        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+        compress(
+            ds,
+            DeflatedImageFrameCompression,
+            arr=ref,
+            encoding_plugin="pydicom",
+        )
         assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -1986,7 +2026,12 @@ class TestCompressDeflated:
         ds = dcmread(path)
         assert hasattr(ds, "file_meta")
         ref = ds.pixel_array
-        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+        compress(
+            ds,
+            DeflatedImageFrameCompression,
+            arr=ref,
+            encoding_plugin="pydicom",
+        )
         assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
         assert np.array_equal(ds.pixel_array, ref)
 

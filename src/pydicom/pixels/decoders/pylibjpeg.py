@@ -80,7 +80,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
 
     if tsyntax == uid.RLELossless and runner.bits_allocated == 1:
         raise NotImplementedError(
-            "pylibjpeg cannot decompress RLELossless encoded data "
+            "pylibjpeg cannot decompress RLE Lossless encoded data "
             "with bits allocated = 1."
         )
 

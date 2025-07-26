@@ -577,7 +577,6 @@ class TestEncodeDeflatedFrame:
         encoded = _encode_deflated_frame(input_pixel_data, runner)
         decoded = _deflated_decode_frame(encoded)
         # Bit-packed data
-        n_pixels = ds.Rows * ds.Columns
         arr = unpack_bits(decoded)
         arr = reshape_pixel_array(ds, arr)
 
