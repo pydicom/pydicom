@@ -367,9 +367,9 @@ In the above example we used a :class:`str` to set the *Patient's Name*, but wha
 for other elements? Should they all be strings too? (Hint: no).
 
 The allowed object type to use for an element's value depends on its :dcm:`Value Representation
-<part05/sect_6.2.html>`. We saw that *Patient's Name* has a VR of **PN**. By checking the
-:doc:`Element VR and Python types</guides/element_value_types>` guide,
-we see that elements with a VR of **PN** can be set using:
+<part05/sect_6.2.html>`. We can see from the above that *Patient's Name* has a VR of
+**PN**. By checking the :doc:`Element VR and Python types</guides/element_value_types>`
+guide, we see that elements with a VR of **PN** can be set using:
 
 * ``None``, :class:`str` or :class:`~pydicom.valuerep.PersonName` if the *Value
   Multiplicity* (VM) is 1, or
@@ -463,14 +463,15 @@ There are two ways to get an element's VR:
 
 As we saw earlier, you can use the :doc:`Element VR and Python types
 </guides/element_value_types>` guide to find the Python type to use for a given VR.
-For **DS** we can use a :class:`str`, :class:`int` or :class:`float`, so to add the new element::
+For **DS** with a VM of 1-n, we can use a :class:`str`, :class:`int` or :class:`float`,
+or a ``list`` of those types. So to add the new element::
 
     >>> ds.add_new([0x0028, 0x1050], 'DS', "100.0")
     >>> elem = ds[0x0028, 0x1050]
     >>> elem
     (0028,1050) Window Center                       DS: "100.0"
 
-Some VRs also require the value be formatted correctly. For example, elements with
+Some VRs, like **DS**, require the value be formatted correctly. For example, elements with
 a VR of **DA** should use the YYYYMMDD format and only allow ASCII characters 0 to 9 (unless
 used for query matching). The full list of VRs and their formatting requirements can be found in
 :dcm:`Section 6.2 of Part 5 of the DICOM Standard<part05/sect_6.2.html>`.
@@ -480,7 +481,7 @@ Alternative for standard elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Adding elements with :meth:`~pydicom.dataset.Dataset.add_new` is a lot of
 work, so for standard elements you can just use the keyword
-and *pydicom* will do the lookup for you::
+and *pydicom* will do the VR lookup for you::
 
     >>> 'WindowWidth' in ds
     False

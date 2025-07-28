@@ -1,9 +1,8 @@
-====================
-Structured Reporting
-====================
+============================================
+A (brief) introduction to Structured Reports
+============================================
 
-Starting in *pydicom* version 1.4, some support for DICOM Structured Reporting (SR) began to be added,
-as alpha code; the API for this is subject to change in future *pydicom* versions. At this point the
+Limited support is available in *pydicom* for DICOM Structured Reporting (SR), currently
 code is limited to code dictionaries and one class :class:`~pydicom.sr.coding.Code`
 as a foundational step for future work.
 

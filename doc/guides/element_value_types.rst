@@ -1,3 +1,4 @@
+
 ============================
 Element VRs and Python types
 ============================
@@ -134,7 +135,7 @@ ensure that the value gets written correctly?
 
 
 Bufferable O* VRs
------------------
+=================
 
 The value for elements with O\* VRs (**OB**, **OD**, **OF**, **OL**, **OV** and
 **OW**) can be set using an object that inherits from :class:`io.BufferedIOBase` such

@@ -102,9 +102,9 @@ then `NumPy <https://numpy.org/>`_ is required.
             conda install numpy
 
 
-To decode JPEG compressed pixel data one or more additional libraries will
+To decode JPEG compressed pixel data, one or more additional libraries will
 need to be installed. See :doc:`this page </guides/plugin_table>` for details of
-which library is needed to compress or decompress using a given compression
+which library is needed to compress or decompress a given compression
 method, as specified by the dataset's (0002,0010) *Transfer Syntax UID* value.
 
 

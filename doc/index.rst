@@ -5,9 +5,9 @@
 pydicom
 =======
 
-An easy to use `Python <https://www.python.org/>`_ package for creating, reading, modifying and writing
-`DICOM <https://www.dicomstandard.org/>`_ files, with optional support for converting compressed
-and uncompressed *Pixel Data* to `NumPy <https://www.numpy.org>`_
+An easy to use `Python <https://www.python.org/>`_ package for creating, reading, modifying
+and writing `DICOM <https://www.dicomstandard.org/>`_ datasets and File-sets, with optional
+support for converting compressed and uncompressed *Pixel Data* to `NumPy <https://www.numpy.org>`_
 `ndarrays <https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html>`_ (and back again).
 
 ..
@@ -156,7 +156,8 @@ Documentation
         **Learning resources**
         ^^^
 
-        A collection of code examples, tutorials and usage guides for *pydicom*.
+        Our collection of code examples, tutorials and guides should help you learn
+        the basics of *pydicom*, as well as more advanced topics.
 
         +++
 
@@ -165,13 +166,13 @@ Documentation
             :color: primary
             :click-parent:
 
-            Examples, tutorials and guides
+            Learning resources
 
     .. grid-item-card::
         :img-top: _static/img/api-reference.svg
         :text-align: center
 
-        **API Reference**
+        **API reference**
         ^^^
 
         The API reference documentation contains detailed descriptions of the classes,

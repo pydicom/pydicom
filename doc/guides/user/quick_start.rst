@@ -20,16 +20,16 @@ a CT scan acquisition. Each dataset is made up of a collection of :dcm:`Data Ele
 <part05/chapter_7.html#sect_7.1>`, with each Data Element representing an *attribute* of
 the object. A Data Element is itself made of a unique identifier called the *Element Tag*,
 has a format specifier called the *Value Representation* and contains the *Value* of the
-attribute. The ICOM Standard groups Data Elements that describe related attributes
+attribute. The DICOM Standard groups Data Elements that describe related attributes
 into *modules*.
 
 In :dcm:`Part 3<part03/ps3.3.html>`, the DICOM Standard defines the many different types
 of dataset using something called an Information Object Definition (IOD). Each IOD contains
 a table of optional (U) and mandatory (M) modules that a dataset must have in order to meet
-that definition. This means you can use the IOD that corresponds to a given dataset to see
-what Data Elements it should contain.
+that definition. This means you can use the IOD that corresponds to a given dataset to
+determine which Data Elements it should contain.
 
-As an example, the :dcm:`CT Image IOD<part03/sect_A.3.html>` contains :dcm:`a table
+As an example, the :dcm:`CT Image IOD<part03/sect_A.3.html>` contains :dcm:`this table
 <part03/sect_A.3.3.html>` with the modules that are required for a dataset to be
 considered a valid *CT Image* instance. This includes the *Patient* module, which
 contains patient demographic information. If we look at :dcm:`the Patient module
@@ -37,10 +37,10 @@ contains patient demographic information. If we look at :dcm:`the Patient module
 attributes for the *Patient's Name*, *Patient ID* and *Patient's Birth Date*, all of
 which are considered *Type* 2.
 
-Because Type 2 means that :dcm:`the attribute must be present<part05/sect_7.4.3.html>`,
-this means that in any given *CT Image* dataset we should be able to find three Data
-Elements corresponding to those attributes (however they may not have a useful value,
-as Type 2 also means the value may be empty).
+Type 2 attributes :dcm:`must be present, but may have an empty value
+<part05/sect_7.4.3.html>`, so in any given *CT Image* dataset we should be able to find
+three Data Elements corresponding to those attributes, albeit with no guarantee
+they'll have a useful value.
 
 .. include:: /tutorials/_dataset_basics_content.rst
 
