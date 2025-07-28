@@ -561,6 +561,10 @@ def decompress(
 
     .. versionadded:: 3.0
 
+    .. versionchanged:: 3.1
+
+        Add support for decoding encapsulated pixel data when *Bits Allocated* = 1.
+
     .. warning::
 
         This function requires `NumPy <https://numpy.org/>`_ and may require
@@ -1339,7 +1343,7 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
           in the correct order.
         * For `bytes` or `bytearray`, each byte represents a single pixel and must have
           a value of either 0 or 1 (i.e. ``b'\x00'`` or ``b'\x01'```). Pixels should be
-          orderedin the same order as a 1D array, i.e. column index changes most
+          ordered in the same order as a 1D array, i.e. column index changes most
           frequently, then row index, then frame index.
     pad : bool, optional
         If ``True`` (default) then add a null byte to the end of the packed
@@ -2197,7 +2201,7 @@ def get_packed_frame(
         Non-negative, zero-based index of the frame to extract.
     frame_length : int
         Number of pixels in each frame.
-    pad : bool
+    pad : bool, optional
         Whether to zero-pad the resulting bytes to a multiple of 2 bytes
         (default ``True``).
 
@@ -2330,7 +2334,7 @@ def concatenate_packed_frames(
         List of individual frames in native bit-packed representation.
     frame_length : int
         Number of pixels in each frame.
-    pad : bool
+    pad : bool, optional
         Whether to zero-pad the resulting bytes to a multiple of 2 bytes
         (default ``True``).
 

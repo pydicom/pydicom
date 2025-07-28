@@ -130,7 +130,8 @@ def _rle_decode_frame(
     if nr_bits == 1 and nr_samples != 1:
         raise NotImplementedError(
             "Unable to decode RLE encoded pixel data with "
-            "*Bits Allocated* = 1 and *Samples Per Pixel* > 1."
+            "(0028,0100) 'Bits Allocated' = 1 and "
+            "(0028,0002) 'Samples Per Pixel' > 1."
         )
     if nr_bits % 8 and nr_bits != 1:
         raise NotImplementedError(

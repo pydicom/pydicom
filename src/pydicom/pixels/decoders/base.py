@@ -447,7 +447,7 @@ class DecodeRunner(RunnerBase):
     def iter_decode(self) -> Iterator[bytes | bytearray]:
         """Yield decoded frames from the encoded pixel data.
 
-        ..versionchanged:: 3.1
+        .. versionchanged:: 3.1
 
             Add support for encapsulated single bit images (*Bits Allocated* = 1)
 
