@@ -222,13 +222,13 @@ class EncodeRunner(RunnerBase):
         # 2 bytes/px actual
         if 8 < self.bits_stored <= 16:
             if bytes_per_pixel == 2:
-                out = src
-            else:
-                # If not 2 bytes/px then must be 3, 4, 5, 6, 7 or 8
-                #   but only the first 2 bytes are relevant
-                out = bytearray(expected_length * 2)
-                out[::2] = src[::bytes_per_pixel]
-                out[1::2] = src[1::bytes_per_pixel]
+                return src
+
+            # If not 2 bytes/px then must be 3, 4, 5, 6, 7 or 8
+            #   but only the first 2 bytes are relevant
+            out = bytearray(expected_length * 2)
+            out[::2] = src[::bytes_per_pixel]
+            out[1::2] = src[1::bytes_per_pixel]
             return out
 
         # 3 or 4 bytes/px actual
