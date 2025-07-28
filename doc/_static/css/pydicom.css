@@ -46,18 +46,3 @@ html[data-theme="dark"] .sd-card img[src*=".svg"] {
 html[data-theme="light"] .sd-card img[src*=".svg"] {
     filter: invert(35%) sepia(9%) saturate(1265%) hue-rotate(177deg) brightness(90%) contrast(94%);
 }
-
-/*
-.sd-card-footer {
-    display: flex !important;
-    column-gap: 5px;
-}
-
-.sd-card-footer p {
-    width: 100%;
-    margin-bottom: 0;
-}
-
-.sd-card-footer a {
-    width: 100%;
-}*/
