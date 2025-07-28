@@ -2178,6 +2178,7 @@ def get_packed_frame(
     src: bytes,
     index: int,
     frame_length: int,
+    start_offset: int = 0,
     pad: bool = True,
 ) -> bytes:
     """Retrieve a single bit-packed frame from a bit-packed buffer.
@@ -2201,6 +2202,10 @@ def get_packed_frame(
         Non-negative, zero-based index of the frame to extract.
     frame_length : int
         Number of pixels in each frame.
+    start_offset : int, optional
+        Position of the first byte of ``src`` relative to the start of the
+        pixel data. This allows for extraction of a frame from a truncated
+        input buffer containing the desired frame (default ``0``).
     pad : bool, optional
         Whether to zero-pad the resulting bytes to a multiple of 2 bytes
         (default ``True``).
@@ -2225,13 +2230,18 @@ def get_packed_frame(
     # Pixel index one beyond the last pixel in the requested frame
     pixel_end = pixel_start + frame_length
 
-    # Index of first byte containing pixels from the requested frame
-    byte_start = math.floor(pixel_start / 8)
+    # Index within src of first byte containing pixels from the requested frame
+    byte_start = math.floor(pixel_start / 8) - start_offset
 
-    # Index of the byte one beyond that containing last pixel in the requested
-    # frame
-    byte_end = math.floor((pixel_end - 1) / 8) + 1
+    # Index within src of the byte one beyond that containing last pixel in the
+    # requested frame
+    byte_end = math.floor((pixel_end - 1) / 8) + 1 - start_offset
 
+    if byte_start < 0:
+        raise IndexError(
+            f"Requested frame with index {index} lies before the provided "
+            f"'src' given the 'start_offset' of {start_offset}"
+        )
     if byte_end > len(src):
         raise IndexError(
             f"Length of 'src' ({len(src)}) bytes is insufficient to contain "

@@ -30,6 +30,7 @@ from pydicom.pixels.utils import (
     _get_jpg_parameters,
     concatenate_packed_frames,
     get_j2k_parameters,
+    get_packed_frame,
     pack_bits,
     unpack_bits,
 )
@@ -1563,16 +1564,6 @@ class Decoder(CoderBase):
             `view_only` is ``True`` in which case a :class:`memoryview` of the
             original buffer will be returned instead.
 
-        Notes
-        -----
-        For certain images, those with BitsAllocated=1, multiple frames and
-        number of pixels per frame that is not a multiple of 8, it is not
-        possible to isolate a buffer to a single frame because frame boundaries
-        may occur within the middle a byte. If a single frame is requested (via
-        ``index``) for these cases, the buffer returned will consist of the
-        smallest set of bytes required to entirely contain the requested frame.
-        However, the first and last byte may also contain information on pixel
-        values in neighboring frames.
         """
         length_bytes = runner.frame_length(unit="bytes")
 
@@ -1629,7 +1620,18 @@ class Decoder(CoderBase):
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            return runner.get_data(src, start_offset, ceil(length_bytes))
+            buf = runner.get_data(src, start_offset, ceil(length_bytes))
+
+            if runner.bits_allocated == 1:
+                # May need to bit-shift to remove pixels from neighboring frames
+                return get_packed_frame(
+                    buf,
+                    index=index,
+                    frame_length=int(runner.frame_length("pixels")),
+                    start_offset=start_offset,
+                )
+
+            return buf
 
         # Return all frames
         length_bytes *= runner.number_of_frames

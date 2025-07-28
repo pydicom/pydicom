@@ -16,7 +16,7 @@ from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.decoders import ExplicitVRLittleEndianDecoder
 from pydicom.pixels.decoders.base import DecodeRunner, Decoder
 from pydicom.pixels.processing import convert_color_space
-from pydicom.pixels.utils import pack_bits
+from pydicom.pixels.utils import get_packed_frame, pack_bits
 
 from pydicom.uid import (
     ExplicitVRLittleEndian,
@@ -1713,6 +1713,7 @@ class TestDecoder_Buffer:
         reference = EXPL_1_1_3F_NONALIGNED
         full_buffer, _ = decoder.as_buffer(reference.ds)
 
+        frame_length = reference.ds.Rows * reference.ds.Columns
         full_len = ceil(
             (
                 reference.ds.Rows
@@ -1724,15 +1725,21 @@ class TestDecoder_Buffer:
         )
         assert len(full_buffer) == full_len
 
-        # When requesting a single frame, the returned buffer will contain some
-        # pixels from neighnoring frames
+        # When requesting a single frame, the returned buffer should be shifted
+        # to align it with the start of a byte (changed in version 3.1)
         frame_1_buffer, _ = decoder.as_buffer(reference.ds, index=1)
 
-        frame_length_pixels = reference.ds.Rows * reference.ds.Columns
-        assert (
-            frame_1_buffer
-            == full_buffer[frame_length_pixels // 8 : ceil(2 * frame_length_pixels / 8)]
+        expected = get_packed_frame(
+            src=reference.ds.PixelData,
+            index=1,
+            frame_length=frame_length,
         )
+        expected_len = ceil(frame_length / 8)
+        if expected_len % 2 == 1:
+            expected_len += 1
+
+        assert len(frame_1_buffer) == expected_len
+        assert frame_1_buffer == expected
 
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""

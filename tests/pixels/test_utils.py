@@ -1546,6 +1546,48 @@ class TestGetPackedFrame:
         with pytest.raises(ValueError, match=msg):
             get_packed_frame(packed_data, -1, 8)
 
+    @pytest.mark.parametrize("pad", [True, False])
+    def test_start_offset(self, pad):
+        """Tests using a non-zero start_offset."""
+        pixels_per_frame = 12
+        packed_data = pack_bits(bytes(REFERENCE_BINARY_PIXELS))
+
+        for index in range(len(REFERENCE_BINARY_PIXELS) // pixels_per_frame):
+            frame_start_byte = (index * pixels_per_frame) // 8
+
+            ref = get_packed_frame(
+                packed_data,
+                index,
+                pixels_per_frame,
+                pad=pad,
+            )
+
+            start_offset = 0
+            for start_offset in range(1, frame_start_byte + 1):
+                frame = get_packed_frame(
+                    packed_data[start_offset:],
+                    index,
+                    pixels_per_frame,
+                    start_offset=start_offset,
+                    pad=pad,
+                )
+                assert frame == ref
+
+            # A start offset one beyond the start of the frame should fail
+            start_offset += 1
+            msg = (
+                f"Requested frame with index {index} lies before the provided "
+                f"'src' given the 'start_offset' of {start_offset}"
+            )
+            with pytest.raises(IndexError, match=msg):
+                frame = get_packed_frame(
+                    packed_data[start_offset:],
+                    index,
+                    pixels_per_frame,
+                    start_offset=start_offset,
+                    pad=pad,
+                )
+
 
 class TestConcatenatePackedFrames:
 
