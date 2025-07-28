@@ -3,40 +3,6 @@
 Glossary
 ========
 
-.. _glossary_general:
-
-General
-=======
-
-**Information Object Definition (IOD)**
-    An Information Object Definition
-
-**UID**
-    A Unique Identifier, in *pydicom* the :class:`~pydicom.uid.UID` class is used to
-    represent these.
-
-    References:
-
-**DICOM**
-    Digital Imaging and Communication in Medicine.
-
-**Data Set**
-
-**Data Element**
-
-    Element Tag
-    Value
-    Value Representation
-    Value Multiplicity
-
-**File-set**
-
-**SOP Class**
-    A Service-Object Pair.
-
-*
-
-
 .. _glossary_file_meta:
 
 :dcm:`File Meta Information<part10/chapter_7.html#sect_7.1>`
