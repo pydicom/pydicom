@@ -1319,6 +1319,13 @@ class Decoder(CoderBase):
     ) -> tuple[Buffer, dict[str, str | int]]:
         """Return the raw decoded pixel data as a buffer-like.
 
+        .. versionchanged:: 3.1
+
+            Native single-bit images (*Bits Allocated = 1*) are now always
+            returned with the start of a frame aligned to a byte boundary, and
+            with pixels from neighboring frames masked. Add support for
+            encapsulated single-bit images.
+
         .. warning::
 
             This method should only be used by advanced users who understand the
@@ -1547,6 +1554,12 @@ class Decoder(CoderBase):
     @staticmethod
     def _as_buffer_native(runner: DecodeRunner, index: int | None) -> Buffer:
         """ "Return the raw encoded pixel data as a buffer-like.
+
+        .. versionchanged:: 3.1
+
+            Single-bit images (*Bits Allocated = 1*) are now always
+            returned with the start of a frame aligned to a byte boundary, and
+            with pixels from neighboring frames masked.
 
         Parameters
         ----------
