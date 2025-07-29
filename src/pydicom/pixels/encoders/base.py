@@ -89,7 +89,6 @@ class EncodeRunner(RunnerBase):
             "transfer_syntax_uid": tsyntax,
             "byteorder": "<",
             "pixel_keyword": "PixelData",
-            "is_bitpacked": False,
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword", "byteorder")
         self._encoders: dict[str, EncodeFunction] = {}

@@ -171,7 +171,6 @@ class TestDecodeRunner:
             "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
             "  as_rgb: True\n"
             "  allow_excess_frames: True\n"
-            "  is_bitpacked: False\n"
             "  pixel_keyword: PixelData\n"
             "  correct_unused_bits: True\n"
             "Decoders\n"
@@ -935,46 +934,6 @@ class TestDecoder:
         )
         with pytest.raises(ValueError, match=msg):
             decoder._validate_plugins("foo")
-
-    @pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
-    def test_bitpack_option_array(self):
-        """Test compatibility of "is_bitpacked" option with array methods."""
-        decoder = get_decoder(RLELossless)
-        source = RLE_1_1_3F.ds
-
-        decoder.as_array(source, is_bitpacked=False)
-        msg = "Cannot return an array in bit-packed format."
-        with pytest.raises(ValueError, match=msg):
-            decoder.as_array(source, is_bitpacked=True)
-        list(decoder.iter_array(source, is_bitpacked=False))
-        with pytest.raises(ValueError, match=msg):
-            list(decoder.iter_array(source, is_bitpacked=True))
-
-    def test_bitpack_option_buffer(self):
-        """Test compatibility of "is_bitpacked" option with buffer methods."""
-        decoder = get_decoder(RLELossless)
-        source = RLE_1_1_3F.ds
-
-        decoder.as_buffer(source, is_bitpacked=True, decoding_plugin="pydicom")
-        msg = "Buffers of single bit data are always in bit-packed format."
-        with pytest.raises(ValueError, match=msg):
-            decoder.as_buffer(source, is_bitpacked=False, decoding_plugin="pydicom")
-
-        list(
-            decoder.iter_buffer(
-                source,
-                is_bitpacked=True,
-                decoding_plugin="pydicom",
-            )
-        )
-        with pytest.raises(ValueError, match=msg):
-            list(
-                decoder.iter_buffer(
-                    source,
-                    is_bitpacked=False,
-                    decoding_plugin="pydicom",
-                )
-            )
 
 
 @pytest.fixture()
@@ -1825,7 +1784,6 @@ class TestDecoder_Buffer:
 
         runner = DecodeRunner(RLELossless)
         runner.set_source(reference.ds)
-        runner.set_option("is_bitpacked", True)
 
         msg = (
             "4 frames have been found in the encapsulated pixel data, which is "

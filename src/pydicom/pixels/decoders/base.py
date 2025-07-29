@@ -268,7 +268,6 @@ class DecodeRunner(RunnerBase):
             "transfer_syntax_uid": tsyntax,
             "as_rgb": True,
             "allow_excess_frames": True,
-            "is_bitpacked": False,
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword")
         self._decoders: dict[str, DecodeFunction] = {}
@@ -1014,9 +1013,6 @@ class Decoder(CoderBase):
         if index is not None and index < 0:
             raise ValueError("'index' must be greater than or equal to 0")
 
-        if kwargs.get("is_bitpacked", False):
-            raise ValueError("Cannot return an array in bit-packed format.")
-
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
@@ -1400,13 +1396,6 @@ class Decoder(CoderBase):
         runner.set_source(src)
         runner.set_options(**kwargs)
 
-        if runner.get_option("bits_allocated") == 1 and not kwargs.get(
-            "is_bitpacked", True
-        ):
-            raise ValueError(
-                "Buffers of single bit data are always in bit-packed format."
-            )
-
         runner.set_decoders(
             cast(
                 dict[str, "DecodeFunction"],
@@ -1766,11 +1755,6 @@ class Decoder(CoderBase):
                 "NumPy is required when converting pixel data to an ndarray"
             )
 
-        if kwargs.get("is_bitpacked", False):
-            raise ValueError("Cannot return an array in bit-packed format.")
-
-        kwargs["is_bitpacked"] = False
-
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
@@ -1934,11 +1918,6 @@ class Decoder(CoderBase):
             <pydicom.pixels.decoders.base.DecodeRunner.pixel_properties>` for the
             possible contents.
         """
-        if not kwargs.get("is_bitpacked", True):
-            raise ValueError(
-                "Buffers of single bit data are always in bit-packed format."
-            )
-
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)

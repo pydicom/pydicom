@@ -140,7 +140,6 @@ class TestEncodeRunner:
             "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
             "  byteorder: <\n"
             "  pixel_keyword: PixelData\n"
-            "  is_bitpacked: False\n"
             "Encoders\n"
             "  foo"
         )
