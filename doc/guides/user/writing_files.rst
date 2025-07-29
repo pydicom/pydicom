@@ -26,8 +26,8 @@ If you need to create a new DICOM dataset then you can either:
 Using ``codify``
 ----------------
 
-*pydicom* has a command-line utility called ``codify`` that can produce Python
-code using an existing DICOM file that can be run to produce a copy of the original.
+*pydicom* has a command-line utility called ``codify`` that can produce Python code
+that can be run to produce a copy of an existing DICOM file.
 
 In other words: *pydicom* has a tool that can automatically generate
 well-designed Python code for you - code that creates DICOM files. The only

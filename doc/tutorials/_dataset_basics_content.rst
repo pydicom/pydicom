@@ -23,7 +23,7 @@ we use :func:`~pydicom.filereader.dcmread`, which returns a
 :class:`~pydicom.dataset.FileDataset` instance::
 
     >>> from pydicom import dcmread, examples
-    >>> path = get_path("ct")
+    >>> path = examples.get_path("ct")
     >>> ds = dcmread(path)
 
 :func:`~pydicom.filereader.dcmread` can also handle file-likes::
@@ -176,11 +176,10 @@ There are three categories of elements:
   aren't registered in the official DICOM Standard, and are instead created
   privately, as specified by the (gggg,0010-00FF) *Private Creator* element.
 
-  * If the private creator is unknown then the element name will be *Private
-    tag data* and the VR **UN**.
+  * If the private creator is unknown to *pydicom* then the element name will be
+    *Private tag data* and the VR **UN**.
   * If the private creator is known then the element name will be surrounded
-    by square brackets, e.g. *[Window value]* and the VR will be as
-    shown.
+    by square brackets, e.g. *[Window value]* and the VR will be shown.
 
 For all element categories, we can access a particular element in the dataset
 through its tag, which returns a :class:`~pydicom.dataelem.DataElement`
@@ -553,6 +552,8 @@ preferred :class:`list` method::
     >>> del ds.OtherPatientIDsSequence[2]
     >>> len(seq)
     2
+    >>> ds.ImageType
+    ['ORIGINAL', 'PRIMARY', 'DERIVED', 'LOCALIZER']
     >>> del ds.ImageType[2]
     >>> ds.ImageType
     ['ORIGINAL', 'PRIMARY', 'LOCALIZER']

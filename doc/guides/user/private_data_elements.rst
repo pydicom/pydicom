@@ -152,7 +152,7 @@ For private elements, the analogous functions are
 
 Note that unlike public elements, private elements don't have a keyword. As a private element
 is defined by the tuple of private creator, group ID and tag, you always have to provide the private
-creator to define a new private tag.
+creator to define a new private tag offset.
 
 An example of how to use :func:`~pydicom.datadict.add_private_dict_entries` can
 be found in :ref:`this code snippet <sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py>`.
