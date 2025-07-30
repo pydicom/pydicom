@@ -83,7 +83,7 @@ Converting raw pixel data to an :class:`~numpy.ndarray` always requires `NumPy
 <https://numpy.org/>`_, and decoding JPEG compressed pixel data requires installing
 one or more additional libraries.
 
-The quickest way to install NumPy and all the aadditional libraries is with:
+The quickest way to install NumPy and all the additional libraries is with:
 
 .. tab-set::
     :sync-group: install
