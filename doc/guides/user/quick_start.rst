@@ -80,7 +80,7 @@ concatenated together as :class:`bytes`::
     32768
 
 For datasets with a compressed *Transfer Syntax*, each frame of image data will have
-been :dcm:`encapsulated<part05/sect_A.4.html>`, which we must first remove. In *pydicom*
+been :dcm:`encapsulated<part05/sect_A.4.html>`, which must be reversed. In *pydicom*
 this can be done with the :func:`~pydicom.encaps.get_frame` function or the
 :func:`~pydicom.encaps.generate_frames` iterator to return or yield a frame of compressed
 image data as :class:`bytes`::

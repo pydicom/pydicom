@@ -14,7 +14,9 @@ and values are the corresponding :class:`~dataelem.DataElement` instances.
 
   The iterator of a :class:`~dataset.Dataset` yields
   :class:`~dataelem.DataElement` instances, e.g. the values of the
-  dictionary instead of the keys normally yielded by iterating a :class:`dict`.
+  dictionary instead of the keys normally yielded by iterating a :class:`dict`. If you'd
+  prefer this to be explicit then iterate over :meth:`Dataset.values()
+  <pydicom.dataset.Dataset.values>` instead.
 
 A :class:`~dataset.Dataset` can be created directly, but you'll
 usually get one by reading an existing DICOM dataset from file using

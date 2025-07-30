@@ -79,9 +79,34 @@ To add type hints for these attributes you can install the `types-pydicom <https
 Install the optional libraries
 ==============================
 
-If you're going to be manipulating pixel data as anything other than raw :class:`bytes`
-then `NumPy <https://numpy.org/>`_ is required.
+Converting raw pixel data to an :class:`~numpy.ndarray` always requires `NumPy
+<https://numpy.org/>`_, and decoding JPEG compressed pixel data requires installing
+one or more additional libraries.
 
+The quickest way to install NumPy and all the aadditional libraries is with:
+
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
+
+    .. tab-item:: pip
+        :sync: pip
+
+        .. code-block:: bash
+
+            pip install -U pydicom[pixeldata]
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pydicom[pixeldata]
+
+
+Alternatively, you can install only the libraries you need. NumPy is always required,
+and can handle converting uncompressed pixel data to an ``ndarray`` without any other
+packages:
 
 .. tab-set::
     :sync-group: install
@@ -101,14 +126,12 @@ then `NumPy <https://numpy.org/>`_ is required.
 
             conda install numpy
 
-
-To decode JPEG compressed pixel data, one or more additional libraries will
-need to be installed. See :doc:`this page </guides/plugin_table>` for details of
-which library is needed to compress or decompress using a given compression
-method, as specified by the dataset's (0002,0010) *Transfer Syntax UID* value.
-
-
 .. _tut_install_pil:
+
+For compressed pixel data, see :doc:`this page </guides/plugin_table>` for
+details of which library is needed to compress or decompress using a given compression
+method, as specified by the dataset's (0002,0010) *Transfer Syntax UID* value, then
+follow the corresponding installation instructions below.
 
 Installing Pillow
 -----------------
