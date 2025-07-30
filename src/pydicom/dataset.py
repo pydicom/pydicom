@@ -451,7 +451,7 @@ class Dataset:  # noqa: PLW1641
             note = ""
             for frame, lineno in reversed(all_frames):
                 filename = Path(frame.f_code.co_filename).name
-                if filename in ("dataelem.py", "sequence.py"): 
+                if filename in ("dataelem.py", "sequence.py"):
                     elem = frame.f_locals.get("self")
                     if elem and (path := path_to(elem, self)):
                         note = "Error occurred at " + path
@@ -1117,7 +1117,7 @@ class Dataset:  # noqa: PLW1641
                 self[tag] = correct_ambiguous_vr_element(self[tag], self, elem[6])
 
         return cast(DataElement, self._dict.get(tag))
-    
+
     def private_block(
         self, group: int, private_creator: str, create: bool = False
     ) -> PrivateBlock:
@@ -3709,60 +3709,64 @@ _RE_CAMEL_CASE = re.compile(
 
 def path_to(target, node) -> str | None:
     """Return a pseudo-code path to a particular DataElement, Sequence, or value
-    
+
     This is used by Dataset's context manager to report the specific data element
     where an error occurred.
 
     Params
     ------
     target: Any
-        Usually a DataElement, Sequence, or Sequence item.  Can be a value, 
+        Usually a DataElement, Sequence, or Sequence item.  Can be a value,
         in which case the path to the first DataElement found (depth first search)
         with that value is returned.
     node: Any
-        The object currently being searched (function is called recursively).  
+        The object currently being searched (function is called recursively).
         First call to the function will typically be a Dataset
 
     Returns
     -------
-    str | None:  
-        The path to the target object from the node.  
+    str | None:
+        The path to the target object from the node.
         During recursion, returns none if a leaf node reached without finding target.
-    
+
     Examples
     --------
     >> path_to(data_element)
     'FileDataset(filename='rtplan.dcm').BeamSequence[0].BeamName'
-    
+
     """
     ns = SimpleNamespace(target=target)  # make dotted lookup to avoid name binding
     match node:
         case elem if node is target:  # done if match on identity
-            return f""
-        
+            return ""
+
         case Dataset():
             if hasattr(node, "file_meta"):
-                items = chain(node.items(), node.file_meta.items()) 
+                items = chain(node.items(), node.file_meta.items())
             else:
                 items = node.items()
             for tag, dataelem in items:
                 if (path := path_to(target, dataelem)) is not None:
                     tag_str = keyword_for_tag(tag)
-                    prefix = f"FileDataset(filename='{node.filename}')" if hasattr(node, "filename") else ""
+                    prefix = (
+                        f"FileDataset(filename='{node.filename}')"
+                        if hasattr(node, "filename")
+                        else ""
+                    )
                     if tag.group == 2:
                         prefix += ".file_meta"
                     if tag_str:
                         return f"{prefix}.{tag_str}" + path
                     else:
                         return f"{prefix}[{tag}]" + path
-            # XX could also go down node.file_meta here, if it exists       
-                
+            # XX could also go down node.file_meta here, if it exists
+
         case DataElement(VR="SQ"):
             for i, subnode in enumerate(node.value):
                 if (path := path_to(target, subnode)) is not None:
                     return f"[{i}]" + path
-        
-        case DataElement(value=ns.target): # Done if match a data element value
+
+        case DataElement(value=ns.target):  # Done if match a data element value
             return ""  # f" (value = {target})"
 
     return None
