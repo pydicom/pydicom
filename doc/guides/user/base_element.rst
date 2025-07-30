@@ -1,7 +1,5 @@
-Core elements in pydicom
-========================
-
-.. rubric:: pydicom object model, description of classes, examples
+Dataset, DataElement and Tag
+============================
 
 Dataset
 -------
@@ -16,7 +14,9 @@ and values are the corresponding :class:`~dataelem.DataElement` instances.
 
   The iterator of a :class:`~dataset.Dataset` yields
   :class:`~dataelem.DataElement` instances, e.g. the values of the
-  dictionary instead of the keys normally yielded by iterating a :class:`dict`.
+  dictionary instead of the keys normally yielded by iterating a :class:`dict`. If you'd
+  prefer this to be explicit then iterate over :meth:`Dataset.values()
+  <pydicom.dataset.Dataset.values>` instead.
 
 A :class:`~dataset.Dataset` can be created directly, but you'll
 usually get one by reading an existing DICOM dataset from file using
@@ -59,8 +59,8 @@ You can access specific elements by their DICOM keyword or tag::
     >>> ds[0x10, 0x10].value  # element tag
     'Last^First^mid^pre'
 
-When using the element tag directly a :class:`~dataelem.DataElement`
-instance is returned, so :attr:`DataElement.value<dataelem.DataElement.value>`
+Unlike when accessing with a keyword which returns the element's value, accessing with a tag
+returns the :class:`~dataelem.DataElement` instance instead, so :attr:`DataElement.value<dataelem.DataElement.value>`
 must be used to get the value.
 
 .. warning::
@@ -77,13 +77,17 @@ number::
     >>> ds.SeriesNumber = 5
     >>> ds[0x10, 0x10].value = 'Test'
 
-The use of element keywords is possible because *pydicom* intercepts requests
-for member variables, and checks if they are in the DICOM dictionary. It translates
-the keyword to a (group, element) tag and returns the corresponding value for
-that tag if it exists in the dataset.
+Accessing element values via keywords is possible because *pydicom* intercepts requests
+for :class:`~pydicom.dataset.Dataset` attributes and checks to see if they're in the DICOM dictionary.
+If so it converts the keyword to a (group, element) tag and returns the corresponding value for
+that tag (if it exists).
 
 See :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` for a
-usage example of data elements removal and assignation.
+usage example of data element removal and assignation.
+
+
+Sequences
+---------
 
 .. note::
 
@@ -106,7 +110,7 @@ usage example of data elements removal and assignation.
            :class:`~dataelem.DataElement` instances, and so on...
 
 The value of sequence elements is a :class:`~sequence.Sequence`
-instance, which wraps a Python :class:`list<list>`. Items in the sequence are
+instance, which acts like a Python :class:`list`. Items in the sequence are
 referenced by number, beginning at index ``0`` as per Python convention::
 
   >>> ds.BeamSequence[0].BeamName
@@ -122,7 +126,7 @@ Using DICOM keywords is the recommended way to access data elements, but you
 can also use the tag numbers directly, such as::
 
   >>> # Same thing with tag numbers - much harder to read:
-  >>> # Really should only be used if DICOM keyword not in pydicom dictionary
+  >>> # Really should only be used if DICOM keyword not in pydicom's dictionary
   >>> ds[0x300a, 0xb0][0][0x300a, 0xc2].value
   'Field 1'
 
@@ -256,14 +260,3 @@ so in effect it's just a number with some extra behavior:
     portions of the tag.
   * The :attr:`BaseTag.is_private<tag.BaseTag.is_private>` property checks
     whether the tag represents a private tag (i.e. if group number is odd).
-
-Sequence
---------
-
-:class:`~sequence.Sequence` is derived from Python's :class:`list`.
-The only added functionality is to make string representations prettier.
-Otherwise all the usual methods of :class:`list` like item selection, append,
-etc. are available.
-
-For examples of accessing data nested in sequences, see
-:ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`.

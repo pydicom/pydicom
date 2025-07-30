@@ -73,6 +73,7 @@ extensions = [
     "sphinx.ext.napoleon",  # Numpy style docstrings
     "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
+    "sphinx_design",
     # Custom
     "sphinx_copybutton",
 ]
@@ -96,6 +97,7 @@ extlinks = {
     "gh": ("https://github.com/pydicom/%s", None),
     "issue": ("https://github.com/pydicom/pydicom/issues/%s", "#%s"),
     "pr": ("https://github.com/pydicom/pydicom/pull/%s", "#%s"),
+    "wiki": ("https://en.wikipedia.org/wiki/%s", "#%s"),
 }
 
 # intersphinx configuration
@@ -184,7 +186,7 @@ exclude_trees = ["_build"]
 pygments_style = "sphinx"
 
 # Custom style
-# html_style = "css/pydicom.css"
+html_style = "css/pydicom.css"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -204,22 +206,17 @@ html_theme = "pydata_sphinx_theme"
 # html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Define the version we use for matching in the version switcher.
-version_match = os.environ.get("READTHEDOCS_VERSION")
-# If READTHEDOCS_VERSION doesn't exist, we're not on RTD
-# If it is an integer, we're in a PR build and the version isn't correct.
-# If it's "latest" → change to "dev" (that's what we want the switcher to call it)
-json_url = "https://pydicom.github.io/pydicom/dev/_static/switcher.json"
-if not version_match or version_match.isdigit() or version_match == "latest":
-    # For local development, infer the version to match from the package.
-    if "dev" in release or "rc" in release:
-        version_match = "dev"
-        # We want to keep the relative reference if we are in dev mode
-        # but we want the whole url if we are effectively in a released version
-        json_url = "_static/switcher.json"
-    else:
-        version_match = f"v{release}"
-elif version_match == "stable":
-    version_match = f"v{release}"
+# Annoyingly the dropdown menu label requires `version_match` to be an exact match
+#   to the 'version' in switcher.json, while the warning banner requires a wildcard
+#   match to the package version (not `version_match`)
+if "dev" in pydicom.__version__:
+    version_match = "dev"
+    # 'version' attribute in the JSON file should use MAJOR.MINOR.*
+    json_url = "_static/switcher.json"
+else:
+    # Match to MAJOR.MINOR.*
+    version_match = ".".join(pydicom.__version__.split(".")[:2]) + ".*"
+    json_url = "https://pydicom.github.io/pydicom/dev/_static/switcher.json"
 
 html_theme_options = {
     "logo": {
@@ -231,7 +228,7 @@ html_theme_options = {
     "navbar_center": ["navbar-nav"],
     "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
     "navbar_persistent": ["search-button"],
-    "header_links_before_dropdown": 5,
+    "header_links_before_dropdown": 6,
     "icon_links": [
         {
             "name": "GitHub",

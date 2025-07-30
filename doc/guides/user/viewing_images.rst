@@ -3,11 +3,6 @@
 Viewing Images
 ==============
 
-.. rubric:: How to use other packages with pydicom to view DICOM images
-
-Introduction
-------------
-
 *pydicom* is mainly concerned with getting at the DICOM data elements in files,
 but it is often desirable to view pixel data as an image.
 There are several options:

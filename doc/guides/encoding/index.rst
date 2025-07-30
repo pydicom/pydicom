@@ -1,7 +1,7 @@
 
-===================
-Pixel Data Encoding
-===================
+=================================================
+*Pixel Data* encoding guides, options and plugins
+=================================================
 
 *Transfer Syntax UID* specific encoding information:
 

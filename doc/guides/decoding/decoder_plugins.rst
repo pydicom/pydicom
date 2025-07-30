@@ -22,7 +22,7 @@ converting raw encoded source data to unencoded pixel values. In order to do
 so, each decoder for compressed transfer syntaxes has at least one decoding
 plugin which performs the actual conversion.
 
-An decoding plugin must implement three objects within the same module:
+A decoding plugin must implement three objects within the same module:
 
 * A function named ``is_available`` with the following signature:
 

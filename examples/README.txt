@@ -1,6 +1,6 @@
 .. _general_examples:
 
-General examples
-----------------
+Examples
+--------
 
 Somewhere to start

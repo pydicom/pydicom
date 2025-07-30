@@ -1,6 +1,6 @@
-=============
-Release notes
-=============
+========
+Releases
+========
 
 .. toctree::
    :maxdepth: 0
