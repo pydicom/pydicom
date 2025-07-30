@@ -28,7 +28,7 @@ from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import Dataset, FileDataset, validate_file_meta, FileMetaDataset
+from pydicom.dataset import Dataset, FileDataset, path_to, validate_file_meta, FileMetaDataset
 from pydicom.encaps import encapsulate
 from pydicom.filebase import DicomBytesIO
 from pydicom.pixels.utils import get_image_pixel_ids
@@ -3142,3 +3142,52 @@ class TestFuture:
         )
         with pytest.raises(TypeError, match=msg):
             Dataset().decompress(handler_name="foo")
+
+
+class TestDatasetErrors:
+    """Tests for dataset context manager error reporting"""
+    def setup_method(self):
+        plan = Dataset()
+        plan.filename = "test.dcm"
+        beam0 = Dataset()
+
+        cp0 = Dataset()
+        cp0.ControlPointIndex = 0
+        cp0.CumulativeMetersetWeight = 0.5
+        cp1 = Dataset()
+        cp1.ControlPointIndex = 1
+        cp1.CumulativeMetersetWeight = 1.0
+        beam0.ControlPointSequence = Sequence([cp0, cp1])
+
+        priv_ds = Dataset()
+        priv_block = priv_ds.private_block(0x1001, "Test", create=True)
+        priv_block.add_new(0x42, VR.DS, '42.0')
+
+        plan.BeamSequence = Sequence([beam0, priv_ds])
+        self.file_ds = FileDataset("test.dcm", plan)
+
+
+    def test_data_elem_value(self):
+        """Setting a bad value gives error message with location info"""
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"
+        # Give a bad value for existing element
+        with pytest.raises(ValueError) as excinfo:
+            with self.file_ds as ds:
+                ds.BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight = "hello"
+        assert hasattr(excinfo.value, "__notes__")
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+        # Bad value for new element
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
+        with pytest.raises(ValueError) as excinfo:
+            with self.file_ds as ds:
+                ds.BeamSequence[0].ControlPointSequence[1].GantryAngle = "hello"
+        assert hasattr(excinfo.value, "__notes__")
+        assert any(msg in note for note in excinfo.value.__notes__)
+         
+
+
+    def test_path_to(self):
+        target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
+        expected = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
+        assert path_to(target, self.file_ds) == expected
