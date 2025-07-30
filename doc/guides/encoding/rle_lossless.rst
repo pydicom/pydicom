@@ -20,15 +20,14 @@ syntax. For an explanation of each parameter and its relationship with the
 | *Samples   | *Photometric    | *Pixel          | *Bits      | *Bits   |
 | per Pixel* | Interpretation* | Representation* | Allocated* | Stored* |
 +============+=================+=================+============+=========+
-| 1          | MONOCHROME1     | 0 or 1          | 1, 8 or 16 | 1 to 16 |
-|            +-----------------+                 |            |         |
-|            | MONOCHROME2     |                 |            |         |
-|            +-----------------+-----------------+            |         |
-|            | PALETTE COLOR   | 0               |            |         |
+| 1          | | MONOCHROME1   | 0 or 1          | 1, 8 or 16 | 1 to 16 |
+|            | | MONOCHROME2   |                 |            |         |
+|            +-----------------+-----------------+------------+---------+
+|            | PALETTE COLOR   | 0               | 1, 8 or 16 | 1 to 16 |
 +------------+-----------------+-----------------+------------+---------+
 | 3          | RGB             | 0               | 8 or 16    | 1 to 16 |
-|            +-----------------+                 +------------+---------+
-|            | YBR_FULL        |                 | 8          | 1 to 8  |
+|            +-----------------+-----------------+------------+---------+
+|            | YBR_FULL        | 0               | 8          | 1 to 8  |
 +------------+-----------------+-----------------+------------+---------+
 
 To ensure you have the correct *Photometric Interpretation* when encoding using

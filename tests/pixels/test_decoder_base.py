@@ -1266,6 +1266,7 @@ class TestDecoder_Array:
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
         assert meta["photometric_interpretation"] == PI.RGB
+        assert not isinstance(meta["photometric_interpretation"], PI)
 
         # force_rgb
         rgb, meta = decoder.as_array(
@@ -1282,6 +1283,7 @@ class TestDecoder_Array:
         assert meta["photometric_interpretation"] == PI.YBR_FULL
         ybr2, meta = decoder.as_array(reference.ds, as_rgb=True, force_ybr=True)
         assert meta["photometric_interpretation"] == PI.YBR_FULL
+        assert not isinstance(meta["photometric_interpretation"], PI)
         assert np.array_equal(ybr, ybr2)
 
         # Test is actually ybr + ybr = ybr`

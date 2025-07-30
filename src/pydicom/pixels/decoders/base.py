@@ -144,7 +144,7 @@ def _process_color_space(
             PI.YBR_FULL,
             bit_depth=runner.bits_stored,
         )
-        changes["photometric_interpretation"] = PI.YBR_FULL
+        changes["photometric_interpretation"] = str(PI.YBR_FULL)
     elif to_rgb:
         arr = convert_color_space(
             arr,
@@ -152,7 +152,7 @@ def _process_color_space(
             PI.RGB,
             bit_depth=runner.bits_stored,
         )
-        changes["photometric_interpretation"] = PI.RGB
+        changes["photometric_interpretation"] = str(PI.RGB)
 
     return arr
 

@@ -1,81 +1,188 @@
 
-=====================
-pydicom documentation
-=====================
+:html_theme.sidebar_secondary.remove: true
+
+=======
+pydicom
+=======
+
+An easy to use `Python <https://www.python.org/>`_ package for creating, reading, modifying
+and writing `DICOM <https://www.dicomstandard.org/>`_ datasets and File-sets, with optional
+support for converting compressed and uncompressed *Pixel Data* to `NumPy <https://www.numpy.org>`_
+`ndarrays <https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html>`_ (and back again).
+
+..
+    For the navigation links in the top bar, hidden to avoid clutter
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Documentation
+    :maxdepth: 1
+    :hidden:
 
-   guides/user/index
-   tutorials/index
-   guides/index
-   reference/index
-
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Examples
-
-   auto_examples/index
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: Additional Information
-
-   tutorials/contributing
-   faq/index
-   release_notes/index
+    guides/user/index
+    tutorials/index
+    guides/index
+    auto_examples/index
+    reference/index
+    release_notes/index
 
 
-Getting Started
-===============
-If you're new to *pydicom* then start here:
+Install
+=======
 
-* :doc:`Installation<guides/user/installation>` |
-  :doc:`Plugins for Pixel Data</guides/plugin_table>` |
-  :doc:`What Python types do I use for each VR<guides/element_value_types>`
-* **Basics**: :doc:`Dataset: read, access, modify, write</tutorials/dataset_basics>`
-* **Intermediate**:
-  :doc:`Waveform decoding and encoding</tutorials/waveforms>` |
-  :doc:`DICOM File-sets and DICOMDIR</tutorials/filesets>`
-* **Pixel Data**:
-  :doc:`Introduction & accessing</tutorials/pixel_data/introduction>` |
-  :doc:`Creating new Pixel Data</tutorials/pixel_data/creation>` |
-  :doc:`Compression and decompression</tutorials/pixel_data/compressing>`
+.. tab-set::
+    :class: sd-width-content-min
 
+    .. tab-item:: pip
 
-:doc:`User Guide <guides/user/index>`
-==========================================
+        .. code-block:: bash
 
-The main documentation. This contains an in-depth description of all
-core elements of *pydicom* and how to use them.
+            pip install pydicom
+
+    .. tab-item:: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pydicom
 
 
-:doc:`Examples <auto_examples/index>`
-=====================================
+For more detailed instructions, see the :doc:`installation guide<guides/user/installation>`.
 
-A set of examples illustrating the use of the different core elements. It
-complements the :doc:`User Guide <guides/user/index>`.
-
-
-Reference
-=========
-
-Documentation for *pydicom's* public functions, classes and other objects.
-
-.. toctree::
-   :maxdepth: 1
-
-   reference/index
-
-
-Releases
+Examples
 ========
 
-.. toctree::
-   :maxdepth: 1
+.. tab-set::
+    :class: sd-width-content-min
 
-   release_notes/index
+    .. tab-item:: Dataset I/O
+
+        .. code-block:: python
+
+            >>> from pydicom import dcmread
+            >>> ds = dcmread("path/to/dataset")
+            >>> ds.PatientName
+            'CompressedSamples^CT1'
+            >>> ds.PatientName = "Citizen^Jan"
+            >>> print(ds)
+            ...
+            (0010,0010) Patient's Name                      PN: 'Citizen^Jan'
+            (0010,0020) Patient ID                          LO: '4MR1'
+            ...
+            >>> ds.save_as("modified.dcm")
+
+    .. tab-item:: DICOMDIR and File-sets
+
+        .. code-block:: python
+
+            >>> from pydicom import examples
+            >>> from pydicom.fileset import FileSet
+            >>> path = examples.get_path("dicomdir")  # Example DICOMDIR dataset
+            >>> fs = FileSet(path)
+            >>> fs.find_values("PatientID")
+            ['77654033', '9890234']
+            >>> ds = fs.find(PatientID='77654033')[0].load()
+            >>> type(ds)
+            <class 'pydicom.dataset.FileDataset'>
+            >>> ds.PatientID
+            '77654033'
+
+    .. tab-item:: Convert pixel data to ndarray
+
+        .. code-block:: python
+
+            >>> from pydicom import dcmread, examples
+            >>> path = examples.get_path("mr")  # Example MR dataset
+            >>> ds = dcmread(path)
+            >>> arr = ds.pixel_array  # requires NumPy, see the installation guide
+            >>> arr
+            array([[ 905, 1019, 1227, ...,  302,  304,  328],
+               [ 628,  770,  907, ...,  298,  331,  355],
+               [ 498,  566,  706, ...,  280,  285,  320],
+               ...,
+               [ 334,  400,  431, ..., 1094, 1068, 1083],
+               [ 339,  377,  413, ..., 1318, 1346, 1336],
+               [ 378,  374,  422, ..., 1369, 1129,  862]],
+              shape=(64, 64), dtype=int16)
+
+More usage examples can be found :doc:`here<auto_examples/index>`.
+
+Documentation
+=============
+
+.. grid:: 1 1 2 2
+    :gutter: 2 3 4 4
+
+    .. grid-item-card::
+        :img-top: _static/img/quick-start.svg
+        :text-align: center
+
+        **Quick start**
+        ^^^
+
+        If you're new to *pydicom* start here for an introduction to reading
+        and manipulating DICOM datasets, and accessing *Pixel Data* as a NumPy ndarray.
+
+        +++
+
+        .. button-ref:: /guides/user/quick_start
+            :expand:
+            :color: primary
+            :click-parent:
+
+            Quick start
+
+    .. grid-item-card::
+        :img-top: _static/img/user-guide.svg
+        :text-align: center
+
+        **User guide**
+        ^^^
+
+        The user guide covers usage of *pydicom's* core classes and functions and
+        how they're related to the relevant parts of the DICOM Standard.
+
+        +++
+
+        .. button-ref:: guides/user/index
+            :expand:
+            :color: primary
+            :click-parent:
+
+            User guide
+
+    .. grid-item-card::
+        :img-top: _static/img/learning.svg
+        :text-align: center
+        :class-item: pydicom-learning
+
+        **Learning resources**
+        ^^^
+
+        Our collection of code examples, tutorials and guides should help you learn
+        the basics of *pydicom*, as well as more advanced topics.
+
+        +++
+
+        .. button-ref:: learning/index
+            :expand:
+            :color: primary
+            :click-parent:
+
+            Learning resources
+
+    .. grid-item-card::
+        :img-top: _static/img/api-reference.svg
+        :text-align: center
+
+        **API reference**
+        ^^^
+
+        The API reference documentation contains detailed descriptions of the classes,
+        functions, modules and other objects included in *pydicom*.
+
+        +++
+
+        .. button-ref:: reference/index
+            :expand:
+            :color: primary
+            :click-parent:
+
+            API reference

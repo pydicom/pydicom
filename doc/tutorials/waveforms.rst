@@ -1,6 +1,6 @@
-=========
-Waveforms
-=========
+=====================================
+A beginner's guide to *Waveform Data*
+=====================================
 
 This tutorial is about understanding waveforms in DICOM datasets and covers:
 

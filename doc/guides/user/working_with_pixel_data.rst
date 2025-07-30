@@ -6,11 +6,6 @@ Working with Pixel Data
 
 .. currentmodule:: pydicom
 
-.. rubric:: How to work with pixel data in pydicom.
-
-Introduction
-------------
-
 Many DICOM SOP classes contain bulk pixel data, which is usually used to
 represent one or more image frames (although :dcm:`other types of data
 <part03/sect_A.18.3.html>` are possible). In these SOP classes the pixel

@@ -330,6 +330,8 @@ As with the other lossless compression methods its use is straightforward::
     >>> ds.compress(DeflatedImageFrameCompression)
 
 
+.. _tut_pixel_data_encode_third_party:
+
 Encapsulating data compressed by third-party packages
 .....................................................
 
