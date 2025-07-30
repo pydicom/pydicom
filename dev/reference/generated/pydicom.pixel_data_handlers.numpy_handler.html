@@ -31,12 +31,14 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/generated/pydicom.pixel_data_handlers.numpy_handler';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -151,7 +154,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -170,6 +173,13 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     API
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="../index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -366,37 +331,9 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    API
-  </a>
-</li>
-
-
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -1283,7 +1220,7 @@ YBR_FULL_422</p></td>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.numpy_handler.get_pixeldata">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">get_pixeldata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6185b0fa2/src/pydicom/pixel_data_handlers/numpy_handler.py#L122"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">get_pixeldata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/7844eccc6/src/pydicom/pixel_data_handlers/numpy_handler.py#L122"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="Link to this definition">#</a></dt>
 <dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1321,13 +1258,13 @@ Data</em> or (7FE0,0009) <em>Double Float Pixel Data</em> as a 1D array.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.numpy_handler.is_available">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">is_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6185b0fa2/src/pydicom/pixel_data_handlers/numpy_handler.py#L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">is_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/7844eccc6/src/pydicom/pixel_data_handlers/numpy_handler.py#L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="Link to this definition">#</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">needs_to_convert_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6185b0fa2/src/pydicom/pixel_data_handlers/numpy_handler.py#L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">needs_to_convert_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/7844eccc6/src/pydicom/pixel_data_handlers/numpy_handler.py#L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB" title="Link to this definition">#</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -1335,7 +1272,7 @@ RGB.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6185b0fa2/src/pydicom/pixel_data_handlers/numpy_handler.py#L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/7844eccc6/src/pydicom/pixel_data_handlers/numpy_handler.py#L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="Link to this definition">#</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -1343,7 +1280,7 @@ to RGB.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">supports_transfer_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transfer_syntax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6185b0fa2/src/pydicom/pixel_data_handlers/numpy_handler.py#L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.numpy_handler.</span></span><span class="sig-name descname"><span class="pre">supports_transfer_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transfer_syntax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/7844eccc6/src/pydicom/pixel_data_handlers/numpy_handler.py#L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax" title="Link to this definition">#</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

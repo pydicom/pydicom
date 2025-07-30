@@ -31,12 +31,14 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/generated/pydicom.uid.TwelveLeadECGWaveformStorage';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -151,7 +154,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -170,6 +173,13 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     API
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="../index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -366,37 +331,9 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    API
-  </a>
-</li>
-
-
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -1167,7 +1104,7 @@
 <h1>pydicom.uid.TwelveLeadECGWaveformStorage<a class="headerlink" href="#pydicom-uid-twelveleadecgwaveformstorage" title="Link to this heading">#</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.uid.TwelveLeadECGWaveformStorage">
-<span class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></span><span class="sig-name descname"><span class="pre">TwelveLeadECGWaveformStorage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.2.840.10008.5.1.4.1.1.9.1.1'</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6185b0fa2/src/pydicom/uid.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.TwelveLeadECGWaveformStorage" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></span><span class="sig-name descname"><span class="pre">TwelveLeadECGWaveformStorage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.2.840.10008.5.1.4.1.1.9.1.1'</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/7844eccc6/src/pydicom/uid.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.TwelveLeadECGWaveformStorage" title="Link to this definition">#</a></dt>
 <dd><p>1.2.840.10008.5.1.4.1.1.9.1.1</p>
 </dd></dl>
 

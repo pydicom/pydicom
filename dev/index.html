@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>pydicom documentation &#8212; pydicom 3.1.0.dev0 documentation</title>
+    <title>pydicom &#8212; pydicom 3.1.0.dev0 documentation</title>
   
   
   
@@ -31,12 +31,14 @@
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=ccdb6887"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,7 +64,7 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pydicom User Guide" href="guides/user/index.html" />
+    <link rel="next" title="User Guide" href="guides/user/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -150,7 +153,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -170,6 +173,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="reference/index.html">
     API
   </a>
@@ -177,56 +187,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -314,10 +279,6 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
 </div>
 
     </header>
@@ -348,7 +309,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -368,36 +329,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -411,7 +344,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -513,56 +446,158 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="pydicom-documentation">
-<h1>pydicom documentation<a class="headerlink" href="#pydicom-documentation" title="Link to this heading">#</a></h1>
+  <section id="pydicom">
+<h1>pydicom<a class="headerlink" href="#pydicom" title="Link to this heading">#</a></h1>
+<p>An easy to use <a class="reference external" href="https://www.python.org/">Python</a> package for creating, reading, modifying
+and writing <a class="reference external" href="https://www.dicomstandard.org/">DICOM</a> datasets and File-sets, with optional
+support for converting compressed and uncompressed <em>Pixel Data</em> to <a class="reference external" href="https://www.numpy.org">NumPy</a>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html">ndarrays</a> (and back again).</p>
 <div class="toctree-wrapper compound">
 </div>
-<div class="toctree-wrapper compound">
+<section id="install">
+<h2>Install<a class="headerlink" href="#install" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set sd-width-content-min docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+pip</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pydicom
+</pre></div>
 </div>
-<div class="toctree-wrapper compound">
 </div>
-<section id="getting-started">
-<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
-<p>If you’re new to <em>pydicom</em> then start here:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="guides/user/installation.html"><span class="doc">Installation</span></a> |
-<a class="reference internal" href="guides/plugin_table.html"><span class="doc">Plugins for Pixel Data</span></a> |
-<a class="reference internal" href="guides/element_value_types.html"><span class="doc">What Python types do I use for each VR</span></a></p></li>
-<li><p><strong>Basics</strong>: <a class="reference internal" href="tutorials/dataset_basics.html"><span class="doc">Dataset: read, access, modify, write</span></a></p></li>
-<li><p><strong>Intermediate</strong>:
-<a class="reference internal" href="tutorials/waveforms.html"><span class="doc">Waveform decoding and encoding</span></a> |
-<a class="reference internal" href="tutorials/filesets.html"><span class="doc">DICOM File-sets and DICOMDIR</span></a></p></li>
-<li><p><strong>Pixel Data</strong>:
-<a class="reference internal" href="tutorials/pixel_data/introduction.html"><span class="doc">Introduction &amp; accessing</span></a> |
-<a class="reference internal" href="tutorials/pixel_data/creation.html"><span class="doc">Creating new Pixel Data</span></a> |
-<a class="reference internal" href="tutorials/pixel_data/compressing.html"><span class="doc">Compression and decompression</span></a></p></li>
-</ul>
-</section>
-<section id="user-guide">
-<h2><a class="reference internal" href="guides/user/index.html"><span class="doc">User Guide</span></a><a class="headerlink" href="#user-guide" title="Link to this heading">#</a></h2>
-<p>The main documentation. This contains an in-depth description of all
-core elements of <em>pydicom</em> and how to use them.</p>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+conda</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom
+</pre></div>
+</div>
+</div>
+</div>
+<p>For more detailed instructions, see the <a class="reference internal" href="guides/user/installation.html"><span class="doc">installation guide</span></a>.</p>
 </section>
 <section id="examples">
-<h2><a class="reference internal" href="auto_examples/index.html"><span class="doc">Examples</span></a><a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
-<p>A set of examples illustrating the use of the different core elements. It
-complements the <a class="reference internal" href="guides/user/index.html"><span class="doc">User Guide</span></a>.</p>
-</section>
-<section id="reference">
-<h2>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h2>
-<p>Documentation for <em>pydicom’s</em> public functions, classes and other objects.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="reference/index.html">API</a></li>
-</ul>
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set sd-width-content-min docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Dataset I/O</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;path/to/dataset&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+<span class="go">&#39;CompressedSamples^CT1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s2">&quot;Citizen^Jan&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">(0010,0010) Patient&#39;s Name                      PN: &#39;Citizen^Jan&#39;</span>
+<span class="go">(0010,0020) Patient ID                          LO: &#39;4MR1&#39;</span>
+<span class="go">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;modified.dcm&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+DICOMDIR and File-sets</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.fileset</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileSet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;dicomdir&quot;</span><span class="p">)</span>  <span class="c1"># Example DICOMDIR dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FileSet</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PatientID&quot;</span><span class="p">)</span>
+<span class="go">[&#39;77654033&#39;, &#39;9890234&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s1">&#39;77654033&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">&lt;class &#39;pydicom.dataset.FileDataset&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span>
+<span class="go">&#39;77654033&#39;</span>
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Convert pixel data to ndarray</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;mr&quot;</span><span class="p">)</span>  <span class="c1"># Example MR dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>  <span class="c1"># requires NumPy, see the installation guide</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
+<span class="go">array([[ 905, 1019, 1227, ...,  302,  304,  328],</span>
+<span class="go">   [ 628,  770,  907, ...,  298,  331,  355],</span>
+<span class="go">   [ 498,  566,  706, ...,  280,  285,  320],</span>
+<span class="go">   ...,</span>
+<span class="go">   [ 334,  400,  431, ..., 1094, 1068, 1083],</span>
+<span class="go">   [ 339,  377,  413, ..., 1318, 1346, 1336],</span>
+<span class="go">   [ 378,  374,  422, ..., 1369, 1129,  862]],</span>
+<span class="go">  shape=(64, 64), dtype=int16)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>More usage examples can be found <a class="reference internal" href="auto_examples/index.html"><span class="doc">here</span></a>.</p>
 </section>
-<section id="releases">
-<h2>Releases<a class="headerlink" href="#releases" title="Link to this heading">#</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="release_notes/index.html">Release notes</a></li>
-</ul>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-1 sd-row-cols-md-2 sd-row-cols-lg-2 sd-g-2 sd-g-xs-2 sd-g-sm-3 sd-g-md-4 sd-g-lg-4 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-text-center docutils">
+<img alt="" class="sd-card-img-top" src="_images/quick-start.svg" />
+<div class="sd-card-header docutils">
+<p class="sd-card-text"><strong>Quick start</strong></p>
+</div>
+<div class="sd-card-body docutils">
+<p class="sd-card-text">If you’re new to <em>pydicom</em> start here for an introduction to reading
+and manipulating DICOM datasets, and accessing <em>Pixel Data</em> as a NumPy ndarray.</p>
+</div>
+<div class="sd-card-footer docutils">
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-primary sd-stretched-link reference internal" href="guides/user/quick_start.html"><span class="doc">Quick start</span></a></span></p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-text-center docutils">
+<img alt="" class="sd-card-img-top" src="_images/user-guide.svg" />
+<div class="sd-card-header docutils">
+<p class="sd-card-text"><strong>User guide</strong></p>
+</div>
+<div class="sd-card-body docutils">
+<p class="sd-card-text">The user guide covers usage of <em>pydicom’s</em> core classes and functions and
+how they’re related to the relevant parts of the DICOM Standard.</p>
+</div>
+<div class="sd-card-footer docutils">
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-primary sd-stretched-link reference internal" href="guides/user/index.html"><span class="doc">User guide</span></a></span></p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row pydicom-learning docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-text-center docutils">
+<img alt="" class="sd-card-img-top" src="_images/learning.svg" />
+<div class="sd-card-header docutils">
+<p class="sd-card-text"><strong>Learning resources</strong></p>
+</div>
+<div class="sd-card-body docutils">
+<p class="sd-card-text">Our collection of code examples, tutorials and guides should help you learn
+the basics of <em>pydicom</em>, as well as more advanced topics.</p>
+</div>
+<div class="sd-card-footer docutils">
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-primary sd-stretched-link reference internal" href="learning/index.html"><span class="doc">Learning resources</span></a></span></p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-text-center docutils">
+<img alt="" class="sd-card-img-top" src="_images/api-reference.svg" />
+<div class="sd-card-header docutils">
+<p class="sd-card-text"><strong>API reference</strong></p>
+</div>
+<div class="sd-card-body docutils">
+<p class="sd-card-text">The API reference documentation contains detailed descriptions of the classes,
+functions, modules and other objects included in <em>pydicom</em>.</p>
+</div>
+<div class="sd-card-footer docutils">
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-primary sd-stretched-link reference internal" href="reference/index.html"><span class="doc">API reference</span></a></span></p>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -582,7 +617,7 @@ complements the <a class="reference internal" href="guides/user/index.html"><spa
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">pydicom User Guide</p>
+        <p class="prev-next-title">User Guide</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -592,28 +627,6 @@ complements the <a class="reference internal" href="guides/user/index.html"><spa
             </div>
             
             
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-guide"><span class="xref std std-doc">User Guide</span></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples"><span class="xref std std-doc">Examples</span></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#releases">Releases</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>

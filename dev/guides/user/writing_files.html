@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing DICOM Files &#8212; pydicom 3.1.0.dev0 documentation</title>
+    <title>Creating new datasets &#8212; pydicom 3.1.0.dev0 documentation</title>
   
   
   
@@ -31,12 +31,14 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/user/writing_files';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -62,7 +65,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Working with Pixel Data" href="working_with_pixel_data.html" />
-    <link rel="prev" title="Core elements in pydicom" href="base_element.html" />
+    <link rel="prev" title="Private Data Elements" href="private_data_elements.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -151,7 +154,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -367,36 +332,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -489,18 +426,37 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="what_is_dicom.html">What is DICOM?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Writing DICOM Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">pydicom quick start</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="base_element.html">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">FAQ</a></li>
 </ul>
 </div>
 </nav></div>
@@ -542,9 +498,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">pydicom User Guide</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Writing DICOM Files</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Creating new datasets</span></li>
   </ul>
 </nav>
 </div>
@@ -561,16 +517,13 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="writing-dicom-files">
-<span id="id1"></span><h1>Writing DICOM Files<a class="headerlink" href="#writing-dicom-files" title="Link to this heading">#</a></h1>
-<p class="rubric">How to write DICOM files using pydicom.</p>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
+  <section id="creating-new-datasets">
+<span id="writing-dicom-files"></span><h1>Creating new datasets<a class="headerlink" href="#creating-new-datasets" title="Link to this heading">#</a></h1>
 <p>Probably the most common use of <em>pydicom</em> is to read an existing DICOM file,
-alter some items, and write it back out again. The <a class="reference internal" href="../../tutorials/dataset_basics.html"><span class="doc">Dataset basics tutorial</span></a> shows how to do this.</p>
-<p>If you need to create a DICOM file from scratch then you can either:</p>
+alter some elements, and write it back out again. The <a class="reference internal" href="../../tutorials/dataset_basics.html"><span class="doc">Dataset basics tutorial</span></a> shows how to do this.</p>
+<p>If you need to create a new DICOM dataset then you can either:</p>
 <ul class="simple">
-<li><p>Use the <code class="docutils literal notranslate"><span class="pre">codify</span></code> script to create Python code from an existing dataset.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command-line utility to create Python code from an existing dataset.</p></li>
 <li><p>Create a new <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance and populate it.</p></li>
 </ul>
 <div class="admonition warning">
@@ -579,16 +532,14 @@ alter some items, and write it back out again. The <a class="reference internal"
 file meta information and in the main dataset. Also, you should create your
 own UIDs, implementation name, and so on.</p>
 </div>
-</section>
 <section id="using-codify">
 <span id="writing-files-using-codify"></span><h2>Using <code class="docutils literal notranslate"><span class="pre">codify</span></code><a class="headerlink" href="#using-codify" title="Link to this heading">#</a></h2>
-<p><em>pydicom</em> has a command-line utility called <code class="docutils literal notranslate"><span class="pre">codify</span></code> that
-takes an existing DICOM file, and produces Python code that can be run to
-produce a copy of the original file.</p>
+<p><em>pydicom</em> has a command-line utility called <code class="docutils literal notranslate"><span class="pre">codify</span></code> that can produce Python code
+that can be run to produce a copy of an existing DICOM file.</p>
 <p>In other words: <em>pydicom</em> has a tool that can automatically generate
 well-designed Python code for you - code that creates DICOM files. The only
 requirement is that you have an existing DICOM file that looks approximately
-like the one you need. You can then use the code as a model to work from. The
+like the one you need. You can then use that code as a model to work from. The
 tool is especially useful with sequences, which can be tricky to code
 correctly.</p>
 <div class="admonition warning">
@@ -613,17 +564,18 @@ to edit the code to supply a valid value.</p>
 element value that is coded. Data elements bigger than that will have the
 syntax error line as shown above.</p>
 </div>
-<p>One potential disadvantage of <code class="docutils literal notranslate"><span class="pre">codify</span></code>, depending on your use case, is that it
-does not create loops. If you have, say, 30 items in a Sequence, <code class="docutils literal notranslate"><span class="pre">codify</span></code> will
-produce code that makes them one at a time. Code you wrote by hand would
+<p>One potential disadvantage of <code class="docutils literal notranslate"><span class="pre">codify</span></code> is that it does not create loops.
+If you have, say, 30 items in a Sequence, <code class="docutils literal notranslate"><span class="pre">codify</span></code> will produce code that
+makes them one at a time. Code you wrote by hand would
 likely create them in a loop, because most of the code needed is quite
 repetitive. If you want to switch to a loop, you could use the first item’s
 code as a starting point, and modify as needed, deleting the code for the
 other individual items.</p>
-<p>For details on calling the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command, see the <a class="reference internal" href="../cli/cli_guide.html#cli-codify"><span class="std std-ref">pydicom codify command</span></a> section.</p>
+<p>For more information on the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command, see the <a class="reference internal" href="../cli/cli_codify.html"><span class="doc">codify</span></a>
+documentation.</p>
 <p><code class="docutils literal notranslate"><span class="pre">codify</span></code> could also be called from code, rather than from a command line; you
-can look at the codify.py source and the <code class="docutils literal notranslate"><span class="pre">code_file</span></code> function for a
-starting point for that.</p>
+can look at the <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/util/codify.py">codify source code</a> and the
+<code class="docutils literal notranslate"><span class="pre">code_file</span></code> function for a starting point.</p>
 </section>
 <section id="writing-a-file-from-scratch">
 <h2>Writing a file from scratch<a class="headerlink" href="#writing-a-file-from-scratch" title="Link to this heading">#</a></h2>
@@ -634,7 +586,7 @@ can certainly write code from scratch to make a complete DICOM file using
 <p>It’s not particularly difficult, but to produce a valid DICOM file requires
 specific items to be created.  A basic example of that is available in the
 example file <a class="reference internal" href="../../auto_examples/input_output/plot_write_dicom.html#sphx-glr-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">Write DICOM data</span></a>.</p>
-<p>Just don’t forget the warnings in the Introduction section above, and be sure
+<p>Just don’t forget the warnings in the sections above, and be sure
 to create all the required DICOM data elements.</p>
 </section>
 </section>
@@ -650,12 +602,12 @@ to create all the required DICOM data elements.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="base_element.html"
+       href="private_data_elements.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Core elements in pydicom</p>
+        <p class="prev-next-title">Private Data Elements</p>
       </div>
     </a>
     <a class="right-next"
@@ -686,7 +638,6 @@ to create all the required DICOM data elements.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-codify">Using <code class="docutils literal notranslate"><span class="pre">codify</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-file-from-scratch">Writing a file from scratch</a></li>
 </ul>

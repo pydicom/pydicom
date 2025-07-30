@@ -31,12 +31,14 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_dicom_difference';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -62,7 +65,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Display unicode person names" href="show_charset_name.html" />
-    <link rel="prev" title="General examples" href="index.html" />
+    <link rel="prev" title="Examples" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -151,7 +154,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -170,6 +173,13 @@
 </li>
 
 
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference/index.html">
     API
@@ -177,57 +187,12 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
-    General examples
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -343,7 +308,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -362,37 +327,9 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -406,7 +343,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -553,7 +490,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">General examples</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Analyse differences between DICOM files</span></li>
   </ul>
@@ -1279,7 +1216,7 @@ to download the full example code.</p>
         <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.081 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.083 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-dicom-difference-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/41ba38a2ae2d88170db68a78dcabe080/plot_dicom_difference.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dicom_difference.ipynb</span></code></a></p>
@@ -1310,7 +1247,7 @@ to download the full example code.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">General examples</p>
+        <p class="prev-next-title">Examples</p>
       </div>
     </a>
     <a class="right-next"

@@ -31,12 +31,14 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/memory_dataset';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -151,7 +154,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -170,6 +173,13 @@
 </li>
 
 
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference/index.html">
     API
@@ -177,57 +187,12 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
-    General examples
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -343,7 +308,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -362,37 +327,9 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -406,7 +343,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -553,7 +490,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">General examples</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Show working with memory-based dataset</span></li>
   </ul>

@@ -31,12 +31,14 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/user/private_data_elements';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,8 +64,8 @@
     <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Best Practices" href="best_practices.html" />
-    <link rel="prev" title="Viewing Images" href="viewing_images.html" />
+    <link rel="next" title="Creating new datasets" href="writing_files.html" />
+    <link rel="prev" title="Dataset, DataElement and Tag" href="base_element.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -151,7 +154,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -367,36 +332,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -489,18 +426,37 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="what_is_dicom.html">What is DICOM?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">pydicom quick start</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="base_element.html">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Private Data Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Private Data Elements</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">FAQ</a></li>
 </ul>
 </div>
 </nav></div>
@@ -542,7 +498,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">pydicom User Guide</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Private Data Elements</span></li>
   </ul>
@@ -563,10 +519,7 @@
                   
   <section id="private-data-elements">
 <span id="id1"></span><h1>Private Data Elements<a class="headerlink" href="#private-data-elements" title="Link to this heading">#</a></h1>
-<p class="rubric">Accessing or creating private data elements</p>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>The DICOM standard allows DICOM file creators to use <cite>private data elements</cite>
+<p>The DICOM standard allows DICOM dataset creators to use <cite>private data elements</cite>
 to store information that is not defined by the DICOM standard itself.</p>
 <p>Private data elements are stored in a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> just
 like other data elements. When reading files with <em>pydicom</em>, they will automatically be read
@@ -576,55 +529,53 @@ show anything except the tag and the value.</p>
 <p>When writing your own private data elements, the DICOM standard requires the
 use of ‘private creator blocks’.  <em>pydicom</em> has some convenience
 functions to make creating private blocks and data elements easier.</p>
-<p>The sections below outlines accessing and creating private blocks and data
-elements using <em>pydicom</em>.</p>
-</section>
-<section id="displaying-private-data-elements-in-pydicom">
-<h2>Displaying Private Data Elements in <em>pydicom</em><a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Link to this heading">#</a></h2>
-<p>Here is an example of some private tags displayed for <em>pydicom’s</em> example CT
-dataset:</p>
+<section id="displaying-private-elements">
+<h2>Displaying private elements<a class="headerlink" href="#displaying-private-elements" title="Link to this heading">#</a></h2>
+<p>Here are some of the private tags displayed for <em>pydicom’s</em> example CT dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
 <span class="go">Dataset.file_meta -------------------------------</span>
-<span class="go">(0002, 0000) File Meta Information Group Length  UL: 192</span>
-<span class="go">(0002, 0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
-<span class="go">(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage</span>
-<span class="go">(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
-<span class="go">(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian</span>
-<span class="go">(0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2</span>
-<span class="go">(0002, 0013) Implementation Version Name         SH: &#39;DCTOOL100&#39;</span>
-<span class="go">(0002, 0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
+<span class="go">(0002,0000) File Meta Information Group Length  UL: 192</span>
+<span class="go">(0002,0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="go">(0002,0002) Media Storage SOP Class UID         UI: CT Image Storage</span>
+<span class="go">(0002,0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
+<span class="go">(0002,0010) Transfer Syntax UID                 UI: Explicit VR Little Endian</span>
+<span class="go">(0002,0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2</span>
+<span class="go">(0002,0013) Implementation Version Name         SH: &#39;DCTOOL100&#39;</span>
+<span class="go">(0002,0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
 <span class="go">-------------------------------------------------</span>
-<span class="go">(0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
-<span class="go">(0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
+<span class="go">(0008,0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
+<span class="go">(0008,0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
 <span class="go">...</span>
-<span class="go">(0009, 0010) Private Creator                     LO: &#39;GEMS_IDEN_01&#39;</span>
-<span class="go">(0009, 1001) [Full fidelity]                     LO: &#39;GE_GENESIS_FF&#39;</span>
-<span class="go">(0009, 1002) [Suite id]                          SH: &#39;CT01&#39;</span>
+<span class="go">(0009,0010) Private Creator                     LO: &#39;GEMS_IDEN_01&#39;</span>
+<span class="go">(0009,1001) [Full fidelity]                     LO: &#39;GE_GENESIS_FF&#39;</span>
+<span class="go">(0009,1002) [Suite id]                          SH: &#39;CT01&#39;</span>
 <span class="go">...</span>
 </pre></div>
 </div>
-<p>The last two lines in the example above show <em>pydicom’s</em> display of two private
-data elements.  The line preceding those shows the private creator data element
-that reserves a section of tag element numbers for that creator’s use.</p>
-<p>Since the descriptions for private data elements are not part of the DICOM
-standard, and are thus not necessarily unique, <em>pydicom</em> does not allow you to
-access data elements using those names. This is indicated by enclosing the
-text in square brackets, to make it clear it is different from DICOM
-standard descriptors.</p>
-<p>You can still access the private data elements using the tag, remembering that
-data elements access by tag number return a full <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>
-instance, and the <cite>value</cite> attribute is needed to get the value:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x00091001</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+<p>The last three lines above show a (gggg,0010) <em>Private Creator</em> element followed by
+two private data elements. Private creator elements are used to reserve the set of
+tags with the same group number for that creator’s use. So with the above the reserved group
+number is <code class="docutils literal notranslate"><span class="pre">0x0009</span></code>, so (0009,1001) <em>[Full fidelity]</em> and (0009,1002) <em>[Suite id]</em> private
+elements belong to the <code class="docutils literal notranslate"><span class="pre">'GEMS_IDEN_01'</span></code> private element creator.</p>
+<p>Since private data elements are not part of the DICOM standard they lack standardized
+element keywords, which is indicated by enclosing the element’s name in square brackets. They
+are also not guaranteed to be unique for a given element tag. Because of this <em>pydicom</em>
+does not allow you to use a keyword to access them, but they can still be accessed using
+the tag:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mh">0x00091001</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+<span class="go">&lt;class &#39;pydicom.dataelem.DataElement&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">value</span>
 <span class="go">&#39;GE_GENESIS_FF&#39;</span>
 </pre></div>
 </div>
-<p>You can also create a <a class="reference internal" href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivateBlock</span></code></a> instance and access elements
+<p>You can also create a <a class="reference internal" href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivateBlock</span></code></a> instance and access private elements
 through it:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">block</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">private_block</span><span class="p">(</span><span class="mh">0x0009</span><span class="p">,</span> <span class="s1">&#39;GEMS_IDEN_01&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">block</span><span class="p">[</span><span class="mh">0x01</span><span class="p">]</span>
-<span class="go">(0009, 1001) [Full fidelity]                     LO: &#39;GE_GENESIS_FF&#39;</span>
+<span class="go">(0009,1001) [Full fidelity]                     LO: &#39;GE_GENESIS_FF&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">block</span><span class="p">[</span><span class="mh">0x01</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 <span class="go">&#39;GE_GENESIS_FF&#39;</span>
 </pre></div>
@@ -632,8 +583,8 @@ through it:</p>
 <p>Using the private block like this is even more useful when creating your own
 private data elements, as shown in the next section.</p>
 </section>
-<section id="setting-private-data-elements-with-pydicom">
-<h2>Setting Private Data Elements with <em>pydicom</em><a class="headerlink" href="#setting-private-data-elements-with-pydicom" title="Link to this heading">#</a></h2>
+<section id="adding-private-elements">
+<h2>Adding private elements<a class="headerlink" href="#adding-private-elements" title="Link to this heading">#</a></h2>
 <p>The DICOM standard requires a private creator data element to identify and
 reserve a section of private tags. That name should be unique, and usually
 has the company name as the first part to accomplish that.  <em>pydicom</em> provides
@@ -648,7 +599,7 @@ convenience functions to manage this:</p>
 </pre></div>
 </div>
 <p>Standard Python operations like <code class="docutils literal notranslate"><span class="pre">in</span></code> and <code class="docutils literal notranslate"><span class="pre">del</span></code> can also be used when working
-with block object:</p>
+with a private block object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mh">0x01</span> <span class="ow">in</span> <span class="n">block</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="mh">0x02</span> <span class="ow">in</span> <span class="n">block</span>
@@ -658,8 +609,9 @@ with block object:</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-<p>Since v3.0, there’s also a convenience method to add a private tag without creating a private block first:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">block</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">add_new_private</span><span class="p">(</span><span class="s2">&quot;My company 001&quot;</span><span class="p">,</span> <span class="mh">0x000B</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="s2">&quot;my value&quot;</span><span class="p">,</span> <span class="n">VR</span><span class="o">.</span><span class="n">SH</span><span class="p">)</span>
+<p>Since v3.0, there’s also a convenience method to add a private tag without creating a private
+block first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">add_new_private</span><span class="p">(</span><span class="s2">&quot;My company 001&quot;</span><span class="p">,</span> <span class="mh">0x000B</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="s2">&quot;my value&quot;</span><span class="p">,</span> <span class="s2">&quot;SH&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
 <span class="gp">...</span>
 <span class="go">(000b, 0010) Private Creator                     LO: &#39;My company 001&#39;</span>
@@ -669,8 +621,8 @@ with block object:</p>
 </div>
 <p>Note that for known private tags you don’t need to provide the VR in this function.</p>
 </section>
-<section id="removing-all-private-data-elements">
-<h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Link to this heading">#</a></h2>
+<section id="removing-all-private-elements">
+<h2>Removing all private elements<a class="headerlink" href="#removing-all-private-elements" title="Link to this heading">#</a></h2>
 <p>One part of anonymizing a DICOM file is to ensure that private data elements
 have been removed, as there is no guarantee as to what kind of information
 might be contained in them.  <em>pydicom</em> provides a convenience function
@@ -682,30 +634,30 @@ might be contained in them.  <em>pydicom</em> provides a convenience function
 files, to remove a large number of lines from the display of a dataset –
 lines which may not provide useful information.</p>
 </section>
-<section id="adding-new-entries-to-the-dicom-dictionary">
-<h2>Adding new entries to the DICOM dictionary<a class="headerlink" href="#adding-new-entries-to-the-dicom-dictionary" title="Link to this heading">#</a></h2>
-<p><em>pydicom</em> contains a dictionary with all known DICOM tags from the latest DICOM standard
-at release time. It also contains a dictionary with a number of known private tags
-collected from various sources.
-Sometimes you may encounter tags unknown to <em>pydicom</em> - either tags defined in a newer version
-of the standard, or, the more common case, private tags that are not contained
-in the private tags dictionary.</p>
-<p>In this case, you can add these tags to the DICOM dictionary before reading or writing datasets
-containing these tags. After that, <em>pydicom</em> will correctly handle the type of these tags, and
-can display their description if needed.</p>
-<p>For standard tags, you can use <a class="reference internal" href="../../reference/generated/pydicom.datadict.add_dict_entry.html#pydicom.datadict.add_dict_entry" title="pydicom.datadict.add_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_dict_entry()</span></code></a> or
-<a class="reference internal" href="../../reference/generated/pydicom.datadict.add_dict_entries.html#pydicom.datadict.add_dict_entries" title="pydicom.datadict.add_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_dict_entries()</span></code></a> (to add multiple tags at once):</p>
+<section id="adding-new-elements-to-the-dicom-dictionaries">
+<h2>Adding new elements to the DICOM dictionaries<a class="headerlink" href="#adding-new-elements-to-the-dicom-dictionaries" title="Link to this heading">#</a></h2>
+<p><em>pydicom</em> contains a dictionary with all known public elements from the latest DICOM standard,
+as well as a separate dictionary with a number of known private elements collected from various
+sources.</p>
+<p>Sometimes you may encounter elements unknown to <em>pydicom</em> - either because they’ve been defined
+by a newer version of the DICOM standard, or because they’re private elements that aren’t in
+the private element dictionary. When this occurs you can add these elements to the corresponding
+dictionary before reading or writing a dataset containing them, after that they’ll be handled
+correctly.</p>
+<p>For standard public elements, you can use <a class="reference internal" href="../../reference/generated/pydicom.datadict.add_dict_entry.html#pydicom.datadict.add_dict_entry" title="pydicom.datadict.add_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_dict_entry()</span></code></a> or
+<a class="reference internal" href="../../reference/generated/pydicom.datadict.add_dict_entries.html#pydicom.datadict.add_dict_entries" title="pydicom.datadict.add_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_dict_entries()</span></code></a> (for multiple elements):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">add_dict_entry</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="mh">0x888800001</span><span class="p">,</span> <span class="n">VR</span><span class="o">=</span><span class="s2">&quot;SH&quot;</span><span class="p">,</span> <span class="n">keyword</span><span class="o">=</span><span class="s2">&quot;SomeNewTag&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Some New Tag&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>For private tags, the analogous functions are
-<a class="reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entry.html#pydicom.datadict.add_private_dict_entry" title="pydicom.datadict.add_private_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_private_dict_entry()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_private_dict_entries()</span></code></a>:</p>
+<p>For private elements, the analogous functions are
+<a class="reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entry.html#pydicom.datadict.add_private_dict_entry" title="pydicom.datadict.add_private_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_private_dict_entry()</span></code></a> and
+<a class="reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_private_dict_entries()</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">add_private_dict_entry</span><span class="p">(</span><span class="n">private_creator</span><span class="o">=</span><span class="s2">&quot;ACME 1.1&quot;</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="mh">0x004100001</span><span class="p">,</span> <span class="n">VR</span><span class="o">=</span><span class="s2">&quot;DA&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Release Date&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that private tags do not have a keyword, as they are not registered in the
-standard DICOM data dictionary. As a private tag is defined by the tuple of private creator, group ID and tag offset,
-you always have to provide the private creator to define a new private tag.</p>
+<p>Note that unlike public elements, private elements don’t have a keyword. As a private element
+is defined by the tuple of private creator, group ID and tag, you always have to provide the private
+creator to define a new private tag offset.</p>
 <p>An example of how to use <a class="reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_private_dict_entries()</span></code></a> can
 be found in <a class="reference internal" href="../../auto_examples/metadata_processing/plot_add_dict_entries.html#sphx-glr-auto-examples-metadata-processing-plot-add-dict-entries-py"><span class="std std-ref">this code snippet</span></a>.</p>
 </section>
@@ -722,20 +674,20 @@ be found in <a class="reference internal" href="../../auto_examples/metadata_pro
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="viewing_images.html"
+       href="base_element.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Viewing Images</p>
+        <p class="prev-next-title">Dataset, DataElement and Tag</p>
       </div>
     </a>
     <a class="right-next"
-       href="best_practices.html"
+       href="writing_files.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Best Practices</p>
+        <p class="prev-next-title">Creating new datasets</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -758,11 +710,10 @@ be found in <a class="reference internal" href="../../auto_examples/metadata_pro
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#displaying-private-data-elements-in-pydicom">Displaying Private Data Elements in <em>pydicom</em></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-private-data-elements-with-pydicom">Setting Private Data Elements with <em>pydicom</em></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-all-private-data-elements">Removing All Private Data Elements</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-new-entries-to-the-dicom-dictionary">Adding new entries to the DICOM dictionary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#displaying-private-elements">Displaying private elements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-private-elements">Adding private elements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-all-private-elements">Removing all private elements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-new-elements-to-the-dicom-dictionaries">Adding new elements to the DICOM dictionaries</a></li>
 </ul>
   </nav></div>
 

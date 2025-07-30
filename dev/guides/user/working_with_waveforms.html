@@ -31,12 +31,14 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/user/working_with_waveforms';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,7 +64,7 @@
     <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Handling of compressed pixel data" href="image_data_handlers.html" />
+    <link rel="next" title="Element VRs and Python types" href="../element_value_types.html" />
     <link rel="prev" title="Working with Overlay Data" href="working_with_overlays.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -151,7 +154,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -367,36 +332,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -489,18 +426,37 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="what_is_dicom.html">What is DICOM?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">pydicom quick start</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="base_element.html">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Working with Waveform Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">FAQ</a></li>
 </ul>
 </div>
 </nav></div>
@@ -542,7 +498,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">pydicom User Guide</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Working with Waveform Data</span></li>
   </ul>
@@ -563,9 +519,6 @@
                   
   <section id="working-with-waveform-data">
 <span id="id1"></span><h1>Working with Waveform Data<a class="headerlink" href="#working-with-waveform-data" title="Link to this heading">#</a></h1>
-<p class="rubric">How to work with waveform data in pydicom.</p>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <p>Some DICOM SOP classes such as <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.2.html">Basic Voice Audio Waveform</a> and <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>
 contain a (5400,0100) <em>Waveform Sequence</em> element,
 where each item in the sequence is a related group of waveforms (a multiplex).
@@ -589,7 +542,6 @@ corresponding (5400,1010) <em>Waveform Data</em> element.</p>
 <span class="go">(5400, 1010) Waveform Data                       OW: Array of 240000 elements</span>
 </pre></div>
 </div>
-</section>
 <section id="dataset-waveform-array">
 <h2><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code><a class="headerlink" href="#dataset-waveform-array" title="Link to this heading">#</a></h2>
 <div class="admonition warning">
@@ -658,11 +610,11 @@ function with the <em>as_raw</em> keyword parameter instead:</p>
       </div>
     </a>
     <a class="right-next"
-       href="image_data_handlers.html"
+       href="../element_value_types.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Handling of compressed pixel data</p>
+        <p class="prev-next-title">Element VRs and Python types</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -685,7 +637,6 @@ function with the <em>as_raw</em> keyword parameter instead:</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-waveform-array"><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code></a></li>
 </ul>
   </nav></div>

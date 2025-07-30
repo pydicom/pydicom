@@ -31,12 +31,14 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/filesets';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,8 +64,8 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Structured Reporting" href="sr_basics.html" />
-    <link rel="prev" title="Waveforms" href="waveforms.html" />
+    <link rel="next" title="A (brief) introduction to Structured Reports" href="sr_basics.html" />
+    <link rel="prev" title="A beginner’s guide to Waveform Data" href="waveforms.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -151,7 +154,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -367,36 +332,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -491,15 +428,15 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="pixel_data/index.html"><em>Pixel Data</em></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pixel_data/index.html">A beginner’s guide to <em>Pixel Data</em></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/introduction.html"><em>Pixel Data</em> - Part 1: Introduction and accessing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/creation.html"><em>Pixel Data</em> - Part 2: Creation of pixel data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/compressing.html"><em>Pixel Data</em> - Part 3: Compression and decompression</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveforms.html">A beginner’s guide to <em>Waveform Data</em></a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">DICOM File-sets and DICOMDIR</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sr_basics.html">A (brief) introduction to Structured Reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
@@ -1028,7 +965,7 @@ to create new File-sets, and to load, search and modify existing ones.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Waveforms</p>
+        <p class="prev-next-title">A beginner’s guide to <em>Waveform Data</em></p>
       </div>
     </a>
     <a class="right-next"
@@ -1036,7 +973,7 @@ to create new File-sets, and to load, search and modify existing ones.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Structured Reporting</p>
+        <p class="prev-next-title">A (brief) introduction to Structured Reports</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

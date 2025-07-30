@@ -1,0 +1,1547 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pydicom quick start &#8212; pydicom 3.1.0.dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=d3077db3"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'guides/user/quick_start';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../_static/custom-icons.js?v=1cb01586"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Dataset, DataElement and Tag" href="base_element.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="3.1.0.dev0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pydicom_flat_black.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">pydicom</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../index.html">
+    Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pydicom/pydicom/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pydicom/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../index.html">
+    Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pydicom/pydicom/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pydicom/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="what_is_dicom.html">What is DICOM?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">pydicom quick start</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="base_element.html">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">FAQ</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pydicom quick start</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pydicom-quick-start">
+<h1>pydicom quick start<a class="headerlink" href="#pydicom-quick-start" title="Link to this heading">#</a></h1>
+<p>Welcome to the quick start guide for <em>pydicom</em>.</p>
+<p><em>pydicom</em> is an MIT licensed, open source <a class="reference external" href="https://www.python.org/">Python</a> library for
+creating, reading, modifying and writing <a class="reference external" href="https://www.dicomstandard.org/">DICOM</a>
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html">Data Sets</a> (<em>datasets</em> for short) and
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">File-sets</a>. It can also convert
+the imaging and waveform data in certain dataset types to a <a class="reference external" href="https://www.numpy.org">NumPy</a>
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code> (and back again), as long as suitable optional packages are <a class="reference internal" href="installation.html"><span class="doc">installed</span></a>.</p>
+<section id="what-is-a-dicom-dataset">
+<h2>What is a DICOM dataset?<a class="headerlink" href="#what-is-a-dicom-dataset" title="Link to this heading">#</a></h2>
+<p>A DICOM dataset represents an instance of a real world object, such as a single image slice from
+a CT scan acquisition. Each dataset is made up of a collection of <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html#sect_7.1">Data Elements</a>, with each Data Element representing an <em>attribute</em> of
+the object. A Data Element is itself made of a unique identifier called the <em>Element Tag</em>,
+has a format specifier called the <em>Value Representation</em> and contains the <em>Value</em> of the
+attribute. The DICOM Standard groups Data Elements that describe related attributes
+into <em>modules</em>.</p>
+<p>In <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">Part 3</a>, the DICOM Standard defines the many different types
+of dataset using something called an Information Object Definition (IOD). Each IOD contains
+a table of optional (U) and mandatory (M) modules that a dataset must have in order to meet
+that definition. This means you can use the IOD that corresponds to a given dataset to
+determine which Data Elements it should contain.</p>
+<p>As an example, the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.3.html">CT Image IOD</a> contains <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.3.3.html">this table</a> with the modules that are required for a dataset to be
+considered a valid <em>CT Image</em> instance. This includes the <em>Patient</em> module, which
+contains patient demographic information. If we look at <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.html#sect_C.7.1.1">the Patient module</a> itself, we see that it contains
+attributes for the <em>Patient’s Name</em>, <em>Patient ID</em> and <em>Patient’s Birth Date</em>, all of
+which are considered <em>Type</em> 2.</p>
+<p>Type 2 attributes <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.4.3.html">must be present, but may have an empty value</a>, so in any given <em>CT Image</em> dataset we should be able to find
+three Data Elements corresponding to those attributes, albeit with no guarantee
+they’ll have a useful value.</p>
+</section>
+<section id="reading-a-dataset">
+<h2>Reading a dataset<a class="headerlink" href="#reading-a-dataset" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We’re going to be using example DICOM datasets that are included with
+<em>pydicom</em>, such as <a class="extlink-gh reference external" href="https://github.com/pydicom/pydicom/blob/main/src/pydicom/data/test_files/CT_small.dcm">CT_small.dcm</a>.
+You can get the local file path to these datasets by using the <a class="reference internal" href="../../reference/generated/pydicom.examples.get_path.html#pydicom.examples.get_path" title="pydicom.examples.get_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_path()</span></code></a>
+function to return the path as a <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> (your path may vary):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span>
+<span class="go">PosixPath(&#39;/path/to/pydicom/data/test_files/CT_small.dcm&#39;)</span>
+</pre></div>
+</div>
+<p>When using <em>pydicom</em> to read your own data, use the path to those files directly
+instead.</p>
+</div>
+<p>To read the DICOM dataset at a given file path (as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>)
+we use <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>, which returns a
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ct&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> can also handle file-likes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And can be used as a context manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">&lt;class &#39;pydicom.dataset.FileDataset&#39;&gt;</span>
+</pre></div>
+</div>
+<p>By default, <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> will read any DICOM dataset
+stored in accordance with the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>.
+However, you may occasionally read a file that gives you the following
+exception:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">no_meta_path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;no_meta&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">no_meta_path</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/filereader.py&quot;</span>, line <span class="m">887</span>, in <span class="n">dcmread</span>
+<span class="w">    </span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="n">specific_tags</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/filereader.py&quot;</span>, line <span class="m">678</span>, in <span class="n">read_partial</span>
+<span class="w">    </span><span class="n">preamble</span> <span class="o">=</span> <span class="n">read_preamble</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/filereader.py&quot;</span>, line <span class="m">631</span>, in <span class="n">read_preamble</span>
+<span class="w">    </span><span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="s2">&quot;File is missing DICOM File Meta Information &quot;</span>
+<span class="gr">  pydicom.errors.InvalidDicomError</span>: <span class="n">File is missing DICOM File Meta Information</span>
+<span class="x">  header or the &#39;DICM&#39; prefix is missing from the header. Use force=True to</span>
+<span class="x">  force reading.</span>
+</pre></div>
+</div>
+<p>This indicates that either:</p>
+<ul class="simple">
+<li><p>The file isn’t a DICOM file, or</p></li>
+<li><p>The file contains DICOM data but isn’t in the DICOM File Format</p></li>
+</ul>
+<p>If you’re sure the file contains DICOM data, you can use the <cite>force</cite>
+keyword parameter to force reading:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">no_meta_path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A note of caution about using <code class="docutils literal notranslate"><span class="pre">force=True</span></code>; because <em>pydicom</em> uses a
+deferred-read system, <strong>no exceptions</strong> will be raised at the time of reading,
+no matter what the contents of the file are:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;not_dicom.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">not_dicom</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">not_dicom</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;This is not a DICOM file!&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="s1">&#39;not_dicom.txt&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You’ll only run into problems when trying to use the dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">1703</span>, in <span class="n">__str__</span>
+<span class="w">    </span>  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">()</span>
+  File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">1436</span>, in <span class="n">_pretty_str</span>
+<span class="w">    </span>  <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+  File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">1079</span>, in <span class="n">__iter__</span>
+<span class="w">    </span>  <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+  File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">833</span>, in <span class="n">__getitem__</span>
+<span class="w">    </span>  <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="n">character_set</span><span class="p">)</span>
+  File <span class="nb">&quot;../pydicom/dataelem.py&quot;</span>, line <span class="m">581</span>, in <span class="n">DataElement_from_raw</span>
+<span class="w">    </span>  <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="gr">  KeyError</span>: <span class="n">&quot;Unknown DICOM tag (6854,7369) can&#39;t look up VR&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="viewing-and-accessing">
+<h2>Viewing and accessing<a class="headerlink" href="#viewing-and-accessing" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CT_small.dcm</span></code> dataset is also included as an example <code class="docutils literal notranslate"><span class="pre">FileDataset</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">&lt;class &#39;pydicom.dataset.FileDataset&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">filename</span>
+<span class="go">&#39;/path/to/pydicom/data/test_files/CT_small.dcm&#39;</span>
+</pre></div>
+</div>
+<p>You can view the contents of the entire dataset by using <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">Dataset.file_meta -------------------------------</span>
+<span class="go">(0002,0000) File Meta Information Group Length  UL: 192</span>
+<span class="go">(0002,0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="go">(0002,0002) Media Storage SOP Class UID         UI: CT Image Storage</span>
+<span class="go">(0002,0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
+<span class="go">(0002,0010) Transfer Syntax UID                 UI: Explicit VR Little Endian</span>
+<span class="go">(0002,0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2</span>
+<span class="go">(0002,0013) Implementation Version Name         SH: &#39;DCTOOL100&#39;</span>
+<span class="go">(0002,0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
+<span class="go">-------------------------------------------------</span>
+<span class="go">(0008,0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
+<span class="go">(0008,0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
+<span class="go">(0008,0012) Instance Creation Date              DA: &#39;20040119&#39;</span>
+<span class="go">(0008,0013) Instance Creation Time              TM: &#39;072731&#39;</span>
+<span class="go">(0008,0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3</span>
+<span class="go">(0008,0016) SOP Class UID                       UI: CT Image Storage</span>
+<span class="go">...</span>
+<span class="go">(0010,1002)  Other Patient IDs Sequence   2 item(s) ----</span>
+<span class="go">    (0010,0020) Patient ID                          LO: &#39;ABCD1234&#39;</span>
+<span class="go">    (0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+<span class="go">    ---------</span>
+<span class="go">    (0010,0020) Patient ID                          LO: &#39;1234ABCD&#39;</span>
+<span class="go">    (0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+<span class="go">    ---------</span>
+<span class="go">...</span>
+<span class="go">(0043,0010) Private Creator                     LO: &#39;GEMS_PARM_01&#39;</span>
+<span class="go">(0043,1010) [Window value]                      US: 400</span>
+<span class="go">...</span>
+<span class="go">(7FE0,0010) Pixel Data                          OW: Array of 32768 elements</span>
+<span class="go">(FFFC,FFFC) Data Set Trailing Padding           OB: Array of 126 elements</span>
+</pre></div>
+</div>
+<p>The print output shows a list of the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html#sect_7.1">Data Elements</a> (or <em>elements</em> for short) present in the
+dataset, one element per line. The format of each line is:</p>
+<ul class="simple">
+<li><p><strong>(0008,0005)</strong>: The element’s <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html#sect_7.1.1">tag</a>,
+as (group number, element number) in hexadecimal</p></li>
+<li><p><strong>Specific Character Set</strong>: the element’s name, if known</p></li>
+<li><p><strong>CS</strong>: The element’s <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">Value Representation</a> (VR),
+if known</p></li>
+<li><p><strong>‘ISO_IR_100’</strong>: the element’s stored value, or the length of the value if it’s too
+long to show concisely</p></li>
+</ul>
+<section id="elements">
+<h3>Elements<a class="headerlink" href="#elements" title="Link to this heading">#</a></h3>
+<p>There are three categories of elements:</p>
+<ul class="simple">
+<li><p><strong>Standard elements</strong> such as (0008,0016) <em>SOP Class UID</em>. These elements
+are registered in <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">Part 6</a> of the official DICOM Standard,
+have a tag with an even group number and are unique at each level of the dataset.</p></li>
+<li><p><strong>Repeating group elements</strong> such as (60xx,3000) <em>Overlay Data</em> (not found
+in this dataset). <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.6.html">Repeating group</a> elements are
+also registered in the official DICOM Standard, however they have a tag with a group
+number defined over a range rather than a fixed value.
+For example, there may be multiple <em>Overlay Data</em> elements at a given level
+of the dataset as long as each has its own unique group number; <code class="docutils literal notranslate"><span class="pre">0x6000</span></code>,
+<code class="docutils literal notranslate"><span class="pre">0x6002</span></code>, <code class="docutils literal notranslate"><span class="pre">0x6004</span></code>, or any even value up to <code class="docutils literal notranslate"><span class="pre">0x601E</span></code>.</p></li>
+<li><p><strong>Private elements</strong> such as (0043,1010) <em>[Window value]</em>.
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.8.html">Private elements</a> have a tag with an odd group number,
+aren’t registered in the official DICOM Standard, and are instead created
+privately, as specified by the (gggg,0010-00FF) <em>Private Creator</em> element.</p>
+<ul>
+<li><p>If the private creator is unknown to <em>pydicom</em> then the element name will be
+<em>Private tag data</em> and the VR <strong>UN</strong>.</p></li>
+<li><p>If the private creator is known then the element name will be surrounded
+by square brackets, e.g. <em>[Window value]</em> and the VR will be shown.</p></li>
+</ul>
+</li>
+</ul>
+<p>For all element categories, we can access a particular element in the dataset
+through its tag, which returns a <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>
+instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0008</span><span class="p">,</span> <span class="mh">0x0016</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
+<span class="go">(0008,0016) SOP Class UID                       UI: CT Image Storage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">tag</span>
+<span class="go">(0008,0016)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">keyword</span>
+<span class="go">&#39;SOPClassUID&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">private_elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x1010</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">private_elem</span>
+<span class="go">(0043,1010) [Window value]                      US: 400</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">private_elem</span><span class="o">.</span><span class="n">keyword</span>
+<span class="go">&#39;&#39;</span>
+</pre></div>
+</div>
+<p>We can also access standard elements through their <em>keyword</em>. The keyword is
+usually the same as the element’s name without any spaces, but there are
+exceptions - such as (0010,0010) <em>Patient’s Name</em> having a keyword of
+<em>PatientName</em>. A list of keywords for all standard elements can be found
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">here</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;SOPClassUID&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
+<span class="go">(0008,0016) SOP Class UID                       UI: CT Image Storage</span>
+</pre></div>
+</div>
+<p>Because of the lack of a unique keyword, this won’t work for private or
+repeating group elements. So for those elements stick to the
+<code class="docutils literal notranslate"><span class="pre">Dataset[group</span> <span class="pre">number,</span> <span class="pre">element</span> <span class="pre">number]</span></code> method.</p>
+<p>In most cases, the important thing about an element is its value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&#39;1.2.840.10008.5.1.4.1.1.2&#39;</span>
+</pre></div>
+</div>
+<p>For standard elements, you can use the Python dot notation with the keyword to
+get the value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SOPClassUID</span>
+<span class="go">&#39;1.2.840.10008.5.1.4.1.1.2&#39;</span>
+</pre></div>
+</div>
+<p>This is the recommended method of accessing the value of standard elements.
+It’s simpler and more human-friendly then dealing with element tags and later
+on you’ll see how you can use the keyword to do far more than just accessing the value.</p>
+<p>Elements may also be multi-valued - that is, have a <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.4.html">Value Multiplicity</a> (VM) &gt; 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
+<span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;ImageType&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">VM</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>The items for multi-valued elements can be accessed using the standard Python
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">&#39;PRIMARY&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="sequences">
+<h3>Sequences<a class="headerlink" href="#sequences" title="Link to this heading">#</a></h3>
+<p>When viewing a dataset, you may see that some of the elements are indented:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">(0010,1002)  Other Patient IDs Sequence   2 item(s) ----</span>
+<span class="go">    (0010,0020) Patient ID                          LO: &#39;ABCD1234&#39;</span>
+<span class="go">    (0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+<span class="go">    ---------</span>
+<span class="go">    (0010,0020) Patient ID                          LO: &#39;1234ABCD&#39;</span>
+<span class="go">    (0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+<span class="go">    ---------</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>This indicates that those elements are part of a sequence, in this case
+part of the <em>Other Patient IDs Sequence</em> element. Sequence elements have a
+VR of <strong>SQ</strong> and have a name that ends in the word <em>Sequence</em>.
+DICOM datasets use the <a class="reference external" href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree data structure</a>, with non-sequence
+elements acting as leaves and sequence elements acting as the nodes where
+branches start.</p>
+<ul class="simple">
+<li><p>The top-level (root) dataset contains 0 or more elements:</p>
+<ul>
+<li><p>An element may be non-sequence type; its VR is not <strong>SQ</strong> (leaf), or</p></li>
+<li><p>An element may be a sequence type; its VR is <strong>SQ</strong> and it contains 0 or
+more items (branches):</p>
+<ul>
+<li><p>Each item in the sequence is another dataset, containing 0 or more
+elements:</p>
+<ul>
+<li><p>An element may be non-sequence type, or</p></li>
+<li><p>An element may be a sequence type, and so on…</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Sequence elements can be accessed in the same manner as non-sequence ones:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0010</span><span class="p">,</span> <span class="mh">0x1002</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;OtherPatientIDsSequence&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The main difference between sequence and non-sequence elements is that their value is
+a list-like object containing zero or more <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances,
+which can be accessed using the standard Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&lt;class &#39;pydicom.dataset.Dataset&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">(0010,0020) Patient ID                          LO: &#39;ABCD1234&#39;</span>
+<span class="go">(0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">(0010,0020) Patient ID                          LO: &#39;1234ABCD&#39;</span>
+<span class="go">(0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="dataset-file-meta">
+<h3>Dataset.file_meta<a class="headerlink" href="#dataset-file-meta" title="Link to this heading">#</a></h3>
+<p>Earlier we saw that by default <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> only reads
+files that are in the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>. So what’s the
+difference between a DICOM dataset written to file and one written in the DICOM File Format?
+The answer is a file header containing:</p>
+<ul>
+<li><p>An 128 byte preamble:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">preamble</span>
+<span class="go">b&#39;II*\x00T\x18\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...</span>
+</pre></div>
+</div>
+</li>
+<li><p>Followed by a 4 byte <code class="docutils literal notranslate"><span class="pre">DICM</span></code> prefix</p></li>
+<li><p>Followed by the required DICOM <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html#table_7.1-1">File Meta Information</a> elements, which in <em>pydicom</em> are
+stored in a <a class="reference internal" href="../../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileMetaDataset</span></code></a> instance in the
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta" title="pydicom.dataset.FileDataset.file_meta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">file_meta</span></code></a> attribute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span>
+<span class="go">(0002,0000) File Meta Information Group Length  UL: 192</span>
+<span class="go">(0002,0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="go">(0002,0002) Media Storage SOP Class UID         UI: CT Image Storage</span>
+<span class="go">(0002,0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
+<span class="go">(0002,0010) Transfer Syntax UID                 UI: Explicit VR Little Endian</span>
+<span class="go">(0002,0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2</span>
+<span class="go">(0002,0013) Implementation Version Name         SH: &#39;DCTOOL100&#39;</span>
+<span class="go">(0002,0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>As you can see, all the elements in the <code class="docutils literal notranslate"><span class="pre">file_meta</span></code> have tags with a group number of
+<code class="docutils literal notranslate"><span class="pre">0x0002</span></code>. In fact, the DICOM File Format header is the only place you should find group
+<code class="docutils literal notranslate"><span class="pre">0x0002</span></code> elements as their presence anywhere else is non-conformant.</p>
+<p>Out of all of the elements in the <code class="docutils literal notranslate"><span class="pre">file_meta</span></code>, the most important is
+(0002,0010) <em>Transfer Syntax UID</em>, as the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_10.html">transfer syntax</a> defines the way the
+entire dataset (including the pixel data) has been encoded. Chances are
+that at some point you’ll need to know it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
+<span class="go">&#39;1.2.840.10008.1.2.1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Explicit VR Little Endian&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="o">.</span><span class="n">keyword</span>
+<span class="go">&#39;ExplicitVRLittleEndian&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="modifying-a-dataset">
+<h2>Modifying a dataset<a class="headerlink" href="#modifying-a-dataset" title="Link to this heading">#</a></h2>
+<section id="modifying-elements">
+<h3>Modifying elements<a class="headerlink" href="#modifying-elements" title="Link to this heading">#</a></h3>
+<p>We can modify the value of any element by retrieving it and setting the value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0010</span><span class="p">,</span> <span class="mh">0x0010</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&#39;CompressedSamples^CT1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Citizen^Jan&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
+<span class="go">(0010,0010) Patient&#39;s Name                      PN: &#39;Citizen^Jan&#39;</span>
+</pre></div>
+</div>
+<p>Which raises the question; what <em>kind</em> of value should be used to set an element’s value?
+In the above example we used a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> to set the <em>Patient’s Name</em>, but what about
+for other elements? Should they all be strings too? (Hint: no).</p>
+<p>The allowed object type to use for an element’s value depends on its <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">Value Representation</a>. We can see from the above that <em>Patient’s Name</em> has a VR of
+<strong>PN</strong>. By checking the <a class="reference internal" href="../element_value_types.html"><span class="doc">Element VR and Python types</span></a>
+guide, we see that elements with a VR of <strong>PN</strong> can be set using:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> if the <em>Value
+Multiplicity</em> (VM) is 1, or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">list[str]</span></code> or <code class="docutils literal notranslate"><span class="pre">list[PersonName]</span></code> for VM &gt; 1.</p></li>
+</ul>
+<p>Each standard element also has restrictions on its allowed VM, given in <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">Part 6</a>. For <em>Patient’s Name</em> the VM must always be 1, so the
+allowed types are <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">PersonName</span></code>. If instead we look up
+(0018,106C) <em>Synchronization Channel</em>, we see the VR is <strong>US</strong> and the allowed VM 2,
+so using the <em>Element VR and Python types</em> guide, we see the only type that may be
+used is <code class="docutils literal notranslate"><span class="pre">list[int]</span></code>.</p>
+<p>For standard elements it’s simpler to use the keyword to set the value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s1">&#39;Citizen^Snips&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
+<span class="go">(0010,0010) Patient&#39;s Name                      PN: &#39;Citizen^Snips&#39;</span>
+</pre></div>
+</div>
+<p>Multi-valued elements can be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> or modified using the
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ORIGINAL&#39;</span><span class="p">,</span> <span class="s1">&#39;PRIMARY&#39;</span><span class="p">,</span> <span class="s1">&#39;LOCALIZER&#39;</span><span class="p">]</span>  <span class="c1"># VR &#39;CS&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
+<span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;LOCALIZER&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DERIVED&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
+<span class="go">[&#39;ORIGINAL&#39;, &#39;DERIVED&#39;, &#39;LOCALIZER&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;PRIMARY&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
+<span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;DERIVED&#39;, &#39;LOCALIZER&#39;]</span>
+</pre></div>
+</div>
+<p>Similarly, for sequence elements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dataset</span><span class="p">(),</span> <span class="n">Dataset</span><span class="p">()]</span>  <span class="c1"># VR &#39;SQ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Dataset</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>The items in a sequence are always <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances, if you
+try to add any other type to a sequence you’ll get an exception:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Hello world?&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/multival.py&quot;</span>, line <span class="m">63</span>, in <span class="n">append</span>
+<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_constructor</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+  File <span class="nb">&quot;.../pydicom/sequence.py&quot;</span>, line <span class="m">15</span>, in <span class="n">validate_dataset</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Sequence contents must be Dataset instances.&#39;</span><span class="p">)</span>
+<span class="gr">  TypeError</span>: <span class="n">Sequence contents must be Dataset instances.</span>
+</pre></div>
+</div>
+<p>You can set any element value as empty by using <code class="docutils literal notranslate"><span class="pre">None</span></code> (sequence elements
+will automatically be converted to an empty list when you do so):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
+<span class="go">(0010,0010) Patient&#39;s Name                      PN: None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>Elements with a value of <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">b''</span></code>, <code class="docutils literal notranslate"><span class="pre">''</span></code> or <code class="docutils literal notranslate"><span class="pre">[]</span></code> will still be
+written to file, but will have an empty value and zero length.</p>
+</section>
+<section id="adding-elements">
+<h3>Adding elements<a class="headerlink" href="#adding-elements" title="Link to this heading">#</a></h3>
+<section id="standard-and-repeating-group-elements">
+<h4>Standard and repeating group elements<a class="headerlink" href="#standard-and-repeating-group-elements" title="Link to this heading">#</a></h4>
+<p>New elements of any category can be added to the dataset with the
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new()</span></code></a> method, which takes the tag, VR and
+value to use for the new element.</p>
+<p>Let’s say we wanted to add the (0028,1050) <em>Window Center</em> standard element. We
+already know the tag is (0028,1050), but how we get the VR and how do we
+know the Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> to use for the value?</p>
+<p>There are two ways to get an element’s VR:</p>
+<ul class="simple">
+<li><p>You can use <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">Part 6 of the DICOM Standard</a>
+and search for the element</p></li>
+<li><p>Alternatively, you can use the <a class="reference internal" href="../../reference/generated/pydicom.datadict.dictionary_VR.html#pydicom.datadict.dictionary_VR" title="pydicom.datadict.dictionary_VR"><code class="xref py py-func docutils literal notranslate"><span class="pre">dictionary_VR()</span></code></a>
+function to look it up</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.datadict</span><span class="w"> </span><span class="kn">import</span> <span class="n">dictionary_VR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dictionary_VR</span><span class="p">([</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">])</span>
+<span class="go">&#39;DS&#39;</span>
+</pre></div>
+</div>
+<p>As we saw earlier, you can use the <a class="reference internal" href="../element_value_types.html"><span class="doc">Element VR and Python types</span></a> guide to find the Python type to use for a given VR.
+For <strong>DS</strong> with a VM of 1-n, we can use a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>,
+or a <code class="docutils literal notranslate"><span class="pre">list</span></code> of those types. So to add the new element:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">add_new</span><span class="p">([</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">],</span> <span class="s1">&#39;DS&#39;</span><span class="p">,</span> <span class="s2">&quot;100.0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
+<span class="go">(0028,1050) Window Center                       DS: &quot;100.0&quot;</span>
+</pre></div>
+</div>
+<p>Some VRs, like <strong>DS</strong>, require the value be formatted correctly. For example, elements with
+a VR of <strong>DA</strong> should use the YYYYMMDD format and only allow ASCII characters 0 to 9 (unless
+used for query matching). The full list of VRs and their formatting requirements can be found in
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html">Section 6.2 of Part 5 of the DICOM Standard</a>.</p>
+</section>
+<section id="alternative-for-standard-elements">
+<h4>Alternative for standard elements<a class="headerlink" href="#alternative-for-standard-elements" title="Link to this heading">#</a></h4>
+<p>Adding elements with <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new()</span></code></a> is a lot of
+work, so for standard elements you can just use the keyword
+and <em>pydicom</em> will do the VR lookup for you:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;WindowWidth&#39;</span> <span class="ow">in</span> <span class="n">ds</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">WindowWidth</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;WindowWidth&#39;</span><span class="p">]</span>
+<span class="go">(0028,1051) Window Width                        DS: &quot;500.0&quot;</span>
+</pre></div>
+</div>
+<p>Notice how we can also use the element keyword with the Python
+<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator to see if a standard element is in
+the dataset? This also works with element tags, so private and repeating group
+elements are also covered:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x1010</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ds</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h4>Sequences<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<p>Because sequence items are also <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances,
+you can use the same methods on them as well.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Dataset</span><span class="p">(),</span> <span class="n">Dataset</span><span class="p">(),</span> <span class="n">Dataset</span><span class="p">()]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s1">&#39;Citizen^Jan&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">TypeOfPatientID</span> <span class="o">=</span> <span class="s1">&#39;TEXT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s1">&#39;CompressedSamples^CT1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">TypeOfPatientID</span> <span class="o">=</span> <span class="s1">&#39;TEXT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">(0010,0020) Patient ID                          LO: &#39;Citizen^Jan&#39;</span>
+<span class="go">(0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">(0010,0020) Patient ID                          LO: &#39;CompressedSamples^CT1&#39;</span>
+<span class="go">(0010,0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="private-elements">
+<h4>Private elements<a class="headerlink" href="#private-elements" title="Link to this heading">#</a></h4>
+<p>When adding private elements, the DICOM Standard <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.8.html#sect_7.8.1">requires</a>
+a (gggg,0010-00FF) <em>Private Creator</em> element also be added to identify and reserve the
+<code class="docutils literal notranslate"><span class="pre">gggg</span></code> section of private tags. <em>pydicom</em> provides the
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new_private" title="pydicom.dataset.Dataset.add_new_private"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new_private()</span></code></a> convenience method to help manage this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">add_new_private</span><span class="p">(</span><span class="s2">&quot;Private Creator Name&quot;</span><span class="p">,</span> <span class="mh">0x000B</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="s2">&quot;my value&quot;</span><span class="p">,</span> <span class="s2">&quot;SH&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
+<span class="gp">...</span>
+<span class="go">(000B,0010) Private Creator                     LO: &#39;Private Creator Name&#39;</span>
+<span class="go">(000B,1001) Private tag data                    SH: &#39;my value&#39;</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="deleting-elements">
+<h3>Deleting elements<a class="headerlink" href="#deleting-elements" title="Link to this heading">#</a></h3>
+<p>All elements can be deleted with the <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__delitem__" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">del</span></code></a>
+operator in combination with the element tag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x1010</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x1010</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ds</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>For standard elements you can use the keyword instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">WindowCenter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;WindowCenter&#39;</span> <span class="ow">in</span> <span class="n">ds</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>And you can remove items from sequences and multi-valued elements using your
+preferred <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
+<span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;DERIVED&#39;, &#39;LOCALIZER&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
+<span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;LOCALIZER&#39;]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="writing-a-dataset">
+<h2>Writing a dataset<a class="headerlink" href="#writing-a-dataset" title="Link to this heading">#</a></h2>
+<p>After changing the dataset, the final step is to write the modifications back
+to file. This can be done by using <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> to
+write the dataset to the supplied path:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also write to any Python file-like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default, <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> will write the dataset
+as-is. This means that even if your dataset is not conformant to the
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a> it will
+still be written exactly as given. To be certain you’re writing the
+dataset in the DICOM File Format you can use the <cite>enforce_file_format</cite> keyword
+parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">enforce_file_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will attempt to automatically add in any missing required group
+<code class="docutils literal notranslate"><span class="pre">0x0002</span></code> File Meta Information elements and set a blank 128 byte preamble (if
+required). If it’s unable to do so then an exception will be raised:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">enforce_file_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">2452</span>, in <span class="n">save_as</span>
+<span class="w">    </span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span>
+  File <span class="nb">&quot;.../pydicom/filewriter.py&quot;</span>, line <span class="m">1311</span>, in <span class="n">dcmwrite</span>
+<span class="w">    </span><span class="n">validate_file_meta</span><span class="p">(</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">3204</span>, in <span class="n">validate_file_meta</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+<span class="gr">AttributeError</span>: <span class="n">Required File Meta Information elements are either missing</span>
+<span class="x">or have an empty value: (0002,0010) Transfer Syntax UID</span>
+</pre></div>
+</div>
+<p>The exception message contains the required element(s) that need to be added,
+usually this will only be the <em>Transfer Syntax UID</em>. It’s an important element,
+so get in the habit of making sure it’s there and correct.</p>
+<p>Because we deleted the <a class="reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta" title="pydicom.dataset.FileDataset.file_meta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">file_meta</span></code></a> dataset
+we need to add it back:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileMetaDataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>And now we can add our <em>Transfer Syntax UID</em> element and save to file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="s1">&#39;1.2.840.10008.1.2.1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s1">&#39;out.dcm&#39;</span><span class="p">,</span> <span class="n">enforce_file_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-pixel-data">
+<h2>Accessing <em>Pixel Data</em><a class="headerlink" href="#accessing-pixel-data" title="Link to this heading">#</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>We have a separate and more in-depth <a class="reference internal" href="../../tutorials/pixel_data/index.html"><span class="doc">pixel data tutorial</span></a>
+that also covers creation of new pixel data and compressing and decompressing existing
+pixel data.</p>
+</div>
+<p>Many DICOM datasets have image and image-like data available in the (7FE0,0010) <em>Pixel
+Data</em> element. If present, the data will either be available as uncompressed raw binary data
+or as an encapsulated and compressed image codestream, depending on the <em>Transfer Syntax UID</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="o">.</span><span class="n">is_compressed</span>  <span class="c1"># raw binary</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="o">.</span><span class="n">is_compressed</span>  <span class="c1"># encapsulated codestreams</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<section id="as-bytes">
+<h3>As <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a><a class="headerlink" href="#as-bytes" title="Link to this heading">#</a></h3>
+<p>For datasets with an uncompressed <em>Transfer Syntax UID</em>, accessing the image data is
+simply a matter of accessing the <em>Pixel Data</em> value, which will return all frames
+concatenated together as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_data</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">pixel_data</span><span class="p">)</span>
+<span class="go">&lt;class &#39;bytes&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">pixel_data</span><span class="p">)</span>
+<span class="go">32768</span>
+</pre></div>
+</div>
+<p>For datasets with a compressed <em>Transfer Syntax</em>, each frame of image data will have
+been <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a>, which must be reversed. In <em>pydicom</em>
+this can be done with the <a class="reference internal" href="../../reference/generated/pydicom.encaps.get_frame.html#pydicom.encaps.get_frame" title="pydicom.encaps.get_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame()</span></code></a> function or the
+<a class="reference internal" href="../../reference/generated/pydicom.encaps.generate_frames.html#pydicom.encaps.generate_frames" title="pydicom.encaps.generate_frames"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_frames()</span></code></a> iterator to return or yield a frame of compressed
+image data as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.encaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_frame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">jpeg2k</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+<span class="go">152326</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nr_frames</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NumberOfFrames&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Number Of Frames may not be present</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">get_frame</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">number_of_frames</span><span class="o">=</span><span class="n">nr_frames</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+<span class="go">152294</span>
+</pre></div>
+</div>
+</section>
+<section id="as-a-numpy-ndarray">
+<h3>As a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><a class="headerlink" href="#as-a-numpy-ndarray" title="Link to this heading">#</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Converting uncompressed <em>Pixel Data</em> to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> requires installing
+<a class="reference external" href="https://www.numpy.org">NumPy</a>, and converting compressed <em>Pixel Data</em> may
+require installing other packages. See <a class="reference internal" href="../plugin_table.html"><span class="doc">this page</span></a>
+for a list of supported transfer syntaxes and the packages required to decompress
+them.</p>
+</div>
+<p>There are three main methods for converting <em>Pixel Data</em> to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>,
+depending on your use case:</p>
+<ol class="arabic simple">
+<li><p>Using the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property, in conjunction
+with <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array_options" title="pydicom.dataset.Dataset.pixel_array_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.pixel_array_options()</span></code></a>.</p></li>
+<li><p>Using the <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> or <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
+functions.</p></li>
+<li><p>Using the <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> or
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a> instance
+methods.</p></li>
+</ol>
+<section id="with-dataset-pixel-array">
+<h4>With <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a><a class="headerlink" href="#with-dataset-pixel-array" title="Link to this heading">#</a></h4>
+<p>The most convenient way to return the entire pixel data as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+is with the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(30, 240, 320, 3)</span>
+</pre></div>
+</div>
+<p>This will load the entire pixel data into memory and convert it to a <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>. By default,
+it will also convert any pixel data in the <a class="extlink-wiki reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> color space to RGB using
+the <a class="reference internal" href="../../reference/generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> function. Customization of the conversion
+process can be done through <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array_options" title="pydicom.dataset.Dataset.pixel_array_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.pixel_array_options()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array_options</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Convert only the first frame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>  <span class="c1"># still reads all frames into memory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(240, 320, 3)</span>
+</pre></div>
+</div>
+<p>The main drawbacks of <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> are:</p>
+<ul class="simple">
+<li><p>It requires loading the entire <em>Pixel Data</em> into memory.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> is kept as an attribute of the dataset, taking up memory when it might
+not need to do so.</p></li>
+<li><p>The returned <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> lacks any descriptive metadata.</p></li>
+<li><p>The conversion can only be customized using a second function.</p></li>
+</ul>
+</section>
+<section id="with-pixel-array-and-iter-pixels">
+<h4>With <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a><a class="headerlink" href="#with-pixel-array-and-iter-pixels" title="Link to this heading">#</a></h4>
+<p>The <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> functions convert the pixel data data
+to an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> directly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">pixel_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># reads all frames into memory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(240, 320, 3)</span>
+</pre></div>
+</div>
+<p>If you’re concerned about memory usage, both functions can be used with the path to
+the dataset instead. This will reduce the amount of <em>Pixel Data</em> read into memory to the
+minimum required:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;ybr_color&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># reads only a single frame into memory</span>
+</pre></div>
+</div>
+<p>If you need the elements from the dataset’s <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a>
+module in order to perform any required image processing operations (such as
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.apply_rescale.html#pydicom.pixels.apply_rescale" title="pydicom.pixels.apply_rescale"><code class="xref py py-func docutils literal notranslate"><span class="pre">rescale</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">windowing</span></code></a>),
+you can pass an empty <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> via the <cite>ds_out</cite> parameter, which will be populated by the
+group <code class="docutils literal notranslate"><span class="pre">0x0028</span></code> elements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ds_out</span><span class="o">=</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span>
+<span class="go">(240, 320)</span>
+</pre></div>
+</div>
+<p>The main drawback of <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> is that the
+returned <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> lacks any descriptive metadata.</p>
+</section>
+<section id="with-decoder-as-array-and-decoder-iter-array">
+<h4>With <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a><a class="headerlink" href="#with-decoder-as-array-and-decoder-iter-array" title="Link to this heading">#</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not use the <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class directly, instead use the class instance
+returned by the <a class="reference internal" href="../../reference/generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_decoder()</span></code></a> function.</p>
+</div>
+<p>Finally, if you need metadata describing the returned <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, you can use the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a> methods for the <code class="docutils literal notranslate"><span class="pre">Decoder</span></code> class instance returned by
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_decoder()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixels</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_decoder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decoder</span> <span class="o">=</span> <span class="n">get_decoder</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;photometric_interpretation&quot;</span><span class="p">]</span>
+<span class="go">&#39;RGB&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;number_of_frames&quot;</span><span class="p">]</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>The main drawback of using the <code class="docutils literal notranslate"><span class="pre">Decoder</span></code> methods in the manner shown above is
+that the entire <em>Pixel Data</em> will be read into memory. However, this doesn’t necessarily
+have to be the case; the <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a> functions use those same methods to perform
+memory-efficient decoding. If you need both image metadata and memory efficiency,
+take a look at the source code for those functions to see how you can implement this yourself.</p>
+</section>
+</section>
+</section>
+<section id="loading-a-file-set">
+<h2>Loading a File-set<a class="headerlink" href="#loading-a-file-set" title="Link to this heading">#</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>We have a separate and more in-depth <a class="reference internal" href="../../tutorials/filesets.html"><span class="doc">File-set tutorial</span></a>
+that also covers creating and modifying File-sets.</p>
+</div>
+<p>A File-set is a collection of (usually) related datasets that have been written to file and share
+a common naming space. They’re identifiable by a <code class="docutils literal notranslate"><span class="pre">DICOMDIR</span></code> file located in their root
+directory, which is used to summarize the File-set’s contents. While the DICOMDIR file can be
+read using <a class="reference internal" href="../../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> like any other DICOM dataset, we recommend that
+you use the <a class="reference internal" href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class to manage the DICOMDIR and related File-set
+instead.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The DICOMDIR dataset contains a series of records that are referenced to each other by
+their file offsets, which makes it very easy to ‘break’ a DICOMDIR dataset, even by
+changing something seemingly innocuous like the (0004,1130) <em>File-set ID</em>. This is why we
+recommend using <a class="reference internal" href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> to manage any changes.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.fileset</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileSet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;dicomdir&quot;</span><span class="p">)</span>  <span class="c1"># The path to the example File-set</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FileSet</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A summary of the File-set’s contents is shown when printing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+<span class="go">DICOM File-set</span>
+<span class="go">  Root directory: .../pydicom/data/test_files/dicomdirtests</span>
+<span class="go">  File-set ID: PYDICOM_TEST</span>
+<span class="go">  File-set UID: 1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187</span>
+<span class="go">  Descriptor file ID: (no value available)</span>
+<span class="go">  Descriptor file character set: (no value available)</span>
+<span class="go">  Changes staged for write(): DICOMDIR update, directory structure update</span>
+
+<span class="go">  Managed instances:</span>
+<span class="go">    PATIENT: PatientID=&#39;77654033&#39;, PatientName=&#39;Doe^Archibald&#39;</span>
+<span class="go">      STUDY: StudyDate=20010101, StudyTime=000000, StudyDescription=&#39;XR C Spine Comp Min 4 Views&#39;</span>
+<span class="go">        SERIES: Modality=CR, SeriesNumber=1</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=CR, SeriesNumber=2</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=CR, SeriesNumber=3</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">      STUDY: StudyDate=19950903, StudyTime=173032, StudyDescription=&#39;CT, HEAD/BRAIN WO CONTRAST&#39;</span>
+<span class="go">        SERIES: Modality=CT, SeriesNumber=2</span>
+<span class="go">          IMAGE: 4 SOP Instances</span>
+<span class="go">    PATIENT: PatientID=&#39;98890234&#39;, PatientName=&#39;Doe^Peter&#39;</span>
+<span class="go">      STUDY: StudyDate=20010101, StudyTime=000000</span>
+<span class="go">        SERIES: Modality=CT, SeriesNumber=4</span>
+<span class="go">          IMAGE: 2 SOP Instances</span>
+<span class="go">        SERIES: Modality=CT, SeriesNumber=5</span>
+<span class="go">          IMAGE: 5 SOP Instances</span>
+<span class="go">      ...</span>
+</pre></div>
+</div>
+<p>You can search the File-set with the <a class="reference internal" href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find_values" title="pydicom.fileset.FileSet.find_values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_values()</span></code></a> method to
+return a list of element values found in the DICOMDIR’s records:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PatientID&quot;</span><span class="p">)</span>
+<span class="go">[&#39;77654033&#39;, &#39;98890234&#39;]</span>
+</pre></div>
+</div>
+<p>The search can be expanded to the File-set’s managed instances (its datasets), by passing
+<code class="docutils literal notranslate"><span class="pre">load=True</span></code>, at the cost of a longer search time due to having to read and decode the
+corresponding files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PhotometricInterpretation&quot;</span><span class="p">)</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PhotometricInterpretation&quot;</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">[&#39;MONOCHROME1&#39;, &#39;MONOCHROME2&#39;]</span>
+</pre></div>
+</div>
+<p>The File-set can also be searched to find instances matching a query using the
+<a class="reference internal" href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find" title="pydicom.fileset.FileSet.find"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find()</span></code></a> method, which returns a list of <a class="reference internal" href="../../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> that
+can be read and decoded using <a class="reference internal" href="../../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.load" title="pydicom.fileset.FileInstance.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileInstance.load()</span></code></a> to return them as a
+<a class="reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">matches</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s2">&quot;77654033&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+<span class="go">&#39;Doe^Archibald&#39;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find" title="pydicom.fileset.FileSet.find"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find()</span></code></a> also supports the use of the <cite>load</cite> parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PhotometricInterpretation</span><span class="o">=</span><span class="s1">&#39;MONOCHROME1&#39;</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PhotometricInterpretation</span><span class="o">=</span><span class="s1">&#39;MONOCHROME1&#39;</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="base_element.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Dataset, DataElement and Tag</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-dicom-dataset">What is a DICOM dataset?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-a-dataset">Reading a dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-and-accessing">Viewing and accessing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#elements">Elements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequences">Sequences</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-file-meta">Dataset.file_meta</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-a-dataset">Modifying a dataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-elements">Modifying elements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-elements">Adding elements</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-and-repeating-group-elements">Standard and repeating group elements</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-for-standard-elements">Alternative for standard elements</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Sequences</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#private-elements">Private elements</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deleting-elements">Deleting elements</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-dataset">Writing a dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-pixel-data">Accessing <em>Pixel Data</em></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#as-bytes">As <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#as-a-numpy-ndarray">As a NumPy <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#with-dataset-pixel-array">With <code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#with-pixel-array-and-iter-pixels">With <code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#with-decoder-as-array-and-decoder-iter-array">With <code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-a-file-set">Loading a File-set</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2008-2025, Darcy Mason and pydicom contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

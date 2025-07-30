@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Core elements in pydicom &#8212; pydicom 3.1.0.dev0 documentation</title>
+    <title>Dataset, DataElement and Tag &#8212; pydicom 3.1.0.dev0 documentation</title>
   
   
   
@@ -31,12 +31,14 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/user/base_element';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,8 +64,8 @@
     <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Writing DICOM Files" href="writing_files.html" />
-    <link rel="prev" title="Installation" href="installation.html" />
+    <link rel="next" title="Private Data Elements" href="private_data_elements.html" />
+    <link rel="prev" title="pydicom quick start" href="quick_start.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -151,7 +154,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -347,7 +312,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -367,36 +332,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -489,18 +426,37 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="what_is_dicom.html">What is DICOM?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Core elements in pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">pydicom quick start</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_files.html">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">FAQ</a></li>
 </ul>
 </div>
 </nav></div>
@@ -542,9 +498,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">pydicom User Guide</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Core elements in pydicom</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Dataset, DataElement and Tag</span></li>
   </ul>
 </nav>
 </div>
@@ -561,9 +517,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="core-elements-in-pydicom">
-<h1>Core elements in pydicom<a class="headerlink" href="#core-elements-in-pydicom" title="Link to this heading">#</a></h1>
-<p class="rubric">pydicom object model, description of classes, examples</p>
+  <section id="dataset-dataelement-and-tag">
+<h1>Dataset, DataElement and Tag<a class="headerlink" href="#dataset-dataelement-and-tag" title="Link to this heading">#</a></h1>
 <section id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Link to this heading">#</a></h2>
 <p>The main class in <em>pydicom</em> is <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> which emulates the behavior
@@ -573,7 +528,8 @@ and values are the corresponding <a class="reference internal" href="../../refer
 <p class="admonition-title">Warning</p>
 <p>The iterator of a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> yields
 <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> instances, e.g. the values of the
-dictionary instead of the keys normally yielded by iterating a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
+dictionary instead of the keys normally yielded by iterating a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>. If you’d
+prefer this to be explicit then iterate over <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.values" title="pydicom.dataset.Dataset.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.values()</span></code></a> instead.</p>
 </div>
 <p>A <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> can be created directly, but you’ll
 usually get one by reading an existing DICOM dataset from file using
@@ -615,8 +571,8 @@ usually get one by reading an existing DICOM dataset from file using
 <span class="go">&#39;Last^First^mid^pre&#39;</span>
 </pre></div>
 </div>
-<p>When using the element tag directly a <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>
-instance is returned, so <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.value</span></code></a>
+<p>Unlike when accessing with a keyword which returns the element’s value, accessing with a tag
+returns the <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> instance instead, so <a class="reference internal" href="../../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.value</span></code></a>
 must be used to get the value.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -632,12 +588,15 @@ number:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Test&#39;</span>
 </pre></div>
 </div>
-<p>The use of element keywords is possible because <em>pydicom</em> intercepts requests
-for member variables, and checks if they are in the DICOM dictionary. It translates
-the keyword to a (group, element) tag and returns the corresponding value for
-that tag if it exists in the dataset.</p>
+<p>Accessing element values via keywords is possible because <em>pydicom</em> intercepts requests
+for <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> attributes and checks to see if they’re in the DICOM dictionary.
+If so it converts the keyword to a (group, element) tag and returns the corresponding value for
+that tag (if it exists).</p>
 <p>See <a class="reference internal" href="../../auto_examples/metadata_processing/plot_anonymize.html#sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"><span class="std std-ref">Anonymize DICOM data</span></a> for a
-usage example of data elements removal and assignation.</p>
+usage example of data element removal and assignation.</p>
+</section>
+<section id="sequences">
+<h2>Sequences<a class="headerlink" href="#sequences" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To understand using <a class="reference internal" href="../../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> in <em>pydicom</em>, please refer
@@ -666,7 +625,7 @@ element can be one of:</p>
 </ul>
 </div>
 <p>The value of sequence elements is a <a class="reference internal" href="../../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>
-instance, which wraps a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>. Items in the sequence are
+instance, which acts like a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>. Items in the sequence are
 referenced by number, beginning at index <code class="docutils literal notranslate"><span class="pre">0</span></code> as per Python convention:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BeamName</span>
 <span class="go">&#39;Field 1&#39;</span>
@@ -680,7 +639,7 @@ referenced by number, beginning at index <code class="docutils literal notransla
 <p>Using DICOM keywords is the recommended way to access data elements, but you
 can also use the tag numbers directly, such as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Same thing with tag numbers - much harder to read:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Really should only be used if DICOM keyword not in pydicom dictionary</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Really should only be used if DICOM keyword not in pydicom&#39;s dictionary</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span> <span class="mh">0xb0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mh">0x300a</span><span class="p">,</span> <span class="mh">0xc2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 <span class="go">&#39;Field 1&#39;</span>
 </pre></div>
@@ -818,15 +777,6 @@ whether the tag represents a private tag (i.e. if group number is odd).</p></li>
 </ul>
 </div></blockquote>
 </section>
-<section id="sequence">
-<h2>Sequence<a class="headerlink" href="#sequence" title="Link to this heading">#</a></h2>
-<p><a class="reference internal" href="../../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> is derived from Python’s <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>.
-The only added functionality is to make string representations prettier.
-Otherwise all the usual methods of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> like item selection, append,
-etc. are available.</p>
-<p>For examples of accessing data nested in sequences, see
-<a class="reference internal" href="../../auto_examples/metadata_processing/plot_sequences.html#sphx-glr-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">Working with sequences</span></a>.</p>
-</section>
 </section>
 
 
@@ -840,20 +790,20 @@ etc. are available.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="installation.html"
+       href="quick_start.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title">pydicom quick start</p>
       </div>
     </a>
     <a class="right-next"
-       href="writing_files.html"
+       href="private_data_elements.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Writing DICOM Files</p>
+        <p class="prev-next-title">Private Data Elements</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -877,9 +827,9 @@ etc. are available.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset">Dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequences">Sequences</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataelement">DataElement</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tag">Tag</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence">Sequence</a></li>
 </ul>
   </nav></div>
 

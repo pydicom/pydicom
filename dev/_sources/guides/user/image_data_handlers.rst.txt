@@ -5,8 +5,6 @@ Handling of compressed pixel data
 
 .. currentmodule:: pydicom
 
-.. rubric:: How to get compressed pixel data
-
 .. |chk|   unicode:: U+02713 .. CHECK MARK
 
 

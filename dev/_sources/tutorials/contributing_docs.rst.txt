@@ -189,9 +189,6 @@ There are also a number of directives that tell Sphinx to do certain things
 (like inserting code blocks or a table of contents). Sphinx has a list of
 these `here <https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html>`_.
 
-For more information on writing documentation for *pydicom*, see
-:doc:`writing documentation</guides/writing_documentation>`.
-
 Just like before, you should build and preview the updated page. When you're
 happy with the results move on to the next section.
 

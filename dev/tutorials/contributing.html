@@ -31,12 +31,14 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/contributing';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,8 +64,8 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Frequently asked questions" href="../faq/index.html" />
-    <link rel="prev" title="Add items to the private DICOM dictionary" href="../auto_examples/metadata_processing/plot_add_dict_entries.html" />
+    <link rel="next" title="FAQ" href="../faq.html" />
+    <link rel="prev" title="Best Practices" href="../guides/user/best_practices.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -149,9 +152,9 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="#">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -341,9 +306,9 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -363,36 +328,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -406,7 +343,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -485,7 +422,39 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/what_is_dicom.html">What is DICOM?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/quick_start.html">pydicom quick start</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/base_element.html">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/writing_files.html">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/image_data_handlers.html">Handling of compressed pixel data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/viewing_images.html">Viewing Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/working_with_waveforms.html">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../guides/element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/user/best_practices.html">Best Practices</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+</div>
 </nav></div>
     </div>
   
@@ -524,6 +493,9 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
+    
+    <li class="breadcrumb-item"><a href="../guides/user/index.html" class="nav-link">User Guide</a></li>
+    
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Contributing to pydicom</span></li>
   </ul>
 </nav>
@@ -577,20 +549,20 @@ for contributing</a>, as well as tutorials for:</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../auto_examples/metadata_processing/plot_add_dict_entries.html"
+       href="../guides/user/best_practices.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Add items to the private DICOM dictionary</p>
+        <p class="prev-next-title">Best Practices</p>
       </div>
     </a>
     <a class="right-next"
-       href="../faq/index.html"
+       href="../faq.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Frequently asked questions</p>
+        <p class="prev-next-title">FAQ</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

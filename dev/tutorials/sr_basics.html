@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Structured Reporting &#8212; pydicom 3.1.0.dev0 documentation</title>
+    <title>A (brief) introduction to Structured Reports &#8212; pydicom 3.1.0.dev0 documentation</title>
   
   
   
@@ -31,12 +31,14 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/sr_basics';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -151,7 +154,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -171,6 +174,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference/index.html">
     API
   </a>
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -343,7 +308,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../guides/user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -363,36 +328,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -406,7 +343,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -487,15 +424,15 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="pixel_data/index.html"><em>Pixel Data</em></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pixel_data/index.html">A beginner’s guide to <em>Pixel Data</em></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/introduction.html"><em>Pixel Data</em> - Part 1: Introduction and accessing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/creation.html"><em>Pixel Data</em> - Part 2: Creation of pixel data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pixel_data/compressing.html"><em>Pixel Data</em> - Part 3: Compression and decompression</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveforms.html">A beginner’s guide to <em>Waveform Data</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="filesets.html">DICOM File-sets and DICOMDIR</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Structured Reporting</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">A (brief) introduction to Structured Reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
@@ -542,7 +479,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tutorials</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Structured Reporting</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">A (brief) introduction to Structured Reports</span></li>
   </ul>
 </nav>
 </div>
@@ -559,10 +496,9 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="structured-reporting">
-<h1>Structured Reporting<a class="headerlink" href="#structured-reporting" title="Link to this heading">#</a></h1>
-<p>Starting in <em>pydicom</em> version 1.4, some support for DICOM Structured Reporting (SR) began to be added,
-as alpha code; the API for this is subject to change in future <em>pydicom</em> versions. At this point the
+  <section id="a-brief-introduction-to-structured-reports">
+<h1>A (brief) introduction to Structured Reports<a class="headerlink" href="#a-brief-introduction-to-structured-reports" title="Link to this heading">#</a></h1>
+<p>Limited support is available in <em>pydicom</em> for DICOM Structured Reporting (SR), currently
 code is limited to code dictionaries and one class <a class="reference internal" href="../reference/generated/pydicom.sr.Code.html#pydicom.sr.Code" title="pydicom.sr.coding.Code"><code class="xref py py-class docutils literal notranslate"><span class="pre">Code</span></code></a>
 as a foundational step for future work.</p>
 <p>Most access is through a <code class="docutils literal notranslate"><span class="pre">codes</span></code> class instance provided in <code class="docutils literal notranslate"><span class="pre">pydicom.sr.codedict</span></code>. This can be used

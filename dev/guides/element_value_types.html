@@ -31,12 +31,14 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
   <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -49,6 +51,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/element_value_types';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -61,8 +64,8 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Plugins for Pixel Data Compression and Decompression" href="plugin_table.html" />
-    <link rel="prev" title="Guides" href="index.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Working with Waveform Data" href="user/working_with_waveforms.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
@@ -149,9 +152,9 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -163,9 +166,16 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="index.html">
     Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
   </a>
 </li>
 
@@ -178,56 +188,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
+  <a class="nav-link nav-internal" href="../release_notes/index.html">
+    Releases
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../release_notes/index.html">
-    Release notes
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -345,9 +310,9 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="user/index.html">
-    pydicom User Guide
+    User Guide
   </a>
 </li>
 
@@ -359,7 +324,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="index.html">
     Guides
   </a>
@@ -367,36 +332,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    General examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../tutorials/contributing.html">
-    Contributing to pydicom
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../faq/index.html">
-    Frequently asked questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Examples
   </a>
 </li>
 
@@ -410,7 +347,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../release_notes/index.html">
-    Release notes
+    Releases
   </a>
 </li>
 
@@ -489,40 +426,37 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="user/index.html">pydicom User Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="user/installation.html">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/base_element.html">Core elements in pydicom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/writing_files.html">Writing DICOM Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/working_with_overlays.html">Working with Overlay Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/working_with_waveforms.html">Working with Waveform Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/image_data_handlers.html">Handling of compressed pixel data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/private_data_elements.html">Private Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/best_practices.html">Best Practices</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="user/what_is_dicom.html">What is DICOM?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/quick_start.html">pydicom quick start</a></li>
 </ul>
-</details></li>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datasets and elements</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="user/base_element.html">Dataset, DataElement and Tag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/writing_files.html">Creating new datasets</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Pixel Data</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="user/working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/image_data_handlers.html">Handling of compressed pixel data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/viewing_images.html">Viewing Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Overlays and waveforms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="user/working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/working_with_waveforms.html">Working with Waveform Data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Element VRs and Python types</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plugin_table.html">Plugins for Pixel Data Compression and Decompression</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="decoding/index.html">Pixel Data Decoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="decoding/decoder_options.html">Pixel Data Decoder Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decoding/decoder_plugins.html">Pixel Data Decoder Plugins</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="encoding/index.html">Pixel Data Encoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="encoding/jpeg_ls.html">JPEG-LS Encoding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encoding/jpeg_2k.html">JPEG 2000 Encoding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encoding/rle_lossless.html">RLE Lossless Encoding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encoding/defl_image.html">Deflated Image Frame Compression</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encoding/encoder_plugin_options.html">Encoder Plugins Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encoding/encoder_plugins.html">Pixel Data Encoder Plugins</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="cli/cli_guide.html">Command-line Interface Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_documentation.html">Writing documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
 </ul>
 </div>
 </nav></div>
@@ -564,7 +498,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Guides</a></li>
+    <li class="breadcrumb-item"><a href="user/index.html" class="nav-link">User Guide</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Element VRs and Python types</span></li>
   </ul>
@@ -605,10 +539,11 @@ the table below</p></li>
 <ul>
 <li><p>Can also be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of their <em>set using</em> type - for
 <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.4.html">Value Multiplicity</a> (VM) &gt; 1, the value will
-be stored as a <a class="reference internal" href="../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> of their <em>stored as</em> type</p></li>
-<li><p>However, according to the DICOM Standard, elements with VR <strong>LT</strong>, <strong>OB</strong>,
-<strong>OD</strong>, <strong>OF</strong>, <strong>OL</strong>, <strong>OW</strong>, <strong>ST</strong>, <strong>UN</strong>, <strong>UR</strong> and <strong>UT</strong> should
-never have a VM greater than 1.</p></li>
+be stored as a <a class="reference internal" href="../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> of their <em>stored as</em> type.</p></li>
+<li><p>However, all standard elements have restrictions on what their VM may be,
+given in <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">Part 6 of the DICOM Standard</a>.
+In particular, elements with VR <strong>LT</strong>, <strong>OB</strong>, <strong>OD</strong>, <strong>OF</strong>, <strong>OL</strong>, <strong>OW</strong>,
+<strong>ST</strong>, <strong>UN</strong>, <strong>UR</strong> and <strong>UT</strong> should never have a VM greater than 1.</p></li>
 </ul>
 </li>
 <li><p><strong>SQ</strong> element values should be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of zero or more
@@ -850,7 +785,7 @@ memory when creating datasets:</p>
 </pre></div>
 </div>
 <p>To use a buffered <em>Pixel Data</em> value with a dataset that has a compressed transfer
-syntax such as <em>JPEG 2000 Lossles</em>, the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_buffer()</span></code></a> and
+syntax such as <em>JPEG 2000 Lossless</em>, the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_buffer()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended_buffer()</span></code></a> functions can be used to encapsulate
 the buffered frames:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileMetaDataset</span>
@@ -882,20 +817,20 @@ with <a class="reference external" href="https://docs.python.org/3/library/pickl
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="user/working_with_waveforms.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Guides</p>
+        <p class="prev-next-title">Working with Waveform Data</p>
       </div>
     </a>
     <a class="right-next"
-       href="plugin_table.html"
+       href="glossary.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Plugins for Pixel Data Compression and Decompression</p>
+        <p class="prev-next-title">Glossary</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
