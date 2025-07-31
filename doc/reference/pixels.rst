@@ -31,9 +31,11 @@ Utility functions
 
    as_pixel_options
    compress
+   concatenate_packed_frames
    decompress
    get_decoder
    get_encoder
+   get_packed_frame
    iter_pixels
    pack_bits
    pixel_array

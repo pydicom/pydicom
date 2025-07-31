@@ -14,6 +14,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.pixels.common import Buffer, RunnerBase, CoderBase, RunnerOptions
+from pydicom.pixels.utils import get_packed_frame
 from pydicom.uid import (
     UID,
     JPEGBaseline8Bit,
@@ -176,11 +177,34 @@ class EncodeRunner(RunnerBase):
         #   needed: e.g. 32 bits allocated with 7 bits stored
         # However the encoders typically expect data to be sized appropriately
         # for the sample precision, so we need to downscale to:
+        #   precision = 1:        an 8-bit container (char) or bit-packed (8
+        #                         pixels/char)
         #    0 < precision <=  8: an 8-bit container (char)
         #    8 < precision <= 16: a 16-bit container (short)
         #   16 < precision <= 32: a 32-bit container (int/long)
         #   32 < precision <= 64: a 64-bit container (long long)
-        bytes_per_frame = cast(int, self.frame_length(unit="bytes"))
+        if self.bits_allocated == 1:
+
+            # Data *may* be bit-packed, use length and source type to infer
+            total_pixels = self.frame_length(unit="pixels") * self.number_of_frames
+
+            if self._src_type == "Dataset" or (
+                self._src_type == "Buffer" and len(self._src) < total_pixels
+            ):
+                # Pass to the encoder in a bitpacked form
+                self.set_option("is_bitpacked", True)
+                return get_packed_frame(
+                    src=cast(bytes, self._src),
+                    index=0 if index is None else index,
+                    frame_length=cast(int, self.frame_length(unit="pixels")),
+                    pad=False,
+                )
+
+            # Array or non-bitpacked buffer
+            self.set_option("is_bitpacked", False)
+            bytes_per_frame = cast(int, self.frame_length(unit="pixels"))
+        else:
+            bytes_per_frame = cast(int, self.frame_length(unit="bytes"))
         start = 0 if index is None else index * bytes_per_frame
         src = cast(bytes, self.src[start : start + bytes_per_frame])
 
@@ -262,7 +286,9 @@ class EncodeRunner(RunnerBase):
         ----------
         src : bytes | bytearray | memoryview | pydicom.dataset.Dataset | numpy.ndarray
 
-            * If a buffer-like then the encoded pixel data
+            * If a buffer-like then the encoded pixel data. When bits allocated
+              is 1, this may be bit-packed (8 pixels within a byte) or unpacked (1
+              byte per pixel). The length of the buffer will be used to infer which.
             * If a :class:`~pydicom.dataset.Dataset` then a dataset containing
               the pixel data and associated group ``0x0028`` elements.
             * If a :class:`numpy.ndarray` then an array containing the image data.
@@ -425,8 +451,12 @@ class EncodeRunner(RunnerBase):
     def _validate_buffer(self) -> None:
         """Validate the supplied pixel data buffer."""
         # Check the length is at least as long as required
-        length_bytes = self.frame_length(unit="bytes")
-        expected = length_bytes * self.number_of_frames
+        if self.bits_allocated == 1:
+            expected = self.frame_length(unit="pixels") / 8
+        else:
+            length_bytes = self.frame_length(unit="bytes")
+            expected = length_bytes * self.number_of_frames
+
         if (actual := len(self.src)) < expected:
             raise ValueError(
                 "The length of the uncompressed pixel data doesn't match the "
@@ -515,6 +545,10 @@ class Encoder(CoderBase):
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
             </guides/user/image_data_compression>` for more information.
+
+        .. versionchanged:: 3.1
+
+            Add support for encoding single bit images (*Bits Allocated* = 1)
 
         Parameters
         ----------
@@ -624,6 +658,10 @@ class Encoder(CoderBase):
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
             </guides/user/image_data_compression>` for more information.
+
+        .. versionchanged:: 3.1
+
+            Add support for encoding single bit images (*Bits Allocated* = 1)
 
         Parameters
         ----------
@@ -760,23 +798,23 @@ ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
         ("RGB", 3, (0,), (8, 16), range(2, 17)),
     ],
     JPEG2000Lossless: [  # 1.2.840.10008.1.2.4.90: Table 8.2.4-1 in PS3.5
-        ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME1", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME2", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
         ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
         ("YBR_RCT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
     ],
     JPEG2000: [  # 1.2.840.10008.1.2.4.91: Table 8.2.4-1 in PS3.5
-        ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
-        ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME1", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME2", 1, (0, 1), (1, 8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_ICT", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("RGB", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
         ("YBR_FULL", 3, (0,), (8, 16, 24, 32, 40), range(1, 39)),
     ],
     RLELossless: [  # 1.2.840.10008.1.2.5: Table 8.2.2-1 in PS3.5
-        ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
-        ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
+        ("MONOCHROME1", 1, (0, 1), (1, 8, 16), range(1, 17)),
+        ("MONOCHROME2", 1, (0, 1), (1, 8, 16), range(1, 17)),
         ("PALETTE COLOR", 1, (0,), (8, 16), range(1, 17)),
         ("YBR_FULL", 3, (0,), (8,), range(1, 9)),
         ("RGB", 3, (0,), (8, 16), range(1, 17)),

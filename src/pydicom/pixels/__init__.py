@@ -17,8 +17,10 @@ from pydicom.pixels.processing import (
 from pydicom.pixels.utils import (
     as_pixel_options,
     compress,
+    concatenate_packed_frames,
     decompress,
     iter_pixels,
+    get_packed_frame,
     pack_bits,
     pixel_array,
     set_pixel_data,

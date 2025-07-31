@@ -6,6 +6,7 @@ from io import BytesIO
 import logging
 import os
 import random
+import re
 from struct import pack, unpack
 from sys import byteorder
 
@@ -29,6 +30,7 @@ from pydicom.pixels.encoders.native import _encode_rle_frame
 from pydicom.pixels.decoders.native import _rle_decode_frame
 from pydicom.pixels.utils import (
     as_pixel_options,
+    concatenate_packed_frames,
     _passes_version_check,
     _get_jpg_parameters,
     reshape_pixel_array,
@@ -36,6 +38,7 @@ from pydicom.pixels.utils import (
     get_expected_length,
     get_j2k_parameters,
     get_nr_frames,
+    get_packed_frame,
     pack_bits,
     set_pixel_data,
     unpack_bits,
@@ -67,6 +70,8 @@ from .pixels_reference import (
     RLE_16_1_1F,
     RLE_16_1_10F,
     RLE_32_3_2F,
+    DEFL_1_1_3F,
+    DEFL_1_1_3F_NONALIGNED,
     EXPL_16_1_10F,
     EXPL_16_1_1F,
     EXPL_16_16_1F,
@@ -84,6 +89,8 @@ from .pixels_reference import (
     JLSL_08_08_3_0_1F_ILV2,
     JLSN_08_01_1_0_1F,
     J2KR_08_08_3_0_1F_YBR_RCT,
+    J2KR_1_1_3F,
+    J2KR_1_1_3F_NONALIGNED,
     EXPL_1_1_3F,
     EXPL_1_1_3F_NONALIGNED,
 )
@@ -1342,15 +1349,26 @@ REFERENCE_PACK_PARTIAL = [
 ]
 
 
-@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestPackBits:
     """Tests for pack_bits()."""
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     @pytest.mark.parametrize("output, input", REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""
         assert output == pack_bits(np.asarray(input), pad=False)
 
+    @pytest.mark.parametrize("output, input", REFERENCE_PACK_UNPACK)
+    def test_pack_bytes(self, input, output):
+        """Test packing data."""
+        assert output == pack_bits(bytes(input), pad=False)
+
+    @pytest.mark.parametrize("output, input", REFERENCE_PACK_UNPACK)
+    def test_pack_bytearray(self, input, output):
+        """Test packing data."""
+        assert output == pack_bits(bytearray(input), pad=False)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
         with pytest.raises(
@@ -1358,6 +1376,15 @@ class TestPackBits:
         ):
             pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
+    def test_non_binary_input_no_numpy(self):
+        """Test non-binary input raises exception."""
+        with pytest.raises(
+            ValueError, match=r"Only binary arrays \(containing ones or"
+        ):
+            pack_bits(b"\x00\x00\x02\x00\x00\x00\x00\x00")
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_ndarray_input(self):
         """Test non 1D input gets ravelled."""
         arr = np.asarray(
@@ -1371,6 +1398,35 @@ class TestPackBits:
         b = pack_bits(arr, pad=False)
         assert b"\x00\x55\xff" == b
 
+    def test_bytes_input(self):
+        """Repeat above test with bytes input."""
+        # fmt: off
+        inp = bytes(
+            [
+                0, 0, 0, 0, 0, 0, 0, 0,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                1, 1, 1, 1, 1, 1, 1, 1,
+            ]
+        )
+        # fmt: on
+        b = pack_bits(inp, pad=False)
+        assert b"\x00\x55\xff" == b
+
+    def test_bytearry_input(self):
+        """Repeat above test with bytearray input."""
+        # fmt: off
+        inp = bytearray(
+            [
+                0, 0, 0, 0, 0, 0, 0, 0,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                1, 1, 1, 1, 1, 1, 1, 1,
+            ]
+        )
+        # fmt: on
+        b = pack_bits(inp, pad=False)
+        assert b"\x00\x55\xff" == b
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_padding(self):
         """Test odd length packed data is padded."""
         arr = np.asarray(
@@ -1385,11 +1441,39 @@ class TestPackBits:
         assert 4 == len(b)
         assert 0 == b[-1]
 
+    def test_padding_bytes(self):
+        """Test odd length packed data is padded with byte input."""
+        # fmt: off
+        inp = bytes(
+            [
+                0, 0, 0, 0, 0, 0, 0, 0,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                1, 1, 1, 1, 1, 1, 1, 1,
+            ]
+        )
+        # fmt: on
+        assert 3 == len(pack_bits(inp, pad=False))
+        b = pack_bits(inp, pad=True)
+        assert 4 == len(b)
+        assert 0 == b[-1]
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     @pytest.mark.parametrize("output, input", REFERENCE_PACK_PARTIAL)
     def test_pack_partial(self, input, output):
         """Test packing data that isn't a full byte long."""
         assert output == pack_bits(np.asarray(input), pad=False)
 
+    @pytest.mark.parametrize("output, input", REFERENCE_PACK_PARTIAL)
+    def test_pack_partial_bytes(self, input, output):
+        """Test packing data that isn't a full byte long."""
+        assert output == pack_bits(bytes(input), pad=False)
+
+    @pytest.mark.parametrize("output, input", REFERENCE_PACK_PARTIAL)
+    def test_pack_partial_bytearray(self, input, output):
+        """Test packing data that isn't a full byte long."""
+        assert output == pack_bits(bytearray(input), pad=False)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_functional(self):
         """Test against a real dataset."""
         ds = EXPL_1_1_3F.ds
@@ -1397,12 +1481,150 @@ class TestPackBits:
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
     def test_functional_nonaligned(self):
         """Test against a real dataset."""
         ds = EXPL_1_1_3F_NONALIGNED.ds
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
+
+
+# fmt: off
+REFERENCE_BINARY_PIXELS = [
+    1, 0, 0, 0, 1, 0, 1, 0,
+    1, 0, 1, 1, 1, 0, 1, 0,
+    0, 0, 1, 0, 1, 0, 1, 0,
+    1, 1, 1, 1, 0, 0, 1, 0,
+    1, 0, 0, 0, 0, 0, 0, 1,
+    0, 1, 1, 0, 0, 0, 1, 1,
+]
+# fmt: on
+
+
+class TestGetPackedFrame:
+
+    @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
+    @pytest.mark.parametrize("pad", [True, False])
+    def test_get_packed_frame(self, pixels_per_frame, pad):
+        """Get every possible frame from reference pixels."""
+        n_frames = len(REFERENCE_BINARY_PIXELS) // pixels_per_frame
+        packed_data = pack_bits(bytes(REFERENCE_BINARY_PIXELS))
+
+        for f in range(n_frames):
+            frame = get_packed_frame(
+                packed_data,
+                f,
+                pixels_per_frame,
+                pad=pad,
+            )
+            ref = REFERENCE_BINARY_PIXELS[
+                f * pixels_per_frame : (f + 1) * pixels_per_frame
+            ]
+            assert frame == pack_bits(bytes(ref), pad=pad)
+
+        # Try to access one beyond the last valid frame
+        if pixels_per_frame > 8:
+            msg = (
+                f"Length of 'src' ({len(packed_data)}) bytes is insufficient to "
+                f"contain frame with index {n_frames} with given "
+                f"'frame_length' ({pixels_per_frame} pixels)"
+            )
+            with pytest.raises(IndexError, match=re.escape(msg)):
+                frame = get_packed_frame(
+                    packed_data,
+                    n_frames,  # beyond end
+                    pixels_per_frame,
+                    pad=pad,
+                )
+
+    def test_negative_index(self):
+        packed_data = pack_bits(bytes(REFERENCE_BINARY_PIXELS))
+
+        # Negative index is not allowed
+        msg = "'index' must be non-negative"
+        with pytest.raises(ValueError, match=msg):
+            get_packed_frame(packed_data, -1, 8)
+
+    @pytest.mark.parametrize("pad", [True, False])
+    def test_start_offset(self, pad):
+        """Tests using a non-zero start_offset."""
+        pixels_per_frame = 12
+        packed_data = pack_bits(bytes(REFERENCE_BINARY_PIXELS))
+
+        for index in range(len(REFERENCE_BINARY_PIXELS) // pixels_per_frame):
+            frame_start_byte = (index * pixels_per_frame) // 8
+
+            ref = get_packed_frame(
+                packed_data,
+                index,
+                pixels_per_frame,
+                pad=pad,
+            )
+
+            start_offset = 0
+            for start_offset in range(1, frame_start_byte + 1):
+                frame = get_packed_frame(
+                    packed_data[start_offset:],
+                    index,
+                    pixels_per_frame,
+                    start_offset=start_offset,
+                    pad=pad,
+                )
+                assert frame == ref
+
+            # A start offset one beyond the start of the frame should fail
+            start_offset += 1
+            msg = (
+                f"Requested frame with index {index} lies before the provided "
+                f"'src' given the 'start_offset' of {start_offset}"
+            )
+            with pytest.raises(IndexError, match=msg):
+                frame = get_packed_frame(
+                    packed_data[start_offset:],
+                    index,
+                    pixels_per_frame,
+                    start_offset=start_offset,
+                    pad=pad,
+                )
+
+
+class TestConcatenatePackedFrames:
+
+    @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
+    @pytest.mark.parametrize("pad", [True, False])
+    def test_concatenate_packed_frames(self, pixels_per_frame, pad):
+        n_frames = len(REFERENCE_BINARY_PIXELS) // pixels_per_frame
+        ref = pack_bits(
+            bytes(REFERENCE_BINARY_PIXELS[: n_frames * pixels_per_frame]),
+            pad=pad,
+        )
+
+        packed_frames = []
+        for f in range(n_frames):
+            unpacked_frame = REFERENCE_BINARY_PIXELS[
+                f * pixels_per_frame : (f + 1) * pixels_per_frame
+            ]
+            packed_frames.append(pack_bits(bytes(unpacked_frame), pad=False))
+
+        concatenated = concatenate_packed_frames(
+            packed_frames,
+            pixels_per_frame,
+            pad=pad,
+        )
+
+        assert concatenated == ref
+
+    def test_wrong_frame_lengths(self):
+
+        frames = [
+            b"\x00\x01",
+            b"\x00\x03",
+            b"\x00\x01\x45",
+        ]
+        msg = "Expected frames with length 2 bytes, got 3 bytes"
+        with pytest.raises(ValueError, match=msg):
+            concatenate_packed_frames(frames, frame_length=16)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -1459,6 +1681,31 @@ class TestCompressRLE:
         assert ds.SamplesPerPixel == 1
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert len(ds.PixelData) == 21370
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+    @pytest.mark.parametrize(
+        "path,length",
+        [
+            (EXPL_1_1_3F.path, 6366),
+            (EXPL_1_1_3F_NONALIGNED.path, 6390),
+        ],
+    )
+    def test_compress_1bit(self, path, length):
+        """Test compressing a single bit image dataset."""
+        ds = dcmread(path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+
+        assert ds.BitsAllocated == 1
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == length
         assert "PlanarConfiguration" not in ds
         assert ds["PixelData"].is_undefined_length
         assert ds["PixelData"].VR == "OB"
@@ -1687,6 +1934,23 @@ class TestCompressJ2K:
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
+    @pytest.mark.parametrize("path", [EXPL_1_1_3F.path, EXPL_1_1_3F_NONALIGNED.path])
+    def test_lossless_1bit(self, path):
+        """Test JPEG 2000 Lossless on single bit image."""
+        ds = dcmread(path)
+        original = ds.SOPInstanceUID
+        ref = ds.pixel_array
+        compress(
+            ds,
+            JPEG2000Lossless,
+            encoding_plugin="pylibjpeg",
+        )
+        assert ds.BitsAllocated == 1
+        assert ds.file_meta.TransferSyntaxUID == JPEG2000Lossless
+        assert np.array_equal(ds.pixel_array, ref)
+        assert ds.SOPInstanceUID == original
+        assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
+
     def test_lossy(self):
         """Test JPEG 2000 and the j2k_cr and j2k_psnr kwargs."""
         ds = dcmread(EXPL_16_16_1F.path)
@@ -1758,13 +2022,58 @@ class TestCompressDeflated:
         assert ds._pixel_array is None
         assert ds._pixel_id == {}
 
+    @pytest.mark.parametrize(
+        "path,length",
+        [
+            (EXPL_1_1_3F.path, 2920),
+            (EXPL_1_1_3F_NONALIGNED.path, 3386),
+        ],
+    )
+    def test_compress_bytes_1bit(self, path, length):
+        """Test compressing a single bit dataset."""
+        ds = dcmread(path)
+        assert not ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert len(ds.PixelData) == length
+        assert "PlanarConfiguration" not in ds
+        assert ds["PixelData"].is_undefined_length
+        assert ds["PixelData"].VR == "OB"
+
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
         """Test compressing using pixel data from an arr."""
         ds = dcmread(EXPL_16_16_1F.path)
         assert hasattr(ds, "file_meta")
         ref = ds.pixel_array
-        compress(ds, DeflatedImageFrameCompression, encoding_plugin="pydicom")
+        compress(
+            ds,
+            DeflatedImageFrameCompression,
+            arr=ref,
+            encoding_plugin="pydicom",
+        )
+        assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    @pytest.mark.parametrize("path", [EXPL_1_1_3F.path, EXPL_1_1_3F_NONALIGNED.path])
+    def test_compress_arr_1bit(self, path):
+        """Test compressing using pixel data from an arr."""
+        ds = dcmread(path)
+        assert hasattr(ds, "file_meta")
+        ref = ds.pixel_array
+        compress(
+            ds,
+            DeflatedImageFrameCompression,
+            arr=ref,
+            encoding_plugin="pydicom",
+        )
         assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -1977,6 +2286,26 @@ class TestDecompress:
 
         assert np.array_equal(ds.pixel_array, ref)
 
+    @pytest.mark.skipif(SKIP_J2K, reason="J2K plugins unavailable")
+    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
+    def test_j2k_1bit(self, path):
+        """Test decoding J2K YBR_RCT -> RGB"""
+        ds = dcmread(path)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 1
+        decompress(ds, decoding_plugin="pylibjpeg")
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        elem = ds["PixelData"]
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert ds.NumberOfFrames == 3
+        assert ds.PhotometricInterpretation == "MONOCHROME2"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+
+        assert np.array_equal(ds.pixel_array, ref)
+
     @pytest.mark.skipif(SKIP_JPG, reason="JPEG plugins unavailable")
     def test_as_rgb(self):
         """Test decoding J2K - 1 frame, 3 sample (YBR_RCT)"""
@@ -2006,6 +2335,38 @@ class TestDecompress:
         ds.pixel_array_options(as_rgb=False)
         rgb = convert_color_space(ds.pixel_array, "YBR_FULL", "RGB")
         assert np.array_equal(rgb, ref)
+
+    def test_single_bit_with_pdh_raises(self):
+        """Test a single bit image is unpacked correctly."""
+        ds = dcmread(DEFL_1_1_3F.path)
+
+        assert ds.BitsAllocated == 1
+        msg = (
+            "Decompression of single-bit images is not supported with the "
+            " 'use_pdh' option."
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            decompress(ds, use_pdh=True)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    @pytest.mark.parametrize("path", [DEFL_1_1_3F.path, DEFL_1_1_3F_NONALIGNED.path])
+    def test_single_bit_deflated(self, path):
+        """Test a single bit image is unpacked correctly."""
+        ds = dcmread(path)
+        ref = ds.pixel_array
+
+        assert ds.BitsAllocated == 1
+        decompress(ds)
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.BitsAllocated == 1
+        elem = ds["PixelData"]
+        assert len(elem.value) == np.ceil(ds.Rows * ds.Columns * ds.NumberOfFrames / 8)
+        assert elem.is_undefined_length is False
+        assert elem.VR == "OB"
+        assert ds._pixel_array is None
+        assert ds._pixel_id == {}
+        assert np.array_equal(ds.pixel_array, ref)
 
     @pytest.mark.skipif(SKIP_RLE, reason="RLE plugins unavailable")
     def test_instance_uid(self):

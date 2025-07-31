@@ -76,6 +76,13 @@ def is_available(uid: str) -> bool:
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignore[return]
     """Return the decoded image data in `src` as a :class:`bytearray`."""
     tsyntax = runner.transfer_syntax
+    original_bits_allocated = runner.bits_allocated
+
+    if tsyntax == uid.RLELossless and runner.bits_allocated == 1:
+        raise NotImplementedError(
+            "pylibjpeg cannot decompress RLE Lossless encoded data "
+            "with bits allocated = 1."
+        )
 
     # Currently only one pylibjpeg plugin is available per UID
     #   so decode using the first available decoder
@@ -111,5 +118,13 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
                 runner.set_option("bits_allocated", 8)
             elif 8 < precision <= 16:
                 runner.set_option("bits_allocated", 16)
+
+        # Signal whether single-bit data is represented in unpacked form
+        if original_bits_allocated == 1:
+            if tsyntax == uid.RLELossless:
+                # In case pylibjpeg supports this case in the future
+                runner.set_option("is_bitpacked", True)
+            else:
+                runner.set_option("is_bitpacked", False)
 
         return frame

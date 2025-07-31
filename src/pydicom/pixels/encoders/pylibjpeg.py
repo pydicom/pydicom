@@ -5,7 +5,7 @@ from typing import cast
 
 from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.common import PhotometricInterpretation as PI
-from pydicom.pixels.utils import _passes_version_check
+from pydicom.pixels.utils import _passes_version_check, unpack_bits
 from pydicom import uid
 
 try:
@@ -48,6 +48,10 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     tsyntax = runner.transfer_syntax
     if tsyntax == uid.RLELossless:
         return cast(bytes, encoder(src, **runner.options))
+
+    if runner.options.get("is_bitpacked", False):
+        pixels_per_frame = runner.rows * runner.columns * runner.samples_per_pixel
+        src = cast(bytes, unpack_bits(src, as_array=False)[:pixels_per_frame])
 
     opts = dict(runner.options)
     if runner.photometric_interpretation == PI.RGB:
