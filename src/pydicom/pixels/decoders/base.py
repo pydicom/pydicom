@@ -1133,7 +1133,7 @@ class Decoder(CoderBase):
                     if original_bits_allocated == 1 and runner.get_option(
                         "is_bitpacked"
                     ):
-                        frame = unpack_bits(frame)
+                        frame = unpack_bits(frame)[:pixels_per_frame]
                     excess.append(np.frombuffer(frame, runner.pixel_dtype))
                     runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
