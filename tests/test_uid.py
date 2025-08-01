@@ -417,6 +417,13 @@ class TestRegisterTransferSyntax:
     def teardown_method(self):
         pydicom.uid.PrivateTransferSyntaxes = []
 
+        try:
+            index = pydicom.uid.AllTransferSyntaxes.index("1.2.840.10008.99.99.99.99")
+            del pydicom.uid.AllTransferSyntaxes[index]
+            del pydicom.uid.FooEndianBarVR
+        except Exception:
+            pass
+
     def test_no_encoding_raises(self):
         """Test not supplying the encoding raises"""
         uid = UID("1.2.3")
@@ -455,3 +462,64 @@ class TestRegisterTransferSyntax:
         assert uid.is_transfer_syntax
         assert not uid.is_implicit_VR
         assert uid.is_little_endian
+
+    def test_private_raises(self):
+        """Test exception raised if re-registering private transfer syntax."""
+        register_transfer_syntax("1.2.3", False, True)
+
+        msg = "The UID '1.2.3' has already been registered"
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax("1.2.3", False, True)
+
+    def test_public_raises(self):
+        """Test exceptions with registering public transfer syntaxes."""
+        msg = "The UID '1.2.840.10008.1.2.1' has already been registered"
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax(pydicom.uid.ExplicitVRLittleEndian)
+
+        msg = "'name' and 'keyword' are required when registering a public transfer syntax"
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax("1.2.840.10008.99.99.99.99")
+
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax("1.2.840.10008.99.99.99.99", name="Foo")
+
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax("1.2.840.10008.99.99.99.99", keyword="Foo")
+
+        msg = (
+            "The UID keyword '123' must be a valid Python identifier and cannot be a "
+            "Python keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax(
+                "1.2.840.10008.99.99.99.99", name="Foo", keyword="123"
+            )
+
+        msg = (
+            "The UID keyword 'and' must be a valid Python identifier and cannot be a "
+            "Python keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            register_transfer_syntax(
+                "1.2.840.10008.99.99.99.99", name="Foo", keyword="and"
+            )
+
+    def test_public(self):
+        """Test adding a public transfer syntax"""
+        value = "1.2.840.10008.99.99.99.99"
+        assert value not in pydicom.uid.AllTransferSyntaxes
+        uid = register_transfer_syntax(
+            value, name="Foo Endian Bar VR", keyword="FooEndianBarVR"
+        )
+        assert isinstance(uid, UID)
+        assert uid == value
+        assert uid in pydicom.uid.AllTransferSyntaxes
+        assert uid.is_transfer_syntax
+        assert not uid.is_private
+        assert uid.keyword == "FooEndianBarVR"
+        assert uid.name == "Foo Endian Bar VR"
+
+        uid = pydicom.uid.FooEndianBarVR
+        assert uid == value
+        assert isinstance(uid, UID)
