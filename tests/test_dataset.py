@@ -28,14 +28,9 @@ from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import (
-    Dataset,
-    FileDataset,
-    path_to,
-    validate_file_meta,
-    FileMetaDataset,
-)
+from pydicom.dataset import Dataset, FileDataset, path_to, validate_file_meta, FileMetaDataset
 from pydicom.encaps import encapsulate
+from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.pixels.utils import get_image_pixel_ids
 from pydicom.sequence import Sequence
@@ -3150,9 +3145,9 @@ class TestFuture:
             Dataset().decompress(handler_name="foo")
 
 
-class TestDatasetErrors:
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="Needs Python 3.11+")
+class TestDatasetContextManager:
     """Tests for dataset context manager error reporting"""
-
     def setup_method(self):
         plan = Dataset()
         plan.filename = "test.dcm"
@@ -3168,7 +3163,7 @@ class TestDatasetErrors:
 
         priv_ds = Dataset()
         priv_block = priv_ds.private_block(0x1001, "Test", create=True)
-        priv_block.add_new(0x42, VR.DS, "42.0")
+        priv_block.add_new(0x42, VR.DS, '42.0')
 
         plan.BeamSequence = Sequence([beam0, priv_ds])
         self.file_ds = FileDataset("test.dcm", plan)
@@ -3179,9 +3174,7 @@ class TestDatasetErrors:
         # Give a bad value for existing element
         with pytest.raises(ValueError) as excinfo:
             with self.file_ds as ds:
-                ds.BeamSequence[0].ControlPointSequence[
-                    1
-                ].CumulativeMetersetWeight = "hello"
+                ds.BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight = "hello"
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
 
@@ -3192,10 +3185,23 @@ class TestDatasetErrors:
                 ds.BeamSequence[0].ControlPointSequence[1].GantryAngle = "hello"
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
-
+         
+    def test_correct_ambiguous(self):
+        """Test that data element in `correct_ambiguous_vr_element` error is noted"""
+        # issue #2168, error occurs on save_as, not at assignment
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.SmallestImagePixelValue = b'\0'
+        with tempfile.TemporaryDirectory() as tdir:
+            with pytest.raises(BytesLengthException) as excinfo:
+                with ds:
+                    ds.save_as(f"{tdir}/foo.bin")
+        assert hasattr(excinfo.value, "__notes__")
+        msg = ".SmallestImagePixelValue"
+        assert any(msg in note for note in excinfo.value.__notes__)
+    
     def test_path_to(self):
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
-        expected = (
-            "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
-        )
+        expected = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
         assert path_to(target, self.file_ds) == expected
