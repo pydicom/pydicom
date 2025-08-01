@@ -2,6 +2,7 @@
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
 import hashlib
+from keyword import iskeyword
 import re
 import secrets
 import uuid
@@ -50,6 +51,12 @@ class UID(str):
     """
 
     _PRIVATE_TS_ENCODING: tuple[bool, bool]
+    _NATIVE_ENCODING = [
+        "1.2.840.10008.1.2",  # Explicit VR Little Endian
+        "1.2.840.10008.1.2.1",  # Implicit VR Little Endian
+        "1.2.840.10008.1.2.2",  # Explicit VR Big Endian
+        "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
+    ]
 
     def __new__(
         cls: type["UID"], val: str, validation_mode: int | None = None
@@ -153,16 +160,8 @@ class UID(str):
     def is_compressed(self) -> bool:
         """Return ``True`` if a compressed transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Explicit VR Little Endian
-            # Implicit VR Little Endian
-            # Explicit VR Big Endian
-            # Deflated Explicit VR Little Endian
-            if self in [
-                "1.2.840.10008.1.2",
-                "1.2.840.10008.1.2.1",
-                "1.2.840.10008.1.2.2",
-                "1.2.840.10008.1.2.1.99",
-            ]:
+
+            if self in self._NATIVE_ENCODING:
                 return False
 
             # All encapsulated transfer syntaxes
@@ -218,7 +217,7 @@ class UID(str):
         """Return ``True`` if the UID isn't an officially registered DICOM
         UID.
         """
-        return self[:14] != "1.2.840.10008."
+        return not self.startswith("1.2.840.10008.")
 
     @property
     def is_valid(self) -> bool:
@@ -466,11 +465,23 @@ def register_transfer_syntax(
     uid: str | UID,
     implicit_vr: bool | None = None,
     little_endian: bool | None = None,
+    name: str = "",
+    keyword: str = "",
 ) -> UID:
-    """Register a private transfer syntax with the :mod:`~pydicom.uid` module
-    so it can be used when reading datasets with :func:`~pydicom.filereader.dcmread`.
+    """Register a private or unknown public transfer syntax with the :mod:`~pydicom.uid`
+    module so it can be used when reading datasets with
+    :func:`~pydicom.filereader.dcmread`.
 
     .. versionadded: 3.0
+
+    .. versionchanged:: 3.1
+
+        Added the `name` and `keyword` arguments and support for adding public
+        transfer syntaxes.
+
+    Public transfer syntaxes will be added to the UID data dictionary, the
+    ``pydicom.uid`` module using the supplied keyword and
+    ``pydicom.uid.AllTransferSyntaxes``.
 
     Parameters
     ----------
@@ -480,11 +491,20 @@ def register_transfer_syntax(
     implicit_vr : bool, optional
         If ``True`` then the transfer syntax uses implicit VR encoding, otherwise
         if ``False`` then it uses explicit VR encoding. Required when `uid` has
-        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding` and
+        ignored when registering a public transfer syntax.
     little_endian : bool, optional
         If ``True`` then the transfer syntax uses little endian encoding, otherwise
         if ``False`` then it uses big endian encoding. Required when `uid` has
-        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding`.
+        not had the encoding set using :meth:`~pydicom.uid.UID.set_private_encoding` and
+        ignored when registering a public transfer syntax.
+    name : str, optional
+        The name of the transfer syntax, required if adding a public transfer syntax and
+        ignored otherwise.
+    keyword : str, optional
+        The keyword for the transfer syntax. Must be a valid Python identifier and must
+        not be a Python keyword. Required if adding a public transfer syntax and
+        ignored otherwise.
 
     Returns
     -------
@@ -492,6 +512,28 @@ def register_transfer_syntax(
         The registered UID.
     """
     uid = UID(uid)
+
+    if uid in AllTransferSyntaxes or uid in PrivateTransferSyntaxes:
+        raise ValueError(f"The UID '{uid}' has already been registered")
+
+    if not uid.is_private:
+        if not name or not keyword:
+            raise ValueError(
+                "'name' and 'keyword' are required when registering a public transfer "
+                "syntax"
+            )
+
+        if iskeyword(keyword) or not keyword.isidentifier():
+            raise ValueError(
+                f"The UID keyword '{keyword}' must be a valid Python identifier and "
+                "cannot be a Python keyword"
+            )
+
+        UID_dictionary[str(uid)] = (name, "Transfer Syntax", "", "", keyword)
+        AllTransferSyntaxes.append(uid)
+        globals()[keyword] = uid
+
+        return uid
 
     if None in (implicit_vr, little_endian) and not uid.is_transfer_syntax:
         raise ValueError(
