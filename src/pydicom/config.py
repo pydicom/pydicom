@@ -133,7 +133,7 @@ def DS_numpy(use_numpy: bool = True) -> None:
     use_numpy : bool, optional
         ``True`` (default) to read multi-value **DS** elements
         as :class:`~numpy.ndarray`, ``False`` to read multi-valued **DS**
-        data elements as type :class:`~python.mulitval.MultiValue`
+        data elements as type :class:`~pydicom.multival.MultiValue`
 
         Note: once a value has been accessed, changing this setting will
         no longer change its type
