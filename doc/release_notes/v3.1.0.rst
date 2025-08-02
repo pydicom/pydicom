@@ -59,3 +59,4 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` (:issue:`2210`)
 * Added support for compressing and decompressing *Deflated Image Frame Compression* (:issue:`2213`)
 * Suggest an element keyword when an unknown camel case dataset attribute is used.
+* Added support for adding unknown public transfer syntaxes to :func:`~pydicom.uid.register_transfer_syntax`
