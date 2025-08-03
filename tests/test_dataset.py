@@ -3187,8 +3187,8 @@ class TestDatasetContextManager:
     def test_bad_VR(self):
         # From issue 2170, 1739
         ds = Dataset()
-        elem = RawDataElement(Tag(0x01f11026), "FD", 6, b"0.264 ", 0, True, True)
-        ds[0x1f11026] = elem
+        elem = RawDataElement(Tag(0x01F11026), "FD", 6, b"0.264 ", 0, True, True)
+        ds[0x1F11026] = elem
         with pytest.raises(BytesLengthException) as excinfo:
             with ds:
                 str(ds)
@@ -3245,4 +3245,3 @@ class TestDatasetContextManager:
             "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
         )
         assert path_to(target, self.file_ds) == expected
-
