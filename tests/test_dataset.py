@@ -150,32 +150,6 @@ class TestDataset:
         with pytest.raises(AttributeError, match=msg):
             test()
 
-    def test_tag_exception_print(self):
-        """Test that tag appears in exception messages."""
-        ds = Dataset()
-        ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
-
-        msg = r"With tag \(0028,0106\) got exception: bad repr"
-        with pytest.raises(ValueError, match=msg):
-            str(ds)
-
-    def test_tag_exception_walk(self):
-        """Test that tag appears in exceptions raised during recursion."""
-        ds = Dataset()
-        ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
-
-        def callback(dataset, data_element):
-            return str(data_element)
-
-        def func(dataset=ds):
-            return dataset.walk(callback)
-
-        msg = r"With tag \(0028,0106\) got exception: bad repr"
-        with pytest.raises(ValueError, match=msg):
-            func()
-
     def test_set_new_data_element_by_name(self):
         """Dataset: set new data_element by name."""
         ds = Dataset()
@@ -3175,7 +3149,7 @@ class TestDatasetContextManager:
         plan.BeamSequence = Sequence([beam0, priv_ds])
         self.file_ds = FileDataset("test.dcm", plan)
 
-    def test_data_elem_value(self):
+    def test_bad_elem_value(self):
         """Setting a bad value gives error message with location info"""
         msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"
         # Give a bad value for existing element
@@ -3205,10 +3179,48 @@ class TestDatasetContextManager:
         with tempfile.TemporaryDirectory() as tdir:
             with pytest.raises(BytesLengthException) as excinfo:
                 with ds:
-                    ds.save_as(f"{tdir}/foo.bin")
+                    ds.save_as(f"{tdir}/foo.dcm")
         assert hasattr(excinfo.value, "__notes__")
         msg = ".SmallestImagePixelValue"
         assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_bad_VR(self):
+        # From issue 2170, 1739
+        ds = Dataset()
+        elem = RawDataElement(Tag(0x01f11026), "FD", 6, b"0.264 ", 0, True, True)
+        ds[0x1f11026] = elem
+        with pytest.raises(BytesLengthException) as excinfo:
+            with ds:
+                str(ds)
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "at [(01F1,1026)]\n  Converting RawDataElement(vr='FD', value=b'0.264 '"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_tag_exception_print(self):
+        """Test that tag appears in exception messages."""
+        ds = Dataset()
+        ds.PatientID = "123456"  # Valid value
+        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
+
+        msg = r"With tag \(0028,0106\) got exception: bad repr"
+        with pytest.raises(ValueError, match=msg):
+            str(ds)
+
+    def test_tag_exception_walk(self):
+        """Test that tag appears in exceptions raised during recursion."""
+        ds = Dataset()
+        ds.PatientID = "123456"  # Valid value
+        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
+
+        def callback(dataset, data_element):
+            return str(data_element)
+
+        def func(dataset=ds):
+            return dataset.walk(callback)
+
+        msg = r"With tag \(0028,0106\) got exception: bad repr"
+        with pytest.raises(ValueError, match=msg):
+            func()
 
     def test_path_to(self):
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
@@ -3216,3 +3228,4 @@ class TestDatasetContextManager:
             "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
         )
         assert path_to(target, self.file_ds) == expected
+

@@ -443,7 +443,6 @@ class Dataset:  # noqa: PLW1641
         exc_tb: TracebackType | None,
     ) -> bool | None:
         """Method invoked on exit from a with statement."""
-        new_elem = False
         if exc_val is None or sys.version_info < (3, 11):
             return None
 
@@ -451,12 +450,18 @@ class Dataset:  # noqa: PLW1641
         tb = exc_val.__traceback__
         all_frames = list(traceback.walk_tb(tb))
         note = ""
+        new_elem = False
+        raw_elem = False
         for frame, lineno in reversed(all_frames):
             filename = Path(frame.f_code.co_filename).name
             match (filename, frame.f_code.co_name):
-                case ("filewriter.py", "_correct_ambiguous_vr_element"):
+                case ("filewriter.py", _):
                     elem = frame.f_locals.get("elem")
-                case ("dataelem.py" | "sequence.py" | "dataset.py", func):
+                case ("dataelem.py", "convert_raw_data_element"):
+                    elem = frame.f_locals.get("raw")
+                    if elem:
+                        raw_elem = True
+                case ("dataelem.py" | "sequence.py" | "dataset.py", _):
                     elem = frame.f_locals.get("self")
                 case _:
                     elem = None
@@ -466,11 +471,18 @@ class Dataset:  # noqa: PLW1641
                 break
             if path := path_to(elem, self):
                 note = "Error occurred at " + path
+                if new_elem:
+                    note += "\n   with DataElement not yet assigned to Dataset"
+                if raw_elem:
+                    note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
                 break
             else:
                 new_elem = filename == "dataelem.py"
 
-        exc_val.add_note(note)
+        # Check if note already exists and don't repeat
+        # This is so both pydicom and user can use this context manager
+        if not hasattr(exc_val, "__notes__") or all(n!=note for n in exc_val.__notes__):
+            exc_val.add_note(note)
 
         # Returning anything other than True will re-raise any exceptions
         return None
@@ -3735,11 +3747,13 @@ def path_to(target, node) -> str | None:
     'FileDataset(filename='rtplan.dcm').BeamSequence[0].BeamName'
 
     """
+    if not target:
+        return None
+    
     ns = SimpleNamespace(target=target)  # make dotted lookup to avoid name binding
     match node:
-        case elem if node is target:  # done if match on identity
+        case elem if node is target:  # finished if match on identity
             return ""
-
         case Dataset():
             if hasattr(node, "file_meta"):
                 items = chain(node.items(), node.file_meta.items())
@@ -3759,13 +3773,10 @@ def path_to(target, node) -> str | None:
                         return f"{prefix}.{tag_str}" + path
                     else:
                         return f"{prefix}[{tag}]" + path
-            # XX could also go down node.file_meta here, if it exists
-
         case DataElement(VR="SQ"):
             for i, subnode in enumerate(node.value):
                 if (path := path_to(target, subnode)) is not None:
                     return f"[{i}]" + path
-
         case DataElement(value=ns.target):  # Done if match a data element value
             return ""  # f" (value = {target})"
 
