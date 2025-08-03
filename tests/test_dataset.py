@@ -3208,14 +3208,13 @@ class TestDatasetContextManager:
         msg = ".SmallestImagePixelValue"
         assert any(msg in note for note in excinfo.value.__notes__)
 
-
     def test_exception_walk(self):
         """Test context manager path in exceptions raised during recursion."""
         ds = Dataset()
         beam = Dataset()
         beam.BeamNumber = "1"
         beam.SmallestImagePixelValue = BadRepr()  # Invalid value
-        
+
         ds.PatientID = "123456"  # Valid value
         ds.BeamSequence = [beam]
 
@@ -3227,7 +3226,7 @@ class TestDatasetContextManager:
         assert hasattr(excinfo.value, "__notes__")
         msg = "Error occurred at .BeamSequence[0].SmallestImagePixelValue"
         assert any(msg in note for note in excinfo.value.__notes__)
-        
+
         # Repeat but adding our own layer of context management
         # in addition to builtin `walk` context management
         with pytest.raises(ValueError) as excinfo:
@@ -3235,9 +3234,6 @@ class TestDatasetContextManager:
                 ds.walk(callback)  # walk uses `with self` to catch errors
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
-
-
-
 
     def test_path_to(self):
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]

@@ -3134,8 +3134,9 @@ class Dataset:  # noqa: PLW1641
         # For exception catching, only use context manager at starting Dataset
         with self:
             self._walk(callback, recursive)
-    
-    def _walk(self, callback: Callable[["Dataset", DataElement], None], recursive: bool = True
+
+    def _walk(
+        self, callback: Callable[["Dataset", DataElement], None], recursive: bool = True
     ) -> None:
         taglist = sorted(self._dict.keys())
 
@@ -3758,7 +3759,7 @@ def path_to(target, node) -> str | None:
     # until the target object or value is found.
     # As the recursion is unwound, the node or index at each level
     # is prepended to the ongoing "path"
-    
+
     if not target:
         return None
 
@@ -3777,7 +3778,7 @@ def path_to(target, node) -> str | None:
                     break
             else:  # for-else = "no break", i.e. target not found
                 return None
-            
+
             # Have matching DataElement, compose path of this node
             kw_or_tag = f".{kw}" if (kw := keyword_for_tag(tag)) else f"[{tag}]"
 
@@ -3785,8 +3786,10 @@ def path_to(target, node) -> str | None:
             meta = ".file_meta" if tag.group == 2 else ""
             filename = getattr(node, "filename", "")
             details = f"(filename='{filename}')" if filename else ""
-            cls_name = f"{node.__class__.__name__}" if isinstance(node, FileDataset) else ""
-            
+            cls_name = (
+                f"{node.__class__.__name__}" if isinstance(node, FileDataset) else ""
+            )
+
             return f"{cls_name}{details}{meta}{kw_or_tag}" + path
         case DataElement(VR="SQ"):
             # Above case `if isinstance(node, DataElement) and node.VR == 'SQ'`
