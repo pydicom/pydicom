@@ -33,7 +33,6 @@ from pydicom.tag import (
     ItemTag,
     ItemDelimiterTag,
     SequenceDelimiterTag,
-    tag_in_exception,
     _LUT_DESCRIPTOR_TAGS,
 )
 from pydicom.uid import (
@@ -840,8 +839,7 @@ def write_dataset(
         if tag.element == 0 and tag.group > 6:
             continue
 
-        with tag_in_exception(tag):
-            write_data_element(fp, get_item(tag), dataset_encoding)
+        write_data_element(fp, get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
 
@@ -1459,7 +1457,8 @@ def dcmwrite(
             #   is encoded normally, then "deflate" compression applied
             buffer = DicomBytesIO()
             buffer.is_implicit_VR, buffer.is_little_endian = encoding
-            write_dataset(buffer, dataset)
+            with dataset:  # catch exceptions
+                write_dataset(buffer, dataset)
 
             # Compress the encoded data and write to file
             compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
@@ -1470,7 +1469,8 @@ def dcmwrite(
                 fp.write(b"\x00")
 
         else:
-            write_dataset(fp, dataset)
+            with dataset:  # catch exceptions
+                write_dataset(fp, dataset)
 
     finally:
         if not caller_owns_file:

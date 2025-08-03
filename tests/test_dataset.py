@@ -3202,25 +3202,42 @@ class TestDatasetContextManager:
         ds.PatientID = "123456"  # Valid value
         ds.SmallestImagePixelValue = BadRepr()  # Invalid value
 
-        msg = r"With tag \(0028,0106\) got exception: bad repr"
-        with pytest.raises(ValueError, match=msg):
+        with pytest.raises(ValueError) as excinfo:
             str(ds)
+        assert hasattr(excinfo.value, "__notes__")
+        msg = ".SmallestImagePixelValue"
+        assert any(msg in note for note in excinfo.value.__notes__)
 
-    def test_tag_exception_walk(self):
-        """Test that tag appears in exceptions raised during recursion."""
+
+    def test_exception_walk(self):
+        """Test context manager path in exceptions raised during recursion."""
         ds = Dataset()
+        beam = Dataset()
+        beam.BeamNumber = "1"
+        beam.SmallestImagePixelValue = BadRepr()  # Invalid value
+        
         ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
+        ds.BeamSequence = [beam]
 
         def callback(dataset, data_element):
-            return str(data_element)
+            str(data_element)
 
-        def func(dataset=ds):
-            return dataset.walk(callback)
+        with pytest.raises(ValueError) as excinfo:
+            ds.walk(callback)  # walk uses `with self` to catch errors
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "Error occurred at .BeamSequence[0].SmallestImagePixelValue"
+        assert any(msg in note for note in excinfo.value.__notes__)
+        
+        # Repeat but adding our own layer of context management
+        # in addition to builtin `walk` context management
+        with pytest.raises(ValueError) as excinfo:
+            with ds:
+                ds.walk(callback)  # walk uses `with self` to catch errors
+        assert hasattr(excinfo.value, "__notes__")
+        assert any(msg in note for note in excinfo.value.__notes__)
 
-        msg = r"With tag \(0028,0106\) got exception: bad repr"
-        with pytest.raises(ValueError, match=msg):
-            func()
+
+
 
     def test_path_to(self):
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]

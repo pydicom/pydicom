@@ -20,6 +20,9 @@ def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
     Used to include the tag details in the traceback message when an exception
     is raised within the context.
 
+    Note: It is preferable to use the `with dataset` context manager
+    which provides the full path to the data element.
+
     Parameters
     ----------
     tag : BaseTag

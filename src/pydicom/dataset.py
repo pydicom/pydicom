@@ -74,7 +74,7 @@ from pydicom.pixels.utils import (
     get_image_pixel_ids,
     set_pixel_data,
 )
-from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
+from pydicom.tag import Tag, BaseTag, TagType, TAG_PIXREP
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
@@ -452,7 +452,7 @@ class Dataset:  # noqa: PLW1641
         note = ""
         new_elem = False
         raw_elem = False
-        for frame, lineno in reversed(all_frames):
+        for frame, _ in reversed(all_frames):
             filename = Path(frame.f_code.co_filename).name
             match (filename, frame.f_code.co_name):
                 case ("filewriter.py", _):
@@ -2505,23 +2505,21 @@ class Dataset:  # noqa: PLW1641
         ):
             strings.append(f"{'Dataset.file_meta ':-<49}")
             for elem in self.file_meta:
-                with tag_in_exception(elem.tag):
-                    strings.append(indent_str + repr(elem))
+                strings.append(indent_str + repr(elem))
             strings.append(f"{'':-<49}")
 
         for elem in self:
-            with tag_in_exception(elem.tag):
-                if elem.VR == VR_.SQ:  # a sequence
-                    strings.append(
-                        f"{indent_str}{elem.tag}  {elem.name}  "
-                        f"{len(elem.value)} item(s) ---- "
-                    )
-                    if not top_level_only:
-                        for dataset in elem.value:
-                            strings.append(dataset._pretty_str(indent + 1))
-                            strings.append(nextindent_str + "---------")
-                else:
-                    strings.append(indent_str + repr(elem))
+            if elem.VR == VR_.SQ:  # a sequence
+                strings.append(
+                    f"{indent_str}{elem.tag}  {elem.name}  "
+                    f"{len(elem.value)} item(s) ---- "
+                )
+                if not top_level_only:
+                    for dataset in elem.value:
+                        strings.append(dataset._pretty_str(indent + 1))
+                        strings.append(nextindent_str + "---------")
+            else:
+                strings.append(indent_str + repr(elem))
         return "\n".join(strings)
 
     @property
@@ -3053,7 +3051,8 @@ class Dataset:  # noqa: PLW1641
             if :data:`pydicom.config.show_file_meta` is ``True``
 
         """
-        return self._pretty_str()
+        with self:  # catch exceptions
+            return self._pretty_str()
 
     def top(self) -> str:
         """Return a :class:`str` representation of the top level elements."""
@@ -3130,17 +3129,23 @@ class Dataset:  # noqa: PLW1641
             Flag to indicate whether to recurse into sequences (default
             ``True``).
         """
+        # For exception catching, only use context manager at starting Dataset
+        with self:
+            self._walk(callback, recursive)
+    
+    def _walk(self, callback: Callable[["Dataset", DataElement], None], recursive: bool = True
+    ) -> None:
         taglist = sorted(self._dict.keys())
+
         for tag in taglist:
-            with tag_in_exception(tag):
-                data_element = self[tag]
-                callback(self, data_element)  # self = this Dataset
-                # 'tag in self' below needed in case callback deleted
-                # data_element
-                if recursive and tag in self and data_element.VR == VR_.SQ:
-                    sequence = data_element.value
-                    for dataset in sequence:
-                        dataset.walk(callback)
+            data_element = self[tag]
+            callback(self, data_element)  # self = this Dataset
+            # 'tag in self' below needed in case callback deleted
+            # data_element
+            if recursive and tag in self and data_element.VR == VR_.SQ:
+                sequence = data_element.value
+                for dataset in sequence:
+                    dataset._walk(callback)
 
     @classmethod
     def from_json(
@@ -3747,37 +3752,47 @@ def path_to(target, node) -> str | None:
     'FileDataset(filename='rtplan.dcm').BeamSequence[0].BeamName'
 
     """
+    # Recurse down DICOM's nested structures, depth first,
+    # until the target object or value is found.
+    # As the recursion is unwound, the node or index at each level
+    # is prepended to the ongoing "path"
+    
     if not target:
         return None
     
     ns = SimpleNamespace(target=target)  # make dotted lookup to avoid name binding
     match node:
-        case elem if node is target:  # finished if match on identity
+        case _ if node is target:  # finished if match on identity
             return ""
         case Dataset():
+            # recurse into Dataset and file_meta data elements
             if hasattr(node, "file_meta"):
                 items = chain(node.items(), node.file_meta.items())
             else:
                 items = node.items()
             for tag, dataelem in items:
                 if (path := path_to(target, dataelem)) is not None:
-                    tag_str = keyword_for_tag(tag)
-                    prefix = (
-                        f"FileDataset(filename='{node.filename}')"
-                        if hasattr(node, "filename")
-                        else ""
-                    )
-                    if tag.group == 2:
-                        prefix += ".file_meta"
-                    if tag_str:
-                        return f"{prefix}.{tag_str}" + path
-                    else:
-                        return f"{prefix}[{tag}]" + path
+                    break
+            else:  # for-else = "no break", i.e. target not found
+                return None
+            
+            # Have matching DataElement, compose path of this node
+            kw_or_tag = f".{kw}" if (kw := keyword_for_tag(tag)) else f"[{tag}]"
+
+            # The following only apply if at root Dataset
+            meta = ".file_meta" if tag.group == 2 else ""
+            filename = getattr(node, "filename", "")
+            details = f"(filename='{filename}')" if filename else ""
+            cls_name = f"{node.__class__.__name__}" if isinstance(node, FileDataset) else ""
+            
+            return f"{cls_name}{details}{meta}{kw_or_tag}" + path
         case DataElement(VR="SQ"):
+            # Above case `if isinstance(node, DataElement) and node.VR == 'SQ'`
+            # Recurse into Sequence items
             for i, subnode in enumerate(node.value):
                 if (path := path_to(target, subnode)) is not None:
                     return f"[{i}]" + path
-        case DataElement(value=ns.target):  # Done if match a data element value
-            return ""  # f" (value = {target})"
+        case DataElement(value=ns.target):  # Match a data element value
+            return ""
 
     return None
