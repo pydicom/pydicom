@@ -481,7 +481,9 @@ class Dataset:  # noqa: PLW1641
 
         # Check if note already exists and don't repeat
         # This is so both pydicom and user can use this context manager
-        if not hasattr(exc_val, "__notes__") or all(n!=note for n in exc_val.__notes__):
+        if not hasattr(exc_val, "__notes__") or all(
+            n != note for n in exc_val.__notes__
+        ):
             exc_val.add_note(note)
 
         # Returning anything other than True will re-raise any exceptions
@@ -3749,7 +3751,7 @@ def path_to(target, node) -> str | None:
     """
     if not target:
         return None
-    
+
     ns = SimpleNamespace(target=target)  # make dotted lookup to avoid name binding
     match node:
         case elem if node is target:  # finished if match on identity
