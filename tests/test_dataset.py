@@ -31,7 +31,7 @@ from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import (
     Dataset,
     FileDataset,
-    path_to,
+    _path_to,
     validate_file_meta,
     FileMetaDataset,
 )
@@ -3234,10 +3234,19 @@ class TestDatasetContextManager:
                 ds.walk(callback)  # walk uses `with self` to catch errors
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
-
+    
+    def test_exception_index_error(self):
+        """Test that path shown to Sequence when index error occurs."""
+        with pytest.raises(IndexError) as excinfo:
+            with self.file_ds:
+                self.file_ds.BeamSequence[0].ControlPointSequence[99]
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence"
+        assert any(msg in note for note in excinfo.value.__notes__)
+    
     def test_path_to(self):
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
         expected = (
             "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
         )
-        assert path_to(target, self.file_ds) == expected
+        assert _path_to(target, self.file_ds) == expected

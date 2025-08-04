@@ -463,13 +463,15 @@ class Dataset:  # noqa: PLW1641
                         raw_elem = True
                 case ("dataelem.py" | "sequence.py" | "dataset.py", _):
                     elem = frame.f_locals.get("self")
+                case ("multival.py", _):
+                    elem = frame.f_locals.get("self")
                 case _:
                     elem = None
             if elem is None:
                 continue
             if elem is self:
                 break
-            if path := path_to(elem, self):
+            if path := _path_to(elem, self):
                 note = "Error occurred at " + path
                 if new_elem:
                     note += "\n   with DataElement not yet assigned to Dataset"
@@ -481,7 +483,7 @@ class Dataset:  # noqa: PLW1641
 
         # Check if note already exists and don't repeat
         # This is so both pydicom and user can use this context manager
-        if not hasattr(exc_val, "__notes__") or all(
+        if note and not hasattr(exc_val, "__notes__") or all(
             n != note for n in exc_val.__notes__
         ):
             exc_val.add_note(note)
@@ -3727,7 +3729,7 @@ _RE_CAMEL_CASE = re.compile(
 )
 
 
-def path_to(target, node) -> str | None:
+def _path_to(target, node) -> str | None:
     """Return a pseudo-code path to a particular DataElement, Sequence, or value
 
     This is used by Dataset's context manager to report the specific data element
@@ -3741,13 +3743,13 @@ def path_to(target, node) -> str | None:
         with that value is returned.
     node: Any
         The object currently being searched (function is called recursively).
-        First call to the function will typically be a Dataset
+        On the first call to the function it will typically be a Dataset
 
     Returns
     -------
     str | None:
         The path to the target object from the node.
-        During recursion, returns none if a leaf node reached without finding target.
+        During recursion, returns ``None`` if a leaf node is reached without finding target.
 
     Examples
     --------
@@ -3774,15 +3776,16 @@ def path_to(target, node) -> str | None:
             else:
                 items = node.items()
             for tag, dataelem in items:
-                if (path := path_to(target, dataelem)) is not None:
+                if (path := _path_to(target, dataelem)) is not None:
                     break
             else:  # for-else = "no break", i.e. target not found
                 return None
 
             # Have matching DataElement, compose path of this node
+            # For private elements, DICOM keyword not available so use Tag number
             kw_or_tag = f".{kw}" if (kw := keyword_for_tag(tag)) else f"[{tag}]"
 
-            # The following only apply if at root Dataset
+            # The following lines only affect path if at root Dataset
             meta = ".file_meta" if tag.group == 2 else ""
             filename = getattr(node, "filename", "")
             details = f"(filename='{filename}')" if filename else ""
@@ -3791,11 +3794,13 @@ def path_to(target, node) -> str | None:
             )
 
             return f"{cls_name}{details}{meta}{kw_or_tag}" + path
-        case DataElement(VR="SQ"):
-            # Above case `if isinstance(node, DataElement) and node.VR == 'SQ'`
+        case DataElement(VR="SQ") as elem:
+            # Check Sequence object itself:
+            if elem.value is target:
+                return ""
             # Recurse into Sequence items
             for i, subnode in enumerate(node.value):
-                if (path := path_to(target, subnode)) is not None:
+                if (path := _path_to(target, subnode)) is not None:
                     return f"[{i}]" + path
         case DataElement(value=ns.target):  # Match a data element value
             return ""
