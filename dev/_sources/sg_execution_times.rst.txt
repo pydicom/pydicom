@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.536** total execution time for 15 files **from all galleries**:
+**00:00.546** total execution time for 15 files **from all galleries**:
 
 .. container::
 
@@ -36,13 +36,13 @@ Computation times
      - 00:00.177
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``../examples/image_processing/plot_waveforms.py``)
-     - 00:00.168
+     - 00:00.173
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``../examples/input_output/plot_read_dicom.py``)
-     - 00:00.087
+     - 00:00.089
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
-     - 00:00.081
+     - 00:00.083
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``../examples/metadata_processing/plot_anonymize.py``)
      - 00:00.006
