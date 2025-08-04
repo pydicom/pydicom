@@ -483,9 +483,9 @@ class Dataset:  # noqa: PLW1641
 
         # Check if note already exists and don't repeat
         # This is so both pydicom and user can use this context manager
-        if note and not hasattr(exc_val, "__notes__") or all(
+        if note and (not hasattr(exc_val, "__notes__") or all(
             n != note for n in exc_val.__notes__
-        ):
+        )):
             exc_val.add_note(note)
 
         # Returning anything other than True will re-raise any exceptions
