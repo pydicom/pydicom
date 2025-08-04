@@ -3234,7 +3234,7 @@ class TestDatasetContextManager:
                 ds.walk(callback)  # walk uses `with self` to catch errors
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
-    
+
     def test_exception_index_error(self):
         """Test that path shown to Sequence when index error occurs."""
         with pytest.raises(IndexError) as excinfo:
@@ -3243,7 +3243,7 @@ class TestDatasetContextManager:
         assert hasattr(excinfo.value, "__notes__")
         msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence"
         assert any(msg in note for note in excinfo.value.__notes__)
-    
+
     def test_path_to(self):
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
         expected = (
