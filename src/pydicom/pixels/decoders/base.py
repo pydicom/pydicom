@@ -1102,11 +1102,13 @@ class Decoder(CoderBase):
         if index is not None:
             # The decoding plugin may alter runner.bits_allocated to give a
             #   different dtype itemsize
-            frame = np.frombuffer(runner.decode(index=index), dtype=runner.pixel_dtype)
+            buffer = runner.decode(index=index)
             runner.set_option("bits_allocated", original_bits_allocated)
 
             if runner.get_option("is_bitpacked"):
-                frame = unpack_bits(frame)[:pixels_per_frame]
+                frame = unpack_bits(buffer)[:pixels_per_frame]
+            else:
+                frame = np.frombuffer(buffer, dtype=runner.pixel_dtype)
 
             arr[:] = frame
 
@@ -1115,10 +1117,12 @@ class Decoder(CoderBase):
         # Return all frames
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
-            frame = np.frombuffer(next(frame_generator), dtype=runner.pixel_dtype)
+            buffer = next(frame_generator)
 
             if runner.get_option("is_bitpacked"):
-                frame = unpack_bits(frame)[:pixels_per_frame]
+                frame = unpack_bits(buffer)[:pixels_per_frame]
+            else:
+                frame = np.frombuffer(buffer, dtype=runner.pixel_dtype)
 
             start = idx * pixels_per_frame
             arr[start : start + pixels_per_frame] = frame
@@ -1128,13 +1132,14 @@ class Decoder(CoderBase):
         if runner.get_option("allow_excess_frames", False):
             excess = []
             original_nr_frames = runner.number_of_frames
-            for frame in frame_generator:
-                if len(frame) == runner.frame_length(unit="bytes"):
-                    if original_bits_allocated == 1 and runner.get_option(
-                        "is_bitpacked"
-                    ):
-                        frame = unpack_bits(frame)[:pixels_per_frame]
-                    excess.append(np.frombuffer(frame, runner.pixel_dtype))
+            for buffer in frame_generator:
+                if len(buffer) == runner.frame_length(unit="bytes"):
+                    if runner.get_option("is_bitpacked"):
+                        frame = unpack_bits(buffer)[:pixels_per_frame]
+                    else:
+                        frame = np.frombuffer(buffer, runner.pixel_dtype)
+
+                    excess.append(frame)
                     runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
             if excess:
