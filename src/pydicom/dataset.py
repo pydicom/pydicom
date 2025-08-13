@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -443,53 +443,7 @@ class Dataset:  # noqa: PLW1641
         exc_tb: TracebackType | None,
     ) -> bool | None:
         """Method invoked on exit from a with statement."""
-        if exc_val is None or sys.version_info < (3, 11):
-            return None
-
-        # Find first data element or Sequence up the trace
-        tb = exc_val.__traceback__
-        all_frames = list(traceback.walk_tb(tb))
-        note = ""
-        new_elem = False
-        raw_elem = False
-        for frame, _ in reversed(all_frames):
-            filename = Path(frame.f_code.co_filename).name
-            match (filename, frame.f_code.co_name):
-                case ("filewriter.py", _):
-                    elem = frame.f_locals.get("elem")
-                case ("dataelem.py", "convert_raw_data_element"):
-                    elem = frame.f_locals.get("raw")
-                    if elem:
-                        raw_elem = True
-                case ("dataelem.py" | "sequence.py" | "dataset.py", _):
-                    elem = frame.f_locals.get("self")
-                case ("multival.py", _):
-                    elem = frame.f_locals.get("self")
-                case _:
-                    elem = None
-            if elem is None:
-                continue
-            if elem is self:
-                break
-            if path := _path_to(elem, self):
-                note = "Error occurred at " + path
-                if new_elem:
-                    note += "\n   with DataElement not yet assigned to Dataset"
-                if raw_elem:
-                    note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
-                break
-            else:
-                new_elem = filename == "dataelem.py"
-
-        # Check if note already exists and don't repeat
-        # This is so both pydicom and user can use this context manager
-        if note and (not hasattr(exc_val, "__notes__") or all(
-            n != note for n in exc_val.__notes__
-        )):
-            exc_val.add_note(note)
-
-        # Returning anything other than True will re-raise any exceptions
-        return None
+        return _trace_from(self, exc_type, exc_val, exc_tb)
 
     def add(self, data_element: DataElement) -> None:
         """Add an element to the :class:`Dataset`.
@@ -3805,4 +3759,59 @@ def _path_to(target, node) -> str | None:
         case DataElement(value=ns.target):  # Match a data element value
             return ""
 
+    return None
+
+def _trace_from(
+        base, 
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool | None:
+    """Return a pseudo-code path from `base` to an object where exception occurred"""
+    if exc_val is None or sys.version_info < (3, 11):
+        return None
+
+    # Find first data element or Sequence up the trace
+    tb = exc_val.__traceback__
+    all_frames = list(traceback.walk_tb(tb))
+    note = ""
+    new_elem = False
+    raw_elem = False
+    for frame, _ in reversed(all_frames):
+        filename = Path(frame.f_code.co_filename).name
+        match (filename, frame.f_code.co_name):
+            case ("filewriter.py", _):
+                elem = frame.f_locals.get("elem")
+            case ("dataelem.py", "convert_raw_data_element"):
+                elem = frame.f_locals.get("raw")
+                if elem:
+                    raw_elem = True
+            case ("dataelem.py" | "sequence.py" | "dataset.py", _):
+                elem = frame.f_locals.get("self")
+            case ("multival.py", _):
+                elem = frame.f_locals.get("self")
+            case _:
+                elem = None
+        if elem is None:
+            continue
+        if elem is base:
+            break
+        if path := _path_to(elem, base):
+            note = "Error occurred at " + path
+            if new_elem:
+                note += "\n   with DataElement not yet assigned"
+            if raw_elem:
+                note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
+            break
+        else:
+            new_elem = filename == "dataelem.py"
+
+    # Check if note already exists and don't repeat
+    # This is so both pydicom and user can use this context manager
+    if note and (not hasattr(exc_val, "__notes__") or all(
+        n != note for n in exc_val.__notes__
+    )):
+        exc_val.add_note(note)
+
+    # Returning anything other than True will re-raise any exceptions
     return None

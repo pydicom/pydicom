@@ -49,6 +49,9 @@ And can even be used as a context manager::
     ...
     <class 'pydicom.dataset.FileDataset'>
 
+When using a context manager as above, pydicom can often provide more detailed 
+error messages, especially useful for nested DICOM information (Python >= 3.11).
+
 By default, :func:`~pydicom.filereader.dcmread` will read any DICOM dataset
 stored in accordance with the :dcm:`DICOM File Format<part10/chapter_7.html>`.
 However, occasionally you may try to read a file that gives you the following
