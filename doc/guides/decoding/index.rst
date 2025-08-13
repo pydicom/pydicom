@@ -1,7 +1,7 @@
 
-===================
-Pixel Data Decoding
-===================
+=========================================
+*Pixel Data* decoding options and plugins
+=========================================
 
 Decoding plugin information:
 

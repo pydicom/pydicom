@@ -44,7 +44,7 @@ TagListType = list[int] | list[str] | list[tuple[int, int]] | list["BaseTag"]
 def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
     """Create a :class:`BaseTag`.
 
-    General function for creating a :class:`BaseTag` in any of the standard
+    General function for creating a :class:`BaseTag` from any of the standard
     forms:
 
     * ``Tag(0x00100015)``
@@ -54,7 +54,7 @@ def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
 
     Parameters
     ----------
-    arg : int or str or 2-tuple of int
+    arg : int | str | tuple[int, int]
 
         * If :class:`int` then either the group number or the combined
           group and element numbers of the tag

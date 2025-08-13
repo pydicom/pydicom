@@ -62,3 +62,4 @@ Enhancements
 * Added enhanced exception notes (Python >= 3.11) giving a pseudo-code path to the DICOM object
   where an error occurred.  Activated using `with dataset:` context; already used internally in key 
   locations (:issue:`2168`)
+* Added support for adding unknown public transfer syntaxes to :func:`~pydicom.uid.register_transfer_syntax`

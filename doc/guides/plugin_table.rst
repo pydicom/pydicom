@@ -1,16 +1,37 @@
 
 ====================================================
-Plugins for Pixel Data Compression and Decompression
+Plugins for Pixel Data compression and decompression
 ====================================================
+
+The default installation of *pydicom* doesn't support decompression or compression of
+*Pixel Data*, except for *RLE Lossless* and *Deflated Image Frame Compression*.
+Support for other compressed transfer syntaxes is added through plugins, each of which
+requires installing `NumPy <https://numpy.org/>`_ and one or more third-party packages.
+
+To determine the transfer syntax used by a dataset you can use the following snippet::
+
+    from pydicom import dcmread
+
+    ds = dcmread("path/to/dataset")
+    print(ds.file_meta.TransferSyntaxUID.name)
 
 
 .. _guide_decoding_plugins:
 
-Plugins for Decompression
+Plugins for decompression
 =========================
 
-The table below lists the plugins available for decompressing pixel data that's been compressed using the corresponding
-*Transfer Syntax UID*. No plugins are used for uncompressed pixel data.
+The table below lists the plugins available for decompressing pixel data that's been
+compressed using the method corresponding to the *Transfer Syntax UID*. No plugins are
+required for uncompressed pixel data, as *pydicom* can handle these natively as long as
+`NumPy <https://numpy.org/>`_ is installed.
+
+If your dataset uses a compressed transfer syntax that isn't listed below then
+you'll have to rely on third-party methods for decoding, :ref:`as described here
+<tut_pixel_data_decode_third_party>`.
+
+Supported Transfer Syntaxes
+---------------------------
 
 .. |chk|   unicode:: U+02713 .. CHECK MARK
 
@@ -53,121 +74,91 @@ The table below lists the plugins available for decompressing pixel data that's 
 | :sup:`4` with Pillow's *Jpeg2KImagePlugin*
 
 
-Plugins
--------
+Plugin requirements and limitations
+-----------------------------------
 
-``pylibjpeg``
-.............
+.. _pylj: https://github.com/pydicom/pylibjpeg
+.. _pylj-lj: https://github.com/pydicom/pylibjpeg-libjpeg
+.. _pylj-oj: https://github.com/pydicom/pylibjpeg-openjpeg
+.. _pylj-rle: https://github.com/pydicom/pylibjpeg-rle
+.. _py-gdcm: https://github.com/tfmoraes/python-gdcm
+.. _pil: https://pillow.readthedocs.io/en/stable/
+.. _pil_j2k: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#jpeg-2000
+.. _pyjls: https://github.com/pydicom/pyjpegls
+.. _pyd: https://github.com/pydicom/pydicom
 
-Requires `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ and at least one of:
 
-* `pylibjpeg-libjpeg <https://github.com/pydicom/pylibjpeg-libjpeg>`_
-* `pylibjpeg-openjpeg <https://github.com/pydicom/pylibjpeg-openjpeg>`_
-* `pylibjpeg-rle <https://github.com/pydicom/pylibjpeg-rle>`_
-
-**Known limitations**
-
-* Maximum supported *Bits Stored* for JPEG 2000 and HTJ2K is 24
-
-``gdcm``
-........
-
-Requires `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_.
-
-**Known limitations**
-
-* *JPEG Extended 12-bit* is only available if *Bits Allocated* is 8
-* *JPEG-LS Near Lossless* only if *Bits Stored* is at least 8 for a *Pixel Representation* of 1
-* *JPEG-LS Lossless* and *JPEG-LS Near Lossless* only if *Bits Stored* is not 6 or 7
-* Maximum supported *Bits Stored* is 16
-
-``pillow``
-..........
-
-Requires `Pillow <https://pillow.readthedocs.io/en/stable/>`_, with support for
-JPEG 2000 via Pillow's `Jpeg2KImagePlugin
-<https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#jpeg-2000>`_
-requiring `OpenJPEG <https://www.openjpeg.org/>`_.
-
-**Known limitations**
-
-* *JPEG Extended 12-bit* is only available if *Bits Allocated* is 8
-* *JPEG 2000 Lossless* and *JPEG 2000* are only available for a *Samples per Pixel* of
-  3 when *Bits Stored* is <= 8
-* Maximum supported *Bits Stored* is 16
-
-``pyjpegls``
-............
-
-Requires `pyjpegls <https://github.com/pydicom/pyjpegls>`_.
-
-``pydicom``
-...........
-
-Requires `pydicom <https://github.com/pydicom/pydicom>`_.
-
-**Known limitations**
-
-* *RLE Lossless*: Slower than the other plugins by 3-4x
-
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| Plugin        | Requires                                  | Known limitations                                                   |
++===============+===========================================+===============================+=====================================+
+| ``pylibjpeg`` | `pylibjpeg <pylj_>`_ and at least one of  | * Maximum supported *Bits Stored* for JPEG 2000 and HTJ2K is 24     |
+|               | `pylibjpeg-libjpeg <pylj-lj_>`_,          |                                                                     |
+|               | `pylibjpeg-openjpeg <pylj-oj_>`_ and      |                                                                     |
+|               | `pylibjpeg-rle <pylj-rle_>`_              |                                                                     |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| ``gdcm``      | `python-gdcm <py-gdcm_>`_                 | * *JPEG Extended 12-bit* is only available if *Bits Allocated* is 8 |
+|               |                                           | * *JPEG-LS Near Lossless* only if *Bits Stored* is at least 8       |
+|               |                                           |   for a *Pixel Representation* of 1                                 |
+|               |                                           | * *JPEG-LS Lossless* and *JPEG-LS Near Lossless* only if            |
+|               |                                           |   *Bits Stored* is not 6 or 7                                       |
+|               |                                           | * Maximum supported *Bits Stored* is 16                             |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| ``pillow``    | `Pillow <pil_>`_, with support for JPEG   | * *JPEG Extended 12-bit* is only available if *Bits Allocated* is 8 |
+|               | 2000 via Pillow's `Jpeg2KImagePlugin      | * *JPEG 2000 Lossless* and *JPEG 2000* are only available           |
+|               | <pil_j2k_>`_                              |   for a *Samples per Pixel* of 3 when *Bits Stored* is <= 8         |
+|               |                                           | * Maximum supported *Bits Stored* is 16                             |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| ``pyjpegls``  | `pyjpegls <pyjls_>`_                      |                                                                     |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| ``pydicom``   | `pydicom <pyd_>`_                         | * *RLE Lossless*: Slower than the other plugins by 3-4x             |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
 
 
 .. _guide_encoding_plugins:
 
-Plugins for Compression
+Plugins for compression
 =======================
 
 .. currentmodule:: pydicom.pixels.encoders
 
-+---------------------------------------------------+---------------+--------------------------------------------+
-| Transfer Syntax                                   | Plugins       | Encoding guide                             |
-+-------------------------+-------------------------+               |                                            |
-| Name                    | UID                     |               |                                            |
-+=========================+=========================+===============+============================================+
-| *JPEG-LS Lossless*      | 1.2.840.10008.1.2.4.80  | ``pyjpegls``  | :doc:`JPEG-LS</guides/encoding/jpeg_ls>`   |
-+-------------------------+-------------------------+               |                                            |
-| *JPEG-LS Near Lossless* | 1.2.840.10008.1.2.4.81  |               |                                            |
-+-------------------------+-------------------------+---------------+--------------------------------------------+
-| *JPEG 2000 Lossless*    | 1.2.840.10008.1.2.4.90  | ``pylibjpeg`` | :doc:`JPEG 2000</guides/encoding/jpeg_2k>` |
-+-------------------------+-------------------------+               |                                            |
-| *JPEG 2000*             | 1.2.840.10008.1.2.4.91  |               |                                            |
-+-------------------------+-------------------------+---------------+--------------------------------------------+
-| *RLE Lossless*          | 1.2.840.10008.1.2.5     | ``pylibjpeg`` | :doc:`RLE</guides/encoding/rle_lossless>`  |
-|                         |                         +---------------+                                            |
-|                         |                         | ``pydicom``   |                                            |
-+-------------------------+-------------------------+---------------+--------------------------------------------+
-| *Deflated Image Frame   | 1.2.840.10008.1.2.8.1   | ``pydicom``   | :doc:`Deflated Image                       |
-| Compression*            |                         |               | </guides/encoding/defl_image>`             |
-+-------------------------+-------------------------+---------------+--------------------------------------------+
+The table below lists the plugins available for compressing pixel data using the method
+corresponding to the *Transfer Syntax UID*. If you wish to use a compression method that
+isn't listed below then you'll have to rely on third-party methods for encoding,
+:ref:`as described here <tut_pixel_data_encode_third_party>`.
+
+Supported Transfer Syntaxes
+---------------------------
+
++------------------------------------------------------+-----------------+--------------------------------------------+
+| Transfer Syntax                                      | Plugins         | Encoding guide                             |
++---------------------------+--------------------------+                 |                                            |
+| Name                      | UID                      |                 |                                            |
++===========================+==========================+=================+============================================+
+| | *JPEG-LS Lossless*      | | 1.2.840.10008.1.2.4.80 | ``pyjpegls``    | :doc:`JPEG-LS</guides/encoding/jpeg_ls>`   |
+| | *JPEG-LS Near Lossless* | | 1.2.840.10008.1.2.4.81 |                 |                                            |
++---------------------------+--------------------------+-----------------+--------------------------------------------+
+| | *JPEG 2000 Lossless*    | | 1.2.840.10008.1.2.4.90 | ``pylibjpeg``   | :doc:`JPEG 2000</guides/encoding/jpeg_2k>` |
+| | *JPEG 2000*             | | 1.2.840.10008.1.2.4.91 |                 |                                            |
++---------------------------+--------------------------+-----------------+--------------------------------------------+
+| *RLE Lossless*            | 1.2.840.10008.1.2.5      | | ``pylibjpeg`` | :doc:`RLE</guides/encoding/rle_lossless>`  |
+|                           |                          | | ``pydicom``   |                                            |
++---------------------------+--------------------------+-----------------+--------------------------------------------+
+| *Deflated Image Frame     | 1.2.840.10008.1.2.8.1    | ``pydicom``     | :doc:`Deflated Image                       |
+| Compression*              |                          |                 | </guides/encoding/defl_image>`             |
++---------------------------+--------------------------+-----------------+--------------------------------------------+
 
 
-Plugins
--------
+Plugin requirements and limitations
+-----------------------------------
 
-``pyjpegls``
-............
-
-Requires `pyjpegls <https://github.com/pydicom/pyjpegls>`_.
-
-
-``pylibjpeg``
-.............
-
-Requires `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ as well as
-`pylibjpeg-openjpeg <https://github.com/pydicom/pylibjpeg-openjpeg>`_ for JPEG 2000
-compression and `pylibjpeg-rle <https://github.com/pydicom/pylibjpeg-rle>`_ for
-*RLE Lossless*.
-
-**Known limitations**
-
-* The maximum supported *Bits Stored* for JPEG 2000 is 24, however the results
-  for 20-24 are very poor when using lossy compression.
-
-``pydicom``
-...........
-
-Requires `pydicom <https://github.com/pydicom/pydicom>`_.
-
-**Known limitations**
-
-* *RLE Lossless*: Much slower than the other plugins
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| Plugin        | Requires                                  | Known limitations                                                   |
++===============+===========================================+===============================+=====================================+
+| ``pyjpegls``  | `pyjpegls <pyjls_>`_                      |                                                                     |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| ``pylibjpeg`` | `pylibjpeg <pylj_>`_ and                  | * Maximum supported *Bits Stored* for JPEG 2000 is 24, however the  |
+|               | `pylibjpeg-openjpeg <pylj-oj_>`_ and/or   |   results for 20-24 are quite poor when using lossy compression     |
+|               | `pylibjpeg-rle <pylj-rle_>`_              |                                                                     |
++---------------+-------------------------------------------+---------------------------------------------------------------------+
+| ``pydicom``   | `pydicom <pyd_>`_                         | * *RLE Lossless*: Much slower than the other plugins                |
++---------------+-------------------------------------------+---------------------------------------------------------------------+

@@ -5,7 +5,7 @@
 .. _cli_guide:
 
 ============================
-Command-line Interface Guide
+Command-line Interface guide
 ============================
 
 .. versionadded:: 2.2

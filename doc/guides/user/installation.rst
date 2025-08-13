@@ -17,38 +17,39 @@ Install the official release
 
 *pydicom*, being a Python library, requires `Python
 <https://www.python.org/>`_. If you're not sure whether or not your version of
-Python is supported, check :ref:`this table<faq_install_version>`.
+Python is supported, you can check :ref:`this table<faq_install_version>`.
 
-Install using pip
------------------
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`__, the
-official third-party Python software repository. The simplest way to install the latest version
-from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
+    .. tab-item:: pip
+        :sync: pip
 
-  python -m pip install -U pydicom
+        .. code-block:: bash
+
+            pip install -U pydicom
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pydicom
 
 You can also perform an offline installation by
-:gh:`downloading <pydicom/releases>` and installing
-one of the release ``*.whl`` files. For example, with the v3.0 release::
+`downloading <https://pypi.org/project/pydicom/#files>`_ and installing
+one of the release ``*.whl`` files. For example, with the `file for the v3.0
+release <https://pypi.org/project/pydicom/3.0.1/#files>`_::
 
-  pip install pydicom-3.0.0-py3-none-any.whl
-
-
-Install using conda
--------------------
-
-*pydicom* is also available for `conda <https://docs.conda.io/>`_ at
-`conda-forge <https://anaconda.org/conda-forge/pydicom>`__::
-
-  conda install -c conda-forge pydicom
+  pip install pydicom-3.0.1-py3-none-any.whl
 
 
 Additional type hints
 ---------------------
 
-The default *pydicom* type hinting doesn't cover standard element keywords accessed
-through :class:`~pydicom.dataset.Dataset`::
+*pydicom's* default type hinting doesn't cover standard elements accessed via their
+keyword through :class:`~pydicom.dataset.Dataset`::
 
     # foo.py
     from pydicom import Dataset
@@ -61,9 +62,9 @@ through :class:`~pydicom.dataset.Dataset`::
     $ mypy foo.py
     Success: no issues found in 1 source file
 
-To add extra type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
+To add type hints for these attributes you can install the `types-pydicom <https://github.com/pydicom/types-pydicom>`_ package::
 
-    python -m pip install -U types-pydicom
+    pip install -U types-pydicom
 
 .. code-block:: shell
 
@@ -78,42 +79,114 @@ To add extra type hints for these attributes you can install the `types-pydicom 
 Install the optional libraries
 ==============================
 
-If you're going to be manipulating pixel data then
-`NumPy <https://numpy.org/>`_ is required.
+Converting raw pixel data to an :class:`~numpy.ndarray` always requires `NumPy
+<https://numpy.org/>`_, and decoding JPEG compressed pixel data requires installing
+one or more additional libraries.
 
-Using pip::
+The quickest way to install NumPy and all the additional libraries is with:
 
-  python -m pip install -U numpy
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-Through conda::
+    .. tab-item:: pip
+        :sync: pip
 
-  conda install numpy
+        .. code-block:: bash
 
-To decode JPEG compressed pixel data one or more additional libraries will
-need to be installed. See :ref:`this page <guide_compressed>` for a list of
-which library is needed to handle a given JPEG format, as specified by
-the dataset's (0002,0010) *Transfer Syntax UID* value.
+            pip install -U pydicom[pixeldata]
 
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pydicom[pixeldata]
+
+
+Alternatively, you can install only the libraries you need. NumPy is always required,
+and can handle converting uncompressed pixel data to an ``ndarray`` without any other
+packages:
+
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
+
+    .. tab-item:: pip
+        :sync: pip
+
+        .. code-block:: bash
+
+            pip install -U numpy
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install numpy
 
 .. _tut_install_pil:
+
+For compressed pixel data, see :doc:`this page </guides/plugin_table>` for
+details of which library is needed to compress or decompress using a given compression
+method, as specified by the dataset's (0002,0010) *Transfer Syntax UID* value, then
+follow the corresponding installation instructions below.
 
 Installing Pillow
 -----------------
 
 `Pillow <https://pillow.readthedocs.io/>`_ is a popular Python imaging library
-that can handle the decompression of some JPEG and JPEG 2000 images.
+that can handle the decompression of some JPEG and JPEG 2000 images. It includes
+JPEG support by default, however JPEG 2000 requires the
+`openjpeg <https://www.openjpeg.org/>`_  library be installed.
 
-Using pip; you may need to make sure that the
-`libjpeg <https://libjpeg.sourceforge.net/>`_ (for JPEG) and
-`openjpeg <https://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
-beforehand::
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-  python -m pip install -U pillow
+    .. tab-item:: pip
+        :sync: pip
 
-Through conda::
+        .. code-block:: bash
 
-  conda install -c conda-forge openjpeg jpeg
-  conda install pillow
+            pip install -U pillow
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge openjpeg jpeg
+            conda install pillow
+
+
+.. _tut_install_pylj:
+
+Installing pylibjpeg
+--------------------
+
+:gh:`pylibjpeg <pylibjpeg>` is a Python framework for
+decompressing JPEG, JPEG-LS images and compressing or decompressing JPEG 2000 and
+RLE images, provided a suitable plugin is installed.
+
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
+
+    .. tab-item:: pip
+        :sync: pip
+
+        .. code-block:: bash
+
+            pip install -U pylibjpeg[all]
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pylibjpeg[all]
 
 
 Installing pyjpegls
@@ -121,17 +194,28 @@ Installing pyjpegls
 
 `pyjpegls <https://github.com/pydicom/pyjpegls>`_ is a Python interface to
 the `CharLS <https://github.com/team-charls/charls>`_ C++ library and can
-decompress JPEG-LS images. It is a fork of `CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_
-created to provide compatibility with the latest Python versions.
+compress and decompress JPEG-LS images. It's a fork of `CharPyLS
+<https://github.com/Who8MyLunch/CharPyLS>`_ created to provide compatibility with the
+latest Python versions.
 
-Using pip::
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
-  python -m pip install -U pyjpegls
+    .. tab-item:: pip
+        :sync: pip
 
-Through conda::
+        .. code-block:: bash
 
-  conda install cython
-  python -m pip install git+https://github.com/pydicom/pyjpegls
+            pip install -U pyjpegls
+
+    .. tab-item:: conda
+        :sync: conda
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pyjpegls
+
 
 
 .. _tut_install_gdcm:
@@ -144,28 +228,28 @@ with DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
 The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`__ are built by the
 `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
-versions of Python on Windows, MacOS and Linux, and can be installed using pip::
-
-  python -m pip install -U python-gdcm
+versions of Python on Windows, MacOS and Linux, and can be installed using pip.
 
 The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`__
-tend to be older versions and not as well supported. They're available on conda using::
+tend to be older versions and may not be as well supported.
 
-  conda install gdcm -c conda-forge
+.. tab-set::
+    :sync-group: install
+    :class: sd-width-content-min
 
+    .. tab-item:: pip
+        :sync: pip
 
-.. _tut_install_pylj:
+        .. code-block:: bash
 
-Installing pylibjpeg
---------------------
+            pip install -U python-gdcm
 
-:gh:`pylibjpeg <pylibjpeg>` is a Python framework for
-decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
-RLE images provided a suitable plugin is installed.
+    .. tab-item:: conda
+        :sync: conda
 
-Using pip::
+        .. code-block:: bash
 
-  python -m pip install -U pylibjpeg[all]
+            conda install -c conda-forge gdcm
 
 
 .. _tut_install_dev:
@@ -178,7 +262,7 @@ To install a snapshot of the latest code (the ``main`` branch) from
 
   pip install git+https://github.com/pydicom/pydicom
 
-The ``main`` branch is under active development and while it is usually
+The ``main`` branch is under active development and while it's usually
 stable, it may have undocumented changes or bugs.
 
 If you want to keep up-to-date with the latest code, make sure you have

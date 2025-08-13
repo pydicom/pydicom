@@ -287,6 +287,39 @@ And of course if the specified plugin isn't available you'll get an exception::
     RuntimeError: Unable to decompress 'JPEG 2000 Image Compression (Lossless Only)' pixel data because the specified plugin is missing dependencies:
         pillow - requires numpy and pillow>=10.0
 
+.. _tut_pixel_data_decode_third_party:
+
+If support for the transfer syntax used by a dataset isn't available in *pydicom*,
+you can instead use :func:`~pydicom.encaps.get_frame` or :func:`~pydicom.encaps.generate_frames`
+with a third-party package or application capable of performing the decoding::
+
+    import subprocess
+
+    import fakelib
+
+    from pydicom import dcmread
+    from pydicom.encaps import generate_frames
+
+    ds = dcmread("path/to/dataset")
+    number_of_frames = ds.get("NumberOfFrames", 1)
+
+    for buffer in generate_frames(ds.PixelData, number_of_frames=number_of_frames):
+        # Example using a Python package
+        frame = fakelib.decompression_function(buffer)
+
+        # Example using a CLI application such as libjxl's djxl
+        # Write the frame data to file
+        with open("bar.jxl", "wb") as f:
+            f.write(buffer)
+
+        # Decode by calling the CLI app using subprocess
+        p = subprocess.run(["/usr/bin/djxl", "bar.jxl", "bar.pfm"])
+
+        # Read the decoded frame data
+        if p.returncode == 0:
+            with open("bar.pfm", "rb") as f:
+                frame = f.read()
+
 
 Minimizing memory usage
 .......................

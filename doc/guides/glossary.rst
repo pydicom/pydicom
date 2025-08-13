@@ -5,8 +5,8 @@ Glossary
 
 .. _glossary_file_meta:
 
-:dcm:`File Meta Information<>`
-==============================
+:dcm:`File Meta Information<part10/chapter_7.html#sect_7.1>`
+============================================================
 
 .. _transfer_syntax:
 

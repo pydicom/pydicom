@@ -44,6 +44,7 @@ docs = [
     "sphinx-gallery",
     "sphinxcontrib-napoleon",
     "sphinx-copybutton",
+    "sphinx_design",
 ]
 
 dev = [

@@ -6,11 +6,6 @@ Working with Overlay Data
 
 .. currentmodule:: pydicom
 
-.. rubric:: How to work with overlay data in pydicom.
-
-Introduction
-------------
-
 :dcm:`Overlays<part03/sect_C.9.2.html>` in DICOM are present in what's called
 a :dcm:`Repeating Group<part05/sect_7.6.html>`, where the group number of the
 element tags are defined over a range rather than a specific value. For

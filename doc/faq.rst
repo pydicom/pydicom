@@ -1,8 +1,8 @@
 .. _faq:
 
-==========================
-Frequently asked questions
-==========================
+===
+FAQ
+===
 
 .. _faq_general:
 
@@ -23,24 +23,6 @@ Alternatively, you can use something along the lines of:
 
   Mason, D. L., et al, pydicom: An open source DICOM library, https://github.com/pydicom/pydicom [Online; accessed YYYY-MM-DD].
 
-
-.. _faq_install:
-
-Installation
-============
-
-What are pydicom's prerequisites?
----------------------------------
-
-Required
-~~~~~~~~
-*pydicom* requires Python.
-
-Optional
-~~~~~~~~
-When manipulating *Pixel Data* it's recommended you install
-`NumPy <https://numpy.org/>`_. When dealing with compressed *Pixel Data* see
-:ref:`this table<guide_compressed>` for which libraries are required.
 
 .. _faq_install_version:
 
@@ -71,7 +53,9 @@ What version of Python can I use?
 +-----------------+------------------+---------------------------+
 | 2.4             | June 2023        | 3.7, 3.8, 3.9, 3.10, 3.11 |
 +-----------------+------------------+---------------------------+
-| 3.0             | ~September 2024  | 3.10, 3.11, 3.12          |
+| 3.0             | September 2024   | 3.10, 3.11, 3.12          |
++-----------------+------------------+---------------------------+
+| 3.1             | ~September 2025  | 3.10, 3.11, 3.12, 3.13    |
 +-----------------+------------------+---------------------------+
 
 
