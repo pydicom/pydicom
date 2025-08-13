@@ -3250,3 +3250,13 @@ class TestDatasetContextManager:
             "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
         )
         assert _path_to(target, self.file_ds) == expected
+
+    def test_path_to_value(self):
+        # Test path_to with a value for the target
+        target = 0.5
+        expected = (
+            "FileDataset(filename='test.dcm').BeamSequence[0]"
+            ".ControlPointSequence[0].CumulativeMetersetWeight"
+        )
+
+        assert _path_to(target, self.file_ds) == expected
