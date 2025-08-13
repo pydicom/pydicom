@@ -3761,12 +3761,13 @@ def _path_to(target, node) -> str | None:
 
     return None
 
+
 def _trace_from(
-        base, 
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> bool | None:
+    base,
+    exc_type: type[BaseException] | None,
+    exc_val: BaseException | None,
+    exc_tb: TracebackType | None,
+) -> bool | None:
     """Return a pseudo-code path from `base` to an object where exception occurred"""
     if exc_val is None or sys.version_info < (3, 11):
         return None
@@ -3808,9 +3809,9 @@ def _trace_from(
 
     # Check if note already exists and don't repeat
     # This is so both pydicom and user can use this context manager
-    if note and (not hasattr(exc_val, "__notes__") or all(
-        n != note for n in exc_val.__notes__
-    )):
+    if note and (
+        not hasattr(exc_val, "__notes__") or all(n != note for n in exc_val.__notes__)
+    ):
         exc_val.add_note(note)
 
     # Returning anything other than True will re-raise any exceptions
