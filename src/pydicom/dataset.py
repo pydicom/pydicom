@@ -2462,8 +2462,7 @@ class Dataset:  # noqa: PLW1641
             and pydicom.config.show_file_meta
         ):
             strings.append(f"{'Dataset.file_meta ':-<49}")
-            for elem in self.file_meta:
-                strings.append(indent_str + repr(elem))
+            strings.extend(indent_str + repr(elem) for elem in self.file_meta)
             strings.append(f"{'':-<49}")
 
         for elem in self:
@@ -3683,7 +3682,7 @@ _RE_CAMEL_CASE = re.compile(
 )
 
 
-def _path_to(target, node) -> str | None:
+def _path_to(target: Any, node: Any) -> str | None:
     """Return a pseudo-code path to a particular DataElement, Sequence, or value
 
     This is used by Dataset's context manager to report the specific data element
@@ -3726,9 +3725,9 @@ def _path_to(target, node) -> str | None:
         case Dataset():
             # recurse into Dataset and file_meta data elements
             if hasattr(node, "file_meta"):
-                items = chain(node.items(), node.file_meta.items())
+                items = chain(node.items(), node.file_meta.items())  # type: ignore[assignment]
             else:
-                items = node.items()
+                items = node.items()  # type: ignore[assignment]
             for tag, dataelem in items:
                 if (path := _path_to(target, dataelem)) is not None:
                     break
@@ -3763,7 +3762,7 @@ def _path_to(target, node) -> str | None:
 
 
 def _trace_from(
-    base,
+    base: Any,
     exc_type: type[BaseException] | None,
     exc_val: BaseException | None,
     exc_tb: TracebackType | None,
@@ -3812,7 +3811,7 @@ def _trace_from(
     if note and (
         not hasattr(exc_val, "__notes__") or all(n != note for n in exc_val.__notes__)
     ):
-        exc_val.add_note(note)
+        exc_val.add_note(note)  # type: ignore[attr-defined]
 
     # Returning anything other than True will re-raise any exceptions
     return None
