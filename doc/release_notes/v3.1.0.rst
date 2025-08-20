@@ -37,7 +37,7 @@ Fixes
 
 Enhancements
 ------------
-* Python 3.12 and 3.13 now supported; limited support for pre-release Python 3.14
+* Python 3.12, 3.13 and 3.14 now supported.
 * Added the option to pass a ``bool`` ndarray to :func:`~pydicom.pixels.set_pixel_data`
   to store with *Bits Allocated* of ``1`` using bit-packing (:issue:`2141`).
 * Added a check to :meth:`~pydicom.dataset.Dataset.set_pixel_data` to ensure that the
@@ -48,10 +48,10 @@ Enhancements
 * Updated UIDs to version 2024d of the DICOM Standard
 * The following UID constants have been added:
 
-    * :attr:`~pydicom.uid.JPEGXLLossless`
-    * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
-    * :attr:`~pydicom.uid.JPEGXL`
-    * :attr:`~pydicom.uid.DeflatedImageFrameCompression`
+  * :attr:`~pydicom.uid.JPEGXLLossless`
+  * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
+  * :attr:`~pydicom.uid.JPEGXL`
+  * :attr:`~pydicom.uid.DeflatedImageFrameCompression`
 * Added ability to specify tag numbers in the CLI commands (allows private tags to be specified)
 * Removed `exec` and `eval` from tests, CLI, and scripts for improved security (:issue:`2193`)
 * Added support for up to 16-bit input images to :func:`~pydicom.pixels.convert_color_space`
@@ -60,3 +60,7 @@ Enhancements
 * Added support for compressing and decompressing *Deflated Image Frame Compression* (:issue:`2213`)
 * Suggest an element keyword when an unknown camel case dataset attribute is used.
 * Added support for adding unknown public transfer syntaxes to :func:`~pydicom.uid.register_transfer_syntax`
+* Added an 'include_high_bits' keyword parameter to :meth:`Dataset.compress()
+  <pydicom.dataset.Dataset.compress>` and :func:`~pydicom.pixels.compress` to allow
+  including or excluding data in any "unused" bits above *Bits Stored* when
+  compressing (:issue:`2260`).
