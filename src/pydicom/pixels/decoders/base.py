@@ -219,14 +219,20 @@ def _apply_sign_correction(arr: "np.ndarray", runner: "DecodeRunner") -> "np.nda
     if runner.transfer_syntax in JPEG2000TransferSyntaxes:
         j2k_signed = runner.get_option("j2k_is_signed", runner.pixel_representation)
         precision = runner.get_option("j2k_precision", runner.bits_stored)
+        if precision > runner.bits_stored:
+            precision = runner.bits_stored
+
         bit_shift = 8 * arr.dtype.itemsize - precision
-        if bit_shift and j2k_signed != runner.pixel_representation:
+        if bit_shift or j2k_signed != runner.pixel_representation:
             np.left_shift(arr, bit_shift, out=arr)
             np.right_shift(arr, bit_shift, out=arr)
     elif runner.transfer_syntax in JPEGLSTransferSyntaxes:
         # JPEG-LS has no way to track signedness, so signed integers are
         #   always decoded as unsigned
         precision = runner.get_option("jls_precision", runner.bits_stored)
+        if precision > runner.bits_stored:
+            precision = runner.bits_stored
+
         bit_shift = 8 * arr.dtype.itemsize - precision
         if bit_shift:
             np.left_shift(arr, bit_shift, out=arr)
