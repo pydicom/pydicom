@@ -34,6 +34,8 @@ Fixes
 * Correctly handle empty values represented as empty strings in json while converting them
   to a dataset (:issue:`2221`).
 * Correctly handle empty LUT data (:issue:`2238`).
+* Fixed data in the bits above *Bits Stored* being included in the returned pixel data
+  for JPEG 2000 and JPEG-LS (:issue:`2260`).
 
 Enhancements
 ------------

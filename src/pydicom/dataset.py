@@ -2003,8 +2003,8 @@ class Dataset:  # noqa: PLW1641
             If ``None`` (default) then raise an exception if the unused bits above
             *Bits Stored* contain data (such as overlays), otherwise either include the
             data in the higher bits when encoding (if ``True``) or exclude it (if
-            ``False``, requires NumPy). Storing overlay data in these unused bits was
-            retired from the DICOM Standard in 2004 and we recommend converting
+            ``False``, may require NumPy). Storing overlay data in these unused bits
+            was retired from the DICOM Standard in 2004 and we recommend converting
             datasets to use the :dcm:`Overlay Plane module<part03/sect_C.9.2.html>`
             instead.
         jls_error : int, optional

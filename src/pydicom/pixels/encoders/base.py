@@ -575,7 +575,7 @@ class EncodeRunner(RunnerBase):
             else:
                 # Buffer contains only unsigned integers
                 # Example for bits_stored 6: actual_max must be in
-                #   0b0000_0000 to 0b0001_0000 [0 to 31]
+                #   0b0000_0000 to 0b0001_1111 [0 to 31]
                 overflow = actual_max > 2**(bits_stored - min_bits) - 1
                 fill_bits = (0x00, )
 
@@ -585,7 +585,7 @@ class EncodeRunner(RunnerBase):
                 for max_bits in range(bytes_per_pixel * 8, min_bits, -8):
                     min_bits = max_bits - 8
                     actual_max = max(self.src[min_bits // 8::bytes_per_pixel])
-                    # May produce a false negative but worst case the user
+                    # May produce a false positive but worst case the user
                     #   will explicitly allow or disallow the high bits
                     overflow = actual_max not in fill_bits
                     if overflow:
