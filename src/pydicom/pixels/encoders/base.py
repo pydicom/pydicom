@@ -246,7 +246,9 @@ class EncodeRunner(RunnerBase):
             if self.bits_stored == itemsize * 8:
                 # No unused high bits to worry about
                 pass
-            elif include_high_bits is False and self.transfer_syntax in _SHIFT_HIGH_BITS:
+            elif (
+                include_high_bits is False and self.transfer_syntax in _SHIFT_HIGH_BITS
+            ):
                 # Remove any data from the high bits
                 #   For unsigned integers replace the high bits with 0s
                 #   For signed integers replace the high bits with 1s
@@ -554,14 +556,14 @@ class EncodeRunner(RunnerBase):
                 elif bits_stored < max_bits:
                     # The byte contains the bits_stored byte
                     actual_max = max(self.src[byte_offset::bytes_per_pixel])
-                    overflow = actual_max > 2**(bits_stored - min_bits) - 1
+                    overflow = actual_max > 2 ** (bits_stored - min_bits) - 1
         else:
             # Checking overflow in signed data is more complex since signed values may
             #   have fill bits, so we check for consistency instead
             # Start at the byte containing bits_stored to see if there are any negative
             #   integers
             min_bits = bits_stored + bits_stored % 8 - 8
-            actual_max = max(self.src[min_bits // 8::bytes_per_pixel])
+            actual_max = max(self.src[min_bits // 8 :: bytes_per_pixel])
             if (0x01 << (bits_stored - min_bits - 1)) & actual_max:
                 # Buffer contains signed integers
                 # All bits above bits_stored must either be 0b0 or 0b1
@@ -576,15 +578,15 @@ class EncodeRunner(RunnerBase):
                 # Buffer contains only unsigned integers
                 # Example for bits_stored 6: actual_max must be in
                 #   0b0000_0000 to 0b0001_1111 [0 to 31]
-                overflow = actual_max > 2**(bits_stored - min_bits) - 1
-                fill_bits = (0x00, )
+                overflow = actual_max > 2 ** (bits_stored - min_bits) - 1
+                fill_bits = (0x00,)
 
             # Check the bytes above the bits_stored byte
             if not overflow:
                 # Start at the most significant byte and work downwards
                 for max_bits in range(bytes_per_pixel * 8, min_bits, -8):
                     min_bits = max_bits - 8
-                    actual_max = max(self.src[min_bits // 8::bytes_per_pixel])
+                    actual_max = max(self.src[min_bits // 8 :: bytes_per_pixel])
                     # May produce a false positive but worst case the user
                     #   will explicitly allow or disallow the high bits
                     overflow = actual_max not in fill_bits
