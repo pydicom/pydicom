@@ -3245,6 +3245,7 @@ class TestDatasetContextManager:
         assert any(msg in note for note in excinfo.value.__notes__)
 
     def test_path_to(self):
+        """Pseudo-code path to an object is returned"""
         target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
         expected = (
             "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
@@ -3252,7 +3253,7 @@ class TestDatasetContextManager:
         assert _path_to(target, self.file_ds) == expected
 
     def test_path_to_value(self):
-        # Test path_to with a value for the target
+        """Pseudo-code path to a value is returned"""
         target = 0.5
         expected = (
             "FileDataset(filename='test.dcm').BeamSequence[0]"
@@ -3260,3 +3261,7 @@ class TestDatasetContextManager:
         )
 
         assert _path_to(target, self.file_ds) == expected
+
+    def test_path_to_None(self):
+        """Pseudo-code path to None is ignored"""
+        assert _path_to(None, self.file_ds) is None
