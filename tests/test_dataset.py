@@ -28,8 +28,15 @@ from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import Dataset, FileDataset, validate_file_meta, FileMetaDataset
+from pydicom.dataset import (
+    Dataset,
+    FileDataset,
+    _path_to,
+    validate_file_meta,
+    FileMetaDataset,
+)
 from pydicom.encaps import encapsulate
+from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.pixels.utils import get_image_pixel_ids
 from pydicom.sequence import Sequence
@@ -142,32 +149,6 @@ class TestDataset:
         msg = r"'Foo' object has no attribute '_barr'"
         with pytest.raises(AttributeError, match=msg):
             test()
-
-    def test_tag_exception_print(self):
-        """Test that tag appears in exception messages."""
-        ds = Dataset()
-        ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
-
-        msg = r"With tag \(0028,0106\) got exception: bad repr"
-        with pytest.raises(ValueError, match=msg):
-            str(ds)
-
-    def test_tag_exception_walk(self):
-        """Test that tag appears in exceptions raised during recursion."""
-        ds = Dataset()
-        ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
-
-        def callback(dataset, data_element):
-            return str(data_element)
-
-        def func(dataset=ds):
-            return dataset.walk(callback)
-
-        msg = r"With tag \(0028,0106\) got exception: bad repr"
-        with pytest.raises(ValueError, match=msg):
-            func()
 
     def test_set_new_data_element_by_name(self):
         """Dataset: set new data_element by name."""
@@ -3142,3 +3123,158 @@ class TestFuture:
         )
         with pytest.raises(TypeError, match=msg):
             Dataset().decompress(handler_name="foo")
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="Needs Python 3.11+")
+class TestDatasetContextManager:
+    """Tests for dataset context manager error reporting"""
+
+    def setup_method(self):
+        plan = Dataset()
+        plan.filename = "test.dcm"
+        beam0 = Dataset()
+
+        cp0 = Dataset()
+        cp0.ControlPointIndex = 0
+        cp0.CumulativeMetersetWeight = 0.5
+        cp1 = Dataset()
+        cp1.ControlPointIndex = 1
+        cp1.CumulativeMetersetWeight = 1.0
+        beam0.ControlPointSequence = Sequence([cp0, cp1])
+
+        priv_ds = Dataset()
+        priv_block = priv_ds.private_block(0x1001, "Test", create=True)
+        priv_block.add_new(0x42, VR.DS, "42.0")
+
+        plan.BeamSequence = Sequence([beam0, priv_ds])
+        self.file_ds = FileDataset("test.dcm", plan)
+
+    def test_bad_elem_value(self):
+        """Setting a bad value gives error message with location info"""
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"
+        # Give a bad value for existing element
+        with pytest.raises(ValueError) as excinfo:
+            with self.file_ds as ds:
+                ds.BeamSequence[0].ControlPointSequence[
+                    1
+                ].CumulativeMetersetWeight = "hello"
+        assert hasattr(excinfo.value, "__notes__")
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+        # Bad value for new element
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
+        with pytest.raises(ValueError) as excinfo:
+            with self.file_ds as ds:
+                ds.BeamSequence[0].ControlPointSequence[1].GantryAngle = "hello"
+        assert hasattr(excinfo.value, "__notes__")
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_correct_ambiguous(self):
+        """Test that data element in `correct_ambiguous_vr_element` error is noted"""
+        # issue #2168, error occurs on save_as, not at assignment
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.SmallestImagePixelValue = b"\0"
+        with tempfile.TemporaryDirectory() as tdir:
+            with pytest.raises(BytesLengthException) as excinfo:
+                with ds:
+                    ds.save_as(f"{tdir}/foo.dcm")
+        assert hasattr(excinfo.value, "__notes__")
+        msg = ".SmallestImagePixelValue"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_bad_VR(self):
+        # From issue 2170, 1739
+        ds = Dataset()
+        elem = RawDataElement(Tag(0x01F11026), "FD", 6, b"0.264 ", 0, True, True)
+        ds[0x1F11026] = elem
+        with pytest.raises(BytesLengthException) as excinfo:
+            with ds:
+                str(ds)
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "at [(01F1,1026)]\n  Converting RawDataElement(vr='FD', value=b'0.264 '"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_bad_VR_nested(self):
+        """Test bad VR nested inside sequences is caught in exception of __str__"""
+        # Also gives coverage for _pretty_str `if not top_level_only`
+        cp1 = self.file_ds.BeamSequence[0].ControlPointSequence[1]
+        cp1[0x1F11026] = RawDataElement(
+            Tag(0x01F11026), "FD", 6, b"0.264 ", 0, True, True
+        )
+        with pytest.raises(BytesLengthException) as excinfo:
+            str(self.file_ds)
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "[(01F1,1026)]\n  Converting RawDataElement(vr='FD', value=b'0.264 '"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_tag_exception_print(self):
+        """Test that tag appears in exception messages."""
+        ds = Dataset()
+        ds.PatientID = "123456"  # Valid value
+        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
+
+        with pytest.raises(ValueError) as excinfo:
+            str(ds)
+        assert hasattr(excinfo.value, "__notes__")
+        msg = ".SmallestImagePixelValue"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_exception_walk(self):
+        """Test context manager path in exceptions raised during recursion."""
+        ds = Dataset()
+        beam = Dataset()
+        beam.BeamNumber = "1"
+        beam.SmallestImagePixelValue = BadRepr()  # Invalid value
+
+        ds.PatientID = "123456"  # Valid value
+        ds.BeamSequence = [beam]
+
+        def callback(dataset, data_element):
+            str(data_element)
+
+        with pytest.raises(ValueError) as excinfo:
+            ds.walk(callback)  # walk uses `with self` to catch errors
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "Error occurred at .BeamSequence[0].SmallestImagePixelValue"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+        # Repeat but adding our own layer of context management
+        # in addition to builtin `walk` context management
+        with pytest.raises(ValueError) as excinfo:
+            with ds:
+                ds.walk(callback)  # walk uses `with self` to catch errors
+        assert hasattr(excinfo.value, "__notes__")
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_exception_index_error(self):
+        """Test that path shown to Sequence when index error occurs."""
+        with pytest.raises(IndexError) as excinfo:
+            with self.file_ds:
+                self.file_ds.BeamSequence[0].ControlPointSequence[99]
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
+    def test_path_to(self):
+        """Pseudo-code path to an object is returned"""
+        target = self.file_ds.BeamSequence[0].ControlPointSequence[1]
+        expected = (
+            "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
+        )
+        assert _path_to(target, self.file_ds) == expected
+
+    def test_path_to_value(self):
+        """Pseudo-code path to a value is returned"""
+        target = 0.5
+        expected = (
+            "FileDataset(filename='test.dcm').BeamSequence[0]"
+            ".ControlPointSequence[0].CumulativeMetersetWeight"
+        )
+
+        assert _path_to(target, self.file_ds) == expected
+
+    def test_path_to_None(self):
+        """Pseudo-code path to None is ignored"""
+        assert _path_to(None, self.file_ds) is None

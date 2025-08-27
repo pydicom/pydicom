@@ -1,4 +1,4 @@
-# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Unit tests for pydicom.data_manager"""
 
 import json

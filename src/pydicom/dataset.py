@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -19,6 +19,7 @@ import io
 import json
 import os
 import os.path
+from pathlib import Path
 import re
 from bisect import bisect_left
 from collections.abc import (
@@ -31,8 +32,10 @@ from collections.abc import (
 )
 from contextlib import nullcontext
 from importlib.util import find_spec as have_package
-from itertools import takewhile
-from types import TracebackType
+from itertools import chain, takewhile
+import sys
+import traceback
+from types import SimpleNamespace, TracebackType
 from typing import (
     TypeAlias,
     Any,
@@ -71,7 +74,7 @@ from pydicom.pixels.utils import (
     get_image_pixel_ids,
     set_pixel_data,
 )
-from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType, TAG_PIXREP
+from pydicom.tag import Tag, BaseTag, TagType, TAG_PIXREP
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
@@ -440,8 +443,7 @@ class Dataset:  # noqa: PLW1641
         exc_tb: TracebackType | None,
     ) -> bool | None:
         """Method invoked on exit from a with statement."""
-        # Returning anything other than True will re-raise any exceptions
-        return None
+        return _trace_from(self, exc_type, exc_val, exc_tb)
 
     def add(self, data_element: DataElement) -> None:
         """Add an element to the :class:`Dataset`.
@@ -2460,24 +2462,21 @@ class Dataset:  # noqa: PLW1641
             and pydicom.config.show_file_meta
         ):
             strings.append(f"{'Dataset.file_meta ':-<49}")
-            for elem in self.file_meta:
-                with tag_in_exception(elem.tag):
-                    strings.append(indent_str + repr(elem))
+            strings.extend(indent_str + repr(elem) for elem in self.file_meta)
             strings.append(f"{'':-<49}")
 
         for elem in self:
-            with tag_in_exception(elem.tag):
-                if elem.VR == VR_.SQ:  # a sequence
-                    strings.append(
-                        f"{indent_str}{elem.tag}  {elem.name}  "
-                        f"{len(elem.value)} item(s) ---- "
-                    )
-                    if not top_level_only:
-                        for dataset in elem.value:
-                            strings.append(dataset._pretty_str(indent + 1))
-                            strings.append(nextindent_str + "---------")
-                else:
-                    strings.append(indent_str + repr(elem))
+            if elem.VR == VR_.SQ:  # a sequence
+                strings.append(
+                    f"{indent_str}{elem.tag}  {elem.name}  "
+                    f"{len(elem.value)} item(s) ---- "
+                )
+                if not top_level_only:
+                    for dataset in elem.value:
+                        strings.append(dataset._pretty_str(indent + 1))
+                        strings.append(nextindent_str + "---------")
+            else:
+                strings.append(indent_str + repr(elem))
         return "\n".join(strings)
 
     @property
@@ -3009,7 +3008,8 @@ class Dataset:  # noqa: PLW1641
             if :data:`pydicom.config.show_file_meta` is ``True``
 
         """
-        return self._pretty_str()
+        with self:  # catch exceptions
+            return self._pretty_str()
 
     def top(self) -> str:
         """Return a :class:`str` representation of the top level elements."""
@@ -3086,17 +3086,24 @@ class Dataset:  # noqa: PLW1641
             Flag to indicate whether to recurse into sequences (default
             ``True``).
         """
+        # For exception catching, only use context manager at starting Dataset
+        with self:
+            self._walk(callback, recursive)
+
+    def _walk(
+        self, callback: Callable[["Dataset", DataElement], None], recursive: bool = True
+    ) -> None:
         taglist = sorted(self._dict.keys())
+
         for tag in taglist:
-            with tag_in_exception(tag):
-                data_element = self[tag]
-                callback(self, data_element)  # self = this Dataset
-                # 'tag in self' below needed in case callback deleted
-                # data_element
-                if recursive and tag in self and data_element.VR == VR_.SQ:
-                    sequence = data_element.value
-                    for dataset in sequence:
-                        dataset.walk(callback)
+            data_element = self[tag]
+            callback(self, data_element)  # self = this Dataset
+            # 'tag in self' below needed in case callback deleted
+            # data_element
+            if recursive and tag in self and data_element.VR == VR_.SQ:
+                sequence = data_element.value
+                for dataset in sequence:
+                    dataset._walk(callback)
 
     @classmethod
     def from_json(
@@ -3673,3 +3680,138 @@ _RE_CAMEL_CASE = re.compile(
     "(?P<start>(^[A-Za-z])((?=.+?[A-Z])[A-Za-z0-9]+)|(^[A-Z])([A-Za-z0-9]+))"
     "(?P<last>[A-Za-z0-9][^_]$)"  # Last character is alphanumeric
 )
+
+
+def _path_to(target: Any, node: Any) -> str | None:
+    """Return a pseudo-code path to a particular DataElement, Sequence, or value
+
+    This is used by Dataset's context manager to report the specific data element
+    where an error occurred.
+
+    Params
+    ------
+    target: Any
+        Usually a DataElement, Sequence, or Sequence item.  Can be a value,
+        in which case the path to the first DataElement found (depth first search)
+        with that value is returned.
+    node: Any
+        The object currently being searched (function is called recursively).
+        On the first call to the function it will typically be a Dataset
+
+    Returns
+    -------
+    str | None:
+        The path to the target object from the node.
+        During recursion, returns ``None`` if a leaf node is reached without finding target.
+
+    Examples
+    --------
+    >> path_to(data_element)
+    'FileDataset(filename='rtplan.dcm').BeamSequence[0].BeamName'
+
+    """
+    # Recurse down DICOM's nested structures, depth first,
+    # until the target object or value is found.
+    # As the recursion is unwound, the node or index at each level
+    # is prepended to the ongoing "path"
+
+    if not target:
+        return None
+
+    ns = SimpleNamespace(target=target)  # make dotted lookup to avoid name binding
+    match node:
+        case _ if node is target:  # finished if match on identity
+            return ""
+        case Dataset():
+            # recurse into Dataset and file_meta data elements
+            if hasattr(node, "file_meta"):
+                items = chain(node.items(), node.file_meta.items())  # type: ignore[assignment]
+            else:
+                items = node.items()  # type: ignore[assignment]
+            for tag, dataelem in items:
+                if (path := _path_to(target, dataelem)) is not None:
+                    break
+            else:  # for-else = "no break", i.e. target not found
+                return None
+
+            # Have matching DataElement, compose path of this node
+            # For private elements, DICOM keyword not available so use Tag number
+            kw_or_tag = f".{kw}" if (kw := keyword_for_tag(tag)) else f"[{tag}]"
+
+            # The following lines only affect path if at root Dataset
+            meta = ".file_meta" if tag.group == 2 else ""
+            filename = getattr(node, "filename", "")
+            details = f"(filename='{filename}')" if filename else ""
+            cls_name = (
+                f"{node.__class__.__name__}" if isinstance(node, FileDataset) else ""
+            )
+
+            return f"{cls_name}{details}{meta}{kw_or_tag}" + path
+        case DataElement(VR="SQ") as elem:
+            # Check Sequence object itself:
+            if elem.value is target:
+                return ""
+            # Recurse into Sequence items
+            for i, subnode in enumerate(node.value):
+                if (path := _path_to(target, subnode)) is not None:
+                    return f"[{i}]" + path
+        case DataElement(value=ns.target):  # Match a data element value
+            return ""
+
+    return None
+
+
+def _trace_from(
+    base: Any,
+    exc_type: type[BaseException] | None,
+    exc_val: BaseException | None,
+    exc_tb: TracebackType | None,
+) -> bool | None:
+    """Return a pseudo-code path from `base` to an object where exception occurred"""
+    if exc_val is None or sys.version_info < (3, 11):
+        return None
+
+    # Find first data element or Sequence up the trace
+    tb = exc_val.__traceback__
+    all_frames = list(traceback.walk_tb(tb))
+    note = ""
+    new_elem = False
+    raw_elem = False
+    for frame, _ in reversed(all_frames):
+        filename = Path(frame.f_code.co_filename).name
+        match (filename, frame.f_code.co_name):
+            case ("filewriter.py", _):
+                elem = frame.f_locals.get("elem")
+            case ("dataelem.py", "convert_raw_data_element"):
+                elem = frame.f_locals.get("raw")
+                if elem:
+                    raw_elem = True
+            case ("dataelem.py" | "sequence.py" | "dataset.py", _):
+                elem = frame.f_locals.get("self")
+            case ("multival.py", _):
+                elem = frame.f_locals.get("self")
+            case _:
+                elem = None
+        if elem is None:
+            continue
+        if elem is base:
+            break
+        if path := _path_to(elem, base):
+            note = "Error occurred at " + path
+            if new_elem:
+                note += "\n   with DataElement not yet assigned"
+            if raw_elem:
+                note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
+            break
+        else:
+            new_elem = filename == "dataelem.py"
+
+    # Check if note already exists and don't repeat
+    # This is so both pydicom and user can use this context manager
+    if note and (
+        not hasattr(exc_val, "__notes__") or all(n != note for n in exc_val.__notes__)
+    ):
+        exc_val.add_note(note)  # type: ignore[attr-defined]
+
+    # Returning anything other than True will re-raise any exceptions
+    return None

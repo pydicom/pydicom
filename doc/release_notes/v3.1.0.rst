@@ -59,4 +59,7 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` (:issue:`2210`)
 * Added support for compressing and decompressing *Deflated Image Frame Compression* (:issue:`2213`)
 * Suggest an element keyword when an unknown camel case dataset attribute is used.
+* Added enhanced exception notes (Python >= 3.11) giving a pseudo-code path to the DICOM object
+  where an error occurred.  Activated using `with dataset:` context; already used internally in key
+  locations (:issue:`2168`)
 * Added support for adding unknown public transfer syntaxes to :func:`~pydicom.uid.register_transfer_syntax`
