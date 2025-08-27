@@ -3196,6 +3196,17 @@ class TestDatasetContextManager:
         msg = "at [(01F1,1026)]\n  Converting RawDataElement(vr='FD', value=b'0.264 '"
         assert any(msg in note for note in excinfo.value.__notes__)
 
+    def test_bad_VR_nested(self):
+        """Test bad VR nested inside sequences is caught in exception of __str__"""
+        # Also gives coverage for _pretty_str `if not top_level_only`
+        cp1 = self.file_ds.BeamSequence[0].ControlPointSequence[1]
+        cp1[0x1F11026] = RawDataElement(Tag(0x01F11026), "FD", 6, b"0.264 ", 0, True, True)
+        with pytest.raises(BytesLengthException) as excinfo:
+            str(self.file_ds)
+        assert hasattr(excinfo.value, "__notes__")
+        msg = "[(01F1,1026)]\n  Converting RawDataElement(vr='FD', value=b'0.264 '"
+        assert any(msg in note for note in excinfo.value.__notes__)
+
     def test_tag_exception_print(self):
         """Test that tag appears in exception messages."""
         ds = Dataset()
