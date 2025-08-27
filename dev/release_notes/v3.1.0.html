@@ -577,6 +577,9 @@ syntax or not (<a class="extlink-issue reference external" href="https://github.
 <a class="reference internal" href="../reference/generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2210">#2210</a>)</p></li>
 <li><p>Added support for compressing and decompressing <em>Deflated Image Frame Compression</em> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2213">#2213</a>)</p></li>
 <li><p>Suggest an element keyword when an unknown camel case dataset attribute is used.</p></li>
+<li><p>Added enhanced exception notes (Python &gt;= 3.11) giving a pseudo-code path to the DICOM object
+where an error occurred.  Activated using <cite>with dataset:</cite> context; already used internally in key
+locations (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2168">#2168</a>)</p></li>
 <li><p>Added support for adding unknown public transfer syntaxes to <a class="reference internal" href="../reference/generated/pydicom.uid.register_transfer_syntax.html#pydicom.uid.register_transfer_syntax" title="pydicom.uid.register_transfer_syntax"><code class="xref py py-func docutils literal notranslate"><span class="pre">register_transfer_syntax()</span></code></a></p></li>
 </ul>
 </section>
