@@ -42,7 +42,7 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytearray:
         "rows": runner.rows,
         "columns": runner.columns,
         "samples_per_pixel": runner.samples_per_pixel,
-        "bits_stored": runner.bits_stored,
+        "bits_stored": runner.get_frame_option(runner.index, "precision"),
     }
 
     if runner.samples_per_pixel > 1:

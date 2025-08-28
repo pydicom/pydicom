@@ -53,6 +53,8 @@ def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     if runner.photometric_interpretation == PI.RGB:
         opts["use_mct"] = False
 
+    opts["bits_stored"] = runner.get_frame_option(runner.index, "precision")
+
     cr = opts.pop("compression_ratios", opts.get("j2k_cr", None))
     psnr = opts.pop("signal_noise_ratios", opts.get("j2k_psnr", None))
     if tsyntax == uid.JPEG2000Lossless:

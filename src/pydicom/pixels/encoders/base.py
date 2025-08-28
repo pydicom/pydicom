@@ -40,10 +40,13 @@ LOGGER = logging.getLogger(__name__)
 
 EncodeFunction = Callable[[bytes, "EncodeRunner"], bytes | bytearray]
 
-# JPEG-LS with pyjpegls and JPEG2000 with pylibjpeg-openjpeg both default
-#   to removing the high bits, so we only need to handle
-#   RLE Lossless and Deflated Image ourselves
-_SHIFT_HIGH_BITS = [RLELossless, DeflatedImageFrameCompression]
+
+_LOSSLESS_SYNTAXES = [
+    JPEGLSLossless,
+    JPEG2000Lossless,
+    RLELossless,
+    DeflatedImageFrameCompression,
+]
 
 
 class EncodeOptions(RunnerOptions, total=False):
@@ -95,9 +98,11 @@ class EncodeRunner(RunnerBase):
             "transfer_syntax_uid": tsyntax,
             "byteorder": "<",
             "pixel_keyword": "PixelData",
-            "include_high_bits": None,
+            "include_high_bits": self.transfer_syntax in _LOSSLESS_SYNTAXES,
         }
-        self._undeletable = ("transfer_syntax_uid", "pixel_keyword", "byteorder")
+        self._undeletable = (
+            "transfer_syntax_uid", "pixel_keyword", "byteorder", "include_high_bits"
+        )
         self._encoders: dict[str, EncodeFunction] = {}
 
     def encode(self, index: int | None) -> bytes:
@@ -149,38 +154,35 @@ class EncodeRunner(RunnerBase):
         #   the memory usage
         arr = cast(np.ndarray, self.src[index] if index is not None else self.src)
 
-        # The ndarray containing the pixel data may use a larger container
-        #   than is strictly needed: e.g. 32 bits allocated with 7 bits stored.
-        #   However the encoders expect data to be sized appropriately
-        #   for the sample precision, so we may need to downscale
-        if self.bits_stored <= 8:
-            itemsize = 1
-        elif 8 < self.bits_stored <= 16:
-            itemsize = 2
-        elif 16 < self.bits_stored <= 32:
-            itemsize = 4
-        elif 32 < self.bits_stored <= 64:
-            itemsize = 8
+        include_high_bits = self.get_option("include_high_bits")
+        if include_high_bits is False:
+            # Encode only the pixel sample bits, excluding any bits above bits_stored
+            # The ndarray containing the pixel data may use a larger container
+            #   than is strictly needed: e.g. 32 bits allocated with 7 bits stored.
+            #   However the encoders expect data to be sized appropriately
+            #   for the sample precision, so we may need to downscale
+            if self.bits_stored <= 8:
+                itemsize = 1
+            elif 8 < self.bits_stored <= 16:
+                itemsize = 2
+            elif 16 < self.bits_stored <= 32:
+                itemsize = 4
+            elif 32 < self.bits_stored <= 64:
+                itemsize = 8
 
-        if arr.dtype.itemsize != itemsize:
-            # Creates a view of the original array, may be read-only
-            arr = arr.astype(f"<{arr.dtype.kind}{itemsize}")
+            if arr.dtype.itemsize != itemsize:
+                # Creates a view of the original array, may be read-only
+                arr = arr.astype(f"<{arr.dtype.kind}{itemsize}")
 
-        include_high_bits = self.get_option("include_high_bits", None)
-        if self.bits_stored == itemsize * 8:
-            # No unused high bits to worry about
-            pass
-        elif self.transfer_syntax in _SHIFT_HIGH_BITS and include_high_bits is False:
-            # Remove any data from the high bits
-            #   For unsigned integers replace the high bits with 0s
-            #   For signed integers replace the high bits with 1s
-            shift = itemsize * 8 - self.bits_stored
-            # Copy `arr` to avoid modifying the original
-            arr = np.left_shift(arr, shift)
-            np.right_shift(arr, shift, out=arr)
+            self.set_frame_option(self.index, "precision", runner.bits_stored)
         elif include_high_bits is True:
-            # Include the data in the high bits when encoding
-            self.set_option("bits_stored", itemsize * 8)
+            # Encode the entire pixel cell, including any bits above bits_stored
+            self.set_frame_option(self.index, "precision", arr.dtype.itemsize * 8)
+        else:
+            raise TypeError(
+                "The 'include_high_bits' option must be bool, not "
+                f"{type(include_high_bits).__name__}"
+            )
 
         # JPEG-LS allows different ordering of the input image data via the
         #   interleave mode (ILV) parameter. ILV 0 matches a planar configuration
@@ -209,125 +211,51 @@ class EncodeRunner(RunnerBase):
         start = 0 if index is None else index * bytes_per_frame
         src = cast(bytes, self.src[start : start + bytes_per_frame])
 
-        # Resize the data to fit the appropriate container
-        expected_length = cast(int, self.frame_length(unit="pixels"))
+        include_high_bits = self.get_option("include_high_bits")
+        if include_high_bits is True:
+            # Include all bits of pixel cell when compressing, including any high bits
+            #   RLE Lossless and Deflated Image: always
+            #   JPEG-LS Lossless and JPEG 2000 Lossless: by default
+            #   JPEG-LS Near Lossless and JPEG 2000: never
+            bytes_to_transfer = math.ceil(self.bits_allocated / 8)
+        else:
+            # Include only the pixel sample bits when compressing
+            #   RLE Lossless and Deflated Image: never
+            #   JPEG-LS Lossless and JPEG 2000 Lossless: optional
+            #   JPEG-LS Near Lossless and JPEG 2000: always
+            bytes_to_transfer = math.ceil(self.bits_stored / 8)
+
+        # Match the precision to the required encoder container size
+        container_sizes = {1: 1, 2: 2, 3: 4, 4: 4, 5: 8, 6: 8, 7: 8, 8: 8}
+        container_size = container_sizes[bytes_to_transfer]
+
+        # TODO: wait for per-frame options PR
+        # pyjpegls and pylibjpeg-openjpeg both only encode the bits specified by the
+        #   precision, so we don't need to manually set any unused bits with fill
+        #   values, only size the supplied buffer to an appropriate length
+        if include_high_bits is True:
+            self.set_frame_option(self.index, "precision", container_size * 8)
+        else:
+            self.set_frame_option(self.index, "precision", self.bits_stored)
+
+        # Examples
+        # bits_stored 8, bits_allocated 16, include_high_bits False -> 8-bit container
+        #   strip out every second byte
+        # bits_stored 8, bits_allocated 16, include_high_bits True -> 16-bit container
+        #   return unchanged
+        # bits_stored 16, bits_allocated 24, include_high_bits False -> 16-bit container
+        #   strip out every third byte
+        # bits_stored 16, bits_allocated 24, include_high_bits True -> 32-bit container
+        #   add an extra padding byte after every third byte
+        expected_nr_pixels = cast(int, self.frame_length(unit="pixels"))
         bytes_per_pixel = len(src) // expected_length
-        print(bytes_per_pixel, self.bits_stored)
-
-        include_high_bits = self.get_option("include_high_bits", None)
-
-        # It's faster to use numpy if its available?
-        if HAVE_NP:
-            # Take the first `itemsize` bytes out of every `bytes_per_pixel` bytes
-            arr = np.frombuffer(src, dtype="u1")
-            if self.bits_stored <= 8:
-                itemsize = 1
-                arr = arr[::bytes_per_pixel] if bytes_per_pixel != 1 else arr
-
-            if 8 < self.bits_stored <= 16:
-                itemsize = 2
-                if bytes_per_pixel != 2:
-                    arr = arr.reshape(arr.size // bytes_per_pixel, bytes_per_pixel)
-                    arr = arr[..., :itemsize].ravel()
-
-            if 16 < self.bits_stored <= 32:
-                itemsize = 4
-                if bytes_per_pixel != 4:
-                    arr = arr.reshape(arr.size // bytes_per_pixel, bytes_per_pixel)
-                    arr = arr[..., :itemsize].ravel()
-
-            if 32 < self.bits_stored <= 64:
-                itemsize = 8
-                if bytes_per_pixel != 8:
-                    arr = arr.reshape(arr.size // bytes_per_pixel, bytes_per_pixel)
-                    arr = arr[..., :itemsize].ravel()
-
-            # How to handle data in the unused high bits above `bits_stored`
-            if self.bits_stored == itemsize * 8:
-                # No unused high bits to worry about
-                pass
-            elif (
-                include_high_bits is False and self.transfer_syntax in _SHIFT_HIGH_BITS
-            ):
-                # Remove any data from the high bits
-                #   For unsigned integers replace the high bits with 0s
-                #   For signed integers replace the high bits with 1s
-                kind = "u" if self.pixel_representation == 0 else "i"
-                arr = arr.astype(f"<{kind}{itemsize}", copy=not arr.flags.writeable)
-                shift = itemsize * 8 - self.bits_stored
-                np.left_shift(arr, shift, out=arr)
-                np.right_shift(arr, shift, out=arr)
-            elif include_high_bits is True:
-                # Include the data in the high bits
-                print(itemsize)
-                self.set_option("bits_stored", itemsize * 8)
-
-            return arr.tobytes()
-
-        # How to handle data in the unused high bits above `bits_stored`
-        if self.bits_stored == bytes_per_pixel * 8:
-            pass
-        elif include_high_bits is True:
-            # Include the data in the high bits
-            self.set_option("bits_stored", bytes_per_pixel * 8)
-        elif include_high_bits is False:
-            raise ValueError("NumPy is required if 'include_high_bits' is False")
-
-        # 1 byte/px actual
-        if self.bits_stored <= 8:
-            # If not 1 byte/px then must be 2, 3, 4, 5, 6, 7 or 8
-            #   but only the first byte is relevant
-            return src if bytes_per_pixel == 1 else src[::bytes_per_pixel]
-
-        # 2 bytes/px actual
-        if 8 < self.bits_stored <= 16:
-            if bytes_per_pixel == 2:
-                return src
-
-            # If not 2 bytes/px then must be 3, 4, 5, 6, 7 or 8
-            #   but only the first 2 bytes are relevant
-            out = bytearray(expected_length * 2)
-            out[::2] = src[::bytes_per_pixel]
-            out[1::2] = src[1::bytes_per_pixel]
-            return out
-
-        # 3 or 4 bytes/px actual
-        if 16 < self.bits_stored <= 32:
-            if bytes_per_pixel == 4:
-                return src
-
-            # If not 4 bytes/px then must be 3, 5, 6, 7 or 8
-            #   but only the first 3 or 4 bytes are relevant
-            out = bytearray(expected_length * 4)
-            out[::4] = src[::bytes_per_pixel]
-            out[1::4] = src[1::bytes_per_pixel]
-            out[2::4] = src[2::bytes_per_pixel]
-            if bytes_per_pixel > 3:
-                out[3::4] = src[3::bytes_per_pixel]
-
-            return out
-
-        # 32 < bits_stored <= 64 (maximum allowed)
-        # 5, 6, 7 or 8 bytes/px actual
-        if bytes_per_pixel == 8:
+        if bytes_to_transfer in (1, 2, 4, 8) and bytes_to_transfer == bytes_per_pixel:
             return src
 
-        # If not 8 bytes/px then must be 5, 6 or 7
-        out = bytearray(expected_length * 8)
-        out[::8] = src[::bytes_per_pixel]
-        out[1::8] = src[1::bytes_per_pixel]
-        out[2::8] = src[2::bytes_per_pixel]
-        out[3::8] = src[3::bytes_per_pixel]
-        out[4::8] = src[4::bytes_per_pixel]
-        if bytes_per_pixel == 5:
-            return out
+        out = bytearray(expected_nr_pixels * container_size)
+        for offset in range(bytes_to_transfer):
+            out[offset::container_size] = src[offset::bytes_per_pixel]
 
-        out[5::8] = src[5::bytes_per_pixel]
-        if bytes_per_pixel == 6:
-            return out
-
-        # 7 bytes/px
-        out[6::8] = src[6::bytes_per_pixel]
         return out
 
     def set_encoders(self, encoders: dict[str, EncodeFunction]) -> None:
@@ -423,8 +351,8 @@ class EncodeRunner(RunnerBase):
         shape = arr.shape
         dtype = arr.dtype
 
-        if len(shape) not in (2, 3, 4):
-            raise ValueError(f"Unable to encode {len(shape)}D ndarrays")
+        if arr.ndims not in (2, 3, 4):
+            raise ValueError(f"Unable to encode {arr.ndims}D ndarrays")
 
         # `arr` may be (for planar configuration 0):
         #   (rows, columns)
@@ -466,34 +394,12 @@ class EncodeRunner(RunnerBase):
                 f"'Pixel Representation' of '{self.pixel_representation}' ({s} integers)"
             )
 
-        # Check the dtype's itemsize is at least as large as *Bits Allocated*
-        if dtype.itemsize < math.ceil(self.bits_allocated / 8):
+        # Check the dtype's itemsize matches *Bits Allocated*
+        if dtype.itemsize != self.bits_allocated // 8:
             raise ValueError(
                 f"The ndarray's dtype '{dtype}' is not consistent with a (0028,0100) "
                 f"'Bits Allocated' value of '{self.bits_allocated}'"
             )
-
-        include_high_bits = self.get_option("include_high_bits", None)
-
-        # Check the pixel data values are consistent with *Bits Stored*
-        bits_stored = self.bits_stored
-        if include_high_bits is None and bits_stored != arr.itemsize * 8:
-            amax, amin = arr.max(), arr.min()
-            if is_signed:
-                minimum = -(2 ** (bits_stored - 1))
-                maximum = 2 ** (bits_stored - 1) - 1
-            else:
-                minimum, maximum = 0, 2**bits_stored - 1
-
-            if amax > maximum or amin < minimum:
-                raise ValueError(
-                    "The ndarray contains values that are outside the allowable "
-                    f"range of ({minimum}, {maximum}) for a (0028,0101) 'Bits "
-                    f"Stored' value of '{bits_stored}', which may indicate "
-                    "the presence of overlays in the unused bits. To include the "
-                    "data in these unused bits pass 'include_high_bits=True' or to "
-                    "exclude it pass 'include_high_bits=False'."
-                )
 
         if self.transfer_syntax == JPEGLSNearLossless and is_signed:
             # JPEG-LS doesn't track signedness, so with lossy encoding of
@@ -503,7 +409,7 @@ class EncodeRunner(RunnerBase):
             #   range (minimum + jls_error, maximum - jls_error), where
             #   `jls_error` is the JPEG-LS 'NEAR' parameter and `minimum`
             #   and `maximum` are the min/max possible values for a given
-            #   sample precision
+            #   sample precision.
             error = self.get_option("jls_error", 0)
             amax, amin = arr.max(), arr.min()
             within = amax <= (maximum - error) and amin >= (minimum + error)
@@ -511,11 +417,11 @@ class EncodeRunner(RunnerBase):
                 raise ValueError(
                     "The supported range of pixel values when performing lossy "
                     "JPEG-LS encoding of signed integers with a (0028,0103) 'Bits "
-                    f"Stored' value of '{bits_stored}' and a 'jls_error' "
+                    f"Stored' value of '{self.bits_stored}' and a 'jls_error' "
                     f"of '{error}' is ({minimum + error}, {maximum - error})"
                 )
 
-    def _validate_buffer(self) -> None:
+    def _validate_buffer(self, allow_numpy: bool = True) -> None:
         """Validate the supplied pixel data buffer."""
         # Check the length is at least as long as required
         length_bytes = self.frame_length(unit="bytes")
@@ -525,86 +431,6 @@ class EncodeRunner(RunnerBase):
                 "The length of the uncompressed pixel data doesn't match the expected "
                 f"length - {actual_length} bytes actual vs. {expected_length} expected"
             )
-
-        include_high_bits = self.get_option("include_high_bits", None)
-        if include_high_bits is not None:
-            return
-
-        # FIXME: Hmm... bits_allocated != container size here?
-        bits_allocated = self.bits_allocated
-        bits_stored = self.bits_stored
-        if bits_allocated == 1 or bits_stored == bits_allocated:
-            return
-
-        # Check for the presence of data in the unused bits above 'bits_stored'
-        overflow = False
-        is_signed = self.pixel_representation == 1
-        bytes_per_pixel = actual_length // self.frame_length(unit="pixels")
-        if not is_signed:
-            # Start at the most significant byte and work towards the least
-            for max_bits in range(bytes_per_pixel * 8, 0, -8):
-                if overflow or max_bits <= bits_stored:
-                    # Found data in high bits or the byte is below the bits_stored byte
-                    break
-
-                min_bits = max_bits - 8
-                byte_offset = min_bits // 8
-                if bits_stored < min_bits:
-                    # The byte is above the bits_stored byte
-                    actual_max = max(self.src[byte_offset::bytes_per_pixel])
-                    overflow = actual_max != 0x00
-                elif bits_stored < max_bits:
-                    # The byte contains the bits_stored byte
-                    actual_max = max(self.src[byte_offset::bytes_per_pixel])
-                    overflow = actual_max > 2 ** (bits_stored - min_bits) - 1
-        else:
-            # Checking overflow in signed data is more complex since signed values may
-            #   have fill bits, so we check for consistency instead
-            # Start at the byte containing bits_stored to see if there are any negative
-            #   integers
-            min_bits = bits_stored + bits_stored % 8 - 8
-            actual_max = max(self.src[min_bits // 8 :: bytes_per_pixel])
-            if (0x01 << (bits_stored - min_bits - 1)) & actual_max:
-                # Buffer contains signed integers
-                # All bits above bits_stored must either be 0b0 or 0b1
-                # Example for bits_stored 6: actual_max must be in either:
-                #   0b0010_0000 to 0b0011_1111 [32 to 63] or
-                #   0b1110_0000 to 0b1111_1111 [224 to 255]
-                # So right shift and check the residual high bits
-                shifted = actual_max >> (bits_stored - min_bits)
-                overflow = shifted not in (0x00, 2**shifted - 1)
-                fill_bits = (0x00, 0xFF)
-            else:
-                # Buffer contains only unsigned integers
-                # Example for bits_stored 6: actual_max must be in
-                #   0b0000_0000 to 0b0001_1111 [0 to 31]
-                overflow = actual_max > 2 ** (bits_stored - min_bits) - 1
-                fill_bits = (0x00,)
-
-            # Check the bytes above the bits_stored byte
-            if not overflow:
-                # Start at the most significant byte and work downwards
-                for max_bits in range(bytes_per_pixel * 8, min_bits, -8):
-                    min_bits = max_bits - 8
-                    actual_max = max(self.src[min_bits // 8 :: bytes_per_pixel])
-                    # May produce a false positive but worst case the user
-                    #   will explicitly allow or disallow the high bits
-                    overflow = actual_max not in fill_bits
-                    if overflow:
-                        break
-
-        if overflow:
-            msg = (
-                "The pixel data contains values that are outside the allowable range "
-                f"for a (0028,0101) 'Bits Stored' value of '{bits_stored}', which may "
-                "indicate the presence of overlays in the higher bits. To include the "
-                "data in these high bits when compressing pass 'include_high_bits=True' "
-                "or to exclude it pass 'include_high_bits=False'"
-            )
-            if self.transfer_syntax in _SHIFT_HIGH_BITS:
-                msg += " (requires NumPy)"
-
-            raise ValueError(msg)
 
     def _validate_encoding_profile(self) -> None:
         """Perform  UID specific validation of encoding parameters based on
@@ -676,7 +502,6 @@ class Encoder(CoderBase):
         *,
         index: int | None = None,
         validate: bool = True,
-        include_high_bits: bool | None = None,
         encoding_plugin: str = "",
         **kwargs: Any,
     ) -> bytes:
@@ -689,10 +514,6 @@ class Encoder(CoderBase):
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
             </guides/user/image_data_compression>` for more information.
-
-        .. versionchanged:: 3.1
-
-            Added the `include_high_bits` keyword parameter.
 
         Parameters
         ----------
@@ -720,14 +541,6 @@ class Encoder(CoderBase):
             If ``True`` (default) then validate the supplied encoding options
             and pixel data prior to encoding, otherwise if ``False`` no
             validation will be performed.
-        include_high_bits : bool | None, optional
-            If ``None`` (default) then raise an exception if the unused bits above
-            *Bits Stored* contain data (such as overlays), otherwise either include the
-            data in the higher bits when encoding (if ``True``) or exclude it (if
-            ``False``, requires NumPy). Storing overlay data in these unused bits was
-            retired from the DICOM Standard in 2004 and we recommend converting
-            datasets to use the :dcm:`Overlay Plane module<part03/sect_C.9.2.html>`
-            instead.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
             `encoding_plugin` is not specified then all available
@@ -773,7 +586,6 @@ class Encoder(CoderBase):
         runner = EncodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
-        runner.set_option("include_high_bits", include_high_bits)
         runner.set_encoders(
             cast(
                 dict[str, "EncodeFunction"],
@@ -800,7 +612,6 @@ class Encoder(CoderBase):
         src: "bytes | np.ndarray | Dataset",
         *,
         validate: bool = True,
-        include_high_bits: bool | None = None,
         encoding_plugin: str = "",
         **kwargs: Any,
     ) -> Iterator[bytes]:
@@ -812,10 +623,6 @@ class Encoder(CoderBase):
             installation of additional packages to perform the actual pixel
             data encoding. See the :doc:`encoding documentation
             </guides/user/image_data_compression>` for more information.
-
-        .. versionchanged:: 3.1
-
-            Added the `include_high_bits` keyword parameter.
 
         Parameters
         ----------
@@ -840,14 +647,6 @@ class Encoder(CoderBase):
             If ``True`` (default) then validate the supplied encoding options
             and pixel data prior to encoding, otherwise if ``False`` no
             validation will be performed.
-        include_high_bits : bool | None, optional
-            If ``None`` (default) then raise an exception if the unused bits above
-            *Bits Stored* contain data (such as overlays), otherwise either include the
-            data in the higher bits when encoding (if ``True``) or exclude it (if
-            ``False``, requires NumPy). Storing overlay data in these unused bits was
-            retired from the DICOM Standard in 2004 and we recommend converting
-            datasets to use the :dcm:`Overlay Plane module<part03/sect_C.9.2.html>`
-            instead.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
             `encoding_plugin` is not specified then all available
@@ -890,7 +689,6 @@ class Encoder(CoderBase):
         runner = EncodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
-        runner.set_option("include_high_bits", include_high_bits)
         runner.set_encoders(
             cast(
                 dict[str, "EncodeFunction"],

@@ -367,7 +367,7 @@ class TestEncodeRunner:
             "expected length - 23 bytes actual vs. 24 expected"
         )
         with pytest.raises(ValueError, match=msg):
-            runner._validate_buffer()
+            runner._validate_buffer(allow_numpy=HAVE_NP)
 
         runner.set_option("number_of_frames", 3)
         runner._src = b"\x00" * 24
@@ -376,7 +376,209 @@ class TestEncodeRunner:
             "expected length - 24 bytes actual vs. 72 expected"
         )
         with pytest.raises(ValueError, match=msg):
-            runner._validate_buffer()
+            runner._validate_buffer(allow_numpy=HAVE_NP)
+
+    def test_validate_buffer_overflow_u1(self):
+        """Test validating a buffer with data in the high bits for unsigned"""
+        runner = EncodeRunner(RLELossless)
+        opts = {
+            "rows": 3,
+            "columns": 4,
+            "number_of_frames": 1,
+            "samples_per_pixel": 1,
+            "bits_allocated": 8,
+            "bits_stored": 6,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "pixel_representation": 0,
+        }
+        runner._src = b"\xFF" * 12
+        runner.set_options(**opts)
+
+        msg = (
+            "The pixel data contains values that are outside the allowable range "
+            r"for a \(0028,0101\) 'Bits Stored' value of '6', which may "
+            "indicate the presence of overlays in the higher bits. To include the "
+            "data in these high bits when compressing pass 'include_high_bits=True' "
+            r"or to exclude it pass 'include_high_bits=False' \(requires NumPy\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            runner._validate_buffer(allow_numpy=HAVE_NP)
+
+        # Don't need to validate if 'include_high_bits' is set
+        runner.set_option("include_high_bits", False)
+        assert runner._validate_buffer(allow_numpy=HAVE_NP) is None
+        runner.set_option("include_high_bits", True)
+        assert runner._validate_buffer(allow_numpy=HAVE_NP) is None
+        runner.del_option("include_high_bits")
+
+        runner.set_option("bits_stored", 12)
+        runner.set_option("bits_allocated", 16)
+        runner._src = b"\xFF" * 24
+
+        msg = (
+            "The pixel data contains values that are outside the allowable range "
+            r"for a \(0028,0101\) 'Bits Stored' value of '12'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            runner._validate_buffer(allow_numpy=HAVE_NP)
+
+        runner.set_option("bits_allocated", 32)
+        runner._src = b"\xFF\x0F\x08\x00" * 12
+        with pytest.raises(ValueError, match=msg):
+            runner._validate_buffer(allow_numpy=HAVE_NP)
+
+        runner._src = b"\xFF\x0F\x00\x01" * 12
+        with pytest.raises(ValueError, match=msg):
+            runner._validate_buffer(allow_numpy=HAVE_NP)
+
+        runner._src = b"\xFF\x0F\x00\x00" * 12
+        assert runner._validate_buffer(allow_numpy=HAVE_NP) is None
+
+    def test_validate_buffer_overflow_i1(self):
+        """Test validating a buffer with data in the high bits for 8-bit signed"""
+        runner = EncodeRunner(RLELossless)
+        opts = {
+            "rows": 3,
+            "columns": 4,
+            "number_of_frames": 1,
+            "samples_per_pixel": 1,
+            "bits_allocated": 8,
+            "bits_stored": 6,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "pixel_representation": 1,
+        }
+        runner._src = b"\xFF" * 12
+        runner.set_options(**opts)
+
+        # The unused bits are either all 0s or 1s
+        good = (
+            b"\x00",  # 0b0000_0000
+            b"\x1F",  # 0b0001_1111
+            b"\x20",  # 0b0010_0000
+            b"\x3F",  # 0b0011_1111
+            b"\xE0",  # 0b1110_0000
+            b"\xFF",  # 0b1111_1111
+        )
+        for value in good:
+            runner._src = value * 12
+            assert runner._validate_buffer(allow_numpy=HAVE_NP) is None
+
+        msg = (
+            "The pixel data contains values that are outside the allowable range "
+            r"for a \(0028,0101\) 'Bits Stored' value of '6', which may "
+            "indicate the presence of overlays in the higher bits. To include the "
+            "data in these high bits when compressing pass 'include_high_bits=True' "
+            r"or to exclude it pass 'include_high_bits=False' \(requires NumPy\)"
+        )
+
+        # The unused bits are a mix of 0s and 1s for signed, or 1s for unsigned
+        bad = (
+            b"\x60",  # 0b0110_0000
+            b"\xA0",  # 0b1010_0000
+            b"\x80",  # 0b1000_0000
+            b"\xC0",  # 0b1100_0000
+            b"\x40",  # 0b0100_0000
+        )
+        for value in bad:
+            runner._src = value * 12
+            with pytest.raises(ValueError, match=msg):
+                runner._validate_buffer(allow_numpy=HAVE_NP)
+
+    def test_validate_buffer_overflow_i2(self):
+        """Test validating a buffer with data in the high bits for 16-bit signed"""
+        runner = EncodeRunner(RLELossless)
+        opts = {
+            "rows": 3,
+            "columns": 4,
+            "number_of_frames": 1,
+            "samples_per_pixel": 1,
+            "bits_allocated": 16,
+            "bits_stored": 6,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "pixel_representation": 1,
+        }
+        runner._src = b"\xFF" * 12
+        runner.set_options(**opts)
+
+        # Test bits_stored bit in LSB
+        # The unused bits are either all 0s or 1s
+        good = (
+            b"\x00\x00",  # 0b0000_0000
+            b"\x1F\x00",  # 0b0001_1111
+            b"\x20\x00",  # 0b0010_0000
+            b"\x3F\x00",  # 0b0011_1111
+            b"\xE0\xFF",  # 0b1110_0000
+            b"\xFF\xFF",  # 0b1111_1111
+        )
+        for value in good:
+            runner._src = value * 12
+            assert runner._validate_buffer(allow_numpy=HAVE_NP) is None
+
+        msg = (
+            "The pixel data contains values that are outside the allowable range "
+            r"for a \(0028,0101\) 'Bits Stored' value of '6', which may "
+        )
+        if HAVE_NP:
+            msg = (
+                "The pixel data contains values that are outside the allowable range "
+                r"of \(-32, 31\) for a \(0028,0101\) 'Bits Stored' value of '6', "
+            )
+
+        # The unused bits are a mix of 0s and 1s for signed, or 1s for unsigned
+        bad = (
+            b"\x60\x00",  # 0b0000_0000 0b0110_0000
+            b"\xA0\x00",  # 0b0000_0000 0b1010_0000
+            b"\x80\x00",  # 0b0000_0000 0b1000_0000
+            b"\xC0\x00",  # 0b0000_0000 0b1100_0000
+            b"\x40\x00",  # 0b0000_0000 0b0100_0000
+            b"\x00\x10",  # 0b0001_0000 0b0000_0000
+            b"\x1F\x20",  # 0b0010_0000 0b0001_1111
+            b"\x00\x80",  # 0b1000_0000 0b0000_0000
+            b"\x1F\x20",  # 0b0010_0000 0b0001_1111
+            b"\x10\xEF",  # 0b1110_1111 0b0010_0000
+            b"\x3F\x02",  # 0b0000_0010 0b0011_1111
+            b"\xE0\x7E",  # 0b1111_1110 0b1110_0000
+            b"\xFF\x01",  # 0b0000_0001 0b1111_1111
+        )
+        for value in bad:
+            runner._src = value * 12
+            with pytest.raises(ValueError, match=msg):
+                runner._validate_buffer(allow_numpy=HAVE_NP)
+
+        # Test bits_stored bit in MSB
+        runner.set_option("bits_stored", 12)
+        good = (
+            b"\xFF\x00",  # 0b0000_0000
+            b"\xFF\x07",  # 0b0000_0111
+            b"\xFF\x08",  # 0b0000_1000
+            b"\xFF\x0F",  # 0b0000_1111
+            b"\xFF\xF8",  # 0b1111_1000
+            b"\xFF\xFF",  # 0b1111_1111
+        )
+        for value in good:
+            runner._src = value * 12
+            assert runner._validate_buffer(allow_numpy=HAVE_NP) is None
+
+        msg = (
+            "The pixel data contains values that are outside the allowable range "
+            r"for a \(0028,0101\) 'Bits Stored' value of '12', which may "
+        )
+        if HAVE_NP:
+            msg = (
+                "The pixel data contains values that are outside the allowable range "
+                r"of \(-2048, 2047\) for a \(0028,0101\) 'Bits Stored' value of '12', "
+            )
+        bad = (
+            b"\xFF\x60",  # 0b0000_0000 0b0110_0000
+            b"\xFF\xA0",  # 0b0000_0000 0b1010_0000
+            b"\xFF\x80",  # 0b0000_0000 0b1000_0000
+            b"\xFF\xC0",  # 0b0000_0000 0b1100_0000
+            b"\xFF\x40",  # 0b0000_0000 0b0100_0000
+        )
+        for value in bad:
+            runner._src = value * 12
+            with pytest.raises(ValueError, match=msg):
+                runner._validate_buffer(allow_numpy=HAVE_NP)
 
     def test_validate_encoding_profile(self):
         """Test the encoding profile validation."""

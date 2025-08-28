@@ -1881,7 +1881,6 @@ class Dataset:  # noqa: PLW1641
         encapsulate_ext: bool = False,
         *,
         generate_instance_uid: bool | None = None,
-        include_high_bits: bool | None = None,
         jls_error: int | None = None,
         j2k_cr: list[float] | None = None,
         j2k_psnr: list[float] | None = None,
@@ -1959,8 +1958,7 @@ class Dataset:  # noqa: PLW1641
 
         .. versionchanged:: 3.1
 
-            Added support for *Deflated Image Frame Compression* and the
-            `include_high_bits` keyword parameter.
+            Added support for *Deflated Image Frame Compression*.
 
         Examples
         --------
@@ -1999,14 +1997,6 @@ class Dataset:  # noqa: PLW1641
             using :func:`~pydicom.uid.generate_uid`, otherwise ``False`` to always keep
             the original. The default behavior is to only generate a new *SOP Instance
             UID* when performing lossy compression.
-        include_high_bits : bool | None, optional
-            If ``None`` (default) then raise an exception if the unused bits above
-            *Bits Stored* contain data (such as overlays), otherwise either include the
-            data in the higher bits when encoding (if ``True``) or exclude it (if
-            ``False``, may require NumPy). Storing overlay data in these unused bits
-            was retired from the DICOM Standard in 2004 and we recommend converting
-            datasets to use the :dcm:`Overlay Plane module<part03/sect_C.9.2.html>`
-            instead.
         jls_error : int, optional
             **JPEG-LS Near Lossless only**. The allowed absolute compression error
             in the pixel values.
@@ -2037,7 +2027,6 @@ class Dataset:  # noqa: PLW1641
             encoding_plugin=encoding_plugin,
             encapsulate_ext=encapsulate_ext,
             generate_instance_uid=generate_instance_uid,
-            include_high_bits=include_high_bits,
             jls_error=jls_error,
             j2k_cr=j2k_cr,
             j2k_psnr=j2k_psnr,
