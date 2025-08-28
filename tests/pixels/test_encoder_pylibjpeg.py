@@ -41,6 +41,7 @@ SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
 IMPL = get_testdata_file("MR_small_implicit.dcm")
 EXPL = get_testdata_file("OBXXXX1A.dcm")
 RGB = get_testdata_file("US1_UNCR.dcm")
+EXPL_1BIT = get_testdata_file("liver.dcm")
 
 
 @pytest.mark.skipif(SKIP_RLE, reason="no -rle plugin")
@@ -129,6 +130,45 @@ class TestJ2KLosslessEncoding:
         arr -= arr.min()
         arr /= arr.max()
         self.ref3 = arr
+
+    def test_arr_1bit_spp1(self):
+        """Test with single bit allocated."""
+        ds = dcmread(EXPL_1BIT)
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": 0,
+            "number_of_frames": ds.NumberOfFrames,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+        }
+
+        plugins = ["pylibjpeg"]
+        if HAVE_GDCM:
+            plugins.append("gdcm")
+        if HAVE_PIL:
+            plugins.append("pillow")
+
+        ref = ds.pixel_array
+
+        encoded = [
+            JPEG2000LosslessEncoder.encode(
+                ref, encoding_plugin="pylibjpeg", index=index, **opts
+            )
+            for index in range(ds.NumberOfFrames)
+        ]
+        encaps = encapsulate(encoded)
+        for index in range(ds.NumberOfFrames):
+            for plugin in plugins:
+                out, _ = JPEG2000LosslessDecoder.as_array(
+                    encaps,
+                    decoding_plugin=plugin,
+                    index=index,
+                    **opts,
+                )
+                assert np.array_equal(out, ref[index])
 
     def test_arr_u1_spp1(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 1"""
@@ -448,6 +488,46 @@ class TestJ2KLosslessEncoding:
                     **opts,
                 )
                 assert np.array_equal(out, ref)
+
+    def test_buffer_1bit_spp1(self):
+        """Test with single bit allocated."""
+        ds = dcmread(EXPL_1BIT)
+        opts = {
+            "rows": ds.Rows,
+            "columns": ds.Columns,
+            "samples_per_pixel": ds.SamplesPerPixel,
+            "photometric_interpretation": ds.PhotometricInterpretation,
+            "pixel_representation": 0,
+            "number_of_frames": ds.NumberOfFrames,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+        }
+
+        plugins = ["pylibjpeg"]
+        if HAVE_GDCM:
+            plugins.append("gdcm")
+        if HAVE_PIL:
+            plugins.append("pillow")
+
+        buffer = ds.PixelData
+        ref = ds.pixel_array
+
+        encoded = [
+            JPEG2000LosslessEncoder.encode(
+                buffer, encoding_plugin="pylibjpeg", index=index, **opts
+            )
+            for index in range(ds.NumberOfFrames)
+        ]
+        encaps = encapsulate(encoded)
+        for index in range(ds.NumberOfFrames):
+            for plugin in plugins:
+                out, _ = JPEG2000LosslessDecoder.as_array(
+                    encaps,
+                    decoding_plugin=plugin,
+                    index=index,
+                    **opts,
+                )
+                assert np.array_equal(out, ref[index])
 
     def test_buffer_u1_spp1(self):
         """Test unsigned bits allocated 8, bits stored (1, 8), samples per pixel 1"""

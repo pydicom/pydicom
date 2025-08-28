@@ -7,6 +7,7 @@ from struct import pack
 import zlib
 
 from pydicom.pixels.encoders.base import EncodeRunner
+from pydicom.pixels.utils import pack_bits
 from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
 
@@ -29,7 +30,8 @@ def _encode_deflated_frame(src: bytes, runner: EncodeRunner) -> bytes:
     Parameters
     ----------
     src : bytes
-        A single frame of little-endian ordered image data to be encoded.
+        A single frame of little-endian ordered image data to be encoded. For
+        single bit images, the data should not be bit-packed.
     runner : pydicom.pixels.encoders.base.EncodeRunner
         The runner managing the encoding process.
 
@@ -38,6 +40,13 @@ def _encode_deflated_frame(src: bytes, runner: EncodeRunner) -> bytes:
     bytes
         A deflate encoded frame.
     """
+    # In the case of single bit images, the data must first be bit-packed
+    # before being encoded with Deflate
+    if runner.get_option("bits_allocated") == 1 and not runner.get_option(
+        "is_bitpacked", False
+    ):
+        src = pack_bits(src, pad=False)
+
     # TODO: Python 3.11 switch to using zlib.compress() instead
     enc = zlib.compressobj(wbits=-zlib.MAX_WBITS)
 
@@ -51,6 +60,7 @@ def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
     ----------
     src : bytes
         A single frame of little-endian ordered image data to be RLE encoded.
+        For single bit images, the data should not be bit-packed.
     runner : pydicom.pixels.encoders.base.EncodeRunner
         The runner managing the encoding process.
 
@@ -61,6 +71,13 @@ def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
     """
     if runner.get_option("byteorder", "<") == ">":
         raise ValueError("Unsupported option \"byteorder = '>'\"")
+
+    # In the case of single bit images, the data must first be bit-packed
+    # before being encoded with RLE
+    if runner.get_option("bits_allocated") == 1 and not runner.get_option(
+        "is_bitpacked", False
+    ):
+        src = pack_bits(src, pad=False)
 
     bytes_allocated = math.ceil(runner.bits_allocated / 8)
 

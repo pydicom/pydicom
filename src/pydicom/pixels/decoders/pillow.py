@@ -56,6 +56,7 @@ def is_available(uid: str) -> bool:
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     """Return the decoded image data in `src` as a :class:`bytes`."""
     tsyntax = runner.transfer_syntax
+    original_bits_allocated = runner.bits_allocated
 
     # libjpeg only supports 8-bit JPEG Extended (can be 8 or 12 in the JPEG standard)
     if tsyntax == uid.JPEGExtended12Bit and runner.bits_stored != 8:
@@ -123,5 +124,9 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     # pillow returns YBR_ICT and YBR_RCT as RGB
     if runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT):
         runner.set_option("photometric_interpretation", PI.RGB)
+
+    # Signal that single-bit data is represented in unpacked form
+    if original_bits_allocated == 1:
+        runner.set_option("is_bitpacked", False)
 
     return cast(bytes, arr.tobytes())

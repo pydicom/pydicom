@@ -246,6 +246,25 @@ class TestRLELossless:
         with pytest.raises(RuntimeError, match=msg):
             gdcm_rle_encode(b"\x00", runner)
 
+    def test_encoding_single_bit_raises(self):
+        """Test that encoding single bit data raises an exception"""
+        kwargs = {
+            "rows": 1,
+            "columns": 1,
+            "samples_per_pixel": 1,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+            "number_of_frames": 1,
+            "photometric_interpretation": "MONOCHROME2",
+            "transfer_syntax_uid": RLELossless,
+        }
+        runner = EncodeRunner(RLELossless)
+        runner.set_options(**kwargs)
+        msg = "Unable to encode single bit data"
+        with pytest.raises(ValueError, match=msg):
+            gdcm_rle_encode(b"\x00", runner)
+
     def test_no_sequence_raises(self):
         """Test that no sequence of fragments raises an exception"""
         kwargs = {

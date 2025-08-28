@@ -1,6 +1,7 @@
 """Tests for the pydicom plugin decoders."""
 
 from io import BytesIO
+import re
 from struct import pack, unpack
 
 import pytest
@@ -15,6 +16,7 @@ from pydicom.pixels.decoders.native import (
     _rle_decode_segment,
     _rle_decode_frame,
 )
+from pydicom.pixels.utils import unpack_bits
 from pydicom.uid import RLELossless, ExplicitVRLittleEndian
 
 try:
@@ -25,9 +27,14 @@ except ImportError:
     HAVE_NP = False
 
 
-from .pixels_reference import PIXEL_REFERENCE, RLE_16_1_1F, RLE_16_1_10F
-
-RLE_REFERENCE = PIXEL_REFERENCE[RLELossless]
+from .pixels_reference import (
+    PIXEL_REFERENCE,
+    RLE_1_1_3F,
+    RLE_1_1_3F_NONALIGNED,
+    RLE_16_1_1F,
+    RLE_16_1_10F,
+    RLE_PIXEL_REFERENCE_WITH_1BIT,
+)
 
 
 def name(ref):
@@ -41,7 +48,7 @@ class TestAsArray:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless using dataset."""
         arr, _ = self.decoder.as_array(
@@ -69,7 +76,7 @@ class TestAsArray:
                 # The returned array is always planar configuration 0
                 assert meta["planar_configuration"] == 0
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless using binary IO."""
         ds = reference.ds
@@ -148,7 +155,7 @@ class TestIterArray:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         func = self.decoder.iter_array(
@@ -168,7 +175,7 @@ class TestIterArray:
                 # The returned array is always planar configuration 0
                 assert meta["planar_configuration"] == 0
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless for binary IO."""
         ds = reference.ds
@@ -225,7 +232,7 @@ class TestAsBuffer:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         ds = reference.ds
@@ -234,7 +241,14 @@ class TestAsBuffer:
         )
         buffer, meta = self.decoder.as_buffer(reference.ds)
 
-        frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+        if ds.BitsAllocated == 1:
+            # Compare the bits unpacked (simplifies indexing)
+            buffer = unpack_bits(buffer, False)
+            frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel
+        else:
+            frame_len = (
+                ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+            )
 
         for index in range(reference.number_of_frames):
             if reference.number_of_frames == 1:
@@ -263,7 +277,7 @@ class TestAsBuffer:
                 buf_plane = buffer_frame[2 * plane_length :]
                 assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless for binary IO."""
         ds = reference.ds
@@ -290,9 +304,14 @@ class TestAsBuffer:
             buffer, _ = self.decoder.as_buffer(f, **opts)
             assert f.tell() == file_offset
 
-            frame_len = (
-                ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
-            )
+            if ds.BitsAllocated == 1:
+                # Compare the bits unpacked (simplifies indexing)
+                buffer = unpack_bits(buffer, False)
+                frame_len = ds.Rows * ds.Columns * ds.SamplesPerPixel
+            else:
+                frame_len = (
+                    ds.Rows * ds.Columns * ds.SamplesPerPixel * ds.BitsAllocated // 8
+                )
 
             for index in range(reference.number_of_frames):
                 if reference.number_of_frames == 1:
@@ -320,7 +339,7 @@ class TestAsBuffer:
                     buf_plane = buffer_frame[2 * plane_length :]
                     assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_index(self, reference):
         """Test by `index` for RLE lossless"""
         ds = reference.ds
@@ -331,6 +350,11 @@ class TestAsBuffer:
             buffer, _ = self.decoder.as_buffer(
                 reference.ds, index=index, decoding_plugin="pydicom"
             )
+
+            if ds.BitsAllocated == 1:
+                # Compare the bits unpacked (simplifies indexing)
+                frame_len = ds.Rows * ds.Columns
+                buffer = unpack_bits(buffer, False)[:frame_len]
 
             if ds.SamplesPerPixel == 1:
                 assert arr.tobytes() == buffer
@@ -349,7 +373,7 @@ class TestAsBuffer:
                 buf_plane = buffer[2 * plane_length :]
                 assert arr_plane == buf_plane
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_index_binary(self, reference):
         """Test by `index` for RLE lossless for binary IO"""
         ds = reference.ds
@@ -379,6 +403,11 @@ class TestAsBuffer:
                 )
                 assert f.tell() == file_offset
 
+                if ds.BitsAllocated == 1:
+                    # Compare the bits unpacked (simplifies indexing)
+                    frame_len = ds.Rows * ds.Columns
+                    buffer = unpack_bits(buffer, False)[:frame_len]
+
                 if ds.SamplesPerPixel == 1:
                     assert arr.tobytes() == buffer
                 else:
@@ -404,7 +433,7 @@ class TestIterBuffer:
     def setup_method(self):
         self.decoder = get_decoder(RLELossless)
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference(self, reference):
         """Test against the reference data for RLE lossless."""
         arr_func = self.decoder.iter_array(
@@ -415,6 +444,11 @@ class TestIterBuffer:
         )
 
         for (arr, _), (buf, meta) in zip(arr_func, buf_func):
+            if reference.ds.BitsAllocated == 1:
+                # Compare the bits unpacked (simplifies indexing)
+                frame_len = reference.ds.Rows * reference.ds.Columns
+                buf = unpack_bits(buf, False)[:frame_len]
+
             if reference.ds.SamplesPerPixel == 3:
                 # If samples per pixel is 3 then bytes are planar configuration 1
                 assert meta["planar_configuration"] == 1
@@ -434,7 +468,7 @@ class TestIterBuffer:
             else:
                 assert arr.tobytes() == buf
 
-    @pytest.mark.parametrize("reference", RLE_REFERENCE, ids=name)
+    @pytest.mark.parametrize("reference", RLE_PIXEL_REFERENCE_WITH_1BIT, ids=name)
     def test_reference_binary(self, reference):
         """Test against the reference data for RLE lossless for binary IO."""
         ds = reference.ds
@@ -465,6 +499,11 @@ class TestIterBuffer:
                 f, raw=True, decoding_plugin="pydicom", **opts
             )
             for (arr, _), (buf, _) in zip(arrays, buf_func):
+                if reference.ds.BitsAllocated == 1:
+                    # Compare the bits unpacked (simplifies indexing)
+                    frame_len = reference.ds.Rows * reference.ds.Columns
+                    buf = unpack_bits(buf, False)[:frame_len]
+
                 if reference.ds.SamplesPerPixel == 3:
                     # If samples per pixel is 3 then bytes are planar configuration 1
                     # Red
@@ -569,6 +608,15 @@ class TestDecodeRLEFrame:
         msg = r"Unable to decode RLE encoded pixel data with 12 bits allocated"
         with pytest.raises(NotImplementedError, match=msg):
             _rle_decode_frame(b"\x00\x00\x00\x00", 1, 1, 1, 12)
+
+    def test_single_bits_multiple_sample_raises(self):
+        """Test exception raised for BitsAllocated 1 with multiple samples."""
+        msg = (
+            r"Unable to decode RLE encoded pixel data with (0028,0100) "
+            r"'Bits Allocated' = 1 and (0028,0002) 'Samples Per Pixel' > 1."
+        )
+        with pytest.raises(NotImplementedError, match=re.escape(msg)):
+            _rle_decode_frame(b"\x00\x00\x00\x00", 1, 1, 3, 1)
 
     @pytest.mark.parametrize("header,samples,bits", BAD_SEGMENT_DATA)
     def test_invalid_nr_segments_raises(self, header, samples, bits):

@@ -28,7 +28,11 @@ from pydicom.pixels.common import (
 from pydicom.pixels.processing import convert_color_space
 from pydicom.pixels.utils import (
     _get_jpg_parameters,
+    concatenate_packed_frames,
     get_j2k_parameters,
+    get_packed_frame,
+    pack_bits,
+    unpack_bits,
 )
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -441,7 +445,14 @@ class DecodeRunner(RunnerBase):
             self._conform_jpg_colorspace(jpg_info)
 
     def iter_decode(self) -> Iterator[bytes | bytearray]:
-        """Yield decoded frames from the encoded pixel data."""
+        """Yield decoded frames from the encoded pixel data.
+
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
+        """
+        original_bits_allocated = self.bits_allocated
         if self.is_binary:
             file_offset = cast(BinaryIO, self.src).tell()
 
@@ -455,6 +466,10 @@ class DecodeRunner(RunnerBase):
         )
         for index, src in enumerate(encoded_frames):
             self._get_frame_info(src)
+
+            # This may have been overridden by the plugin by the previous
+            # frame
+            self.set_option("bits_allocated", original_bits_allocated)
 
             # Try the previously successful decoder first (if available)
             name, func = getattr(self, "_previous", (None, None))
@@ -887,6 +902,10 @@ class Decoder(CoderBase):
     ) -> tuple["np.ndarray", dict[str, str | int]]:
         """Return decoded pixel data as :class:`~numpy.ndarray`.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         .. warning::
 
             This method requires `NumPy <https://numpy.org/>`_ and may require
@@ -1046,6 +1065,10 @@ class Decoder(CoderBase):
     def _as_array_encapsulated(runner: DecodeRunner, index: int | None) -> "np.ndarray":
         """Return compressed and encapsulated pixel data as :class:`~numpy.ndarray`.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         Parameters
         ----------
         runner : pydicom.pixels.decoders.base.DecodeRunner
@@ -1057,7 +1080,9 @@ class Decoder(CoderBase):
         Returns
         -------
         numpy.ndarray
-            A 1D array containing the pixel data.
+            A 1D array containing the pixel data. For single bit images (*Bits
+            Allocated* of 1), pixels are always returned "unpacked", with a
+            single pixel in each byte.
         """
         # The initial preallocated array uses an itemsize based off the dataset's
         #   bits allocated value, however each decoded frame may use a smaller
@@ -1077,28 +1102,44 @@ class Decoder(CoderBase):
         if index is not None:
             # The decoding plugin may alter runner.bits_allocated to give a
             #   different dtype itemsize
-            arr[:] = np.frombuffer(runner.decode(index=index), dtype=runner.pixel_dtype)
+            buffer = runner.decode(index=index)
             runner.set_option("bits_allocated", original_bits_allocated)
+
+            if runner.get_option("is_bitpacked"):
+                frame = unpack_bits(buffer)[:pixels_per_frame]
+            else:
+                frame = np.frombuffer(buffer, dtype=runner.pixel_dtype)
+
+            arr[:] = frame
 
             return arr
 
         # Return all frames
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
-            frame = next(frame_generator)
+            buffer = next(frame_generator)
+
+            if runner.get_option("is_bitpacked"):
+                frame = unpack_bits(buffer)[:pixels_per_frame]
+            else:
+                frame = np.frombuffer(buffer, dtype=runner.pixel_dtype)
+
             start = idx * pixels_per_frame
-            arr[start : start + pixels_per_frame] = np.frombuffer(
-                frame, dtype=runner.pixel_dtype
-            )
+            arr[start : start + pixels_per_frame] = frame
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
         if runner.get_option("allow_excess_frames", False):
             excess = []
             original_nr_frames = runner.number_of_frames
-            for frame in frame_generator:
-                if len(frame) == runner.frame_length(unit="bytes"):
-                    excess.append(np.frombuffer(frame, runner.pixel_dtype))
+            for buffer in frame_generator:
+                if len(buffer) == runner.frame_length(unit="bytes"):
+                    if runner.get_option("is_bitpacked"):
+                        frame = unpack_bits(buffer)[:pixels_per_frame]
+                    else:
+                        frame = np.frombuffer(buffer, runner.pixel_dtype)
+
+                    excess.append(frame)
                     runner.set_option("number_of_frames", runner.number_of_frames + 1)
 
             if excess:
@@ -1279,6 +1320,13 @@ class Decoder(CoderBase):
     ) -> tuple[Buffer, dict[str, str | int]]:
         """Return the raw decoded pixel data as a buffer-like.
 
+        .. versionchanged:: 3.1
+
+            Native single-bit images (*Bits Allocated = 1*) are now always
+            returned with the start of a frame aligned to a byte boundary, and
+            with pixels from neighboring frames masked. Add support for
+            encapsulated single-bit images.
+
         .. warning::
 
             This method should only be used by advanced users who understand the
@@ -1352,6 +1400,7 @@ class Decoder(CoderBase):
         runner = DecodeRunner(self.UID)
         runner.set_source(src)
         runner.set_options(**kwargs)
+
         runner.set_decoders(
             cast(
                 dict[str, "DecodeFunction"],
@@ -1375,6 +1424,10 @@ class Decoder(CoderBase):
     ) -> bytes | bytearray:
         """ "Return the raw decoded pixel data as a buffer-like.
 
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
+
         Parameters
         ----------
         runner : pydicom.pixels.decoders.base.DecodeRunner
@@ -1386,18 +1439,25 @@ class Decoder(CoderBase):
         Returns
         -------
         bytes | bytearray
-            A buffer-like containing the decoded pixel data.
-        """
+            A buffer-like containing the decoded pixel data. For single bit
+            images (*Bits Allocated* of 1), pixels are always returned
+            "packed", with 8 pixels in a single byte.
 
-        # Return the specified frame only
+        """
+        original_bits_allocated = runner.bits_allocated
+
         if index is not None:
             frame = runner.decode(index=index)
+
             length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
                     "Unexpected number of bytes in the decoded frame with index "
                     f"{index} ({actual} bytes actual vs {length_bytes} expected)"
                 )
+
+            if original_bits_allocated == 1 and not runner.get_option("is_bitpacked"):
+                frame = pack_bits(frame, pad=False)
 
             return frame
 
@@ -1407,7 +1467,9 @@ class Decoder(CoderBase):
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
+
             bits_allocated.append(runner.bits_allocated)
+
             length_bytes = runner.frame_length(unit="bytes")
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
@@ -1415,7 +1477,13 @@ class Decoder(CoderBase):
                     f"{idx} ({actual} bytes actual vs {length_bytes} expected)"
                 )
 
+            if original_bits_allocated == 1 and not runner.get_option("is_bitpacked"):
+                frame = pack_bits(frame, pad=False)
+
             frames.append(frame)
+
+            # Reset bits allocated so it is correct for the next frame
+            runner.set_option("bits_allocated", original_bits_allocated)
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
@@ -1424,6 +1492,10 @@ class Decoder(CoderBase):
             original_nr_frames = runner.number_of_frames
             for frame in frame_generator:
                 if len(frame) == runner.frame_length(unit="bytes"):
+                    if original_bits_allocated == 1 and not runner.get_option(
+                        "is_bitpacked"
+                    ):
+                        frame = pack_bits(frame, pad=False)
                     excess.append(frame)
                     runner.set_option("number_of_frames", runner.number_of_frames + 1)
                     bits_allocated.append(runner.bits_allocated)
@@ -1460,12 +1532,28 @@ class Decoder(CoderBase):
                     frames[idx] = out
 
             runner.set_option("bits_allocated", target)
+        else:
+            # The bits allocated may have been reset above, so return it to the
+            # value actually set by the decoding function
+            runner.set_option("bits_allocated", bits_allocated[0])
+
+        if original_bits_allocated == 1:
+            return concatenate_packed_frames(
+                frames,
+                frame_length=runner.rows * runner.columns,
+            )
 
         return b"".join(b for b in frames)
 
     @staticmethod
     def _as_buffer_native(runner: DecodeRunner, index: int | None) -> Buffer:
         """ "Return the raw encoded pixel data as a buffer-like.
+
+        .. versionchanged:: 3.1
+
+            Single-bit images (*Bits Allocated = 1*) are now always
+            returned with the start of a frame aligned to a byte boundary, and
+            with pixels from neighboring frames masked.
 
         Parameters
         ----------
@@ -1483,16 +1571,6 @@ class Decoder(CoderBase):
             `view_only` is ``True`` in which case a :class:`memoryview` of the
             original buffer will be returned instead.
 
-        Notes
-        -----
-        For certain images, those with BitsAllocated=1, multiple frames and
-        number of pixels per frame that is not a multiple of 8, it is not
-        possible to isolate a buffer to a single frame because frame boundaries
-        may occur within the middle a byte. If a single frame is requested (via
-        ``index``) for these cases, the buffer returned will consist of the
-        smallest set of bytes required to entirely contain the requested frame.
-        However, the first and last byte may also contain information on pixel
-        values in neighboring frames.
         """
         length_bytes = runner.frame_length(unit="bytes")
 
@@ -1549,7 +1627,18 @@ class Decoder(CoderBase):
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            return runner.get_data(src, start_offset, ceil(length_bytes))
+            buf = runner.get_data(src, start_offset, ceil(length_bytes))
+
+            if runner.bits_allocated == 1:
+                # May need to bit-shift to remove pixels from neighboring frames
+                return get_packed_frame(
+                    buf,
+                    index=index,
+                    frame_length=int(runner.frame_length("pixels")),
+                    start_offset=start_offset,
+                )
+
+            return buf
 
         # Return all frames
         length_bytes *= runner.number_of_frames
@@ -1573,6 +1662,10 @@ class Decoder(CoderBase):
             the installation of additional packages to perform the actual pixel
             data decoding. See the :doc:`pixel data decompression documentation
             </guides/user/image_data_handlers>` for more information.
+
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
 
         **Processing**
 
@@ -1693,7 +1786,10 @@ class Decoder(CoderBase):
         log_warning = True
         if self.is_encapsulated and not indices:
             for frame in runner.iter_decode():
-                arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
+                if runner.get_option("is_bitpacked"):
+                    arr = unpack_bits(frame)[: cast(int, runner.frame_length("pixels"))]
+                else:
+                    arr = np.frombuffer(frame, dtype=runner.pixel_dtype)
                 arr = runner.reshape(arr, as_frame=True)
                 if runner._test_for("sign_correction"):
                     arr = _apply_sign_correction(arr, runner)
@@ -1762,6 +1858,10 @@ class Decoder(CoderBase):
             perform the actual pixel data decoding (see the :doc:`pixel data
             decompression documentation</guides/user/image_data_handlers>` for more
             information).
+
+        .. versionchanged:: 3.1
+
+            Add support for encapsulated single bit images (*Bits Allocated* = 1)
 
         Parameters
         ----------
@@ -1833,11 +1933,15 @@ class Decoder(CoderBase):
             ),
         )
 
+        bits_allocated = runner.bits_allocated
+
         if validate:
             runner.validate()
 
         if self.is_encapsulated and not indices:
             for buffer in runner.iter_decode():
+                if bits_allocated == 1 and not runner.get_option("is_bitpacked"):
+                    buffer = pack_bits(buffer, pad=False)
                 yield buffer, runner.pixel_properties(as_frame=True)
 
             return

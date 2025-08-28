@@ -68,6 +68,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     tsyntax = runner.transfer_syntax
     photometric_interpretation = runner.photometric_interpretation
     bits_stored = runner.bits_stored
+    original_bits_allocated = runner.bits_allocated
     if tsyntax == uid.JPEGExtended12Bit and bits_stored != 8:
         raise NotImplementedError(
             "GDCM does not support 'JPEG Extended' for samples with 12-bit precision"
@@ -167,5 +168,9 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         PI.YBR_RCT,
     ):
         runner.set_option("photometric_interpretation", PI.RGB)
+
+    # Signal that single-bit data is represented in unpacked form
+    if original_bits_allocated == 1:
+        runner.set_option("is_bitpacked", False)
 
     return frame
