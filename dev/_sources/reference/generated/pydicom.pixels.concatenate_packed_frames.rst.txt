@@ -1,0 +1,6 @@
+﻿pydicom.pixels.concatenate\_packed\_frames
+==========================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: concatenate_packed_frames

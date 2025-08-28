@@ -702,9 +702,11 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.create_icc_transform.html">pydicom.pixels.create_icc_transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.as_pixel_options.html">pydicom.pixels.as_pixel_options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.compress.html">pydicom.pixels.compress</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.concatenate_packed_frames.html">pydicom.pixels.concatenate_packed_frames</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.decompress.html">pydicom.pixels.decompress</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html">pydicom.pixels.get_decoder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html">pydicom.pixels.get_encoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.get_packed_frame.html">pydicom.pixels.get_packed_frame</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html">pydicom.pixels.iter_pixels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html">pydicom.pixels.pack_bits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html">pydicom.pixels.pixel_array</a></li>
@@ -1144,20 +1146,26 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.compress.html#pydicom.pixels.compress" title="pydicom.pixels.compress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compress</span></code></a>(ds, transfer_syntax_uid[, arr, ...])</p></td>
 <td><p>Compress uncompressed pixel data and update <cite>ds</cite> in-place with the resulting <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a> codestream.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.decompress.html#pydicom.pixels.decompress" title="pydicom.pixels.decompress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code></a>(ds, *[, as_rgb, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.concatenate_packed_frames.html#pydicom.pixels.concatenate_packed_frames" title="pydicom.pixels.concatenate_packed_frames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_packed_frames</span></code></a>(frames, frame_length)</p></td>
+<td><p>Concatenate individual bit-packed frames.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.decompress.html#pydicom.pixels.decompress" title="pydicom.pixels.decompress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code></a>(ds, *[, as_rgb, ...])</p></td>
 <td><p>Perform an in-place decompression of a dataset with a compressed <em>Transfer Syntax UID</em>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decoder</span></code></a>(uid)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_decoder.html#pydicom.pixels.get_decoder" title="pydicom.pixels.get_decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decoder</span></code></a>(uid)</p></td>
 <td><p>Return the pixel data decoder corresponding to <cite>uid</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html#pydicom.pixels.get_encoder" title="pydicom.pixels.get_encoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_encoder</span></code></a>(uid)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_encoder.html#pydicom.pixels.get_encoder" title="pydicom.pixels.get_encoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_encoder</span></code></a>(uid)</p></td>
 <td><p>Return the pixel data encoder corresponding to <cite>uid</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.get_packed_frame.html#pydicom.pixels.get_packed_frame" title="pydicom.pixels.get_packed_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_packed_frame</span></code></a>(src, index, frame_length[, ...])</p></td>
+<td><p>Retrieve a single bit-packed frame from a bit-packed buffer.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_pixels</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
 <td><p>Yield decoded pixel data frames from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.pack_bits.html#pydicom.pixels.pack_bits" title="pydicom.pixels.pack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack_bits</span></code></a>(arr[, pad])</p></td>
-<td><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p></td>
+<td><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> or bytes for use with <em>Pixel Data</em>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_array</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
 <td><p>Return decoded pixel data from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>

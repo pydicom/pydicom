@@ -1,0 +1,6 @@
+﻿pydicom.pixels.get\_packed\_frame
+=================================
+
+.. currentmodule:: pydicom.pixels
+
+.. autofunction:: get_packed_frame
