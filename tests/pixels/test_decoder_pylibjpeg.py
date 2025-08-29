@@ -190,7 +190,7 @@ class TestLibJpegDecoder:
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
             "'YBR_FULL_422' however the encoded image codestream for frame 0 uses "
-            "component IDs that indicate it should be 'RGB'"
+            "component IDs that indicate it may be 'RGB'"
         )
         ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "YBR_FULL_422"
@@ -210,7 +210,7 @@ class TestLibJpegDecoder:
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
             "'RGB' however the encoded image codestream for frame 0 contains a JFIF "
-            "APP marker which indicates it should be 'YBR_FULL_422'"
+            "APP marker which indicates it may be 'YBR_FULL_422'"
         )
         ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"

@@ -172,7 +172,7 @@ def _process_color_space(
         return arr
 
     # Conversion to RGB
-    # For native all frame are the same PI
+    # For native all frames are the same PI
     ybr = (PI.YBR_FULL, PI.YBR_FULL_422, PI.YBR_PARTIAL_420, PI.YBR_PARTIAL_422)
     if runner.is_native:
         if not (runner.photometric_interpretation in ybr and as_rgb) and not force_rgb:
@@ -445,7 +445,7 @@ class DecodeRunner(RunnerBase):
             warn_and_log(
                 f"The (0028,0004) 'Photometric Interpretation' value is '{pi}' "
                 f"however the encoded image codestream for frame {index} uses "
-                "component IDs that indicate it should be 'RGB'"
+                "component IDs that indicate it may be 'RGB'"
             )
             return
 
@@ -477,7 +477,7 @@ class DecodeRunner(RunnerBase):
                 warn_and_log(
                     f"The (0028,0004) 'Photometric Interpretation' value is '{pi}' "
                     f"however the encoded image codestream for frame {index} contains "
-                    f"{marker_name} marker which indicates it should be '{expected_cs}'"
+                    f"{marker_name} marker which indicates it may be '{expected_cs}'"
                 )
                 return
 
@@ -1407,7 +1407,7 @@ class Decoder(CoderBase):
         #   itemsize (such as bits allocated 16 and JPEG with precision 8 only
         #   returning 8-bit data rather than 16-bit)
         # We account for this by interpreting each frame using that decoded size,
-        #   the either inserting it into the preallocated array or using
+        #   then either inserting it into the preallocated array or using
         #   ndarray.astype() to upscale (if required)
         pixels_per_frame = cast(int, runner.frame_length(unit="pixels"))
 
