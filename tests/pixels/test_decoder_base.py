@@ -1,5 +1,6 @@
 """Tests for pydicom.pixels.decoder.base."""
 
+import importlib
 from io import BytesIO
 import logging
 from math import ceil
@@ -57,6 +58,12 @@ from .pixels_reference import (
 
 
 RLE_REFERENCE = PIXEL_REFERENCE[RLELossless]
+
+HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
+HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
+HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
+SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
+SKIP_JPG = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
 
 
 class TestDecodeRunner:
@@ -2129,6 +2136,7 @@ def test_get_decoder():
         get_decoder(SMPTEST211030PCMDigitalAudio)
 
 
+@pytest.mark.skipif(SKIP_J2K, reason="Missing dependencies for JPEG 2000")
 class TestApplySignCorrection:
     """Tests for _apply_sign_correction()"""
 
@@ -2181,6 +2189,7 @@ class TestApplySignCorrection:
         assert out[1].tolist() == [[1, 0, -1, -2], [-3, -4, -5, -6]]
 
 
+@pytest.mark.skipif(SKIP_JPG, reason="Missing dependencies for JPEG")
 class TestProcessColorSpace:
     """Tests for _process_color_space()"""
 
