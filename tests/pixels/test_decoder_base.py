@@ -1,5 +1,6 @@
 """Tests for pydicom.pixels.decoder.base."""
 
+import importlib
 from io import BytesIO
 import logging
 from math import ceil
@@ -14,7 +15,12 @@ from pydicom.encaps import get_frame, generate_frames, encapsulate
 from pydicom.pixels import get_decoder
 from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.decoders import ExplicitVRLittleEndianDecoder
-from pydicom.pixels.decoders.base import DecodeRunner, Decoder
+from pydicom.pixels.decoders.base import (
+    DecodeRunner,
+    Decoder,
+    _apply_sign_correction,
+    _process_color_space,
+)
 from pydicom.pixels.processing import convert_color_space
 from pydicom.pixels.utils import get_packed_frame, pack_bits
 
@@ -26,6 +32,8 @@ from pydicom.uid import (
     JPEGBaseline8Bit,
     RLELossless,
     SMPTEST211030PCMDigitalAudio,
+    JPEG2000,
+    JPEGLSLossless,
 )
 
 try:
@@ -50,6 +58,12 @@ from .pixels_reference import (
 
 
 RLE_REFERENCE = PIXEL_REFERENCE[RLELossless]
+
+HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
+HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
+HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
+SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
+SKIP_JPG = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
 
 
 class TestDecodeRunner:
@@ -266,6 +280,39 @@ class TestDecodeRunner:
             runner._opts["transfer_syntax_uid"] = ExplicitVRBigEndian
             assert runner.pixel_dtype.byteorder in [">", "="]
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+    def test_frame_dtype_float(self):
+        """Test frame_dtype defaults to pixel_dtype for float pixel data."""
+        runner = DecodeRunner(RLELossless)
+        runner.set_option("bits_allocated", 16)
+        runner.set_option("pixel_representation", 0)
+        runner.set_option("pixel_keyword", "FloatPixelData")
+        assert runner.frame_dtype(0) == runner.pixel_dtype
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+    def test_frame_dtype(self):
+        """Test frame_dtype sets itemsize from frame properties."""
+        runner = DecodeRunner(RLELossless)
+        runner.set_option("bits_allocated", 16)
+        runner.set_option("pixel_representation", 0)
+        runner.set_option("pixel_keyword", "PixelData")
+        assert runner._frame_meta == {}
+        assert runner.frame_dtype(0).itemsize == 2  # falls back to expected
+        runner._frame_meta[0] = {"bits_allocated": 1}  # bit packed uses u1
+        assert runner.frame_dtype(0).itemsize == 1
+        assert runner.frame_dtype(0).kind == "u"
+        runner._frame_meta[0] = {"bits_allocated": 8}
+        assert runner.frame_dtype(0).itemsize == 1
+        assert runner.frame_dtype(0).kind == "u"
+
+        runner.set_option("pixel_representation", 1)
+        runner._frame_meta[0] = {"bits_allocated": 16}
+        assert runner.frame_dtype(0).itemsize == 2
+        assert runner.frame_dtype(0).kind == "i"
+        runner._frame_meta[0] = {"bits_allocated": 32}
+        assert runner.frame_dtype(0).itemsize == 4
+        assert runner.frame_dtype(0).kind == "i"
+
     def test_validate_buffer(self):
         """Tests for validate_buffer()"""
         runner = DecodeRunner(RLELossless)
@@ -385,12 +432,12 @@ class TestDecodeRunner:
         assert runner._previous[1] == runner._decoders["pydicom"]
 
         arr = np.frombuffer(buffer, dtype=runner.pixel_dtype)
-        arr = runner.reshape(arr, as_frame=True)
+        arr = runner.reshape(arr, 0)
         RLE_16_1_10F.test(arr, index=0)
 
         buffer = runner.decode(9)
         arr = np.frombuffer(buffer, dtype=runner.pixel_dtype)
-        arr = runner.reshape(arr, as_frame=True)
+        arr = runner.reshape(arr, 9)
         RLE_16_1_10F.test(arr, index=9)
 
         def decode1(src, opts):
@@ -429,14 +476,14 @@ class TestDecodeRunner:
         assert runner._previous[1] == runner._decoders["pydicom"]
 
         arr = np.frombuffer(buffer, dtype=runner.pixel_dtype)
-        arr = runner.reshape(arr, as_frame=True)
+        arr = runner.reshape(arr, 0)
         RLE_16_1_10F.test(arr, index=0)
 
         for ii in range(9):
             buffer = next(data)
 
         arr = np.frombuffer(buffer, dtype=runner.pixel_dtype)
-        arr = runner.reshape(arr, as_frame=True)
+        arr = runner.reshape(arr, 9)
         RLE_16_1_10F.test(arr, index=9)
 
         pytest.raises(StopIteration, next, data)
@@ -507,8 +554,15 @@ class TestDecodeRunner:
         assert runner.get_data(src, 3, 4) == b"\x03\x04\x05"
         assert src.tell() == 2
 
-    def test_pixel_properties(self):
-        """Test pixel_properties()"""
+    def test_pixel_properties_raises(self):
+        """Test pixel_properties() raises if index invalid"""
+        runner = DecodeRunner(RLELossless)
+        msg = "'index' must be int or None, not 'bool'"
+        with pytest.raises(TypeError, match=msg):
+            runner.pixel_properties(True)
+
+    def test_pixel_properties_none(self):
+        """Test pixel_properties(index = None)"""
         runner = DecodeRunner(RLELossless)
         opts = {
             "columns": 9,
@@ -522,7 +576,7 @@ class TestDecodeRunner:
             "bits_stored": 8,
         }
         runner.set_options(**opts)
-        d = runner.pixel_properties()
+        d = runner.pixel_properties(None)
         assert d["columns"] == 9
         assert d["rows"] == 10
         assert d["samples_per_pixel"] == 1
@@ -531,15 +585,46 @@ class TestDecodeRunner:
         assert d["pixel_representation"] == 0
         assert d["bits_allocated"] == 16
         assert d["bits_stored"] == 8
-        assert d["number_of_frames"] == 3
         assert "planar_configuration" not in d
 
         runner.set_option("pixel_keyword", "FloatPixelData")
-        assert "pixel_representation" not in runner.pixel_properties()
+        assert "pixel_representation" not in runner.pixel_properties(None)
 
         runner.set_option("samples_per_pixel", 3)
         runner.set_option("planar_configuration", 1)
-        assert runner.pixel_properties()["planar_configuration"] == 1
+        assert runner.pixel_properties(None)["planar_configuration"] == 1
+
+    def test_pixel_properties_as_frame_warns(self):
+        """Test pixel_properties() warns for as_frame"""
+        runner = DecodeRunner(RLELossless)
+        opts = {
+            "columns": 9,
+            "rows": 10,
+            "samples_per_pixel": 1,
+            "number_of_frames": 3,
+            "pixel_keyword": "PixelData",
+            "photometric_interpretation": PI.RGB,
+            "pixel_representation": 0,
+            "bits_allocated": 16,
+            "bits_stored": 8,
+        }
+        runner.set_options(**opts)
+        runner.set_frame_option(0, "photometric_interpretation", "RGB")
+        runner.set_frame_option(0, "bits_allocated", 8)
+
+        msg = "'as_frame' is deprecated and will be removed in v4.0"
+        with pytest.warns(DeprecationWarning, match=msg):
+            d = runner.pixel_properties(0, as_frame=True)
+
+        assert d["columns"] == 9
+        assert d["rows"] == 10
+        assert d["samples_per_pixel"] == 1
+        assert d["number_of_frames"] == 1
+        assert d["photometric_interpretation"] == PI.RGB
+        assert d["pixel_representation"] == 0
+        assert d["bits_allocated"] == 8
+        assert d["bits_stored"] == 8
+        assert "planar_configuration" not in d
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -774,7 +859,7 @@ class TestDecodeRunner_Reshape:
     def test_1frame_1sample(self, _1frame_1sample):
         """Test reshaping 1 frame, 1 sample/pixel."""
         self.runner.set_option("samples_per_pixel", 1)
-        arr = self.runner.reshape(_1frame_1sample)
+        arr = self.runner.reshape(_1frame_1sample, None)
         assert (4, 5) == arr.shape
         assert np.array_equal(arr, self.ref_1_1)
 
@@ -782,7 +867,7 @@ class TestDecodeRunner_Reshape:
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
         assert not out.flags.writeable
-        out = self.runner.reshape(out)
+        out = self.runner.reshape(out, None)
         assert not out.flags.writeable
 
     def test_1frame_3sample_0conf(self, _1frame_3sample_0config):
@@ -790,15 +875,18 @@ class TestDecodeRunner_Reshape:
         self.runner.set_option("number_of_frames", 1)
         self.runner.set_option("samples_per_pixel", 3)
         self.runner.set_option("planar_configuration", 0)
-        arr = self.runner.reshape(_1frame_3sample_0config)
+        self.runner.set_frame_option(0, "planar_configuration", 0)
+        arr = self.runner.reshape(_1frame_3sample_0config, None)
         assert (4, 5, 3) == arr.shape
         assert np.array_equal(arr, self.ref_1_3)
+        assert self.runner.planar_configuration == 0
+        assert self.runner.get_frame_option(0, "planar_configuration") == 0
 
         # Test reshape to (rows, cols, planes) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
         assert not out.flags.writeable
-        out = self.runner.reshape(out)
+        out = self.runner.reshape(out, None)
         assert not out.flags.writeable
 
     def test_1frame_3sample_1conf(self, _1frame_3sample_1config):
@@ -806,22 +894,25 @@ class TestDecodeRunner_Reshape:
         self.runner.set_option("number_of_frames", 1)
         self.runner.set_option("samples_per_pixel", 3)
         self.runner.set_option("planar_configuration", 1)
-        arr = self.runner.reshape(_1frame_3sample_1config)
+        self.runner.set_frame_option(0, "planar_configuration", 1)
+        arr = self.runner.reshape(_1frame_3sample_1config, None)
         assert (4, 5, 3) == arr.shape
         assert np.array_equal(arr, self.ref_1_3)
+        assert self.runner.planar_configuration == 0
+        assert self.runner.get_frame_option(0, "planar_configuration") == 0
 
         # Test reshape to (rows, cols, planes) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
         assert not out.flags.writeable
-        out = self.runner.reshape(out)
+        out = self.runner.reshape(out, None)
         assert not out.flags.writeable
 
     def test_2frame_1sample(self, _1frame_1sample, _2frame_1sample):
         """Test reshaping 2 frame, 1 sample/pixel."""
         self.runner.set_option("number_of_frames", 2)
         self.runner.set_option("samples_per_pixel", 1)
-        arr = self.runner.reshape(_2frame_1sample)
+        arr = self.runner.reshape(_2frame_1sample, None)
         assert (2, 4, 5) == arr.shape
         assert np.array_equal(arr, self.ref_2_1)
 
@@ -829,10 +920,10 @@ class TestDecodeRunner_Reshape:
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
         assert not out.flags.writeable
-        out = self.runner.reshape(out)
+        out = self.runner.reshape(out, None)
         assert not out.flags.writeable
 
-        arr = self.runner.reshape(_1frame_1sample, as_frame=True)
+        arr = self.runner.reshape(_1frame_1sample, 0)
         assert (4, 5) == arr.shape
         assert np.array_equal(arr, self.ref_1_1)
 
@@ -843,20 +934,25 @@ class TestDecodeRunner_Reshape:
         self.runner.set_option("number_of_frames", 2)
         self.runner.set_option("samples_per_pixel", 3)
         self.runner.set_option("planar_configuration", 0)
-        arr = self.runner.reshape(_2frame_3sample_0config)
+        self.runner.set_frame_option(0, "planar_configuration", 0)
+        self.runner.set_frame_option(1, "planar_configuration", 0)
+        arr = self.runner.reshape(_2frame_3sample_0config, None)
         assert (2, 4, 5, 3) == arr.shape
         assert np.array_equal(arr, self.ref_2_3)
+        assert self.runner.planar_configuration == 0
 
         # Test reshape to (frames, rows, cols, planes) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
         assert not out.flags.writeable
-        out = self.runner.reshape(out)
+        out = self.runner.reshape(out, None)
         assert not out.flags.writeable
 
-        arr = self.runner.reshape(_1frame_3sample_0config, as_frame=True)
+        arr = self.runner.reshape(_1frame_3sample_0config, 0)
         assert (4, 5, 3) == arr.shape
         assert np.array_equal(arr, self.ref_1_3)
+        assert self.runner.planar_configuration == 0
+        assert self.runner.get_frame_option(0, "planar_configuration") == 0
 
     def test_2frame_3sample_1conf(
         self, _1frame_3sample_1config, _2frame_3sample_1config
@@ -865,20 +961,44 @@ class TestDecodeRunner_Reshape:
         self.runner.set_option("number_of_frames", 2)
         self.runner.set_option("samples_per_pixel", 3)
         self.runner.set_option("planar_configuration", 1)
-        arr = self.runner.reshape(_2frame_3sample_1config)
+        self.runner.set_frame_option(0, "planar_configuration", 1)
+        self.runner.set_frame_option(1, "planar_configuration", 1)
+        arr = self.runner.reshape(_2frame_3sample_1config, None)
         assert (2, 4, 5, 3) == arr.shape
         assert np.array_equal(arr, self.ref_2_3)
+        assert self.runner.planar_configuration == 0
 
         # Test reshape to (frames, rows, cols, planes) is view-only
+        self.runner._frame_meta = {}
+        self.runner.set_option("planar_configuration", 1)
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
         assert not out.flags.writeable
-        out = self.runner.reshape(out)
+        out = self.runner.reshape(out, None)
         assert not out.flags.writeable
 
-        arr = self.runner.reshape(_1frame_3sample_1config, as_frame=True)
+        self.runner._frame_meta = {}
+        self.runner.set_option("planar_configuration", 1)
+        arr = self.runner.reshape(_1frame_3sample_1config, 0)
         assert (4, 5, 3) == arr.shape
         assert np.array_equal(arr, self.ref_1_3)
+        assert self.runner.get_frame_option(0, "planar_configuration") == 0
+
+    def test_as_frame_warns(self, _1frame_1sample):
+        """Test DecodeRunner.reshape() warns if as_frame is used"""
+        self.runner.set_option("samples_per_pixel", 1)
+        msg = "'as_frame' is deprecated and will be removed in v4.0"
+        with pytest.warns(DeprecationWarning, match=msg):
+            arr = self.runner.reshape(_1frame_1sample, 0, as_frame=True)
+
+        assert (4, 5) == arr.shape
+
+    def test_index_raises(self, _1frame_1sample):
+        """Test DecodeRunner.reshape() warns if as_frame is used"""
+        self.runner.set_option("samples_per_pixel", 1)
+        msg = "'index' must be int or None, not 'bool'"
+        with pytest.raises(TypeError, match=msg):
+            self.runner.reshape(_1frame_1sample, True)
 
 
 class TestDecoder:
@@ -1009,11 +1129,22 @@ class TestDecoder_Array:
                 "interpretation of 'YBR_FULL_422'"
             ) in caplog.text
 
-    def test_colorspace_change_view_warns(self, caplog):
+    def test_colorspace_rgb_view_warns(self, caplog):
         """Test warning for color space change with `view_only`"""
         decoder = get_decoder(ExplicitVRLittleEndian)
         with caplog.at_level(logging.WARNING, logger="pydicom"):
             decoder.as_array(EXPL_8_3_1F_YBR.ds, view_only=True)
+
+            assert (
+                "Unable to return an ndarray that's a view on the original "
+                "buffer if applying a color space conversion"
+            ) in caplog.text
+
+    def test_colorspace_force_ybr_view_warns(self, caplog):
+        """Test warning for color space change with `view_only`"""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        with caplog.at_level(logging.WARNING, logger="pydicom"):
+            decoder.as_array(EXPL_8_3_1F_YBR.ds, force_ybr=True, view_only=True)
 
             assert (
                 "Unable to return an ndarray that's a view on the original "
@@ -1202,6 +1333,55 @@ class TestDecoder_Array:
 
         runner.set_option("allow_excess_frames", False)
         arr, meta = decoder.as_array(src, **runner.options)
+        assert arr.shape == (10, 64, 64)
+        assert meta["number_of_frames"] == 10
+
+    def test_encapsulated_excess_frames_combinations(self):
+        """Test returning excess frame data for the various combinations"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        ds = dcmread(reference.path)
+
+        # 1 + many
+        ds.NumberOfFrames = 1
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(ds)
+        with pytest.warns(UserWarning, match="10 frames have been found"):
+            arr, meta = decoder.as_array(ds.PixelData, **runner.options)
+
+        assert arr.shape == (10, 64, 64)
+        assert meta["number_of_frames"] == 10
+
+        # 1 + 1
+        ds.NumberOfFrames = 1
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(ds)
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        src = encapsulate(frames[:2])
+
+        with pytest.warns(UserWarning, match="2 frames have been found"):
+            arr, meta = decoder.as_array(src, **runner.options)
+
+        assert arr.shape == (2, 64, 64)
+        assert meta["number_of_frames"] == 2
+
+        # many + 1
+        ds.NumberOfFrames = 9
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(ds)
+        with pytest.warns(UserWarning, match="10 frames have been found"):
+            arr, meta = decoder.as_array(ds.PixelData, **runner.options)
+
+        assert arr.shape == (10, 64, 64)
+        assert meta["number_of_frames"] == 10
+
+        # many + many
+        ds.NumberOfFrames = 5
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(ds)
+        with pytest.warns(UserWarning, match="10 frames have been found"):
+            arr, meta = decoder.as_array(ds.PixelData, **runner.options)
+
         assert arr.shape == (10, 64, 64)
         assert meta["number_of_frames"] == 10
 
@@ -1603,7 +1783,7 @@ class TestDecoder_Buffer:
             arr, meta_a = decoder.as_array(reference.ds, index=index)
             buffer, meta_b = decoder.as_buffer(reference.ds, index=index)
             assert arr.tobytes() == buffer
-            assert meta_a == meta_b
+            assert meta_a == meta_b[index]
             assert meta_a["number_of_frames"] == 1
 
         msg = "There is insufficient pixel data to contain 11 frames"
@@ -1622,7 +1802,7 @@ class TestDecoder_Buffer:
         assert isinstance(buffer, memoryview)
         assert arr.tobytes() == buffer
         assert buffer.obj is reference.ds.PixelData
-        assert meta_a == meta_b
+        assert meta_a == meta_b[0]
 
         # mutable source buffer
         # Also tests buffer-like `src`
@@ -1712,8 +1892,8 @@ class TestDecoder_Buffer:
             buffer, meta = decoder.as_buffer(reference.ds, index=index)
             assert isinstance(buffer, bytes | bytearray)
             assert arr.tobytes() == buffer
-            assert meta["bits_stored"] == 12
-            assert meta["number_of_frames"] == 1
+            assert meta[index]["bits_stored"] == 12
+            assert meta[index]["number_of_frames"] == 1
 
     def test_encapsulated_plugin(self):
         """Test `decoding_plugin` with an encapsulated pixel data."""
@@ -1769,14 +1949,14 @@ class TestDecoder_Buffer:
             buffer, meta = decoder.as_buffer(src, **runner.options)
 
         assert len(buffer) == 11 * 64 * 64 * 2
-        assert meta["number_of_frames"] == 11
+        assert len(meta) == 11
 
         runner.set_option("allow_excess_frames", False)
         buffer, meta = decoder.as_buffer(src, **runner.options)
         assert len(buffer) == 10 * 64 * 64 * 2
-        assert meta["number_of_frames"] == 10
+        assert len(meta) == 10
 
-    def test_encapsulated_excess_frames_singlebit(self):
+    def test_encapsulated_excess_frames_singlebit_packed(self):
         """Test returning excess frame data"""
         decoder = get_decoder(RLELossless)
         reference = RLE_1_1_3F
@@ -1798,12 +1978,12 @@ class TestDecoder_Buffer:
             buffer, meta = decoder.as_buffer(src, **runner.options)
 
         assert len(buffer) == (4 * 512 * 512) // 8
-        assert meta["number_of_frames"] == 4
+        assert len(meta) == 4
 
         runner.set_option("allow_excess_frames", False)
         buffer, meta = decoder.as_buffer(src, **runner.options)
         assert len(buffer) == (3 * 512 * 512) // 8
-        assert meta["number_of_frames"] == 3
+        assert len(meta) == 3
 
     def test_expb_ow_index_invalid_raises(self):
         """Test invalid index with BE swapped OW raises"""
@@ -1954,3 +2134,170 @@ def test_get_decoder():
     )
     with pytest.raises(NotImplementedError, match=msg):
         get_decoder(SMPTEST211030PCMDigitalAudio)
+
+
+@pytest.mark.skipif(SKIP_J2K, reason="Missing dependencies for JPEG 2000")
+class TestApplySignCorrection:
+    """Tests for _apply_sign_correction()"""
+
+    def test_j2k_sign_correction_multi(self):
+        """Test multiframe J2K with inconsistent values."""
+        runner = DecodeRunner(JPEG2000)
+        runner.set_option("bits_stored", 12)
+        runner.set_option("pixel_representation", 0)
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+        }
+        frame = np.asarray(
+            [
+                [4097, 4096, 4095, 4094],
+                [4093, 4092, 4091, 4090],
+            ],
+            dtype="u2",
+        )
+        arr = np.asarray([frame, frame])
+        out = _apply_sign_correction(arr, runner, None)
+        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        assert out[1].tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+        }
+        arr = np.asarray([frame, frame])
+        out = _apply_sign_correction(arr, runner, None)
+        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        assert out[1].tolist() == [[4097, 4096, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+    def test_jls_sign_correction_multi(self):
+        """Test multiframe JLS with inconsistent values."""
+        runner = DecodeRunner(JPEGLSLossless)
+        runner.set_option("bits_stored", 12)
+        runner.set_option("pixel_representation", 1)
+        runner._frame_meta = {0: {"jls_precision": 12}, 1: {"jls_precision": 11}}
+        frame = np.asarray(
+            [
+                [4097, 4096, 4095, 4094],
+                [4093, 4092, 4091, 4090],
+            ],
+            dtype="i2",
+        )
+        arr = np.asarray([frame, frame])
+        out = _apply_sign_correction(arr, runner, None)
+        assert out[0].tolist() == [[1, 0, -1, -2], [-3, -4, -5, -6]]
+        assert out[1].tolist() == [[1, 0, -1, -2], [-3, -4, -5, -6]]
+
+
+@pytest.mark.skipif(SKIP_JPG, reason="Missing dependencies for JPEG")
+class TestProcessColorSpace:
+    """Tests for _process_color_space()"""
+
+    def test_encapsulated_none(self):
+        """Test RGB conversion with index = None"""
+        runner = DecodeRunner(JPEGBaseline8Bit)
+        runner._frame_meta = {
+            0: {"photometric_interpretation": "YBR_FULL"},
+            1: {"photometric_interpretation": "YBR_FULL"},
+        }
+        runner.set_option("photometric_interpretation", "YBR_FULL")
+        runner.set_option("number_of_frames", 2)
+        runner.set_option("bits_stored", 8)
+        runner.set_option("to_rgb", True)
+
+        arr = EXPL_8_3_1F_YBR.ds.pixel_array
+        frames = np.asarray([arr, arr])
+        assert frames.shape == (2, 100, 100, 3)
+
+        changes = {}
+        _ = _process_color_space(frames, runner, None, changes)
+        assert changes["photometric_interpretation"] == "RGB"
+        assert runner._frame_meta[0]["photometric_interpretation"] == "RGB"
+        assert runner._frame_meta[1]["photometric_interpretation"] == "RGB"
+        assert np.array_equal(frames[0], convert_color_space(arr, "YBR_FULL", "RGB"))
+
+    def test_encapsulated_none_single(self):
+        """Test RGB conversion with a single frame with index = None"""
+        runner = DecodeRunner(JPEGBaseline8Bit)
+        runner._frame_meta = {
+            0: {"photometric_interpretation": "YBR_FULL"},
+        }
+        runner.set_option("photometric_interpretation", "YBR_FULL")
+        runner.set_option("number_of_frames", 1)
+        runner.set_option("bits_stored", 8)
+        runner.set_option("to_rgb", True)
+
+        arr = EXPL_8_3_1F_YBR.ds.pixel_array
+        frames = np.asarray([arr]).squeeze()
+        assert frames.shape == (100, 100, 3)
+
+        changes = {}
+        out = _process_color_space(frames, runner, None, changes)
+        assert changes["photometric_interpretation"] == "RGB"
+        assert runner._frame_meta[0]["photometric_interpretation"] == "RGB"
+        assert np.array_equal(out, convert_color_space(arr, "YBR_FULL", "RGB"))
+
+    def test_encapsulated_none_multi_inconsistent(self):
+        """Test RGB conversion with multiple frames with index = None"""
+        runner = DecodeRunner(JPEGBaseline8Bit)
+        runner._frame_meta = {
+            0: {"photometric_interpretation": "RGB"},  # Don't convert frame 1
+            1: {"photometric_interpretation": "YBR_FULL"},
+        }
+        runner.set_option("photometric_interpretation", "YBR_FULL")
+        runner.set_option("number_of_frames", 2)
+        runner.set_option("bits_stored", 8)
+        runner.set_option("to_rgb", True)
+
+        arr = EXPL_8_3_1F_YBR.ds.pixel_array
+        frames = np.asarray([arr, arr])
+        assert frames.shape == (2, 100, 100, 3)
+
+        changes = {}
+        out = _process_color_space(frames, runner, None, changes)
+        assert changes["photometric_interpretation"] == "RGB"
+        assert runner._frame_meta[0]["photometric_interpretation"] == "RGB"
+        assert runner._frame_meta[1]["photometric_interpretation"] == "RGB"
+        assert np.array_equal(out[0], arr)
+        assert np.array_equal(out[1], convert_color_space(arr, "YBR_FULL", "RGB"))
+
+    def test_encapsulated_indexed_single(self):
+        """Test RGB conversion with a single frame with index != None"""
+        runner = DecodeRunner(JPEGBaseline8Bit)
+        runner._frame_meta = {
+            0: {"photometric_interpretation": "YBR_FULL"},
+            1: {"photometric_interpretation": "YBR_FULL"},
+        }
+        runner.set_option("photometric_interpretation", "YBR_FULL")
+        runner.set_option("number_of_frames", 2)
+        runner.set_option("bits_stored", 8)
+        runner.set_option("to_rgb", True)
+
+        arr = EXPL_8_3_1F_YBR.ds.pixel_array
+        frames = np.asarray([arr]).squeeze()
+        assert frames.shape == (100, 100, 3)
+
+        changes = {}
+        out = _process_color_space(frames, runner, 0, changes)
+        assert "photometric_interpretation" not in changes
+        assert runner._frame_meta[0]["photometric_interpretation"] == "RGB"
+        assert runner._frame_meta[1]["photometric_interpretation"] == "YBR_FULL"
+        assert np.array_equal(out, convert_color_space(arr, "YBR_FULL", "RGB"))
+
+        runner._frame_meta = {
+            0: {"photometric_interpretation": "YBR_FULL"},
+            1: {"photometric_interpretation": "YBR_FULL"},
+        }
+        runner.set_option("photometric_interpretation", "YBR_FULL")
+        runner.set_option("number_of_frames", 2)
+        runner.set_option("bits_stored", 8)
+        runner.set_option("to_rgb", True)
+
+        frames = np.asarray([arr]).squeeze()
+        assert frames.shape == (100, 100, 3)
+
+        out = _process_color_space(frames, runner, 1, changes)
+        assert "photometric_interpretation" not in changes
+        assert runner._frame_meta[0]["photometric_interpretation"] == "YBR_FULL"
+        assert runner._frame_meta[1]["photometric_interpretation"] == "RGB"
+        assert np.array_equal(out, convert_color_space(arr, "YBR_FULL", "RGB"))

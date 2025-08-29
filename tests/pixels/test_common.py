@@ -61,6 +61,13 @@ class TestRunnerBase:
         assert runner.transfer_syntax == RLELossless
         assert runner.options == {"transfer_syntax_uid": RLELossless}
         assert runner._src_type == "UNDEFINED"
+        assert not hasattr(runner, "_index")
+        assert runner._frame_meta == {}
+        assert not runner.is_native
+        assert runner.is_encapsulated
+
+        with pytest.raises(ValueError, match="The frame 'index' is not available"):
+            runner.index
 
     def test_del_option(self):
         """Test for del_option()"""
@@ -452,6 +459,61 @@ class TestRunnerBase:
             encaps_runner.set_option("photometric_interpretation", PI.YBR_FULL_422)
             assert length[3] == native_runner.frame_length(unit="bytes")
             assert length[1] == encaps_runner.frame_length(unit="bytes")
+
+    def test_set_frame_option(self):
+        """Tests for set_frame_option()"""
+        runner = RunnerBase(RLELossless)
+        msg = (
+            "Invalid 'bits_allocated' value '0' for frame 0, must be 1 or a "
+            "multiple of 8"
+        )
+        with pytest.raises(ValueError, match=msg):
+            runner.set_frame_option(0, "bits_allocated", 0)
+
+        runner.set_frame_option(0, "bits_allocated", 1)
+        assert runner._frame_meta[0]["bits_allocated"] == 1
+        runner.set_frame_option(0, "bits_allocated", 8)
+        assert runner._frame_meta[0]["bits_allocated"] == 8
+        runner.set_frame_option(0, "bits_allocated", 16)
+        assert runner._frame_meta[0]["bits_allocated"] == 16
+
+        msg = "Invalid 'planar_configuration' value '2' for frame 0, must be 0 or 1"
+        with pytest.raises(ValueError, match=msg):
+            runner.set_frame_option(0, "planar_configuration", 2)
+
+        runner.set_frame_option(0, "planar_configuration", 0)
+        assert runner._frame_meta[0]["planar_configuration"] == 0
+        runner.set_frame_option(0, "planar_configuration", 1)
+        assert runner._frame_meta[0]["planar_configuration"] == 1
+
+        runner.set_frame_option(0, "photometric_interpretation", PI.RGB)
+        assert runner._frame_meta[0]["photometric_interpretation"] == PI.RGB
+        runner.set_frame_option(0, "photometric_interpretation", "PALETTE COLOR")
+        pi = runner._frame_meta[0]["photometric_interpretation"]
+        assert isinstance(pi, PI)
+        assert pi == PI.PALETTE_COLOR
+        runner.set_frame_option(0, "photometric_interpretation", "FOO")
+        pi = runner._frame_meta[0]["photometric_interpretation"]
+        assert not isinstance(pi, PI)
+        assert pi == "FOO"
+
+    def test_get_frame_option(self):
+        """Tests for get_frame_option()"""
+        runner = RunnerBase(RLELossless)
+        assert runner.get_frame_option(0, "foo") is None
+        assert runner.get_frame_option(0, "foo", 11) == 11
+        assert runner.get_frame_option(None, "foo") is None
+        assert runner.get_frame_option(None, "foo", 12) == 12
+
+        runner.set_frame_option(5, "foo", 0)
+        runner.set_frame_option(2, "foo", 0)
+        assert runner.get_frame_option(2, "foo") == 0
+        assert runner.get_frame_option(None, "foo") == 0
+
+        runner.set_frame_option(7, "foo", 10)
+        msg = "Multiple inconsistent inter-frame values found for 'foo': 0, 10"
+        with pytest.raises(ValueError, match=msg):
+            runner.get_frame_option(None, "foo")
 
 
 class TestCoderBase:

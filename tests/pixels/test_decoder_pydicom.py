@@ -262,7 +262,7 @@ class TestAsBuffer:
             if ds.SamplesPerPixel == 1:
                 assert arr_frame.tobytes() == buffer_frame
             else:
-                assert meta["planar_configuration"] == 1
+                assert meta[index]["planar_configuration"] == 1
                 # Red
                 arr_plane = arr_frame[..., 0].tobytes()
                 plane_length = len(arr_plane)

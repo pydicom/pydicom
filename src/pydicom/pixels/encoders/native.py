@@ -40,12 +40,15 @@ def _encode_deflated_frame(src: bytes, runner: EncodeRunner) -> bytes:
     bytes
         A deflate encoded frame.
     """
+    runner.set_frame_option(runner.index, "encoding_plugin", "pydicom")
     # In the case of single bit images, the data must first be bit-packed
     # before being encoded with Deflate
-    if runner.get_option("bits_allocated") == 1 and not runner.get_option(
-        "is_bitpacked", False
+    if (
+        runner.bits_allocated == 1
+        and runner.get_frame_option(runner.index, "bits_allocated", 1) != 1
     ):
         src = pack_bits(src, pad=False)
+        runner.set_frame_option(runner.index, "bits_allocated", 1)
 
     # TODO: Python 3.11 switch to using zlib.compress() instead
     enc = zlib.compressobj(wbits=-zlib.MAX_WBITS)
@@ -69,15 +72,19 @@ def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
     bytes
         An RLE encoded frame.
     """
+    runner.set_frame_option(runner.index, "encoding_plugin", "pydicom")
+
     if runner.get_option("byteorder", "<") == ">":
         raise ValueError("Unsupported option \"byteorder = '>'\"")
 
     # In the case of single bit images, the data must first be bit-packed
     # before being encoded with RLE
-    if runner.get_option("bits_allocated") == 1 and not runner.get_option(
-        "is_bitpacked", False
+    if (
+        runner.bits_allocated == 1
+        and runner.get_frame_option(runner.index, "bits_allocated", 1) != 1
     ):
         src = pack_bits(src, pad=False)
+        runner.set_frame_option(runner.index, "bits_allocated", 1)
 
     bytes_allocated = math.ceil(runner.bits_allocated / 8)
 

@@ -14,7 +14,11 @@ except ImportError:
 from pydicom.pixels import get_decoder
 from pydicom.uid import JPEGLSLossless, JPEGLSNearLossless
 
-from .pixels_reference import PIXEL_REFERENCE, JLSN_08_01_1_0_1F
+from .pixels_reference import (
+    PIXEL_REFERENCE,
+    JLSN_08_01_1_0_1F,
+    JLSL_16_15_1_1_1F,  # Signed
+)
 
 
 HAVE_PYJPEGLS = bool(importlib.util.find_spec("jpeg_ls"))
@@ -83,5 +87,23 @@ class TestPyJpegLSDecoder:
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
         # as_buffer() returns container sized to codestream precision
-        assert meta["bits_allocated"] == 8
-        assert meta["bits_stored"] == 8
+        assert meta[0]["bits_allocated"] == 8
+        assert meta[0]["bits_stored"] == 8
+
+    def test_sign_correction_indexed(self):
+        """Test that sign correction works as expected with `index`"""
+        reference = JLSL_16_15_1_1_1F
+        decoder = get_decoder(JPEGLSLossless)
+        arr, meta = decoder.as_array(reference.ds, index=0, decoding_plugin="pyjpegls")
+        reference.test(arr)
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    def test_sign_correction_iter(self):
+        """Test that sign correction works as expected with iter_array()"""
+        reference = JLSL_16_15_1_1_1F
+        decoder = get_decoder(JPEGLSLossless)
+        for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="pyjpegls"):
+            reference.test(arr)
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable

@@ -65,10 +65,12 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     bytes
         The decoded pixel data frame.
     """
+    runner.set_frame_option(runner.index, "decoding_plugin", "gdcm")
+
     tsyntax = runner.transfer_syntax
     photometric_interpretation = runner.photometric_interpretation
     bits_stored = runner.bits_stored
-    original_bits_allocated = runner.bits_allocated
+    bits_allocated = runner.bits_allocated
     if tsyntax == uid.JPEGExtended12Bit and bits_stored != 8:
         raise NotImplementedError(
             "GDCM does not support 'JPEG Extended' for samples with 12-bit precision"
@@ -120,26 +122,32 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
 
     if tsyntax in uid.JPEGLSTransferSyntaxes:
         # GDCM always returns JPEG-LS data as color-by-pixel
-        runner.set_option("planar_configuration", 0)
-        bits_stored = runner.get_option("jls_precision", bits_stored)
+        runner.set_frame_option(runner.index, "planar_configuration", 0)
+        bits_stored = runner.get_frame_option(
+            runner.index, "jls_precision", bits_stored
+        )
         if 0 < bits_stored <= 8:
-            runner.set_option("bits_allocated", 8)
+            bits_allocated = 8
         elif 8 < bits_stored <= 16:
-            runner.set_option("bits_allocated", 16)
+            bits_allocated = 16
 
     if tsyntax in uid.JPEG2000TransferSyntaxes:
         # GDCM pixel container size is based on precision
-        bits_stored = runner.get_option("j2k_precision", bits_stored)
+        bits_stored = runner.get_frame_option(
+            runner.index, "j2k_precision", bits_stored
+        )
         if 0 < bits_stored <= 8:
-            runner.set_option("bits_allocated", 8)
+            bits_allocated = 8
         elif 8 < bits_stored <= 16:
-            runner.set_option("bits_allocated", 16)
+            bits_allocated = 16
         elif 16 < bits_stored <= 32:
-            runner.set_option("bits_allocated", 32)
+            bits_allocated = 32
+
+    runner.set_frame_option(runner.index, "bits_allocated", bits_allocated)
 
     pixel_format = gdcm.PixelFormat(
         runner.samples_per_pixel,
-        runner.bits_allocated,
+        bits_allocated,
         bits_stored,
         bits_stored - 1,
         runner.pixel_representation,
@@ -167,10 +175,10 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
         PI.YBR_ICT,
         PI.YBR_RCT,
     ):
-        runner.set_option("photometric_interpretation", PI.RGB)
+        runner.set_frame_option(runner.index, "photometric_interpretation", PI.RGB)
 
     # Signal that single-bit data is represented in unpacked form
-    if original_bits_allocated == 1:
-        runner.set_option("is_bitpacked", False)
+    if runner.bits_allocated == 1:
+        runner.set_frame_option(runner.index, "bits_allocated", 8)
 
     return frame

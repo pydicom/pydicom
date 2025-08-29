@@ -43,15 +43,17 @@ def is_available(uid: str) -> bool:
 
 def _encode_frame(src: bytes, runner: EncodeRunner) -> bytes | bytearray:
     """Return `src` as an encoded codestream."""
-    encoder = cast(Encoder, _ENCODERS[runner.transfer_syntax])
+    runner.set_frame_option(runner.index, "encoding_plugin", "pylibjpeg")
 
+    encoder = cast(Encoder, _ENCODERS[runner.transfer_syntax])
     tsyntax = runner.transfer_syntax
     if tsyntax == uid.RLELossless:
         return cast(bytes, encoder(src, **runner.options))
 
-    if runner.options.get("is_bitpacked", False):
+    if runner.get_frame_option(runner.index, "bits_allocated", 8) == 1:
         pixels_per_frame = runner.rows * runner.columns * runner.samples_per_pixel
         src = cast(bytes, unpack_bits(src, as_array=False)[:pixels_per_frame])
+        runner.set_frame_option(runner.index, "bits_allocated", 8)
 
     opts = dict(runner.options)
     if runner.photometric_interpretation == PI.RGB:

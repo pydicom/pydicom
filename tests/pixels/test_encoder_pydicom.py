@@ -153,10 +153,11 @@ class TestEncodeRLEFrame:
             "bits_allocated": ds.BitsAllocated,
             "bits_stored": ds.BitsStored,
             "number_of_frames": n_frames,
-            "is_bitpacked": pass_as_packed,
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner.set_frame_option(0, "bits_allocated", 1 if pass_as_packed else 8)
+        runner._index = 0
 
         if pass_as_packed:
             input_arr = ds.PixelData
@@ -194,6 +195,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
@@ -225,6 +227,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
@@ -256,6 +259,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
@@ -287,6 +291,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
@@ -318,6 +323,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
@@ -349,6 +355,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(ds.PixelData, runner)
         decoded = _rle_decode_frame(
@@ -377,6 +384,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         msg = (
             r"Unable to encode as the DICOM standard only allows "
@@ -401,6 +409,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = (
@@ -440,6 +449,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = b"\x01\x00\x00\x00\x40\x00\x00\x00" + b"\x00" * 56
@@ -461,6 +471,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = (
@@ -488,6 +499,7 @@ class TestEncodeRLEFrame:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         msg = r"Unsupported option \"byteorder = '>'\""
         with pytest.raises(ValueError, match=msg):
@@ -564,10 +576,11 @@ class TestEncodeDeflatedFrame:
             "bits_allocated": ds.BitsAllocated,
             "bits_stored": ds.BitsStored,
             "number_of_frames": 1,
-            "is_bitpacked": pass_as_packed,
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner.set_frame_option(0, "bits_allocated", 1 if pass_as_packed else 8)
+        runner._index = 0
 
         input_pixel_data = ds.PixelData
         if not pass_as_packed:
@@ -601,6 +614,7 @@ class TestEncodeDeflatedFrame:
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_deflated_frame(ds.PixelData, runner)
         decoded = _deflated_decode_frame(encoded)
@@ -630,6 +644,7 @@ class TestEncodeDeflatedFrame:
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_deflated_frame(ds.PixelData, runner)
         decoded = _deflated_decode_frame(encoded)
@@ -659,6 +674,7 @@ class TestEncodeDeflatedFrame:
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_deflated_frame(ds.PixelData, runner)
         decoded = _deflated_decode_frame(encoded)
@@ -689,6 +705,7 @@ class TestEncodeDeflatedFrame:
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_deflated_frame(ds.PixelData, runner)
         decoded = _deflated_decode_frame(encoded)
@@ -718,6 +735,7 @@ class TestEncodeDeflatedFrame:
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_deflated_frame(ds.PixelData, runner)
         decoded = _deflated_decode_frame(encoded)
@@ -748,6 +766,7 @@ class TestEncodeDeflatedFrame:
         }
         runner = EncodeRunner(DeflatedImageFrameCompression)
         runner.set_options(**kwargs)
+        runner._index = 0
 
         encoded = _encode_deflated_frame(ds.PixelData, runner)
         decoded = _deflated_decode_frame(encoded)

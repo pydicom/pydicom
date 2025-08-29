@@ -548,9 +548,9 @@ class TestNumeric:
         assert ds_json["00091014"]["Value"] == [42]
         assert ds_json["00091015"]["Value"] == [3.14159265]
         assert ds_json["00091102"]["Value"] == [2]
-        assert not "Value" in ds_json["00091103"]
-        assert not "Value" in ds_json["00091104"]
-        assert not "Value" in ds_json["00091105"]
+        assert "Value" not in ds_json["00091103"]
+        assert "Value" not in ds_json["00091104"]
+        assert "Value" not in ds_json["00091105"]
 
     def test_numeric_types(self):
         ds = Dataset()

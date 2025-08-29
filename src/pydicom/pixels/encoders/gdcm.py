@@ -46,6 +46,8 @@ def encode_pixel_data(src: bytes, runner: EncodeRunner) -> bytes:
     bytes
         The encoded image data.
     """
+    runner.set_frame_option(runner.index, "encoding_plugin", "gdcm")
+
     byteorder = runner.get_option("byteorder", "<")
     if byteorder == ">":
         raise ValueError("Unsupported option \"byteorder = '>'\"")
