@@ -52,6 +52,8 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
     bytearray
         The decoded frame, ordered as planar configuration 1.
     """
+    runner.set_frame_option(runner.index, "decoding_plugin", "pydicom")
+
     if runner.transfer_syntax == RLELossless:
         frame = _rle_decode_frame(
             src,
@@ -62,15 +64,14 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
             runner.get_option("rle_segment_order", ">"),
         )
 
-        # Update the runner options to ensure the reshaping is correct
-        # Only do this if we successfully decoded the frame
-        runner.set_option("planar_configuration", 1)
+        # Update the frame's options to ensure the reshaping is correct
+        runner.set_frame_option(runner.index, "planar_configuration", 1)
     else:
         frame = _deflated_decode_frame(src)
 
     # Signal that single bit data is represented in bit-packed form
     if runner.bits_allocated == 1:
-        runner.set_option("is_bitpacked", True)
+        runner.set_frame_option(runner.index, "bits_allocated", 1)
 
     return frame
 

@@ -180,8 +180,8 @@ class TestLibJpegDecoder:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
-        assert meta["bits_allocated"] == 8
-        assert meta["bits_stored"] == 8
+        assert meta[0]["bits_allocated"] == 8
+        assert meta[0]["bits_stored"] == 8
 
     def test_rgb_component_ids(self):
         """Test decoding an incorrect photometric interpretation using cIDs."""
@@ -189,7 +189,7 @@ class TestLibJpegDecoder:
         reference = JPGB_08_08_3_0_1F_RGB
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
-            "'YBR_FULL_422' however the encoded image's codestream uses "
+            "'YBR_FULL_422' however the encoded image codestream for frame 0 uses "
             "component IDs that indicate it should be 'RGB'"
         )
         ds = dcmread(reference.path)
@@ -209,8 +209,8 @@ class TestLibJpegDecoder:
         reference = JPGB_08_08_3_0_1F_YBR_FULL
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
-            "'RGB' however the encoded image's codestream contains a JFIF APP "
-            "marker which indicates it should be 'YBR_FULL_422'"
+            "'RGB' however the encoded image codestream for frame 0 contains a JFIF "
+            "APP marker which indicates it should be 'YBR_FULL_422'"
         )
         ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"
@@ -238,7 +238,7 @@ class TestLibJpegDecoder:
 
         decoder = get_decoder(JPEGLSLossless)
         buffer, meta = decoder.as_buffer(ds, decoding_plugin="pylibjpeg")
-        assert meta["bits_allocated"] == 16
+        assert meta[0]["bits_allocated"] == 16
         arr = np.frombuffer(buffer, dtype="<u2")
         arr = arr.reshape(2, ds.Rows, ds.Columns)
         JLSL_08_07_1_0_1F.test(arr[0], plugin="pylibjpeg")
@@ -248,26 +248,6 @@ class TestLibJpegDecoder:
         np.left_shift(arr, 1, out=arr)
         np.right_shift(arr, 1, out=arr)
         JLSL_16_15_1_1_1F.test(arr[1], plugin="pylibjpeg")
-
-    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
-    def test_j2k_singlebit_as_buffer(self, path):
-        """Test retrieving buffers from single bit J2K."""
-        ds = dcmread(path)
-        arr = ds.pixel_array
-        n_pixels_per_frame = ds.Rows * ds.Columns
-        n_pixels = n_pixels_per_frame * ds.NumberOfFrames
-
-        decoder = get_decoder(JPEG2000Lossless)
-        buffer, meta = decoder.as_buffer(ds, decoding_plugin="pylibjpeg")
-        unpacked_buffer = unpack_bits(buffer)[:n_pixels]
-        assert np.array_equal(unpacked_buffer, arr.flatten())
-
-        for index in range(ds.NumberOfFrames):
-            buffer, meta = decoder.as_buffer(
-                ds, decoding_plugin="pylibjpeg", index=index
-            )
-            unpacked_buffer = unpack_bits(buffer)[:n_pixels_per_frame]
-            assert np.array_equal(unpacked_buffer, arr[index].flatten())
 
     def test_iter_array_ybr_to_rgb(self):
         """Test conversion from YBR to RGB for multi-framed data."""
@@ -378,6 +358,81 @@ class TestOpenJpegDecoder:
             else:
                 assert arr.shape == reference.shape[1:]
 
+    def test_j2k_sign_correction_indexed(self):
+        """Test that sign correction works as expected with `index`"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        arr, meta = decoder.as_array(reference.ds, index=0, decoding_plugin="pylibjpeg")
+        reference.test(arr)
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    def test_j2k_sign_correction_iter(self):
+        """Test that sign correction works as expected with iter_array()"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="pylibjpeg"):
+            reference.test(arr)
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+
+    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
+    def test_j2k_singlebit_as_buffer(self, path):
+        """Test retrieving buffers from single bit J2K."""
+        ds = dcmread(path)
+        arr = ds.pixel_array
+        n_pixels_per_frame = ds.Rows * ds.Columns
+        n_pixels = n_pixels_per_frame * ds.NumberOfFrames
+
+        decoder = get_decoder(JPEG2000Lossless)
+        buffer, meta = decoder.as_buffer(ds, decoding_plugin="pylibjpeg")
+        unpacked_buffer = unpack_bits(buffer)[:n_pixels]
+        assert np.array_equal(unpacked_buffer, arr.flatten())
+
+        for index in range(ds.NumberOfFrames):
+            buffer, meta = decoder.as_buffer(
+                ds, decoding_plugin="pylibjpeg", index=index
+            )
+            unpacked_buffer = unpack_bits(buffer)[:n_pixels_per_frame]
+            assert np.array_equal(unpacked_buffer, arr[index].flatten())
+
+    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
+    def test_j2k_singlebit_iter_buffer(self, path):
+        """Test retrieving buffers from single bit J2K."""
+        ds = dcmread(path)
+        arr = ds.pixel_array
+        nr_pixels = ds.Rows * ds.Columns
+
+        decoder = get_decoder(JPEG2000Lossless)
+        generator = decoder.iter_buffer(ds, decoding_plugin="pylibjpeg")
+        for idx, (buffer, meta) in enumerate(generator):
+            unpacked_buffer = unpack_bits(buffer)[:nr_pixels]
+            assert np.array_equal(unpacked_buffer, arr[idx].flatten())
+
+    def test_j2k_singlebit_excess(self):
+        """Test retrieving buffers from single bit J2K with excess frames."""
+        ds = dcmread(J2KR_1_1_3F.path)
+        ds.NumberOfFrames = 2
+        decoder = get_decoder(JPEG2000Lossless)
+        msg = (
+            "3 frames have been found in the encapsulated pixel data, which is "
+            r"larger than the given \(0028,0008\) 'Number of Frames' value of 2. "
+            "The returned data will include these extra frames and if it's correct "
+            "then you should update 'Number of Frames' accordingly, otherwise pass "
+            "'allow_excess_frames=False' to return only the first 2 frames."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            buffer, meta = decoder.as_buffer(ds, decoding_plugin="pylibjpeg")
+
+        assert len(buffer) == (3 * 512 * 512) // 8
+        assert len(meta) == 3
+
+        buffer, meta = decoder.as_buffer(
+            ds, allow_excess_frames=False, decoding_plugin="pylibjpeg"
+        )
+        assert len(buffer) == (2 * 512 * 512) // 8
+        assert len(meta) == 2
+
 
 @pytest.mark.skipif(SKIP_RLE, reason="Test is missing dependencies")
 class TestRleDecoder:
@@ -399,8 +454,9 @@ class TestRleDecoder:
         buffer, meta = decoder.as_buffer(
             reference.ds, raw=True, decoding_plugin="pylibjpeg"
         )
-        if meta["samples_per_pixel"] > 1:
-            assert meta["planar_configuration"] == 1
+        for idx in meta:
+            if meta[idx]["samples_per_pixel"] > 1:
+                assert meta[idx]["planar_configuration"] == 1
 
     def test_singlebit_raises(self):
         """Currently single bit is not supported, check error raised."""
@@ -409,8 +465,8 @@ class TestRleDecoder:
         msg = (
             "Unable to decode as exceptions were raised by all "
             "available plugins:\n  pylibjpeg: pylibjpeg cannot "
-            "decompress RLE Lossless encoded data with bits "
-            "allocated = 1."
+            r"decompress RLE Lossless encoded data with \(0028,0100\) 'Bits "
+            "Allocated' = 1"
         )
         with pytest.raises(RuntimeError, match=msg):
             decoder.as_array(reference.ds, decoding_plugin="pylibjpeg")

@@ -17,9 +17,10 @@ except ImportError:
     pass
 
 from pydicom import dcmread
-from pydicom.encaps import get_frame
-from pydicom.pixels import get_decoder
+from pydicom.encaps import encapsulate, get_frame
+from pydicom.pixels import get_decoder, convert_color_space
 from pydicom.pixels.decoders.pillow import is_available
+from pydicom.pixels.utils import unpack_bits, _get_jpg_parameters
 from pydicom.uid import (
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
@@ -33,6 +34,10 @@ from .pixels_reference import (
     JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
     J2KR_16_10_1_0_1F_M1,
+    JPGB_08_08_3_0_1F_RGB_APP14,  # Adobe APP14 in RGB
+    J2KR_16_13_1_1_1F_M2_MISMATCH,  # Pixel Representation mismatch to J2K codestream
+    J2KR_1_1_3F,
+    J2KR_1_1_3F_NONALIGNED,
 )
 
 
@@ -85,12 +90,12 @@ class TestLibJpegDecoder:
             assert arr.flags.writeable
 
     def test_rgb_component_ids(self):
-        """Test decoding an incorrect photometric interpretation using cIDs."""
+        """Test decoding an incorrect photometric interpretation using CIDs."""
         decoder = get_decoder(JPEGBaseline8Bit)
         reference = JPGB_08_08_3_0_1F_RGB
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
-            "'YBR_FULL_422' however the encoded image's codestream uses "
+            "'YBR_FULL_422' however the encoded image codestream for frame 0 uses "
             "component IDs that indicate it should be 'RGB'"
         )
         ds = dcmread(reference.path)
@@ -110,19 +115,96 @@ class TestLibJpegDecoder:
         reference = JPGB_08_08_3_0_1F_YBR_FULL
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
-            "'RGB' however the encoded image's codestream contains a JFIF APP "
-            "marker which indicates it should be 'YBR_FULL_422'"
+            "'RGB' however the encoded image codestream for frame 0 contains a JFIF "
+            "APP marker which indicates it should be 'YBR_FULL_422'"
         )
         ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"
         with pytest.warns(UserWarning, match=msg):
             arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
 
-        reference.test(arr, plugin="pylibjpeg")
+        reference.test(arr, plugin="pillow")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
         assert arr.flags.writeable
         assert meta["photometric_interpretation"] == "YBR_FULL_422"
+
+    def test_adobe_color_space(self):
+        """Test color space conversions if Adobe APP14 is present."""
+        reference = JPGB_08_08_3_0_1F_RGB_APP14
+        ds = dcmread(reference.path)
+        decoder = get_decoder(JPEGBaseline8Bit)
+
+        # Color space is in RGB so no transform needed
+        assert ds.PhotometricInterpretation == "RGB"
+        arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+        reference.test(arr, plugin="pillow")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "RGB"
+
+        # Again, no conversion should be applied as already RGB
+        arr, meta = decoder.as_array(ds, raw=False, decoding_plugin="pillow")
+        reference.test(arr, plugin="pillow")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+        assert meta["photometric_interpretation"] == "RGB"
+
+        ds.PhotometricInterpretation = "YBR_FULL"
+        msg = "contains an Adobe APP14 marker which indicates it should be 'RGB'"
+        with pytest.warns(UserWarning, match=msg):
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+
+        # Change apparent color space to YCbCr
+        codestream = bytearray(get_frame(ds.PixelData, 0, number_of_frames=1))
+        codestream[17] = 1
+        ds.PixelData = encapsulate([codestream])
+        ds.PhotometricInterpretation = "RGB"
+
+        msg = (
+            "contains an Adobe APP14 marker which indicates it should be 'YBR_FULL_422'"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+
+        # No conversion should be used with raw=True so should match reference
+        assert meta["photometric_interpretation"] == "YBR_FULL_422"
+        reference.test(arr, plugin="pillow")
+        assert arr.shape == reference.shape
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+        # With raw=False Pillow should apply a YCbCr -> RGB conversion
+        ref = convert_color_space(arr, "YBR_FULL", "RGB")
+        with pytest.warns(UserWarning, match=msg):
+            arr, meta = decoder.as_array(ds, raw=False, decoding_plugin="pillow")
+
+        assert meta["photometric_interpretation"] == "RGB"
+        assert np.allclose(arr, ref, atol=1)
+
+    def test_no_adobe_app_marker(self):
+        """Test color space conversions without an Adobe APP14 marker."""
+        reference = JPGB_08_08_3_0_1F_RGB_APP14
+        ds = dcmread(reference.path)
+        ref = ds.pixel_array
+        codestream = b"\xff\xd8" + get_frame(ds.PixelData, 0, number_of_frames=1)[18:]
+        meta = _get_jpg_parameters(codestream)
+        assert "app" not in meta
+        ds.PixelData = encapsulate([codestream])
+
+        # Original is in RGB, but we want it to do a conversion
+        ds.PhotometricInterpretation = "YBR_FULL"
+        decoder = get_decoder(JPEGBaseline8Bit)
+        arr, meta = decoder.as_array(ds, decoding_plugin="pillow")
+        assert meta["photometric_interpretation"] == "RGB"
+        assert np.allclose(arr, convert_color_space(ref, "YBR_FULL", "RGB"), atol=1)
+
+        # If raw=True do no conversion
+        arr, meta = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+        assert meta["photometric_interpretation"] == "YBR_FULL"
+        assert np.array_equal(arr, ref)
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
@@ -188,3 +270,39 @@ class TestOpenJpegDecoder:
                 samples_per_pixel=3,
                 planar_configuration=0,
             )
+
+    def test_j2k_sign_correction_indexed(self):
+        """Test that sign correction works as expected with `index`"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        arr, meta = decoder.as_array(reference.ds, index=0, decoding_plugin="pillow")
+        reference.test(arr)
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    def test_j2k_sign_correction_iter(self):
+        """Test that sign correction works as expected with iter_array()"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="pillow"):
+            reference.test(arr)
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+
+    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
+    def test_j2k_singlebit_as_buffer(self, path):
+        """Test retrieving buffers from single bit J2K."""
+        ds = dcmread(path)
+        arr = ds.pixel_array
+        n_pixels_per_frame = ds.Rows * ds.Columns
+        n_pixels = n_pixels_per_frame * ds.NumberOfFrames
+
+        decoder = get_decoder(JPEG2000Lossless)
+        buffer, meta = decoder.as_buffer(ds, decoding_plugin="pillow")
+        unpacked_buffer = unpack_bits(buffer)[:n_pixels]
+        assert np.array_equal(unpacked_buffer, arr.flatten())
+
+        for index in range(ds.NumberOfFrames):
+            buffer, meta = decoder.as_buffer(ds, decoding_plugin="pillow", index=index)
+            unpacked_buffer = unpack_bits(buffer)[:n_pixels_per_frame]
+            assert np.array_equal(unpacked_buffer, arr[index].flatten())

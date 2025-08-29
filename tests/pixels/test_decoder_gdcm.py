@@ -19,7 +19,7 @@ from pydicom.pixels import get_decoder
 from pydicom.pixels.decoders import gdcm
 from pydicom.pixels.decoders.gdcm import _decode_frame
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.pixels.utils import _passes_version_check
+from pydicom.pixels.utils import _passes_version_check, unpack_bits
 from pydicom.uid import (
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
@@ -41,6 +41,8 @@ from .pixels_reference import (
     JPGB_08_08_3_0_1F_RGB,  # has RGB component IDs
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
     RLE_32_1_1F,
+    J2KR_1_1_3F,
+    J2KR_1_1_3F_NONALIGNED,
 )
 
 
@@ -193,7 +195,7 @@ class TestDecoding:
         arr = arr.reshape((ds.Rows, ds.Columns))
         JLSN_08_01_1_0_1F.test(arr)
         assert arr.shape == JLSN_08_01_1_0_1F.shape
-        assert meta["bits_allocated"] == 8
+        assert meta[0]["bits_allocated"] == 8
 
     def test_jls_lossy_signed_raises(self):
         """Test decoding JPEG-LS signed with < 8-bits raises."""
@@ -220,7 +222,7 @@ class TestDecoding:
         reference = JPGB_08_08_3_0_1F_RGB
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
-            "'YBR_FULL_422' however the encoded image's codestream uses "
+            "'YBR_FULL_422' however the encoded image codestream for frame 0 uses "
             "component IDs that indicate it should be 'RGB'"
         )
         ds = dcmread(reference.path)
@@ -240,8 +242,8 @@ class TestDecoding:
         reference = JPGB_08_08_3_0_1F_YBR_FULL
         msg = (
             r"The \(0028,0004\) 'Photometric Interpretation' value is "
-            "'RGB' however the encoded image's codestream contains a JFIF APP "
-            "marker which indicates it should be 'YBR_FULL_422'"
+            "'RGB' however the encoded image codestream for frame 0 contains a JFIF "
+            "APP marker which indicates it should be 'YBR_FULL_422'"
         )
         ds = dcmread(reference.path)
         ds.PhotometricInterpretation = "RGB"
@@ -276,6 +278,7 @@ class TestDecoding:
         }
         runner = DecodeRunner(JPEGBaseline8Bit)
         runner.set_options(**kwargs)
+        runner._index = 0
         frame = get_frame(ds.PixelData, 0, number_of_frames=1)
         unconverted = _decode_frame(frame, runner)
 
@@ -307,6 +310,7 @@ class TestDecoding:
         }
         runner = DecodeRunner(JPEG2000Lossless)
         runner.set_options(**kwargs)
+        runner._index = 0
         frame = get_frame(ds.PixelData, 0, number_of_frames=1)
         unconverted = _decode_frame(frame, runner)
 
@@ -339,6 +343,7 @@ class TestDecoding:
         }
         runner = DecodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
         frame = get_frame(ds.PixelData, 0, number_of_frames=1)
         unconverted = _decode_frame(frame, runner)
 
@@ -369,6 +374,42 @@ class TestDecoding:
         )
         with pytest.raises(RuntimeError, match=msg):
             ds.pixel_array
+
+    def test_j2k_sign_correction_indexed(self):
+        """Test that sign correction works as expected with `index`"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        arr, _ = decoder.as_array(reference.ds, index=0, decoding_plugin="gdcm")
+        reference.test(arr)
+        assert arr.dtype == reference.dtype
+        assert arr.flags.writeable
+
+    def test_j2k_sign_correction_iter(self):
+        """Test that sign correction works as expected with iter_array()"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        decoder = get_decoder(JPEG2000Lossless)
+        for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="gdcm"):
+            reference.test(arr)
+            assert arr.dtype == reference.dtype
+            assert arr.flags.writeable
+
+    @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
+    def test_j2k_singlebit_as_buffer(self, path):
+        """Test retrieving buffers from single bit J2K."""
+        ds = dcmread(path)
+        arr = ds.pixel_array
+        n_pixels_per_frame = ds.Rows * ds.Columns
+        n_pixels = n_pixels_per_frame * ds.NumberOfFrames
+
+        decoder = get_decoder(JPEG2000Lossless)
+        buffer, meta = decoder.as_buffer(ds, decoding_plugin="gdcm")
+        unpacked_buffer = unpack_bits(buffer)[:n_pixels]
+        assert np.array_equal(unpacked_buffer, arr.flatten())
+
+        for index in range(ds.NumberOfFrames):
+            buffer, meta = decoder.as_buffer(ds, decoding_plugin="gdcm", index=index)
+            unpacked_buffer = unpack_bits(buffer)[:n_pixels_per_frame]
+            assert np.array_equal(unpacked_buffer, arr[index].flatten())
 
 
 @pytest.fixture()

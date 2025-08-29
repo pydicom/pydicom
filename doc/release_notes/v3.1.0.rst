@@ -6,6 +6,13 @@ Changes
 
 * DICOM dictionary updated to 2024d.
 * Prefer using pylibjpeg over GDCM when encoding *RLE Lossless*.
+* Prefer using Pillow when decoding *JPEG Baseline 8-bit* and *JPEG Extended 12-bit*
+* Improvements made to communications with the plugins when decoding and encoding pixel
+  data and correcting for inter-frame decoding variations in multi-frame datasets (:pr:``).
+* The metadata returned by :meth:`Decoder.as_buffer
+  <pydicom.pixels.decoders.base.Decoder.as_buffer>` is now a ``dict`` containing the
+  per-frame metadata to help account for inter-frame variations in frame properties
+  when decoding.
 
 Fixes
 -----
@@ -48,10 +55,10 @@ Enhancements
 * Updated UIDs to version 2024d of the DICOM Standard
 * The following UID constants have been added:
 
-    * :attr:`~pydicom.uid.JPEGXLLossless`
-    * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
-    * :attr:`~pydicom.uid.JPEGXL`
-    * :attr:`~pydicom.uid.DeflatedImageFrameCompression`
+  * :attr:`~pydicom.uid.JPEGXLLossless`
+  * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
+  * :attr:`~pydicom.uid.JPEGXL`
+  * :attr:`~pydicom.uid.DeflatedImageFrameCompression`
 * Added ability to specify tag numbers in the CLI commands (allows private tags to be specified)
 * Removed `exec` and `eval` from tests, CLI, and scripts for improved security (:issue:`2193`)
 * Added support for up to 16-bit input images to :func:`~pydicom.pixels.convert_color_space`
@@ -63,3 +70,7 @@ Enhancements
   where an error occurred.  Activated using `with dataset:` context; already used internally in key
   locations (:issue:`2168`)
 * Added support for adding unknown public transfer syntaxes to :func:`~pydicom.uid.register_transfer_syntax`
+* When decoding JPEG pixel data use Pillow's color transformations rather than
+  :func:`~pydicom.pixels.convert_color_space` where applicable (:issue:`2228`)
+* Take the color space information from an Adobe APP14 marker into account when decoding
+  pixel data for JPEG transfer syntaxes.

@@ -2918,6 +2918,7 @@ class TestConvertRLEEndianness:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
         encoded = _encode_rle_frame(ds.PixelData, runner)
 
         # Only the header should be changed
@@ -2949,6 +2950,7 @@ class TestConvertRLEEndianness:
         }
         runner = EncodeRunner(RLELossless)
         runner.set_options(**kwargs)
+        runner._index = 0
         encoded = _encode_rle_frame(ref.tobytes(), runner)
 
         # Original encoded lengths are 4454, 16840, 3600, 16840, 4428, 16840
