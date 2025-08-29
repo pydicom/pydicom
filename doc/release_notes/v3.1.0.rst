@@ -8,7 +8,7 @@ Changes
 * Prefer using pylibjpeg over GDCM when encoding *RLE Lossless*.
 * Prefer using Pillow when decoding *JPEG Baseline 8-bit* and *JPEG Extended 12-bit*
 * Improvements made to communications with the plugins when decoding and encoding pixel
-  data and correcting for inter-frame decoding variations in multi-frame datasets (:pr:``).
+  data and correcting for inter-frame decoding variations in multi-frame datasets (:pr:`2262`).
 * The metadata returned by :meth:`Decoder.as_buffer
   <pydicom.pixels.decoders.base.Decoder.as_buffer>` is now a ``dict`` containing the
   per-frame metadata to help account for inter-frame variations in frame properties

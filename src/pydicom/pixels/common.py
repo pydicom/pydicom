@@ -512,9 +512,7 @@ class RunnerBase:
 
     @property
     def index(self) -> int:
-        """Return the index of the frame currently being encoded or decoded. Only
-        available for encapsulated transfer syntaxes.
-        """
+        """Return the index of the frame currently being encoded or decoded."""
         if hasattr(self, "_index"):
             return self._index
 
