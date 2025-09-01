@@ -110,7 +110,7 @@ A decoding plugin must implement three objects within the same module:
   * ``j2k_precision``: :class:`int` - the precision used in the JPEG 2000 codestream
     for the frame being decoded (JPEG 2000 transfer syntaxes only).
   * ``j2k_is_signed``: :class:`bool` - whether the JPEG 2000 codestream for the frame
-    frame being decoded uses signed integers or not (JPEG 2000 transfer syntaxes only).
+    being decoded uses signed integers or not (JPEG 2000 transfer syntaxes only).
 
   The values for these frame options should be set appropriately to match the decoded
   pixel data returned by the plugin. For example, if a frame's original
