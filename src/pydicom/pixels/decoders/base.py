@@ -163,6 +163,7 @@ def _process_color_space(
             per_frame=True,
             bit_depth=runner.bits_stored,
         )
+        # All frames have been converted, safe to update the runner option
         if index is None:
             changes["photometric_interpretation"] = PI.YBR_FULL
 
@@ -216,10 +217,11 @@ def _process_color_space(
         return arr
 
     # Either:
-    #   All frames are being converted and the frame indices match the array indices
-    #   A single frame is being converted and its index may not match the array index
+    # Multiple frames are being converted and frame indices match the array indices
+    # A single frame is being converted and its index may not match the array index
     for idx, current_pi, to_rgb in indices_pi_to_rgb:
         if to_rgb:
+            # Match the frame to the correct array index
             dst = None if runner.number_of_frames == 1 or index is not None else idx
             arr[dst] = convert_color_space(
                 arr[dst],
@@ -304,11 +306,13 @@ def _apply_sign_correction(
         container_size = 8 * arr.dtype.itemsize
         pixel_representation = runner.pixel_representation
         if index is None:
+            # Correct all frames
             signs = [
                 meta.get("j2k_is_signed", pixel_representation)
                 for meta in runner._frame_meta.values()
             ]
         else:
+            # Correct only the frame at `index`
             signs = [
                 runner.get_frame_option(index, "j2k_is_signed", pixel_representation)
             ]
@@ -405,10 +409,12 @@ class DecodeRunner(RunnerBase):
         self._previous: tuple[str, DecodeFunction]
 
         # The frame currently being decoded
-        # Not useful for native encodig with Decoder.as_array(..., index=None)
+        # Not useful for decoding native with Decoder.as_array(..., index=None)
         self._index: int
         # The frame meta information, keyed to the frame index
-        # Frame indices are not guaranteed to start at 0, be sequential, or ordered
+        # When decoding with `index=None`, frame indices start at 0 and are sequential
+        #   otherwise the indices may not start at 0 and/or may not be sequential or
+        #   ordered
         self._frame_meta: dict[int, FrameOptions] = {}
 
         if self.is_encapsulated:
@@ -668,8 +674,7 @@ class DecodeRunner(RunnerBase):
             self._index = idx
             self._frame_set_options(idx, src)
 
-            # This may have been overridden by the plugin by the previous
-            # frame
+            # This may have been overridden by the plugin by the previous frame
             self.set_option("bits_allocated", original_bits_allocated)
 
             # Try the previously successful decoder first (if available)
@@ -738,7 +743,8 @@ class DecodeRunner(RunnerBase):
         self, index: int | None, as_frame: bool = False
     ) -> dict[str, str | int]:
         """Return a dict containing the :dcm:`Image Pixel
-        <part03/sect_C.7.6.3.html>` module related properties.
+        <part03/sect_C.7.6.3.html>` module related properties, must be called after
+        decoding frame `index` has been completed.
 
         .. versionchanged:: 3.1
 
@@ -773,14 +779,6 @@ class DecodeRunner(RunnerBase):
             * `number_of_frames`
             * `planar_configuration` (if `samples_per_pixel` > 1)
             * `pixel_representation` (if the pixel keyword is ``"PixelData"``)
-
-            The returned values depend on whether or not this method is
-            called before or after decoding the pixel data, as the decoding
-            plugins and image processing functions may update the values as
-            needed to reflect the corresponding decoded data. For example, if
-            the pixel data is converted from the YCbCr to RGB color space then
-            the `photometric_interpretation` value will be changed to match
-            after the data has been decoded.
         """
         as_frame = False if config._use_future else as_frame
         if as_frame:
@@ -797,7 +795,6 @@ class DecodeRunner(RunnerBase):
             "rows": self.rows,
             "samples_per_pixel": self.samples_per_pixel,
         }
-
         if self.pixel_keyword == "PixelData":
             d["bits_stored"] = self.bits_stored
             d["pixel_representation"] = self.pixel_representation
@@ -846,8 +843,8 @@ class DecodeRunner(RunnerBase):
         ----------
         arr : np.ndarray
             The image data to process, may be the entire single or multi-framed pixel
-            data and (if `index` is ``None``) or the data from a single frame
-            (if `index` is not ``None``).
+            data (if `index` is ``None``) or the data from a single frame (if `index`
+            is not ``None``).
         index : int | None
             If ``None`` then `arr` contains the entire pixel data and may be single or
             multi-framed, otherwise `arr` contains the data from the single frame
@@ -886,8 +883,7 @@ class DecodeRunner(RunnerBase):
         Parameters
         ----------
         arr : np.ndarray
-            The 1D array to be reshaped. For encapsulated pixel data `arr` may only
-            contain data from a single frame and `index` may not be ``None``.
+            The 1D array to be reshaped.
         index : int | None
             If ``None`` then `arr` contains the entire (single or multi-framed) pixel
             data, otherwise `arr` contains a single frame's worth of pixel data for
@@ -1407,7 +1403,7 @@ class Decoder(CoderBase):
         #   itemsize (such as bits allocated 16 and JPEG with precision 8 only
         #   returning 8-bit data rather than 16-bit)
         # We account for this by interpreting each frame using that decoded size,
-        #   then either inserting it into the preallocated array or using
+        #   then either inserting it into the preallocated output array or using
         #   ndarray.astype() to upscale (if required)
         pixels_per_frame = cast(int, runner.frame_length(unit="pixels"))
 
@@ -1432,6 +1428,7 @@ class Decoder(CoderBase):
 
             return runner.reshape(frame, index)
 
+        # Return all frames
         # Preallocate the output array, individual frames will be placed into it
         # The output dtype is based off the original input parameters
         number_of_frames = runner.number_of_frames
@@ -1441,6 +1438,7 @@ class Decoder(CoderBase):
             runner.columns,
             runner.samples_per_pixel,
         )
+        # squeeze() will reduce shape (1, R, C, 1) to (R, C)
         arr = np.empty(shape, dtype=runner.pixel_dtype).squeeze()
 
         frame_generator = runner.iter_decode()
@@ -1613,7 +1611,7 @@ class Decoder(CoderBase):
                     "original buffer for bit-packed pixel data"
                 )
 
-            # Number of bits to remove from the start after unpacking in
+            # Number of bits to remove from the start after unpacking
             bit_offset_start = 0
 
             if index is None:
@@ -1651,10 +1649,10 @@ class Decoder(CoderBase):
         out[2::6], out[5::6] = arr[3::4], arr[3::4]  # R
 
         # Resampling affects entire pixel data, can safely set the photometric interp.
-        runner.set_option("photometric_interpretation", PI.YBR_FULL)
+        if index is None:
+            runner.set_option("photometric_interpretation", PI.YBR_FULL)
 
-        # FIXME: Can this only affect a single frame?
-        for idx in range(runner.number_of_frames):
+        for idx in indices:
             runner.set_frame_option(idx, "photometric_interpretation", PI.YBR_FULL)
 
         return runner.reshape(out, index)
@@ -1806,8 +1804,6 @@ class Decoder(CoderBase):
             "packed", with 8 pixels in a single byte.
 
         """
-        original_bits_allocated = runner.bits_allocated
-
         if index is not None:
             frame = runner.decode(index)
             length_bytes = runner.frame_length(unit="bytes", index=index)
@@ -1825,7 +1821,6 @@ class Decoder(CoderBase):
 
         # Return all frames
         frames = []
-        bits_allocated = []
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
             frame = next(frame_generator)
@@ -1841,9 +1836,6 @@ class Decoder(CoderBase):
                 runner.set_frame_option(runner.index, "bits_allocated", 1)
 
             frames.append(frame)
-
-            # Reset bits allocated so it is correct for the next frame
-            runner.set_option("bits_allocated", original_bits_allocated)
 
         # Check to see if we have any more frames available
         #   Should only apply to JPEG transfer syntaxes
@@ -1861,7 +1853,7 @@ class Decoder(CoderBase):
             if excess:
                 number_of_frames = runner.number_of_frames
                 warn_and_log(
-                    f"{len(excess) + len(frames)} frames have been found in the "
+                    f"{len(excess) + number_of_frames} frames have been found in the "
                     "encapsulated pixel data, which is larger than the given "
                     f"(0028,0008) 'Number of Frames' value of {number_of_frames}. "
                     "The returned data will include these extra frames and if it's "
@@ -2184,7 +2176,6 @@ class Decoder(CoderBase):
         indices = indices if indices else range(runner.number_of_frames)
         for idx in indices:
             arr = func(runner, idx)
-
             if runner._test_for("sign_correction"):
                 arr = _apply_sign_correction(arr, runner, idx)
             elif runner._test_for("shift_correction"):

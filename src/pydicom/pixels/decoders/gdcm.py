@@ -144,7 +144,6 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
             bits_allocated = 32
 
     runner.set_frame_option(runner.index, "bits_allocated", bits_allocated)
-
     pixel_format = gdcm.PixelFormat(
         runner.samples_per_pixel,
         bits_allocated,
@@ -163,9 +162,9 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
     # On big endian systems GDCM returns decoded data as big endian :(
     if runner._test_for("gdcm_be_system"):
         b = bytearray(frame)
-        if runner.bits_allocated == 16:
+        if bits_allocated == 16:
             b[::2], b[1::2] = b[1::2], b[::2]
-        elif runner.bits_allocated == 32:
+        elif bits_allocated == 32:
             b[::4], b[1::4], b[2::4], b[3::4] = b[3::4], b[2::4], b[1::4], b[::4]
 
         frame = bytes(b)

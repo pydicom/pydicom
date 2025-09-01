@@ -102,7 +102,7 @@ class EncodeRunner(RunnerBase):
         # The frame currently being encoded
         self._index: int
         # The frame meta information, keyed to the frame index
-        # Frame indices are not guaranteed to start at 0, but are sequential and ordered
+        # Frame indices are not guaranteed to start at 0, but are sequential
         self._frame_meta: dict[int, FrameOptions] = {}
 
     def encode(self, index: int | None) -> bytes:

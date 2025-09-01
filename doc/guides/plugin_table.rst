@@ -92,7 +92,7 @@ Plugin requirements and limitations
 | Plugin        | Requires                                  | Known limitations                                                   |
 +===============+===========================================+===============================+=====================================+
 | ``pylibjpeg`` | `pylibjpeg <pylj_>`_ and at least one of  | * Maximum supported *Bits Stored* for JPEG 2000 and HTJ2K is 24     |
-|               | `pylibjpeg-libjpeg <pylj-lj_>`_,          | * Slower than ``pillow`` to decode *JPEG Baseline* and *JPEG        |
+|               | `pylibjpeg-libjpeg <pylj-lj_>`_,          | * Slower than ``pillow`` to decode *JPEG Baseline 8-bit* and *JPEG  |
 |               | `pylibjpeg-openjpeg <pylj-oj_>`_ and      |   Extended 12-bit*, especially if needing to convert to RGB         |
 |               | `pylibjpeg-rle <pylj-rle_>`_              |                                                                     |
 +---------------+-------------------------------------------+---------------------------------------------------------------------+
@@ -102,7 +102,7 @@ Plugin requirements and limitations
 |               |                                           | * *JPEG-LS Lossless* and *JPEG-LS Near Lossless* only if            |
 |               |                                           |   *Bits Stored* is not 6 or 7                                       |
 |               |                                           | * Maximum supported *Bits Stored* is 16                             |
-|               |                                           | * Slower than ``pillow`` to decode *JPEG Baseline* and *JPEG        |
+|               |                                           | * Slower than ``pillow`` to decode *JPEG Baseline 8-bit* and *JPEG  |
 |               |                                           |   Extended 12-bit*, especially if needing to convert to RGB         |
 +---------------+-------------------------------------------+---------------------------------------------------------------------+
 | ``pillow``    | `Pillow <pil_>`_, with support for JPEG   | * *JPEG Extended 12-bit* is only available if *Bits Allocated* is 8 |

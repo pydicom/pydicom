@@ -270,9 +270,6 @@ class FrameOptions(TypedDict, total=False):
 
     ## DecodeRunner
     decoding_plugin: str
-
-    # Pixel data description options
-    bits_allocated: int  # bits_allocated 1 indicates the frame data is bit-packed
     photometric_interpretation: str
     planar_configuration: int
 
@@ -283,6 +280,9 @@ class FrameOptions(TypedDict, total=False):
 
     ## EncodeRunner
     encoding_plugin: str
+
+    ## DecodeRunner and EncodeRunner
+    bits_allocated: int  # bits_allocated 1 indicates the frame data is bit-packed
 
 
 # TODO: Python 3.11 switch to StrEnum

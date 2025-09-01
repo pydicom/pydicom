@@ -98,8 +98,8 @@ A decoding plugin must implement three objects within the same module:
   by the plugin using the :meth:`~pydicom.pixels.decoders.base.DecodeRunner.get_frame_option`
   and :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_frame_option` methods:
 
-  * ``bits_allocated``: :class:`int` - the number of bits used to contain
-    each pixel in the decoded frame, should be 1 or a multiple of 8.
+  * ``bits_allocated``: :class:`int` - the number of bits used to contain each pixel
+    in the decoded frame, should be 1 (for bit-packed data) or a multiple of 8.
   * ``photometric_interpretation``: :class:`str` - the color space of the decoded
     frame, such as ``'YBR_FULL'``.
   * ``planar_configuration``: :class:`int` - the order of the pixels in the decoded
@@ -111,8 +111,6 @@ A decoding plugin must implement three objects within the same module:
     for the frame being decoded (JPEG 2000 transfer syntaxes only).
   * ``j2k_is_signed``: :class:`bool` - whether the JPEG 2000 codestream for the frame
     frame being decoded uses signed integers or not (JPEG 2000 transfer syntaxes only).
-  * ``is_bitpacked``: :class:`bool` - whether or not the frame's data has been
-    bit-packed.
 
   The values for these frame options should be set appropriately to match the decoded
   pixel data returned by the plugin. For example, if a frame's original
