@@ -76,11 +76,12 @@ A decoding plugin must implement three objects within the same module:
   * ``number_of_frames``: :class:`int` - the number of image frames
     contained in `src`
   * ``bits_allocated``: :class:`int` - the number of bits used to contain
-    each pixel in `src`, should be a multiple of 8.
+    each pixel in `src`, should be 1 or a multiple of 8.
   * ``photometric_interpretation``: :class:`str` - the color space
     of the encoded data, such as ``'YBR_FULL'``
   * ``pixel_keyword``: :class:`str` - one of ``"PixelData"``, ``"FloatPixelData"``,
     ``"DoubleFloatPixelData"``.
+  * ``as_rgb``: :class:`bool` - whether or not YCbCr data should be converted to RGB.
 
   And conditionally:
 
@@ -93,14 +94,29 @@ A decoding plugin must implement three objects within the same module:
   * ``planar_configuration``: :class:`int` - required when ``samples_per_pixel``
     > 1, ``0`` for color-by-pixel, ``1`` for color-by-plane.
 
-  If your decoder needs to signal that one of the decoding option values needs
-  to be modified then this can be done with the
-  :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_option` method. This
-  should only be done after successfully decoding the frame, as if the
-  decoding fails changing the option value may cause issues with
-  other decoding plugins that may also attempt to decode the same frame. It's also
-  important to be aware that any changes you make will also affect following frames
-  (if any).
+  In addition, the following options for individual frames can be set or retrieved
+  by the plugin using the :meth:`~pydicom.pixels.decoders.base.DecodeRunner.get_frame_option`
+  and :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_frame_option` methods:
+
+  * ``bits_allocated``: :class:`int` - the number of bits used to contain each pixel
+    in the decoded frame, should be 1 (for bit-packed data) or a multiple of 8.
+  * ``photometric_interpretation``: :class:`str` - the color space of the decoded
+    frame, such as ``'YBR_FULL'``.
+  * ``planar_configuration``: :class:`int` - the order of the pixels in the decoded
+    frame, available when ``samples_per_pixel`` > 1, ``0`` for color-by-pixel, ``1``
+    for color-by-plane.
+  * ``jls_precision`` :class:`int` - the precision used in the JPEG-LS codestream for
+    the frame being decoded (JPEG-LS transfer syntaxes only).
+  * ``j2k_precision``: :class:`int` - the precision used in the JPEG 2000 codestream
+    for the frame being decoded (JPEG 2000 transfer syntaxes only).
+  * ``j2k_is_signed``: :class:`bool` - whether the JPEG 2000 codestream for the frame
+    being decoded uses signed integers or not (JPEG 2000 transfer syntaxes only).
+
+  The values for these frame options should be set appropriately to match the decoded
+  pixel data returned by the plugin. For example, if a frame's original
+  ``photometric_interpretation`` is ``YBR_FULL`` and the plugin converts it to ``RGB``
+  then you should use :meth:`~pydicom.pixels.decoders.base.DecodeRunner.set_frame_option`
+  to reflect the change in color space.
 
   When possible it's recommended that the decoding function return the decoded
   pixel data as a :class:`bytearray` to minimize later memory usage.

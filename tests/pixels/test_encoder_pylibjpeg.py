@@ -417,7 +417,7 @@ class TestJ2KLosslessEncoding:
                 assert np.array_equal(out, ref)
 
     def test_arr_i2_spp1(self):
-        """Test signed bits allocated 8, bits stored (1, 16), samples per pixel 1"""
+        """Test signed bits allocated 16, bits stored (1, 16), samples per pixel 1"""
         ds = examples.ct
         opts = {
             "rows": ds.Rows,
@@ -455,7 +455,7 @@ class TestJ2KLosslessEncoding:
                 assert np.array_equal(out, ref)
 
     def test_arr_i4_spp1(self):
-        """Test signed bits allocated 8, bits stored (1, 24), samples per pixel 1"""
+        """Test signed bits allocated 32, bits stored (1, 24), samples per pixel 1"""
         ds = examples.ct
         opts = {
             "rows": ds.Rows,

@@ -30,6 +30,8 @@ def is_available(uid: str) -> bool:
 
 def _encode_frame(src: bytes, runner: EncodeRunner) -> bytearray:
     """Return the image data in `src` as a JPEG-LS encoded codestream."""
+    runner.set_frame_option(runner.index, "encoding_plugin", "pylibjpeg")
+
     lossy_error = runner.get_option("jls_error", 0)
     if lossy_error and runner.transfer_syntax == uid.JPEGLSLossless:
         raise ValueError(

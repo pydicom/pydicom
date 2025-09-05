@@ -63,7 +63,7 @@ An encoding plugin must implement three objects within the same module:
     * ``'number_of_frames'``: :class:`int` - the number of image frames
       contained in `src`
     * ``'bits_allocated'``: :class:`int` - the number of bits used to contain
-      each pixel in `src`, should be a multiple of 8.
+      each pixel in `src`, should be 1 or a multiple of 8.
     * ``'bits_stored'``: :class:`int` - the number of bits actually used by
       each pixel in `src`, e.g. 12-bit pixel data (range 0 to 4095) will be
       contained by 16-bits (range 0 to 65535).
@@ -73,14 +73,13 @@ An encoding plugin must implement three objects within the same module:
     * ``'photometric_interpretation'``: :class:`str` - the intended color space
       of the encoded data, such as ``'YBR_FULL'``
 
-    If your encoder needs to signal that one of the encoding option values needs
-    to be modified then this can be done with the
-    :meth:`~pydicom.pixels.encoders.base.EncodeRunner.set_option` method. This
-    should only be done after successfully encoding the frame, as if the
-    encoding fails changing the option value may cause issues with
-    other encoding plugins that may also attempt to encode the same frame. It's also
-    important to be aware that any changes you make will also affect following frames
-    (if any).
+    In addition, the following option for individual frames can be set or retrieved
+    by the plugin using the
+    :meth:`~pydicom.pixels.encoders.base.EncodeRunner.get_frame_option` and
+    and :meth:`~pydicom.pixels.encoders.base.EncodeRunner.set_frame_option` methods:
+
+    * ``bits_allocated``: :class:`int` - the number of bits used to contain each pixel
+      in the frame, should be 1 (for bit-packed data) or a multiple of 8.
 
   At a minimum the encoding function must support the encoding of
   little-endian byte ordered data and should return the encoded

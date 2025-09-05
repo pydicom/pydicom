@@ -75,13 +75,14 @@ def is_available(uid: str) -> bool:
 
 def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignore[return]
     """Return the decoded image data in `src` as a :class:`bytearray`."""
+    runner.set_frame_option(runner.index, "decoding_plugin", "pylibjpeg")
     tsyntax = runner.transfer_syntax
-    original_bits_allocated = runner.bits_allocated
+    bits_allocated = runner.bits_allocated
 
     if tsyntax == uid.RLELossless and runner.bits_allocated == 1:
         raise NotImplementedError(
             "pylibjpeg cannot decompress RLE Lossless encoded data "
-            "with bits allocated = 1."
+            "with (0028,0100) 'Bits Allocated' = 1"
         )
 
     # Currently only one pylibjpeg plugin is available per UID
@@ -92,39 +93,45 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
 
         # pylibjpeg-rle returns decoded data as planar configuration 1
         if tsyntax == uid.RLELossless:
-            runner.set_option("planar_configuration", 1)
+            runner.set_frame_option(runner.index, "planar_configuration", 1)
 
         if tsyntax in _OPENJPEG_SYNTAXES:
             # pylibjpeg-openjpeg returns YBR_ICT and YBR_RCT as RGB
             if runner.photometric_interpretation in (PI.YBR_ICT, PI.YBR_RCT):
-                runner.set_option("photometric_interpretation", PI.RGB)
+                runner.set_frame_option(
+                    runner.index, "photometric_interpretation", PI.RGB
+                )
 
             # pylibjpeg-openjpeg pixel container size is based on J2K precision
-            precision = runner.get_option("j2k_precision", runner.bits_stored)
+            precision = runner.get_frame_option(
+                runner.index, "j2k_precision", runner.bits_stored
+            )
             if 0 < precision <= 8:
-                runner.set_option("bits_allocated", 8)
+                bits_allocated = 8
             elif 8 < precision <= 16:
-                runner.set_option("bits_allocated", 16)
+                bits_allocated = 16
             elif 16 < precision <= 32:
-                runner.set_option("bits_allocated", 32)
+                bits_allocated = 32
 
         if tsyntax in uid.JPEGLSTransferSyntaxes:
             # pylibjpeg-libjpeg always returns JPEG-LS data as color-by-pixel
-            runner.set_option("planar_configuration", 0)
+            runner.set_frame_option(runner.index, "planar_configuration", 0)
 
             # pylibjpeg-libjpeg pixel container size is based on JPEG-LS precision
-            precision = runner.get_option("jls_precision", runner.bits_stored)
+            precision = runner.get_frame_option(
+                runner.index, "jls_precision", runner.bits_stored
+            )
             if 0 < precision <= 8:
-                runner.set_option("bits_allocated", 8)
+                bits_allocated = 8
             elif 8 < precision <= 16:
-                runner.set_option("bits_allocated", 16)
+                bits_allocated = 16
 
         # Signal whether single-bit data is represented in unpacked form
-        if original_bits_allocated == 1:
-            if tsyntax == uid.RLELossless:
-                # In case pylibjpeg supports this case in the future
-                runner.set_option("is_bitpacked", True)
-            else:
-                runner.set_option("is_bitpacked", False)
+        if runner.bits_allocated == 1:
+            runner.set_frame_option(
+                runner.index, "bits_allocated", 1 if tsyntax == uid.RLELossless else 8
+            )
+        else:
+            runner.set_frame_option(runner.index, "bits_allocated", bits_allocated)
 
         return frame
