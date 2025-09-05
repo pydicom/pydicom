@@ -1449,10 +1449,10 @@
       </ul></li>
       <li><a href="reference/generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds">format_number_as_ds() (in module pydicom.valuerep)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.formatted">formatted() (pydicom.valuerep.PersonName method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.formatted_lines">formatted_lines() (pydicom.dataset.Dataset method)</a>
 
       <ul>
@@ -1462,6 +1462,8 @@
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.encaps.fragment_frame.html#pydicom.encaps.fragment_frame">fragment_frame() (in module pydicom.encaps)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.frame_dtype">frame_dtype() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.frame_length">frame_length() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 
@@ -1593,6 +1595,12 @@
       </ul></li>
       <li><a href="reference/generated/pydicom.encaps.get_frame_offsets.html#pydicom.encaps.get_frame_offsets">get_frame_offsets() (in module pydicom.encaps)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.get_frame_option">get_frame_option() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.get_frame_option">(pydicom.pixels.encoders.base.EncodeRunner method)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.pixels.utils.get_image_pixel_ids.html#pydicom.pixels.utils.get_image_pixel_ids">get_image_pixel_ids() (in module pydicom.pixels.utils)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.get_item">get_item() (pydicom.dataset.Dataset method)</a>
@@ -1750,7 +1758,13 @@
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.indent_chars">indent_chars (pydicom.dataset.Dataset attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.index">index (pydicom.fileset.RecordNode property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.index">(pydicom.pixels.decoders.base.DecodeRunner property)</a>
 </li>
+        <li><a href="reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.index">(pydicom.pixels.encoders.base.EncodeRunner property)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement.index">index() (pydicom.dataelem.RawDataElement method)</a>
 
       <ul>
@@ -1872,7 +1886,11 @@
       <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.is_encapsulated">is_encapsulated (pydicom.pixels.decoders.base.Decoder property)</a>
 
       <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.is_encapsulated">(pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
         <li><a href="reference/generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder.is_encapsulated">(pydicom.pixels.encoders.base.Encoder property)</a>
+</li>
+        <li><a href="reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.is_encapsulated">(pydicom.pixels.encoders.base.EncodeRunner property)</a>
 </li>
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_encapsulated">(pydicom.uid.UID property)</a>
 </li>
@@ -1905,6 +1923,8 @@
         <li><a href="reference/generated/pydicom.valuerep.ISfloat.html#pydicom.valuerep.ISfloat.is_integer">(pydicom.valuerep.ISfloat method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement.is_little_endian">is_little_endian (pydicom.dataelem.RawDataElement attribute)</a>
 
       <ul>
@@ -1923,14 +1943,16 @@
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_little_endian">(pydicom.uid.UID property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal.is_nan">is_nan() (pydicom.valuerep.DSdecimal method)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.is_native">is_native (pydicom.pixels.decoders.base.Decoder property)</a>
 
       <ul>
+        <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.is_native">(pydicom.pixels.decoders.base.DecodeRunner property)</a>
+</li>
         <li><a href="reference/generated/pydicom.pixels.encoders.base.Encoder.html#pydicom.pixels.encoders.base.Encoder.is_native">(pydicom.pixels.encoders.base.Encoder property)</a>
+</li>
+        <li><a href="reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.is_native">(pydicom.pixels.encoders.base.EncodeRunner property)</a>
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal.is_normal">is_normal() (pydicom.valuerep.DSdecimal method)</a>
@@ -3274,6 +3296,12 @@
 </li>
       <li><a href="reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.set_encoders">set_encoders() (pydicom.pixels.encoders.base.EncodeRunner method)</a>
 </li>
+      <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_frame_option">set_frame_option() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.set_frame_option">(pydicom.pixels.encoders.base.EncodeRunner method)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_option">set_option() (pydicom.pixels.decoders.base.DecodeRunner method)</a>
 
       <ul>

@@ -18,8 +18,10 @@
       ~EncodeRunner.encode
       ~EncodeRunner.frame_length
       ~EncodeRunner.get_frame
+      ~EncodeRunner.get_frame_option
       ~EncodeRunner.get_option
       ~EncodeRunner.set_encoders
+      ~EncodeRunner.set_frame_option
       ~EncodeRunner.set_option
       ~EncodeRunner.set_options
       ~EncodeRunner.set_source
@@ -37,10 +39,13 @@
       ~EncodeRunner.bits_stored
       ~EncodeRunner.columns
       ~EncodeRunner.extended_offsets
+      ~EncodeRunner.index
       ~EncodeRunner.is_array
       ~EncodeRunner.is_binary
       ~EncodeRunner.is_buffer
       ~EncodeRunner.is_dataset
+      ~EncodeRunner.is_encapsulated
+      ~EncodeRunner.is_native
       ~EncodeRunner.number_of_frames
       ~EncodeRunner.options
       ~EncodeRunner.photometric_interpretation

@@ -554,7 +554,7 @@ pixel, e.g. 1 for grayscale images or 3 for RGB.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'number_of_frames'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of image frames
 contained in <cite>src</cite></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'bits_allocated'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain
-each pixel in <cite>src</cite>, should be a multiple of 8.</p></li>
+each pixel in <cite>src</cite>, should be 1 or a multiple of 8.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'bits_stored'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits actually used by
 each pixel in <cite>src</cite>, e.g. 12-bit pixel data (range 0 to 4095) will be
 contained by 16-bits (range 0 to 65535).</p></li>
@@ -564,14 +564,14 @@ integers.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'photometric_interpretation'</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the intended color space
 of the encoded data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code></p></li>
 </ul>
-<p>If your encoder needs to signal that one of the encoding option values needs
-to be modified then this can be done with the
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.set_option" title="pydicom.pixels.encoders.base.EncodeRunner.set_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_option()</span></code></a> method. This
-should only be done after successfully encoding the frame, as if the
-encoding fails changing the option value may cause issues with
-other encoding plugins that may also attempt to encode the same frame. It’s also
-important to be aware that any changes you make will also affect following frames
-(if any).</p>
+<p>In addition, the following option for individual frames can be set or retrieved
+by the plugin using the
+<a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.get_frame_option" title="pydicom.pixels.encoders.base.EncodeRunner.get_frame_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_frame_option()</span></code></a> and
+and <a class="reference internal" href="../../reference/generated/pydicom.pixels.encoders.base.EncodeRunner.html#pydicom.pixels.encoders.base.EncodeRunner.set_frame_option" title="pydicom.pixels.encoders.base.EncodeRunner.set_frame_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_frame_option()</span></code></a> methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bits_allocated</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain each pixel
+in the frame, should be 1 (for bit-packed data) or a multiple of 8.</p></li>
+</ul>
 </li>
 </ul>
 <p>At a minimum the encoding function must support the encoding of

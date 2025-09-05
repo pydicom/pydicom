@@ -16,14 +16,17 @@
       ~DecodeRunner.__init__
       ~DecodeRunner.decode
       ~DecodeRunner.del_option
+      ~DecodeRunner.frame_dtype
       ~DecodeRunner.frame_length
       ~DecodeRunner.get_data
+      ~DecodeRunner.get_frame_option
       ~DecodeRunner.get_option
       ~DecodeRunner.iter_decode
       ~DecodeRunner.pixel_properties
       ~DecodeRunner.process
       ~DecodeRunner.reshape
       ~DecodeRunner.set_decoders
+      ~DecodeRunner.set_frame_option
       ~DecodeRunner.set_option
       ~DecodeRunner.set_options
       ~DecodeRunner.set_source
@@ -41,10 +44,13 @@
       ~DecodeRunner.bits_stored
       ~DecodeRunner.columns
       ~DecodeRunner.extended_offsets
+      ~DecodeRunner.index
       ~DecodeRunner.is_array
       ~DecodeRunner.is_binary
       ~DecodeRunner.is_buffer
       ~DecodeRunner.is_dataset
+      ~DecodeRunner.is_encapsulated
+      ~DecodeRunner.is_native
       ~DecodeRunner.number_of_frames
       ~DecodeRunner.options
       ~DecodeRunner.photometric_interpretation

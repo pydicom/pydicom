@@ -655,6 +655,8 @@ Compression</em></p></td>
 <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a></p></td>
 <td colspan="2"><ul class="simple">
 <li><p>Maximum supported <em>Bits Stored</em> for JPEG 2000 and HTJ2K is 24</p></li>
+<li><p>Slower than <code class="docutils literal notranslate"><span class="pre">pillow</span></code> to decode <em>JPEG Baseline 8-bit</em> and <em>JPEG
+Extended 12-bit</em>, especially if needing to convert to RGB</p></li>
 </ul>
 </td>
 </tr>
@@ -667,6 +669,8 @@ for a <em>Pixel Representation</em> of 1</p></li>
 <li><p><em>JPEG-LS Lossless</em> and <em>JPEG-LS Near Lossless</em> only if
 <em>Bits Stored</em> is not 6 or 7</p></li>
 <li><p>Maximum supported <em>Bits Stored</em> is 16</p></li>
+<li><p>Slower than <code class="docutils literal notranslate"><span class="pre">pillow</span></code> to decode <em>JPEG Baseline 8-bit</em> and <em>JPEG
+Extended 12-bit</em>, especially if needing to convert to RGB</p></li>
 </ul>
 </td>
 </tr>

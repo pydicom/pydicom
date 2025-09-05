@@ -557,11 +557,12 @@ pixel, e.g. 1 for grayscale images or 3 for RGB.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">number_of_frames</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of image frames
 contained in <cite>src</cite></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bits_allocated</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain
-each pixel in <cite>src</cite>, should be a multiple of 8.</p></li>
+each pixel in <cite>src</cite>, should be 1 or a multiple of 8.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">photometric_interpretation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the color space
 of the encoded data, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pixel_keyword</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - one of <code class="docutils literal notranslate"><span class="pre">&quot;PixelData&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;FloatPixelData&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;DoubleFloatPixelData&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">as_rgb</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - whether or not YCbCr data should be converted to RGB.</p></li>
 </ul>
 <p>And conditionally:</p>
 <ul class="simple">
@@ -574,14 +575,29 @@ the number of bits actually used by each pixel in <cite>src</cite>, e.g. 12-bit 
 <li><p><code class="docutils literal notranslate"><span class="pre">planar_configuration</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - required when <code class="docutils literal notranslate"><span class="pre">samples_per_pixel</span></code>
 &gt; 1, <code class="docutils literal notranslate"><span class="pre">0</span></code> for color-by-pixel, <code class="docutils literal notranslate"><span class="pre">1</span></code> for color-by-plane.</p></li>
 </ul>
-<p>If your decoder needs to signal that one of the decoding option values needs
-to be modified then this can be done with the
-<a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_option" title="pydicom.pixels.decoders.base.DecodeRunner.set_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_option()</span></code></a> method. This
-should only be done after successfully decoding the frame, as if the
-decoding fails changing the option value may cause issues with
-other decoding plugins that may also attempt to decode the same frame. It’s also
-important to be aware that any changes you make will also affect following frames
-(if any).</p>
+<p>In addition, the following options for individual frames can be set or retrieved
+by the plugin using the <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.get_frame_option" title="pydicom.pixels.decoders.base.DecodeRunner.get_frame_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_frame_option()</span></code></a>
+and <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_frame_option" title="pydicom.pixels.decoders.base.DecodeRunner.set_frame_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_frame_option()</span></code></a> methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bits_allocated</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the number of bits used to contain each pixel
+in the decoded frame, should be 1 (for bit-packed data) or a multiple of 8.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">photometric_interpretation</span></code>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> - the color space of the decoded
+frame, such as <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">planar_configuration</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the order of the pixels in the decoded
+frame, available when <code class="docutils literal notranslate"><span class="pre">samples_per_pixel</span></code> &gt; 1, <code class="docutils literal notranslate"><span class="pre">0</span></code> for color-by-pixel, <code class="docutils literal notranslate"><span class="pre">1</span></code>
+for color-by-plane.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jls_precision</span></code> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the precision used in the JPEG-LS codestream for
+the frame being decoded (JPEG-LS transfer syntaxes only).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">j2k_precision</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> - the precision used in the JPEG 2000 codestream
+for the frame being decoded (JPEG 2000 transfer syntaxes only).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">j2k_is_signed</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - whether the JPEG 2000 codestream for the frame
+being decoded uses signed integers or not (JPEG 2000 transfer syntaxes only).</p></li>
+</ul>
+<p>The values for these frame options should be set appropriately to match the decoded
+pixel data returned by the plugin. For example, if a frame’s original
+<code class="docutils literal notranslate"><span class="pre">photometric_interpretation</span></code> is <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> and the plugin converts it to <code class="docutils literal notranslate"><span class="pre">RGB</span></code>
+then you should use <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.DecodeRunner.html#pydicom.pixels.decoders.base.DecodeRunner.set_frame_option" title="pydicom.pixels.decoders.base.DecodeRunner.set_frame_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_frame_option()</span></code></a>
+to reflect the change in color space.</p>
 <p>When possible it’s recommended that the decoding function return the decoded
 pixel data as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> to minimize later memory usage.</p>
 </li>
