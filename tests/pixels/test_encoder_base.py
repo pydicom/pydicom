@@ -465,7 +465,7 @@ class TestEncodeRunner_GetFrame:
         self.runner.set_source(arr)
         out = self.runner.get_frame(None)
 
-        # Output data should be bitpacked
+        # Output data should be unpacked
         assert len(out) == 1
         assert b"\x05" == out
         assert self.runner.get_frame_option(0, "bits_allocated") == 8

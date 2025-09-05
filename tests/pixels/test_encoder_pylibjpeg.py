@@ -447,7 +447,6 @@ class TestJ2KLosslessEncoding:
             )
 
             for plugin in plugins:
-                print(plugin, bits_stored)
                 out, _ = JPEG2000LosslessDecoder.as_array(
                     encapsulate([cs]),
                     decoding_plugin=plugin,
