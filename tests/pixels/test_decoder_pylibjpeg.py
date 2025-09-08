@@ -43,6 +43,7 @@ from .pixels_reference import (
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
     JLSL_08_07_1_0_1F,
     JLSL_16_15_1_1_1F,
+    JLSL_16_12_1_1_10F,
     JPGB_08_08_3_0_120F_YBR_FULL_422,
     RLE_1_1_3F,
 )
@@ -273,6 +274,22 @@ class TestLibJpegDecoder:
         for _, meta in decoder.iter_array(ds, decoding_plugin="pylibjpeg"):
             assert meta["planar_configuration"] == 0
 
+    def test_jls_shift_correction(self):
+        """Regression test for #2260"""
+        reference = JLSL_16_12_1_1_10F
+        ds = dcmread(reference.path)
+        ds.BitsStored = 8
+        ds.PixelRepresentation = 0
+        decoder = get_decoder(JPEGLSLossless)
+
+        arr, _ = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
+        # Would be [192 309 362 219 135] if no shift
+        assert [192, 53, 106, 219, 135] == arr[0, -1, -5:].tolist()
+
+        iterator = decoder.iter_array(ds, decoding_plugin="pylibjpeg")
+        arr, _ = next(iterator)
+        assert [192, 53, 106, 219, 135] == arr[-1, -5:].tolist()
+
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
 class TestOpenJpegDecoder:
@@ -432,6 +449,39 @@ class TestOpenJpegDecoder:
         )
         assert len(buffer) == (2 * 512 * 512) // 8
         assert len(meta) == 2
+
+    def test_j2k_shift_correction(self):
+        """Regression test for #2260"""
+        reference = J2KR_16_13_1_1_1F_M2_MISMATCH
+        ds = dcmread(reference.path)
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 12
+
+        decoder = get_decoder(JPEG2000Lossless)
+        arr, _ = decoder.as_array(ds, index=0, decoding_plugin="pylibjpeg")
+        assert arr.dtype.kind == "u"
+        assert arr.dtype.itemsize == 2
+
+        # Without a shift this would be 6192
+        assert 2096 == arr[0, 0]
+        assert [621, 412, 138, 3903, 3576, 3329, 3189, 3130, 3108, 3101] == (
+            arr[47:57, 279].tolist()
+        )
+        assert [3719, 3975, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
+            arr[328:338, 106].tolist()
+        )
+
+        iterator = decoder.iter_array(ds, decoding_plugin="pylibjpeg")
+        arr, _ = next(iterator)
+        assert arr.dtype.kind == "u"
+        assert arr.dtype.itemsize == 2
+        assert 2096 == arr[0, 0]
+        assert [621, 412, 138, 3903, 3576, 3329, 3189, 3130, 3108, 3101] == (
+            arr[47:57, 279].tolist()
+        )
+        assert [3719, 3975, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
+            arr[328:338, 106].tolist()
+        )
 
 
 @pytest.mark.skipif(SKIP_RLE, reason="Test is missing dependencies")
