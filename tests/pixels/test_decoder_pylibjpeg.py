@@ -290,6 +290,12 @@ class TestLibJpegDecoder:
         arr, _ = next(iterator)
         assert [192, 53, 106, 219, 135] == arr[-1, -5:].tolist()
 
+        iterator = decoder.iter_array(
+            ds, indices=[0, 1, 2], decoding_plugin="pylibjpeg"
+        )
+        arr, _ = next(iterator)
+        assert [192, 53, 106, 219, 135] == arr[-1, -5:].tolist()
+
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
 class TestOpenJpegDecoder:
@@ -473,8 +479,16 @@ class TestOpenJpegDecoder:
 
         iterator = decoder.iter_array(ds, decoding_plugin="pylibjpeg")
         arr, _ = next(iterator)
-        assert arr.dtype.kind == "u"
-        assert arr.dtype.itemsize == 2
+        assert 2096 == arr[0, 0]
+        assert [621, 412, 138, 3903, 3576, 3329, 3189, 3130, 3108, 3101] == (
+            arr[47:57, 279].tolist()
+        )
+        assert [3719, 3975, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
+            arr[328:338, 106].tolist()
+        )
+
+        iterator = decoder.iter_array(ds, indices=[0], decoding_plugin="pylibjpeg")
+        arr, _ = next(iterator)
         assert 2096 == arr[0, 0]
         assert [621, 412, 138, 3903, 3576, 3329, 3189, 3130, 3108, 3101] == (
             arr[47:57, 279].tolist()
