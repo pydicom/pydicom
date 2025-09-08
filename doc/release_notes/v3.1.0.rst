@@ -41,10 +41,12 @@ Fixes
 * Correctly handle empty values represented as empty strings in json while converting them
   to a dataset (:issue:`2221`).
 * Correctly handle empty LUT data (:issue:`2238`).
+* Fixed data in the "unused" bits above *Bits Stored* being included in the return pixel
+  data for JPEG 2000 and JPEG-LS (:issue:`2260`).
 
 Enhancements
 ------------
-* Python 3.12 and 3.13 now supported; limited support for pre-release Python 3.14
+* Python 3.12, 3.13 and 3.14 are now supported.
 * Added the option to pass a ``bool`` ndarray to :func:`~pydicom.pixels.set_pixel_data`
   to store with *Bits Allocated* of ``1`` using bit-packing (:issue:`2141`).
 * Added a check to :meth:`~pydicom.dataset.Dataset.set_pixel_data` to ensure that the
