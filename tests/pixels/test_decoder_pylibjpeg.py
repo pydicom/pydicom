@@ -43,7 +43,7 @@ from .pixels_reference import (
     JPGB_08_08_3_0_1F_YBR_FULL,  # has JFIF APP marker
     JLSL_08_07_1_0_1F,
     JLSL_16_15_1_1_1F,
-    JLSL_16_12_1_1_10F,
+    JLSL_16_12_1_0_10F,
     JPGB_08_08_3_0_120F_YBR_FULL_422,
     RLE_1_1_3F,
     EXPL_16_1_10F,
@@ -277,10 +277,10 @@ class TestLibJpegDecoder:
 
     def test_jls_shift_correction(self):
         """Regression test for #2260"""
-        reference = JLSL_16_12_1_1_10F
+        reference = JLSL_16_12_1_0_10F
         ds = dcmread(reference.path)
         ds.BitsStored = 8
-        ds.PixelRepresentation = 0
+        assert reference.ds.PixelRepresentation == 0
         decoder = get_decoder(JPEGLSLossless)
 
         arr, _ = decoder.as_array(ds, raw=True, decoding_plugin="pylibjpeg")
@@ -293,14 +293,15 @@ class TestLibJpegDecoder:
 
     def test_jls_sign_correction_iter(self):
         """Test the JLS sign correction works with iter_array(..., indices=[...])"""
-        reference = JLSL_16_12_1_1_10F
+        reference = JLSL_16_15_1_1_1F
+        assert reference.ds.PixelRepresentation == 1
         decoder = get_decoder(JPEGLSLossless)
         iterator = decoder.iter_array(
-            reference.ds, indices=[0, 1, 2], decoding_plugin="pylibjpeg"
+            reference.ds, indices=[0], decoding_plugin="pylibjpeg"
         )
 
         arr, _ = next(iterator)
-        assert np.array_equal(arr, EXPL_16_1_10F.ds.pixel_array[0])
+        reference.test(arr)
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
