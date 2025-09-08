@@ -46,6 +46,7 @@ from .pixels_reference import (
     JLSL_16_12_1_1_10F,
     JPGB_08_08_3_0_120F_YBR_FULL_422,
     RLE_1_1_3F,
+    EXPL_16_1_10F,
 )
 
 
@@ -290,11 +291,16 @@ class TestLibJpegDecoder:
         arr, _ = next(iterator)
         assert [192, 53, 106, 219, 135] == arr[-1, -5:].tolist()
 
+    def test_jls_sign_correction_iter(self):
+        """Test the JLS sign correction works with iter_array(..., indices=[...])"""
+        reference = JLSL_16_12_1_1_10F
+        decoder = get_decoder(JPEGLSLossless)
         iterator = decoder.iter_array(
-            ds, indices=[0, 1, 2], decoding_plugin="pylibjpeg"
+            reference.ds, indices=[0, 1, 2], decoding_plugin="pylibjpeg"
         )
+
         arr, _ = next(iterator)
-        assert [192, 53, 106, 219, 135] == arr[-1, -5:].tolist()
+        assert np.array_equal(arr, EXPL_16_1_10F.ds.pixel_array[0])
 
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
