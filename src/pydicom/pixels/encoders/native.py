@@ -5,9 +5,10 @@ from itertools import groupby
 import math
 from struct import pack
 import zlib
+from typing import cast
 
 from pydicom.pixels.encoders.base import EncodeRunner
-from pydicom.pixels.utils import pack_bits
+from pydicom.pixels.utils import pack_bits, unpack_bits
 from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
 
@@ -77,14 +78,15 @@ def _encode_rle_frame(src: bytes, runner: EncodeRunner) -> bytes:
     if runner.get_option("byteorder", "<") == ">":
         raise ValueError("Unsupported option \"byteorder = '>'\"")
 
-    # In the case of single bit images, the data must first be bit-packed
-    # before being encoded with RLE
+    # In the case of single bit images, the data must first be unpacked to 8
+    # bits before being encoded with RLE
     if (
         runner.bits_allocated == 1
-        and runner.get_frame_option(runner.index, "bits_allocated", 1) != 1
+        and runner.get_frame_option(runner.index, "bits_allocated", 1) == 1
     ):
-        src = pack_bits(src, pad=False)
-        runner.set_frame_option(runner.index, "bits_allocated", 1)
+        pixels_per_frame = cast(int, runner.frame_length(unit="pixels"))
+        src = cast(bytes, unpack_bits(src, as_array=False))[:pixels_per_frame]
+        runner.set_frame_option(runner.index, "bits_allocated", 8)
 
     bytes_allocated = math.ceil(runner.bits_allocated / 8)
 

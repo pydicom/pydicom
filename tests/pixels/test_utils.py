@@ -1691,8 +1691,8 @@ class TestCompressRLE:
     @pytest.mark.parametrize(
         "path,length",
         [
-            (EXPL_1_1_3F.path, 6366),
-            (EXPL_1_1_3F_NONALIGNED.path, 6390),
+            (EXPL_1_1_3F.path, 14954),
+            (EXPL_1_1_3F_NONALIGNED.path, 14898),
         ],
     )
     def test_compress_1bit(self, path, length):
