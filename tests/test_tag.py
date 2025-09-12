@@ -41,7 +41,7 @@ class TestBaseTag:
         """Test __le__ raises TypeError when comparing to non numeric."""
 
         def test_raise():
-            BaseTag(0x00010002) <= "Somethin"
+            BaseTag(0x00010002) <= "Something"
 
         pytest.raises(TypeError, test_raise)
 
@@ -77,7 +77,7 @@ class TestBaseTag:
         """Test __lt__ raises TypeError when comparing to non numeric."""
 
         def test_raise():
-            BaseTag(0x00010002) < "Somethin"
+            BaseTag(0x00010002) < "Something"
 
         pytest.raises(TypeError, test_raise)
 
