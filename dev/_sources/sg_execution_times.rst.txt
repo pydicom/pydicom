@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.551** total execution time for 15 files **from all galleries**:
+**00:00.579** total execution time for 15 files **from all galleries**:
 
 .. container::
 
@@ -33,16 +33,16 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py` (``../examples/input_output/plot_read_fileset.py``)
-     - 00:00.181
+     - 00:00.189
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``../examples/image_processing/plot_waveforms.py``)
-     - 00:00.174
+     - 00:00.186
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``../examples/input_output/plot_read_dicom.py``)
-     - 00:00.090
+     - 00:00.094
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
-     - 00:00.082
+     - 00:00.085
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``../examples/metadata_processing/plot_anonymize.py``)
      - 00:00.006
@@ -57,7 +57,7 @@ Computation times
      - 00:00.004
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``../examples/input_output/plot_read_rtplan.py``)
-     - 00:00.002
+     - 00:00.003
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``../examples/metadata_processing/plot_add_dict_entries.py``)
      - 00:00.002
