@@ -273,10 +273,15 @@ def _correct_unused_bits(
     return arr
 
 
-def _apply_sign_correction(
+def _apply_j2k_corrections(
     arr: "np.ndarray", runner: "DecodeRunner", index: int | None = None
 ) -> "np.ndarray":
-    """Convert `arr` to match the signedness required by the 'pixel_representation'."""
+    """Apply sign and unused bit corrections to `arr` for JPEG 2000."""
+    # For JPEG 2000 we may need to correct `arr` if the signedness in the codestream
+    #   doesn't match Pixel Representation.
+    # Otherwise we need to correct `arr` if Bits Stored or the precision in the
+    #   codestream is less than the container size
+
     # JPEG 2000 Example:
     # Dataset: Pixel Representation 1, Bits Stored 13, Bits Allocated 16
     # J2K codestream: precision 13, signedness 0 (i.e. unsigned)
@@ -302,74 +307,99 @@ def _apply_sign_correction(
     # If it were encoded correctly as an unsigned integer it would instead be:
     #     0001 1000 0011 0000  (value 6192)
     # Which can be fixed in the same way as for signed integers.
-    if runner.transfer_syntax in JPEG2000TransferSyntaxes:
-        container_size = 8 * arr.dtype.itemsize
-        pixel_representation = runner.pixel_representation
-        if index is None:
-            # Correct all frames
-            signs = [
-                meta.get("j2k_is_signed", pixel_representation)
-                for meta in runner._frame_meta.values()
-            ]
-        else:
-            # Correct only the frame at `index`
-            signs = [
-                runner.get_frame_option(index, "j2k_is_signed", pixel_representation)
-            ]
 
-        bits_stored = runner.bits_stored
-        if index is None:
-            bit_shifts = [
-                container_size - meta.get("j2k_precision", bits_stored)
-                for meta in runner._frame_meta.values()
-            ]
-        else:
-            precision = runner.get_frame_option(index, "j2k_precision", bits_stored)
-            bit_shifts = [container_size - precision]
+    pixel_representation = runner.pixel_representation
+    if index is None:
+        # Correct all frames
+        signs = [
+            meta.get("j2k_is_signed", pixel_representation)
+            for meta in runner._frame_meta.values()
+        ]
+    else:
+        # Correct only the frame at `index`
+        signs = [runner.get_frame_option(index, "j2k_is_signed", pixel_representation)]
 
-        # Single or multi-framed with consistent sign and precision values
-        if len(set(signs)) == 1 and len(set(bit_shifts)) == 1:
-            if bit_shifts[0] and signs[0] != pixel_representation:
-                np.left_shift(arr, bit_shifts[0], out=arr)
-                np.right_shift(arr, bit_shifts[0], out=arr)
+    # To prevent any data in the bits above bits_stored being included in the
+    #   returned ndarray, use bits_stored instead of jls_precision if jls_precision
+    #   is greater than bits_stored. This may occur when the entire container is
+    #   encoded rather than only the bits_stored bits and there may be overlays or
+    #   other data in any "unused" high bits that we don't want in `arr`
+    bits_stored = runner.bits_stored
+    if index is None:
+        precisions = [
+            meta.get("j2k_precision", bits_stored)
+            for meta in runner._frame_meta.values()
+        ]
+        precisions = [
+            bits_stored if prec > bits_stored else prec for prec in precisions
+        ]
+    else:
+        precision = runner.get_frame_option(index, "j2k_precision", bits_stored)
+        precisions = [bits_stored if precision > bits_stored else precision]
 
-            return arr
+    container_size = 8 * arr.dtype.itemsize
+    bit_shifts = [container_size - prec for prec in precisions]
 
-        # Multi-framed with inconsistent sign or precision values
-        for frame, is_signed, bit_shift in zip(arr, signs, bit_shifts):
-            if bit_shift and is_signed != pixel_representation:
-                np.left_shift(frame, bit_shift, out=frame)
-                np.right_shift(frame, bit_shift, out=frame)
+    # Single or multi-framed with consistent sign and precision values
+    # We need to perform a correction if
+    #   The J2K signednesss doesn't match the DICOM pixel representation
+    #   Signedness does match but (bit_shift != 0 and bit_correction)
+    bit_correction = runner.get_option("correct_unused_bits", True)
+    if len(set(signs)) == 1 and len(set(bit_shifts)) == 1:
+        if (bit_correction and bit_shifts[0]) or signs[0] != pixel_representation:
+            np.left_shift(arr, bit_shifts[0], out=arr)
+            np.right_shift(arr, bit_shifts[0], out=arr)
 
         return arr
 
+    # Multi-framed with inconsistent sign or precision values
+    for frame, is_signed, bit_shift in zip(arr, signs, bit_shifts):
+        if (bit_correction and bit_shift) or is_signed != pixel_representation:
+            np.left_shift(frame, bit_shift, out=frame)
+            np.right_shift(frame, bit_shift, out=frame)
+
+    return arr
+
+
+def _apply_jls_sign_correction(
+    arr: "np.ndarray", runner: "DecodeRunner", index: int | None = None
+) -> "np.ndarray":
+    """Convert `arr` to match the signedness required by the 'pixel_representation'."""
     # JPEG-LS has no way to track signedness, so signed integers are
     #   always decoded as unsigned and need to be corrected
-    if runner.transfer_syntax in JPEGLSTransferSyntaxes:
-        container_size = 8 * arr.dtype.itemsize
-        bits_stored = runner.bits_stored
-        if index is None:
-            bit_shifts = [
-                container_size - meta.get("jls_precision", bits_stored)
-                for meta in runner._frame_meta.values()
-            ]
-        else:
-            precision = runner.get_frame_option(index, "jls_precision", bits_stored)
-            bit_shifts = [container_size - precision]
 
-        # Single or multi-framed with consistent precision values
-        if len(set(bit_shifts)) == 1:
-            if bit_shifts[0]:
-                np.left_shift(arr, bit_shifts[0], out=arr)
-                np.right_shift(arr, bit_shifts[0], out=arr)
+    # To prevent any data in the bits above bits_stored being included in the
+    #   returned ndarray, use bits_stored instead of jls_precision if jls_precision
+    #   is greater than bits_stored. This may occur when the entire container is
+    #   encoded rather than only the bits_stored bits and there may be overlays or
+    #   other data in any "unused" high bits that we don't want in `arr`
+    bits_stored = runner.bits_stored
+    if index is None:
+        precisions = [
+            meta.get("jls_precision", bits_stored)
+            for meta in runner._frame_meta.values()
+        ]
+        precisions = [
+            bits_stored if prec > bits_stored else prec for prec in precisions
+        ]
+    else:
+        prec = runner.get_frame_option(index, "jls_precision", bits_stored)
+        precisions = [bits_stored if prec > bits_stored else prec]
 
-            return arr
+    # Single or multi-framed with consistent precision values
+    container_size = 8 * arr.dtype.itemsize
+    bit_shifts = [container_size - prec for prec in precisions]
+    if len(set(bit_shifts)) == 1 and bit_shifts[0]:
+        np.left_shift(arr, bit_shifts[0], out=arr)
+        np.right_shift(arr, bit_shifts[0], out=arr)
 
-        # Multi-framed with inconsistent precision values
-        for frame, bit_shift in zip(arr, bit_shifts):
-            if bit_shift:
-                np.left_shift(frame, bit_shift, out=frame)
-                np.right_shift(frame, bit_shift, out=frame)
+        return arr
+
+    # Multi-framed with inconsistent precision values
+    for frame, bit_shift in zip(arr, bit_shifts):
+        if bit_shift:
+            np.left_shift(frame, bit_shift, out=frame)
+            np.right_shift(frame, bit_shift, out=frame)
 
     return arr
 
@@ -403,6 +433,7 @@ class DecodeRunner(RunnerBase):
             "transfer_syntax_uid": tsyntax,
             "as_rgb": True,
             "allow_excess_frames": True,
+            "correct_unused_bits": True,
         }
         self._undeletable = ("transfer_syntax_uid", "pixel_keyword")
         self._decoders: dict[str, DecodeFunction] = {}
@@ -426,8 +457,6 @@ class DecodeRunner(RunnerBase):
             self.set_option("apply_j2k_sign_correction", True)
         elif self.transfer_syntax in JPEGLSTransferSyntaxes:
             self.set_option("apply_jls_sign_correction", True)
-        else:
-            self.set_option("correct_unused_bits", True)
 
     def _conform_jpg_colorspace(self, info: dict[str, Any], index: int) -> None:
         """Conform the photometric interpretation to the JPEG/JPEG-LS codestream.
@@ -1064,19 +1093,18 @@ class DecodeRunner(RunnerBase):
                 and self.get_option("pixel_vr") == "OW"
             )
 
-        if test == "sign_correction":
-            use_j2k_correction = (
-                self.transfer_syntax in JPEG2000TransferSyntaxes
-                and self.photometric_interpretation in (PI.MONOCHROME1, PI.MONOCHROME2)
-                and self.get_option("apply_j2k_sign_correction", False)
+        if test == "j2k_corrections":
+            return self.transfer_syntax in JPEG2000TransferSyntaxes and (
+                self.get_option("apply_j2k_sign_correction", False)
+                or self.get_option("correct_unused_bits", False)
             )
-            use_jls_correction = (
+
+        if test == "jls_sign_correction":
+            return (
                 self.transfer_syntax in JPEGLSTransferSyntaxes
                 and self.pixel_representation == 1
                 and self.get_option("apply_jls_sign_correction", False)
             )
-
-            return use_j2k_correction or use_jls_correction
 
         if test == "shift_correction":
             return (
@@ -1361,8 +1389,13 @@ class Decoder(CoderBase):
             arr = self._as_array_encapsulated(runner, index)
             as_writeable = True
 
-        if runner._test_for("sign_correction"):
-            arr = _apply_sign_correction(arr, runner)
+        if runner._test_for("j2k_corrections"):
+            # Performs both sign and shift corrections, if needed
+            arr = _apply_j2k_corrections(arr, runner)
+        elif runner._test_for("jls_sign_correction"):
+            # Performs sign corrected required if Pixel Representation is 1
+            # If applied then no separate shift correction is needed
+            arr = _apply_jls_sign_correction(arr, runner)
         elif runner._test_for("shift_correction"):
             arr = _correct_unused_bits(arr, runner)
 
@@ -2158,8 +2191,13 @@ class Decoder(CoderBase):
                 runner.set_frame_option(idx, "bits_allocated", bits_allocated)
 
                 arr = runner.reshape(arr, idx)
-                if runner._test_for("sign_correction"):
-                    arr = _apply_sign_correction(arr, runner, idx)
+                if runner._test_for("j2k_corrections"):
+                    # Performs both sign and shift corrections, if needed
+                    arr = _apply_j2k_corrections(arr, runner)
+                elif runner._test_for("jls_sign_correction"):
+                    # Performs sign corrected required if Pixel Representation is 1
+                    # No separate shift correction is needed
+                    arr = _apply_jls_sign_correction(arr, runner)
                 elif runner._test_for("shift_correction"):
                     arr = _correct_unused_bits(arr, runner, log_warning=log_warning)
                     log_warning = False
@@ -2176,8 +2214,10 @@ class Decoder(CoderBase):
         indices = indices if indices else range(runner.number_of_frames)
         for idx in indices:
             arr = func(runner, idx)
-            if runner._test_for("sign_correction"):
-                arr = _apply_sign_correction(arr, runner, idx)
+            if runner._test_for("j2k_corrections"):
+                arr = _apply_j2k_corrections(arr, runner)
+            elif runner._test_for("jls_sign_correction"):
+                arr = _apply_jls_sign_correction(arr, runner)
             elif runner._test_for("shift_correction"):
                 arr = _correct_unused_bits(arr, runner, log_warning=log_warning)
                 log_warning = False

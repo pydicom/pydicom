@@ -18,7 +18,8 @@ from pydicom.pixels.decoders import ExplicitVRLittleEndianDecoder
 from pydicom.pixels.decoders.base import (
     DecodeRunner,
     Decoder,
-    _apply_sign_correction,
+    _apply_j2k_corrections,
+    _apply_jls_sign_correction,
     _process_color_space,
 )
 from pydicom.pixels.processing import convert_color_space
@@ -64,6 +65,7 @@ HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
 HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
 SKIP_J2K = not (HAVE_NP and HAVE_PYLJ and HAVE_OJ)
 SKIP_JPG = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
+SKIP_JLS = not (HAVE_NP and HAVE_PYLJ and HAVE_LJ)
 
 
 class TestDecodeRunner:
@@ -185,8 +187,8 @@ class TestDecodeRunner:
             "  transfer_syntax_uid: 1.2.840.10008.1.2.5\n"
             "  as_rgb: True\n"
             "  allow_excess_frames: True\n"
-            "  pixel_keyword: PixelData\n"
             "  correct_unused_bits: True\n"
+            "  pixel_keyword: PixelData\n"
             "Decoders\n"
             "  foo"
         )
@@ -2137,18 +2139,14 @@ def test_get_decoder():
 
 
 @pytest.mark.skipif(SKIP_J2K, reason="Missing dependencies for JPEG 2000")
-class TestApplySignCorrection:
-    """Tests for _apply_sign_correction()"""
+class TestApplyJ2KCorrections:
+    """Tests for _apply_j2k_corrections()"""
 
-    def test_j2k_sign_correction_multi(self):
-        """Test multiframe J2K with inconsistent values."""
+    def test_single_unsigned(self):
+        """Test J2K corrections for unsigned output."""
         runner = DecodeRunner(JPEG2000)
         runner.set_option("bits_stored", 12)
         runner.set_option("pixel_representation", 0)
-        runner._frame_meta = {
-            0: {"j2k_precision": 12, "j2k_is_signed": True},
-            1: {"j2k_precision": 11, "j2k_is_signed": True},
-        }
         frame = np.asarray(
             [
                 [4097, 4096, 4095, 4094],
@@ -2156,37 +2154,300 @@ class TestApplySignCorrection:
             ],
             dtype="u2",
         )
-        arr = np.asarray([frame, frame])
-        out = _apply_sign_correction(arr, runner, None)
-        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
-        assert out[1].tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        # Should use unsigned, precision 12
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        # Should use unsigned precision of 11
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        # Should use unsigned precision of 12
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
 
         runner._frame_meta = {
             0: {"j2k_precision": 12, "j2k_is_signed": True},
             1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
         }
-        arr = np.asarray([frame, frame])
-        out = _apply_sign_correction(arr, runner, None)
-        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
-        assert out[1].tolist() == [[4097, 4096, 4095, 4094], [4093, 4092, 4091, 4090]]
 
-    def test_jls_sign_correction_multi(self):
-        """Test multiframe JLS with inconsistent values."""
-        runner = DecodeRunner(JPEGLSLossless)
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+    def test_multi_unsigned(self):
+        """Test J2K corrections for unsigned output."""
+        runner = DecodeRunner(JPEG2000)
         runner.set_option("bits_stored", 12)
-        runner.set_option("pixel_representation", 1)
-        runner._frame_meta = {0: {"jls_precision": 12}, 1: {"jls_precision": 11}}
+        runner.set_option("pixel_representation", 0)
         frame = np.asarray(
             [
                 [4097, 4096, 4095, 4094],
                 [4093, 4092, 4091, 4090],
             ],
+            dtype="u2",
+        )
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        # Should use unsigned, precision 12
+        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        # Should use unsigned precision of 11
+        assert out[1].tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        # Should use unsigned precision of 12
+        assert out[2].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        assert out[1].tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        assert out[2].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        assert out[1].tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        assert out[2].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        assert out[0].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+        assert out[1].tolist() == [[1, 0, 2047, 2046], [2045, 2044, 2043, 2042]]
+        assert out[2].tolist() == [[1, 0, 4095, 4094], [4093, 4092, 4091, 4090]]
+
+    def test_single_signed(self):
+        """Test J2K corrections for signed output."""
+        runner = DecodeRunner(JPEG2000)
+        runner.set_option("bits_stored", 12)
+        runner.set_option("pixel_representation", 1)
+        frame = np.asarray(
+            [
+                [2048, 2047, 1, 0],
+                [-1, -2047, -2048, -2049],
+            ],
             dtype="i2",
         )
-        arr = np.asarray([frame, frame])
-        out = _apply_sign_correction(arr, runner, None)
-        assert out[0].tolist() == [[1, 0, -1, -2], [-3, -4, -5, -6]]
-        assert out[1].tolist() == [[1, 0, -1, -2], [-3, -4, -5, -6]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        # Should use signed, precision 12
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        # Should use signed, precision 11
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        # Should use signed, precision 12
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        out = _apply_j2k_corrections(frame.copy(), runner, 0)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 1)
+        assert out.tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        out = _apply_j2k_corrections(frame.copy(), runner, 2)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+    def test_multi_signed(self):
+        """Test J2K corrections for signed output."""
+        runner = DecodeRunner(JPEG2000)
+        runner.set_option("bits_stored", 12)
+        runner.set_option("pixel_representation", 1)
+        frame = np.asarray(
+            [
+                [2048, 2047, 1, 0],
+                [-1, -2047, -2048, -2049],
+            ],
+            dtype="i2",
+        )
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        # Should use signed, precision 12
+        assert out[0].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        # Should use signed, precision 11
+        assert out[1].tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        # Should use signed, precision 12
+        assert out[2].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": True},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": True},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        assert out[0].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        assert out[1].tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        assert out[2].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": False},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        assert out[0].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        assert out[1].tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        assert out[2].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+        runner._frame_meta = {
+            0: {"j2k_precision": 12, "j2k_is_signed": False},
+            1: {"j2k_precision": 11, "j2k_is_signed": True},
+            2: {"j2k_precision": 14, "j2k_is_signed": False},
+        }
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_j2k_corrections(arr, runner, None)
+        assert out[0].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        assert out[1].tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        assert out[2].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+
+@pytest.mark.skipif(SKIP_JLS, reason="Missing dependencies for JPEG 2000")
+class TestApplyJLSSignCorrection:
+    """Tests for _apply_jls_sign_correction()"""
+
+    def test_single(self):
+        """Test single frame JLS sign correction."""
+        runner = DecodeRunner(JPEGLSLossless)
+        runner.set_option("bits_stored", 12)
+        runner.set_option("pixel_representation", 1)
+        runner._frame_meta = {
+            0: {"jls_precision": 12},
+            1: {"jls_precision": 11},
+            2: {"jls_precision": 14},
+        }
+        frame = np.asarray(
+            [
+                [2048, 2047, 1, 0],
+                [-1, -2047, -2048, -2049],
+            ],
+            dtype="i2",
+        )
+        # Should use signed, precision 12
+        out = _apply_jls_sign_correction(frame.copy(), runner, 0)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        # Should use signed, precision 11
+        out = _apply_jls_sign_correction(frame.copy(), runner, 1)
+        assert out.tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        # Should use signed, precision 12
+        out = _apply_jls_sign_correction(frame.copy(), runner, 2)
+        assert out.tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+
+    def test_multi(self):
+        """Test multi-frame JLS sign correction."""
+        runner = DecodeRunner(JPEGLSLossless)
+        runner.set_option("bits_stored", 12)
+        runner.set_option("pixel_representation", 1)
+        runner._frame_meta = {
+            0: {"jls_precision": 12},
+            1: {"jls_precision": 11},
+            2: {"jls_precision": 14},
+        }
+        frame = np.asarray(
+            [
+                [2048, 2047, 1, 0],
+                [-1, -2047, -2048, -2049],
+            ],
+            dtype="i2",
+        )
+        arr = np.asarray([frame, frame, frame])
+        out = _apply_jls_sign_correction(arr, runner, None)
+        # Should use signed, precision 12
+        assert out[0].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
+        # Should use signed, precision 11
+        assert out[1].tolist() == [[0, -1, 1, 0], [-1, 1, 0, -1]]
+        # Should use signed, precision 12
+        assert out[2].tolist() == [[-2048, 2047, 1, 0], [-1, -2047, -2048, 2047]]
 
 
 @pytest.mark.skipif(SKIP_JPG, reason="Missing dependencies for JPEG")

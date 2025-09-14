@@ -1927,7 +1927,7 @@ def test(ref, arr, **kwargs):
     assert np.array_equal(arr, ref)
 
 
-JLSL_16_12_1_1_10F = PixelReference("emri_small_jpeg_ls_lossless.dcm", "<u2", test)
+JLSL_16_12_1_0_10F = PixelReference("emri_small_jpeg_ls_lossless.dcm", "<u2", test)
 
 
 # JLSN, (8, 8), (1, 45, 10, 1), OB, MONOCHROME2, 0
@@ -2019,7 +2019,7 @@ PIXEL_REFERENCE[JPEGLSLossless] = [
     JLSL_08_07_1_0_1F,
     JLSL_16_15_1_1_1F,
     JLSL_16_16_1_1_1F,
-    JLSL_16_12_1_1_10F,
+    JLSL_16_12_1_0_10F,
 ]
 PIXEL_REFERENCE[JPEGLSNearLossless] = [
     JLSN_08_01_1_0_1F,
