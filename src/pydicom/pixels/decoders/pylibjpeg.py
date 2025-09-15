@@ -128,9 +128,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:  # type: ignor
 
         # Signal whether single-bit data is represented in unpacked form
         if runner.bits_allocated == 1:
-            runner.set_frame_option(
-                runner.index, "bits_allocated", 1 if tsyntax == uid.RLELossless else 8
-            )
+            runner.set_frame_option(runner.index, "bits_allocated", 8)
         else:
             runner.set_frame_option(runner.index, "bits_allocated", bits_allocated)
 

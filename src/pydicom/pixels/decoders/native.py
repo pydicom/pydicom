@@ -4,7 +4,6 @@
 This module is not intended to be used directly.
 """
 
-import math
 from struct import unpack
 import zlib
 
@@ -66,12 +65,16 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytearray:
 
         # Update the frame's options to ensure the reshaping is correct
         runner.set_frame_option(runner.index, "planar_configuration", 1)
+
+        # Signal that single bit data is represented in un-packed form
+        if runner.bits_allocated == 1:
+            runner.set_frame_option(runner.index, "bits_allocated", 8)
     else:
         frame = _deflated_decode_frame(src)
 
-    # Signal that single bit data is represented in bit-packed form
-    if runner.bits_allocated == 1:
-        runner.set_frame_option(runner.index, "bits_allocated", 1)
+        # Signal that single bit data is represented in bit-packed form
+        if runner.bits_allocated == 1:
+            runner.set_frame_option(runner.index, "bits_allocated", 1)
 
     return frame
 
@@ -144,30 +147,17 @@ def _rle_decode_frame(
     nr_segments = len(offsets)
 
     # Check that the actual number of segments is as expected
-    if nr_bits == 1:
-        bytes_per_sample = 1
-        expected_nr_segments = 1
+    bytes_per_sample = 1 if nr_bits == 1 else nr_bits // 8
+    expected_nr_segments = nr_samples * bytes_per_sample
 
-        # Since there can only be one segment, the length of the segment, the
-        # stride and total decoded length are all the same, and equal to the
-        # decoded length n bytes of the bit-packed array
-        decoded_segment_length = math.ceil(rows * columns / 8)
-        decoded_total_length = decoded_segment_length
+    # Number of bytes in each decoded segment
+    decoded_segment_length = rows * columns
 
-        # `stride` is the total number of bytes of each sample plane
-        stride = decoded_total_length
-    else:
-        bytes_per_sample = nr_bits // 8
-        expected_nr_segments = nr_samples * bytes_per_sample
+    # `stride` is the total number of bytes of each sample plane
+    stride = bytes_per_sample * rows * columns
 
-        # Number of bytes in each decoded segment
-        decoded_segment_length = rows * columns
-
-        # `stride` is the total number of bytes of each sample plane
-        stride = bytes_per_sample * rows * columns
-
-        # total number of bytes in decoded array
-        decoded_total_length = stride * nr_samples
+    # total number of bytes in decoded array
+    decoded_total_length = stride * nr_samples
 
     if nr_segments != expected_nr_segments:
         raise ValueError(
