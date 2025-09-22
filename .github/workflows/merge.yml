@@ -1,7 +1,6 @@
 name: merge
 # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions
 permissions:
-    # Can read repo contents
     contents: read
 
 on:
