@@ -1,4 +1,6 @@
 name: tests_wf
+permissions:
+    contents: read
 
 on:
   workflow_call:
@@ -41,11 +43,13 @@ jobs:
     - name: Set env variables
       run: echo "PYTEST_ARGS=--cov-append --cov=pydicom" >> "$GITHUB_ENV"
     - name: Check-out code
-      uses: actions/checkout@v5
+      # v5.0.0
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
       with:
         fetch-depth: 2
     - name: Set up Python ${{ inputs.python-version }}
-      uses: actions/setup-python@v5
+      # v6.0.0
+      uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
       with:
         python-version: ${{ inputs.python-version }}
         cache: pip
@@ -88,7 +92,8 @@ jobs:
 
     - name: Send coverage results
       if: success() && inputs.upload-coverage
-      uses: codecov/codecov-action@v5
+      # v5.5.1
+      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
       with:
         token: ${{ secrets.codecov_token }}
         env_vars: inputs.os,inputs.python-version
