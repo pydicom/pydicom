@@ -18,6 +18,7 @@ from pydicom.datadict import (
     add_private_dict_entries,
     add_private_dict_entry,
     _dictionary_vr_fast,
+    tag_for_keyword,
 )
 from pydicom.datadict import add_dict_entry, add_dict_entries
 from .test_util import save_private_dict
@@ -183,3 +184,8 @@ class TestDict:
         msg = r"Tag \(50F1,0010\) not found in DICOM dictionary"
         with pytest.raises(KeyError, match=msg):
             _dictionary_vr_fast(0x50F10010)
+
+    def test_tag_for_keyword_case_insensitive(self):
+        assert tag_for_keyword("PatientID") == 0x00100020
+        assert tag_for_keyword("patientid") == 0x00100020
+        assert tag_for_keyword("PATIENTID") == 0x00100020

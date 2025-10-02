@@ -8,6 +8,7 @@ from pydicom.misc import warn_and_log
 from pydicom._private_dict import private_dictionaries
 from pydicom.tag import Tag, BaseTag, TagType
 
+from pydicom.util.collections import CaseInsensitiveDict
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
@@ -455,7 +456,9 @@ def keyword_for_tag(tag: TagType) -> str:
 
 
 # Provide for the 'reverse' lookup. Given the keyword, what is the tag?
-keyword_dict: dict[str, int] = {dictionary_keyword(tag): tag for tag in DicomDictionary}
+keyword_dict: CaseInsensitiveDict = CaseInsensitiveDict(
+    {dictionary_keyword(tag): tag for tag in DicomDictionary}
+)
 
 
 def tag_for_keyword(keyword: str) -> int | None:
@@ -474,7 +477,8 @@ def tag_for_keyword(keyword: str) -> int | None:
         If the element is in the DICOM data dictionary then returns the
         corresponding element's tag, otherwise returns ``None``.
     """
-    return keyword_dict.get(keyword)
+    value = keyword_dict.get(keyword)
+    return value if isinstance(value, int) else None
 
 
 def repeater_has_tag(tag: int) -> bool:
