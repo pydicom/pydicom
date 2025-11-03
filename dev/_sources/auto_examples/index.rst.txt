@@ -115,7 +115,7 @@ be applied to DICOM images.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from 512  imes 512 to 64       imes 64. The downsizing is performed by taking the central section instead of averagin the pixels. Finally, the image is store as a dicom image.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from 512  imes 512 to 64       imes 64. The downsizing is performed by taking the central section instead of averaging the pixels. Finally, the image is store as a dicom image.">
 
 .. only:: html
 
