@@ -10,7 +10,8 @@ observ = "observ"
 
 [default]
 extend-ignore-re = [
-    "np\\.\\w"
+    "np\\.\\w",
+    "`eval`uable"
 ]
 
 [files]
