@@ -169,8 +169,6 @@ class TestEncodeRLEFrame:
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
 
-        decoded = unpack_bits(decoded, as_array=False)[:n_pixels]
-
         arr = np.frombuffer(decoded, "|u1")
         arr = reshape_pixel_array(ds, arr)
 
