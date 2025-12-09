@@ -84,6 +84,20 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
                 else:
                     # Use Image.draft() to signal no color transformation
                     image.draft("YCbCr", image.size)  # type: ignore[no-untyped-call]
+                    # Ensure per-frame PI matches the returned samples
+                    # JPEG Baseline typically implies YCbCr 4:2:2
+                    if tsyntax == uid.JPEGBaseline8Bit:
+                        runner.set_frame_option(
+                            runner.index,
+                            "photometric_interpretation",
+                            PI.YBR_FULL_422,
+                        )
+                    else:
+                        runner.set_frame_option(
+                            runner.index,
+                            "photometric_interpretation",
+                            PI.YBR_FULL,
+                        )
             elif image.info["adobe_transform"] == 1:  # 0: RGB, 1: YCbCr
                 # If the Adobe APP14 marker is present then Pillow uses the value to
                 #   determine the color space and defaults to returning RGB
@@ -93,6 +107,19 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
                     )
                 elif "YBR" in cs:
                     image.draft("YCbCr", image.size)  # type: ignore[no-untyped-call]
+                    # Match frame PI to returned YCbCr samples
+                    if tsyntax == uid.JPEGBaseline8Bit:
+                        runner.set_frame_option(
+                            runner.index,
+                            "photometric_interpretation",
+                            PI.YBR_FULL_422,
+                        )
+                    else:
+                        runner.set_frame_option(
+                            runner.index,
+                            "photometric_interpretation",
+                            PI.YBR_FULL,
+                        )
 
         return cast(bytes, image.tobytes())
 

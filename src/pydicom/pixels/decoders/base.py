@@ -516,6 +516,20 @@ class DecodeRunner(RunnerBase):
                 )
                 return
 
+        # If no RGB indicators (component IDs or APP markers) were found then
+        #   default JPEG Baseline multi-sample images to YCbCr 4:2:2 and others
+        #   to YCbCr full range. This covers the common case where the dataset's
+        #   Photometric Interpretation was incorrectly set to RGB while the
+        #   codestream is actually YCbCr.
+        if self.transfer_syntax == JPEGBaseline8Bit and "YBR" not in pi:
+            self.set_frame_option(index, "photometric_interpretation", PI.YBR_FULL_422)
+            warn_and_log(
+                f"The (0028,0004) 'Photometric Interpretation' value is '{pi}' "
+                f"however the JPEG Baseline codestream for frame {index} has no RGB "
+                f"indicators; defaulting to 'YBR_FULL_422' per JPEG conventions"
+            )
+            return
+
     def decode(self, index: int) -> bytes | bytearray:
         """Decode the frame of pixel data at `index`.
 

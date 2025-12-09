@@ -204,6 +204,40 @@ class TestLibJpegDecoder:
         assert meta["photometric_interpretation"] == "YBR_FULL"
         assert np.array_equal(arr, ref)
 
+    def test_no_markers_but_pi_rgb_defaults_to_ybr_full_422(self):
+        """If no APP markers and dataset PI is RGB, default to YBR_FULL_422.
+
+        This simulates a common real-world case where the DICOM's
+        PhotometricInterpretation is incorrectly set to RGB while the
+        JPEG Baseline codestream is actually YCbCr with no APP hints.
+        Raw decode should report YBR_FULL_422 PI, and non-raw should
+        convert to RGB by default (as_rgb=True).
+        """
+        reference = JPGB_08_08_3_0_1F_RGB_APP14
+        ds = dcmread(reference.path)
+
+        # Strip APP markers by skipping initial segments up to the SOF
+        codestream = b"\xff\xd8" + get_frame(ds.PixelData, 0, number_of_frames=1)[18:]
+        meta = _get_jpg_parameters(codestream)
+        assert "app" not in meta
+        ds.PixelData = encapsulate([codestream])
+
+        # Incorrectly mark dataset as RGB (common issue in the wild)
+        ds.PhotometricInterpretation = "RGB"
+
+        decoder = get_decoder(JPEGBaseline8Bit)
+
+        # Raw decode should not convert; PI should default to YBR_FULL_422 now
+        arr_raw, meta_raw = decoder.as_array(ds, raw=True, decoding_plugin="pillow")
+        assert meta_raw["photometric_interpretation"] == "YBR_FULL_422"
+
+        # Non-raw decode (default as_rgb=True) should convert to RGB
+        arr_rgb, meta_rgb = decoder.as_array(ds, decoding_plugin="pillow")
+        assert meta_rgb["photometric_interpretation"] == "RGB"
+        # Validate conversion numerically against converting raw ourselves
+        ref_rgb = convert_color_space(arr_raw, "YBR_FULL", "RGB")
+        assert np.allclose(arr_rgb, ref_rgb, atol=1)
+
 
 @pytest.mark.skipif(SKIP_OJ, reason="Test is missing dependencies")
 class TestOpenJpegDecoder:
