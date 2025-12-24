@@ -25,6 +25,11 @@ jobs:
             test-numpy: true
             test-extras: true
             upload-coverage: true
+          - os: windows
+            python-version: "3.14"
+            test-numpy: true
+            test-extras: true
+            upload-coverage: false
           - os: macos
             python-version: "3.12"
             test-numpy: true

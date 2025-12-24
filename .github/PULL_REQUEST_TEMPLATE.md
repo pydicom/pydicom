@@ -1,6 +1,6 @@
 <!--
-Please prefix your PR title with [WIP] for PRs that are in progress and change
-to [MRG] when you consider them ready for final review.
+Please create a draft PR if the PR is still in progress and change
+it to a regular PR when you consider it ready for final review.
 -->
 
 #### Describe the changes
