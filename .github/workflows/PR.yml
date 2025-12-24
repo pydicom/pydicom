@@ -30,11 +30,10 @@ jobs:
             test-numpy: true
             test-extras: true
             upload-coverage: false
-          # Pre-release Python
           - os: ubuntu
             python-version: "3.14"
-            test-numpy: false
-            test-extras: false
+            test-numpy: true
+            test-extras: true
             upload-coverage: false
           - os: ubuntu
             python-version: "pypy3.10"
