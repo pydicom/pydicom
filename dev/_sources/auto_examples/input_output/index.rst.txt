@@ -26,7 +26,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_rtplan_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py`
+  :doc:`/auto_examples/input_output/plot_read_rtplan`
 
 .. raw:: html
 
@@ -43,7 +43,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py`
+  :doc:`/auto_examples/input_output/plot_read_dicom`
 
 .. raw:: html
 
@@ -60,7 +60,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_printing_dataset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py`
+  :doc:`/auto_examples/input_output/plot_printing_dataset`
 
 .. raw:: html
 
@@ -77,7 +77,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_write_dicom_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py`
+  :doc:`/auto_examples/input_output/plot_write_dicom`
 
 .. raw:: html
 
@@ -94,7 +94,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_fileset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py`
+  :doc:`/auto_examples/input_output/plot_read_fileset`
 
 .. raw:: html
 

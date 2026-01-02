@@ -1200,16 +1200,16 @@ image data as <a class="reference external" href="https://docs.python.org/3/libr
 </div>
 </section>
 <section id="as-a-numpy-ndarray">
-<h3>As a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><a class="headerlink" href="#as-a-numpy-ndarray" title="Link to this heading">#</a></h3>
+<h3>As a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><a class="headerlink" href="#as-a-numpy-ndarray" title="Link to this heading">#</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Converting uncompressed <em>Pixel Data</em> to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> requires installing
+<p>Converting uncompressed <em>Pixel Data</em> to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> requires installing
 <a class="reference external" href="https://www.numpy.org">NumPy</a>, and converting compressed <em>Pixel Data</em> may
 require installing other packages. See <a class="reference internal" href="../plugin_table.html"><span class="doc">this page</span></a>
 for a list of supported transfer syntaxes and the packages required to decompress
 them.</p>
 </div>
-<p>There are three main methods for converting <em>Pixel Data</em> to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>,
+<p>There are three main methods for converting <em>Pixel Data</em> to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>,
 depending on your use case:</p>
 <ol class="arabic simple">
 <li><p>Using the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property, in conjunction
@@ -1222,7 +1222,7 @@ methods.</p></li>
 </ol>
 <section id="with-dataset-pixel-array">
 <h4>With <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a><a class="headerlink" href="#with-dataset-pixel-array" title="Link to this heading">#</a></h4>
-<p>The most convenient way to return the entire pixel data as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+<p>The most convenient way to return the entire pixel data as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
 is with the <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> property:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">ybr_color</span>
@@ -1512,7 +1512,7 @@ can be read and decoded using <a class="reference internal" href="../../referenc
 
   <p class="copyright">
     
-      © Copyright 2008-2025, Darcy Mason and pydicom contributors.
+      © Copyright 2008-2026, Darcy Mason and pydicom contributors.
       <br/>
     
   </p>

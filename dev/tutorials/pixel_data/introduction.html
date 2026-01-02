@@ -508,7 +508,7 @@
 <p>This is part 1 of the tutorial on using <em>pydicom</em> with DICOM <em>Pixel Data</em>. It covers:</p>
 <ul class="simple">
 <li><p>An introduction to DICOM pixel data</p></li>
-<li><p>Converting pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p></li>
+<li><p>Converting pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p></li>
 <li><p>Customizing the conversion process</p></li>
 </ul>
 <p>It’s assumed that you’re already familiar with the <a class="reference internal" href="../dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
@@ -629,11 +629,11 @@ dataset contains a single grayscale image with dimensions 128 x 128 and that eac
 pixel should be interpreted as a 2-byte signed integer.</p>
 </section>
 <section id="converting-to-an-ndarray">
-<h2>Converting to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><a class="headerlink" href="#converting-to-an-ndarray" title="Link to this heading">#</a></h2>
+<h2>Converting to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a><a class="headerlink" href="#converting-to-an-ndarray" title="Link to this heading">#</a></h2>
 <p>Properly interpreting all the possible variations of a dataset’s pixel data requires
 a lot of specific domain knowledge, not just of DICOM but also the various
 JPEG compression schemes. For this reason <em>pydicom</em> offers a number of methods
-for converting the pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, the most high-level
+for converting the pixel data to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, the most high-level
 of which are the <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
 functions:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -654,7 +654,7 @@ functions:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>This will convert the entire pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> before using
+<p>This will convert the entire pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> before using
 <a class="reference external" href="https://matplotlib.org/">matplotlib</a> to display it. If the dataset has multiple
 frames but you’re only interested in a particular one, then you can use the <cite>index</cite> parameter
 to return it:</p>
@@ -716,7 +716,7 @@ data as found in the dataset you can pass <code class="docutils literal notransl
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Further customization of the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> is possible by
+<p>Further customization of the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> is possible by
 passing one or more <a class="reference internal" href="../../guides/decoding/decoder_options.html"><span class="doc">decoding options</span></a> to
 <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>.</p>
 </section>
@@ -753,7 +753,7 @@ you’ll get an exception:</p>
 <span class="x">    pillow - requires numpy and pillow&gt;=10.0</span>
 </pre></div>
 </div>
-<p>While the resulting <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for lossless compression methods should
+<p>While the resulting <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for lossless compression methods should
 be identical no matter which plugin is used, there may be slight differences for lossy
 compression methods. To ensure consistency you can use the <cite>decoding_plugin</cite> argument
 to use the specified <a class="reference internal" href="../../guides/plugin_table.html"><span class="doc">decompression plugin</span></a>:</p>
@@ -878,14 +878,14 @@ or alternatively by using <a class="reference internal" href="../../reference/ge
 </section>
 </section>
 <section id="converting-to-an-ndarray-with-metadata">
-<h2>Converting to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with metadata<a class="headerlink" href="#converting-to-an-ndarray-with-metadata" title="Link to this heading">#</a></h2>
+<h2>Converting to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with metadata<a class="headerlink" href="#converting-to-an-ndarray-with-metadata" title="Link to this heading">#</a></h2>
 <p>While <a class="reference internal" href="../../reference/generated/pydicom.pixels.pixel_array.html#pydicom.pixels.pixel_array" title="pydicom.pixels.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pixel_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.iter_pixels.html#pydicom.pixels.iter_pixels" title="pydicom.pixels.iter_pixels"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter_pixels()</span></code></a>
 should cover most use cases, you may want more information about the returned
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, such as what color space it’s in. The <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a> methods provide mid-level access
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, such as what color space it’s in. The <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a> and <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a> methods provide mid-level access
 to <em>pydicom’s</em> pixel data decoding functionality while still handling most of the complexity
 of conversion to an array. More importantly, they return or yield a tuple of
-(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>), where the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> contains metadata
-describing the corresponding <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
+(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>), where the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> contains metadata
+describing the corresponding <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The <a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder" title="pydicom.pixels.decoders.base.Decoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decoder</span></code></a> class should not be used
@@ -916,7 +916,7 @@ actual pixel data (such as <em>Number of Frames</em> or <em>Photometric Interpre
 <section id="conclusion-and-next-steps">
 <h2>Conclusion and next steps<a class="headerlink" href="#conclusion-and-next-steps" title="Link to this heading">#</a></h2>
 <p>In part 1 of this tutorial you’ve been introduced to DICOM’s pixel data and learned how to
-use <em>pydicom</em> to access it, convert it to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> and how to
+use <em>pydicom</em> to access it, convert it to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> and how to
 control the conversion process. In the next part you’ll learn how to
 <a class="reference internal" href="creation.html"><span class="doc">create your own pixel data from scratch</span></a>.</p>
 </section>
@@ -1006,7 +1006,7 @@ control the conversion process. In the next part you’ll learn how to
 
   <p class="copyright">
     
-      © Copyright 2008-2025, Darcy Mason and pydicom contributors.
+      © Copyright 2008-2026, Darcy Mason and pydicom contributors.
       <br/>
     
   </p>
