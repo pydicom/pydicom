@@ -208,12 +208,11 @@ After committing the changes, send them to your fork::
 
 You can create a pull request by visiting the :gh:`pydicom GitHub page
 <pydicom>` where you should see your branch under *"Your recently push
-branches"*. Click *"Compare & pull request"* and fill out the title (with a
-``[WIP]`` prefix, i.e. ``[WIP] Add documentation of reading a DICOM file``)
+branches"*. Click *"Compare & pull request"* and fill out the title
 and follow the instructions in the main entry window.
 
 To submit the pull request (PR) for real - **please don't do this for
-this example!** - then on the next page you would click *"Create pull
+this example!** - then on the next page you would click *"Create draft pull
 request"*. Creating the PR would automatically start the documentation build
 checks which would be visible at the bottom of the PR as the
 `CircleCI <https://circleci.com/>`_ check. Depending on when you view it,
@@ -225,9 +224,9 @@ require signing into CircleCI). The artifacts are the generated HTML files
 and can be used to preview the results of the build by clicking Artifacts
 |rarr| ``circleci/project/doc/_build/html/index.html``
 
-If all the checks passed and you were happy with your changes, you'd change
-the PR title prefix to ``[MRG]``. This would indicate that you considered the
-PR ready to be reviewed and merged into the main branch.
+If all the checks passed and you were happy with your changes, you can click on
+*Ready for Review* to convert the draft PR into a regular PR. This would indicate
+that you considered the PR ready to be reviewed and merged into the main branch.
 
 What happens next?
 ==================
