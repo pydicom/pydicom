@@ -216,20 +216,19 @@ patch, send it to your fork::
 
 You can create a pull request by visiting the :gh:`pydicom GitHub page
 <pydicom>` where you should see your branch under *"Your recently push
-branches"*. Click *"Compare & pull request"* and fill out the title (with a
-``[WIP]`` prefix, i.e. ``[WIP] Add NewDefinedUID to uid.py``) and follow the
+branches"*. Click *"Compare & pull request"*, fill out the title and follow the
 instructions in the main entry window.
 
 To submit the pull request (PR) for real - **please don't do this for
-this example!** - then on the next page you would click *"Create pull
-request"*.
+this example!** - then on the next page you would click
+*"Create draft pull request"*.
 Creating the PR would automatically start our checks; that the tests pass and
 the test coverage is good, that the documentation builds OK, etc.
 
-If all the checks passed and you were happy with your changes, you'd change
-the PR title prefix to ``[MRG]``. This would indicate that you considered the
-PR ready to be reviewed and merged into the main branch. You could also ask
-for a review or help at any point after creating the PR.
+If all the checks passed and you were happy with your changes, you can click on
+*Ready for Review* to convert the draft PR into a regular PR. This would indicate
+that you considered the PR ready to be reviewed and merged into the main branch.
+You could also ask for a review or help at any point after creating the PR.
 
 What happens next?
 ==================
