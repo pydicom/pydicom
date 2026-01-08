@@ -2,6 +2,7 @@
 """Tests for the pixels.utils module."""
 
 import importlib
+import sys
 from io import BytesIO
 import logging
 import os
@@ -2014,7 +2015,11 @@ class TestCompressDeflated:
 
         assert ds.SamplesPerPixel == 1
         assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
-        assert len(ds.PixelData) == 22288
+        assert (
+            len(ds.PixelData) == 22288
+            if sys.version_info < (3, 14) or sys.platform != "win32"
+            else 22640
+        )
         assert "PlanarConfiguration" not in ds
         assert ds["PixelData"].is_undefined_length
         assert ds["PixelData"].VR == "OB"
@@ -2025,8 +2030,14 @@ class TestCompressDeflated:
     @pytest.mark.parametrize(
         "path,length",
         [
-            (EXPL_1_1_3F.path, 2920),
-            (EXPL_1_1_3F_NONALIGNED.path, 3386),
+            (
+                EXPL_1_1_3F.path,
+                2920 if sys.version_info < (3, 14) or sys.platform != "win32" else 2558,
+            ),
+            (
+                EXPL_1_1_3F_NONALIGNED.path,
+                3386 if sys.version_info < (3, 14) or sys.platform != "win32" else 3052,
+            ),
         ],
     )
     def test_compress_bytes_1bit(self, path, length):

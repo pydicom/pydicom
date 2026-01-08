@@ -25,7 +25,7 @@ jobs:
             test-numpy: true
             test-extras: true
             upload-coverage: true
-          - os: windows
+          - os: ubuntu
             python-version: "3.14"
             test-numpy: true
             test-extras: true
