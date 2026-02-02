@@ -23,13 +23,13 @@ repos:
       - id: typos
         exclude: _.*_dict.py
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.10
+    rev: v0.14.14
     hooks:
       - id: ruff-check
         files: src
         args: [--fix, --show-fixes, --exit-non-zero-on-fix]
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.12.0
+    rev: 26.1.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-mypy
