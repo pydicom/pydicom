@@ -53,7 +53,6 @@ import urllib.request as urllib2
 from pydicom import _version
 from pydicom.values import converters
 
-
 _PKG_DIRECTORY = Path(__file__).parent.parent.parent / "src" / "pydicom"
 PYDICOM_DICT_FILENAME = _PKG_DIRECTORY / "_dicom_dict.py"
 MAIN_DICT_NAME = "DicomDictionary: dict[int, tuple[str, str, str, str, str]]"

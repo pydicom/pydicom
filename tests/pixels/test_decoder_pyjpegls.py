@@ -20,7 +20,6 @@ from .pixels_reference import (
     JLSL_16_15_1_1_1F,  # Signed
 )
 
-
 HAVE_PYJPEGLS = bool(importlib.util.find_spec("jpeg_ls"))
 SKIP_TEST = not HAVE_NP or not HAVE_PYJPEGLS
 

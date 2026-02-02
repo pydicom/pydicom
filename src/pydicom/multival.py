@@ -6,7 +6,6 @@ or any list of items that must all be the same type.
 from typing import overload, Any, cast, TypeVar
 from collections.abc import Iterable, Callable, MutableSequence, Iterator
 
-
 T = TypeVar("T")
 Self = TypeVar("Self", bound="ConstrainedList")
 

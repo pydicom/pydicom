@@ -13,7 +13,6 @@ from pydicom.pixels.decoders.native import _rle_decode_frame
 from pydicom.pixels.utils import reshape_pixel_array, _convert_rle_endianness
 from pydicom.uid import RLELossless, JPEG2000, ExplicitVRLittleEndian
 
-
 try:
     import gdcm
     import numpy as np

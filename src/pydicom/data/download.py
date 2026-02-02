@@ -39,7 +39,6 @@ except ImportError:
 from . import retry
 from pydicom.misc import warn_and_log
 
-
 HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
 

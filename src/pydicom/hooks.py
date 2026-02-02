@@ -11,7 +11,6 @@ from pydicom.multival import MultiValue
 from pydicom.tag import BaseTag, _LUT_DESCRIPTOR_TAGS
 from pydicom.valuerep import VR
 
-
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
     from pydicom.dataelem import RawDataElement

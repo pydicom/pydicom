@@ -47,7 +47,6 @@ sys.path.append(os.fspath(BASE_DIR))
 
 from github_link import make_linkcode_resolve
 
-
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
 

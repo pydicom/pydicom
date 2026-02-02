@@ -8,7 +8,6 @@ import sys
 
 from pydicom.valuerep import VR
 
-
 GDCM_PRIVATE_DICT = (
     r"https://raw.githubusercontent.com/malaterre/GDCM/"
     r"master/Source/DataDictionary/privatedicts.xml"

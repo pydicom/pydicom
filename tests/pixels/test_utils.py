@@ -97,7 +97,6 @@ from .pixels_reference import (
 )
 from ..test_helpers import assert_no_warning
 
-
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_RLE = bool(importlib.util.find_spec("rle"))
 HAVE_JLS = bool(importlib.util.find_spec("jpeg_ls"))

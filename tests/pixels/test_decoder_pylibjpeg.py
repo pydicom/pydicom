@@ -49,7 +49,6 @@ from .pixels_reference import (
     EXPL_16_1_10F,
 )
 
-
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_LJ = bool(importlib.util.find_spec("libjpeg"))
 HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))

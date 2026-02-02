@@ -8,7 +8,6 @@ from pydicom.misc import warn_and_log
 from pydicom._private_dict import private_dictionaries
 from pydicom.tag import Tag, BaseTag, TagType
 
-
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
 masks: dict[str, tuple[int, int]] = {}

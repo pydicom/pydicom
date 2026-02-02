@@ -40,7 +40,6 @@ from .pixels_reference import (
     J2KR_1_1_3F_NONALIGNED,
 )
 
-
 HAVE_PILLOW = bool(importlib.util.find_spec("PIL"))
 HAVE_LJ = features.check_codec("jpg") if HAVE_PILLOW else False
 HAVE_OJ = features.check_codec("jpg_2000") if HAVE_PILLOW else False

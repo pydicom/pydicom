@@ -115,7 +115,6 @@ from pydicom.uid import (
     UID,
 )
 
-
 LOGGER = logging.getLogger("pydicom")
 
 

@@ -26,7 +26,6 @@ from pydicom.pixels.utils import _get_jpg_parameters
 from pydicom.uid import JPEGLSLossless, JPEGLSNearLossless
 from pydicom.pixel_data_handlers.gdcm_handler import get_pixeldata
 
-
 HAVE_JLS = bool(importlib.util.find_spec("jpeg_ls"))
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_GDCM = bool(importlib.util.find_spec("gdcm"))

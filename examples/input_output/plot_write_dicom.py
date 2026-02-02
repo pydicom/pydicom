@@ -20,7 +20,6 @@ import pydicom
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.uid import UID, ExplicitVRLittleEndian
 
-
 print("Setting dataset values...")
 ds = Dataset()
 ds.PatientName = "Test^Firstname"

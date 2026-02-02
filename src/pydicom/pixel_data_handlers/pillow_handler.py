@@ -44,7 +44,6 @@ from pydicom.uid import (
     JPEGExtended12Bit,
 )
 
-
 logger = logging.getLogger("pydicom")
 
 

@@ -6,7 +6,6 @@ from itertools import groupby
 from pathlib import Path
 import warnings
 
-
 LOGGER = logging.getLogger("pydicom")
 
 

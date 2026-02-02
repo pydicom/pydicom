@@ -10,7 +10,6 @@ from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.utils import pack_bits
 from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
-
 ENCODER_DEPENDENCIES = {
     RLELossless: (),
     DeflatedImageFrameCompression: (),

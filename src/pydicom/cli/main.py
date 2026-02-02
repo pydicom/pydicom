@@ -21,7 +21,6 @@ from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import UID
 from pydicom.valuerep import PersonName
 
-
 subparsers: argparse._SubParsersAction | None = None
 
 

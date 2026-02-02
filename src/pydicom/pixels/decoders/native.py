@@ -12,7 +12,6 @@ from pydicom.misc import warn_and_log
 from pydicom.pixels.decoders.base import DecodeRunner
 from pydicom.uid import RLELossless, DeflatedImageFrameCompression
 
-
 DECODER_DEPENDENCIES = {
     RLELossless: (),
     DeflatedImageFrameCompression: (),

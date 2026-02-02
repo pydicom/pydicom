@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Tests for the 'pydicom' encoder plugin."""
 
-
 import pytest
 
 try:
@@ -33,7 +32,6 @@ from pydicom.pixels.decoders.native import (
 )
 from pydicom.pixels.utils import reshape_pixel_array, unpack_bits
 from pydicom.uid import RLELossless, DeflatedImageFrameCompression
-
 
 # EXPL: Explicit VR Little Endian
 # RLE: RLE Lossless

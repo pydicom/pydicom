@@ -9,7 +9,6 @@ import pytest
 from pydicom.data import get_testdata_file
 from pydicom.misc import is_dicom, size_in_bytes, warn_and_log, find_keyword_candidates
 
-
 test_file = get_testdata_file("CT_small.dcm")
 no_meta_file = get_testdata_file("ExplVR_LitEndNoMeta.dcm")
 

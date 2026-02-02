@@ -45,7 +45,6 @@ from .pixels_reference import (
     J2KR_1_1_3F_NONALIGNED,
 )
 
-
 HAVE_GDCM = bool(importlib.util.find_spec("gdcm"))
 SKIP_TEST = not HAVE_NP or not HAVE_GDCM
 

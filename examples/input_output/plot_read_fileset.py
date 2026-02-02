@@ -15,7 +15,6 @@ from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
 from pydicom.uid import generate_uid
 
-
 path = get_testdata_file("DICOMDIR")
 # A File-set can be loaded from the path to its DICOMDIR dataset or the
 #   dataset itself

@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
+
 import tempfile
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone

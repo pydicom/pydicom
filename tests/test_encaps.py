@@ -29,7 +29,6 @@ from pydicom.encaps import (
 from pydicom.filebase import DicomBytesIO
 from pydicom.fileutil import read_buffer
 
-
 JP2K_10FRAME_NOBOT = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 
 

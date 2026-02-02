@@ -15,7 +15,6 @@ from pydicom.filebase import ReadableBuffer, WriteableBuffer
 
 from pydicom.config import logger, settings
 
-
 PathType = str | bytes | os.PathLike
 
 

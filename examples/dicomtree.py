@@ -6,6 +6,7 @@ Show a dicom file using hierarchical tree
 Show a dicom file using a hierarchical tree in a graphical window.
 
 """
+
 from pathlib import Path
 import sys
 
@@ -13,7 +14,6 @@ import tkinter as tk
 from tkinter import ttk
 
 import pydicom
-
 
 print(__doc__)
 

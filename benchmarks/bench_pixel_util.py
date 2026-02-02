@@ -7,7 +7,6 @@ from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.pixel_data_handlers.util import convert_color_space
 
-
 # 32/32, 3 sample/pixel, 2 frame
 EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
 

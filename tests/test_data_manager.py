@@ -24,7 +24,6 @@ from pydicom.data.data_manager import (
 from pydicom.data import download
 from pydicom.data.download import get_data_dir, calculate_file_hash, get_cached_filehash
 
-
 EXT_PYDICOM = "pydicom-data" in external_data_sources()
 if EXT_PYDICOM:
     DATA_SRC = external_data_sources()["pydicom-data"].data_path

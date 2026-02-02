@@ -38,7 +38,6 @@ if have_numpy:
 
 from pydicom.valuerep import PersonName
 
-
 _T = TypeVar("_T")
 
 

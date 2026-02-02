@@ -22,7 +22,6 @@ import xml.etree.ElementTree as ET
 
 from pydicom import _version
 
-
 _PKG_DIRECTORY = Path(__file__).parent.parent.parent / "src" / "pydicom"
 PYDICOM_DICT_FILENAME = _PKG_DIRECTORY / "_uid_dict.py"
 DICT_NAME = "UID_dictionary"

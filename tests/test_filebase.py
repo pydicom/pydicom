@@ -9,7 +9,6 @@ from pydicom.data import get_testdata_file
 from pydicom.filebase import DicomIO, DicomFileLike, DicomFile, DicomBytesIO
 from pydicom.tag import Tag
 
-
 TEST_FILE = get_testdata_file("CT_small.dcm")
 
 

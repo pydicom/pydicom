@@ -9,7 +9,6 @@ from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_frame,
 )
 
-
 # 8/8-bit, 1 sample/pixel, 1 frame
 OB_RLE_1F = get_testdata_file("OBXXXX1A_rle.dcm")
 # 8/8-bit, 1 sample/pixel, 2 frame

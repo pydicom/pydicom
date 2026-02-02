@@ -334,8 +334,7 @@ class TestDataSetToJson:
 class TestEmptyJsonValues:
     @pytest.fixture
     def test_json(self):
-        yield Dataset.from_json(
-            """{
+        yield Dataset.from_json("""{
             "00091000": { "vr": "CS", "Value": [ "" ] },
             "00091001": { "vr": "CS", "Value": [ null ] },
             "00091002": { "vr": "LO", "Value": [ "" ] },
@@ -352,8 +351,7 @@ class TestEmptyJsonValues:
             "00091023": { "vr": "US", "Value": [ null ] },
             "00091024": { "vr": "FL", "Value": [ "" ] },
             "00091025": { "vr": "FL", "Value": [ null ] }
-        }"""
-        )
+        }""")
 
     def empty_data_from_json_with_none(
         self, test_json, use_none_as_empty_text_VR_value

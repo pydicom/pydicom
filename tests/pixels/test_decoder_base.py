@@ -57,7 +57,6 @@ from .pixels_reference import (
     EXPB_8_1_1F,
 )
 
-
 RLE_REFERENCE = PIXEL_REFERENCE[RLELossless]
 
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))

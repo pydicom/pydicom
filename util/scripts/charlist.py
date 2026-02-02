@@ -7,7 +7,6 @@ import os
 import pydicom
 from pydicom.data import get_charset_files
 
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logger = logging.getLogger("charlist")

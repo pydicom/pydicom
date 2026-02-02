@@ -1,5 +1,6 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
+
 from io import BytesIO, RawIOBase
 from pathlib import Path
 import platform
@@ -17,7 +18,6 @@ from pydicom.fileutil import (
     buffer_length,
     buffer_equality,
 )
-
 
 IS_WINDOWS = platform.system() == "Windows"
 

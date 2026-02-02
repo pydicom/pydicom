@@ -1,5 +1,6 @@
 # Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
+
 import copy
 from contextlib import contextmanager
 from io import BytesIO

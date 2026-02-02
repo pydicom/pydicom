@@ -6,7 +6,6 @@ from pathlib import Path
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
 
-
 # All datasets included here must be available in the package itself
 #   NOT via the pydicom-data download method
 _DATASETS: dict[str, str] = {

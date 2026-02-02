@@ -6,7 +6,6 @@ from pydicom.data import get_testdata_file
 from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
 from pydicom.uid import RLELossless
 
-
 # 8/8-bit, 1 sample/pixel, 1 frame
 EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
 # 8/8-bit, 3 sample/pixel, 1 frame

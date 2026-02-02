@@ -20,7 +20,6 @@ import urllib.request as urllib_request
 from xml.etree import ElementTree as ET
 import zipfile
 
-
 LOGGER = logging.getLogger(__name__)
 
 

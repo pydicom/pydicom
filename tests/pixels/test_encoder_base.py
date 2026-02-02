@@ -34,7 +34,6 @@ from .pixels_reference import (
     EXPL_16_16_1F,
 )
 
-
 HAVE_GDCM = bool(importlib.util.find_spec("gdcm"))
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_RLE = bool(importlib.util.find_spec("rle"))

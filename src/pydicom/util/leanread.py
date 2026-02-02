@@ -13,7 +13,6 @@ from pydicom.tag import TupleTag, ItemTag
 from pydicom.uid import UID
 from pydicom.valuerep import EXPLICIT_VR_LENGTH_32
 
-
 extra_length_VRs_b = tuple(vr.encode("ascii") for vr in EXPLICIT_VR_LENGTH_32)
 ExplicitVRLittleEndian = b"1.2.840.10008.1.2.1"
 ImplicitVRLittleEndian = b"1.2.840.10008.1.2"

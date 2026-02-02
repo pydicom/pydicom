@@ -28,7 +28,6 @@ from pydicom.pixels.utils import as_pixel_options
 from pydicom.pixels.utils import get_expected_length, get_j2k_parameters
 from pydicom.uid import RLELossless, JPEG2000
 
-
 HAVE_PYLJ = bool(importlib.util.find_spec("pylibjpeg"))
 HAVE_OJ = bool(importlib.util.find_spec("openjpeg"))
 HAVE_RLE = bool(importlib.util.find_spec("rle"))

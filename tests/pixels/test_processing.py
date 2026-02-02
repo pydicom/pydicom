@@ -38,7 +38,6 @@ from pydicom.pixels.processing import (
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from .pixels_reference import EXPL_16_3_1F
 
-
 # PAL: PALETTE COLOR Photometric Interpretation
 # SEG: Segmented Palette Color
 # SUP: Supplemental Palette Color

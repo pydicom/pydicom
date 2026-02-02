@@ -4,6 +4,7 @@
 
 This module is not intended to be used directly.
 """
+
 from typing import cast
 
 from pydicom import uid

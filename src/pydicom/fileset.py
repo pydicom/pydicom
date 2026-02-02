@@ -29,7 +29,6 @@ from pydicom.uid import (
     MediaStorageDirectoryStorage,
 )
 
-
 # Regex for conformant File ID paths - PS3.10 Section 8.5
 _RE_FILE_ID = re.compile("^[A-Z0-9_]*$")
 # Prefixes to use when generating File ID components

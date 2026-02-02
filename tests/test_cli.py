@@ -7,7 +7,6 @@ import pytest
 
 from pydicom.cli.main import filespec_parser, eval_element, main, filespec_parts
 
-
 bad_elem_specs = (
     "extra:colon",
     "no_callable()",

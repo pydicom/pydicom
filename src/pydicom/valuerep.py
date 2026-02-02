@@ -13,7 +13,6 @@ from collections.abc import Callable, Sequence, Iterator
 from pydicom import config
 from pydicom.misc import warn_and_log
 
-
 # can't import from charset or get circular import
 default_encoding = "iso8859"
 

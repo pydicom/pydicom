@@ -37,7 +37,6 @@ from pydicom.valuerep import (
 )
 from pydicom.values import convert_value
 
-
 badvr_name = get_testdata_file("badVR.dcm")
 default_encoding = "iso8859"
 

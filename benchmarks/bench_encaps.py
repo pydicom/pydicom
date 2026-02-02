@@ -10,7 +10,6 @@ from pydicom.encaps import (
     decode_data_sequence,
 )
 
-
 JP2K_10FRAME = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 
 

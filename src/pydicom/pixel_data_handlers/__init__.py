@@ -17,7 +17,6 @@ from pydicom.pixels.utils import (
     unpack_bits as _unpack_bits,
 )
 
-
 _DEPRECATED = {
     "apply_color_lut": _apply_color_lut,
     "apply_modality_lut": _apply_modality_lut,

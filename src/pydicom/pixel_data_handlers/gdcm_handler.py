@@ -37,7 +37,6 @@ from pydicom.pixels.utils import (
     get_nr_frames,
 )
 
-
 HANDLER_NAME = "GDCM"
 
 DEPENDENCIES = {

@@ -14,6 +14,7 @@ Dataset (dict subclass)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
+
 import copy
 import io
 import json
@@ -78,7 +79,6 @@ from pydicom.tag import Tag, BaseTag, TagType, TAG_PIXREP
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
-
 
 # FloatPixelData, DoubleFloatPixelData, PixelData
 PIXEL_KEYWORDS = {0x7FE00008, 0x7FE00009, 0x7FE00010}

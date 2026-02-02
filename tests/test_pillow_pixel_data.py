@@ -17,7 +17,6 @@ from pydicom.uid import (
     AllTransferSyntaxes,
 )
 
-
 try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER

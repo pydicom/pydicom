@@ -20,7 +20,6 @@ from pydicom.uid import (
 
 from .pixels_reference import RLE_16_1_10F, EXPL_8_3_1F_YBR
 
-
 REFERENCE_FRAME_LENGTHS = [
     # (rows, cols, samples), bit depth, result in (bytes (native), bytes(encapsulated), pixels, ybr_bytes)
     # YBR can only be 3 samples/px and > 1 bit depth

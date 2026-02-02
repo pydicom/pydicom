@@ -30,7 +30,6 @@ from pydicom.tag import BaseTag
 from pydicom.valuerep import BYTES_VR, AMBIGUOUS_VR, VR
 from pydicom.cli.main import filespec_help, filespec_parser
 
-
 line_term = "\n"
 
 # Precompiled search patterns for camel_to_underscore()
@@ -189,7 +188,7 @@ def code_sequence(
     def unique_name(name: str) -> str:
         name_count = (
             cast(deque, var_names).count(name) - 1
-        )  # type:ignore[redundant-cast]
+        )  # type: ignore[redundant-cast]
         return name if name_count == 0 else name + f"_{name_count}"
 
     lines = []

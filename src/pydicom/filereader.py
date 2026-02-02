@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
-
 # Need zlib and io.BytesIO for deflate-compressed file
 import os
 from struct import Struct, unpack
@@ -40,7 +39,6 @@ from pydicom.tag import (
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR as VR_
-
 
 ENCODED_VR = {vr.encode(default_encoding) for vr in VR_}
 
