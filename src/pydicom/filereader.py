@@ -36,6 +36,7 @@ from pydicom.tag import (
     Tag,
     BaseTag,
     TagListType,
+    TupleTag,
 )
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
@@ -43,6 +44,9 @@ from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR as VR_
 
 
 ENCODED_VR = {vr.encode(default_encoding) for vr in VR_}
+
+# disable some code complexity checks due to performance-relevant code
+# ruff: noqa: C901, PLR0912, PLR0915
 
 
 def data_element_generator(
@@ -166,6 +170,13 @@ def data_element_generator(
                     )
                 vr = None
                 group, elem, length = implicit_VR_unpack(bytes_read)
+                if group == 2:
+                    # as the metadata is expected to be explicit VR, we lookup the VR
+                    # to be able to write it back with the correct transfer syntax
+                    try:
+                        vr = _dictionary_vr_fast(TupleTag((group, elem)))
+                    except KeyError:
+                        vr = "UN"
             else:
                 # Either an unimplemented VR or implicit VR encoding
                 # Note that we treat an unimplemented VR as having a 2-byte
