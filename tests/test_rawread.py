@@ -8,6 +8,7 @@ import pytest
 from pydicom.filereader import data_element_generator
 from pydicom.values import convert_value
 from pydicom.sequence import Sequence
+from pydicom.uid import ImplicitVRLittleEndian
 from pydicom.util.hexutil import hex2bytes
 
 
@@ -570,3 +571,22 @@ class TestRawSequence:
         )
         seq = next(de_gen)
         assert seq[0].PatientID == "4444444444"
+
+    def test_explVR_switch_implVR_in_meta_data(self):
+        """Raw read: Tolerate VR in meta data written as Implicit Little Endian"""
+        # issue 2290
+        hexstr = (
+            "02 00 16 00 41 45 0A 00 41 4C 49 5A 41 4D 53 41 45 20 "  # SourceApplicationEntityTitle
+            "02 00 16 00 06 00 00 00 48 4C 37 5F 41 45"  # SourceApplicationEntityTitle encoded implicit
+            "02 00 99 00 06 00 00 00 41 42 43 44 45 46"  # unknown meta tag encoded implicit
+        )
+        infile = BytesIO(hex2bytes(hexstr))
+        de_gen = data_element_generator(
+            infile, is_implicit_VR=False, is_little_endian=True
+        )
+        tag = next(de_gen)  # written in explicit syntax - contains VR
+        assert tag.VR == "AE"
+        tag = next(de_gen)  # written in implicit syntax - VR must be deduced
+        assert tag.VR == "AE"
+        tag = next(de_gen)  # unknown tag written in implicit syntax - VR set to UN
+        assert tag.VR == "UN"

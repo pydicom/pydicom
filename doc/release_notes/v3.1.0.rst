@@ -43,6 +43,7 @@ Fixes
 * Correctly handle empty LUT data (:issue:`2238`).
 * Fixed data in the "unused" bits above *Bits Stored* sometimes being included in the returned
   pixel data for JPEG 2000 and JPEG-LS (:issue:`2260`).
+* Correctly handle meta data tags incorrectly written in implicit transfer syntax (:issue:`2290`)
 
 Enhancements
 ------------
