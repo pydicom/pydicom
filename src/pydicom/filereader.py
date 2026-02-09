@@ -492,18 +492,18 @@ def read_dataset(
     except NotImplementedError as details:
         logger.error(details)
 
-    ds = Dataset(raw_data_elements, parent_encoding=parent_encoding)
-
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:
-        elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
-        char_set = cast(
-            str | MutableSequence[str] | None, convert_raw_data_element(elem).value
-        )
+        raw_elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
+        elem = convert_raw_data_element(raw_elem)
+        char_set = cast(str | MutableSequence[str] | None, elem.value)
+        # avoid converting the raw data element again
+        raw_data_elements[BaseTag(0x00080005)] = elem
         encoding = convert_encodings(char_set)  # -> List[str]
     else:
         encoding = parent_encoding  # -> str | MutableSequence[str]
 
+    ds = Dataset(raw_data_elements, parent_encoding=parent_encoding)
     ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
     return ds
 
