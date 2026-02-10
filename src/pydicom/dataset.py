@@ -216,16 +216,6 @@ class PrivateBlock:
         self.dataset.add_new(tag, VR, value)
         self.dataset[tag].private_creator = self.private_creator
 
-    def __deepcopy__(self, memo: Any) -> "PrivateBlock":
-        copied = self.__class__(
-            (self.group, self.private_creator),
-            self.dataset,
-            self.block_start >> 8,
-        )
-        memo[id(self)] = copied
-
-        return copied
-
 
 def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
     """Common method for Dataset.__eq__ and FileDataset.__eq__
@@ -444,6 +434,34 @@ class Dataset:  # noqa: PLW1641
     ) -> bool | None:
         """Method invoked on exit from a with statement."""
         return _trace_from(self, exc_type, exc_val, exc_tb)
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> "Dataset":
+        """Return a deep copy of the dataset.
+
+        Makes sure that any copied private block points to the correct dataset.
+
+        Returns
+        -------
+        Dataset
+            A deep copy of the file dataset.
+        """
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k == "_private_blocks":
+                private_blocks: dict[tuple[int, str], PrivateBlock] = {}
+                for key, block in self._private_blocks.items():
+                    private_blocks[key] = PrivateBlock(
+                        (block.group, block.private_creator),
+                        result,
+                        block.block_start >> 8,
+                    )
+                setattr(result, k, private_blocks)
+            else:
+                setattr(result, k, copy.deepcopy(v, memo))
+
+        return result
 
     def add(self, data_element: DataElement) -> None:
         """Add an element to the :class:`Dataset`.
