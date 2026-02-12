@@ -2458,6 +2458,22 @@ class TestFileDataset:
         assert ds_copy.filename is None
         assert ds_copy.buffer is None
 
+    def test_deepcopy_private_blocks(self):
+        """Regression test for #2294."""
+        ds_orig = Dataset()
+        block_orig = ds_orig.private_block(0x0017, "a_producer", create=True)
+        block_orig.add_new(0x01, "UN", b"value1")
+        block_orig.add_new(0x02, "UN", b"Value2")
+        assert id(block_orig.dataset) == id(ds_orig)
+
+        ds = copy.deepcopy(ds_orig)
+        block = ds.private_block(0x0017, "a_producer")
+        assert id(block.dataset) == id(ds)
+
+        del ds[(0x0017, 0x1001)]
+        assert (0x0017, 0x1001) in block_orig.dataset
+        assert (0x0017, 0x1001) not in block.dataset
+
     def test_equality_with_different_metadata(self):
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds2 = copy.deepcopy(ds)
