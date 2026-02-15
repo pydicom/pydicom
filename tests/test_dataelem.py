@@ -129,6 +129,21 @@ class TestDataElement:
         assert math.pi == data_element.value
         assert "3.14159265358979" == str(data_element.value)
 
+    def test_comparison_with_nan(self):
+        nan_value = float("nan")
+        data_element1 = DataElement((1, 2), "FL", nan_value)
+        data_element2 = DataElement((1, 2), "FL", nan_value)
+        assert data_element1 == data_element2
+
+        data_element2 = DataElement((1, 2), "FL", 1.3)
+        assert data_element1 != data_element2
+        data_element2 = DataElement((1, 2), "FL", None)
+        assert data_element1 != data_element2
+
+        data_element1 = DataElement((1, 2), "FL", (nan_value, 1.3, 3.6))
+        data_element2 = DataElement((1, 2), "FL", (nan_value, 1.3, 3.6))
+        assert data_element1 == data_element2
+
     def test_backslash(self):
         """DataElement: String with '\\' sets multi-valued data_element."""
         data_element = DataElement((1, 2), "DS", r"42.1\42.2\42.3")

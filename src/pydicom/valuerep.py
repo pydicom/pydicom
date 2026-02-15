@@ -2,6 +2,7 @@
 """Special classes for DICOM value representations (VR)"""
 
 import datetime
+import math
 from decimal import Decimal
 from enum import Enum, unique
 import re
@@ -1091,6 +1092,8 @@ class DSfloat(float):
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
+        if isinstance(other, float) and math.isnan(other):
+            return math.isnan(self)
 
         return super().__eq__(other)
 
