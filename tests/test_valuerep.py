@@ -18,6 +18,7 @@ from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
 from pydicom.filereader import read_dataset
+from pydicom.multival import MultiValue
 from pydicom.tag import Tag
 from pydicom.valuerep import (
     DS,
@@ -683,6 +684,17 @@ class TestDSfloat:
         """Test hash(DSfloat)"""
         assert hash(DSfloat(1.2345)) == hash(1.2345)
         assert hash(DSfloat("1.2345")) == hash(1.2345)
+
+    def test_comparison_with_nan(self):
+        nan_value = DSfloat("nan")
+        assert nan_value == DSfloat("nan")
+        assert nan_value == math.nan
+        assert nan_value != 1234.5
+        assert nan_value != "1234.5"
+
+        values_with_nan1 = MultiValue(DSfloat, [10.5, nan_value])
+        values_with_nan2 = MultiValue(DSfloat, [10.5, nan_value])
+        assert values_with_nan1 == values_with_nan2
 
 
 class TestDSdecimal:
