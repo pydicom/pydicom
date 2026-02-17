@@ -558,6 +558,8 @@ pixel data for JPEG 2000 and JPEG-LS (<a class="extlink-issue reference external
 <li><p>Correctly handle meta data tags incorrectly written in implicit transfer syntax (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2290">#2290</a>)</p></li>
 <li><p>Made debugging of <a class="reference internal" href="../reference/generated/pydicom.filereader.read_dataset.html#pydicom.filereader.read_dataset" title="pydicom.filereader.read_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_dataset()</span></code></a> a bit more robust (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/2292">#2292</a>).</p></li>
 <li><p>Fixed deepcopy of private blocks in <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2294">#2294</a>)</p></li>
+<li><p>Make float data elements with <cite>NaN</cite> value compare as equal - this is semantically better suited
+then the mathematical comparison, where <cite>NaN != NaN</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2273">#2273</a>)</p></li>
 </ul>
 </section>
 <section id="enhancements">

@@ -46,6 +46,8 @@ Fixes
 * Correctly handle meta data tags incorrectly written in implicit transfer syntax (:issue:`2290`)
 * Made debugging of :func:`~pydicom.filereader.read_dataset` a bit more robust (:pr:`2292`).
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
+* Make float data elements with `NaN` value compare as equal - this is semantically better suited
+  then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 
 Enhancements
 ------------
