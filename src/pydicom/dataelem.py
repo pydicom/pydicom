@@ -8,6 +8,7 @@ A DataElement has a tag,
 """
 
 import base64
+import math
 from collections.abc import Callable, MutableSequence
 import copy
 from io import BufferedIOBase
@@ -691,6 +692,8 @@ class DataElement:  # noqa: PLW1641
                 )
 
             if not self.is_buffered and not other.is_buffered:
+                if isinstance(self.value, float) and math.isnan(self.value):
+                    return other.value is not None and math.isnan(other.value)
                 return self.value == other.value
 
             try:
