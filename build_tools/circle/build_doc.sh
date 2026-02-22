@@ -96,7 +96,8 @@ sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
 python3 -m venv venv
 . venv/bin/activate
 python --version
-pip install -e .[docs]
+pip install --upgrade pip
+pip install --group docs -e .
 
 # The pipefail is requested to propagate exit code
 set -o pipefail && cd doc && make $MAKE_TARGET 2>&1 | tee ~/log.txt
