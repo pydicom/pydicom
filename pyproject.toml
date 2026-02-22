@@ -35,28 +35,6 @@ version = "3.1.0.dev0"
 
 
 [project.optional-dependencies]
-docs = [
-    "numpy",
-    "numpydoc",
-    "matplotlib",
-    "pillow",
-    "pydata-sphinx-theme",
-    "sphinx",
-    "sphinx-gallery",
-    "sphinxcontrib-napoleon",
-    "sphinx-copybutton",
-    "sphinx_design",
-]
-
-dev = [
-    "pydicom-data",
-    "pyfakefs",
-    "pytest",
-    "pytest-cov",
-    "types-requests",
-    "pre-commit",
-]
-
 basic = ["numpy", "types-pydicom"]
 
 pixeldata = [
@@ -81,7 +59,6 @@ homepage = "https://github.com/pydicom/pydicom"
 repository = "https://github.com/pydicom/pydicom"
 
 
-
 [project.scripts]
 pydicom = "pydicom.cli.main:main"
 
@@ -89,6 +66,30 @@ pydicom = "pydicom.cli.main:main"
 [project.entry-points.pydicom_subcommands]
 codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
+
+
+[dependency-groups]
+docs = [
+    "numpy",
+    "numpydoc",
+    "matplotlib",
+    "pillow",
+    "pydata-sphinx-theme",
+    "sphinx",
+    "sphinx-gallery",
+    "sphinxcontrib-napoleon",
+    "sphinx-copybutton",
+    "sphinx_design",
+]
+
+dev = [
+    "pydicom-data",
+    "pyfakefs",
+    "pytest",
+    "pytest-cov",
+    "types-requests",
+    "pre-commit",
+]
 
 
 [tool.black]

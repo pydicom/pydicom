@@ -29,7 +29,7 @@ Download the documentation
 4. Install the cloned copy of *pydicom* and the dependencies requires for
    building the documentation (using ``-e`` for an editable install)::
 
-     pip install -e pydicom[docs]
+     pip install -e pydicom --group docs
 
 
 Build and preview the documentation

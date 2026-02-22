@@ -234,7 +234,7 @@ Install the dependencies needed for building the documentation::
 
     ```bash
     $ cd pydicom/
-    $ pip install -e .[docs]
+    $ pip install -e --group docs
     ```
 
 To build the documentation itself::
