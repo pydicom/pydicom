@@ -13,6 +13,7 @@ Changes
   <pydicom.pixels.decoders.base.Decoder.as_buffer>` is now a ``dict`` containing the
   per-frame metadata to help account for inter-frame variations in frame properties
   when decoding.
+* Apply PEP 735 to build environment. It modifies how build dependencies are installed.
 
 Fixes
 -----
