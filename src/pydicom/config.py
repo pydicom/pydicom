@@ -8,6 +8,7 @@ import os
 from contextlib import contextmanager
 import threading
 from typing import Optional, Any, TYPE_CHECKING
+from collections.abc import Generator
 from copy import deepcopy
 
 have_numpy = True
