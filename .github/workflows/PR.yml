@@ -39,7 +39,7 @@ jobs:
             python-version: "3.14t"
             test-numpy: false
             test-extras: false
-            upload-coverage: false            
+            upload-coverage: false
           - os: ubuntu
             python-version: "pypy3.10"
             test-numpy: false
