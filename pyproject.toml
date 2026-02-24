@@ -98,15 +98,13 @@ force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]
-line-length = 214
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
+exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
 
 [tool.ruff.lint]
-select = [
+extend-select = [
     "UP",
     "C9",
-    "E",
-    "F",
     "PERF",
     "PL",
     "W",
@@ -132,9 +130,7 @@ max-statements = 108
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
-"src/pydicom/_*_dict.py" = ["E501"]
 "src/pydicom/config.py" = ["PLW0602"]
-"src/pydicom/uid.py" = ["E501"]
 "src/pydicom/sr/_concepts_dict.py" = ["F601"]
 "tests/*.py" = ["F401"]
 
