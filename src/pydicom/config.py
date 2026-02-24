@@ -6,8 +6,9 @@
 import logging
 import os
 from contextlib import contextmanager
+import threading
 from typing import Optional, Any, TYPE_CHECKING
-from collections.abc import Generator
+from copy import deepcopy
 
 have_numpy = True
 try:
@@ -29,6 +30,8 @@ if TYPE_CHECKING:  # pragma: no cover
 
 _use_future = False
 _use_future_env = os.getenv("PYDICOM_FUTURE")
+
+
 
 
 # Logging system and debug function to change logging level
@@ -321,11 +324,34 @@ class Settings:
         self._infer_sq_for_un_vr = value
 
 
-settings = Settings()
+_default_settings = Settings()
+
+
+class _ThreadLocalStore(threading.local):
+    def __init__(self):
+        self.thread_settings = deepcopy(_default_settings)
+
+
+_storage = _ThreadLocalStore()
+
+
+class _SettingsProxy:
+    def __getattr__(self, name):
+        return getattr(_storage.thread_settings, name)
+
+    def __setattr__(self, name, value):
+        setattr(_storage.thread_settings, name, value)
+
+
+settings = _SettingsProxy()
 """The global configuration object of type :class:`Settings` to access some
-of the settings. More settings may move here in later versions.
+of the settings.
 
 .. versionadded:: 2.3
+.. versionchanged:: 3.1
+
+            Now thread-safe, accessed through thread-local storage
+
 """
 
 
