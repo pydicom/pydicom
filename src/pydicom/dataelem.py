@@ -180,7 +180,7 @@ class DataElement:  # noqa: PLW1641
         file_value_tell: int | None = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: int | None = None,
+        validation_mode: config.ValidationMode | None = None,
     ) -> None:
         """Create a new :class:`DataElement`.
 

@@ -336,7 +336,7 @@ _default_settings = Settings()
 
 
 class _ThreadLocalStore(threading.local):
-    def __init__(self):
+    def __init__(self) -> None:
         self.thread_settings = deepcopy(_default_settings)
 
 
@@ -344,10 +344,10 @@ _storage = _ThreadLocalStore()
 
 
 class _SettingsProxy:
-    def __getattr__(self, name):
+    def __getattr__(self, name) -> Any:
         return getattr(_storage.thread_settings, name)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name, value) -> None:
         setattr(_storage.thread_settings, name, value)
 
 
