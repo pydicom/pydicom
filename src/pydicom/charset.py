@@ -5,7 +5,6 @@ import codecs
 import re
 from typing import (
     TYPE_CHECKING,
-    Any,
     cast,
 )
 from collections.abc import MutableSequence, Sequence
