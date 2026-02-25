@@ -2026,6 +2026,8 @@ class PersonName:
         responsible_party_name_phonetic: str | bytes = "",
         patient_name_phonetic: str | bytes = "",
         encodings: list[str] | None = None,
+        *,
+        reading_validation_mode: config.ValidationMode | None = None
     ) -> "PersonName":
         """Construct a PersonName from explicit named components following the
         veterinary usage convention.
@@ -2084,6 +2086,9 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
+        if reading_validation_mode is None:
+            reading_validation_mode = config.settings.reading_validation_mode
+
         alphabetic_group: list[str | bytes] = [
             responsible_party_name,
             patient_name,
@@ -2100,7 +2105,7 @@ class PersonName:
         ]
 
         encoded_value: bytes = cls._encode_component_groups(
-            alphabetic_group, ideographic_group, phonetic_group, encodings
+            alphabetic_group, ideographic_group, phonetic_group, encodings, reading_validation_mode=reading_validation_mode
         )
 
         return cls(encoded_value, encodings=encodings)

@@ -296,7 +296,13 @@ custom_encoders = {
 }
 
 
-def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int], *, reading_validation_mode: config.ValidationMode | None = None) -> str:
+def decode_bytes(
+    value: bytes,
+    encodings: Sequence[str],
+    delimiters: set[int],
+    *,
+    reading_validation_mode: config.ValidationMode | None = None,
+) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
     Parameters
@@ -318,7 +324,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int], *
     -------
     str
         The decoded unicode string. If the value could not be decoded,
-        and `reading_validation_mode` is not :attr:`~pydicom.config.ValidationMode.RAISE`, 
+        and `reading_validation_mode` is not :attr:`~pydicom.config.ValidationMode.RAISE`,
         a warning is issued, and `value` is decoded
         using the first encoding with replacement characters,
         resulting in data loss.
@@ -334,7 +340,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int], *
     """
     if reading_validation_mode is None:
         reading_validation_mode = config.settings.reading_validation_mode
-    
+
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
         first_encoding = encodings[0]
@@ -376,7 +382,15 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int], *
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
     return "".join(
-        [_decode_fragment(fragment, encodings, delimiters, reading_validation_mode=reading_validation_mode) for fragment in fragments]
+        [
+            _decode_fragment(
+                fragment,
+                encodings,
+                delimiters,
+                reading_validation_mode=reading_validation_mode,
+            )
+            for fragment in fragments
+        ]
     )
 
 
@@ -384,7 +398,11 @@ decode_string = decode_bytes
 
 
 def _decode_fragment(
-    byte_str: bytes, encodings: Sequence[str], delimiters: set[int], *, reading_validation_mode: config.ValidationMode
+    byte_str: bytes,
+    encodings: Sequence[str],
+    delimiters: set[int],
+    *,
+    reading_validation_mode: config.ValidationMode,
 ) -> str:
     """Decode a byte string encoded with a single encoding.
 
@@ -431,7 +449,12 @@ def _decode_fragment(
     """
     try:
         if byte_str.startswith(ESC):
-            return _decode_escaped_fragment(byte_str, encodings, delimiters, reading_validation_mode=reading_validation_mode)
+            return _decode_escaped_fragment(
+                byte_str,
+                encodings,
+                delimiters,
+                reading_validation_mode=reading_validation_mode,
+            )
         # no escape sequence - use first encoding
         return byte_str.decode(encodings[0])
     except UnicodeError:
@@ -446,7 +469,11 @@ def _decode_fragment(
 
 
 def _decode_escaped_fragment(
-    byte_str: bytes, encodings: Sequence[str], delimiters: set[int], *, reading_validation_mode: config.ValidationMode
+    byte_str: bytes,
+    encodings: Sequence[str],
+    delimiters: set[int],
+    *,
+    reading_validation_mode: config.ValidationMode,
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
 
@@ -647,7 +674,11 @@ def _encode_string_impl(value: str, encoding: str, errors: str = "strict") -> by
 #       is not present in a sequence item then it is inherited from its parent.
 
 
-def convert_encodings(encodings: None | str | MutableSequence[str], *, reading_validation_mode: config.ValidationMode | None = None) -> list[str]:
+def convert_encodings(
+    encodings: None | str | MutableSequence[str],
+    *,
+    reading_validation_mode: config.ValidationMode | None = None,
+) -> list[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
@@ -660,7 +691,7 @@ def convert_encodings(encodings: None | str | MutableSequence[str], *, reading_v
     respective warning issued, if
     `reading_validation_mode` is  :attr:`~pydicom.config.ValidationMode.WARN`,
     or an exception is raised if it is set to :attr:`~pydicom.config.ValidationMode.RAISE`.
-    If `reading_validation_mode` is omitted or None, then the setting in 
+    If `reading_validation_mode` is omitted or None, then the setting in
     :attr:`~pydicom.config.settings` is used.
 
     Parameters
@@ -686,7 +717,7 @@ def convert_encodings(encodings: None | str | MutableSequence[str], *, reading_v
     """
     if reading_validation_mode is None:
         reading_validation_mode = config.settings.reading_validation_mode
-    
+
     encodings = encodings or [""]
     if isinstance(encodings, str):
         encodings = [encodings]
@@ -799,7 +830,10 @@ def _handle_illegal_standalone_encodings(
 
 
 def decode_element(
-    elem: "DataElement", dicom_character_set: str | list[str] | None, *, reading_validation_mode: config.ValidationMode | None = None
+    elem: "DataElement",
+    dicom_character_set: str | list[str] | None,
+    *,
+    reading_validation_mode: config.ValidationMode | None = None,
 ) -> None:
     """Apply the DICOM character encoding to a data element
 
@@ -836,13 +870,25 @@ def decode_element(
             if isinstance(elem.value, str):
                 # already decoded
                 return
-            elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS, reading_validation_mode=reading_validation_mode)
+            elem.value = decode_bytes(
+                elem.value,
+                encodings,
+                TEXT_VR_DELIMS,
+                reading_validation_mode=reading_validation_mode,
+            )
         else:
             output = list()
             for value in elem.value:
                 if isinstance(value, str):
                     output.append(value)
                 else:
-                    output.append(decode_bytes(value, encodings, TEXT_VR_DELIMS, reading_validation_mode=reading_validation_mode))
+                    output.append(
+                        decode_bytes(
+                            value,
+                            encodings,
+                            TEXT_VR_DELIMS,
+                            reading_validation_mode=reading_validation_mode,
+                        )
+                    )
 
             elem.value = output
