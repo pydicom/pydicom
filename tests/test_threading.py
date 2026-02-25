@@ -6,9 +6,9 @@ def test_settings_thread_safety():
     barrier = threading.Barrier(3)
     errors = []
     mode_name = {
-        config.IGNORE: "IGNORE",
-        config.WARN:  "WARN",
-        config.RAISE: "RAISE",
+        config.ValidationMode.IGNORE: "IGNORE",
+        config.ValidationMode.WARN:  "WARN",
+        config.ValidationMode.RAISE: "RAISE",
     }
 
     def worker(id, val):
@@ -21,9 +21,9 @@ def test_settings_thread_safety():
                 f"got {mode_name[config.settings.reading_validation_mode]}"
             )
 
-    t1 = threading.Thread(target=worker, args=(1, config.IGNORE))
-    t2 = threading.Thread(target=worker, args=(2, config.RAISE))
-    t3 = threading.Thread(target=worker, args=(3, config.WARN))
+    t1 = threading.Thread(target=worker, args=(1, config.ValidationMode.IGNORE))
+    t2 = threading.Thread(target=worker, args=(2, config.ValidationMode.RAISE))
+    t3 = threading.Thread(target=worker, args=(3, config.ValidationMode.WARN))
 
     t1.start()
     t2.start()

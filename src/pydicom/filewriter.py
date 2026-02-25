@@ -464,7 +464,7 @@ def _default_encoded(val: str) -> bytes:
     try:
         return val.encode(default_encoding)
     except UnicodeEncodeError:
-        if config.settings.writing_validation_mode == config.RAISE:
+        if config.settings.writing_validation_mode == config.ValidationMode.RAISE:
             raise
         warn_and_log(
             "Not a valid ASCII string "

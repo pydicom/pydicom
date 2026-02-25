@@ -797,7 +797,7 @@ def convert_value(
             raw_data_element.value_tell,
         )
     except ValueError:
-        if config.settings.reading_validation_mode == config.RAISE:
+        if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
             # The user really wants an exception here
             raise
 

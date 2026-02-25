@@ -49,7 +49,7 @@ def enforce_valid_both_fixture(request):
     and ensure it is reset afterwards regardless of whether test succeeds.
     """
     orig_reading_validation_mode = settings.reading_validation_mode
-    settings.reading_validation_mode = config.RAISE if request.param else config.WARN
+    settings.reading_validation_mode = config.ValidationMode.RAISE if request.param else config.ValidationMode.WARN
     yield
     settings.reading_validation_mode = orig_reading_validation_mode
 
@@ -607,13 +607,13 @@ class TestDSfloat:
     def test_enforce_valid_values_length(self):
         """Test that errors are raised when length is too long."""
         with pytest.raises(OverflowError):
-            valuerep.DSfloat("3.141592653589793", validation_mode=config.RAISE)
+            valuerep.DSfloat("3.141592653589793", validation_mode=config.ValidationMode.RAISE)
 
     def test_handle_missing_leading_zero(self):
         """Test that no error is raised with maximum length DS string
         without leading zero."""
         # Regression test for #1632
-        valuerep.DSfloat(".002006091181818", validation_mode=config.RAISE)
+        valuerep.DSfloat(".002006091181818", validation_mode=config.ValidationMode.RAISE)
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
@@ -642,7 +642,7 @@ class TestDSfloat:
     def test_enforce_valid_values_value(self, val: float | str):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSfloat(val, validation_mode=config.RAISE)
+            valuerep.DSfloat(val, validation_mode=config.ValidationMode.RAISE)
 
     def test_comparison_operators(self):
         """Tests for the comparison operators"""
@@ -844,7 +844,7 @@ class TestDSdecimal:
     def test_enforce_valid_values_value(self, val: Decimal | str):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSdecimal(val, validation_mode=config.RAISE)
+            valuerep.DSdecimal(val, validation_mode=config.ValidationMode.RAISE)
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
@@ -949,14 +949,14 @@ class TestIS:
 
         # Strict checking raises an error
         with pytest.raises(ValueError):
-            IS("14.5", validation_mode=config.RAISE)
+            IS("14.5", validation_mode=config.ValidationMode.RAISE)
 
         with pytest.raises(TypeError):
-            IS(14.5, validation_mode=config.RAISE)
+            IS(14.5, validation_mode=config.ValidationMode.RAISE)
 
     def test_float_init(self):
         """New ISfloat created from another behaves correctly"""
-        is1 = IS("14.5", validation_mode=config.IGNORE)
+        is1 = IS("14.5", validation_mode=config.ValidationMode.IGNORE)
         with pytest.warns(UserWarning, match='Value "14.5" is not valid'):
             is2 = IS(is1)
         assert is1 == is2
@@ -991,7 +991,7 @@ class TestIS:
             r"to override the value check"
         )
         with pytest.raises(OverflowError, match=msg):
-            IS(3103050000, validation_mode=config.RAISE)
+            IS(3103050000, validation_mode=config.ValidationMode.RAISE)
 
     def test_str(self, disable_value_validation):
         """Test IS.__str__()."""
@@ -1122,7 +1122,7 @@ class TestDecimalString:
         # Now the input string truly is invalid
         invalid_string = "-9.813386743e-006"
         with pytest.raises(ValueError):
-            valuerep.DS(invalid_string, validation_mode=config.RAISE)
+            valuerep.DS(invalid_string, validation_mode=config.ValidationMode.RAISE)
 
 
 class TestPersonName:

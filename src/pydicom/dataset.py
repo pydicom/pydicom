@@ -1671,7 +1671,7 @@ class Dataset:  # noqa: PLW1641
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.settings.writing_validation_mode == config.RAISE:
+                    if config.settings.writing_validation_mode == config.ValidationMode.RAISE:
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN

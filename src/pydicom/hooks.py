@@ -193,7 +193,7 @@ def raw_element_vr(
                 vr = VR.UL
             else:
                 msg = f"VR lookup failed for the raw element with tag {raw.tag}"
-                if config.settings.reading_validation_mode == config.RAISE:
+                if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
                     raise KeyError(msg)
 
                 vr = VR.UN

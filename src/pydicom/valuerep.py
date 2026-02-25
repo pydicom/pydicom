@@ -404,7 +404,7 @@ VALIDATORS = {
 def validate_value(
     vr: str,
     value: Any,
-    validation_mode: int,
+    validation_mode: config.ValidationMode,
     validator: Callable[[str, Any], tuple[bool, str]] | None = None,
 ) -> None:
     """Validate the given value against the DICOM standard.
@@ -428,7 +428,7 @@ def validate_value(
         If the validation fails and the validation mode is set to
         `RAISE`.
     """
-    if validation_mode == config.IGNORE:
+    if validation_mode == config.ValidationMode.IGNORE:
         return
 
     if value is not None:
@@ -436,7 +436,7 @@ def validate_value(
         if validator is not None:
             is_valid, msg = validator(vr, value)
             if not is_valid:
-                if validation_mode == config.RAISE:
+                if validation_mode == config.ValidationMode.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
 
@@ -1071,7 +1071,7 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode == config.RAISE and not self.auto_format:
+        if validation_mode == config.ValidationMode.RAISE and not self.auto_format:
             if len(str(self)) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
@@ -1208,7 +1208,7 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode != config.IGNORE:
+        if validation_mode != config.ValidationMode.IGNORE:
             if len(repr(self).strip("'")) > 16:
                 msg = (
                     "Values for elements with a VR of 'DS' values must be "
@@ -1219,13 +1219,13 @@ class DSdecimal(Decimal):
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
-                if validation_mode == config.RAISE:
+                if validation_mode == config.ValidationMode.RAISE:
                     raise OverflowError(msg)
                 warn_and_log(msg)
             elif not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 msg = f'Value "{self}" is not valid for elements with a VR of DS'
-                if validation_mode == config.RAISE:
+                if validation_mode == config.ValidationMode.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
 
@@ -1332,9 +1332,9 @@ class ISfloat(float):
             self.original_string = val.original_string
         if validation_mode:
             msg = f'Value "{self}" is not valid for elements with a VR of IS'
-            if validation_mode == config.WARN:
+            if validation_mode == config.ValidationMode.WARN:
                 warn_and_log(msg)
-            elif validation_mode == config.RAISE:
+            elif validation_mode == config.ValidationMode.RAISE:
                 msg += "\nSet reading_validation_mode to WARN or IGNORE to bypass"
                 raise TypeError(msg)
 
@@ -1376,7 +1376,7 @@ class IS(int):
             newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -(2**31) <= newval < 2**31 and validation_mode == config.RAISE:
+        if not -(2**31) <= newval < 2**31 and validation_mode == config.ValidationMode.RAISE:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set "
