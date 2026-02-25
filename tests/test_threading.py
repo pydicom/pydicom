@@ -23,7 +23,7 @@ def test_settings_thread_safety():
 
     t1 = threading.Thread(target=worker, args=(1, config.IGNORE))
     t2 = threading.Thread(target=worker, args=(2, config.RAISE))
-    t3 = threading.Thread(target=worker, args=(2, config.WARN))
+    t3 = threading.Thread(target=worker, args=(3, config.WARN))
 
     t1.start()
     t2.start()

@@ -5,6 +5,7 @@ import codecs
 import re
 from typing import (
     TYPE_CHECKING,
+    Any,
     cast,
 )
 from collections.abc import MutableSequence, Sequence
@@ -295,7 +296,7 @@ custom_encoders = {
 }
 
 
-def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -> str:
+def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int], *, reading_validation_mode: config.ValidationMode | None = None) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
     Parameters
@@ -309,33 +310,38 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -
     delimiters : set of int
         A set of characters or character codes, each of which resets the
         encoding in `value`.
+    reading_validation_mode : config.ValidationMode or None
+        See Returns and Raises sections.  If omitted or None, then the
+        setting at :attr:`~pydicom.config.settings` is used.
 
     Returns
     -------
     str
         The decoded unicode string. If the value could not be decoded,
-        and :attr:`~pydicom.config.settings.reading_validation_mode`
-        is not ``RAISE``, a warning is issued, and `value` is
-        decoded using the first encoding with replacement characters,
+        and `reading_validation_mode` is not :attr:`~pydicom.config.ValidationMode.RAISE`, 
+        a warning is issued, and `value` is decoded
+        using the first encoding with replacement characters,
         resulting in data loss.
 
     Raises
     ------
     UnicodeDecodeError
-        If :attr:`~pydicom.config.settings.reading_validation_mode`
-        is ``RAISE`` and `value` could not be decoded with the given
-        encodings.
+        If `reading_validation_mode` is :attr:`~pydicom.config.ValidationMode.RAISE`
+        and `value` could not be decoded with the given encodings.
     LookupError
-        If :attr:`~pydicom.config.settings.reading_validation_mode`
-        is ``RAISE`` and the given encodings are invalid.
+        If `reading_validation_mode` is :attr:`~pydicom.config.ValidationMode.RAISE`
+        and the given encodings are invalid.
     """
+    if reading_validation_mode is None:
+        reading_validation_mode = config.settings.reading_validation_mode
+    
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
         first_encoding = encodings[0]
         try:
             return value.decode(first_encoding)
         except LookupError:
-            if config.settings.reading_validation_mode == config.RAISE:
+            if reading_validation_mode == config.ValidationMode.RAISE:
                 raise
             # IGNORE is handled as WARN here, as this is
             # not an optional validation check
@@ -346,7 +352,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -
             first_encoding = default_encoding
             return value.decode(first_encoding)
         except UnicodeError:
-            if config.settings.reading_validation_mode == config.RAISE:
+            if reading_validation_mode == config.ValidationMode.RAISE:
                 raise
             warn_and_log(
                 "Failed to decode byte string with encoding "
@@ -370,7 +376,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
     return "".join(
-        [_decode_fragment(fragment, encodings, delimiters) for fragment in fragments]
+        [_decode_fragment(fragment, encodings, delimiters, reading_validation_mode=reading_validation_mode) for fragment in fragments]
     )
 
 
@@ -378,7 +384,7 @@ decode_string = decode_bytes
 
 
 def _decode_fragment(
-    byte_str: bytes, encodings: Sequence[str], delimiters: set[int]
+    byte_str: bytes, encodings: Sequence[str], delimiters: set[int], *, reading_validation_mode: config.ValidationMode
 ) -> str:
     """Decode a byte string encoded with a single encoding.
 
@@ -425,11 +431,11 @@ def _decode_fragment(
     """
     try:
         if byte_str.startswith(ESC):
-            return _decode_escaped_fragment(byte_str, encodings, delimiters)
+            return _decode_escaped_fragment(byte_str, encodings, delimiters, reading_validation_mode=reading_validation_mode)
         # no escape sequence - use first encoding
         return byte_str.decode(encodings[0])
     except UnicodeError:
-        if config.settings.reading_validation_mode == config.RAISE:
+        if reading_validation_mode == config.ValidationMode.RAISE:
             raise
         warn_and_log(
             "Failed to decode byte string with encodings: "
@@ -440,7 +446,7 @@ def _decode_fragment(
 
 
 def _decode_escaped_fragment(
-    byte_str: bytes, encodings: Sequence[str], delimiters: set[int]
+    byte_str: bytes, encodings: Sequence[str], delimiters: set[int], *, reading_validation_mode: config.ValidationMode
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
 
@@ -475,7 +481,7 @@ def _decode_escaped_fragment(
 
     # unknown escape code - use first encoding
     msg = "Found unknown escape sequence in encoded string value"
-    if config.settings.reading_validation_mode == config.RAISE:
+    if reading_validation_mode == config.ValidationMode.RAISE:
         raise ValueError(msg)
 
     warn_and_log(f"{msg} - using encoding {encodings[0]}")
@@ -534,7 +540,7 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
             pass
     # all attempts failed - raise or warn and encode with replacement
     # characters
-    if config.settings.writing_validation_mode == config.RAISE:
+    if config.settings.writing_validation_mode == config.ValidationMode.RAISE:
         # force raising a valid UnicodeEncodeError
         value.encode(encodings[0])
 
@@ -641,7 +647,7 @@ def _encode_string_impl(value: str, encoding: str, errors: str = "strict") -> by
 #       is not present in a sequence item then it is inherited from its parent.
 
 
-def convert_encodings(encodings: None | str | MutableSequence[str]) -> list[str]:
+def convert_encodings(encodings: None | str | MutableSequence[str], *, reading_validation_mode: config.ValidationMode | None = None) -> list[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
@@ -652,9 +658,10 @@ def convert_encodings(encodings: None | str | MutableSequence[str]) -> list[str]
 
     Invalid encodings are replaced with the default encoding with a
     respective warning issued, if
-    :attr:`~pydicom.config.settings.reading_validation_mode` is
-    ``WARN``, or an exception is raised if it is set to
-    ``RAISE``.
+    `reading_validation_mode` is  :attr:`~pydicom.config.ValidationMode.WARN`,
+    or an exception is raised if it is set to :attr:`~pydicom.config.ValidationMode.RAISE`.
+    If `reading_validation_mode` is omitted or None, then the setting in 
+    :attr:`~pydicom.config.settings` is used.
 
     Parameters
     ----------
@@ -669,17 +676,17 @@ def convert_encodings(encodings: None | str | MutableSequence[str]) -> list[str]
         encodings. If an encoding is already a Python encoding, it is returned
         unchanged. Encodings with common spelling errors are replaced by the
         correct encoding, and invalid encodings are replaced with the default
-        encoding if :attr:`~pydicom.config.settings.reading_validation_mode`
-        is not set to ``RAISE``.
+        encoding if `reading_validation_mode` is not set to :attr:`~pydicom.config.ValidationMode.RAISE`.
 
     Raises
     ------
     LookupError
         If `encodings` contains a value that could not be converted and
-        :attr:`~pydicom.config.settings.reading_validation_mode` is
-        ``RAISE``.
+        `reading_validation_mode` is :attr:`~pydicom.config.ValidationMode.RAISE`.
     """
-
+    if reading_validation_mode is None:
+        reading_validation_mode = config.settings.reading_validation_mode
+    
     encodings = encodings or [""]
     if isinstance(encodings, str):
         encodings = [encodings]
@@ -750,7 +757,7 @@ def _warn_about_invalid_encoding(
     ``RAISE``, `LookupError` is raised.
     """
     if patched_encoding is None:
-        if config.settings.reading_validation_mode == config.RAISE:
+        if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
             raise LookupError(f"Unknown encoding '{encoding}'")
 
         msg = f"Unknown encoding '{encoding}' - using default encoding instead"
@@ -792,7 +799,7 @@ def _handle_illegal_standalone_encodings(
 
 
 def decode_element(
-    elem: "DataElement", dicom_character_set: str | list[str] | None
+    elem: "DataElement", dicom_character_set: str | list[str] | None, *, reading_validation_mode: config.ValidationMode | None = None
 ) -> None:
     """Apply the DICOM character encoding to a data element
 
@@ -829,13 +836,13 @@ def decode_element(
             if isinstance(elem.value, str):
                 # already decoded
                 return
-            elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS)
+            elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS, reading_validation_mode=reading_validation_mode)
         else:
             output = list()
             for value in elem.value:
                 if isinstance(value, str):
                     output.append(value)
                 else:
-                    output.append(decode_bytes(value, encodings, TEXT_VR_DELIMS))
+                    output.append(decode_bytes(value, encodings, TEXT_VR_DELIMS, reading_validation_mode=reading_validation_mode))
 
             elem.value = output
