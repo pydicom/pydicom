@@ -131,7 +131,7 @@ def data_element_generator(
     debugging = config.debugging
     defer_size = size_in_bytes(defer_size)
 
-    tag_set: set[int] = {tag for tag in specific_tags} if specific_tags else set()
+    tag_set: set[int] = set(specific_tags) if specific_tags else set()
     has_tag_set = bool(tag_set)
     if has_tag_set:
         tag_set.add(0x00080005)  # Specific Character Set

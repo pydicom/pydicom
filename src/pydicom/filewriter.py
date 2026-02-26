@@ -500,7 +500,7 @@ def write_text(
                 val = b"\\".join([encode_string(val, encodings) for val in val])
             else:
                 val = cast(Sequence[bytes], val)
-                val = b"\\".join([val for val in val])
+                val = b"\\".join(list(val))
         else:
             val = cast(bytes | str, val)
             if isinstance(val, str):

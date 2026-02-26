@@ -399,7 +399,7 @@ class DataElement:  # noqa: PLW1641
                     value = self.value
                 else:
                     value = [self.value]
-                json_element["Value"] = [v for v in value]
+                json_element["Value"] = list(value)
         if "Value" in json_element:
             json_element["Value"] = jsonrep.convert_to_python_number(
                 json_element["Value"], self.VR
