@@ -688,7 +688,7 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
     #   data element: if it fails, retry loading the file meta with an
     #   implicit VR (issue #503)
     try:
-        file_meta[list(file_meta.elements())[0].tag]
+        file_meta[next(iter(file_meta.elements())).tag]
     except NotImplementedError:
         fp.seek(start_file_meta)
         file_meta = FileMetaDataset(

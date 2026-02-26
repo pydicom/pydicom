@@ -181,7 +181,7 @@ class Collection:
             identifiers = cast(CIDValueType, CONCEPTS[scheme][name])
 
             if len(identifiers) == 1:
-                code, val = list(identifiers.items())[0]
+                code, val = next(iter(identifiers.items()))
             else:
                 cid = int(self.name[3:])
                 _matches = [
@@ -215,7 +215,7 @@ class Collection:
                 f"{code_values}"
             )
 
-        code = list(entries.keys())[0]  # get first and only
+        code = next(iter(entries.keys()))  # get first and only
         meaning, cids = entries[code]
 
         return Code(value=code, meaning=meaning, scheme_designator=self.name)
