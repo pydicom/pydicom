@@ -117,9 +117,9 @@ def as_assertable(dataset):
     to a set that can be safely compared using pytest's assert.
     (Datasets can't be so compared because DataElements are not
     hashable.)"""
-    safe_dict = dict(
-        (f"{elem.tag} {elem.keyword}", elem.value) for elem in dataset
-    )
+    safe_dict = {
+        f"{elem.tag} {elem.keyword}": elem.value for elem in dataset
+    }
     if hasattr(dataset, "file_meta"):
         safe_dict.update(as_assertable(dataset.file_meta))
     return safe_dict
