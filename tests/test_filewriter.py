@@ -372,10 +372,10 @@ class TestScratchWriteDateTime(TestWriteFile):
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = dcmread(self.file_out)
-        assert all([a == b for a, b in zip(ds.CalibrationDate, multi_DA_expected)])
+        assert all(a == b for a, b in zip(ds.CalibrationDate, multi_DA_expected))
         assert DA_expected == ds.DateOfLastCalibration
-        assert all([a == b for a, b in zip(ds.ReferencedDateTime, multi_DT_expected)])
-        assert all([a == b for a, b in zip(ds.CalibrationTime, multi_TM_expected)])
+        assert all(a == b for a, b in zip(ds.ReferencedDateTime, multi_DT_expected))
+        assert all(a == b for a, b in zip(ds.CalibrationTime, multi_TM_expected))
         assert TM_expected == ds.TimeOfLastCalibration
 
 

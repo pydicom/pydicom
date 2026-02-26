@@ -151,7 +151,7 @@ def is_conformant_file_id(path: Path) -> bool:
     """
     # No more than 8 characters per component
     parts = path.parts
-    if any([len(pp) > 8 for pp in parts]):
+    if any(len(pp) > 8 for pp in parts):
         return False
 
     # No more than 8 components
@@ -1459,7 +1459,7 @@ class FileSet:
                 ds = ds.load()
 
             # Check that all query elements are present
-            if all([kw in ds for kw in kwargs]):
+            if all(kw in ds for kw in kwargs):
                 has_elements = True
 
             for kw, val in kwargs.items():
