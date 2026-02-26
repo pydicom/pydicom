@@ -1520,7 +1520,7 @@ class TestFileSet:
     def test_file_ids_unique(self, dicomdir):
         """That that the File IDs are all unique within the File-set."""
         fs = FileSet(dicomdir)
-        ids = set([ii.FileID for ii in fs])
+        ids = {ii.FileID for ii in fs}
         assert len(fs._instances) == len(ids)
 
     def test_add_custom(self, ct, tdir, custom_leaf):
