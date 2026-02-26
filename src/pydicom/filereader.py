@@ -876,7 +876,7 @@ def read_partial(
         from pydicom.values import converters
 
         vr = vr.decode(default_encoding)
-        if vr in converters.keys():
+        if vr in converters:
             is_implicit_VR = False
             # Big endian encoding can only be explicit VR
             #   Big endian 0x0004 decoded as little endian will be 1024

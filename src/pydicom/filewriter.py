@@ -1332,7 +1332,7 @@ def dcmwrite(
         enforce_file_format = not write_like_original
 
     # Ensure kwargs only contains `write_like_original`
-    keys = [x for x in kwargs.keys() if x != "write_like_original"]
+    keys = [x for x in kwargs if x != "write_like_original"]
     if keys:
         raise TypeError(
             f"Invalid keyword argument(s) for dcmwrite(): {', '.join(keys)}"

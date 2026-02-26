@@ -781,7 +781,7 @@ class Dataset:  # noqa: PLW1641
             The matching element keywords in the dataset. If no
             filters are used then all element keywords are returned.
         """
-        allnames = [keyword_for_tag(tag) for tag in self._dict.keys()]
+        allnames = [keyword_for_tag(tag) for tag in self._dict]
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
