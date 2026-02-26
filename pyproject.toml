@@ -104,6 +104,7 @@ include = ["src/*.py", "tests/*.py", "doc/*.py"]
 [tool.ruff.lint]
 select = [
     "C4",
+    "ISC",
     "UP",
     "C9",
     "E",
