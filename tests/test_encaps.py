@@ -1237,9 +1237,7 @@ class TestEncapsulate:
     def test_encapsulate_single_fragment_per_frame_no_bot(self):
         """Test encapsulating single fragment per frame with no BOT values."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = [
-            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
-        ]
+        frames = list(generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames))
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=False)
@@ -1253,9 +1251,7 @@ class TestEncapsulate:
     def test_encapsulate_single_fragment_per_frame_bot(self):
         """Test encapsulating single fragment per frame with BOT values."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = [
-            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
-        ]
+        frames = list(generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames))
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
@@ -1282,9 +1278,7 @@ class TestEncapsulate:
     def test_encapsulate_bot(self):
         """Test the Basic Offset Table is correct."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = [
-            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
-        ]
+        frames = list(generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames))
         assert len(frames) == 10
 
         data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
@@ -1337,17 +1331,13 @@ class TestEncapsulateExtended:
 
     def test_encapsulate(self):
         ds = dcmread(JP2K_10FRAME_NOBOT)
-        frames = [
-            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
-        ]
+        frames = list(generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames))
         assert len(frames) == 10
 
         out = encapsulate_extended(frames)
         # Pixel Data encapsulated OK
         assert isinstance(out[0], bytes)
-        test_frames = [
-            f for f in generate_frames(out[0], number_of_frames=ds.NumberOfFrames)
-        ]
+        test_frames = list(generate_frames(out[0], number_of_frames=ds.NumberOfFrames))
         for a, b in zip(test_frames, frames):
             assert a == b
 
@@ -3754,9 +3744,7 @@ class TestEncapsulateExtendedBuffer:
         out = encapsulate_extended_buffer(frames)
         # Pixel Data encapsulated OK
         assert isinstance(out[0], EncapsulatedBuffer)
-        test_frames = [
-            f for f in generate_frames(out[0], number_of_frames=ds.NumberOfFrames)
-        ]
+        test_frames = list(generate_frames(out[0], number_of_frames=ds.NumberOfFrames))
         for a, b in zip(test_frames, frames):
             assert a == b.getvalue()
 

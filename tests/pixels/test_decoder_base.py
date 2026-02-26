@@ -1313,7 +1313,7 @@ class TestDecoder_Array:
         """Test returning excess frame data"""
         decoder = get_decoder(RLELossless)
         reference = RLE_16_1_10F
-        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames = list(generate_frames(reference.ds.PixelData))
         frames.append(frames[-1])
         src = encapsulate(frames)
 
@@ -1358,7 +1358,7 @@ class TestDecoder_Array:
         ds.NumberOfFrames = 1
         runner = DecodeRunner(RLELossless)
         runner.set_source(ds)
-        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames = list(generate_frames(reference.ds.PixelData))
         src = encapsulate(frames[:2])
 
         with pytest.warns(UserWarning, match="2 frames have been found"):
@@ -1391,7 +1391,7 @@ class TestDecoder_Array:
         """Test returning excess frame data"""
         decoder = get_decoder(RLELossless)
         reference = RLE_1_1_3F
-        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames = list(generate_frames(reference.ds.PixelData))
         frames.append(frames[-1])
         src = encapsulate(frames)
 
@@ -1933,7 +1933,7 @@ class TestDecoder_Buffer:
         """Test returning excess frame data"""
         decoder = get_decoder(RLELossless)
         reference = RLE_16_1_10F
-        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames = list(generate_frames(reference.ds.PixelData))
         frames.append(frames[-1])
         src = encapsulate(frames)
 
@@ -1962,7 +1962,7 @@ class TestDecoder_Buffer:
         """Test returning excess frame data"""
         decoder = get_decoder(RLELossless)
         reference = RLE_1_1_3F
-        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        frames = list(generate_frames(reference.ds.PixelData))
         frames.append(frames[-1])
         src = encapsulate(frames)
 

@@ -366,7 +366,7 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
             f"'get_testdata_file' does not support absolute paths, as it only works"
             f" with internal pydicom test data - did you mean 'dcmread(\"{name}\")'?"
         )
-    matches = [m for m in data_path.rglob(name)]
+    matches = list(data_path.rglob(name))
     if matches:
         return os.fspath(matches[0])
 
