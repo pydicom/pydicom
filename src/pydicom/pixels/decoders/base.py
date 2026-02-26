@@ -474,7 +474,7 @@ class DecodeRunner(RunnerBase):
         pi = self.photometric_interpretation
 
         # Check the component IDs for RGB or rgb (in ASCII)
-        has_rgb_ids = info.get("component_ids", None) in ([82, 71, 66], [114, 103, 98])
+        has_rgb_ids = info.get("component_ids") in ([82, 71, 66], [114, 103, 98])
         if has_rgb_ids and pi != PI.RGB:
             self.set_frame_option(index, "photometric_interpretation", PI.RGB)
             warn_and_log(
