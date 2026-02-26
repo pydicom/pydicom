@@ -2291,7 +2291,7 @@ class TestFileDataset:
     def test_dataset_overrides_all_dict_attributes(self):
         """Ensure that we don't use inherited dict functionality"""
         ds = Dataset()
-        di = dict()
+        di = {}
         expected_diff = {
             "fromkeys",
             "__reversed__",
@@ -2563,7 +2563,7 @@ class TestFileMeta:
         ds = Dataset()
         msg = "'Dataset.file_meta' must be a 'FileMetaDataset' instance"
         with pytest.raises(TypeError, match=msg):
-            ds.file_meta = list()
+            ds.file_meta = []
 
     def test_assign_file_meta(self):
         """Test can only set group 2 elements in File Meta"""
