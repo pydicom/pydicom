@@ -173,18 +173,18 @@ class BaseTag(int):
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
             try:
-                other = Tag(other)
+                other = Tag(other)  # type: ignore[arg-type]
             except Exception:
                 return False
 
         return int(self) == int(other)
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 

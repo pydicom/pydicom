@@ -228,7 +228,7 @@ def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
         len(a) == len(b)
         and all(key in b for key in a.keys())
         and all(
-            a[key] == b[key]
+            a[key] == b[key]  # type: ignore[call-overload]
             for key in a.keys()
             if exclude is None or key not in exclude
         )
@@ -796,7 +796,7 @@ class Dataset:  # noqa: PLW1641
 
         return sorted(allnames)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -1562,7 +1562,7 @@ class Dataset:  # noqa: PLW1641
         """Return the number of elements in the top level of the dataset."""
         return len(self._dict)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Compare `self` and `other` for inequality."""
         return not self == other
 
@@ -3640,7 +3640,7 @@ class FileMetaDataset(Dataset):
                 f"Argument must be a dict or Dataset, not {type(init_value)}"
             )
 
-        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]
+        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]  # type: ignore[attr-defined]
         if non_group2:
             raise ValueError(
                 "File meta datasets may only contain group 2 elements but the "
