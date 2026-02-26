@@ -111,12 +111,12 @@ class TestPersonName:
 
     def test_multi_value_to_json(self):
         ds = Dataset()
-        patient_names = ["Buc^Jérôme", "Διονυσιος", "Люкceмбypг"]
+        patient_names = ["Buc^Jérôme", "Διονύσιος", "Люкceмбypг"]
         ds.add_new(0x00091001, "PN", patient_names)
         ds_json = ds.to_json_dict()
         assert [
             {"Alphabetic": "Buc^Jérôme"},
-            {"Alphabetic": "Διονυσιος"},
+            {"Alphabetic": "Διονύσιος"},
             {"Alphabetic": "Люкceмбypг"},
         ] == ds_json["00091001"]["Value"]
 
@@ -235,7 +235,7 @@ class TestDataSetToJson:
         ds.add_new(0x0009101B, "UR", "https://example.com")
         ds.add_new(0x0009101C, "AT", [0x00100010, 0x00100020])
         ds.add_new(0x0009101D, "ST", 100 * "علي بابا")
-        ds.add_new(0x0009101E, "SH", "Διονυσιος")
+        ds.add_new(0x0009101E, "SH", "Διονύσιος")
         ds.add_new(0x00090011, "LO", "Creator 2.0")
         ds.add_new(0x00091101, "SH", "Version2")
         ds.add_new(0x00091102, "US", 2)

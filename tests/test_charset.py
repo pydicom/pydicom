@@ -19,7 +19,7 @@ FILE_PATIENT_NAMES = [
     ("chrFren", "Buc^Jérôme"),
     ("chrFrenMulti", "Buc^Jérôme"),
     ("chrGerm", "Äneas^Rüdiger"),
-    ("chrGreek", "Διονυσιος"),
+    ("chrGreek", "Διονύσιος"),
     ("chrH31", "Yamada^Tarou=山田^太郎=やまだ^たろう"),
     ("chrH32", "ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう"),
     ("chrHbrw", "שרון^דבורה"),
@@ -59,8 +59,8 @@ ENCODED_NAMES = [
     ),
     (
         "ISO 2022 IR 126",
-        "Διονυσιος",
-        b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+        "Διονύσιος",
+        b"\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2",
     ),
     (
         "ISO 2022 IR 138",
@@ -169,7 +169,7 @@ class TestCharset:
 
     def test_bad_encoded_single_encoding(self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
-        elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2")
+        elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2")
 
         with pytest.warns(
             UserWarning, match="Failed to decode byte string with encoding 'UTF8'"
@@ -180,7 +180,7 @@ class TestCharset:
     def test_bad_encoded_single_encoding_enforce_standard(self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
         config.settings.reading_validation_mode is RAISE."""
-        elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2")
+        elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2")
         msg = (
             "'utf.?8' codec can't decode byte 0xc4 in position 0: "
             "invalid continuation byte"
@@ -232,7 +232,7 @@ class TestCharset:
     def test_bad_decoded_multi_byte_encoding(self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(
-            0x00100010, "PN", b"\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+            0x00100010, "PN", b"\x1b$(D\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2"
         )
 
         with pytest.warns(
@@ -248,7 +248,7 @@ class TestCharset:
         """Test handling bad encoding for single encoding if
         `config.settings.reading_validation_mode` is RAISE"""
         elem = DataElement(
-            0x00100010, "PN", b"\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+            0x00100010, "PN", b"\x1b$(D\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2"
         )
         msg = (
             "'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
@@ -260,7 +260,7 @@ class TestCharset:
     def test_unknown_escape_sequence(self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(
-            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2"
         )
 
         with pytest.warns(
@@ -274,7 +274,7 @@ class TestCharset:
         """Test handling bad encoding for single encoding if
         `config.settings.reading_validation_mode` is RAISE"""
         elem = DataElement(
-            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2"
         )
         with pytest.raises(
             ValueError, match="Found unknown escape sequence in encoded string value"
@@ -326,11 +326,11 @@ class TestCharset:
         elem = DataElement(
             0x00100010,
             "PN",
-            b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2",
         )
         # correct encoding
         pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 126"])
-        assert "Dionysios=Διονυσιος" == elem.value
+        assert "Dionysios=Διονύσιος" == elem.value
 
         # patched encoding shall behave correctly, but a warning is issued
         with pytest.warns(
@@ -342,11 +342,11 @@ class TestCharset:
             elem = DataElement(
                 0x00100010,
                 "PN",
-                b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+                b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2",
             )
             pydicom.charset.decode_element(elem, ["ISO_2022-IR 100", "ISO 2022 IR 126"])
 
-            assert "Dionysios=Διονυσιος" == elem.value
+            assert "Dionysios=Διονύσιος" == elem.value
 
         with pytest.warns(
             UserWarning,
@@ -357,10 +357,10 @@ class TestCharset:
             elem = DataElement(
                 0x00100010,
                 "PN",
-                b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+                b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2",
             )
             pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO_2022_IR+126"])
-            assert "Dionysios=Διονυσιος" == elem.value
+            assert "Dionysios=Διονύσιος" == elem.value
 
     def test_multi_charset_default_value(self):
         """Test that the first value is used if no escape code is given"""
@@ -378,15 +378,15 @@ class TestCharset:
         elem = DataElement(
             0x00100010,
             "PN",
-            b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            b"Dionysios=\x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2",
         )
         pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 126"])
-        assert "Dionysios=Διονυσιος" == elem.value
+        assert "Dionysios=Διονύσιος" == elem.value
 
         # multiple values with different encodings
         encoded = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
-            b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
+            b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2\\"
             b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
         )
@@ -394,31 +394,31 @@ class TestCharset:
         pydicom.charset.decode_element(
             elem, ["ISO 2022 IR 100", "ISO 2022 IR 144", "ISO 2022 IR 126"]
         )
-        assert ["Buc^Jérôme", "Διονυσιος", "Люкceмбypг"] == elem.value
+        assert ["Buc^Jérôme", "Διονύσιος", "Люкceмбypг"] == elem.value
 
     def test_single_byte_multi_charset_text(self):
         # changed encoding inside the string
         elem = DataElement(
             0x00081039,
             "LO",
-            b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2",
         )
         pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 126"])
-        assert "Dionysios is Διονυσιος" == elem.value
+        assert "Dionysios is Διονύσιος" == elem.value
 
         # multiple values with different encodings
         elem = DataElement(
             0x00081039,
             "LO",
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
-            b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
+            b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2\\"
             b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3",
         )
         pydicom.charset.decode_element(
             elem, ["ISO 2022 IR 100", "ISO 2022 IR 144", "ISO 2022 IR 126"]
         )
-        assert ["Buc^Jérôme", "Διονυσιος", "Люкceмбypг"] == elem.value
+        assert ["Buc^Jérôme", "Διονύσιος", "Люкceмбypг"] == elem.value
 
     @pytest.mark.parametrize("encoding, decoded, raw_data", ENCODED_NAMES)
     def test_single_byte_code_extensions(self, encoding, decoded, raw_data):

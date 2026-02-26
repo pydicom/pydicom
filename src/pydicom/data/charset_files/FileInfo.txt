@@ -4,7 +4,7 @@ chrArab.dcm      ISO_IR 127                               '\xe2\xc8\xc7\xe6\xea^
 chrFren.dcm      ISO_IR 100                               'Buc^J\xe9r\xf4me'
 chrFrenMulti.dcm ISO_IR 100                               'Buc^J\xe9r\xf4me'
 chrGerm.dcm      ISO_IR 100                               '\xc4neas^R\xfcdiger'
-chrGreek.dcm     ISO_IR 126                               '\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2'
+chrGreek.dcm     ISO_IR 126                               '\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2'
 chrH31.dcm       ['', 'ISO 2022 IR 87']                   'Yamada^Tarou=\x1b$B;3ED\x1b(B^\x1b$BB@O:\x1b(B=\x1b$B$d$^$@\x1b(B^\x1b$B$?$m$&\x1b(B'
 chrH32.dcm       ['ISO 2022 IR 13', 'ISO 2022 IR 87']     '\xd4\xcf\xc0\xde^\xc0\xdb\xb3=\x1b$B;3ED\x1b(J^\x1b$BB@O:\x1b(J=\x1b$B$d$^$@\x1b(J^\x1b$B$?$m$&\x1b(J'
 chrHbrw.dcm      ISO_IR 138                               '\xf9\xf8\xe5\xef^\xe3\xe1\xe5\xf8\xe4'

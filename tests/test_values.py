@@ -64,20 +64,20 @@ class TestConvertAE:
 class TestConvertText:
     def test_single_value(self):
         """Test that encoding can change inside a text string"""
-        bytestring = b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+        bytestring = b"Dionysios is \x1b\x2d\x46\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2"
         encodings = ["latin_1", "iso_ir_126"]
-        assert "Dionysios is Διονυσιος" == convert_text(bytestring, encodings)
+        assert "Dionysios is Διονύσιος" == convert_text(bytestring, encodings)
 
     def test_multi_value(self):
         """Test that backslash is handled as value separator"""
         bytestring = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
-            b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
+            b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2\\"
             b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
         )
         encodings = ["latin_1", "iso_ir_144", "iso_ir_126"]
-        assert ["Buc^Jérôme", "Διονυσιος", "Люкceмбypг"] == convert_text(
+        assert ["Buc^Jérôme", "Διονύσιος", "Люкceмбypг"] == convert_text(
             bytestring, encodings
         )
 
@@ -85,12 +85,12 @@ class TestConvertText:
         """Test that backslash is handled as character"""
         bytestring = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
-            b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
+            b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2\\"
             b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
         )
         encodings = ["latin_1", "iso_ir_144", "iso_ir_126"]
-        assert "Buc^Jérôme\\Διονυσιος\\Люкceмбypг" == convert_single_string(
+        assert "Buc^Jérôme\\Διονύσιος\\Люкceмбypг" == convert_single_string(
             bytestring, encodings
         )
 
@@ -119,14 +119,14 @@ class TestConvertText:
         """Test that delimiters reset the encoding"""
         bytestring = (
             b"\x1b\x2d\x46"
-            b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+            b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2"
             b"\r\nJ\xe9r\xf4me/"
             b"\x1b\x2d\x4c"
             b"\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3"
             b"\tJ\xe9r\xf4me"
         )
         encodings = ["latin_1", "iso_ir_144", "iso_ir_126"]
-        expected = "Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme"
+        expected = "Διονύσιος\r\nJérôme/Люкceмбypг\tJérôme"
         assert expected == convert_single_string(bytestring, encodings)
 
     def test_value_ending_with_padding(self):
@@ -270,11 +270,11 @@ class TestConvertPN:
         """Test that backslash is handled as value separator"""
         bytestring = (
             b"Buc^J\xe9r\xf4me\\\x1b\x2d\x46"
-            b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\"
+            b"\xc4\xe9\xef\xed\xfd\xf3\xe9\xef\xf2\\"
             b"\x1b$BG\\<\\\x1b(B^\x1b$BK\\L\\"
         )
         encodings = ["latin_1", "iso2022_jp", "iso_ir_126"]
-        assert ["Buc^Jérôme", "Διονυσιος", "倍尺^本目"] == convert_PN(
+        assert ["Buc^Jérôme", "Διονύσιος", "倍尺^本目"] == convert_PN(
             bytestring, encodings
         )
 

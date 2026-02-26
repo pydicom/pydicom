@@ -422,11 +422,11 @@ class TestDataElement:
         """Known tags with VR UN are correctly decoded."""
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, "UN", b"ISO_IR 126")
-        ds[0x00100010] = DataElement(0x00100010, "UN", "Διονυσιος".encode("iso_ir_126"))
+        ds[0x00100010] = DataElement(0x00100010, "UN", "Διονύσιος".encode("iso_ir_126"))
         ds.decode()
         assert "CS" == ds[0x00080005].VR
         assert "PN" == ds[0x00100010].VR
-        assert "Διονυσιος" == ds[0x00100010].value
+        assert "Διονύσιος" == ds[0x00100010].value
 
         ds = Dataset()
         ds[0x00080005] = DataElement(
@@ -435,12 +435,12 @@ class TestDataElement:
         ds[0x00100010] = DataElement(
             0x00100010,
             "UN",
-            b"Dionysios=\x1b\x2d\x46" + "Διονυσιος".encode("iso_ir_126"),
+            b"Dionysios=\x1b\x2d\x46" + "Διονύσιος".encode("iso_ir_126"),
         )
         ds.decode()
         assert "CS" == ds[0x00080005].VR
         assert "PN" == ds[0x00100010].VR
-        assert "Dionysios=Διονυσιος" == ds[0x00100010].value
+        assert "Dionysios=Διονύσιος" == ds[0x00100010].value
 
     def test_reading_ds_with_known_tags_with_UN_VR(self, replace_un_with_known_vr):
         """Known tags with VR UN are correctly read."""
@@ -456,10 +456,10 @@ class TestDataElement:
         """Unknown tags with VR UN are not decoded."""
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, "CS", b"ISO_IR 126")
-        ds[0x00111010] = DataElement(0x00111010, "UN", "Διονυσιος".encode("iso_ir_126"))
+        ds[0x00111010] = DataElement(0x00111010, "UN", "Διονύσιος".encode("iso_ir_126"))
         ds.decode()
         assert "UN" == ds[0x00111010].VR
-        assert "Διονυσιος".encode("iso_ir_126") == ds[0x00111010].value
+        assert "Διονύσιος".encode("iso_ir_126") == ds[0x00111010].value
 
     def test_tag_with_long_value_UN_VR(self):
         """Tag with length > 64kb with VR UN is not changed."""
