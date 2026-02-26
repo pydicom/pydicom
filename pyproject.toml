@@ -105,6 +105,7 @@ exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
 extend-select = [
     "C4",
     "ISC",
+    "PIE",
     "UP",
     "C9",
     "PERF",
@@ -114,6 +115,8 @@ extend-select = [
     "UP",
 ]
 ignore = [
+    "PIE808",
+    "PIE790",
     "PERF203",
     "PLC0415",
     "PLC1901",
