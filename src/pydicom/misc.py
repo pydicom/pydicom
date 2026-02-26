@@ -83,7 +83,7 @@ def find_keyword_candidates(
 
     candidates.extend([w for w in _double_edits(keyword) if w in keywords])
     if candidates:
-        return sorted(list(set(candidates)))[:max_candidates]
+        return sorted(set(candidates))[:max_candidates]
 
     return []
 
