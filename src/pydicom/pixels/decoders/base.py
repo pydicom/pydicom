@@ -330,12 +330,10 @@ def _apply_j2k_corrections(
             meta.get("j2k_precision", bits_stored)
             for meta in runner._frame_meta.values()
         ]
-        precisions = [
-            bits_stored if prec > bits_stored else prec for prec in precisions
-        ]
+        precisions = [min(prec, bits_stored) for prec in precisions]
     else:
         precision = runner.get_frame_option(index, "j2k_precision", bits_stored)
-        precisions = [bits_stored if precision > bits_stored else precision]
+        precisions = [min(precision, bits_stored)]
 
     container_size = 8 * arr.dtype.itemsize
     bit_shifts = [container_size - prec for prec in precisions]
@@ -379,12 +377,10 @@ def _apply_jls_sign_correction(
             meta.get("jls_precision", bits_stored)
             for meta in runner._frame_meta.values()
         ]
-        precisions = [
-            bits_stored if prec > bits_stored else prec for prec in precisions
-        ]
+        precisions = [min(prec, bits_stored) for prec in precisions]
     else:
         prec = runner.get_frame_option(index, "jls_precision", bits_stored)
-        precisions = [bits_stored if prec > bits_stored else prec]
+        precisions = [min(prec, bits_stored)]
 
     # Single or multi-framed with consistent precision values
     container_size = 8 * arr.dtype.itemsize
