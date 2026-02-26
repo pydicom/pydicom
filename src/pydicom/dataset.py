@@ -789,7 +789,7 @@ class Dataset:  # noqa: PLW1641
         for filter_ in filters:
             filter_ = filter_.lower()
             match = [x for x in allnames if x.lower().find(filter_) != -1]
-            matches.update({x: 1 for x in match})
+            matches.update(dict.fromkeys(match, 1))
 
         if filters:
             return sorted(matches.keys())

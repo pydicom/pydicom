@@ -1513,7 +1513,7 @@ class FileSet:
               with lists of value(s) for the elements available in the instances.
         """
         element_list = elements if isinstance(elements, list) else [elements]
-        has_element = {element: False for element in element_list}
+        has_element = dict.fromkeys(element_list, False)
         results: dict[str | int, list[Any]] = {element: [] for element in element_list}
         iter_instances = instances or iter(self)
         instance: Dataset | FileInstance
