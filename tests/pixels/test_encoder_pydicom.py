@@ -140,7 +140,6 @@ class TestEncodeRLEFrame:
         ds = dcmread(EXPL_1_1_1F)
         ref = ds.pixel_array
         n_frames = ds.get("NumberOfFrames", 1)
-        n_pixels = ds.Rows * ds.Columns * n_frames
         assert 1 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
 
