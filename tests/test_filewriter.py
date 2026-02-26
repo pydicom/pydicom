@@ -3145,8 +3145,18 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
-            BytesIO(b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0"),
+            # fmt: off
+            (
+                b"\xff\xff\x00\xe0"
+                b"\x00\x01\x02\x03"
+                b"\xfe\xff\xdd\xe0"
+            ),
+            BytesIO(
+                b"\xff\xff\x00\xe0"
+                b"\x00\x01\x02\x03"
+                b"\xfe\xff\xdd\xe0"
+            ),
+            # fmt: on
         ),
     )
     def test_little_endian_incorrect_data(self, data):
@@ -3170,8 +3180,18 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
-            BytesIO(b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd"),
+            # fmt: off
+            (
+                b"\x00\x00\x00\x00"
+                b"\x00\x01\x02\x03"
+                b"\xff\xfe\xe0\xdd"
+            ),
+            BytesIO(
+                b"\x00\x00\x00\x00"
+                b"\x00\x01\x02\x03"
+                b"\xff\xfe\xe0\xdd"
+            ),
+            # fmt: on
         ),
     )
     def test_big_endian_incorrect_data(self, data):
