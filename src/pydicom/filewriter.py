@@ -1299,7 +1299,7 @@ def dcmwrite(
     # Cover use of `write_like_original` as:
     #   optional arg - dcmwrite(fp, ds, write_like_original=bool)
     #   positional arg - dcmwrite(fp, ds, False)
-    write_like_original: bool | None = kwargs.get("write_like_original", None)
+    write_like_original: bool | None = kwargs.get("write_like_original")
     if None not in (__write_like_original, write_like_original):
         if config._use_future:
             raise TypeError(
