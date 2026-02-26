@@ -1740,9 +1740,7 @@ class Dataset:  # noqa: PLW1641
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
-        if not hasattr(self, "_pixel_array"):
-            already_have = False
-        elif self._pixel_array is None:
+        if not hasattr(self, "_pixel_array") or self._pixel_array is None:
             already_have = False
 
         # Checking `_pixel_id` may sometimes give a false result if the pixel
