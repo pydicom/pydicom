@@ -39,7 +39,7 @@ def _filtered(source: Iterable[str], filters: Iterable[str]) -> list[str]:
     filters = [f.lower() for f in filters]
 
     return sorted(
-        set(val for val in source if any((f in val.lower()) for f in filters))
+        {val for val in source if any((f in val.lower()) for f in filters)}
     )
 
 
