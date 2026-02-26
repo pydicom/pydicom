@@ -451,7 +451,7 @@ def compress(
 
     # Encapsulate the encoded *Pixel Data*
     nr_frames = len(encoded)
-    total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
+    total = (nr_frames - 1) * 8 + sum(len(f) for f in encoded[:-1])
     if encapsulate_ext or total > 2**32 - 1:
         (
             ds.PixelData,

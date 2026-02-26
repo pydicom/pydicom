@@ -1120,7 +1120,7 @@ def encapsulate(
     output.extend(b"\xfe\xff\x00\xe0")
     if has_bot:
         # Check that the 2**32 - 1 limit in BOT item lengths won't be exceeded
-        total = (nr_frames - 1) * 8 + sum([len(f) for f in frames[:-1]])
+        total = (nr_frames - 1) * 8 + sum(len(f) for f in frames[:-1])
         if total > 2**32 - 1:
             raise ValueError(
                 f"The total length of the encapsulated frame data ({total} "
