@@ -425,7 +425,7 @@ class TestCharset:
         # single-byte encoding as code extension
         elem = DataElement(0x00100010, "PN", b"ASCII+" + raw_data)
         pydicom.charset.decode_element(elem, ["", encoding])
-        assert "ASCII+" + decoded == elem.value
+        assert f"ASCII+{decoded}" == elem.value
 
     def test_missing_escape_for_single_byte_code_extensions(self):
         # missing escape sequence after component delimiter
@@ -439,7 +439,7 @@ class TestCharset:
     def test_charset_patient_names(self, filename, patient_name):
         """Test patient names are correctly decoded and encoded."""
         # check that patient names are correctly read
-        file_path = get_charset_files(filename + ".dcm")[0]
+        file_path = get_charset_files(f"{filename}.dcm")[0]
         ds = dcmread(file_path)
         ds.decode()
         assert patient_name == ds.PatientName

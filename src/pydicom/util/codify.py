@@ -203,7 +203,7 @@ def code_sequence(
 
     # Create comment line to document the start of Sequence
     lines.append("")
-    lines.append("# " + seq_name)
+    lines.append(f"# {seq_name}")
 
     # Code line to create a new Sequence object
     seq_var = name_filter(seq_keyword)
@@ -211,17 +211,18 @@ def code_sequence(
     orig_seq_var = seq_var
     seq_var = unique_name(seq_var)
 
-    lines.append(seq_var + " = Sequence()")
+    lines.append(f"{seq_var} = Sequence()")
 
     # Code line to add the sequence to its parent
-    lines.append(dataset_name + "." + seq_keyword + " = " + seq_var)
+    lines.append(f"{dataset_name}.{seq_keyword} = {seq_var}")
 
     # Code lines to add sequence items to the Sequence
+    seq_keyword = seq_keyword.replace("Sequence", "")
     for i, ds in enumerate(seq):
         # Determine index to use. If seq item has a data element with 'Index',
         #    use that; if one with 'Number', use that, else start at 1
-        index_keyword = seq_keyword.replace("Sequence", "") + "Index"
-        number_keyword = seq_keyword.replace("Sequence", "") + "Number"
+        index_keyword = f"{seq_keyword}Index"
+        number_keyword = f"{seq_keyword}Number"
         if hasattr(ds, index_keyword):
             index_str = str(getattr(ds, index_keyword))
         elif hasattr(ds, number_keyword):
@@ -231,7 +232,7 @@ def code_sequence(
 
         # Code comment line to mark start of sequence item
         lines.append("")
-        lines.append("# " + seq_name + ": " + seq_item_name + " " + index_str)
+        lines.append(f"# {seq_name}: {seq_item_name} {index_str}")
 
         # Determine the variable name to use for the sequence item (dataset)
         ds_name = orig_seq_var.replace("_sequence", "") + index_str
@@ -487,7 +488,7 @@ def do_codify(args: argparse.Namespace) -> None:
         save_as_filename = args.save_as
     else:
         base, _ = os.path.splitext(filename)
-        save_as_filename = base + "_from_codify" + ".dcm"
+        save_as_filename = f"{base}_from_codify.dcm"
     save_line = f"\nds.save_as(r'{save_as_filename}', enforce_file_format=True)"
     code_str += save_line
 

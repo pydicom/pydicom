@@ -232,12 +232,12 @@ class Collection:
 
     def __repr__(self) -> str:
         """Return a representation of the collection."""
-        concepts = [
+        concepts = '\n'.join(
             self.repr_format.format(name, concept)
             for name, concept in self.concepts.items()
-        ]
+        )
 
-        return f"{self.name}\n" + "\n".join(concepts)
+        return f"{self.name}\n{concepts}"
 
     @property
     def scheme_designator(self) -> str:

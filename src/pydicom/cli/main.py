@@ -36,7 +36,7 @@ re_kywd_or_item = (
     r"(?:\[(-?\d+)\])?"  # Optional [index] or [-index], keep inside brackets
 )
 
-re_file_spec_object = re.compile(re_kywd_or_item + r"(\." + re_kywd_or_item + r")*$")
+re_file_spec_object = re.compile(fr"{re_kywd_or_item}(\.{re_kywd_or_item})*$")
 
 re_match_tag = r"\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
 re_tag_with_spaces = r"\([0-9A-Fa-f]{4}, +[0-9A-Fa-f]{4}\)"

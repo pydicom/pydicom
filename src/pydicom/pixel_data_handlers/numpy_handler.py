@@ -189,7 +189,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     if missing:
         raise AttributeError(
             "Unable to convert the pixel data as the following required "
-            "elements are missing from the dataset: " + ", ".join(missing)
+            f"elements are missing from the dataset: {', '.join(missing)}"
         )
     if ds.SamplesPerPixel > 1:
         if not hasattr(ds, "PlanarConfiguration"):

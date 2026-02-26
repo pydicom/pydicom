@@ -487,7 +487,8 @@ def read_dataset(
     except EOFError as details:
         if config.settings.reading_validation_mode == config.RAISE:
             raise
-        msg = str(details) + " in file " + getattr(fp, "name", "<no filename>")
+        filename = getattr(fp, "name", "<no filename>")
+        msg = f"{details} in file {filename}"
         warn_and_log(msg, UserWarning)
     except NotImplementedError as details:
         logger.error(details)
