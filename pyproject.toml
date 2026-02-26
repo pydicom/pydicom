@@ -105,6 +105,7 @@ include = ["src/*.py", "tests/*.py", "doc/*.py"]
 select = [
     "C4",
     "ISC",
+    "PIE",
     "UP",
     "C9",
     "E",
@@ -114,6 +115,8 @@ select = [
     "W",
 ]
 ignore = [
+    "PIE808",
+    "PIE790",
     "PERF203",
     "PLC1901",
     "PLR2004",
