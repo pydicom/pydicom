@@ -200,6 +200,7 @@ def code_sequence(
         seq_keyword = dictionary_keyword(dataelem.tag)
     except KeyError:
         seq_keyword = f"Tag{dataelem.tag:08x}"
+    seq_item_keyword = seq_keyword.replace("Sequence", "")
 
     # Create comment line to document the start of Sequence
     lines.append("")
@@ -217,12 +218,11 @@ def code_sequence(
     lines.append(f"{dataset_name}.{seq_keyword} = {seq_var}")
 
     # Code lines to add sequence items to the Sequence
-    seq_keyword = seq_keyword.replace("Sequence", "")
     for i, ds in enumerate(seq):
         # Determine index to use. If seq item has a data element with 'Index',
         #    use that; if one with 'Number', use that, else start at 1
-        index_keyword = f"{seq_keyword}Index"
-        number_keyword = f"{seq_keyword}Number"
+        index_keyword = f"{seq_item_keyword}Index"
+        number_keyword = f"{seq_item_keyword}Number"
         if hasattr(ds, index_keyword):
             index_str = str(getattr(ds, index_keyword))
         elif hasattr(ds, number_keyword):
