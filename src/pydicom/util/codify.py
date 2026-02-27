@@ -195,12 +195,12 @@ def code_sequence(
     lines = []
     seq = dataelem.value
     seq_name = dataelem.name
-    seq_item_name = seq_name.replace(" Sequence", "")
+    seq_item_name = seq_name.removesuffix(" Sequence")
     try:
         seq_keyword = dictionary_keyword(dataelem.tag)
     except KeyError:
         seq_keyword = f"Tag{dataelem.tag:08x}"
-    seq_item_keyword = seq_keyword.replace("Sequence", "")
+    seq_item_keyword = seq_keyword.removesuffix("Sequence")
 
     # Create comment line to document the start of Sequence
     lines.append("")
