@@ -190,7 +190,7 @@ def code_sequence(
         name_count = (
             cast(deque, var_names).count(name) - 1
         )  # type:ignore[redundant-cast]
-        return name if name_count == 0 else name + f"_{name_count}"
+        return name if name_count == 0 else f"{name}_{name_count}"
 
     lines = []
     seq = dataelem.value
