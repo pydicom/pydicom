@@ -56,7 +56,9 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def empty_value_for_VR(
-    VR: str | None, raw: bool = False
+    VR: str | None, raw: bool = False,
+    *,
+    settings: config.Settings,
 ) -> bytes | list[str] | str | None | PersonName:
     """Return the value for an empty element for `VR`.
 
@@ -89,7 +91,7 @@ def empty_value_for_VR(
     if VR == VR_.SQ:
         return b"" if raw else []
 
-    if config.use_none_as_empty_text_VR_value:
+    if settings.use_none_as_empty_text_VR_value:
         return None
 
     if VR == VR_.PN:
@@ -180,7 +182,9 @@ class DataElement:  # noqa: PLW1641
         file_value_tell: int | None = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: config.ValidationMode | None = None,
+        validation_mode: config.ValidationMode | None = None,  # deprecate for v4.0, use settings?
+        *,
+        settings: config.Settings,        
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -214,8 +218,9 @@ class DataElement:  # noqa: PLW1641
             Defines if values are validated and how validation errors are
             handled.
         """
+        self.settings = settings
         if validation_mode is None:
-            validation_mode = config.settings.reading_validation_mode
+            validation_mode = settings.reading_validation_mode
 
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
@@ -227,7 +232,7 @@ class DataElement:  # noqa: PLW1641
         if (
             VR == VR_.UN
             and not tag.is_private
-            and config.replace_un_with_known_vr
+            and settings.replace_un_with_known_vr
             and (is_undefined_length or value is None or len(value) < 0xFFFF)
         ):
             try:
@@ -266,6 +271,8 @@ class DataElement:  # noqa: PLW1641
             | Callable[[str], BulkDataType]
             | None
         ) = None,
+        *,
+        settings: config.Settings,
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
@@ -298,6 +305,8 @@ class DataElement:  # noqa: PLW1641
         -------
         DataElement
         """
+        settings = settings or config.settings
+
         # TODO: test wado-rs retrieve wrapper
         converter = JsonDataElementConverter(
             dataset_class, tag, vr, value, value_key, bulk_data_uri_handler
@@ -306,16 +315,16 @@ class DataElement:  # noqa: PLW1641
 
         if (
             vr == VR_.UN
-            and config.replace_un_with_known_vr
+            and settings.replace_un_with_known_vr
             and isinstance(elem_value, bytes)
         ):
             raw = RawDataElement(
                 Tag(tag), vr, len(elem_value), elem_value, 0, True, True
             )
-            elem_value = convert_raw_data_element(raw).value
+            elem_value = convert_raw_data_element(raw, settings=settings).value
 
         try:
-            return cls(tag=tag, value=elem_value, VR=vr)
+            return cls(tag=tag, value=elem_value, VR=vr, settings=settings)
         except Exception as exc:
             raise ValueError(
                 f"Data element '{tag}' could not be loaded from JSON: {elem_value}"
@@ -921,7 +930,7 @@ def convert_raw_data_element(
             raw, data, encoding=encoding, ds=ds, **hooks.raw_element_kwargs
         )
     else:
-        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds)
+        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds, settings = settings)
         hooks.raw_element_value(raw, data, encoding=encoding, ds=ds, settings=settings)
 
     return DataElement(
@@ -931,6 +940,7 @@ def convert_raw_data_element(
         raw.value_tell,
         raw.length == 0xFFFFFFFF,
         already_converted=True,
+        settings=settings,
     )
 
 
@@ -938,6 +948,8 @@ def _DataElement_from_raw(
     raw_data_element: RawDataElement,
     encoding: str | MutableSequence[str] | None = None,
     dataset: "Dataset | None" = None,
+    *,
+    settings: config.Settings,    
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -973,6 +985,7 @@ def _DataElement_from_raw(
         raw=raw_data_element,
         encoding=encoding,
         ds=dataset,
+        settings=settings,
     )
 
 

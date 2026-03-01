@@ -1,4 +1,4 @@
-# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 
 from typing import Any, TYPE_CHECKING, Protocol
 from collections.abc import MutableSequence, Callable
@@ -158,6 +158,7 @@ def raw_element_vr(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
+    settings: config.Settings,
     **kwargs: Any,
 ) -> None:
     """Determine the VR to use for `raw`.
@@ -198,7 +199,7 @@ def raw_element_vr(
 
                 vr = VR.UN
                 warn_and_log(f"{msg} - setting VR to 'UN'")
-    elif vr == VR.UN and config.replace_un_with_known_vr:
+    elif vr == VR.UN and settings.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if raw.tag.is_private:
@@ -254,10 +255,10 @@ def raw_element_value(
             f"{exc} This occurred while trying to parse {raw.tag} according "
             f"to VR '{raw.VR}'."
         )
-        if not config.convert_wrong_length_to_UN:
+        if not settings.convert_wrong_length_to_UN:
             raise BytesLengthException(
-                f"{msg} To replace this error with a warning set "
-                "pydicom.config.convert_wrong_length_to_UN = True."
+                f"{msg} To replace this error with a warning use argument"
+                "`settings = config.Settings(convert_wrong_length_to_UN=True)`."
             )
 
         warn_and_log(f"{msg} Setting VR to 'UN'.")

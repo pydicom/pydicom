@@ -758,7 +758,7 @@ def convert_value(
         raise NotImplementedError(f"Unknown Value Representation '{VR}'")
 
     if raw_data_element.length == 0:
-        return empty_value_for_VR(VR)
+        return empty_value_for_VR(VR, settings=settings)
 
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter,

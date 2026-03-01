@@ -251,7 +251,7 @@ def data_element_generator(
                 value = (
                     fp_read(length)
                     if length > 0
-                    else cast(bytes | None, empty_value_for_VR(vr, raw=True))
+                    else cast(bytes | None, empty_value_for_VR(vr, raw=True, settings=settings))
                 )
                 if debugging:
                     dotdot = "..." if length > 20 else "   "
@@ -316,7 +316,7 @@ def data_element_generator(
                     continue
 
                 yield DataElement(
-                    BaseTag(tag), vr, seq, value_tell, is_undefined_length=True
+                    BaseTag(tag), vr, seq, value_tell, is_undefined_length=True, settings=settings
                 )
             else:
                 if debugging:
