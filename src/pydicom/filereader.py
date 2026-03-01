@@ -58,7 +58,7 @@ def data_element_generator(
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.Settings, # | None = None,    
+    settings: config.Settings, # | None = None,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -115,7 +115,7 @@ def data_element_generator(
     from pydicom.values import convert_string
 
     settings = settings or config.settings
-    
+
     endian_chr = "><"[is_little_endian]
 
     # assign implicit VR struct to variable as use later if VR assumed missing
@@ -565,7 +565,7 @@ def read_sequence_item(
     encoding: str | MutableSequence[str],
     offset: int = 0,
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
 ) -> Dataset | None:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
@@ -637,7 +637,7 @@ def read_sequence_item(
 def _read_command_set_elements(
     fp: BinaryIO,
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
     ) -> Dataset:
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
@@ -671,7 +671,7 @@ def _read_command_set_elements(
 def _read_file_meta_info(
         fp: BinaryIO,
     *,
-    settings: config.Settings        
+    settings: config.Settings
     ) -> FileMetaDataset:
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
@@ -752,7 +752,7 @@ def _read_file_meta_info(
 def read_file_meta_info(
     filename: PathType,
     *,
-    settings: config.Settings  # xxx | None = None    
+    settings: config.Settings  # xxx | None = None
     ) -> FileMetaDataset:
     """Read and return the DICOM file meta information only.
 
@@ -872,7 +872,7 @@ def read_partial(
         More generic file reading function.
     """
     settings = settings or config.settings
-    
+
     # Read File Meta Information
 
     # Read preamble (if present)

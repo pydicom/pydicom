@@ -595,7 +595,7 @@ def convert_SQ(
     encoding: list[str] | None = None,
     offset: int = 0,
     *,
-    settings: config.Settings   
+    settings: config.Settings
 ) -> Sequence:
     """Return a decoded 'SQ' value.
 
@@ -730,7 +730,7 @@ def convert_value(
     raw_data_element: RawDataElement,
     encodings: str | MutableSequence[str] | None = None,
     *,
-    settings: config.Settings 
+    settings: config.Settings
 ) -> Any | MutableSequence[Any]:
     """Return the element value decoded using the appropriate decoder.
 

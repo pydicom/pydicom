@@ -100,10 +100,10 @@ _UNPACK_SHORT = Struct(">H").unpack
 
 
 def _array_common(
-    f: BinaryIO, 
+    f: BinaryIO,
     specific_tags: list[BaseTag | int],
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
     **kwargs: Any
 ) -> tuple["Dataset", dict[str, Any]]:
     """Return a dataset from `f` and a corresponding decoding options dict.
@@ -1117,7 +1117,7 @@ def iter_pixels(
     indices: Iterable[int] | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
-    settings: config.Settings,  # xxx | None = None,    
+    settings: config.Settings,  # xxx | None = None,
     **kwargs: Any,
 ) -> Iterator["np.ndarray"]:
     """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
@@ -1240,7 +1240,7 @@ def iter_pixels(
     from pydicom.dataset import Dataset
     from pydicom.pixels import get_decoder
 
-    settings = settings or config.settings 
+    settings = settings or config.settings
 
     if isinstance(src, Dataset):
         ds: Dataset = src
@@ -1455,7 +1455,7 @@ def pixel_array(
     index: int | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
-    settings: config.Settings,  # xxx | None = None,    
+    settings: config.Settings,  # xxx | None = None,
     **kwargs: Any,
 ) -> "np.ndarray":
     """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.

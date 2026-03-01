@@ -272,7 +272,7 @@ class Settings:
         self._replace_un_with_known_vr: bool | None = None
         self._show_file_meta: bool | None = None
         self._use_none_as_empty_text_VR_value: bool | None = None
-        
+
         # Override settings with any provided kwargs
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -446,7 +446,7 @@ of the settings.
 
     ``config.settings`` will be removed in v4.0, instead
     pass a `settings` argument to function calls
-            
+
 """
 
 
