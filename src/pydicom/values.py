@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Functions for converting values of DICOM
 data elements to proper python types
 """
@@ -594,6 +594,8 @@ def convert_SQ(
     is_little_endian: bool,
     encoding: list[str] | None = None,
     offset: int = 0,
+    *,
+    settings: config.Settings   
 ) -> Sequence:
     """Return a decoded 'SQ' value.
 
@@ -619,7 +621,7 @@ def convert_SQ(
     encodings = encoding or [default_encoding]
     fp = BytesIO(byte_string)
     seq = read_sequence(
-        fp, is_implicit_VR, is_little_endian, len(byte_string), encodings, offset
+        fp, is_implicit_VR, is_little_endian, len(byte_string), encodings, offset, settings=settings
     )
     return seq
 
@@ -727,6 +729,8 @@ def convert_value(
     VR: str,
     raw_data_element: RawDataElement,
     encodings: str | MutableSequence[str] | None = None,
+    *,
+    settings: config.Settings 
 ) -> Any | MutableSequence[Any]:
     """Return the element value decoded using the appropriate decoder.
 
@@ -795,6 +799,7 @@ def convert_value(
             is_little_endian,
             encodings,
             raw_data_element.value_tell,
+            settings=settings,
         )
     except ValueError:
         if config.settings.reading_validation_mode == config.ValidationMode.RAISE:

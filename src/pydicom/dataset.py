@@ -1,4 +1,4 @@
-# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -379,6 +379,7 @@ class Dataset:  # noqa: PLW1641
         self._parent_encoding: str | list[str] = kwargs.get(
             "parent_encoding", default_encoding
         )
+        self.settings = kwargs.pop("settings")
 
         self._dict: MutableMapping[BaseTag, _DatasetValue]
         if not args:
@@ -1090,7 +1091,7 @@ class Dataset:  # noqa: PLW1641
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = convert_raw_data_element(elem, encoding=character_set, ds=self)
+            self[tag] = convert_raw_data_element(elem, encoding=character_set, ds=self, settings=self.settings)
 
             # On initial read of the dataset, propagate the pixel representation
             #   (if any) to child datasets in any sequences.
@@ -1760,7 +1761,7 @@ class Dataset:  # noqa: PLW1641
         if not opts["use_pdh"]:
             # Use 'pydicom.pixels' backend
             opts["decoding_plugin"] = name
-            self._pixel_array = pixel_array(self, **opts)
+            self._pixel_array = pixel_array(self, settings=self.settings, **opts)
             self._pixel_id = get_image_pixel_ids(self)
         else:
             # Use 'pydicom.pixel_data_handlers' backend
@@ -3404,6 +3405,8 @@ class FileDataset(Dataset):
         file_meta: "FileMetaDataset | None" = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
+        *,
+        settings: config.Settings,
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
@@ -3432,7 +3435,7 @@ class FileDataset(Dataset):
             ``True`` (default) if little-endian transfer syntax used; ``False``
             if big-endian.
         """
-        Dataset.__init__(self, dataset)
+        Dataset.__init__(self, dataset, settings=settings)
         self.preamble = preamble
         self.file_meta: FileMetaDataset = (
             file_meta if file_meta is not None else FileMetaDataset()

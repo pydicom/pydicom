@@ -218,6 +218,7 @@ def raw_element_value(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
+    settings: config.Settings,
     **kwargs: Any,
 ) -> None:
     """Convert the encoded value for `raw` to an appropriate type.
@@ -244,7 +245,7 @@ def raw_element_value(
 
     vr = data["VR"]
     try:
-        value = convert_value(vr, raw, encoding)
+        value = convert_value(vr, raw, encoding, settings=settings)
     except NotImplementedError as exc:
         raise NotImplementedError(f"{exc} in tag {raw.tag}")
     except BytesLengthException as exc:

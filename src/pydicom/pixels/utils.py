@@ -1,7 +1,9 @@
-# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Utilities for pixel data handling."""
 
 from collections.abc import Iterable, Iterator
+
+from pydicom import config
 
 try:
     from collections.abc import Buffer  # type: ignore[attr-defined]
@@ -98,7 +100,11 @@ _UNPACK_SHORT = Struct(">H").unpack
 
 
 def _array_common(
-    f: BinaryIO, specific_tags: list[BaseTag | int], **kwargs: Any
+    f: BinaryIO, 
+    specific_tags: list[BaseTag | int],
+    *,
+    settings: config.Settings,    
+    **kwargs: Any
 ) -> tuple["Dataset", dict[str, Any]]:
     """Return a dataset from `f` and a corresponding decoding options dict.
 
@@ -133,7 +139,7 @@ def _array_common(
     read_preamble(f, force=True)
 
     # Read the File Meta (if present)
-    file_meta = _read_file_meta_info(f)
+    file_meta = _read_file_meta_info(f, settings=settings)
     tsyntax = kwargs.setdefault(
         "transfer_syntax_uid",
         file_meta.get("TransferSyntaxUID", None),
@@ -1111,6 +1117,7 @@ def iter_pixels(
     indices: Iterable[int] | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
+    settings: config.Settings,  # xxx | None = None,    
     **kwargs: Any,
 ) -> Iterator["np.ndarray"]:
     """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
@@ -1233,6 +1240,8 @@ def iter_pixels(
     from pydicom.dataset import Dataset
     from pydicom.pixels import get_decoder
 
+    settings = settings or config.settings 
+
     if isinstance(src, Dataset):
         ds: Dataset = src
         file_meta = getattr(ds, "file_meta", {})
@@ -1279,7 +1288,7 @@ def iter_pixels(
         tags = tags | _GROUP_0028 | {0x7FE00001, 0x7FE00002}
 
     try:
-        ds, opts = _array_common(f, list(tags), **kwargs)
+        ds, opts = _array_common(f, list(tags), settings=settings, **kwargs)
 
         if isinstance(ds_out, Dataset):
             ds_out.file_meta = ds.file_meta
@@ -1446,6 +1455,7 @@ def pixel_array(
     index: int | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
+    settings: config.Settings,  # xxx | None = None,    
     **kwargs: Any,
 ) -> "np.ndarray":
     """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.
@@ -1568,6 +1578,8 @@ def pixel_array(
     from pydicom.dataset import Dataset
     from pydicom.pixels import get_decoder
 
+    settings = settings or config.settings
+
     if isinstance(src, Dataset):
         ds: Dataset = src
         file_meta = getattr(ds, "file_meta", {})
@@ -1610,7 +1622,7 @@ def pixel_array(
         tags = tags | _GROUP_0028 | {0x7FE00001, 0x7FE00002}
 
     try:
-        ds, opts = _array_common(f, list(tags), **kwargs)
+        ds, opts = _array_common(f, list(tags), settings=settings, **kwargs)
         tsyntax = opts["transfer_syntax_uid"]
 
         try:

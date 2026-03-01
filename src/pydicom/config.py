@@ -1,4 +1,4 @@
-# Copyright 2008-2023 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Pydicom configuration options."""
 
 # doc strings following items are picked up by sphinx for documentation
@@ -32,8 +32,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 _use_future = False
 _use_future_env = os.getenv("PYDICOM_FUTURE")
-
-
 
 
 # Logging system and debug function to change logging level
@@ -255,7 +253,7 @@ class Settings:
     .. versionadded:: 2.3
     """
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         self._reading_validation_mode: ValidationMode | None = None
         # in future version, writing invalid values will raise by default,
         # currently the default value depends on enforce_valid_values
@@ -264,6 +262,90 @@ class Settings:
 
         # Chunk size to use when reading from buffered DataElement values
         self._buffered_read_size = 8192
+
+        # Until pydicom 4.x, need these flags to fall back to global config.<flag>
+        # if not otherwise set. Use None to show not yet set
+        self._allow_DS_float: bool | None = None
+        self._assume_implicit_vr_switch: bool | None = None
+        self._convert_wrong_length_to_UN: bool | None = None
+        self._datetime_conversion: bool | None = None
+        self._replace_un_with_known_vr: bool | None = None
+        self._show_file_meta: bool | None = None
+        self._use_none_as_empty_text_VR_value: bool | None = None
+        
+        # Override settings with any provided kwargs
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @property
+    def allow_DS_float(self) -> bool:
+        if self._allow_DS_float is None:
+            return globals().get("allow_DS_float")  # type: ignore[return-value]
+        return self._allow_DS_float
+
+    @allow_DS_float.setter
+    def allow_DS_float(self, value: bool):
+        self._allow_DS_float = value
+
+    @property
+    def assume_implicit_vr_switch(self) -> bool:
+        if self._assume_implicit_vr_switch is None:
+            return globals().get("assume_implicit_vr_switch")  # type: ignore[return-value]
+        return self._assume_implicit_vr_switch
+
+    @assume_implicit_vr_switch.setter
+    def assume_implicit_vr_switch(self, value: bool):
+        self._assume_implicit_vr_switch = value
+
+    @property
+    def convert_wrong_length_to_UN(self) -> bool:
+        if self._convert_wrong_length_to_UN is None:
+            return globals().get("convert_wrong_length_to_UN")  # type: ignore[return-value]
+        return self._convert_wrong_length_to_UN
+
+    @convert_wrong_length_to_UN.setter
+    def convert_wrong_length_to_UN(self, value: bool):
+        self._convert_wrong_length_to_UN = value
+
+    @property
+    def datetime_conversion(self) -> bool:
+        if self._datetime_conversion is None:
+            return globals().get("datetime_conversion")  # type: ignore[return-value]
+        return self._datetime_conversion
+
+    @datetime_conversion.setter
+    def datetime_conversion(self, value: bool):
+        self._datetime_conversion = value
+
+    @property
+    def replace_un_with_known_vr(self) -> bool:
+        if self._replace_un_with_known_vr is None:
+            return globals().get("replace_un_with_known_vr")  # type: ignore[return-value]
+        return self._replace_un_with_known_vr
+
+    @replace_un_with_known_vr.setter
+    def replace_un_with_known_vr(self, value: bool):
+        self._replace_un_with_known_vr = value
+
+    @property
+    def show_file_meta(self) -> bool:
+        if self._show_file_meta is None:
+            return globals().get("show_file_meta")  # type: ignore[return-value]
+        return self._show_file_meta
+
+    @show_file_meta.setter
+    def show_file_meta(self, value: bool):
+        self._show_file_meta = value
+
+    @property
+    def use_none_as_empty_text_VR_value(self) -> bool:
+        if self._use_none_as_empty_text_VR_value is None:
+            return globals().get("use_none_as_empty_text_VR_value")  # type: ignore[return-value]
+        return self._use_none_as_empty_text_VR_value
+
+    @use_none_as_empty_text_VR_value.setter
+    def use_none_as_empty_text_VR_value(self, value: bool):
+        self._use_none_as_empty_text_VR_value = value
 
     @property
     def buffered_read_size(self) -> int:
@@ -358,8 +440,13 @@ of the settings.
 .. versionadded:: 2.3
 .. versionchanged:: 3.1
 
-            Now thread-safe, accessed through thread-local storage
+    Now thread-safe, accessed through thread-local storage
 
+.. deprecated:: 4.0
+
+    ``config.settings`` will be removed in v4.0, instead
+    pass a `settings` argument to function calls
+            
 """
 
 
@@ -602,6 +689,7 @@ def future_behavior(enable_future: bool = True) -> None:
     --------
     :attr:`INVALID_KEYWORD_BEHAVIOR`
     :attr:`INVALID_KEY_BEHAVIOR`
+    :attr:`~pydicom.config.Settings.writing_validation_mode`
 
     """
     global _use_future, INVALID_KEYWORD_BEHAVIOR

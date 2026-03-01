@@ -1,4 +1,4 @@
-# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Define the DataElement class.
 
 A DataElement has a tag,
@@ -856,6 +856,7 @@ def convert_raw_data_element(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
+    settings: config.Settings,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw`.
 
@@ -921,7 +922,7 @@ def convert_raw_data_element(
         )
     else:
         hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds)
-        hooks.raw_element_value(raw, data, encoding=encoding, ds=ds)
+        hooks.raw_element_value(raw, data, encoding=encoding, ds=ds, settings=settings)
 
     return DataElement(
         raw.tag,

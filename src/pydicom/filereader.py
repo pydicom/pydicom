@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
 
@@ -57,6 +57,8 @@ def data_element_generator(
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
+    *,
+    settings: config.Settings, # | None = None,    
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -112,6 +114,8 @@ def data_element_generator(
     #    data element
     from pydicom.values import convert_string
 
+    settings = settings or config.settings
+    
     endian_chr = "><"[is_little_endian]
 
     # assign implicit VR struct to variable as use later if VR assumed missing
@@ -161,7 +165,7 @@ def data_element_generator(
                     length = extra_length_unpack(bytes_read)[0]
                     if debugging:
                         debug_msg += " " + bytes2hex(bytes_read)
-            elif not (b"AA" <= vr <= b"ZZ") and config.assume_implicit_vr_switch:
+            elif not (b"AA" <= vr <= b"ZZ") and settings.assume_implicit_vr_switch:
                 # invalid VR, must be 2 cap chrs, assume implicit and continue
                 if debugging:
                     logger.warning(
@@ -281,13 +285,13 @@ def data_element_generator(
         else:
             # VR UN with undefined length shall be handled as SQ
             # see PS 3.5, section 6.2.2
-            if vr == VR_.UN and config.settings.infer_sq_for_un_vr:
+            if vr == VR_.UN and settings.infer_sq_for_un_vr:
                 vr = VR_.SQ
             # Try to look up type to see if is a SQ
             # if private tag, won't be able to look it up in dictionary,
             #   in which case just ignore it and read the bytes unless it is
             #   identified as a Sequence
-            if vr is None or vr == VR_.UN and config.replace_un_with_known_vr:
+            if vr is None or vr == VR_.UN and settings.replace_un_with_known_vr:
                 try:
                     vr = _dictionary_vr_fast(tag)
                 except KeyError:
@@ -306,7 +310,7 @@ def data_element_generator(
                     )
 
                 seq = read_sequence(
-                    fp, is_implicit_VR, is_little_endian, length, encoding
+                    fp, is_implicit_VR, is_little_endian, length, encoding, settings=settings
                 )
                 if has_tag_set and tag not in tag_set:
                     continue
@@ -343,6 +347,8 @@ def _is_implicit_vr(
     is_little_endian: bool,
     stop_when: Callable[[BaseTag, str | None, int], bool] | None,
     is_sequence: bool,
+    *,
+    settings: config.Settings
 ) -> bool:
     """Check if the real VR is explicit or implicit.
 
@@ -366,6 +372,7 @@ def _is_implicit_vr(
     -------
     True if implicit VR is used, False otherwise.
     """
+
     # sequences do not switch from implicit to explicit encoding,
     # but they are allowed to use implicit encoding if the dataset
     # is encoded as explicit VR
@@ -400,7 +407,7 @@ def _is_implicit_vr(
         found_vr = "implicit" if found_implicit else "explicit"
         expected_vr = "implicit" if not found_implicit else "explicit"
         msg = f"Expected {expected_vr} VR, but found {found_vr} VR"
-        if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
+        if settings.reading_validation_mode == config.ValidationMode.RAISE:
             raise InvalidDicomError(msg)
 
         warn_and_log(f"{msg} - using {found_vr} VR for reading", UserWarning)
@@ -418,6 +425,8 @@ def read_dataset(
     parent_encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
+    *,
+    settings: config.Settings  # xxx | None = None
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
@@ -459,11 +468,12 @@ def read_dataset(
         A collection (dictionary) of DICOM
         :class:`~pydicom.dataelem.DataElement` instances.
     """
+    settings = settings or config.settings
     raw_data_elements: dict[BaseTag, RawDataElement | DataElement] = {}
     fp_tell = fp.tell
     fp_start = fp.tell()
     is_implicit_VR = _is_implicit_vr(
-        fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=not at_top_level
+        fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=not at_top_level, settings=settings
     )
     fp.seek(fp_start)
     de_gen = data_element_generator(
@@ -474,6 +484,7 @@ def read_dataset(
         defer_size,
         parent_encoding,
         specific_tags,
+        settings=settings
     )
     try:
         if bytelength is None:
@@ -485,7 +496,7 @@ def read_dataset(
     except StopIteration:
         pass
     except EOFError as details:
-        if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
+        if settings.reading_validation_mode == config.ValidationMode.RAISE:
             raise
         msg = str(details) + " in file " + getattr(fp, "name", "<no filename>")
         warn_and_log(msg, UserWarning)
@@ -495,7 +506,7 @@ def read_dataset(
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:
         raw_elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
-        elem = convert_raw_data_element(raw_elem)
+        elem = convert_raw_data_element(raw_elem, settings=settings)
         char_set = cast(str | MutableSequence[str] | None, elem.value)
         # avoid converting the raw data element again
         raw_data_elements[BaseTag(0x00080005)] = elem
@@ -503,7 +514,7 @@ def read_dataset(
     else:
         encoding = parent_encoding  # -> str | MutableSequence[str]
 
-    ds = Dataset(raw_data_elements, parent_encoding=parent_encoding)
+    ds = Dataset(raw_data_elements, parent_encoding=parent_encoding, settings=settings)
     ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
     return ds
 
@@ -515,6 +526,8 @@ def read_sequence(
     bytelength: int,
     encoding: str | MutableSequence[str],
     offset: int = 0,
+    *,
+    settings: config.Settings
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
@@ -531,7 +544,8 @@ def read_sequence(
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
             file_tell = fp_tell()
             dataset = read_sequence_item(
-                fp, is_implicit_VR, is_little_endian, encoding, offset
+                fp, is_implicit_VR, is_little_endian, encoding, offset,
+                settings=settings,
             )
             if dataset is None:  # None is returned if hit Sequence Delimiter
                 break
@@ -550,6 +564,8 @@ def read_sequence_item(
     is_little_endian: bool,
     encoding: str | MutableSequence[str],
     offset: int = 0,
+    *,
+    settings: config.Settings,    
 ) -> Dataset | None:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
@@ -596,6 +612,7 @@ def read_sequence_item(
             bytelength=None,
             parent_encoding=encoding,
             at_top_level=False,
+            settings=settings,
         )
         ds.is_undefined_length_sequence_item = True
     else:
@@ -606,6 +623,7 @@ def read_sequence_item(
             length,
             parent_encoding=encoding,
             at_top_level=False,
+            settings=settings,
         )
         ds.is_undefined_length_sequence_item = False
 
@@ -616,7 +634,11 @@ def read_sequence_item(
     return ds
 
 
-def _read_command_set_elements(fp: BinaryIO) -> Dataset:
+def _read_command_set_elements(
+    fp: BinaryIO,
+    *,
+    settings: config.Settings,    
+    ) -> Dataset:
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
 
@@ -642,11 +664,15 @@ def _read_command_set_elements(fp: BinaryIO) -> Dataset:
         return tag >> 16 != 0
 
     return read_dataset(
-        fp, is_implicit_VR=True, is_little_endian=True, stop_when=_not_group_0000
+        fp, is_implicit_VR=True, is_little_endian=True, stop_when=_not_group_0000, settings=settings
     )
 
 
-def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
+def _read_file_meta_info(
+        fp: BinaryIO,
+    *,
+    settings: config.Settings        
+    ) -> FileMetaDataset:
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
     File Meta elements are always Explicit VR Little Endian (DICOM Standard,
@@ -674,8 +700,9 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
     start_file_meta = fp.tell()
     file_meta = FileMetaDataset(
         read_dataset(
-            fp, is_implicit_VR=False, is_little_endian=True, stop_when=_not_group_0002
-        )
+            fp, is_implicit_VR=False, is_little_endian=True, stop_when=_not_group_0002, settings=settings
+        ),
+        settings=settings
     )
     file_meta.set_original_encoding(
         is_implicit_vr=False, is_little_endian=True, character_encoding=default_encoding
@@ -696,6 +723,7 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
                 is_implicit_VR=True,
                 is_little_endian=True,
                 stop_when=_not_group_0002,
+                settings=settings,
             )
         )
         file_meta.set_original_encoding(
@@ -721,7 +749,11 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
     return file_meta
 
 
-def read_file_meta_info(filename: PathType) -> FileMetaDataset:
+def read_file_meta_info(
+    filename: PathType,
+    *,
+    settings: config.Settings  # xxx | None = None    
+    ) -> FileMetaDataset:
     """Read and return the DICOM file meta information only.
 
     This function is meant to be used in user code, for quickly going through
@@ -730,7 +762,7 @@ def read_file_meta_info(filename: PathType) -> FileMetaDataset:
     """
     with open(filename, "rb") as fp:
         read_preamble(fp, False)  # if no header, raise exception
-        return _read_file_meta_info(fp)
+        return _read_file_meta_info(fp, settings=settings)
 
 
 def read_preamble(fp: BinaryIO, force: bool) -> bytes | None:
@@ -806,6 +838,8 @@ def read_partial(
     defer_size: int | str | float | None = None,
     force: bool = False,
     specific_tags: list[BaseTag | int] | None = None,
+    *,
+    settings: config.Settings  # xxx | None = None
 ) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 
@@ -837,17 +871,19 @@ def read_partial(
     dcmread
         More generic file reading function.
     """
+    settings = settings or config.settings
+    
     # Read File Meta Information
 
     # Read preamble (if present)
     preamble = read_preamble(fileobj, force)
     # Read any File Meta Information group (0002,eeee) elements (if present)
-    file_meta = _read_file_meta_info(fileobj)
+    file_meta = _read_file_meta_info(fileobj, settings=settings)
 
     # Read Dataset
 
     # Read any Command Set group (0000,eeee) elements (if present)
-    command_set = _read_command_set_elements(fileobj)
+    command_set = _read_command_set_elements(fileobj, settings=settings)
 
     # Check to see if there's anything left to read
     peek = fileobj.read(1)
@@ -932,9 +968,10 @@ def read_partial(
             stop_when=stop_when,
             defer_size=defer_size,
             specific_tags=specific_tags,
+            settings=settings,
         )
     except EOFError:
-        if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
+        if settings.reading_validation_mode == config.ValidationMode.RAISE:
             raise
         # warning already logged in read_dataset
 
@@ -949,6 +986,7 @@ def read_partial(
         file_meta,
         is_implicit_VR,
         is_little_endian,
+        settings=settings,
     )
     # save the originally read transfer syntax properties in the dataset
     ds.set_original_encoding(is_implicit_VR, is_little_endian, dataset._character_set)
@@ -961,6 +999,8 @@ def dcmread(
     stop_before_pixels: bool = False,
     force: bool = False,
     specific_tags: TagListType | None = None,
+    *,
+    settings: config.Settings | None = None,
 ) -> FileDataset:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
@@ -1036,6 +1076,7 @@ def dcmread(
     pydicom.filereader.read_partial
         Only read part of a DICOM file, stopping on given conditions.
     """
+    settings = settings or config.settings
     # Open file if not already a file object
     caller_owns_file = True
     fp = path_from_pathlike(fp)
@@ -1085,6 +1126,7 @@ def dcmread(
             defer_size=size_in_bytes(defer_size),
             force=force,
             specific_tags=specific_tags,
+            settings=settings,
         )
     finally:
         if not caller_owns_file:
