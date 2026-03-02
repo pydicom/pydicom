@@ -58,7 +58,7 @@ if TYPE_CHECKING:  # pragma: no cover
 def empty_value_for_VR(
     VR: str | None, raw: bool = False,
     *,
-    settings: config.Settings,
+    settings: config.Settings | None = None,
 ) -> bytes | list[str] | str | None | PersonName:
     """Return the value for an empty element for `VR`.
 
@@ -185,7 +185,7 @@ class DataElement:  # noqa: PLW1641
         already_converted: bool = False,
         validation_mode: config.ValidationMode | None = None,  # deprecate for v4.0, use settings?
         *,
-        settings: config.Settings,        
+        settings: config.Settings | None = None,        
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -273,7 +273,7 @@ class DataElement:  # noqa: PLW1641
             | None
         ) = None,
         *,
-        settings: config.Settings,
+        settings: config.Settings | None = None,
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
@@ -866,7 +866,7 @@ def convert_raw_data_element(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
-    settings: config.Settings,
+    settings: config.Settings | None = None,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw`.
 

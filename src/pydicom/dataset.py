@@ -3409,7 +3409,7 @@ class FileDataset(Dataset):
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
         *,
-        settings: config.Settings,
+        settings: config.Settings | None = None,
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
@@ -3441,7 +3441,7 @@ class FileDataset(Dataset):
         Dataset.__init__(self, dataset, settings=settings)
         self.preamble = preamble
         self.file_meta: FileMetaDataset = (
-            file_meta if file_meta is not None else FileMetaDataset()
+            file_meta if file_meta is not None else FileMetaDataset(), settings=settings
         )
         # TODO: Remove in v4.0
         if not config._use_future:

@@ -58,7 +58,7 @@ def data_element_generator(
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.Settings, # | None = None,
+    settings: config.Settings | None = None, # | None = None,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -426,7 +426,7 @@ def read_dataset(
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
     *,
-    settings: config.Settings  # xxx | None = None
+    settings: config.Settings | None = None  # xxx | None = None
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
@@ -527,11 +527,12 @@ def read_sequence(
     encoding: str | MutableSequence[str],
     offset: int = 0,
     *,
-    settings: config.Settings
+    settings: config.Settings | None = None
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
     """
+    settings = settings or config.settings
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
     if bytelength != 0:  # SQ of length 0 possible (PS 3.5-2008 7.5.1a (p.40)
@@ -565,7 +566,7 @@ def read_sequence_item(
     encoding: str | MutableSequence[str],
     offset: int = 0,
     *,
-    settings: config.Settings,
+    settings: config.Settings | None = None,
 ) -> Dataset | None:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
@@ -753,7 +754,7 @@ def _read_file_meta_info(
 def read_file_meta_info(
     filename: PathType,
     *,
-    settings: config.Settings  # xxx | None = None
+    settings: config.Settings | None = None  # xxx | None = None
     ) -> FileMetaDataset:
     """Read and return the DICOM file meta information only.
 
@@ -761,6 +762,7 @@ def read_file_meta_info(
     a series of files to find one which is referenced to a particular SOP,
     without having to read the entire files.
     """
+    settings = settings or config.settings
     with open(filename, "rb") as fp:
         read_preamble(fp, False)  # if no header, raise exception
         return _read_file_meta_info(fp, settings=settings)
@@ -840,7 +842,7 @@ def read_partial(
     force: bool = False,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.Settings  # xxx | None = None
+    settings: config.Settings | None = None  # xxx | None = None
 ) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 
@@ -1001,7 +1003,7 @@ def dcmread(
     force: bool = False,
     specific_tags: TagListType | None = None,
     *,
-    settings: config.Settings,
+    settings: config.Settings | None = None,
 ) -> FileDataset:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 

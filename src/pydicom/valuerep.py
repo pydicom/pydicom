@@ -1704,7 +1704,7 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings) -> "PersonName":
+    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings | None = None) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1739,7 +1739,7 @@ class PersonName:
 
         return PersonName(self.original_string, encodings, settings=settings)
 
-    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings) -> bytes:
+    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings | None = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1756,6 +1756,7 @@ class PersonName:
             available, otherwise each group of the patient name is encoded
             with the first matching of the given encodings.
         """
+        settings = settings or config.settings
         encodings = _verify_encodings(encodings) or self.encodings
 
         # if the encoding is not the original encoding, we have to return

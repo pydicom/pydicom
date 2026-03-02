@@ -1117,7 +1117,7 @@ def iter_pixels(
     indices: Iterable[int] | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
-    settings: config.Settings,  # xxx | None = None,
+    settings: config.Settings | None = None,  # xxx | None = None,
     **kwargs: Any,
 ) -> Iterator["np.ndarray"]:
     """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
@@ -1455,7 +1455,7 @@ def pixel_array(
     index: int | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
-    settings: config.Settings,  # xxx | None = None,
+    settings: config.Settings | None = None,  # xxx | None = None,
     **kwargs: Any,
 ) -> "np.ndarray":
     """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.

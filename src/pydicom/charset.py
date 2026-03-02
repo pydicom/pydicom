@@ -300,7 +300,7 @@ def decode_bytes(
     encodings: Sequence[str],
     delimiters: set[int],
     *,
-    settings: config.Settings,
+    settings: config.Settings | None = None,
 ) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
@@ -338,6 +338,7 @@ def decode_bytes(
         and the given encodings are invalid.
     """
     # shortcut for the common case - no escape sequences present
+    settings = settings or config.settings
     if ESC not in value:
         first_encoding = encodings[0]
         try:
@@ -515,7 +516,7 @@ def encode_string(
     value: str, 
     encodings: Sequence[str],
     *,
-    settings: config.Settings,
+    settings: config.Settings | None = None,
     ) -> bytes:
     """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
