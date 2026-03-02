@@ -2480,7 +2480,7 @@ class Dataset:  # noqa: PLW1641
             and pydicom.config.show_file_meta
         ):
             strings.append(f"{'Dataset.file_meta ':-<49}")
-            strings.extend(indent_str + repr(elem) for elem in self.file_meta)
+            strings.extend(f"{indent_str}{elem!r}" for elem in self.file_meta)
             strings.append(f"{'':-<49}")
 
         for elem in self:
@@ -2492,9 +2492,9 @@ class Dataset:  # noqa: PLW1641
                 if not top_level_only:
                     for dataset in elem.value:
                         strings.append(dataset._pretty_str(indent + 1))
-                        strings.append(nextindent_str + "---------")
+                        strings.append(f"{nextindent_str}---------")
             else:
-                strings.append(indent_str + repr(elem))
+                strings.append(f"{indent_str}{elem!r}")
         return "\n".join(strings)
 
     @property
@@ -3764,7 +3764,7 @@ def _path_to(target: Any, node: Any) -> str | None:
                 f"{node.__class__.__name__}" if isinstance(node, FileDataset) else ""
             )
 
-            return f"{cls_name}{details}{meta}{kw_or_tag}" + path
+            return f"{cls_name}{details}{meta}{kw_or_tag}{path}"
         case DataElement(VR="SQ") as elem:
             # Check Sequence object itself:
             if elem.value is target:
@@ -3772,7 +3772,7 @@ def _path_to(target: Any, node: Any) -> str | None:
             # Recurse into Sequence items
             for i, subnode in enumerate(node.value):
                 if (path := _path_to(target, subnode)) is not None:
-                    return f"[{i}]" + path
+                    return f"[{i}]{path}"
         case DataElement(value=ns.target):  # Match a data element value
             return ""
 
@@ -3815,7 +3815,7 @@ def _trace_from(
         if elem is base:
             break
         if path := _path_to(elem, base):
-            note = "Error occurred at " + path
+            note = f"Error occurred at {path}"
             if new_elem:
                 note += "\n   with DataElement not yet assigned"
             if raw_elem:

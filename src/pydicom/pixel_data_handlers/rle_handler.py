@@ -148,7 +148,7 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = ">") -> "np.ndarray":
     if missing:
         raise AttributeError(
             "Unable to convert the pixel data as the following required "
-            "elements are missing from the dataset: " + ", ".join(missing)
+            f"elements are missing from the dataset: {', '.join(missing)}"
         )
 
     nr_bits = cast(int, ds.BitsAllocated)

@@ -2830,8 +2830,8 @@ def test_setattr_warns(setattr_warn):
 
     for s, kw in CAMEL_CASE[1]:
         msg = (
-            r"Camel case attribute '" + s + r"' used which is not a known public "
-            r"element keyword"
+            f"Camel case attribute '{s}' used which is not a known public "
+            "element keyword"
         )
         if kw:
             msg += f", did you mean '{kw}'"
@@ -2864,8 +2864,8 @@ def test_setattr_raises(setattr_raise):
 
     for s, kw in CAMEL_CASE[1]:
         msg = (
-            r"Camel case attribute '" + s + r"' used which is not a known public "
-            r"element keyword"
+            f"Camel case attribute '{s}' used which is not a known public "
+            "element keyword"
         )
         if kw:
             msg += f", did you mean '{kw}'"

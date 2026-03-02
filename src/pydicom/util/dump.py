@@ -118,9 +118,9 @@ def pretty_print(
             print(f"{indent}{elem.tag} {elem.name} -- {len(elem.value)} item(s)")
             for dataset in elem.value:
                 pretty_print(dataset, indent_level + 1)
-                print(next_indent + "---------")
+                print(f"{next_indent}---------")
         else:
-            print(indent + repr(elem))
+            print(f"{indent}{elem!r}")
 
 
 if __name__ == "__main__":  # pragma: no cover

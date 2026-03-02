@@ -188,7 +188,7 @@ def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
 
     msg = ["The following exception(s) occurred trying to download the data files"]
     for err, filenames in errors.items():
-        err_msg = f"  '{err}' for " + ", ".join(filenames[:2])
+        err_msg = f"  '{err}' for {', '.join(filenames[:2])}"
         if len(filenames) > 2:
             err_msg += f" and {len(filenames) - 2} others"
 

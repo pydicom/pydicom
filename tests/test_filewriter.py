@@ -118,7 +118,7 @@ def as_assertable(dataset):
     (Datasets can't be so compared because DataElements are not
     hashable.)"""
     safe_dict = dict(
-        (str(elem.tag) + " " + elem.keyword, elem.value) for elem in dataset
+        (f"{elem.tag} {elem.keyword}", elem.value) for elem in dataset
     )
     if hasattr(dataset, "file_meta"):
         safe_dict.update(as_assertable(dataset.file_meta))
@@ -1947,7 +1947,7 @@ class TestDCMWrite_EnforceFileFormat:
     def test_file_meta_none(self):
         """Test writing a dataset with no file_meta"""
         fp = DicomBytesIO()
-        version = "PYDICOM " + base_version
+        version = f"PYDICOM {base_version}"
         ds = dcmread(rtplan_name)
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = FileMetaDataset()
@@ -2340,7 +2340,7 @@ class TestWriteFileMetaInfoToStandard:
         assert meta.TransferSyntaxUID == "1.3"
         # Updated to meet standard
         assert meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID
-        assert meta.ImplementationVersionName == "PYDICOM " + base_version
+        assert meta.ImplementationVersionName == f"PYDICOM {base_version}"
 
     def test_version(self):
         """Test that the value for FileMetaInformationVersion is OK."""

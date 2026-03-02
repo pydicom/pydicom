@@ -715,10 +715,10 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
     # standard encodings
     patched = None
     if re.match("^ISO[^_]IR", encoding) is not None:
-        patched = "ISO_IR" + encoding[6:]
+        patched = f"ISO_IR{encoding[6:]}"
     # encodings with code extensions
     elif re.match("^(?=ISO.2022.IR.)(?!ISO 2022 IR )", encoding) is not None:
-        patched = "ISO 2022 IR " + encoding[12:]
+        patched = f"ISO 2022 IR {encoding[12:]}"
 
     if patched:
         # handle encoding patched for common spelling errors
