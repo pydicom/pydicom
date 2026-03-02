@@ -179,6 +179,7 @@ def raw_element_vr(
     **kwargs: dict[str, Any]
         Additional keyword arguments.
     """
+    settings = settings or config.settings
     vr = raw.VR
     if vr is None:  # Can be if was implicit VR
         try:
@@ -194,7 +195,7 @@ def raw_element_vr(
                 vr = VR.UL
             else:
                 msg = f"VR lookup failed for the raw element with tag {raw.tag}"
-                if config.settings.reading_validation_mode == config.ValidationMode.RAISE:
+                if settings.reading_validation_mode == config.ValidationMode.RAISE:
                     raise KeyError(msg)
 
                 vr = VR.UN
@@ -244,6 +245,7 @@ def raw_element_value(
     """
     from pydicom.values import convert_value
 
+    settings = settings or config.settings
     vr = data["VR"]
     try:
         value = convert_value(vr, raw, encoding, settings=settings)

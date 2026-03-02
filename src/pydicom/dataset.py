@@ -379,7 +379,9 @@ class Dataset:  # noqa: PLW1641
         self._parent_encoding: str | list[str] = kwargs.get(
             "parent_encoding", default_encoding
         )
-        self.settings = kwargs.pop("settings")
+        # `settings` can't be added as keyword arg after `*args`
+        # so get from kwargs
+        self.settings = kwargs.get("settings") or config.settings
 
         self._dict: MutableMapping[BaseTag, _DatasetValue]
         if not args:
@@ -1657,7 +1659,7 @@ class Dataset:  # noqa: PLW1641
             If `key` is not convertible to a valid tag or a known element
             keyword.
         KeyError
-            If :attr:`~pydicom.config.settings.reading_validation_mode` is
+            If `self.settings.writing_validation_mode` is
              ``RAISE`` and `key` is an unknown non-private tag.
         """
         tag = Tag(key)
@@ -1672,7 +1674,7 @@ class Dataset:  # noqa: PLW1641
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.settings.writing_validation_mode == config.ValidationMode.RAISE:
+                    if self.settings.writing_validation_mode == config.ValidationMode.RAISE:
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN
@@ -2693,6 +2695,7 @@ class Dataset:  # noqa: PLW1641
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
             overwrite=overwrite,
+            settings=self.settings,
             **kwargs,
         )
 

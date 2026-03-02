@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
 
 import datetime
@@ -1036,7 +1036,7 @@ class DSfloat(float):
         self,
         val: str | int | float | Decimal,
         auto_format: bool = False,
-        validation_mode: int | None = None,
+        validation_mode: config.ValidationMode | None = None,
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -1461,7 +1461,7 @@ def _decode_personname(
     return tuple(comps)
 
 
-def _encode_personname(components: Sequence[str], encodings: Sequence[str]) -> bytes:
+def _encode_personname(components: Sequence[str], encodings: Sequence[str], *, settings: config.Settings) -> bytes:
     """Encode a list of text string person name components.
 
     Parameters
@@ -1483,7 +1483,7 @@ def _encode_personname(components: Sequence[str], encodings: Sequence[str]) -> b
 
     encoded_comps = []
     for comp in components:
-        groups = [encode_string(group, encodings) for group in comp.split("^")]
+        groups = [encode_string(group, encodings, settings=settings) for group in comp.split("^")]
         encoded_comp = b"^".join(groups)
         encoded_comps.append(encoded_comp)
 
@@ -1704,7 +1704,7 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Sequence[str] | None = None) -> "PersonName":
+    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1721,6 +1721,8 @@ class PersonName:
             the current object is returned.
         """
         # in the common case (encoding did not change) we decode on demand
+        settings = settings or config.settings
+
         if encodings is None or encodings == self.encodings:
             return self
 
@@ -1730,14 +1732,14 @@ class PersonName:
         if self.original_string is None:
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
-                self.components, self.encodings or [default_encoding]
+                self.components, self.encodings or [default_encoding], settings=settings
             )
             # now that we have the byte length, we re-validate the value
             validate_value("PN", self.original_string, self.validation_mode)
 
-        return PersonName(self.original_string, encodings)
+        return PersonName(self.original_string, encodings, settings=settings)
 
-    def encode(self, encodings: Sequence[str] | None = None) -> bytes:
+    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1759,12 +1761,12 @@ class PersonName:
         # if the encoding is not the original encoding, we have to return
         # a re-encoded string (without updating the original string)
         if encodings != self.encodings and self.encodings is not None:
-            return _encode_personname(self.components, cast(Sequence[str], encodings))
+            return _encode_personname(self.components, cast(Sequence[str], encodings), settings=settings)
 
         if self.original_string is None:
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
-                self.components, encodings or [default_encoding]
+                self.components, encodings or [default_encoding], settings=settings
             )
 
         return self.original_string

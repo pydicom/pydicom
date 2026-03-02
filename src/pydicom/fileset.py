@@ -1,4 +1,4 @@
-# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
 from collections.abc import Iterator, Iterable, Callable
@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
 from typing import Optional, Union, Any, cast
 import uuid
 
+from pydicom import config
 from pydicom.charset import default_encoding
 from pydicom.datadict import tag_for_keyword, dictionary_description
 from pydicom.dataelem import DataElement
@@ -294,7 +295,7 @@ class RecordNode(Iterable["RecordNode"]):
         "Return the number of nodes to the level below the tree root"
         return len(list(self.reverse())) - 1
 
-    def _encode_record(self, force_implicit: bool = False) -> int:
+    def _encode_record(self, force_implicit: bool = False, *, settings: config.Settings) -> int:
         """Encode the node's directory record.
 
         * Encodes the record as explicit VR little endian
@@ -342,7 +343,7 @@ class RecordNode(Iterable["RecordNode"]):
             elif tag == 0x00041420:
                 self._offset_lower = fp.tell() + 8
 
-            write_data_element(fp, self._record[tag], encoding)
+            write_data_element(fp, self._record[tag], encoding, settings=settings)
 
         return len(fp.getvalue())
 
@@ -2154,7 +2155,7 @@ class FileSet:
         self.load(p, raise_orphans=True)
 
     def _write_dicomdir(
-        self, fp: DicomFileLike, copy_safe: bool = False, force_implicit: bool = False
+        self, fp: DicomFileLike, copy_safe: bool = False, force_implicit: bool = False, *, settings: config.Settings
     ) -> None:
         """Encode and write the File-set's DICOMDIR dataset.
 
@@ -2245,8 +2246,8 @@ class FileSet:
             last_elem.value = self._tree.children[-1]._offset
             # Re-write the record offset pointer elements
             fp.seek(tell_offset_first)
-            write_data_element(fp, first_elem)
-            write_data_element(fp, last_elem)
+            write_data_element(fp, first_elem, settings=settings)
+            write_data_element(fp, last_elem, settings=settings)
             # Go to the end
             fp.seek(0, 2)
 

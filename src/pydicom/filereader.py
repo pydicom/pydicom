@@ -263,7 +263,7 @@ def data_element_generator(
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == 0x00080005:
                 # *Specific Character String* is b'' for empty value
-                encoding = convert_string(cast(bytes, value) or b"", is_little_endian)
+                encoding = convert_string(cast(bytes, value) or b"", is_little_endian, settings=settings)
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
@@ -570,6 +570,7 @@ def read_sequence_item(
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
     """
+    settings = settings or config.settings
     seq_item_tell = fp.tell() + offset
     tag_length_format = "<HHL" if is_little_endian else ">HHL"
 
@@ -1000,7 +1001,7 @@ def dcmread(
     force: bool = False,
     specific_tags: TagListType | None = None,
     *,
-    settings: config.Settings | None = None,
+    settings: config.Settings,
 ) -> FileDataset:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 

@@ -88,6 +88,7 @@ def empty_value_for_VR(
         The value a data element with `VR` is assigned on decoding
         if it is empty.
     """
+    settings = settings or config.settings
     if VR == VR_.SQ:
         return b"" if raw else []
 
@@ -218,9 +219,9 @@ class DataElement:  # noqa: PLW1641
             Defines if values are validated and how validation errors are
             handled.
         """
-        self.settings = settings
+        self.settings = settings or config.settings
         if validation_mode is None:
-            validation_mode = settings.reading_validation_mode
+            validation_mode = self.settings.reading_validation_mode
 
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
@@ -232,7 +233,7 @@ class DataElement:  # noqa: PLW1641
         if (
             VR == VR_.UN
             and not tag.is_private
-            and settings.replace_un_with_known_vr
+            and self.settings.replace_un_with_known_vr
             and (is_undefined_length or value is None or len(value) < 0xFFFF)
         ):
             try:
@@ -917,6 +918,8 @@ def convert_raw_data_element(
     pydicom.dataelem.DataElement
         A :class:`~pydicom.dataelem.DataElement` instance created from `raw`.
     """
+    settings = settings or config.settings
+
     data: dict[str, Any] = {}
     if config.data_element_callback:
         raw = config.data_element_callback(raw, **config.data_element_callback_kwargs)
