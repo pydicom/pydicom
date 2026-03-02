@@ -512,7 +512,7 @@ def _decode_escaped_fragment(
 
 
 def encode_string(
-    value: str, 
+    value: str,
     encodings: Sequence[str],
     *,
     settings: config.Settings,
@@ -780,7 +780,7 @@ def _warn_about_invalid_encoding(
     encoding: str,
     patched_encoding: str | None = None,
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
 ) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the

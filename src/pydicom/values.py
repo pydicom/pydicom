@@ -470,7 +470,7 @@ def convert_PN(
     byte_string: bytes,
     encodings: list[str] | None = None,
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
 ) -> PersonName | MutableSequence[PersonName]:
     """Return a decoded 'PN' value.
 
@@ -572,7 +572,7 @@ def convert_single_string(
     encodings: list[str] | None = None,
     vr: str | None = None,
     *,
-    settings: config.Settings     
+    settings: config.Settings
 ) -> str:
     """Return decoded text, ignoring backslashes and trailing spaces.
 

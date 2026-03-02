@@ -185,7 +185,7 @@ class DataElement:  # noqa: PLW1641
         already_converted: bool = False,
         validation_mode: config.ValidationMode | None = None,  # deprecate for v4.0, use settings?
         *,
-        settings: config.Settings,        
+        settings: config.Settings,
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -952,7 +952,7 @@ def _DataElement_from_raw(
     encoding: str | MutableSequence[str] | None = None,
     dataset: "Dataset | None" = None,
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
