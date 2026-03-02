@@ -952,7 +952,7 @@ def _DataElement_from_raw(
     encoding: str | MutableSequence[str] | None = None,
     dataset: "Dataset | None" = None,
     *,
-    settings: config.Settings,    
+    settings: config.Settings,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
