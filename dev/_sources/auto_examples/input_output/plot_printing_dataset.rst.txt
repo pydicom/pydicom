@@ -141,7 +141,7 @@ This example illustrates how to print the data set in your own format.
                 print(indent_string, elem.name)
                 for sequence_item in elem.value:
                     myprint(sequence_item, indent + 1)
-                    print(next_indent_string + "---------")
+                    print(f"{next_indent_string}---------")
             else:
                 if elem.name in dont_print:
                     print("""<item not printed -- in the "don't print" list>""")
@@ -158,7 +158,7 @@ This example illustrates how to print the data set in your own format.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.004 seconds)
+   **Total running time of the script:** (0 minutes 0.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:

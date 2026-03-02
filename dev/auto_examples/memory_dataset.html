@@ -590,7 +590,7 @@ datasets saved as blobs in a database.</p>
         <span class="n">read_dataset</span> <span class="o">=</span> <span class="n">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">read_bytes</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">read_dataset</span><span class="p">)</span>
         <span class="c1"># - you can write your dataset to a file if wanted</span>
-        <span class="n">dcmwrite</span><span class="p">(</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;_new&quot;</span><span class="p">,</span> <span class="n">read_dataset</span><span class="p">)</span>
+        <span class="n">dcmwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">_new&quot;</span><span class="p">,</span> <span class="n">read_dataset</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-memory-dataset-py">

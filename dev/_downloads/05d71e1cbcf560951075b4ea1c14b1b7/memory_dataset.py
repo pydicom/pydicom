@@ -82,4 +82,4 @@ if __name__ == "__main__":
         read_dataset = adapt_dataset_from_bytes(read_bytes)
         print(read_dataset)
         # - you can write your dataset to a file if wanted
-        dcmwrite(file_path + "_new", read_dataset)
+        dcmwrite(f"{file_path}_new", read_dataset)
