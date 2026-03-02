@@ -125,7 +125,7 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
                     unit="B",
                     unit_scale=True,
                     miniters=1,
-                    desc=url.split("/")[-1],
+                    desc=url.rsplit("/", maxsplit=1)[-1],
                 ):
                     f.write(data)
         else:
@@ -135,7 +135,7 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
     else:
         if USE_PROGRESS_BAR:
             with DownloadProgressBar(
-                unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
+                unit="B", unit_scale=True, miniters=1, desc=url.rsplit("/", maxsplit=1)[-1]
             ) as t:
                 urllib.request.urlretrieve(url, filename, reporthook=t.update_to)
         else:
