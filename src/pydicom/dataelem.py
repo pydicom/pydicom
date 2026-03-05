@@ -185,7 +185,7 @@ class DataElement:  # noqa: PLW1641
         already_converted: bool = False,
         validation_mode: config.ValidationMode | None = None,  # deprecate for v4.0, use settings?
         *,
-        settings: config.SettingsType | None = None,        
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -228,7 +228,7 @@ class DataElement:  # noqa: PLW1641
                 if validation_mode is None
                 else config.Settings()
             )
-        
+
         if validation_mode is not None:
             settings.reading_validation_mode = validation_mode
             # writing needed too?

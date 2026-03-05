@@ -2060,7 +2060,7 @@ class FileSet:
             for addition to the File-set.
         """
         settings = settings or self.settings
-    
+
         if not path and self.path is None:
             raise ValueError(
                 "The path to the root directory is required for a new File-set"

@@ -1,7 +1,6 @@
 # Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
 
-from copy import deepcopy
 import datetime
 import math
 from decimal import Decimal
@@ -1534,7 +1533,7 @@ class PersonName:
         """
         # After global settings are removed in v4.0, don't need the following
         # Create a new Settings object if need to set anything from
-        # `validation_mode` argument for backwards compatibility        
+        # `validation_mode` argument for backwards compatibility
         if settings is None:
             settings: config._SettingsProxy | config.Settings = (
                 config.settings
@@ -1598,7 +1597,7 @@ class PersonName:
         return {c: getattr(self, c, "") for c in parts}
 
     @property
-    def components(self, *, settings: config.SettingsType | None = None) -> tuple[str, ...]:
+    def components(self) -> tuple[str, ...]:
         """Returns up to three decoded person name components as a
         :class:`tuple` of :class:`str`.
 
@@ -1611,7 +1610,7 @@ class PersonName:
         if self._components is None:
             groups = self.original_string.split(b"=")
             encodings = self.encodings or [default_encoding]
-            self._components = _decode_personname(groups, encodings, settings=settings or self.settings)
+            self._components = _decode_personname(groups, encodings, settings=self.settings)
 
         return self._components
 

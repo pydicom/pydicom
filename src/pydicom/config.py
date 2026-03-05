@@ -429,7 +429,7 @@ class _SettingsProxy:
 
     def __setattr__(self, name, value) -> None:
         setattr(_storage.thread_settings, name, value)
-    
+
 
 SettingsType = Settings | _SettingsProxy
 
