@@ -158,7 +158,7 @@ def raw_element_vr(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
     **kwargs: Any,
 ) -> None:
     """Determine the VR to use for `raw`.
@@ -220,7 +220,7 @@ def raw_element_value(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
     **kwargs: Any,
 ) -> None:
     """Convert the encoded value for `raw` to an appropriate type.

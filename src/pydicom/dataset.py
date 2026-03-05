@@ -636,7 +636,7 @@ class Dataset:  # noqa: PLW1641
                     dset._parent_encoding = dicom_character_set
                     dset.decode()
             else:
-                decode_data_element(data_element, dicom_character_set)
+                decode_data_element(data_element, dicom_character_set, settings=self.settings)
 
         self.walk(decode_callback, recursive=False)
 
@@ -945,7 +945,7 @@ class Dataset:  # noqa: PLW1641
         if not char_set:
             return self._parent_encoding
 
-        return convert_encodings(char_set.value)
+        return convert_encodings(char_set.value, settings=self.settings)
 
     @property
     def original_character_set(self) -> str | MutableSequence[str]:
@@ -2582,6 +2582,7 @@ class Dataset:  # noqa: PLW1641
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
         overwrite: bool = True,
+        settings: config.SettingsType | None = None,
         **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
@@ -2659,6 +2660,7 @@ class Dataset:  # noqa: PLW1641
         pydicom.filewriter.dcmwrite
             Encode a :class:`Dataset` and write it to a file or buffer.
         """
+        settings = settings or self.settings
         # The default for little_endian is `None` so we can detect conversion
         #   between little and big endian, but we actually default it to `True`
         #   when `implicit_vr` is used
@@ -2695,7 +2697,7 @@ class Dataset:  # noqa: PLW1641
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
             overwrite=overwrite,
-            settings=self.settings,
+            settings=settings,
             **kwargs,
         )
 
@@ -3409,7 +3411,7 @@ class FileDataset(Dataset):
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
         *,
-        settings: config.Settings | None = None,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
@@ -3441,7 +3443,7 @@ class FileDataset(Dataset):
         Dataset.__init__(self, dataset, settings=settings)
         self.preamble = preamble
         self.file_meta: FileMetaDataset = (
-            file_meta if file_meta is not None else FileMetaDataset(), settings=settings
+            file_meta if file_meta is not None else FileMetaDataset(settings=settings)
         )
         # TODO: Remove in v4.0
         if not config._use_future:

@@ -103,7 +103,7 @@ def _array_common(
     f: BinaryIO,
     specific_tags: list[BaseTag | int],
     *,
-    settings: config.Settings,
+    settings: config.SettingsType,
     **kwargs: Any
 ) -> tuple["Dataset", dict[str, Any]]:
     """Return a dataset from `f` and a corresponding decoding options dict.
@@ -1117,7 +1117,7 @@ def iter_pixels(
     indices: Iterable[int] | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
-    settings: config.Settings | None = None,  # xxx | None = None,
+    settings: config.SettingsType | None = None,  # xxx | None = None,
     **kwargs: Any,
 ) -> Iterator["np.ndarray"]:
     """Yield decoded pixel data frames from `src` as :class:`~numpy.ndarray`.
@@ -1455,7 +1455,7 @@ def pixel_array(
     index: int | None = None,
     raw: bool = False,
     decoding_plugin: str = "",
-    settings: config.Settings | None = None,  # xxx | None = None,
+    settings: config.SettingsType | None = None,  # xxx | None = None,
     **kwargs: Any,
 ) -> "np.ndarray":
     """Return decoded pixel data from `src` as :class:`~numpy.ndarray`.

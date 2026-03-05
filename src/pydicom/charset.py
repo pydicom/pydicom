@@ -300,7 +300,7 @@ def decode_bytes(
     encodings: Sequence[str],
     delimiters: set[int],
     *,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
 ) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
@@ -399,7 +399,7 @@ def _decode_fragment(
     encodings: Sequence[str],
     delimiters: set[int],
     *,
-    settings: config.Settings,
+    settings: config.SettingsType,
 ) -> str:
     """Decode a byte string encoded with a single encoding.
 
@@ -470,7 +470,7 @@ def _decode_escaped_fragment(
     encodings: Sequence[str],
     delimiters: set[int],
     *,
-    settings: config.Settings,
+    settings: config.SettingsType,
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
 
@@ -516,7 +516,7 @@ def encode_string(
     value: str,
     encodings: Sequence[str],
     *,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
     ) -> bytes:
     """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
@@ -680,6 +680,8 @@ def _encode_string_impl(value: str, encoding: str, errors: str = "strict") -> by
 
 def convert_encodings(
     encodings: None | str | MutableSequence[str],
+    *,
+    settings: config.SettingsType | None = None,
 ) -> list[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
@@ -717,7 +719,7 @@ def convert_encodings(
         If `encodings` contains a value that could not be converted and
         `reading_validation_mode` is :attr:`~pydicom.config.ValidationMode.RAISE`.
     """
-
+    settings = settings or config.settings
     encodings = encodings or [""]
     if isinstance(encodings, str):
         encodings = [encodings]
@@ -733,7 +735,7 @@ def convert_encodings(
         try:
             py_encodings.append(python_encoding[encoding])
         except KeyError:
-            py_encodings.append(_python_encoding_for_corrected_encoding(encoding))
+            py_encodings.append(_python_encoding_for_corrected_encoding(encoding, settings=settings))
 
     if len(encodings) > 1:
         py_encodings = _handle_illegal_standalone_encodings(encodings, py_encodings)
@@ -741,7 +743,7 @@ def convert_encodings(
     return py_encodings
 
 
-def _python_encoding_for_corrected_encoding(encoding: str) -> str:
+def _python_encoding_for_corrected_encoding(encoding: str, *, settings: config.SettingsType) -> str:
     """Try to replace the given invalid encoding with a valid encoding by
     checking for common spelling errors, and return the correct Python
     encoding for that encoding. Otherwise check if the
@@ -762,10 +764,10 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
         # handle encoding patched for common spelling errors
         try:
             py_encoding = python_encoding[patched]
-            _warn_about_invalid_encoding(encoding, patched)
+            _warn_about_invalid_encoding(encoding, patched, settings=settings)
             return py_encoding
         except KeyError:
-            _warn_about_invalid_encoding(encoding)
+            _warn_about_invalid_encoding(encoding, settings=settings)
             return default_encoding
 
     # fallback: assume that it is already a python encoding
@@ -773,7 +775,7 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
         codecs.lookup(encoding)
         return encoding
     except LookupError:
-        _warn_about_invalid_encoding(encoding)
+        _warn_about_invalid_encoding(encoding, settings=settings)
         return default_encoding
 
 
@@ -781,7 +783,7 @@ def _warn_about_invalid_encoding(
     encoding: str,
     patched_encoding: str | None = None,
     *,
-    settings: config.Settings,
+    settings: config.SettingsType,
 ) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the
@@ -836,7 +838,7 @@ def decode_element(
     elem: "DataElement",
     dicom_character_set: str | list[str] | None,
     *,
-    reading_validation_mode: config.ValidationMode | None = None,
+    settings: config.SettingsType | None = None,
 ) -> None:
     """Apply the DICOM character encoding to a data element
 
@@ -856,7 +858,7 @@ def decode_element(
     if not dicom_character_set:
         dicom_character_set = ["ISO_IR 6"]
 
-    encodings = convert_encodings(dicom_character_set)
+    encodings = convert_encodings(dicom_character_set, settings=settings)
 
     # decode the string value to unicode
     # PN is special case as may have 3 components with different chr sets
@@ -877,7 +879,7 @@ def decode_element(
                 elem.value,
                 encodings,
                 TEXT_VR_DELIMS,
-                reading_validation_mode=reading_validation_mode,
+                settings=settings,
             )
         else:
             output = list()
@@ -890,7 +892,7 @@ def decode_element(
                             value,
                             encodings,
                             TEXT_VR_DELIMS,
-                            reading_validation_mode=reading_validation_mode,
+                            settings=settings,
                         )
                     )
 

@@ -58,7 +58,7 @@ def data_element_generator(
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.Settings | None = None, # | None = None,
+    settings: config.SettingsType | None = None, # | None = None,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -266,7 +266,7 @@ def data_element_generator(
                 encoding = convert_string(cast(bytes, value) or b"", is_little_endian, settings=settings)
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
-                encoding = convert_encodings(encoding)
+                encoding = convert_encodings(encoding, settings=settings)
 
             yield RawDataElement(
                 BaseTag(tag),
@@ -348,7 +348,7 @@ def _is_implicit_vr(
     stop_when: Callable[[BaseTag, str | None, int], bool] | None,
     is_sequence: bool,
     *,
-    settings: config.Settings
+    settings: config.SettingsType
 ) -> bool:
     """Check if the real VR is explicit or implicit.
 
@@ -426,7 +426,7 @@ def read_dataset(
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
     *,
-    settings: config.Settings | None = None  # xxx | None = None
+    settings: config.SettingsType | None = None  # xxx | None = None
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
@@ -510,7 +510,7 @@ def read_dataset(
         char_set = cast(str | MutableSequence[str] | None, elem.value)
         # avoid converting the raw data element again
         raw_data_elements[BaseTag(0x00080005)] = elem
-        encoding = convert_encodings(char_set)  # -> List[str]
+        encoding = convert_encodings(char_set, settings=settings)  # -> List[str]
     else:
         encoding = parent_encoding  # -> str | MutableSequence[str]
 
@@ -527,7 +527,7 @@ def read_sequence(
     encoding: str | MutableSequence[str],
     offset: int = 0,
     *,
-    settings: config.Settings | None = None
+    settings: config.SettingsType | None = None
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
@@ -566,7 +566,7 @@ def read_sequence_item(
     encoding: str | MutableSequence[str],
     offset: int = 0,
     *,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
 ) -> Dataset | None:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
@@ -639,7 +639,7 @@ def read_sequence_item(
 def _read_command_set_elements(
     fp: BinaryIO,
     *,
-    settings: config.Settings,
+    settings: config.SettingsType,
     ) -> Dataset:
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
@@ -673,7 +673,7 @@ def _read_command_set_elements(
 def _read_file_meta_info(
         fp: BinaryIO,
     *,
-    settings: config.Settings
+    settings: config.SettingsType
     ) -> FileMetaDataset:
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
@@ -754,7 +754,7 @@ def _read_file_meta_info(
 def read_file_meta_info(
     filename: PathType,
     *,
-    settings: config.Settings | None = None  # xxx | None = None
+    settings: config.SettingsType | None = None  # xxx | None = None
     ) -> FileMetaDataset:
     """Read and return the DICOM file meta information only.
 
@@ -842,7 +842,7 @@ def read_partial(
     force: bool = False,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.Settings | None = None  # xxx | None = None
+    settings: config.SettingsType | None = None  # xxx | None = None
 ) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 
@@ -1003,7 +1003,7 @@ def dcmread(
     force: bool = False,
     specific_tags: TagListType | None = None,
     *,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
 ) -> FileDataset:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 

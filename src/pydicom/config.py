@@ -421,9 +421,7 @@ class _ThreadLocalStore(threading.local):
     def __init__(self) -> None:
         self.thread_settings = deepcopy(_default_settings)
 
-
 _storage = _ThreadLocalStore()
-
 
 class _SettingsProxy:
     def __getattr__(self, name) -> Any:
@@ -431,9 +429,12 @@ class _SettingsProxy:
 
     def __setattr__(self, name, value) -> None:
         setattr(_storage.thread_settings, name, value)
+    
+
+SettingsType = Settings | _SettingsProxy
 
 
-settings = _SettingsProxy()
+settings: SettingsType = _SettingsProxy()
 """The global configuration object of type :class:`Settings` to access some
 of the settings.
 

@@ -1,6 +1,7 @@
 # Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
 
+from copy import deepcopy
 import datetime
 import math
 from decimal import Decimal
@@ -1431,7 +1432,7 @@ def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] 
 
 
 def _decode_personname(
-    components: Sequence[bytes], encodings: Sequence[str], *, reading_validation_mode: config.ValidationMode
+    components: Sequence[bytes], encodings: Sequence[str], *, settings: config.SettingsType
 ) -> tuple[str, ...]:
     """Return a list of decoded person name components.
 
@@ -1452,7 +1453,7 @@ def _decode_personname(
     """
     from pydicom.charset import decode_bytes
 
-    comps = [decode_bytes(c, encodings, PN_DELIMS, reading_validation_mode=reading_validation_mode) for c in components]
+    comps = [decode_bytes(c, encodings, PN_DELIMS, settings=settings) for c in components]
 
     # Remove empty elements from the end to avoid trailing '='
     while comps and not comps[-1]:
@@ -1461,7 +1462,7 @@ def _decode_personname(
     return tuple(comps)
 
 
-def _encode_personname(components: Sequence[str], encodings: Sequence[str], *, settings: config.Settings) -> bytes:
+def _encode_personname(components: Sequence[str], encodings: Sequence[str], *, settings: config.SettingsType) -> bytes:
     """Encode a list of text string person name components.
 
     Parameters
@@ -1510,6 +1511,8 @@ class PersonName:
         encodings: Sequence[str] | None = None,
         original_string: bytes | None = None,
         validation_mode: config.ValidationMode | None = None,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -1529,14 +1532,26 @@ class PersonName:
         components using the :meth:`from_named_components` and
         :meth:`from_named_components_veterinary` class methods.
         """
+        # After global settings are removed in v4.0, don't need the following
+        # Create a new Settings object if need to set anything from
+        # `validation_mode` argument for backwards compatibility        
+        if settings is None:
+            settings: config._SettingsProxy | config.Settings = (
+                config.settings
+                if validation_mode is None
+                else config.Settings()
+            )
+
+        if validation_mode is not None:
+            settings.reading_validation_mode=validation_mode
+            settings.writing_validation_mode=validation_mode  # for encoding strings
+
+        self.settings = settings
 
         self.original_string: bytes
         self._components: tuple[str, ...] | None = None
         self.encodings: tuple[str, ...] | None
 
-        if validation_mode is None:
-            validation_mode = config.settings.reading_validation_mode
-        self.validation_mode = validation_mode
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -1545,7 +1560,7 @@ class PersonName:
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
-            validate_value("PN", val, validation_mode)
+            validate_value("PN", val, settings.reading_validation_mode)
             self._components = None
         else:
             # val: str
@@ -1555,7 +1570,7 @@ class PersonName:
             # if we don't have the byte string at this point, we at least
             # validate the length of the string components
             validate_value(
-                "PN", original_string if original_string else val, validation_mode
+                "PN", original_string if original_string else val, settings.reading_validation_mode
             )
             components = val.split("=")
             # Remove empty elements from the end to avoid trailing '='
@@ -1583,7 +1598,7 @@ class PersonName:
         return {c: getattr(self, c, "") for c in parts}
 
     @property
-    def components(self) -> tuple[str, ...]:
+    def components(self, *, settings: config.SettingsType | None = None) -> tuple[str, ...]:
         """Returns up to three decoded person name components as a
         :class:`tuple` of :class:`str`.
 
@@ -1596,7 +1611,7 @@ class PersonName:
         if self._components is None:
             groups = self.original_string.split(b"=")
             encodings = self.encodings or [default_encoding]
-            self._components = _decode_personname(groups, encodings, reading_validation_mode=self.validation_mode)
+            self._components = _decode_personname(groups, encodings, settings=settings or self.settings)
 
         return self._components
 
@@ -1704,7 +1719,7 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings | None = None) -> "PersonName":
+    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.SettingsType | None = None) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1721,8 +1736,7 @@ class PersonName:
             the current object is returned.
         """
         # in the common case (encoding did not change) we decode on demand
-        settings = settings or config.settings
-
+        settings = settings or self.settings
         if encodings is None or encodings == self.encodings:
             return self
 
@@ -1735,11 +1749,11 @@ class PersonName:
                 self.components, self.encodings or [default_encoding], settings=settings
             )
             # now that we have the byte length, we re-validate the value
-            validate_value("PN", self.original_string, self.validation_mode)
+            validate_value("PN", self.original_string, settings.reading_validation_mode)
 
         return PersonName(self.original_string, encodings, settings=settings)
 
-    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.Settings | None = None) -> bytes:
+    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.SettingsType | None = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1756,7 +1770,7 @@ class PersonName:
             available, otherwise each group of the patient name is encoded
             with the first matching of the given encodings.
         """
-        settings = settings or config.settings
+        settings = settings or self.settings
         encodings = _verify_encodings(encodings) or self.encodings
 
         # if the encoding is not the original encoding, we have to return
@@ -1796,7 +1810,7 @@ class PersonName:
         phonetic_group: Sequence[str | bytes],
         encodings: list[str] | None = None,
         *,
-        reading_validation_mode: config.ValidationMode
+        settings: config.SettingsType,
     ) -> bytes:
         """Creates a byte string for a person name from lists of parts.
 
@@ -1828,10 +1842,10 @@ class PersonName:
         from pydicom.charset import encode_string, decode_bytes
 
         def enc(s: str) -> bytes:
-            return encode_string(s, encodings or [default_encoding])
+            return encode_string(s, encodings or [default_encoding], settings=settings)
 
         def dec(s: bytes) -> str:
-            return decode_bytes(s, encodings or [default_encoding], set(), reading_validation_mode=reading_validation_mode)
+            return decode_bytes(s, encodings or [default_encoding], set(), settings=settings)
 
         encoded_component_sep = enc("^")
         encoded_group_sep = enc("=")
@@ -1891,7 +1905,7 @@ class PersonName:
         name_suffix_phonetic: str | bytes = "",
         encodings: list[str] | None = None,
         *,
-        reading_validation_mode: config.ValidationMode | None = None
+        settings: config.SettingsType | None = None
     ) -> "PersonName":
         """Construct a PersonName from explicit named components.
 
@@ -1980,9 +1994,7 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
-        if reading_validation_mode is None:
-            reading_validation_mode = config.settings.reading_validation_mode
-
+        settings = settings or config.settings
         alphabetic_group: list[str | bytes] = [
             family_name,
             given_name,
@@ -2014,7 +2026,7 @@ class PersonName:
             ideographic_group,
             phonetic_group,
             encodings,
-            reading_validation_mode=reading_validation_mode
+            settings=settings,
         )
 
         return cls(encoded_value, encodings=encodings)
@@ -2030,7 +2042,7 @@ class PersonName:
         patient_name_phonetic: str | bytes = "",
         encodings: list[str] | None = None,
         *,
-        reading_validation_mode: config.ValidationMode | None = None
+        settings: config.SettingsType | None = None,
     ) -> "PersonName":
         """Construct a PersonName from explicit named components following the
         veterinary usage convention.
@@ -2089,8 +2101,7 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
-        if reading_validation_mode is None:
-            reading_validation_mode = config.settings.reading_validation_mode
+        settings = settings or config.settings
 
         alphabetic_group: list[str | bytes] = [
             responsible_party_name,
@@ -2108,7 +2119,7 @@ class PersonName:
         ]
 
         encoded_value: bytes = cls._encode_component_groups(
-            alphabetic_group, ideographic_group, phonetic_group, encodings, reading_validation_mode=reading_validation_mode
+            alphabetic_group, ideographic_group, phonetic_group, encodings, settings=settings
         )
 
         return cls(encoded_value, encodings=encodings)

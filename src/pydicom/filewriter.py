@@ -342,7 +342,7 @@ def correct_ambiguous_vr(
     return ds
 
 
-def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str, *, settings: config.Settings | None = None) -> None:
+def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str, *, settings: config.SettingsType | None = None) -> None:
     """Write a "value" of type struct_format from the dicom file.
 
     "Value" can be more than one number.
@@ -382,7 +382,7 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str, *, setting
         raise OSError(f"{exc}\nfor data_element:\n{elem}")
 
 
-def write_OBvalue(fp: DicomIO, elem: DataElement, *, settings: config.Settings | None = None)-> None:
+def write_OBvalue(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element with VR of 'other byte' (OB)."""
     settings = settings or config.settings
     if elem.is_buffered:
@@ -398,7 +398,7 @@ def write_OBvalue(fp: DicomIO, elem: DataElement, *, settings: config.Settings |
         fp.write(b"\x00")
 
 
-def write_OWvalue(fp: DicomIO, elem: DataElement, *, settings: config.Settings | None = None)-> None:
+def write_OWvalue(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element with VR of 'other word' (OW).
 
     Note: This **does not currently do the byte swapping** for Endian state.
@@ -417,7 +417,7 @@ def write_OWvalue(fp: DicomIO, elem: DataElement, *, settings: config.Settings |
         fp.write(b"\x00")
 
 
-def write_UI(fp: DicomIO, elem: DataElement, *, settings: config.Settings | None = None)-> None:
+def write_UI(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element with VR of 'unique identifier' (UI)."""
     settings = settings or config.settings
     write_string(fp, elem, "\0", settings=settings)  # pad with 0-byte to even length
@@ -440,7 +440,7 @@ def multi_string(val: str | Iterable[str]) -> str:
 
 
 def write_PN(
-    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None, *, settings: config.Settings | None = None
+    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None, *, settings: config.SettingsType | None = None
 ) -> None:
     settings = settings or config.settings
     if not encodings:
@@ -459,7 +459,7 @@ def write_PN(
     fp.write(enc)
 
 
-def _default_encoded(val: str, *, settings: config.Settings) -> bytes:
+def _default_encoded(val: str, *, settings: config.SettingsType) -> bytes:
     """Return an encoded string using the default encoding.
     Depending on `settings.writing_validation_mode`,
     an encoding error is either propagated, or replacement characters are used
@@ -476,7 +476,7 @@ def _default_encoded(val: str, *, settings: config.Settings) -> bytes:
         return val.encode(default_encoding, errors="replace")
 
 
-def write_string(fp: DicomIO, elem: DataElement, padding: str = " ", *, settings: config.Settings | None = None) -> None:
+def write_string(fp: DicomIO, elem: DataElement, padding: str = " ", *, settings: config.SettingsType | None = None) -> None:
     """Write a single or multivalued ASCII string."""
     settings = settings or config.settings
 
@@ -492,7 +492,7 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = " ", *, settings
 
 
 def write_text(
-    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None, *, settings: config.Settings | None = None
+    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None, *, settings: config.SettingsType | None = None
 ) -> None:
     """Write a single or multivalued text string."""
     settings = settings or config.settings
@@ -517,7 +517,7 @@ def write_text(
         fp.write(val)
 
 
-def write_number_string(fp: DicomIO, elem: DataElement, *, settings: config.Settings | None = None)-> None:
+def write_number_string(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Handle IS or DS VR - write a number stored as a string of digits."""
     # If the DS or IS has an original_string attribute, use that, so that
     # unchanged data elements are written with exact string as when read from
@@ -554,7 +554,7 @@ def _format_DA(val: DA | None) -> str:
     return val.strftime("%Y%m%d")
 
 
-def write_DA(fp: DicomIO, elem: DataElement, *, settings: config.Settings)-> None:
+def write_DA(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType)-> None:
     settings = settings or config.settings
     val = elem.value
     if isinstance(val, str):
@@ -570,7 +570,7 @@ def write_DA(fp: DicomIO, elem: DataElement, *, settings: config.Settings)-> Non
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)
+            val = _default_encoded(val, settings=settings)
 
         fp.write(val)
 
@@ -588,7 +588,7 @@ def _format_DT(val: DT | None) -> str:
     return val.strftime("%Y%m%d%H%M%S%z")
 
 
-def write_DT(fp: DicomIO, elem: DataElement, *, settings: config.Settings)-> None:
+def write_DT(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType)-> None:
     val = elem.value
     if isinstance(val, str):
         write_string(fp, elem, settings=settings)
@@ -603,7 +603,7 @@ def write_DT(fp: DicomIO, elem: DataElement, *, settings: config.Settings)-> Non
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)
+            val = _default_encoded(val, settings=settings)
 
         fp.write(val)
 
@@ -621,7 +621,7 @@ def _format_TM(val: TM | None) -> str:
     return val.strftime("%H%M%S")
 
 
-def write_TM(fp: DicomIO, elem: DataElement, *, settings: config.Settings)-> None:
+def write_TM(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType)-> None:
     val = elem.value
     if isinstance(val, str):
         write_string(fp, elem, settings=settings)
@@ -636,7 +636,7 @@ def write_TM(fp: DicomIO, elem: DataElement, *, settings: config.Settings)-> Non
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)
+            val = _default_encoded(val, settings=settings)
 
         fp.write(val)
 
@@ -646,11 +646,12 @@ def write_data_element(
     elem: DataElement | RawDataElement,
     encodings: str | list[str] | None = None,
     *,
-    settings: config.Settings | None = None
+    settings: config.SettingsType | None = None
 ) -> None:
     """Write the data_element to file fp according to
     dicom media storage rules.
     """
+    settings = settings or config.settings
     # Write element's tag
     fp.write_tag(elem.tag)
 
@@ -681,7 +682,7 @@ def write_data_element(
             )
 
         encodings = encodings or [default_encoding]
-        encodings = convert_encodings(encodings)
+        encodings = convert_encodings(encodings, settings=settings)
         fn, param = writers[cast(VR, vr)]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
@@ -771,7 +772,7 @@ EncodingType = tuple[bool | None, bool | None]
 
 
 def write_dataset(
-    fp: DicomIO, dataset: Dataset, parent_encoding: str | list[str] = default_encoding, *, settings: config.Settings | None = None
+    fp: DicomIO, dataset: Dataset, parent_encoding: str | list[str] = default_encoding, *, settings: config.SettingsType | None = None
 ) -> int:
     """Encode `dataset` and write the encoded data to `fp`.
 
@@ -856,7 +857,7 @@ def write_dataset(
     return fp.tell() - fpStart
 
 
-def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str], *, settings: config.Settings | None = None) -> None:
+def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str], *, settings: config.SettingsType | None = None) -> None:
     """Write a sequence contained in `data_element` to the file-like `fp`.
 
     Parameters
@@ -875,7 +876,7 @@ def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str], *, sett
         write_sequence_item(fp, ds, encodings, settings=settings)
 
 
-def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str], *, settings: config.Settings | None = None) -> None:
+def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str], *, settings: config.SettingsType | None = None) -> None:
     """Write a `dataset` in a sequence to the file-like `fp`.
 
     This is similar to writing a data_element, but with a specific tag for
@@ -908,15 +909,13 @@ def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str], *, 
         fp.seek(location)  # ready for next data_element
 
 
-def write_UN(fp: DicomIO, elem: DataElement, *, settings: config.Settings | None = None)-> None:
+def write_UN(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a byte string for an DataElement of value 'UN' (unknown)."""
-    settings = settings or config.settings
     fp.write(cast(bytes, elem.value))
 
 
-def write_ATvalue(fp: DicomIO, elem: DataElement, *, settings: config.Settings | None = None)-> None:
+def write_ATvalue(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element tag to a file."""
-    settings = settings or config.settings
     try:
         iter(cast(Sequence[Any], elem.value))  # see if is multi-valued AT;
         # Note will fail if Tag ever derived from true tuple rather than being
@@ -932,7 +931,7 @@ def write_ATvalue(fp: DicomIO, elem: DataElement, *, settings: config.Settings |
 
 
 def write_file_meta_info(
-    fp: DicomIO, file_meta: FileMetaDataset, enforce_standard: bool = True, *, settings: config.Settings | None = None
+    fp: DicomIO, file_meta: FileMetaDataset, enforce_standard: bool = True, *, settings: config.SettingsType | None = None
 ) -> None:
     """Write the File Meta Information elements in `file_meta` to `fp`.
 
@@ -1156,7 +1155,7 @@ def dcmwrite(
     enforce_file_format: bool = False,
     force_encoding: bool = False,
     overwrite: bool = True,
-    settings: config.Settings | None = None,
+    settings: config.SettingsType | None = None,
     **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
@@ -1319,7 +1318,6 @@ def dcmwrite(
     # Cover use of `write_like_original` as:
     #   optional arg - dcmwrite(fp, ds, write_like_original=bool)
     #   positional arg - dcmwrite(fp, ds, False)
-    
     write_like_original: bool | None = kwargs.get("write_like_original", None)
     if None not in (__write_like_original, write_like_original):
         if config._use_future:
