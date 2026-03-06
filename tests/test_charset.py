@@ -93,7 +93,7 @@ class TestCharsetUsingSettingsArgs:
             ds.decode()
 
     def test_bad_encoded_single_encoding_enforce_standard(self, allow_reading_invalid_values):
-        """Test handling bad encoding for single encoding if 
+        """Test handling bad encoding for single encoding if
         settings arg `reading_validation_mode` is RAISE."""
         settings = config.Settings(reading_validation_mode=config.ValidationMode.RAISE)
         msg = (
