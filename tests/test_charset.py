@@ -4,7 +4,7 @@
 import pytest
 
 import pydicom.charset
-from pydicom import dcmread
+from pydicom import config, dcmread
 from pydicom.data import get_charset_files, get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
@@ -81,7 +81,104 @@ ENCODED_NAMES = [
 ]
 
 
+class TestCharsetUsingSettingsArgs:
+    """Test charset encoding/decoding behavior with passed settings"""
+    def test_invalid_character_set_enforce_valid(self, allow_reading_invalid_values):
+        """charset: raise on invalid encoding despite global settings"""
+        settings = config.Settings(reading_validation_mode=config.ValidationMode.RAISE)
+        ds = dcmread(get_testdata_file("CT_small.dcm"), settings=settings)
+        ds._read_charset = None
+        ds.SpecificCharacterSet = "UNSUPPORTED"
+        with pytest.raises(LookupError, match="Unknown encoding 'UNSUPPORTED'"):
+            ds.decode()
+
+    def test_bad_encoded_single_encoding_enforce_standard(self, allow_reading_invalid_values):
+        """Test handling bad encoding for single encoding if 
+        settings arg `reading_validation_mode` is RAISE."""
+        settings = config.Settings(reading_validation_mode=config.ValidationMode.RAISE)
+        msg = (
+            "'utf.?8' codec can't decode byte 0xc4 in position 0: "
+            "invalid continuation byte"
+        )
+        elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2", settings=settings)
+
+        with pytest.raises(UnicodeDecodeError, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO_IR 192"])
+
+        # Repeat with settings applied at `decode` step rather than DataElement
+        elem = DataElement(0x00100010, "PN", b"\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2")
+        with pytest.raises(UnicodeDecodeError, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO_IR 192"], settings=settings)
+
+    def test_bad_decoded_multi_byte_encoding_enforce_standard(self, allow_reading_invalid_values):
+        """Test handling bad encoding for single encoding if
+        settings arg `reading_validation_mode` is RAISE"""
+        settings = config.Settings(reading_validation_mode=config.ValidationMode.RAISE)
+        msg = (
+            "'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
+            "illegal multibyte sequence"
+        )
+
+        elem = DataElement(
+            0x00100010, "PN", b"\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            settings=settings,
+        )
+        with pytest.raises(UnicodeDecodeError, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO 2022 IR 159"])
+
+        # Repeat with settings applied at `decode` step rather than DataElement
+        elem = DataElement(
+            0x00100010, "PN", b"\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2"
+        )
+
+        with pytest.raises(UnicodeDecodeError, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO 2022 IR 159"], settings=settings)
+
+    def test_unknown_escape_sequence(self, enforce_valid_values):
+        """Test handling bad encoding for single encoding override global settings with argument"""
+        # Note `enforce_valid_values` passed in test signature,
+        # we test the settings argument overrides it
+        settings = config.Settings(reading_validation_mode=config.ValidationMode.WARN)
+        msg = "Found unknown escape sequence in encoded string value"
+
+        elem = DataElement(
+            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            settings=settings
+        )
+        with pytest.warns(UserWarning, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO_IR 100"])
+            assert "\x1b-FÄéïíõóéïò" == elem.value
+
+        # Repeat with settings applied at `decode` step rather than DataElement
+        elem = DataElement(
+            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+        )
+        with pytest.warns(UserWarning, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO_IR 100"], settings=settings)
+            assert "\x1b-FÄéïíõóéïò" == elem.value
+
+    def test_unknown_escape_sequence_enforce_standard(self, allow_reading_invalid_values):
+        """Test handling bad encoding for single encoding if
+        settings arg `reading_validation_mode` is RAISE"""
+        settings = config.Settings(reading_validation_mode=config.ValidationMode.RAISE)
+        msg = "Found unknown escape sequence in encoded string value"
+        elem = DataElement(
+            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+            settings=settings,
+        )
+        with pytest.raises(ValueError, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO_IR 100"])
+
+        # Repeat with settings applied at `decode` step rather than DataElement
+        elem = DataElement(
+            0x00100010, "PN", b"\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2",
+        )
+        with pytest.raises(ValueError, match=msg):
+            pydicom.charset.decode_element(elem, ["ISO_IR 100"], settings=settings)
+
+
 class TestCharset:
+    """Test charset encoding/decoding, and behavior with global settings"""
     def test_encodings(self):
         test_string = "Hello World"
         for x in pydicom.charset.python_encoding.items():

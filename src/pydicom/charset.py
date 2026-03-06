@@ -852,6 +852,7 @@ def decode_element(
         single value, a multiple value (code extension), or may also be ``''``
         or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
+    settings = settings or elem.settings
     if elem.is_empty:
         return
 
@@ -865,10 +866,10 @@ def decode_element(
     if elem.VR == VR.PN:
         if elem.VM == 1:
             # elem.value: PersonName |  bytes
-            elem.value = cast(PersonName, elem.value).decode(encodings)
+            elem.value = cast(PersonName, elem.value).decode(encodings, settings=settings)
         else:
             # elem.value: Iterable[PersonName |  bytes]
-            elem.value = [cast(PersonName, vv).decode(encodings) for vv in elem.value]
+            elem.value = [cast(PersonName, vv).decode(encodings, settings=settings) for vv in elem.value]
     elif elem.VR in CUSTOMIZABLE_CHARSET_VR:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
