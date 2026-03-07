@@ -1,4 +1,4 @@
-# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
 from collections.abc import Iterator, Iterable, Callable
@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
 from typing import Optional, Union, Any, cast
 import uuid
 
+from pydicom import config
 from pydicom.charset import default_encoding
 from pydicom.datadict import tag_for_keyword, dictionary_description
 from pydicom.dataelem import DataElement
@@ -294,7 +295,7 @@ class RecordNode(Iterable["RecordNode"]):
         "Return the number of nodes to the level below the tree root"
         return len(list(self.reverse())) - 1
 
-    def _encode_record(self, force_implicit: bool = False) -> int:
+    def _encode_record(self, force_implicit: bool = False, *, settings: config.SettingsType) -> int:
         """Encode the node's directory record.
 
         * Encodes the record as explicit VR little endian
@@ -342,7 +343,7 @@ class RecordNode(Iterable["RecordNode"]):
             elif tag == 0x00041420:
                 self._offset_lower = fp.tell() + 8
 
-            write_data_element(fp, self._record[tag], encoding)
+            write_data_element(fp, self._record[tag], encoding, settings=settings)
 
         return len(fp.getvalue())
 
@@ -902,14 +903,14 @@ class FileInstance:
         """
         return self.for_addition or self.for_moving or self.for_removal
 
-    def load(self) -> Dataset:
+    def load(self, *, settings: config.SettingsType | None = None) -> Dataset:
         """Return the referenced instance as a
         :class:`~pydicom.dataset.Dataset`.
         """
         if self.for_addition:
-            return dcmread(cast(Path, self._stage_path))
+            return dcmread(cast(Path, self._stage_path), settings=settings)
 
-        return dcmread(self.path)
+        return dcmread(self.path, settings=settings)
 
     @property
     def path(self) -> str:
@@ -952,7 +953,7 @@ DSPathType = Dataset | str | os.PathLike
 class FileSet:
     """Representation of a DICOM File-set."""
 
-    def __init__(self, ds: DSPathType | None = None) -> None:
+    def __init__(self, ds: DSPathType | None = None, *, settings: config.SettingsType | None = None) -> None:
         """Create or load a File-set.
 
         Parameters
@@ -962,6 +963,7 @@ class FileSet:
             to the DICOMDIR file.
         """
         # The nominal path to the root of the File-set
+        self.settings = settings or config.settings
         self._path: Path | None = None
         # The root node of the record tree used to fill out the DICOMDIR's
         #   *Directory Record Sequence*.
@@ -979,7 +981,7 @@ class FileSet:
         self._stage["path"] = Path(self._stage["t"].name)
 
         # The DICOMDIR instance, not guaranteed to be up-to-date
-        self._ds = Dataset()
+        self._ds = Dataset(settings=self.settings)
         # The File-set's managed SOP Instances as list of FileInstance
         self._instances: list[FileInstance] = []
         # Use alphanumeric or numeric File IDs
@@ -996,12 +998,12 @@ class FileSet:
 
         # Check the DICOMDIR dataset and create the record tree
         if ds:
-            self.load(ds)
+            self.load(ds, settings=self.settings)
         else:
             # New File-set
             self.UID = generate_uid()
 
-    def add(self, ds_or_path: DSPathType) -> FileInstance:
+    def add(self, ds_or_path: DSPathType, *, settings: config.SettingsType | None = None) -> FileInstance:
         """Stage an instance for addition to the File-set.
 
         If the instance has been staged for removal then calling
@@ -1023,9 +1025,10 @@ class FileSet:
         --------
         :meth:`~pydicom.fileset.FileSet.add_custom`
         """
+        settings = settings or self.settings
         ds: Dataset | FileDataset
         if isinstance(ds_or_path, str | os.PathLike):
-            ds = dcmread(ds_or_path)
+            ds = dcmread(ds_or_path, settings=settings)
         else:
             ds = ds_or_path
 
@@ -1072,7 +1075,7 @@ class FileSet:
 
         return cast(FileInstance, instance)
 
-    def add_custom(self, ds_or_path: DSPathType, leaf: RecordNode) -> FileInstance:
+    def add_custom(self, ds_or_path: DSPathType, leaf: RecordNode, *, settings: config.SettingsType | None = None) -> FileInstance:
         """Stage an instance for addition to the File-set using custom records.
 
         This method allows you to add a SOP instance and customize the
@@ -1152,9 +1155,10 @@ class FileSet:
         --------
         :meth:`~pydicom.fileset.FileSet.add`
         """
+        settings = settings or self.settings
         ds: Dataset | FileDataset
         if isinstance(ds_or_path, str | os.PathLike):
-            ds = dcmread(ds_or_path)
+            ds = dcmread(ds_or_path, settings=settings)
         else:
             ds = ds_or_path
 
@@ -1195,7 +1199,7 @@ class FileSet:
         self._stage["+"][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
         instance._apply_stage("+")
-        ds.save_as(instance.path, enforce_file_format=True)
+        ds.save_as(instance.path, enforce_file_format=True, settings=settings)
 
         return cast(FileInstance, instance)
 
@@ -1275,7 +1279,7 @@ class FileSet:
         p = path / "DICOMDIR"
         with open(p, "wb") as fp:
             f = DicomFileLike(fp)
-            self._write_dicomdir(f, copy_safe=True, force_implicit=force_implicit)
+            self._write_dicomdir(f, copy_safe=True, force_implicit=force_implicit, settings=self.settings)
 
         # Reset the *Referenced File ID* values
         # The order here doesn't matter because removed instances aren't
@@ -1592,6 +1596,8 @@ class FileSet:
         ds_or_path: DSPathType,
         include_orphans: bool = True,
         raise_orphans: bool = False,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Load an existing File-set.
 
@@ -1614,10 +1620,11 @@ class FileSet:
             If ``True`` then raise an exception if orphaned directory records
             are found in the File-set (default ``False``).
         """
+        settings = settings or self.settings
         if isinstance(ds_or_path, Dataset):
             ds = ds_or_path
         else:
-            ds = dcmread(ds_or_path)
+            ds = dcmread(ds_or_path, settings=settings)
 
         sop_class = ds.file_meta.get("MediaStorageSOPClassUID", None)
         if sop_class != MediaStorageDirectoryStorage:
@@ -1996,6 +2003,8 @@ class FileSet:
         path: str | os.PathLike | None = None,
         use_existing: bool = False,
         force_implicit: bool = False,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Write the File-set, or changes to the File-set, to the file system.
 
@@ -2050,6 +2059,8 @@ class FileSet:
             If `use_existing` is ``True`` but instances have been staged
             for addition to the File-set.
         """
+        settings = settings or self.settings
+
         if not path and self.path is None:
             raise ValueError(
                 "The path to the root directory is required for a new File-set"
@@ -2106,7 +2117,7 @@ class FileSet:
         if use_existing and not major_change:
             with open(p, "wb") as fp:
                 f = DicomFileLike(fp)
-                self._write_dicomdir(f, force_implicit=force_implicit)
+                self._write_dicomdir(f, force_implicit=force_implicit, settings=settings)
 
             self.load(p, raise_orphans=True)
 
@@ -2147,14 +2158,14 @@ class FileSet:
         # Create the DICOMDIR file
         with open(p, "wb") as fp:
             f = DicomFileLike(fp)
-            self._write_dicomdir(f, force_implicit=force_implicit)
+            self._write_dicomdir(f, force_implicit=force_implicit, settings=settings)
 
         # Reload the File-set
         #   We're doing things wrong if we have orphans so raise
         self.load(p, raise_orphans=True)
 
     def _write_dicomdir(
-        self, fp: DicomFileLike, copy_safe: bool = False, force_implicit: bool = False
+        self, fp: DicomFileLike, copy_safe: bool = False, force_implicit: bool = False, *, settings: config.SettingsType
     ) -> None:
         """Encode and write the File-set's DICOMDIR dataset.
 
@@ -2193,14 +2204,14 @@ class FileSet:
 
         # Write the preamble, DICM marker and File Meta
         fp.write(b"\x00" * 128 + b"DICM")
-        write_file_meta_info(fp, ds.file_meta, enforce_standard=True)
+        write_file_meta_info(fp, ds.file_meta, enforce_standard=True, settings=settings)
 
         # Write the dataset
         # Write up to the *Offset of the First Directory Record...* element
-        write_dataset(fp, ds[:0x00041200])
+        write_dataset(fp, ds[:0x00041200], settings=settings)
         tell_offset_first = fp.tell()  # Start of *Offset of the First...*
         # Write up to (but not including) the *Directory Record Sequence*
-        write_dataset(fp, ds[0x00041200:0x00041220])
+        write_dataset(fp, ds[0x00041200:0x00041220], settings=settings)
 
         # Rebuild and encode the *Directory Record Sequence*
         # Step 1: Determine the offsets for all the records
@@ -2210,7 +2221,7 @@ class FileSet:
             node._offset = offset
             offset += 8  # a sequence item's (tag + length)
             # Copy safe - only modifies RecordNode._offset
-            offset += node._encode_record(force_implicit)
+            offset += node._encode_record(force_implicit, settings=settings)
             # If the sequence item has undefined length then it uses a
             #   sequence item delimiter item
             if node._record.is_undefined_length_sequence_item:
@@ -2237,7 +2248,7 @@ class FileSet:
             cast(list[Dataset], ds.DirectoryRecordSequence).append(record)
 
         # Step 3: Encode *Directory Record Sequence* and the rest
-        write_dataset(fp, ds[0x00041220:])
+        write_dataset(fp, ds[0x00041220:], settings=settings)
 
         # Update the first and last record offsets
         if self._tree.children:
@@ -2245,8 +2256,8 @@ class FileSet:
             last_elem.value = self._tree.children[-1]._offset
             # Re-write the record offset pointer elements
             fp.seek(tell_offset_first)
-            write_data_element(fp, first_elem)
-            write_data_element(fp, last_elem)
+            write_data_element(fp, first_elem, settings=settings)
+            write_data_element(fp, last_elem, settings=settings)
             # Go to the end
             fp.seek(0, 2)
 

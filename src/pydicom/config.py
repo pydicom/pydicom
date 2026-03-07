@@ -1,13 +1,18 @@
-# Copyright 2008-2023 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Pydicom configuration options."""
 
 # doc strings following items are picked up by sphinx for documentation
 
+from enum import IntEnum
 import logging
 import os
 from contextlib import contextmanager
+import threading
 from typing import Optional, Any, TYPE_CHECKING
 from collections.abc import Generator
+from copy import deepcopy
+import sys
+from types import ModuleType
 
 have_numpy = True
 try:
@@ -220,18 +225,24 @@ Use :attr:`Settings.reading_validation_mode` instead.
 """
 
 
-# Constants used to define how data element values shall be validated
-IGNORE = 0
+class ValidationMode(IntEnum):
+    """An IntEnum for validation modes."""
+    IGNORE = 0
+    WARN = 1
+    RAISE = 2
+
+# For backwards compatibility, define the bare validation modes
+IGNORE = ValidationMode.IGNORE
 """If one of the validation modes is set to this value, no value validation
 will be performed.
 """
 
-WARN = 1
+WARN = ValidationMode.WARN
 """If one of the validation modes is set to this value, a warning is issued if
 a value validation error occurs.
 """
 
-RAISE = 2
+RAISE = ValidationMode.RAISE
 """If one of the validation modes is set to this value, an exception is raised
 if a value validation error occurs.
 """
@@ -244,15 +255,99 @@ class Settings:
     .. versionadded:: 2.3
     """
 
-    def __init__(self) -> None:
-        self._reading_validation_mode: int | None = None
+    def __init__(self, **kwargs) -> None:
+        self._reading_validation_mode: ValidationMode | None = None
         # in future version, writing invalid values will raise by default,
         # currently the default value depends on enforce_valid_values
-        self._writing_validation_mode: int | None = RAISE if _use_future else None
+        self._writing_validation_mode: ValidationMode | None = ValidationMode.RAISE if _use_future else None
         self._infer_sq_for_un_vr: bool = True
 
         # Chunk size to use when reading from buffered DataElement values
         self._buffered_read_size = 8192
+
+        # Until pydicom 4.x, need these flags to fall back to global config.<flag>
+        # if not otherwise set. Use None to show not yet set
+        self._allow_DS_float: bool | None = None
+        self._assume_implicit_vr_switch: bool | None = None
+        self._convert_wrong_length_to_UN: bool | None = None
+        self._datetime_conversion: bool | None = None
+        self._replace_un_with_known_vr: bool | None = None
+        self._show_file_meta: bool | None = None
+        self._use_none_as_empty_text_VR_value: bool | None = None
+
+        # Override settings with any provided kwargs
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @property
+    def allow_DS_float(self) -> bool:
+        if self._allow_DS_float is None:
+            return allow_DS_float
+        return self._allow_DS_float
+
+    @allow_DS_float.setter
+    def allow_DS_float(self, value: bool):
+        self._allow_DS_float = value
+
+    @property
+    def assume_implicit_vr_switch(self) -> bool:
+        if self._assume_implicit_vr_switch is None:
+            return assume_implicit_vr_switch
+        return self._assume_implicit_vr_switch
+
+    @assume_implicit_vr_switch.setter
+    def assume_implicit_vr_switch(self, value: bool):
+        self._assume_implicit_vr_switch = value
+
+    @property
+    def convert_wrong_length_to_UN(self) -> bool:
+        if self._convert_wrong_length_to_UN is None:
+            return convert_wrong_length_to_UN
+        return self._convert_wrong_length_to_UN
+
+    @convert_wrong_length_to_UN.setter
+    def convert_wrong_length_to_UN(self, value: bool):
+        self._convert_wrong_length_to_UN = value
+
+    @property
+    def datetime_conversion(self) -> bool:
+        if self._datetime_conversion is None:
+            return datetime_conversion
+        return self._datetime_conversion
+
+    @datetime_conversion.setter
+    def datetime_conversion(self, value: bool):
+        self._datetime_conversion = value
+
+    @property
+    def replace_un_with_known_vr(self) -> bool:
+        if self._replace_un_with_known_vr is None:
+            return replace_un_with_known_vr
+        return self._replace_un_with_known_vr
+
+    @replace_un_with_known_vr.setter
+    def replace_un_with_known_vr(self, value: bool):
+        self._replace_un_with_known_vr = value
+
+    @property
+    def show_file_meta(self) -> bool:
+        if self._show_file_meta is None:
+            return show_file_meta
+        return self._show_file_meta
+
+    @show_file_meta.setter
+    def show_file_meta(self, value: bool):
+        self._show_file_meta = value
+
+    @property
+    def use_none_as_empty_text_VR_value(self) -> bool:
+        if self._use_none_as_empty_text_VR_value is None:
+            return use_none_as_empty_text_VR_value
+        return self._use_none_as_empty_text_VR_value
+
+    @use_none_as_empty_text_VR_value.setter
+    def use_none_as_empty_text_VR_value(self, value: bool):
+        self._use_none_as_empty_text_VR_value = value
 
     @property
     def buffered_read_size(self) -> int:
@@ -274,7 +369,7 @@ class Settings:
         self._buffered_read_size = size
 
     @property
-    def reading_validation_mode(self) -> int:
+    def reading_validation_mode(self) -> ValidationMode:
         """Defines behavior of validation while reading values, compared with
         the DICOM standard, e.g. that DS strings are not longer than
         16 characters and contain only allowed characters.
@@ -286,24 +381,24 @@ class Settings:
         """
         # upwards compatibility
         if self._reading_validation_mode is None:
-            return RAISE if enforce_valid_values else WARN
+            return ValidationMode.RAISE if enforce_valid_values else ValidationMode.WARN
         return self._reading_validation_mode
 
     @reading_validation_mode.setter
-    def reading_validation_mode(self, value: int) -> None:
+    def reading_validation_mode(self, value: ValidationMode) -> None:
         self._reading_validation_mode = value
 
     @property
-    def writing_validation_mode(self) -> int:
+    def writing_validation_mode(self) -> ValidationMode:
         """Defines behavior for value validation while writing a value.
         See :attr:`Settings.reading_validation_mode`.
         """
         if self._writing_validation_mode is None:
-            return RAISE if enforce_valid_values else WARN
+            return ValidationMode.RAISE if enforce_valid_values else ValidationMode.WARN
         return self._writing_validation_mode
 
     @writing_validation_mode.setter
-    def writing_validation_mode(self, value: int) -> None:
+    def writing_validation_mode(self, value: ValidationMode) -> None:
         self._writing_validation_mode = value
 
     @property
@@ -321,11 +416,40 @@ class Settings:
         self._infer_sq_for_un_vr = value
 
 
-settings = Settings()
+_default_settings = Settings()
+
+
+class _ThreadLocalStore(threading.local):
+    def __init__(self) -> None:
+        self.thread_settings = deepcopy(_default_settings)
+
+_storage = _ThreadLocalStore()
+
+class _SettingsProxy:
+    def __getattr__(self, name) -> Any:
+        return getattr(_storage.thread_settings, name)
+
+    def __setattr__(self, name, value) -> None:
+        setattr(_storage.thread_settings, name, value)
+
+
+SettingsType = Settings | _SettingsProxy
+
+
+settings: SettingsType = _SettingsProxy()
 """The global configuration object of type :class:`Settings` to access some
-of the settings. More settings may move here in later versions.
+of the settings.
 
 .. versionadded:: 2.3
+.. versionchanged:: 3.1
+
+    Now thread-safe, accessed through thread-local storage
+
+.. deprecated:: 4.0
+
+    ``config.settings`` will be removed in v4.0, instead
+    pass a `settings` argument to function calls
+
 """
 
 
@@ -350,9 +474,9 @@ def disable_value_validation() -> Generator:
 def strict_reading() -> Generator:
     """Context manager to temporarily enably strict value validation
     for reading."""
-    original_reading_mode = settings._reading_validation_mode
+    original_reading_mode: ValidationMode = settings._reading_validation_mode
     try:
-        settings.reading_validation_mode = RAISE
+        settings.reading_validation_mode = ValidationMode.RAISE
         yield
     finally:
         settings._reading_validation_mode = original_reading_mode
@@ -404,6 +528,7 @@ displaying the file meta information data elements
 .. versionadded:: 2.0
 """
 
+from pydicom.misc import warn_and_log
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
 import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
 import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
@@ -568,6 +693,7 @@ def future_behavior(enable_future: bool = True) -> None:
     --------
     :attr:`INVALID_KEYWORD_BEHAVIOR`
     :attr:`INVALID_KEY_BEHAVIOR`
+    :attr:`~pydicom.config.Settings.writing_validation_mode`
 
     """
     global _use_future, INVALID_KEYWORD_BEHAVIOR
@@ -575,7 +701,7 @@ def future_behavior(enable_future: bool = True) -> None:
     if enable_future:
         _use_future = True
         INVALID_KEYWORD_BEHAVIOR = "RAISE"
-        settings._writing_validation_mode = RAISE
+        settings._writing_validation_mode = ValidationMode.RAISE
     else:
         _use_future = False
         INVALID_KEYWORD_BEHAVIOR = "WARN"
@@ -584,3 +710,44 @@ def future_behavior(enable_future: bool = True) -> None:
 
 if _use_future:
     future_behavior()
+
+
+_DEPRECATED = [
+    "allow_DS_float",
+    "assume_implicit_vr_switch",
+    "convert_wrong_length_to_UN",
+    "datetime_conversion",
+    "replace_un_with_known_vr",
+    "show_file_meta",
+    "use_none_as_empty_text_VR_value",
+]
+
+
+# Handle deprecated global config flags, etc.
+# https://docs.python.org/3/reference/datamodel.html#customizing-module-attribute-access
+class HandleDeprecationModule(ModuleType):
+    msg = (
+        "'pydicom.config.{attr}' is deprecated and will be removed "
+        "in v4.0, please use the `settings` argument to functions or "
+        "classes."
+    )
+    def __repr__(self):
+        return f'Deprecation Handling {self.__name__}'
+
+    def __getattr__(self, attr: str) -> Any:
+        if attr in _DEPRECATED:
+            if _use_future:
+                raise AttributeError(f"pydicom.config has no attribute {attr!r}")
+            warn_and_log(self.msg.format(attr=attr), DeprecationWarning)
+        return super().__getattr__(attr)
+
+    def __setattr__(self, attr: str, value: Any):
+        if attr in _DEPRECATED:
+            if _use_future:
+                raise AttributeError(
+                    f"pydicom.config.{attr} has been removed.  Using `settings` arguments instead"
+                )
+            warn_and_log(self.msg.format(attr=attr), DeprecationWarning)
+        object.__setattr__(self, attr, value)
+
+sys.modules[__name__].__class__ = HandleDeprecationModule

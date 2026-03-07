@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
 
 import datetime
@@ -404,7 +404,7 @@ VALIDATORS = {
 def validate_value(
     vr: str,
     value: Any,
-    validation_mode: int,
+    validation_mode: config.ValidationMode,
     validator: Callable[[str, Any], tuple[bool, str]] | None = None,
 ) -> None:
     """Validate the given value against the DICOM standard.
@@ -428,7 +428,7 @@ def validate_value(
         If the validation fails and the validation mode is set to
         `RAISE`.
     """
-    if validation_mode == config.IGNORE:
+    if validation_mode == config.ValidationMode.IGNORE:
         return
 
     if value is not None:
@@ -436,7 +436,7 @@ def validate_value(
         if validator is not None:
             is_valid, msg = validator(vr, value)
             if not is_valid:
-                if validation_mode == config.RAISE:
+                if validation_mode == config.ValidationMode.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
 
@@ -1036,7 +1036,7 @@ class DSfloat(float):
         self,
         val: str | int | float | Decimal,
         auto_format: bool = False,
-        validation_mode: int | None = None,
+        validation_mode: config.ValidationMode | None = None,
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -1071,7 +1071,7 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode == config.RAISE and not self.auto_format:
+        if validation_mode == config.ValidationMode.RAISE and not self.auto_format:
             if len(str(self)) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
@@ -1208,7 +1208,7 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode != config.IGNORE:
+        if validation_mode != config.ValidationMode.IGNORE:
             if len(repr(self).strip("'")) > 16:
                 msg = (
                     "Values for elements with a VR of 'DS' values must be "
@@ -1219,13 +1219,13 @@ class DSdecimal(Decimal):
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
-                if validation_mode == config.RAISE:
+                if validation_mode == config.ValidationMode.RAISE:
                     raise OverflowError(msg)
                 warn_and_log(msg)
             elif not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 msg = f'Value "{self}" is not valid for elements with a VR of DS'
-                if validation_mode == config.RAISE:
+                if validation_mode == config.ValidationMode.RAISE:
                     raise ValueError(msg)
                 warn_and_log(msg)
 
@@ -1332,9 +1332,9 @@ class ISfloat(float):
             self.original_string = val.original_string
         if validation_mode:
             msg = f'Value "{self}" is not valid for elements with a VR of IS'
-            if validation_mode == config.WARN:
+            if validation_mode == config.ValidationMode.WARN:
                 warn_and_log(msg)
-            elif validation_mode == config.RAISE:
+            elif validation_mode == config.ValidationMode.RAISE:
                 msg += "\nSet reading_validation_mode to WARN or IGNORE to bypass"
                 raise TypeError(msg)
 
@@ -1376,7 +1376,7 @@ class IS(int):
             newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -(2**31) <= newval < 2**31 and validation_mode == config.RAISE:
+        if not -(2**31) <= newval < 2**31 and validation_mode == config.ValidationMode.RAISE:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set "
@@ -1431,7 +1431,7 @@ def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] 
 
 
 def _decode_personname(
-    components: Sequence[bytes], encodings: Sequence[str]
+    components: Sequence[bytes], encodings: Sequence[str], *, settings: config.SettingsType
 ) -> tuple[str, ...]:
     """Return a list of decoded person name components.
 
@@ -1452,7 +1452,7 @@ def _decode_personname(
     """
     from pydicom.charset import decode_bytes
 
-    comps = [decode_bytes(c, encodings, PN_DELIMS) for c in components]
+    comps = [decode_bytes(c, encodings, PN_DELIMS, settings=settings) for c in components]
 
     # Remove empty elements from the end to avoid trailing '='
     while comps and not comps[-1]:
@@ -1461,7 +1461,7 @@ def _decode_personname(
     return tuple(comps)
 
 
-def _encode_personname(components: Sequence[str], encodings: Sequence[str]) -> bytes:
+def _encode_personname(components: Sequence[str], encodings: Sequence[str], *, settings: config.SettingsType) -> bytes:
     """Encode a list of text string person name components.
 
     Parameters
@@ -1483,7 +1483,7 @@ def _encode_personname(components: Sequence[str], encodings: Sequence[str]) -> b
 
     encoded_comps = []
     for comp in components:
-        groups = [encode_string(group, encodings) for group in comp.split("^")]
+        groups = [encode_string(group, encodings, settings=settings) for group in comp.split("^")]
         encoded_comp = b"^".join(groups)
         encoded_comps.append(encoded_comp)
 
@@ -1509,7 +1509,9 @@ class PersonName:
         val: "bytes | str | PersonName",
         encodings: Sequence[str] | None = None,
         original_string: bytes | None = None,
-        validation_mode: int | None = None,
+        validation_mode: config.ValidationMode | None = None,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -1529,12 +1531,26 @@ class PersonName:
         components using the :meth:`from_named_components` and
         :meth:`from_named_components_veterinary` class methods.
         """
+        # After global settings are removed in v4.0, don't need the following
+        # Create a new Settings object if need to set anything from
+        # `validation_mode` argument for backwards compatibility
+        if settings is None:
+            settings: config._SettingsProxy | config.Settings = (
+                config.settings
+                if validation_mode is None
+                else config.Settings()
+            )
+
+        if validation_mode is not None:
+            settings.reading_validation_mode=validation_mode
+            settings.writing_validation_mode=validation_mode  # for encoding strings
+
+        self.settings = settings
+
         self.original_string: bytes
         self._components: tuple[str, ...] | None = None
         self.encodings: tuple[str, ...] | None
-        if validation_mode is None:
-            validation_mode = config.settings.reading_validation_mode
-        self.validation_mode = validation_mode
+
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -1543,7 +1559,7 @@ class PersonName:
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
-            validate_value("PN", val, validation_mode)
+            validate_value("PN", val, settings.reading_validation_mode)
             self._components = None
         else:
             # val: str
@@ -1553,7 +1569,7 @@ class PersonName:
             # if we don't have the byte string at this point, we at least
             # validate the length of the string components
             validate_value(
-                "PN", original_string if original_string else val, validation_mode
+                "PN", original_string if original_string else val, settings.reading_validation_mode
             )
             components = val.split("=")
             # Remove empty elements from the end to avoid trailing '='
@@ -1594,7 +1610,7 @@ class PersonName:
         if self._components is None:
             groups = self.original_string.split(b"=")
             encodings = self.encodings or [default_encoding]
-            self._components = _decode_personname(groups, encodings)
+            self._components = _decode_personname(groups, encodings, settings=self.settings)
 
         return self._components
 
@@ -1702,7 +1718,7 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Sequence[str] | None = None) -> "PersonName":
+    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.SettingsType | None = None) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1719,6 +1735,7 @@ class PersonName:
             the current object is returned.
         """
         # in the common case (encoding did not change) we decode on demand
+        settings = settings or self.settings
         if encodings is None or encodings == self.encodings:
             return self
 
@@ -1728,14 +1745,14 @@ class PersonName:
         if self.original_string is None:
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
-                self.components, self.encodings or [default_encoding]
+                self.components, self.encodings or [default_encoding], settings=settings
             )
             # now that we have the byte length, we re-validate the value
-            validate_value("PN", self.original_string, self.validation_mode)
+            validate_value("PN", self.original_string, settings.reading_validation_mode)
 
-        return PersonName(self.original_string, encodings)
+        return PersonName(self.original_string, encodings, settings=settings)
 
-    def encode(self, encodings: Sequence[str] | None = None) -> bytes:
+    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.SettingsType | None = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1752,17 +1769,18 @@ class PersonName:
             available, otherwise each group of the patient name is encoded
             with the first matching of the given encodings.
         """
+        settings = settings or self.settings
         encodings = _verify_encodings(encodings) or self.encodings
 
         # if the encoding is not the original encoding, we have to return
         # a re-encoded string (without updating the original string)
         if encodings != self.encodings and self.encodings is not None:
-            return _encode_personname(self.components, cast(Sequence[str], encodings))
+            return _encode_personname(self.components, cast(Sequence[str], encodings), settings=settings)
 
         if self.original_string is None:
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
-                self.components, encodings or [default_encoding]
+                self.components, encodings or [default_encoding], settings=settings
             )
 
         return self.original_string
@@ -1790,6 +1808,8 @@ class PersonName:
         ideographic_group: Sequence[str | bytes],
         phonetic_group: Sequence[str | bytes],
         encodings: list[str] | None = None,
+        *,
+        settings: config.SettingsType,
     ) -> bytes:
         """Creates a byte string for a person name from lists of parts.
 
@@ -1821,10 +1841,10 @@ class PersonName:
         from pydicom.charset import encode_string, decode_bytes
 
         def enc(s: str) -> bytes:
-            return encode_string(s, encodings or [default_encoding])
+            return encode_string(s, encodings or [default_encoding], settings=settings)
 
         def dec(s: bytes) -> str:
-            return decode_bytes(s, encodings or [default_encoding], set())
+            return decode_bytes(s, encodings or [default_encoding], set(), settings=settings)
 
         encoded_component_sep = enc("^")
         encoded_group_sep = enc("=")
@@ -1883,6 +1903,8 @@ class PersonName:
         name_prefix_phonetic: str | bytes = "",
         name_suffix_phonetic: str | bytes = "",
         encodings: list[str] | None = None,
+        *,
+        settings: config.SettingsType | None = None
     ) -> "PersonName":
         """Construct a PersonName from explicit named components.
 
@@ -1971,6 +1993,7 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
+        settings = settings or config.settings
         alphabetic_group: list[str | bytes] = [
             family_name,
             given_name,
@@ -2002,6 +2025,7 @@ class PersonName:
             ideographic_group,
             phonetic_group,
             encodings,
+            settings=settings,
         )
 
         return cls(encoded_value, encodings=encodings)
@@ -2016,6 +2040,8 @@ class PersonName:
         responsible_party_name_phonetic: str | bytes = "",
         patient_name_phonetic: str | bytes = "",
         encodings: list[str] | None = None,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> "PersonName":
         """Construct a PersonName from explicit named components following the
         veterinary usage convention.
@@ -2074,6 +2100,8 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
+        settings = settings or config.settings
+
         alphabetic_group: list[str | bytes] = [
             responsible_party_name,
             patient_name,
@@ -2090,7 +2118,7 @@ class PersonName:
         ]
 
         encoded_value: bytes = cls._encode_component_groups(
-            alphabetic_group, ideographic_group, phonetic_group, encodings
+            alphabetic_group, ideographic_group, phonetic_group, encodings, settings=settings
         )
 
         return cls(encoded_value, encodings=encodings)

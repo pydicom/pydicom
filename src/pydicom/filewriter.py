@@ -1,4 +1,4 @@
-# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
 from collections.abc import Sequence, MutableSequence, Iterable
@@ -342,7 +342,7 @@ def correct_ambiguous_vr(
     return ds
 
 
-def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
+def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str, *, settings: config.SettingsType | None = None) -> None:
     """Write a "value" of type struct_format from the dicom file.
 
     "Value" can be more than one number.
@@ -356,6 +356,7 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     struct_format : str
         The character format as used by the struct module.
     """
+    settings = settings or config.settings
     value = elem.value
     if value is None or value == "":
         return  # don't need to write anything for no or empty value
@@ -381,9 +382,9 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
         raise OSError(f"{exc}\nfor data_element:\n{elem}")
 
 
-def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
+def write_OBvalue(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element with VR of 'other byte' (OB)."""
-
+    settings = settings or config.settings
     if elem.is_buffered:
         bytes_written = 0
         buffer = cast(BufferedIOBase, elem.value)
@@ -397,12 +398,12 @@ def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
         fp.write(b"\x00")
 
 
-def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
+def write_OWvalue(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element with VR of 'other word' (OW).
 
     Note: This **does not currently do the byte swapping** for Endian state.
     """
-
+    settings = settings or config.settings
     if elem.is_buffered:
         bytes_written = 0
         buffer = cast(BufferedIOBase, elem.value)
@@ -416,9 +417,10 @@ def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
         fp.write(b"\x00")
 
 
-def write_UI(fp: DicomIO, elem: DataElement) -> None:
+def write_UI(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element with VR of 'unique identifier' (UI)."""
-    write_string(fp, elem, "\0")  # pad with 0-byte to even length
+    settings = settings or config.settings
+    write_string(fp, elem, "\0", settings=settings)  # pad with 0-byte to even length
 
 
 def _is_multi_value(val: Any) -> bool:
@@ -438,8 +440,9 @@ def multi_string(val: str | Iterable[str]) -> str:
 
 
 def write_PN(
-    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None
+    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None, *, settings: config.SettingsType | None = None
 ) -> None:
+    settings = settings or config.settings
     if not encodings:
         encodings = [default_encoding]
 
@@ -449,22 +452,22 @@ def write_PN(
     else:
         val = cast(list[PersonName], elem.value)
 
-    enc = b"\\".join([elem.encode(encodings) for elem in val])
+    enc = b"\\".join([elem.encode(encodings, settings=settings) for elem in val])
     if len(enc) % 2 != 0:
         enc += b" "
 
     fp.write(enc)
 
 
-def _default_encoded(val: str) -> bytes:
+def _default_encoded(val: str, *, settings: config.SettingsType) -> bytes:
     """Return an encoded string using the default encoding.
-    Depending on :attr:`~pydicom.config.settings.writing_validation_mode`,
+    Depending on `settings.writing_validation_mode`,
     an encoding error is either propagated, or replacement characters are used
     and a warning is logged."""
     try:
         return val.encode(default_encoding)
     except UnicodeEncodeError:
-        if config.settings.writing_validation_mode == config.RAISE:
+        if settings.writing_validation_mode == config.ValidationMode.RAISE:
             raise
         warn_and_log(
             "Not a valid ASCII string "
@@ -473,23 +476,26 @@ def _default_encoded(val: str) -> bytes:
         return val.encode(default_encoding, errors="replace")
 
 
-def write_string(fp: DicomIO, elem: DataElement, padding: str = " ") -> None:
+def write_string(fp: DicomIO, elem: DataElement, padding: str = " ", *, settings: config.SettingsType | None = None) -> None:
     """Write a single or multivalued ASCII string."""
+    settings = settings or config.settings
+
     val = multi_string(cast(str | Iterable[str], elem.value))
     if val is not None:
         if len(val) % 2 != 0:
             val += padding  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)  # type: ignore[assignment]
+            val = _default_encoded(val, settings=settings)  # type: ignore[assignment]
 
         fp.write(val)  # type: ignore[arg-type]
 
 
 def write_text(
-    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None
+    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None, *, settings: config.SettingsType | None = None
 ) -> None:
     """Write a single or multivalued text string."""
+    settings = settings or config.settings
     encodings = encodings or [default_encoding]
     val = elem.value
     if val is not None:
@@ -497,25 +503,26 @@ def write_text(
             val = cast(Sequence[bytes] | Sequence[str], val)
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
-                val = b"\\".join([encode_string(val, encodings) for val in val])
+                val = b"\\".join([encode_string(val, encodings, settings=settings) for val in val])
             else:
                 val = cast(Sequence[bytes], val)
                 val = b"\\".join([val for val in val])
         else:
             val = cast(bytes | str, val)
             if isinstance(val, str):
-                val = encode_string(val, encodings)
+                val = encode_string(val, encodings, settings=settings)
 
         if len(val) % 2 != 0:
             val = val + b" "  # pad to even length
         fp.write(val)
 
 
-def write_number_string(fp: DicomIO, elem: DataElement) -> None:
+def write_number_string(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Handle IS or DS VR - write a number stored as a string of digits."""
     # If the DS or IS has an original_string attribute, use that, so that
     # unchanged data elements are written with exact string as when read from
     # file
+    settings = settings or config.settings
     val = elem.value
     if _is_multi_value(val):
         val = cast(Sequence[IS] | Sequence[DSclass], val)
@@ -547,10 +554,11 @@ def _format_DA(val: DA | None) -> str:
     return val.strftime("%Y%m%d")
 
 
-def write_DA(fp: DicomIO, elem: DataElement) -> None:
+def write_DA(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType)-> None:
+    settings = settings or config.settings
     val = elem.value
     if isinstance(val, str):
-        write_string(fp, elem)
+        write_string(fp, elem, settings=settings)
     else:
         if _is_multi_value(val):
             val = cast(Sequence[DA], val)
@@ -562,7 +570,7 @@ def write_DA(fp: DicomIO, elem: DataElement) -> None:
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)
+            val = _default_encoded(val, settings=settings)
 
         fp.write(val)
 
@@ -580,10 +588,10 @@ def _format_DT(val: DT | None) -> str:
     return val.strftime("%Y%m%d%H%M%S%z")
 
 
-def write_DT(fp: DicomIO, elem: DataElement) -> None:
+def write_DT(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType)-> None:
     val = elem.value
     if isinstance(val, str):
-        write_string(fp, elem)
+        write_string(fp, elem, settings=settings)
     else:
         if _is_multi_value(val):
             val = cast(Sequence[DT], val)
@@ -595,7 +603,7 @@ def write_DT(fp: DicomIO, elem: DataElement) -> None:
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)
+            val = _default_encoded(val, settings=settings)
 
         fp.write(val)
 
@@ -613,10 +621,10 @@ def _format_TM(val: TM | None) -> str:
     return val.strftime("%H%M%S")
 
 
-def write_TM(fp: DicomIO, elem: DataElement) -> None:
+def write_TM(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType)-> None:
     val = elem.value
     if isinstance(val, str):
-        write_string(fp, elem)
+        write_string(fp, elem, settings=settings)
     else:
         if _is_multi_value(val):
             val = cast(Sequence[TM], val)
@@ -628,7 +636,7 @@ def write_TM(fp: DicomIO, elem: DataElement) -> None:
             val = val + " "  # pad to even length
 
         if isinstance(val, str):
-            val = _default_encoded(val)
+            val = _default_encoded(val, settings=settings)
 
         fp.write(val)
 
@@ -637,10 +645,13 @@ def write_data_element(
     fp: DicomIO,
     elem: DataElement | RawDataElement,
     encodings: str | list[str] | None = None,
+    *,
+    settings: config.SettingsType | None = None
 ) -> None:
     """Write the data_element to file fp according to
     dicom media storage rules.
     """
+    settings = settings or config.settings
     # Write element's tag
     fp.write_tag(elem.tag)
 
@@ -671,21 +682,21 @@ def write_data_element(
             )
 
         encodings = encodings or [default_encoding]
-        encodings = convert_encodings(encodings)
+        encodings = convert_encodings(encodings, settings=settings)
         fn, param = writers[cast(VR, vr)]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
             if vr in CUSTOMIZABLE_CHARSET_VR or vr == VR.SQ:
-                fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
+                fn(buffer, elem, encodings=encodings, settings=settings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
                 # numeric format parameter
                 if param is not None:
-                    fn(buffer, elem, param)  # type: ignore[operator]
+                    fn(buffer, elem, param, settings=settings)  # type: ignore[operator]
                 elif not elem.is_buffered:
                     # defer writing a buffered value until after we have written the
                     # tag and length in the file
-                    fn(buffer, elem)  # type: ignore[operator]
+                    fn(buffer, elem, settings=settings)  # type: ignore[operator]
 
     # valid pixel data with undefined length shall contain encapsulated
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
@@ -761,7 +772,7 @@ EncodingType = tuple[bool | None, bool | None]
 
 
 def write_dataset(
-    fp: DicomIO, dataset: Dataset, parent_encoding: str | list[str] = default_encoding
+    fp: DicomIO, dataset: Dataset, parent_encoding: str | list[str] = default_encoding, *, settings: config.SettingsType | None = None
 ) -> int:
     """Encode `dataset` and write the encoded data to `fp`.
 
@@ -790,6 +801,8 @@ def write_dataset(
     """
     # TODO: Update in v4.0
     # In order of encoding priority
+
+    settings = settings or config.settings
 
     fp_encoding: EncodingType = (
         getattr(fp, "_implicit_vr", None),
@@ -839,12 +852,12 @@ def write_dataset(
         if tag.element == 0 and tag.group > 6:
             continue
 
-        write_data_element(fp, get_item(tag), dataset_encoding)
+        write_data_element(fp, get_item(tag), dataset_encoding, settings=settings)
 
     return fp.tell() - fpStart
 
 
-def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str]) -> None:
+def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str], *, settings: config.SettingsType | None = None) -> None:
     """Write a sequence contained in `data_element` to the file-like `fp`.
 
     Parameters
@@ -856,13 +869,14 @@ def write_sequence(fp: DicomIO, elem: DataElement, encodings: list[str]) -> None
     encodings : list of str
         The character encodings to use on text values.
     """
+    settings = settings or config.settings
     # write_data_element has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
     for ds in cast(Iterable[Dataset], elem.value):
-        write_sequence_item(fp, ds, encodings)
+        write_sequence_item(fp, ds, encodings, settings=settings)
 
 
-def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str]) -> None:
+def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str], *, settings: config.SettingsType | None = None) -> None:
     """Write a `dataset` in a sequence to the file-like `fp`.
 
     This is similar to writing a data_element, but with a specific tag for
@@ -879,11 +893,12 @@ def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str]) -> 
     encodings : list of str
         The character encodings to use on text values.
     """
+    settings = settings or config.settings
     fp.write_tag(ItemTag)  # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
     # will fill in real value later if not undefined length
     fp.write_UL(0xFFFFFFFF)
-    write_dataset(fp, dataset, parent_encoding=encodings)
+    write_dataset(fp, dataset, parent_encoding=encodings, settings=settings)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
@@ -894,12 +909,12 @@ def write_sequence_item(fp: DicomIO, dataset: Dataset, encodings: list[str]) -> 
         fp.seek(location)  # ready for next data_element
 
 
-def write_UN(fp: DicomIO, elem: DataElement) -> None:
+def write_UN(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a byte string for an DataElement of value 'UN' (unknown)."""
     fp.write(cast(bytes, elem.value))
 
 
-def write_ATvalue(fp: DicomIO, elem: DataElement) -> None:
+def write_ATvalue(fp: DicomIO, elem: DataElement, *, settings: config.SettingsType | None = None)-> None:
     """Write a data_element tag to a file."""
     try:
         iter(cast(Sequence[Any], elem.value))  # see if is multi-valued AT;
@@ -916,7 +931,7 @@ def write_ATvalue(fp: DicomIO, elem: DataElement) -> None:
 
 
 def write_file_meta_info(
-    fp: DicomIO, file_meta: FileMetaDataset, enforce_standard: bool = True
+    fp: DicomIO, file_meta: FileMetaDataset, enforce_standard: bool = True, *, settings: config.SettingsType | None = None
 ) -> None:
     """Write the File Meta Information elements in `file_meta` to `fp`.
 
@@ -981,6 +996,7 @@ def write_file_meta_info(
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
+    settings = settings or config.settings
     validate_file_meta(file_meta, enforce_standard)
 
     if enforce_standard and "FileMetaInformationGroupLength" not in file_meta:
@@ -993,7 +1009,7 @@ def write_file_meta_info(
     buffer = DicomBytesIO()
     buffer.is_little_endian = True
     buffer.is_implicit_VR = False
-    write_dataset(buffer, file_meta)
+    write_dataset(buffer, file_meta, settings=settings)
 
     # If FileMetaInformationGroupLength is present it will be the first written
     #   element and we must update its value to the correct length.
@@ -1006,7 +1022,7 @@ def write_file_meta_info(
         #   Explicit VR must therefore be 12 bytes.
         file_meta.FileMetaInformationGroupLength = buffer.tell() - 12
         buffer.seek(0)
-        write_data_element(buffer, file_meta[0x00020000])
+        write_data_element(buffer, file_meta[0x00020000], settings=settings)
 
     fp.write(buffer.getvalue())
 
@@ -1139,6 +1155,7 @@ def dcmwrite(
     enforce_file_format: bool = False,
     force_encoding: bool = False,
     overwrite: bool = True,
+    settings: config.SettingsType | None = None,
     **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
@@ -1295,6 +1312,8 @@ def dcmwrite(
     pydicom.dataset.Dataset.save_as
         Encode a dataset and write it to file, wraps ``dcmwrite()``.
     """
+    settings = settings or config.settings
+
     # TODO: Remove in v4.0
     # Cover use of `write_like_original` as:
     #   optional arg - dcmwrite(fp, ds, write_like_original=bool)
@@ -1449,7 +1468,7 @@ def dcmwrite(
             fp.write(b"DICM")
 
         if file_meta:  # May be empty
-            write_file_meta_info(fp, file_meta, enforce_standard=enforce_file_format)
+            write_file_meta_info(fp, file_meta, enforce_standard=enforce_file_format, settings=settings)
 
         if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
@@ -1470,7 +1489,7 @@ def dcmwrite(
 
         else:
             with dataset:  # catch exceptions
-                write_dataset(fp, dataset)
+                write_dataset(fp, dataset, settings=settings)
 
     finally:
         if not caller_owns_file:

@@ -1,4 +1,4 @@
-# Copyright 2008-2025 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -379,6 +379,9 @@ class Dataset:  # noqa: PLW1641
         self._parent_encoding: str | list[str] = kwargs.get(
             "parent_encoding", default_encoding
         )
+        # `settings` can't be added as keyword arg after `*args`
+        # so get from kwargs
+        self.settings = kwargs.get("settings") or config.settings
 
         self._dict: MutableMapping[BaseTag, _DatasetValue]
         if not args:
@@ -633,7 +636,7 @@ class Dataset:  # noqa: PLW1641
                     dset._parent_encoding = dicom_character_set
                     dset.decode()
             else:
-                decode_data_element(data_element, dicom_character_set)
+                decode_data_element(data_element, dicom_character_set, settings=self.settings)
 
         self.walk(decode_callback, recursive=False)
 
@@ -942,7 +945,7 @@ class Dataset:  # noqa: PLW1641
         if not char_set:
             return self._parent_encoding
 
-        return convert_encodings(char_set.value)
+        return convert_encodings(char_set.value, settings=self.settings)
 
     @property
     def original_character_set(self) -> str | MutableSequence[str]:
@@ -1090,7 +1093,7 @@ class Dataset:  # noqa: PLW1641
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = convert_raw_data_element(elem, encoding=character_set, ds=self)
+            self[tag] = convert_raw_data_element(elem, encoding=character_set, ds=self, settings=self.settings)
 
             # On initial read of the dataset, propagate the pixel representation
             #   (if any) to child datasets in any sequences.
@@ -1656,7 +1659,7 @@ class Dataset:  # noqa: PLW1641
             If `key` is not convertible to a valid tag or a known element
             keyword.
         KeyError
-            If :attr:`~pydicom.config.settings.reading_validation_mode` is
+            If `self.settings.writing_validation_mode` is
              ``RAISE`` and `key` is an unknown non-private tag.
         """
         tag = Tag(key)
@@ -1671,7 +1674,7 @@ class Dataset:  # noqa: PLW1641
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.settings.writing_validation_mode == config.RAISE:
+                    if self.settings.writing_validation_mode == config.ValidationMode.RAISE:
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN
@@ -1760,7 +1763,7 @@ class Dataset:  # noqa: PLW1641
         if not opts["use_pdh"]:
             # Use 'pydicom.pixels' backend
             opts["decoding_plugin"] = name
-            self._pixel_array = pixel_array(self, **opts)
+            self._pixel_array = pixel_array(self, settings=self.settings, **opts)
             self._pixel_id = get_image_pixel_ids(self)
         else:
             # Use 'pydicom.pixel_data_handlers' backend
@@ -2579,6 +2582,7 @@ class Dataset:  # noqa: PLW1641
         little_endian: bool | None = None,
         enforce_file_format: bool = False,
         overwrite: bool = True,
+        settings: config.SettingsType | None = None,
         **kwargs: Any,
     ) -> None:
         """Encode the current :class:`Dataset` and write it to `filename`.
@@ -2656,6 +2660,7 @@ class Dataset:  # noqa: PLW1641
         pydicom.filewriter.dcmwrite
             Encode a :class:`Dataset` and write it to a file or buffer.
         """
+        settings = settings or self.settings
         # The default for little_endian is `None` so we can detect conversion
         #   between little and big endian, but we actually default it to `True`
         #   when `implicit_vr` is used
@@ -2692,6 +2697,7 @@ class Dataset:  # noqa: PLW1641
             little_endian=little_endian,
             enforce_file_format=enforce_file_format,
             overwrite=overwrite,
+            settings=settings,
             **kwargs,
         )
 
@@ -3404,6 +3410,8 @@ class FileDataset(Dataset):
         file_meta: "FileMetaDataset | None" = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
@@ -3432,10 +3440,10 @@ class FileDataset(Dataset):
             ``True`` (default) if little-endian transfer syntax used; ``False``
             if big-endian.
         """
-        Dataset.__init__(self, dataset)
+        Dataset.__init__(self, dataset, settings=settings)
         self.preamble = preamble
         self.file_meta: FileMetaDataset = (
-            file_meta if file_meta is not None else FileMetaDataset()
+            file_meta if file_meta is not None else FileMetaDataset(settings=settings)
         )
         # TODO: Remove in v4.0
         if not config._use_future:

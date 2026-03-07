@@ -1,4 +1,4 @@
-# Copyright 2008-2024 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Define the DataElement class.
 
 A DataElement has a tag,
@@ -56,7 +56,9 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def empty_value_for_VR(
-    VR: str | None, raw: bool = False
+    VR: str | None, raw: bool = False,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> bytes | list[str] | str | None | PersonName:
     """Return the value for an empty element for `VR`.
 
@@ -86,14 +88,15 @@ def empty_value_for_VR(
         The value a data element with `VR` is assigned on decoding
         if it is empty.
     """
+    settings = settings or config.settings
     if VR == VR_.SQ:
         return b"" if raw else []
 
-    if config.use_none_as_empty_text_VR_value:
+    if settings.use_none_as_empty_text_VR_value:
         return None
 
     if VR == VR_.PN:
-        return b"" if raw else PersonName("")
+        return b"" if raw else PersonName("", settings=settings)
 
     # DS and IS are treated more like int/float than str
     if VR in STR_VR - {VR_.DS, VR_.IS}:
@@ -180,7 +183,9 @@ class DataElement:  # noqa: PLW1641
         file_value_tell: int | None = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: int | None = None,
+        validation_mode: config.ValidationMode | None = None,  # deprecate for v4.0, use settings?
+        *,
+        settings: config.SettingsType | None = None,
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -214,8 +219,21 @@ class DataElement:  # noqa: PLW1641
             Defines if values are validated and how validation errors are
             handled.
         """
-        if validation_mode is None:
-            validation_mode = config.settings.reading_validation_mode
+        # After global settings are removed in v4.0, don't need the following
+        # Create a new Settings object if need to set anything from
+        # `validation_mode` argument for backwards compatibility
+        if settings is None:
+            settings: config.SettingsType = (
+                config.settings
+                if validation_mode is None
+                else config.Settings()
+            )
+
+        if validation_mode is not None:
+            settings.reading_validation_mode = validation_mode
+            # writing needed too?
+
+        self.settings = settings
 
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
@@ -227,7 +245,7 @@ class DataElement:  # noqa: PLW1641
         if (
             VR == VR_.UN
             and not tag.is_private
-            and config.replace_un_with_known_vr
+            and settings.replace_un_with_known_vr
             and (is_undefined_length or value is None or len(value) < 0xFFFF)
         ):
             try:
@@ -236,7 +254,6 @@ class DataElement:  # noqa: PLW1641
                 pass
 
         self.VR = VR  # Note: you must set VR before setting value
-        self.validation_mode = validation_mode
 
         if already_converted:
             self._value = value
@@ -251,7 +268,7 @@ class DataElement:  # noqa: PLW1641
         """Validate the current value against the DICOM standard.
         See :func:`~pydicom.valuerep.validate_value` for details.
         """
-        validate_value(self.VR, value, self.validation_mode)
+        validate_value(self.VR, value, self.settings.reading_validation_mode)
 
     @classmethod
     def from_json(
@@ -266,6 +283,8 @@ class DataElement:  # noqa: PLW1641
             | Callable[[str], BulkDataType]
             | None
         ) = None,
+        *,
+        settings: config.SettingsType | None = None,
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
@@ -298,6 +317,8 @@ class DataElement:  # noqa: PLW1641
         -------
         DataElement
         """
+        settings = settings or config.settings
+
         # TODO: test wado-rs retrieve wrapper
         converter = JsonDataElementConverter(
             dataset_class, tag, vr, value, value_key, bulk_data_uri_handler
@@ -306,16 +327,16 @@ class DataElement:  # noqa: PLW1641
 
         if (
             vr == VR_.UN
-            and config.replace_un_with_known_vr
+            and settings.replace_un_with_known_vr
             and isinstance(elem_value, bytes)
         ):
             raw = RawDataElement(
                 Tag(tag), vr, len(elem_value), elem_value, 0, True, True
             )
-            elem_value = convert_raw_data_element(raw).value
+            elem_value = convert_raw_data_element(raw, settings=settings).value
 
         try:
-            return cls(tag=tag, value=elem_value, VR=vr)
+            return cls(tag=tag, value=elem_value, VR=vr, settings=settings)
         except Exception as exc:
             raise ValueError(
                 f"Data element '{tag}' could not be loaded from JSON: {elem_value}"
@@ -558,7 +579,7 @@ class DataElement:  # noqa: PLW1641
         str or None
             The value this data element is assigned on decoding if it is empty.
         """
-        return empty_value_for_VR(self.VR)
+        return empty_value_for_VR(self.VR, settings=self.settings)
 
     def clear(self) -> None:
         """Clears the value, e.g. sets it to the configured empty value.
@@ -603,9 +624,9 @@ class DataElement:  # noqa: PLW1641
         # e.g. LUT Descriptor is 'US or SS' and VM 3, but the first and
         #   third values are always US (the third should be <= 16, so SS is OK)
         if self.tag in _LUT_DESCRIPTOR_TAGS and val:
-            validate_value(VR_.US, val[0], self.validation_mode)
+            validate_value(VR_.US, val[0], self.settings.reading_validation_mode)
             for value in val[1:]:
-                validate_value(self.VR, value, self.validation_mode)
+                validate_value(self.VR, value, self.settings.reading_validation_mode)
 
             return MultiValue(_pass_through, val)
 
@@ -619,25 +640,25 @@ class DataElement:  # noqa: PLW1641
             val = val.decode()
 
         if self.VR == VR_.IS:
-            return pydicom.valuerep.IS(val, self.validation_mode)
+            return pydicom.valuerep.IS(val, self.settings.reading_validation_mode)
 
         if self.VR == VR_.DA and config.datetime_conversion:
-            return pydicom.valuerep.DA(val, validation_mode=self.validation_mode)
+            return pydicom.valuerep.DA(val, validation_mode=self.settings.reading_validation_mode)
 
         if self.VR == VR_.DS:
-            return pydicom.valuerep.DS(val, False, self.validation_mode)
+            return pydicom.valuerep.DS(val, False, self.settings.reading_validation_mode)
 
         if self.VR == VR_.DT and config.datetime_conversion:
-            return pydicom.valuerep.DT(val, validation_mode=self.validation_mode)
+            return pydicom.valuerep.DT(val, validation_mode=self.settings.reading_validation_mode)
 
         if self.VR == VR_.TM and config.datetime_conversion:
-            return pydicom.valuerep.TM(val, validation_mode=self.validation_mode)
+            return pydicom.valuerep.TM(val, validation_mode=self.settings.reading_validation_mode)
 
         if self.VR == VR_.UI:
-            return UID(val, self.validation_mode) if val is not None else None
+            return UID(val, self.settings.reading_validation_mode) if val is not None else None
 
         if self.VR == VR_.PN:
-            return PersonName(val, validation_mode=self.validation_mode)
+            return PersonName(val, validation_mode=self.settings.reading_validation_mode, settings=self.settings)
 
         if self.VR == VR_.AT and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
@@ -856,6 +877,7 @@ def convert_raw_data_element(
     *,
     encoding: str | MutableSequence[str] | None = None,
     ds: "Dataset | None" = None,
+    settings: config.SettingsType | None = None,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw`.
 
@@ -907,6 +929,8 @@ def convert_raw_data_element(
     pydicom.dataelem.DataElement
         A :class:`~pydicom.dataelem.DataElement` instance created from `raw`.
     """
+    settings = settings or config.settings
+
     data: dict[str, Any] = {}
     if config.data_element_callback:
         raw = config.data_element_callback(raw, **config.data_element_callback_kwargs)
@@ -920,8 +944,8 @@ def convert_raw_data_element(
             raw, data, encoding=encoding, ds=ds, **hooks.raw_element_kwargs
         )
     else:
-        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds)
-        hooks.raw_element_value(raw, data, encoding=encoding, ds=ds)
+        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds, settings = settings)
+        hooks.raw_element_value(raw, data, encoding=encoding, ds=ds, settings=settings)
 
     return DataElement(
         raw.tag,
@@ -930,6 +954,7 @@ def convert_raw_data_element(
         raw.value_tell,
         raw.length == 0xFFFFFFFF,
         already_converted=True,
+        settings=settings,
     )
 
 
@@ -937,6 +962,8 @@ def _DataElement_from_raw(
     raw_data_element: RawDataElement,
     encoding: str | MutableSequence[str] | None = None,
     dataset: "Dataset | None" = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -972,6 +999,7 @@ def _DataElement_from_raw(
         raw=raw_data_element,
         encoding=encoding,
         ds=dataset,
+        settings=settings,
     )
 
 

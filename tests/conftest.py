@@ -1,4 +1,4 @@
-# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Fixtures used in different tests."""
 
 import pytest
@@ -8,7 +8,7 @@ from pydicom import config
 @pytest.fixture
 def enforce_valid_values():
     value = config.settings.reading_validation_mode
-    config.settings.reading_validation_mode = config.RAISE
+    config.settings.reading_validation_mode = config.ValidationMode.RAISE
     yield
     config.settings.reading_validation_mode = value
 
@@ -16,7 +16,7 @@ def enforce_valid_values():
 @pytest.fixture
 def allow_reading_invalid_values():
     value = config.settings.reading_validation_mode
-    config.settings.reading_validation_mode = config.WARN
+    config.settings.reading_validation_mode = config.ValidationMode.WARN
     yield
     config.settings.reading_validation_mode = value
 
@@ -24,7 +24,7 @@ def allow_reading_invalid_values():
 @pytest.fixture
 def enforce_writing_invalid_values():
     value = config.settings.writing_validation_mode
-    config.settings.writing_validation_mode = config.RAISE
+    config.settings.writing_validation_mode = config.ValidationMode.RAISE
     yield
     config.settings.writing_validation_mode = value
 
@@ -32,7 +32,7 @@ def enforce_writing_invalid_values():
 @pytest.fixture
 def allow_writing_invalid_values():
     value = config.settings.writing_validation_mode
-    config.settings.writing_validation_mode = config.WARN
+    config.settings.writing_validation_mode = config.ValidationMode.WARN
     yield
     config.settings.writing_validation_mode = value
 
@@ -50,18 +50,18 @@ def no_numpy_use():
 
 @pytest.fixture
 def no_datetime_conversion():
-    datetime_conversion = config.datetime_conversion
-    config.datetime_conversion = False
+    datetime_conversion = config.settings.datetime_conversion
+    config.settings.datetime_conversion = False
     yield
-    config.datetime_conversion = datetime_conversion
+    config.settings.datetime_conversion = datetime_conversion
 
 
 @pytest.fixture
 def dont_replace_un_with_known_vr():
-    old_value = config.replace_un_with_known_vr
-    config.replace_un_with_known_vr = False
+    old_value = config.settings.replace_un_with_known_vr
+    config.settings.replace_un_with_known_vr = False
     yield
-    config.replace_un_with_known_vr = old_value
+    config.settings.replace_un_with_known_vr = old_value
 
 
 @pytest.fixture
@@ -75,7 +75,7 @@ def dont_replace_un_with_sq_vr():
 @pytest.fixture
 def dont_raise_on_writing_invalid_value():
     old_value = config.settings.writing_validation_mode
-    config.settings.writing_validation_mode = config.WARN
+    config.settings.writing_validation_mode = config.ValidationMode.WARN
     yield
     config.settings.writing_validation_mode = old_value
 
@@ -83,7 +83,7 @@ def dont_raise_on_writing_invalid_value():
 @pytest.fixture
 def raise_on_writing_invalid_value():
     old_value = config.settings.writing_validation_mode
-    config.settings.writing_validation_mode = config.RAISE
+    config.settings.writing_validation_mode = config.ValidationMode.RAISE
     yield
     config.settings.writing_validation_mode = old_value
 
