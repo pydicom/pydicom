@@ -6,6 +6,7 @@ Show a dicom file using hierarchical tree
 Show a dicom file using a hierarchical tree in a graphical window.
 
 """
+
 from pathlib import Path
 import sys
 

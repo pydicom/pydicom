@@ -232,7 +232,7 @@ class Collection:
 
     def __repr__(self) -> str:
         """Return a representation of the collection."""
-        concepts = '\n'.join(
+        concepts = "\n".join(
             self.repr_format.format(name, concept)
             for name, concept in self.concepts.items()
         )

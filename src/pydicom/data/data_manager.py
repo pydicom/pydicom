@@ -394,8 +394,7 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
                 return os.fspath(data_path_with_download(filename))
             except Exception:
                 warn_and_log(
-                    f"A download failure occurred while attempting to "
-                    f"retrieve {name}"
+                    f"A download failure occurred while attempting to retrieve {name}"
                 )
 
     return None

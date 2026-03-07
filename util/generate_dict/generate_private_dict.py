@@ -149,9 +149,7 @@ def write_dict(fp, dict_name, dict_entries):
         fp.write(f'    "{owner}": {{\n')
         for tag in sorted(dict_entries[owner]):
             vr, vm, name = dict_entries[owner][tag]
-            fp.write(
-                f'        "{tag}": ("{vr}", "{vm}", "{name}", ""),\n'
-            )
+            fp.write(f'        "{tag}": ("{vr}", "{vm}", "{name}", ""),\n')
         fp.write("    },\n")
     fp.write("}\n")
 

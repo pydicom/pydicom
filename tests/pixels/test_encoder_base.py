@@ -1258,8 +1258,7 @@ class TestEncodeRunner_GetFrame:
                 runner.set_options(**opts)
                 runner.set_source(src_a)
                 assert runner.get_frame(None) == (
-                    b"\x00\x00\x00\x00\x00\x00\x00\x00"
-                    b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                    b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
                 )
 
                 runner.set_option("columns", 3)
@@ -1327,8 +1326,7 @@ class TestEncodeRunner_GetFrame:
                 runner.set_options(**opts)
                 runner.set_source(src_a)
                 assert runner.get_frame(None) == (
-                    b"\x00\x00\x00\x00\x00\x00\x00\x00"
-                    b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                    b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
                 )
 
                 runner.set_option("columns", 3)
@@ -1396,8 +1394,7 @@ class TestEncodeRunner_GetFrame:
                 runner.set_options(**opts)
                 runner.set_source(src_a)
                 assert runner.get_frame(None) == (
-                    b"\x00\x00\x00\x00\x00\x00\x00\x00"
-                    b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                    b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
                 )
 
                 runner.set_option("columns", 3)

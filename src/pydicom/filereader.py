@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
-
 # Need zlib and io.BytesIO for deflate-compressed file
 import os
 from struct import Struct, unpack

@@ -36,7 +36,7 @@ re_kywd_or_item = (
     r"(?:\[(-?\d+)\])?"  # Optional [index] or [-index], keep inside brackets
 )
 
-re_file_spec_object = re.compile(fr"{re_kywd_or_item}(\.{re_kywd_or_item})*$")
+re_file_spec_object = re.compile(rf"{re_kywd_or_item}(\.{re_kywd_or_item})*$")
 
 re_match_tag = r"\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
 re_tag_with_spaces = r"\([0-9A-Fa-f]{4}, +[0-9A-Fa-f]{4}\)"
@@ -232,9 +232,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
     if element and not re_file_spec_object.match(element):
         # Special message if a tag with spaces
         if m := re.search(re_tag_with_spaces, element):
-            msg = (
-                f"Tag '{m.group()}' is not valid syntax for a " "tag: no spaces allowed"
-            )
+            msg = f"Tag '{m.group()}' is not valid syntax for a tag: no spaces allowed"
         else:
             msg = (
                 f"Component '{element}' is not valid syntax for a "

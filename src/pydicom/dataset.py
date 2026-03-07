@@ -14,6 +14,7 @@ Dataset (dict subclass)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
+
 import copy
 import io
 import json
@@ -1162,7 +1163,7 @@ class Dataset:  # noqa: PLW1641
             raise ValueError("Tag must be private if private creator is given")
 
         # find block with matching private creator
-        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        block = self[(group, 0x10) : (group, 0x100)]  # type: ignore[misc]
         data_el = next((elem for elem in block if elem.value == private_creator), None)
         if data_el is not None:
             return new_block(data_el.tag.element)
@@ -1209,7 +1210,7 @@ class Dataset:  # noqa: PLW1641
         if group % 2 == 0:
             raise ValueError("Group must be an odd number")
 
-        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        block = self[(group, 0x10) : (group, 0x100)]  # type: ignore[misc]
         return [x.value for x in block]
 
     def get_private_item(

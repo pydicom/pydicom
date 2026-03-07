@@ -1323,8 +1323,7 @@ class TestFileSet:
         assert "Managed instances" in s
         assert ("PATIENT: PatientID='1CT1', PatientName='CompressedSamples^CT1'") in s
         assert (
-            "STUDY: StudyDate=20040119, StudyTime=072730, "
-            "StudyDescription='e+1'" in s
+            "STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'" in s
         )
         assert "SERIES: Modality=CT, SeriesNumber=1" in s
         assert 1 == len(fs)

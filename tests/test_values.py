@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for dataset.py"""
+
 import logging
 
 import pytest

@@ -20,8 +20,7 @@ print(__doc__)
 # newline character massage the string representation of each dicom dataset
 # into this form:
 rep = [
-    [f"{line}\n" for line in str(ds).split("\n")]
-    for ds in (examples.mr, examples.ct)
+    [f"{line}\n" for line in str(ds).split("\n")] for ds in (examples.mr, examples.ct)
 ]
 
 

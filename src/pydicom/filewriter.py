@@ -467,8 +467,7 @@ def _default_encoded(val: str) -> bytes:
         if config.settings.writing_validation_mode == config.RAISE:
             raise
         warn_and_log(
-            "Not a valid ASCII string "
-            "- using replacement characters in encoded string"
+            "Not a valid ASCII string - using replacement characters in encoded string"
         )
         return val.encode(default_encoding, errors="replace")
 
@@ -1108,8 +1107,7 @@ def _determine_encoding(
 
     if not tsyntax.is_transfer_syntax:
         raise ValueError(
-            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid "
-            "transfer syntax"
+            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid transfer syntax"
         )
 
     # Check that supplied args match transfer syntax

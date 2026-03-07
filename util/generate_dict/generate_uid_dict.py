@@ -202,7 +202,7 @@ def parse_a2(root):
 def setup_argparse():
     parser = argparse.ArgumentParser(
         description=(
-            "Generate a new _uid_dict.py file from Part 6 of the " "DICOM Standard"
+            "Generate a new _uid_dict.py file from Part 6 of the DICOM Standard"
         ),
         usage="generate_uid_dict.py [options]",
     )
