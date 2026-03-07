@@ -75,15 +75,15 @@ def write_dict(fp, dict_name, attributes, tag_is_string):
     tag_is_string : bool
         If the tag is a string (as it is for the RepeatersDictionary)
     """
-    tag_content = """('{VR}', '{VM}', "{Name}", '{Retired}', '{Keyword}')"""
+    tag_content = '("{VR}", "{VM}", "{Name}", "{Retired}", "{Keyword}")'
     if tag_is_string:
-        entry_format = f"'{{Tag}}': {tag_content}"
+        entry_format = f'"{{Tag}}": {tag_content}'
     else:
         entry_format = f"{{Tag}}: {tag_content}"
 
     fp.write(f"\n{dict_name} = {{\n    ")
     fp.write(",\n    ".join(entry_format.format(**attr) for attr in attributes))
-    fp.write("\n}\n")
+    fp.write(",\n}\n")
 
 
 def parse_header(header_row):
