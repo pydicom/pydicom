@@ -124,14 +124,14 @@ def write_dict(fp, dict_name, dict_entries):
     Dict Format
     -----------
     private_dictionaries = {
-        'CREATOR_1' : {
-            '0029xx00': ('US', '1', 'Unknown', ''),
-            '0029xx01': ('US', '1', 'Unknown', ''),
+        "CREATOR_1" : {
+            "0029xx00": ("US", "1", "Unknown", ""),
+            "0029xx01": ("US", "1", "Unknown", ""),
         },
         ...
-        'CREATOR_N' : {
-            '0029xx00': ('US', '1', 'Unknown', ''),
-            '0029xx01': ('US', '1', 'Unknown', ''),
+        "CREATOR_N" : {
+            "0029xx00": ("US", "1", "Unknown", ""),
+            "0029xx01": ("US", "1", "Unknown", ""),
         },
     }
 
@@ -146,12 +146,11 @@ def write_dict(fp, dict_name, dict_entries):
     """
     fp.write(f"\n{dict_name} = {{\n")
     for owner in sorted(dict_entries):
-        fp.write(f"    '{owner}': {{\n")
+        fp.write(f'    "{owner}": {{\n')
         for tag in sorted(dict_entries[owner]):
             vr, vm, name = dict_entries[owner][tag]
-            quote = '"' if "'" in name else "'"
             fp.write(
-                f"""        '{tag}': ('{vr}', '{vm}', {quote}{name}{quote}, ''),\n"""
+                f'        "{tag}": ("{vr}", "{vm}", "{name}", ""),\n'
             )
         fp.write("    },\n")
     fp.write("}\n")
@@ -167,5 +166,5 @@ if __name__ == "__main__":
 
     with open(PYDICOM_DICT_FILENAME, "w", encoding="utf8") as py_file:
         py_file.write('"""' + PYDICOM_DICT_DOCSTRING + '"""')
-        py_file.write("\n\n")
+        py_file.write("\n")
         write_dict(py_file, PYDICOM_DICT_NAME, entries)
