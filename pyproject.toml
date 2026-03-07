@@ -103,15 +103,15 @@ exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
 
 [tool.ruff.lint]
 extend-select = [
-    "UP",
-    "C9",
+    "C90",
     "PERF",
-    "PL",
+    "E501",
     "W",
+    "PL",
+    "UP",
 ]
 ignore = [
     "PERF203",
-    "E501",
     "PLC0415",
     "PLC1901",
     "PLR2004",
@@ -131,7 +131,9 @@ max-statements = 108
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
+"src/pydicom/_*_dict.py" = ["E501"]
 "src/pydicom/config.py" = ["PLW0602"]
+"src/pydicom/uid.py" = ["E501"]
 "src/pydicom/sr/_concepts_dict.py" = ["F601"]
 "tests/*.py" = ["F401"]
 
