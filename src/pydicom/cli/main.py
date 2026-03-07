@@ -42,7 +42,8 @@ re_match_tag = r"\(([0-9A-Fa-f]{4}),([0-9A-Fa-f]{4})\)"
 re_tag_with_spaces = r"\([0-9A-Fa-f]{4}, +[0-9A-Fa-f]{4}\)"
 
 EXTRA_ALLOWED_IDENTIFIERS = {
-    # selected properties via {v[0] for v in inspect.getmembers(UID, inspect.isdatadescriptor)}
+    # selected properties via:
+    # {v[0] for v in inspect.getmembers(UID, inspect.isdatadescriptor)}
     FileDataset: ("file_meta",),
     Dataset: ("file_meta",),
     UID: (

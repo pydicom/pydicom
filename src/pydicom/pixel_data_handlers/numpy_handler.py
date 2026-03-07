@@ -224,9 +224,9 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
         msg = (
-            f"The length of the pixel data in the dataset ({actual_length} bytes) indicates "
-            f"it contains excess padding. {actual_length - expected_len} bytes will be removed from the "
-            "end of the data"
+            f"The length of the pixel data in the dataset ({actual_length} bytes) "
+            f"indicates it contains excess padding. {actual_length - expected_len} "
+            "bytes will be removed from the end of the data"
         )
         # PS 3.3, Annex C.7.6.3
         if ds.PhotometricInterpretation == "YBR_FULL_422":
@@ -235,12 +235,11 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
             # >= as may also include excess padding
             if actual_length >= ybr_full_length:
                 msg = (
-                    "The Photometric Interpretation of the dataset is "
-                    "YBR_FULL_422, however the length of the pixel data "
-                    f"({actual_length} bytes) is a third larger than expected ({expected_len} bytes) "
-                    "which indicates that this may be incorrect. You may "
-                    "need to change the Photometric Interpretation to "
-                    "the correct value."
+                    "The Photometric Interpretation of the dataset is YBR_FULL_422, "
+                    f"however the length of the pixel data ({actual_length} bytes) is "
+                    f"a third larger than expected ({expected_len} bytes) which "
+                    "indicates that this may be incorrect. You may need to change the "
+                    "Photometric Interpretation to the correct value."
                 )
         warn_and_log(msg)
 

@@ -2040,7 +2040,7 @@ class Dataset:  # noqa: PLW1641
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
-        """
+        """  # noqa: E501
         compress(
             self,
             transfer_syntax_uid,
@@ -3721,7 +3721,8 @@ def _path_to(target: Any, node: Any) -> str | None:
     -------
     str | None:
         The path to the target object from the node.
-        During recursion, returns ``None`` if a leaf node is reached without finding target.
+        During recursion, returns ``None`` if a leaf node is reached without
+        finding target.
 
     Examples
     --------
@@ -3820,7 +3821,10 @@ def _trace_from(
             if new_elem:
                 note += "\n   with DataElement not yet assigned"
             if raw_elem:
-                note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
+                note += (
+                    f"\n  Converting RawDataElement(vr='{elem.VR}', "
+                    f"value={elem.value!r}) "
+                )
             break
         else:
             new_elem = filename == "dataelem.py"

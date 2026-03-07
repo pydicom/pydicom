@@ -3167,7 +3167,7 @@ class TestDatasetContextManager:
 
     def test_bad_elem_value(self):
         """Setting a bad value gives error message with location info"""
-        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"  # noqa: E501
         # Give a bad value for existing element
         with pytest.raises(ValueError) as excinfo:
             with self.file_ds as ds:
