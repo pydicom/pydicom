@@ -111,12 +111,13 @@ extend-select = [
 ]
 ignore = [
     "PERF203",
+    "E501",
+    "PLC0415",
     "PLC1901",
     "PLR2004",
     "PLR5501",
     "PLW0603",
     "PLW2901",
-    "PLC0415",
 ]
 
 [tool.ruff.lint.mccabe]
