@@ -12,6 +12,7 @@ from importlib.metadata import entry_points
 import re
 import sys
 from typing import cast, Any
+import typing
 from collections.abc import Callable
 
 from pydicom import dcmread
@@ -288,7 +289,7 @@ def get_subcommand_entry_points() -> SubCommandType:
     return subcommands
 
 
-def main(args: list[str] | None = None) -> None:
+def main(args: typing.Sequence[str] | None = None) -> None:
     """Entry point for 'pydicom' command line interface
 
     Parameters

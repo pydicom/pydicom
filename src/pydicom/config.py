@@ -11,6 +11,8 @@ import threading
 from typing import Optional, Any, TYPE_CHECKING
 from collections.abc import Generator
 from copy import deepcopy
+import sys
+from types import ModuleType
 
 have_numpy = True
 try:
@@ -280,7 +282,7 @@ class Settings:
     @property
     def allow_DS_float(self) -> bool:
         if self._allow_DS_float is None:
-            return globals().get("allow_DS_float")  # type: ignore[return-value]
+            return allow_DS_float
         return self._allow_DS_float
 
     @allow_DS_float.setter
@@ -290,7 +292,7 @@ class Settings:
     @property
     def assume_implicit_vr_switch(self) -> bool:
         if self._assume_implicit_vr_switch is None:
-            return globals().get("assume_implicit_vr_switch")  # type: ignore[return-value]
+            return assume_implicit_vr_switch
         return self._assume_implicit_vr_switch
 
     @assume_implicit_vr_switch.setter
@@ -300,7 +302,7 @@ class Settings:
     @property
     def convert_wrong_length_to_UN(self) -> bool:
         if self._convert_wrong_length_to_UN is None:
-            return globals().get("convert_wrong_length_to_UN")  # type: ignore[return-value]
+            return convert_wrong_length_to_UN
         return self._convert_wrong_length_to_UN
 
     @convert_wrong_length_to_UN.setter
@@ -310,7 +312,7 @@ class Settings:
     @property
     def datetime_conversion(self) -> bool:
         if self._datetime_conversion is None:
-            return globals().get("datetime_conversion")  # type: ignore[return-value]
+            return datetime_conversion
         return self._datetime_conversion
 
     @datetime_conversion.setter
@@ -320,7 +322,7 @@ class Settings:
     @property
     def replace_un_with_known_vr(self) -> bool:
         if self._replace_un_with_known_vr is None:
-            return globals().get("replace_un_with_known_vr")  # type: ignore[return-value]
+            return replace_un_with_known_vr
         return self._replace_un_with_known_vr
 
     @replace_un_with_known_vr.setter
@@ -330,7 +332,7 @@ class Settings:
     @property
     def show_file_meta(self) -> bool:
         if self._show_file_meta is None:
-            return globals().get("show_file_meta")  # type: ignore[return-value]
+            return show_file_meta
         return self._show_file_meta
 
     @show_file_meta.setter
@@ -340,7 +342,7 @@ class Settings:
     @property
     def use_none_as_empty_text_VR_value(self) -> bool:
         if self._use_none_as_empty_text_VR_value is None:
-            return globals().get("use_none_as_empty_text_VR_value")  # type: ignore[return-value]
+            return use_none_as_empty_text_VR_value
         return self._use_none_as_empty_text_VR_value
 
     @use_none_as_empty_text_VR_value.setter
@@ -526,6 +528,7 @@ displaying the file meta information data elements
 .. versionadded:: 2.0
 """
 
+from pydicom.misc import warn_and_log
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
 import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
 import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
@@ -707,3 +710,44 @@ def future_behavior(enable_future: bool = True) -> None:
 
 if _use_future:
     future_behavior()
+
+
+_DEPRECATED = [
+    "allow_DS_float",
+    "assume_implicit_vr_switch",
+    "convert_wrong_length_to_UN",
+    "datetime_conversion",
+    "replace_un_with_known_vr",
+    "show_file_meta",
+    "use_none_as_empty_text_VR_value",
+]
+
+
+# Handle deprecated global config flags, etc.
+# https://docs.python.org/3/reference/datamodel.html#customizing-module-attribute-access
+class HandleDeprecationModule(ModuleType):
+    msg = (
+        "'pydicom.config.{attr}' is deprecated and will be removed "
+        "in v4.0, please use the `settings` argument to functions or "
+        "classes."
+    )
+    def __repr__(self):
+        return f'Deprecation Handling {self.__name__}'
+
+    def __getattr__(self, attr: str) -> Any:
+        if attr in _DEPRECATED:
+            if _use_future:
+                raise AttributeError(f"pydicom.config has no attribute {attr!r}")
+            warn_and_log(self.msg.format(attr=attr), DeprecationWarning)
+        return super().__getattr__(attr)
+    
+    def __setattr__(self, attr: str, value: Any):
+        if attr in _DEPRECATED:
+            if _use_future:
+                raise AttributeError(
+                    f"pydicom.config.{attr} has been removed.  Using `settings` arguments instead"
+                )
+            warn_and_log(self.msg.format(attr=attr), DeprecationWarning)
+        object.__setattr__(self, attr, value)
+
+sys.modules[__name__].__class__ = HandleDeprecationModule

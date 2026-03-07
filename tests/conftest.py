@@ -50,18 +50,18 @@ def no_numpy_use():
 
 @pytest.fixture
 def no_datetime_conversion():
-    datetime_conversion = config.datetime_conversion
-    config.datetime_conversion = False
+    datetime_conversion = config.settings.datetime_conversion
+    config.settings.datetime_conversion = False
     yield
-    config.datetime_conversion = datetime_conversion
+    config.settings.datetime_conversion = datetime_conversion
 
 
 @pytest.fixture
 def dont_replace_un_with_known_vr():
-    old_value = config.replace_un_with_known_vr
-    config.replace_un_with_known_vr = False
+    old_value = config.settings.replace_un_with_known_vr
+    config.settings.replace_un_with_known_vr = False
     yield
-    config.replace_un_with_known_vr = old_value
+    config.settings.replace_un_with_known_vr = old_value
 
 
 @pytest.fixture
