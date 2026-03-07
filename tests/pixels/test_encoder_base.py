@@ -1257,9 +1257,11 @@ class TestEncodeRunner_GetFrame:
                 opts["bits_stored"] = bits_stored
                 runner.set_options(**opts)
                 runner.set_source(src_a)
+
                 assert runner.get_frame(None) == (
-                    b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
-                )
+                    b"\x00\x00\x00\x00\x00\x00\x00\x00"
+                    b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                )  # fmt: skip
 
                 runner.set_option("columns", 3)
                 runner.set_source(src_b)
@@ -1326,8 +1328,9 @@ class TestEncodeRunner_GetFrame:
                 runner.set_options(**opts)
                 runner.set_source(src_a)
                 assert runner.get_frame(None) == (
-                    b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
-                )
+                    b"\x00\x00\x00\x00\x00\x00\x00\x00"
+                    b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                )  # fmt: skip
 
                 runner.set_option("columns", 3)
                 runner.set_source(src_b)
@@ -1394,8 +1397,9 @@ class TestEncodeRunner_GetFrame:
                 runner.set_options(**opts)
                 runner.set_source(src_a)
                 assert runner.get_frame(None) == (
-                    b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00"
-                )
+                    b"\x00\x00\x00\x00\x00\x00\x00\x00"
+                    b"\x01\x00\x00\x00\x00\x00\x00\x00"
+                )  # fmt: skip
 
                 runner.set_option("columns", 3)
                 runner.set_source(src_b)

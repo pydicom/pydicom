@@ -57,8 +57,10 @@ class TestGetFrameOffsets:
         """Test raises exception if the item length is not a multiple of 4."""
         # Length 10
         bytestream = (
-            b"\xfe\xff\x00\xe0\x0a\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
-        )
+            b"\xfe\xff\x00\xe0"
+            b"\x0a\x00\x00\x00"
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
+        )  # fmt: skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(
@@ -179,7 +181,12 @@ class TestGetNrFragments:
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
-        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00\xfe\xff\xdd\xe0"
+        bytestream = (
+            b"\xfe\xff\x00\xe0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xfe\xff\xdd\xe0"
+        )  # fmt: skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert 1 == self.func(fp)
@@ -301,7 +308,12 @@ class TestGeneratePixelDataFragment:
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
-        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00\xfe\xff\xdd\xe0"
+        bytestream = (
+            b"\xfe\xff\x00\xe0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xfe\xff\xdd\xe0"
+        )  # fmt: skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         fragments = self.func(fp)
@@ -1078,7 +1090,12 @@ class TestReadItem:
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
-        bytestream = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00\xfe\xff\xdd\xe0"
+        bytestream = (
+            b"\xfe\xff\x00\xe0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xfe\xff\xdd\xe0"
+        )  # fmt:skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert self.func(fp) == b"\x01\x00\x00\x00"
@@ -1397,8 +1414,10 @@ class TestParseBasicOffsets:
         """Test raises exception if the item length is not a multiple of 4."""
         # Length 10
         buffer = (
-            b"\xfe\xff\x00\xe0\x0a\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
-        )
+            b"\xfe\xff\x00\xe0"
+            b"\x0a\x00\x00\x00"
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
+        )  # fmt: skip
         msg = "The length of the Basic Offset Table item is not a multiple of 4"
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1406,8 +1425,10 @@ class TestParseBasicOffsets:
                 parse_basic_offsets(src)
 
         buffer = (
-            b"\xff\xfe\xe0\x00\x00\x00\x00\x0a\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
-        )
+            b"\xff\xfe\xe0\x00"
+            b"\x00\x00\x00\x0a"
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1639,14 +1660,24 @@ class TestParseFragments:
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
-        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00\xfe\xff\xdd\xe0"
+        buffer = (
+            b"\xfe\xff\x00\xe0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xfe\xff\xdd\xe0"
+        )  # fmt:skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert parse_fragments(src) == (1, [0])
 
         assert src.tell() == 0
 
-        buffer = b"\xff\xfe\xe0\x00\x00\x00\x00\x04\x00\x00\x00\x01\xff\xfe\xe0\xdd"
+        buffer = (
+            b"\xff\xfe\xe0\x00"
+            b"\x00\x00\x00\x04"
+            b"\x00\x00\x00\x01"
+            b"\xff\xfe\xe0\xdd"
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert parse_fragments(src, endianness=">") == (1, [0])
@@ -1862,14 +1893,24 @@ class TestGenerateFragments:
 
     def test_single_fragment_delimiter(self):
         """Test single fragment is returned OK with sequence delimiter item"""
-        buffer = b"\xfe\xff\x00\xe0\x04\x00\x00\x00\x01\x00\x00\x00\xfe\xff\xdd\xe0"
+        buffer = (
+            b"\xfe\xff\x00\xe0"
+            b"\x04\x00\x00\x00"
+            b"\x01\x00\x00\x00"
+            b"\xfe\xff\xdd\xe0"
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src)
             assert next(fragments) == b"\x01\x00\x00\x00"
             pytest.raises(StopIteration, next, fragments)
 
-        buffer = b"\xff\xfe\xe0\x00\x00\x00\x00\x04\x01\x00\x00\x00\xff\xfe\xe0\xdd"
+        buffer = (
+            b"\xff\xfe\xe0\x00"
+            b"\x00\x00\x00\x04"
+            b"\x01\x00\x00\x00"
+            b"\xff\xfe\xe0\xdd"
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")
