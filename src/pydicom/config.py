@@ -740,7 +740,7 @@ class HandleDeprecationModule(ModuleType):
                 raise AttributeError(f"pydicom.config has no attribute {attr!r}")
             warn_and_log(self.msg.format(attr=attr), DeprecationWarning)
         return super().__getattr__(attr)
-    
+
     def __setattr__(self, attr: str, value: Any):
         if attr in _DEPRECATED:
             if _use_future:
