@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
+
 import tempfile
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
@@ -696,8 +697,7 @@ class TestWriteDataElement:
         elem.value = "Test."
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00"
-            b"\x54\x65\x73\x74\x2e\x20"
+            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00\x54\x65\x73\x74\x2e\x20"
         )
         assert ref_bytes == encoded_elem
 
@@ -705,8 +705,7 @@ class TestWriteDataElement:
         elem.value = ["Aa", "B", "C"]
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00"
-            b"\x41\x61\x5c\x42\x5c\x43"
+            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00\x41\x61\x5c\x42\x5c\x43"
         )
         assert ref_bytes == encoded_elem
 
@@ -714,8 +713,7 @@ class TestWriteDataElement:
         elem.value = ["A", "B", "C"]
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00"
-            b"\x41\x5c\x42\x5c\x43\x20"
+            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00\x41\x5c\x42\x5c\x43\x20"
         )
         assert ref_bytes == encoded_elem
 
@@ -2057,8 +2055,7 @@ class TestDetermineEncoding:
         ds._read_little = True
         tsyntax = ImplicitVRLittleEndian
         msg = (
-            "'implicit_vr' and 'little_endian' are required if "
-            "'force_encoding' is used"
+            "'implicit_vr' and 'little_endian' are required if 'force_encoding' is used"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(ds, tsyntax, None, True, True)
@@ -2138,8 +2135,7 @@ class TestDetermineEncoding:
         """Test public non-transfer syntax raises."""
         syntax = CTImageStorage
         msg = (
-            "The Transfer Syntax UID 'CT Image Storage' is not a valid "
-            "transfer syntax"
+            "The Transfer Syntax UID 'CT Image Storage' is not a valid transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(Dataset(), syntax, False, True, False)
@@ -3145,8 +3141,8 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
-            BytesIO(b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0"),
+            b"\xff\xff\x00\xe0\x00\x01\x02\x03\xfe\xff\xdd\xe0",
+            BytesIO(b"\xff\xff\x00\xe0\x00\x01\x02\x03\xfe\xff\xdd\xe0"),
         ),
     )
     def test_little_endian_incorrect_data(self, data):
@@ -3170,8 +3166,8 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
-            BytesIO(b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd"),
+            b"\x00\x00\x00\x00\x00\x01\x02\x03\xff\xfe\xe0\xdd",
+            BytesIO(b"\x00\x00\x00\x00\x00\x01\x02\x03\xff\xfe\xe0\xdd"),
         ),
     )
     def test_big_endian_incorrect_data(self, data):

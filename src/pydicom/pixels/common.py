@@ -195,7 +195,8 @@ class CoderBase:
 
     @property
     def UID(self) -> UID:
-        """Return the corresponding *Transfer Syntax UID* as :class:`~pydicom.uid.UID`."""
+        """Return the corresponding *Transfer Syntax UID* as
+        :class:`~pydicom.uid.UID`."""
         return self._uid
 
     def _validate_plugins(
@@ -235,9 +236,9 @@ class CoderBase:
                     )
 
                 raise RuntimeError(
-                    f"Unable to compress the pixel data using '{self.UID.name}' because "
-                    f"the specified plugin is missing dependencies:\n\t{plugin} "
-                    f"- requires {missing}"
+                    f"Unable to compress the pixel data using '{self.UID.name}' "
+                    f"because the specified plugin is missing dependencies:\n"
+                    f"\t{plugin} - requires {missing}"
                 )
 
             msg = (
@@ -535,7 +536,8 @@ class RunnerBase:
 
     @property
     def is_dataset(self) -> bool:
-        """Return ``True`` if the pixel data source is a :class:`~pydicom.dataset.Dataset`"""
+        """Return ``True`` if the pixel data source is a
+        :class:`~pydicom.dataset.Dataset`"""
         return self._src_type == "Dataset"
 
     @property
@@ -802,8 +804,8 @@ class RunnerBase:
 
         if self.samples_per_pixel not in (1, 3):
             raise ValueError(
-                f"A (0028,0002) 'Samples per Pixel' value of '{self.samples_per_pixel}' "
-                "is invalid, it must be 1 or 3"
+                f"A (0028,0002) 'Samples per Pixel' value of "
+                f"'{self.samples_per_pixel}' is invalid, it must be 1 or 3"
             )
 
         if self.samples_per_pixel == 3:

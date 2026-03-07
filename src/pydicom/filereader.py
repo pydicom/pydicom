@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
-
 # Need zlib and io.BytesIO for deflate-compressed file
 import os
 from struct import Struct, unpack
@@ -253,7 +252,8 @@ def data_element_generator(
                     dotdot = "..." if length > 20 else "   "
                     displayed_value = value[:20] if value else b""
                     logger_debug(
-                        f"{value_tell:08x}: {bytes2hex(displayed_value):<34} {dotdot} {displayed_value!r} {dotdot}"
+                        f"{value_tell:08x}: {bytes2hex(displayed_value):<34} "
+                        f"{dotdot} {displayed_value!r} {dotdot}"
                     )
 
             # If the tag is (0008,0005) Specific Character Set, then store it

@@ -229,7 +229,9 @@ def convert_DS_string(
 
     Returns
     -------
-    :class:`~pydicom.valuerep.DSfloat`, :class:`~pydicom.valuerep.DSdecimal`, :class:`numpy.float64`, MultiValue of DSfloat/DSdecimal or :class:`numpy.ndarray` of :class:`numpy.float64`
+    :class:`~pydicom.valuerep.DSfloat`, :class:`~pydicom.valuerep.DSdecimal`,
+        :class:`numpy.float64`, MultiValue of DSfloat/DSdecimal or
+        :class:`numpy.ndarray` of :class:`numpy.float64`
 
         If :attr:`~pydicom.config.use_DS_decimal` is ``False`` (default),
         returns a :class:`~pydicom.valuerep.DSfloat` or list of them
@@ -336,7 +338,8 @@ def convert_IS_string(
 
     Returns
     -------
-    :class:`~pydicom.valuerep.IS` or MultiValue of them, or :class:`numpy.int64` or :class:`~numpy.ndarray` of them
+    :class:`~pydicom.valuerep.IS` or MultiValue of them, or :class:`numpy.int64`
+        or :class:`~numpy.ndarray` of them
 
         If :data:`~pydicom.config.use_IS_numpy` is ``False`` (default), returns
         a single :class:`~pydicom.valuerep.IS` or a list of them

@@ -234,8 +234,8 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
         warn_and_log(
-            f"The length of the overlay data in the dataset ({actual_length} "
-            "bytes) indicates it contains excess padding. "
+            f"The length of the overlay data in the dataset "
+            f"({actual_length} bytes) indicates it contains excess padding. "
             f"{actual_length - expected_len} bytes will be removed "
             "from the end of the data"
         )

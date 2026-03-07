@@ -340,8 +340,7 @@ def decode_bytes(value: bytes, encodings: Sequence[str], delimiters: set[int]) -
             # IGNORE is handled as WARN here, as this is
             # not an optional validation check
             warn_and_log(
-                f"Unknown encoding '{first_encoding}' - using default "
-                "encoding instead"
+                f"Unknown encoding '{first_encoding}' - using default encoding instead"
             )
             first_encoding = default_encoding
             return value.decode(first_encoding)

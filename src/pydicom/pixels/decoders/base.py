@@ -1187,9 +1187,10 @@ class DecodeRunner(RunnerBase):
                     warn_and_log(
                         "The number of bytes of pixel data is sufficient to contain "
                         f"{whole_frames} frames which is larger than the given "
-                        f"(0028,0008) 'Number of Frames' value of {self.number_of_frames}. "
-                        "The returned data will include these extra frames and if it's "
-                        "correct then you should update 'Number of Frames' accordingly, "
+                        f"(0028,0008) 'Number of Frames' value of "
+                        f"{self.number_of_frames}. The returned data will include "
+                        f"these extra frames and if it's correct then you should "
+                        f"update 'Number of Frames' accordingly, "
                         "otherwise pass 'allow_excess_frames=False' to return only "
                         f"the first {self.number_of_frames} frames."
                     )
@@ -1592,7 +1593,8 @@ class Decoder(CoderBase):
                 start_offset = file_offset + index * length_bytes
                 if (start_offset + length_bytes) > file_offset + length_source:
                     raise ValueError(
-                        f"There is insufficient pixel data to contain {index + 1} frames"
+                        "There is insufficient pixel data to contain "
+                        f"{index + 1} frames"
                     )
 
                 if length_bytes % 2 == 0:
@@ -1625,7 +1627,8 @@ class Decoder(CoderBase):
                 start_offset = floor(file_offset + index * length_bytes)
                 if (start_offset + length_bytes) > file_offset + length_source:
                     raise ValueError(
-                        f"There is insufficient pixel data to contain {index + 1} frames"
+                        "There is insufficient pixel data to contain "
+                        f"{index + 1} frames"
                     )
 
                 frame = runner.get_data(src, start_offset, ceil(length_bytes))
@@ -1985,7 +1988,8 @@ class Decoder(CoderBase):
                 start_offset = file_offset + index * length_bytes
                 if start_offset + length_bytes > file_offset + length_source:
                     raise ValueError(
-                        f"There is insufficient pixel data to contain {index + 1} frames"
+                        "There is insufficient pixel data to contain "
+                        f"{index + 1} frames"
                     )
 
                 if length_bytes % 2 == 0:
@@ -2100,8 +2104,8 @@ class Decoder(CoderBase):
             (default) then additional processing may be applied to convert the
             pixel data to it's most commonly used form (such as converting from
             YCbCr to RGB). To yield frames of pixel data with no processing
-            whatsoever, use the :meth:`~pydicom.pixels.decoders.base.Decoder.iter_buffer`
-            method.
+            whatsoever, use the
+            :meth:`~pydicom.pixels.decoders.base.Decoder.iter_buffer` method.
         validate : bool, optional
             If ``True`` (default) then validate the supplied decoding options
             and encoded pixel data prior to decoding, otherwise if ``False``

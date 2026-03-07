@@ -2144,8 +2144,7 @@ class TestApplyICCProfile:
             apply_icc_profile(arr, ds)
 
         msg = (
-            "Unsupported 'color_space' value 'ADOBERGB', must be 'sRGB', 'LAB' or "
-            "'XYZ'"
+            "Unsupported 'color_space' value 'ADOBERGB', must be 'sRGB', 'LAB' or 'XYZ'"
         )
         with pytest.raises(ValueError, match=msg):
             apply_icc_profile(arr, ds, color_space="ADOBERGB")
@@ -2247,8 +2246,7 @@ class TestCreateICCTransform:
             create_icc_transform(ds)
 
         msg = (
-            "Unsupported 'color_space' value 'ADOBERGB', must be 'sRGB', 'LAB' or "
-            "'XYZ'"
+            "Unsupported 'color_space' value 'ADOBERGB', must be 'sRGB', 'LAB' or 'XYZ'"
         )
         with pytest.raises(ValueError, match=msg):
             create_icc_transform(ds, color_space="ADOBERGB")

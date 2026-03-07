@@ -1504,7 +1504,6 @@ REFERENCE_BINARY_PIXELS = [
 
 
 class TestGetPackedFrame:
-
     @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
     @pytest.mark.parametrize("pad", [True, False])
     def test_get_packed_frame(self, pixels_per_frame, pad):
@@ -1591,7 +1590,6 @@ class TestGetPackedFrame:
 
 
 class TestConcatenatePackedFrames:
-
     @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
     @pytest.mark.parametrize("pad", [True, False])
     def test_concatenate_packed_frames(self, pixels_per_frame, pad):
@@ -1617,7 +1615,6 @@ class TestConcatenatePackedFrames:
         assert concatenated == ref
 
     def test_wrong_frame_lengths(self):
-
         frames = [
             b"\x00\x01",
             b"\x00\x03",

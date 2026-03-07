@@ -1,7 +1,6 @@
 # Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Test data for a couple of tests"""
 
-
 # Test data: Implicit VR, little endian, SQ with defined lengths
 impl_LE_deflen_std_hex = (
     b"10 00 10 00 "  # (0010,0010) Patient's Name

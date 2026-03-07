@@ -1,5 +1,6 @@
 # Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
+
 import copy
 from contextlib import contextmanager
 from io import BytesIO
@@ -51,7 +52,6 @@ except ImportError:
 # For Python >=3.11, this can be imported from contextlib
 @contextmanager
 def chdir(new_dir):
-
     old_dir = os.getcwd()
     try:
         os.chdir(new_dir)
@@ -334,8 +334,7 @@ class TestDump:
         assert ("(0010,1002) Other Patient IDs Sequence -- 2 item(s)") in s
         assert ("  (0010,0022) Type of Patient ID                  CS: 'TEXT'") in s
         assert (
-            "(FFFC,FFFC) Data Set Trailing Padding           OB: Array of "
-            "126 elements"
+            "(FFFC,FFFC) Data Set Trailing Padding           OB: Array of 126 elements"
         ) in s
 
 

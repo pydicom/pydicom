@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Tests for the 'pydicom' encoder plugin."""
 
-
 import pytest
 
 try:
@@ -15,10 +14,6 @@ from pydicom import dcmread, Dataset
 from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import get_frame
-from pydicom.pixels.encoders import (
-    RLELosslessEncoder,
-    DeflatedImageFrameCompressionEncoder,
-)
 from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.encoders.native import (
     _encode_rle_frame,
@@ -410,6 +405,7 @@ class TestEncodeRLEFrame:
         runner._index = 0
 
         encoded = _encode_rle_frame(arr.tobytes(), runner)
+        # fmt: off
         header = (
             b"\x0f\x00\x00\x00"
             b"\x40\x00\x00\x00"
@@ -434,6 +430,7 @@ class TestEncodeRLEFrame:
             b"\x00\x07\x00\x08\x00\x09\x00\x0a\x00\x0b\x00\x0c"
             b"\x00\x0d\x00\x0e\x00\x0f"
         ) == encoded[64:]
+        # fmt: on
 
     def test_single_row_1sample(self):
         """Test encoding a single row of 1 sample/pixel data."""
@@ -471,6 +468,7 @@ class TestEncodeRLEFrame:
         runner.set_options(**kwargs)
         runner._index = 0
 
+        # fmt: off
         encoded = _encode_rle_frame(arr.tobytes(), runner)
         header = (
             b"\x03\x00\x00\x00"
@@ -485,6 +483,7 @@ class TestEncodeRLEFrame:
             b"\x04\x00\x01\x02\x03\x04"
             b"\x04\x00\x01\x02\x03\x04"
         ) == encoded[64:]
+        # fmt: on
 
     def test_invalid_byteorder_raises(self):
         """Test big endian `src` raises an exception."""

@@ -715,7 +715,7 @@ class DataElement:  # noqa: PLW1641
     def __str__(self) -> str:
         """Return :class:`str` representation of the element."""
         value = self.repval or ""
-        name = f"{self.name[:self.descripWidth]:<{self.descripWidth}}"
+        name = f"{self.name[: self.descripWidth]:<{self.descripWidth}}"
 
         if self.showVR:
             return f"{self.tag} {name} {self.VR}: {value}"

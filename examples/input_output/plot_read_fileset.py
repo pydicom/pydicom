@@ -37,7 +37,7 @@ for patient_id in patient_ids:
     # Returns a list of FileInstance, where each one represents an available
     #   SOP Instance with a matching *Patient ID*
     result = fs.find(PatientID=patient_id)
-    print(f"PatientName={result[0].PatientName}, " f"PatientID={result[0].PatientID}")
+    print(f"PatientName={result[0].PatientName}, PatientID={result[0].PatientID}")
 
     # Search available studies
     study_uids = fs.find_values("StudyInstanceUID", instances=result)
