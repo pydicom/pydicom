@@ -98,7 +98,6 @@ force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]
-src = ["src"]
 line-length = 214
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
 
