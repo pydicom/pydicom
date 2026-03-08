@@ -1158,10 +1158,10 @@ class DSdecimal(Decimal):
         if isinstance(val, str) and val.strip() == "":
             return val
 
-        if isinstance(val, float) and not config.allow_DS_float:
+        if isinstance(val, float) and not config.settings.allow_DS_float:
             raise TypeError(
                 "'DS' cannot be instantiated with a float value unless "
-                "'config.allow_DS_float' is set to True. You should convert "
+                "'config.settings.allow_DS_float' is set to True. You should convert "
                 "the value to a string with the desired number of digits, "
                 "or use 'Decimal.quantize()' and pass a 'Decimal' instance."
             )

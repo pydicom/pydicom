@@ -364,8 +364,36 @@ def generate_example_rst(app, what, name, obj, options, lines):
         open(examples_path, "w").close()
 
 
+def force_descriptor_docstrings(app, what, name, obj, options, lines):
+    """Handle docstrings for backwards-compatibility of config globals"""
+
+    if what not in ("data", "attribute"):
+        return
+
+    try:
+        attr_name = name.rsplit(".")[-1]
+        from pydicom import config
+        
+        descriptor = getattr(type(config), attr_name, None)
+        if isinstance(descriptor, config._DeprecatedGlobal):
+            # breakpoint()
+            lines.clear()
+            if descriptor.__doc__:
+                # Give Sphinx its list of strings
+                lines.extend(descriptor.__doc__.splitlines())
+            else:
+                lines.append(f"Global variable {attr_name} is deprecated.")  
+                lines.append("See :class:`~pydicom.config.Settings`")
+                
+    except Exception as e:
+        pass
+
+
 def setup(app):
     app.connect("autodoc-process-docstring", generate_example_rst)
+    app.connect("autodoc-process-docstring", force_descriptor_docstrings)
+    # app.connect('autodoc-skip-member', lambda app, what, name, obj, skip, options: 
+    #            print(f"DEBUG: Found {name}, skip={skip}") or skip)
     app.add_css_file("css/pydicom.css")
 
 
