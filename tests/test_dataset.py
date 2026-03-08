@@ -824,11 +824,11 @@ class TestDataset:
         assert 0x00090008 not in test_ds
 
         # Slice starting and ending (and not including) (0008,0018)
-        assert ds[(0x0008, 0x0018):(0x0008, 0x0018)] == Dataset()
+        assert ds[(0x0008, 0x0018) : (0x0008, 0x0018)] == Dataset()
 
         # Test slicing using other acceptable Tag initialisations
         assert "SOPInstanceUID" in ds[(0x00080018):(0x00080019)]
-        assert "SOPInstanceUID" in ds[(0x0008, 0x0018):(0x0008, 0x0019)]
+        assert "SOPInstanceUID" in ds[(0x0008, 0x0018) : (0x0008, 0x0019)]
         assert "SOPInstanceUID" in ds["0x00080018":"0x00080019"]
 
     def test_getitem_slice_ffff(self):
@@ -849,7 +849,7 @@ class TestDataset:
 
         assert "CITIZEN^5" == ds[:][0xFFFFFFFF].value
         assert 0xFFFFFFFF not in ds[0x1000:0xFFFFFFFF]
-        assert 0xFFFFFFFF not in ds[(0x1000):(0xFFFF, 0xFFFF)]
+        assert 0xFFFFFFFF not in ds[(0x1000) : (0xFFFF, 0xFFFF)]
 
     def test_delitem_slice(self):
         """Test Dataset.__delitem__ using slices."""
@@ -3167,7 +3167,7 @@ class TestDatasetContextManager:
 
     def test_bad_elem_value(self):
         """Setting a bad value gives error message with location info"""
-        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"
+        msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"  # noqa: E501
         # Give a bad value for existing element
         with pytest.raises(ValueError) as excinfo:
             with self.file_ds as ds:

@@ -249,7 +249,7 @@ def convert_DS_string(
     ImportError
         If :data:`~pydicom.config.use_DS_numpy` is ``True`` and numpy is not
         available
-    """
+    """  # noqa: E501
     num_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance
     # rather than factory DS, but need to
@@ -352,7 +352,7 @@ def convert_IS_string(
     ImportError
         If :data:`~pydicom.config.use_IS_numpy` is ``True`` and numpy is not
         available
-    """
+    """  # noqa: E501
     num_string = byte_string.decode(default_encoding)
 
     if config.use_IS_numpy:

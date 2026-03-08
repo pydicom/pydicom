@@ -116,8 +116,7 @@ def __getattr__(name: str) -> Any:
 
     if name == "dtype_corrected_for_endianness" and not config._use_future:
         msg = (
-            "'dtype_corrected_for_endianness' is deprecated and will be "
-            "removed in v4.0"
+            "'dtype_corrected_for_endianness' is deprecated and will be removed in v4.0"
         )
         warn_and_log(msg, DeprecationWarning)
         return _dtype_corrected_for_endianness

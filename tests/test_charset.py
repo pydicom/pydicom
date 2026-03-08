@@ -480,8 +480,7 @@ class TestCharset:
         elem = DataElement(0x00100010, "PN", "CITIZEN")
         with pytest.warns(
             UserWarning,
-            match="Unknown encoding 'ISO 2022 IR 146' "
-            "- using default encoding instead",
+            match="Unknown encoding 'ISO 2022 IR 146' - using default encoding instead",
         ):
             pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 146"])
 

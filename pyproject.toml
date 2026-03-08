@@ -98,27 +98,26 @@ force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]
-line-length = 214
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
+exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
 
 [tool.ruff.lint]
-select = [
-    "UP",
-    "C9",
-    "E",
-    "F",
+extend-select = [
+    "C90",
     "PERF",
-    "PL",
+    "E501",
     "W",
+    "PL",
+    "UP",
 ]
 ignore = [
     "PERF203",
+    "PLC0415",
     "PLC1901",
     "PLR2004",
     "PLR5501",
     "PLW0603",
     "PLW2901",
-    "PLC0415",
 ]
 
 [tool.ruff.lint.mccabe]

@@ -1323,8 +1323,7 @@ class TestFileSet:
         assert "Managed instances" in s
         assert ("PATIENT: PatientID='1CT1', PatientName='CompressedSamples^CT1'") in s
         assert (
-            "STUDY: StudyDate=20040119, StudyTime=072730, "
-            "StudyDescription='e+1'" in s
+            "STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'" in s
         )
         assert "SERIES: Modality=CT, SeriesNumber=1" in s
         assert 1 == len(fs)
@@ -1759,68 +1758,58 @@ class TestFileSet:
         ds.SOPClassUID = ColorPaletteStorage
         fs.add(ds)
 
-        ref = (
-            "DICOM File-set\n"
-            "  Root directory: (no value available)\n"
-            "  File-set ID: (no value available)\n"
-            f"  File-set UID: {fs.UID}\n"
-            "  Descriptor file ID: (no value available)\n"
-            "  Descriptor file character set: (no value available)\n"
-            "  Changes staged for write(): DICOMDIR creation, 30 additions\n"
-            "\n"
-            "  Managed instances:\n"
-            "    PATIENT: PatientID='1CT1', "
-            "PatientName='CompressedSamples^CT1'\n"
-            "      STUDY: StudyDate=20040119, StudyTime=072730, "
-            "StudyDescription='e+1'\n"
-            "        SERIES: Modality=CT, SeriesNumber=1\n"
-            "          IMAGE: 1 SOP Instance (1 addition)\n"
-            "    PATIENT: PatientID='4MR1', "
-            "PatientName='CompressedSamples^MR1'\n"
-            "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
-            "          IMAGE: 1 SOP Instance (1 addition)\n"
-            "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
-            "      STUDY: StudyDate=20200913, StudyTime=161900, "
-            "StudyDescription='Testing File-set'\n"
-            "        SERIES: Modality=CT, SeriesNumber=1\n"
-            "          IMAGE: 25 SOP Instances (25 additions)\n"
-            "          RT DOSE: 1 SOP Instance (1 addition)\n"
-            "          RT PLAN: 1 SOP Instance (1 addition)\n"
-            "    PALETTE: 1 SOP Instance (to be added)"
-        )
+        ref = f"""\
+DICOM File-set
+  Root directory: (no value available)
+  File-set ID: (no value available)
+  File-set UID: {fs.UID}
+  Descriptor file ID: (no value available)
+  Descriptor file character set: (no value available)
+  Changes staged for write(): DICOMDIR creation, 30 additions
+
+  Managed instances:
+    PATIENT: PatientID='1CT1', PatientName='CompressedSamples^CT1'
+      STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'
+        SERIES: Modality=CT, SeriesNumber=1
+          IMAGE: 1 SOP Instance (1 addition)
+    PATIENT: PatientID='4MR1', PatientName='CompressedSamples^MR1'
+      STUDY: StudyDate=20040826, StudyTime=185059
+        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'
+          IMAGE: 1 SOP Instance (1 addition)
+    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'
+      STUDY: StudyDate=20200913, StudyTime=161900, StudyDescription='Testing File-set'
+        SERIES: Modality=CT, SeriesNumber=1
+          IMAGE: 25 SOP Instances (25 additions)
+          RT DOSE: 1 SOP Instance (1 addition)
+          RT PLAN: 1 SOP Instance (1 addition)
+    PALETTE: 1 SOP Instance (to be added)"""
 
         assert ref == str(fs)
 
         ds, paths = write_fs(fs, tdir.name)
 
-        ref = (
-            "  File-set ID: (no value available)\n"
-            f"  File-set UID: {fs.UID}\n"
-            "  Descriptor file ID: (no value available)\n"
-            "  Descriptor file character set: (no value available)\n"
-            "\n"
-            "  Managed instances:\n"
-            "    PATIENT: PatientID='1CT1', "
-            "PatientName='CompressedSamples^CT1'\n"
-            "      STUDY: StudyDate=20040119, StudyTime=072730, "
-            "StudyDescription='e+1'\n"
-            "        SERIES: Modality=CT, SeriesNumber=1\n"
-            "          IMAGE: 1 SOP Instance\n"
-            "    PATIENT: PatientID='4MR1', "
-            "PatientName='CompressedSamples^MR1'\n"
-            "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
-            "          IMAGE: 1 SOP Instance\n"
-            "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
-            "      STUDY: StudyDate=20200913, StudyTime=161900, "
-            "StudyDescription='Testing File-set'\n"
-            "        SERIES: Modality=CT, SeriesNumber=1\n"
-            "          IMAGE: 25 SOP Instances\n"
-            "          RT DOSE: 1 SOP Instance\n"
-            "          RT PLAN: 1 SOP Instance\n"
-            "    PALETTE: 1 SOP Instance"
-        )
+        ref = f"""\
+  File-set ID: (no value available)
+  File-set UID: {fs.UID}
+  Descriptor file ID: (no value available)
+  Descriptor file character set: (no value available)
+
+  Managed instances:
+    PATIENT: PatientID='1CT1', PatientName='CompressedSamples^CT1'
+      STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'
+        SERIES: Modality=CT, SeriesNumber=1
+          IMAGE: 1 SOP Instance
+    PATIENT: PatientID='4MR1', PatientName='CompressedSamples^MR1'
+      STUDY: StudyDate=20040826, StudyTime=185059
+        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'
+          IMAGE: 1 SOP Instance
+    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'
+      STUDY: StudyDate=20200913, StudyTime=161900, StudyDescription='Testing File-set'
+        SERIES: Modality=CT, SeriesNumber=1
+          IMAGE: 25 SOP Instances
+          RT DOSE: 1 SOP Instance
+          RT PLAN: 1 SOP Instance
+    PALETTE: 1 SOP Instance"""
 
         assert ref in str(fs)
 
@@ -1831,36 +1820,29 @@ class TestFileSet:
             if p.is_file() and p.name not in ["DICOMDIR", "README"]:
                 fs.add(p)
 
-        ref = (
-            "  File-set ID: (no value available)\n"
-            f"  File-set UID: {fs.UID}\n"
-            "  Descriptor file ID: (no value available)\n"
-            "  Descriptor file character set: (no value available)\n"
-            "  Changes staged for write(): DICOMDIR update, 18 additions, "
-            "30 removals\n"
-            "\n"
-            "  Managed instances:\n"
-            "    PATIENT: PatientID='1CT1', "
-            "PatientName='CompressedSamples^CT1'\n"
-            "      STUDY: StudyDate=20040119, StudyTime=072730, "
-            "StudyDescription='e+1'\n"
-            "        SERIES: Modality=CT, SeriesNumber=1\n"
-            "          IMAGE: 0 SOP Instances (1 initial, 1 removal)\n"
-            "    PATIENT: PatientID='4MR1', "
-            "PatientName='CompressedSamples^MR1'\n"
-            "      STUDY: StudyDate=20040826, StudyTime=185059\n"
-            "        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'\n"
-            "          IMAGE: 0 SOP Instances (1 initial, 1 removal)\n"
-            "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
-            "      STUDY: StudyDate=20200913, StudyTime=161900, "
-            "StudyDescription='Testing File-set'\n"
-            "        SERIES: Modality=CT, SeriesNumber=1\n"
-            "          IMAGE: 18 SOP Instances (25 initial, 18 additions, "
-            "25 removals)\n"
-            "          RT DOSE: 0 SOP Instances (1 initial, 1 removal)\n"
-            "          RT PLAN: 0 SOP Instances (1 initial, 1 removal)\n"
-            "    PALETTE: 1 SOP Instance (to be removed)"
-        )
+        ref = f"""\
+  File-set ID: (no value available)
+  File-set UID: {fs.UID}
+  Descriptor file ID: (no value available)
+  Descriptor file character set: (no value available)
+  Changes staged for write(): DICOMDIR update, 18 additions, 30 removals
+
+  Managed instances:
+    PATIENT: PatientID='1CT1', PatientName='CompressedSamples^CT1'
+      STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'
+        SERIES: Modality=CT, SeriesNumber=1
+          IMAGE: 0 SOP Instances (1 initial, 1 removal)
+    PATIENT: PatientID='4MR1', PatientName='CompressedSamples^MR1'
+      STUDY: StudyDate=20040826, StudyTime=185059
+        SERIES: Modality=MR, SeriesNumber=1, SeriesDescription='TEST_DESC'
+          IMAGE: 0 SOP Instances (1 initial, 1 removal)
+    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'
+      STUDY: StudyDate=20200913, StudyTime=161900, StudyDescription='Testing File-set'
+        SERIES: Modality=CT, SeriesNumber=1
+          IMAGE: 18 SOP Instances (25 initial, 18 additions, 25 removals)
+          RT DOSE: 0 SOP Instances (1 initial, 1 removal)
+          RT PLAN: 0 SOP Instances (1 initial, 1 removal)
+    PALETTE: 1 SOP Instance (to be removed)"""
 
         assert ref in str(fs)
 

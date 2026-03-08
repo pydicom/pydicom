@@ -3,6 +3,7 @@
 Use the `jpeg_ls (pyjpegls) <https://github.com/pydicom/pyjpegls>`_ Python
 package to decode *Pixel Data*.
 """
+
 from typing import TYPE_CHECKING, cast
 
 try:

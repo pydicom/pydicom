@@ -345,7 +345,7 @@ class EncodeRunner(RunnerBase):
 
     @property
     def src(self) -> "Buffer | np.ndarray":
-        """Return the buffer-like or :class:`numpy.ndarray` containing the pixel data."""
+        """Return the buffer-like or :class:`numpy.ndarray` containing the pixel data."""  # noqa: E501
         return self._src
 
     def __str__(self) -> str:
@@ -425,7 +425,8 @@ class EncodeRunner(RunnerBase):
             s = ["unsigned", "signed"][is_signed]
             raise ValueError(
                 f"The ndarray's dtype '{dtype}' is not consistent with a (0028,0103) "
-                f"'Pixel Representation' of '{self.pixel_representation}' ({s} integers)"
+                f"'Pixel Representation' of '{self.pixel_representation}' "
+                f"({s} integers)"
             )
 
         # Check the dtype's itemsize is at least as large as *Bits Allocated*

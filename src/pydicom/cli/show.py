@@ -94,8 +94,7 @@ def quiet_rtplan(ds: Dataset) -> str | None:
         beam_delivery = beam.get("TreatmentDeliveryType")
         beam_radtype = beam.get("RadiationType")
         line = (
-            f"Beam {beam_num} '{beam_name}' {beam_delivery} "
-            f"{beam_type} {beam_radtype}"
+            f"Beam {beam_num} '{beam_name}' {beam_delivery} {beam_type} {beam_radtype}"
         )
 
         if beam_type == "STATIC":

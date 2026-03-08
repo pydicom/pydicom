@@ -393,7 +393,7 @@ def compress(
         Optional keyword parameters for the encoding plugin may also be
         present. See the :doc:`encoding plugins options
         </guides/encoding/encoder_plugin_options>` for more information.
-    """
+    """  # noqa: E501
     from pydicom.dataset import FileMetaDataset
     from pydicom.pixels import get_encoder
 
@@ -626,7 +626,8 @@ def decompress(
 
     if "PixelData" not in ds:
         raise AttributeError(
-            "Unable to decompress as the dataset has no (7FE0,0010) 'Pixel Data' element"
+            "Unable to decompress as the dataset has no "
+            "(7FE0,0010) 'Pixel Data' element"
         )
 
     file_meta = ds.get("file_meta", {})
@@ -1333,8 +1334,8 @@ def pack_bits(arr: "np.ndarray | bytes | bytearray", pad: bool = True) -> bytes:
     Parameters
     ----------
     arr : numpy.ndarray | bytes | bytearray
-        The :class:`numpy.ndarray`, :class:`bytes`, or :class:`bytearray` containing 1-bit
-        data as ints/bytes:
+        The :class:`numpy.ndarray`, :class:`bytes`, or :class:`bytearray` containing
+        1-bit data as ints/bytes:
 
         * For a :class:`numpy.ndarray`, `arr` must only contain integer values of 0 and
           1 and must have an 'uint'  or 'int' :class:`numpy.dtype`. The input `arr`
