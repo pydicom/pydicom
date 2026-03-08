@@ -129,7 +129,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
                 obj = obj[int(index)]  # type: ignore
             except (IndexError, TypeError) as e:
                 raise argparse.ArgumentTypeError(
-                    f"'{index}' gave an index error: {str(e)}"
+                    f"'{index}' gave an index error: {e}"
                 )
 
     return obj
@@ -233,7 +233,7 @@ def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
         # Special message if a tag with spaces
         if m := re.search(re_tag_with_spaces, element):
             msg = (
-                f"Tag '{m.group()}' is not valid syntax for a " "tag: no spaces allowed"
+                f"Tag '{m.group()}' is not valid syntax for a tag: no spaces allowed"
             )
         else:
             msg = (

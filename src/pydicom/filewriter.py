@@ -500,7 +500,7 @@ def write_text(
                 val = b"\\".join([encode_string(val, encodings) for val in val])
             else:
                 val = cast(Sequence[bytes], val)
-                val = b"\\".join([val for val in val])
+                val = b"\\".join(list(val))
         else:
             val = cast(bytes | str, val)
             if isinstance(val, str):
@@ -1299,7 +1299,7 @@ def dcmwrite(
     # Cover use of `write_like_original` as:
     #   optional arg - dcmwrite(fp, ds, write_like_original=bool)
     #   positional arg - dcmwrite(fp, ds, False)
-    write_like_original: bool | None = kwargs.get("write_like_original", None)
+    write_like_original: bool | None = kwargs.get("write_like_original")
     if None not in (__write_like_original, write_like_original):
         if config._use_future:
             raise TypeError(
@@ -1332,7 +1332,7 @@ def dcmwrite(
         enforce_file_format = not write_like_original
 
     # Ensure kwargs only contains `write_like_original`
-    keys = [x for x in kwargs.keys() if x != "write_like_original"]
+    keys = [x for x in kwargs if x != "write_like_original"]
     if keys:
         raise TypeError(
             f"Invalid keyword argument(s) for dcmwrite(): {', '.join(keys)}"

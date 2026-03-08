@@ -745,8 +745,6 @@ class TestPillowHandler_JPEG:
         ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422)
         ds.pixel_array_options(use_v2_backend=True)
         ref = ds.pixel_array
-        frames = [
-            f for f in generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames)
-        ]
+        frames = list(generate_frames(ds.PixelData, number_of_frames=ds.NumberOfFrames))
         ds.PixelData = encapsulate(frames, fragments_per_frame=4)
         assert np.array_equal(ds.pixel_array, ref)

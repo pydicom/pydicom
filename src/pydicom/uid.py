@@ -161,11 +161,7 @@ class UID(str):
         """Return ``True`` if a compressed transfer syntax UID."""
         if self.is_transfer_syntax:
 
-            if self in self._NATIVE_ENCODING:
-                return False
-
-            # All encapsulated transfer syntaxes
-            return True
+            return self not in self._NATIVE_ENCODING
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -222,10 +218,7 @@ class UID(str):
     @property
     def is_valid(self) -> bool:
         """Return ``True`` if `self` is a valid UID, ``False`` otherwise."""
-        if len(self) <= 64 and re.match(RE_VALID_UID, self):
-            return True
-
-        return False
+        return bool(len(self) <= 64 and re.match(RE_VALID_UID, self))
 
     def set_private_encoding(self, implicit_vr: bool, little_endian: bool) -> None:
         """Set the corresponding dataset encoding for a privately defined transfer

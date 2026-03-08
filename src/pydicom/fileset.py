@@ -151,7 +151,7 @@ def is_conformant_file_id(path: Path) -> bool:
     """
     # No more than 8 characters per component
     parts = path.parts
-    if any([len(pp) > 8 for pp in parts]):
+    if any(len(pp) > 8 for pp in parts):
         return False
 
     # No more than 8 components
@@ -166,10 +166,7 @@ def is_conformant_file_id(path: Path) -> bool:
         return False
 
     # Characters are in [0-9][A-Z] and _
-    if re.match(_RE_FILE_ID, chars):
-        return True
-
-    return False
+    return bool(re.match(_RE_FILE_ID, chars))
 
 
 class RecordNode(Iterable["RecordNode"]):
@@ -1459,7 +1456,7 @@ class FileSet:
                 ds = ds.load()
 
             # Check that all query elements are present
-            if all([kw in ds for kw in kwargs]):
+            if all(kw in ds for kw in kwargs):
                 has_elements = True
 
             for kw, val in kwargs.items():
@@ -1513,7 +1510,7 @@ class FileSet:
               with lists of value(s) for the elements available in the instances.
         """
         element_list = elements if isinstance(elements, list) else [elements]
-        has_element = {element: False for element in element_list}
+        has_element = dict.fromkeys(element_list, False)
         results: dict[str | int, list[Any]] = {element: [] for element in element_list}
         iter_instances = instances or iter(self)
         instance: Dataset | FileInstance

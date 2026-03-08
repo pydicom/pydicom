@@ -21,7 +21,7 @@ class Code(NamedTuple):
     def __hash__(self) -> int:
         return hash(self.scheme_designator + self.value)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         if self.scheme_designator == "SRT" and self.value in snomed_mapping["SRT"]:
             self_mapped = Code(
                 value=snomed_mapping["SRT"][self.value],
@@ -37,19 +37,19 @@ class Code(NamedTuple):
                 scheme_version=self.scheme_version,
             )
 
-        if other.scheme_designator == "SRT" and other.value in snomed_mapping["SRT"]:
+        if other.scheme_designator == "SRT" and other.value in snomed_mapping["SRT"]:  # type: ignore[attr-defined]
             other_mapped = Code(
-                value=snomed_mapping["SRT"][other.value],
+                value=snomed_mapping["SRT"][other.value],  # type: ignore[attr-defined]
                 meaning="",
                 scheme_designator="SCT",
-                scheme_version=other.scheme_version,
+                scheme_version=other.scheme_version,  # type: ignore[attr-defined]
             )
         else:
             other_mapped = Code(
-                value=other.value,
+                value=other.value,  # type: ignore[attr-defined]
                 meaning="",
-                scheme_designator=other.scheme_designator,
-                scheme_version=other.scheme_version,
+                scheme_designator=other.scheme_designator,  # type: ignore[attr-defined]
+                scheme_version=other.scheme_version,  # type: ignore[attr-defined]
             )
 
         return (
@@ -58,7 +58,7 @@ class Code(NamedTuple):
             and self_mapped.scheme_version == other_mapped.scheme_version
         )
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         return not (self == other)
 
 

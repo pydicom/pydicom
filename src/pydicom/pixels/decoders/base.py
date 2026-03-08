@@ -331,11 +331,11 @@ def _apply_j2k_corrections(
             for meta in runner._frame_meta.values()
         ]
         precisions = [
-            bits_stored if prec > bits_stored else prec for prec in precisions
+            min(prec, bits_stored) for prec in precisions
         ]
     else:
         precision = runner.get_frame_option(index, "j2k_precision", bits_stored)
-        precisions = [bits_stored if precision > bits_stored else precision]
+        precisions = [min(precision, bits_stored)]
 
     container_size = 8 * arr.dtype.itemsize
     bit_shifts = [container_size - prec for prec in precisions]
@@ -380,11 +380,11 @@ def _apply_jls_sign_correction(
             for meta in runner._frame_meta.values()
         ]
         precisions = [
-            bits_stored if prec > bits_stored else prec for prec in precisions
+            min(prec, bits_stored) for prec in precisions
         ]
     else:
         prec = runner.get_frame_option(index, "jls_precision", bits_stored)
-        precisions = [bits_stored if prec > bits_stored else prec]
+        precisions = [min(prec, bits_stored)]
 
     # Single or multi-framed with consistent precision values
     container_size = 8 * arr.dtype.itemsize
@@ -474,7 +474,7 @@ class DecodeRunner(RunnerBase):
         pi = self.photometric_interpretation
 
         # Check the component IDs for RGB or rgb (in ASCII)
-        has_rgb_ids = info.get("component_ids", None) in ([82, 71, 66], [114, 103, 98])
+        has_rgb_ids = info.get("component_ids") in ([82, 71, 66], [114, 103, 98])
         if has_rgb_ids and pi != PI.RGB:
             self.set_frame_option(index, "photometric_interpretation", PI.RGB)
             warn_and_log(

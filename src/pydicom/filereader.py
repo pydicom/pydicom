@@ -131,7 +131,7 @@ def data_element_generator(
     debugging = config.debugging
     defer_size = size_in_bytes(defer_size)
 
-    tag_set: set[int] = {tag for tag in specific_tags} if specific_tags else set()
+    tag_set: set[int] = set(specific_tags) if specific_tags else set()
     has_tag_set = bool(tag_set)
     if has_tag_set:
         tag_set.add(0x00080005)  # Specific Character Set
@@ -688,7 +688,7 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
     #   data element: if it fails, retry loading the file meta with an
     #   implicit VR (issue #503)
     try:
-        file_meta[list(file_meta.elements())[0].tag]
+        file_meta[next(iter(file_meta.elements())).tag]
     except NotImplementedError:
         fp.seek(start_file_meta)
         file_meta = FileMetaDataset(
@@ -876,7 +876,7 @@ def read_partial(
         from pydicom.values import converters
 
         vr = vr.decode(default_encoding)
-        if vr in converters.keys():
+        if vr in converters:
             is_implicit_VR = False
             # Big endian encoding can only be explicit VR
             #   Big endian 0x0004 decoded as little endian will be 1024

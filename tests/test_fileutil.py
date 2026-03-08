@@ -139,7 +139,7 @@ class TestBufferFunctions:
     def test_read_buffer(self):
         """Test read_buffer()"""
         b = BytesIO()
-        assert [d for d in read_buffer(b)] == []
+        assert list(read_buffer(b)) == []
 
         b = BytesIO(b"\x01" * 100 + b"\x02\x03")
         out = bytearray()

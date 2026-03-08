@@ -831,7 +831,7 @@ def decode_element(
                 return
             elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS)
         else:
-            output = list()
+            output = []
             for value in elem.value:
                 if isinstance(value, str):
                     output.append(value)

@@ -39,7 +39,7 @@ def _filtered(source: Iterable[str], filters: Iterable[str]) -> list[str]:
     filters = [f.lower() for f in filters]
 
     return sorted(
-        set(val for val in source if any((f in val.lower()) for f in filters))
+        {val for val in source if any((f in val.lower()) for f in filters)}
     )
 
 
@@ -181,7 +181,7 @@ class Collection:
             identifiers = cast(CIDValueType, CONCEPTS[scheme][name])
 
             if len(identifiers) == 1:
-                code, val = list(identifiers.items())[0]
+                code, val = next(iter(identifiers.items()))
             else:
                 cid = int(self.name[3:])
                 _matches = [
@@ -215,7 +215,7 @@ class Collection:
                 f"{code_values}"
             )
 
-        code = list(entries.keys())[0]  # get first and only
+        code = next(iter(entries.keys()))  # get first and only
         meaning, cids = entries[code]
 
         return Code(value=code, meaning=meaning, scheme_designator=self.name)
@@ -246,7 +246,7 @@ class Collection:
 
     def __str__(self) -> str:
         """Return a string representation of the collection."""
-        len_names = max(len(n) for n in self.concepts.keys()) + 2
+        len_names = max(len(n) for n in self.concepts) + 2
         len_codes = max(len(c[0]) for c in self.concepts.values()) + 2
         len_schemes = max(len(c[1]) for c in self.concepts.values()) + 2
 
@@ -333,11 +333,11 @@ class Concepts:
 
     def schemes(self) -> list[str]:
         """Return a list of available scheme designations."""
-        return [c for c in self._collections.keys() if not c.startswith("CID")]
+        return [c for c in self._collections if not c.startswith("CID")]
 
     def CIDs(self) -> list[str]:
         """Return a list of available CID names."""
-        return [c for c in self._collections.keys() if c.startswith("CID")]
+        return [c for c in self._collections if c.startswith("CID")]
 
 
 # Named concept collections like SNOMED-CT, etc

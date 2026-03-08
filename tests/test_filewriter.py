@@ -117,9 +117,9 @@ def as_assertable(dataset):
     to a set that can be safely compared using pytest's assert.
     (Datasets can't be so compared because DataElements are not
     hashable.)"""
-    safe_dict = dict(
-        (f"{elem.tag} {elem.keyword}", elem.value) for elem in dataset
-    )
+    safe_dict = {
+        f"{elem.tag} {elem.keyword}": elem.value for elem in dataset
+    }
     if hasattr(dataset, "file_meta"):
         safe_dict.update(as_assertable(dataset.file_meta))
     return safe_dict
@@ -372,10 +372,10 @@ class TestScratchWriteDateTime(TestWriteFile):
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = dcmread(self.file_out)
-        assert all([a == b for a, b in zip(ds.CalibrationDate, multi_DA_expected)])
+        assert all(a == b for a, b in zip(ds.CalibrationDate, multi_DA_expected))
         assert DA_expected == ds.DateOfLastCalibration
-        assert all([a == b for a, b in zip(ds.ReferencedDateTime, multi_DT_expected)])
-        assert all([a == b for a, b in zip(ds.CalibrationTime, multi_TM_expected)])
+        assert all(a == b for a, b in zip(ds.ReferencedDateTime, multi_DT_expected))
+        assert all(a == b for a, b in zip(ds.CalibrationTime, multi_TM_expected))
         assert TM_expected == ds.TimeOfLastCalibration
 
 
@@ -3145,8 +3145,18 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
-            BytesIO(b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0"),
+            # fmt: off
+            (
+                b"\xff\xff\x00\xe0"
+                b"\x00\x01\x02\x03"
+                b"\xfe\xff\xdd\xe0"
+            ),
+            BytesIO(
+                b"\xff\xff\x00\xe0"
+                b"\x00\x01\x02\x03"
+                b"\xfe\xff\xdd\xe0"
+            ),
+            # fmt: on
         ),
     )
     def test_little_endian_incorrect_data(self, data):
@@ -3170,8 +3180,18 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
-            BytesIO(b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd"),
+            # fmt: off
+            (
+                b"\x00\x00\x00\x00"
+                b"\x00\x01\x02\x03"
+                b"\xff\xfe\xe0\xdd"
+            ),
+            BytesIO(
+                b"\x00\x00\x00\x00"
+                b"\x00\x01\x02\x03"
+                b"\xff\xfe\xe0\xdd"
+            ),
+            # fmt: on
         ),
     )
     def test_big_endian_incorrect_data(self, data):
