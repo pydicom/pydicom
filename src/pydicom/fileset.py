@@ -346,24 +346,47 @@ class RecordNode(Iterable["RecordNode"]):
 
         return len(fp.getvalue())
 
-    @property
-    def _file_id(self) -> Path | None:
+    def file_id_path(self, root_path: Path) -> Path | None:
         """Return the *Referenced File ID* as a :class:`~pathlib.Path`.
+
+        Params
+        ------
+        root_path : Path
+            The root path of the parent file set.
 
         Returns
         -------
         pathlib.Path or None
             The *Referenced File ID* from the directory record as a
             :class:`pathlib.Path` or ``None`` if the element value is null.
+
+        Raises
+        ------
+        PermissionError
+            If the file ID points to a path outside the fileset root path.
+
+        AttributeError
+            If the Referenced File ID is missing in the directory record.
+
+        :meta private:
         """
         if "ReferencedFileID" in self._record:
             elem = self._record["ReferencedFileID"]
+            if elem.VM < 1:
+                return None
             if elem.VM == 1:
-                return Path(cast(str, self._record.ReferencedFileID))
-            if elem.VM > 1:
-                return Path(*cast(list[str], self._record.ReferencedFileID))
+                path = Path(cast(str, self._record.ReferencedFileID))
+            else:
+                path = Path(*cast(list[str], self._record.ReferencedFileID))
 
-            return None
+            if path is not None:
+                if path.anchor or not (
+                    (root_path / path).resolve().is_relative_to(root_path)
+                ):
+                    raise PermissionError(
+                        f"ReferencedFileID ('{path}') must be inside the DICOMDIR root path"
+                    )
+            return path
 
         raise AttributeError("No 'Referenced File ID' in the directory record")
 
@@ -373,7 +396,7 @@ class RecordNode(Iterable["RecordNode"]):
         return self.root.file_set
 
     def __getitem__(self, key: Union[str, "RecordNode"]) -> "RecordNode":
-        """Return the current node's child using it's
+        """Return the current node's child using its
         :attr:`~pydicom.fileset.RecordNode.key`
         """
         if isinstance(key, RecordNode):
@@ -525,7 +548,7 @@ class RecordNode(Iterable["RecordNode"]):
             indent = indent_char * node.depth
             if node.children:
                 s.append(f"{indent}{node}")
-                # Summarise any leaves at the next level
+                # Summarize any leaves at the next level
                 for child in node.children:
                     if child.has_instance:
                         s.extend(leaf_summary(child, indent_char))
@@ -926,9 +949,8 @@ class FileInstance:
             return os.fspath(cast(Path, self._stage_path))
 
         # If not staged for addition then File Set must exist on file system
-        return os.fspath(
-            cast(Path, self.file_set.path) / cast(Path, self.node._file_id)
-        )
+        root_path = self.file_set.root_path
+        return os.fspath(root_path / cast(Path, self.node.file_id_path(root_path)))
 
     @property
     def SOPClassUID(self) -> UID:
@@ -962,7 +984,7 @@ class FileSet:
             to the DICOMDIR file.
         """
         # The nominal path to the root of the File-set
-        self._path: Path | None = None
+        self._root_path: Path | None = None
         # The root node of the record tree used to fill out the DICOMDIR's
         #   *Directory Record Sequence*.
         # The tree for instances currently in the File-set
@@ -1203,7 +1225,7 @@ class FileSet:
         """Clear the File-set."""
         self._tree.children = []
         self._instances = []
-        self._path = None
+        self._root_path = None
         self._ds = Dataset()
         self._id = None
         self._uid = generate_uid()
@@ -1635,7 +1657,7 @@ class FileSet:
             )
 
         try:
-            path = Path(cast(str, ds.filename)).resolve(strict=True)
+            path = Path(ds.filename).resolve(strict=True)
         except FileNotFoundError:
             raise FileNotFoundError(
                 "Unable to load the File-set as the 'filename' attribute "
@@ -1661,7 +1683,7 @@ class FileSet:
         self._charset = cast(
             str | None, ds.get("SpecificCharacterSetOfFileSetDescriptorFile", None)
         )
-        self._path = path.parent
+        self._root_path = path.parent
         self._ds = ds
 
         # Create the record tree
@@ -1670,20 +1692,17 @@ class FileSet:
         bad_instances = []
         for instance in self:
             # Check that the referenced file exists
-            file_id = instance.node._file_id
-            if file_id is None:
-                bad_instances.append(instance)
-                continue
-
+            file_id = self._file_id_path(instance.node)
+            assert file_id is not None
             try:
                 # self.path is already set at this point
-                (cast(Path, self.path) / file_id).resolve(strict=True)
+                (self.root_path / file_id).resolve(strict=True)
             except FileNotFoundError:
                 bad_instances.append(instance)
                 warn_and_log(
                     "The referenced SOP Instance for the directory record at "
                     f"offset {instance.node._offset} does not exist: "
-                    f"{cast(Path, self.path) / file_id}"
+                    f"{self.root_path / file_id}"
                 )
                 continue
 
@@ -1694,6 +1713,31 @@ class FileSet:
 
         for instance in bad_instances:
             self._instances.remove(instance)
+
+    def _file_id_path(self, node: RecordNode) -> Path | None:
+        """Return the *Referenced File ID* from the given node
+        as a :class:`~pathlib.Path`.
+
+        Parameters
+        ----------
+        node: RecordNode
+            The node where the *Referenced File ID* resides.
+
+        Returns
+        -------
+        pathlib.Path or None
+            The *Referenced File ID* from the directory record as a
+            :class:`pathlib.Path` or ``None`` if the element value is null.
+
+        Raises
+        ------
+        PermissionError
+            If the file ID points to a path outside the fileset root path.
+
+        AttributeError
+            If the Referenced File ID is missing in the directory record.
+        """
+        return node.file_id_path(self.root_path)
 
     def _parse_records(
         self, ds: Dataset, include_orphans: bool, raise_orphans: bool = False
@@ -1748,7 +1792,10 @@ class FileSet:
                 del node.parent[node]
 
             # The leaf node references the FileInstance
-            if "ReferencedFileID" in node._record:
+            if (
+                "ReferencedFileID" in node._record
+                and self._file_id_path(node) is not None
+            ):
                 node.instance = FileInstance(node)
                 self._instances.append(node.instance)
 
@@ -1781,12 +1828,11 @@ class FileSet:
         for node in missing:
             # Get the path to the orphaned instance
             original_value = node._record.ReferencedFileID
-            file_id = node._file_id
-            if file_id is None:
+            if (file_id := self._file_id_path(node)) is None:
                 continue
 
             # self.path is set for an existing File Set
-            path = cast(Path, self.path) / file_id
+            path = self.root_path / file_id
             if node.record_type == "PRIVATE":
                 instance = self.add_custom(path, node)
             else:
@@ -1796,14 +1842,29 @@ class FileSet:
             instance.node._record.ReferencedFileID = original_value
 
     @property
+    def root_path(self) -> Path:
+        """Return the absolute path to the File-set root directory as
+        :class:`pathlib.Path`.
+
+        Raises
+        ------
+        AttributeError
+            If the root path is not set.
+        """
+        if self._root_path is None:
+            raise AttributeError("No root path set in the File-set")
+
+        return self._root_path
+
+    @property
     def path(self) -> str | None:
         """Return the absolute path to the File-set root directory as
         :class:`str` (if set) or ``None`` otherwise.
         """
-        if self._path is not None:
-            return os.fspath(self._path)
+        if self._root_path is not None:
+            return os.fspath(self._root_path)
 
-        return self._path
+        return None
 
     def _recordify(self, ds: Dataset) -> Iterator[Dataset]:
         """Yield directory records for a SOP Instance.
@@ -2062,14 +2123,15 @@ class FileSet:
             )
 
         if path:
-            self._path = Path(path)
+            self._root_path = Path(path)
 
         # Don't write unless changed or new
         if not self.is_staged:
             return
 
         # Path to the DICOMDIR file
-        p = cast(Path, self._path) / "DICOMDIR"
+        root = self.root_path
+        p = root / "DICOMDIR"
 
         # Re-use the existing directory structure if only moves or removals
         #   are required and `use_existing` is True
@@ -2117,13 +2179,20 @@ class FileSet:
         #   and copy any to the stage
         fout = {Path(ii.FileID) for ii in self}
         fin = {
-            ii.node._file_id for ii in self if ii.SOPInstanceUID not in self._stage["+"]
+            self._file_id_path(ii.node)
+            for ii in self
+            if ii.SOPInstanceUID not in self._stage["+"]
         }
         collisions = fout & fin
-        for instance in [ii for ii in self if ii.node._file_id in collisions]:
+        for instance in [
+            ii for ii in self if self._file_id_path(ii.node) in collisions
+        ]:
             self._stage["+"][instance.SOPInstanceUID] = instance
             instance._apply_stage("+")
-            shutil.copyfile(self._path / instance.node._file_id, instance.path)
+            shutil.copyfile(
+                root / cast(Path, self._file_id_path(instance.node)),
+                instance.path,
+            )
 
         for instance in self:
             dst = self._path / instance.FileID
@@ -2133,7 +2202,7 @@ class FileSet:
                 src = instance.path
                 fn = shutil.copyfile
             else:
-                src = self._path / instance.node._file_id
+                src = root / cast(Path, self._file_id_path(instance.node))
                 fn = shutil.move
 
             fn(os.fspath(src), os.fspath(dst))

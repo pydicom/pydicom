@@ -9,7 +9,7 @@ import pytest
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.filebase import DicomBytesIO
+from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.fileset import (
     FileSet,
     FileInstance,
@@ -106,6 +106,56 @@ def tdir():
     return TemporaryDirectory()
 
 
+FILESET_ROOT = "/path/to/fileset/"
+ABS_FILE_PATH = "/secret.txt"
+SYMLINK_TO_ABS_FILE = "Pat1/St1/Im2"
+SYMLINK_TO_ABS_DIR = "Pat1/St2"
+DOT_DOT_FILE = "../goback.txt"
+ABS_FILE_CONTENTS = "Top Secret file contents"
+COPY_PATH = "/path/to/copied/"
+
+
+@pytest.fixture(
+    params=[
+        ABS_FILE_PATH,
+        DOT_DOT_FILE,
+        SYMLINK_TO_ABS_FILE,
+        SYMLINK_TO_ABS_DIR + ABS_FILE_PATH,
+    ]
+)
+def fileset_fs(request, fs, ignore_reading_invalid_values):
+    """Create an in-memory file system with pyfakefs and test DICOMDIRs"""
+    # Simplified version of submitted report from JeongAhn Jang, in pyfakefs
+    orig_dicomdir_root = Path(TEST_FILE).parent
+    dicomdir_root = Path(FILESET_ROOT)
+    fs.add_real_file(
+        orig_dicomdir_root / "77654033/CR1/6154",
+        target_path=dicomdir_root / "Pat1/St1/Im1",
+    )
+    fs.create_file(ABS_FILE_PATH, contents=ABS_FILE_CONTENTS)
+    fs.create_dir(COPY_PATH)
+    fs.create_symlink(dicomdir_root / SYMLINK_TO_ABS_FILE, ABS_FILE_PATH)
+    fs.create_symlink(dicomdir_root / SYMLINK_TO_ABS_DIR, "/")
+    # MAKE DICOMDIR for this simplified file-set
+    fset = FileSet()
+    fset.add(dicomdir_root / "Pat1/St1/Im1")
+    fset.write(dicomdir_root)
+
+    # Create bad DICOMDIR2 file from the simplified one
+    # Modify first referenced file
+    fset = FileSet(dicomdir_root / "DICOMDIR")
+    record = next(
+        rec for rec in fset._ds.DirectoryRecordSequence if "ReferencedFileID" in rec
+    )
+    record.ReferencedFileID = request.param
+
+    # Write modified DICOMDIR file
+    with open(dicomdir_root / "DICOMDIR2", "wb") as fp:
+        fset._write_dicomdir(DicomFileLike(fp))
+
+    yield fs
+
+
 @pytest.fixture
 def custom_leaf():
     """Return the leaf node from a custom 4-level record hierarchy"""
@@ -139,7 +189,7 @@ def custom_leaf():
 
 
 @pytest.fixture
-def private(dicomdir):
+def private(dicomdir, request, ignore_reading_invalid_values):
     """Return a DICOMDIR dataset with PRIVATE records."""
 
     def write_record(ds):
@@ -167,13 +217,17 @@ def private(dicomdir):
     middle = private_record()
     bottom = private_record()
     bottom.ReferencedSOPClassUIDInFile = "1.2.3.4"
-    bottom.ReferencedFileID = [
-        "TINY_ALPHA",
-        "PT000000",
-        "ST000000",
-        "SE000000",
-        "IM000000",
-    ]
+    if hasattr(request, "param"):
+        file_ids = request.param
+    else:
+        file_ids = [
+            "TINY_ALPHA",
+            "PT000000",
+            "ST000000",
+            "SE000000",
+            "IM000000",
+        ]
+    bottom.ReferencedFileID = file_ids
     bottom.ReferencedSOPInstanceUIDInFile = (
         "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187"
     )
@@ -683,6 +737,15 @@ class TestRecordNode:
         with pytest.raises(AttributeError, match=msg):
             instance.node.key
 
+    @pytest.mark.parametrize("private", [["/", "etc", "passwd"]], indirect=True)
+    def test_id_outside_root(self, private):
+        """File ID points to a path outside the root directory."""
+        with pytest.raises(
+            PermissionError,
+            match=r"ReferencedFileID .* must be inside the DICOMDIR root path",
+        ):
+            FileSet(private)
+
     def test_bad_record(self, private):
         """Test a bad directory record raises an exception when loading."""
         del private.DirectoryRecordSequence[0].PatientID
@@ -745,7 +808,33 @@ class TestRecordNode:
         item.ReferencedFileID = "01"
         ds.save_as(p / "DICOMDIR", overwrite=True)
         fs = FileSet(ds)
-        assert fs._instances[0].node._file_id == Path("01")
+        assert fs._instances[0].node.file_id_path(fs.root_path) == Path("01")
+
+    def test_absolute_file_id(self, ct, tdir, ignore_reading_invalid_values):
+        """Test a singleton File ID."""
+        fs = FileSet()
+        p = Path(tdir.name)
+        ct.save_as(p / "01")
+        fs.add(p / "01")
+        fs.write(p)
+        ds = dcmread(p / "DICOMDIR")
+        item = ds.DirectoryRecordSequence[-1]
+        item.ReferencedFileID = "/01"
+        ds.save_as(p / "DICOMDIR", overwrite=True)
+        with pytest.raises(
+            PermissionError,
+            match=r"ReferencedFileID .* must be inside the DICOMDIR root path",
+        ):
+            FileSet(ds)
+
+    def test_root_path_missing(self, ct):
+        """Test RecordNode._file_id if no Referenced File ID."""
+        fs = FileSet()
+        instance = fs.add(ct)
+        # del instance.node._record.ReferencedFileID
+        msg = r"No root path set in the File-set"
+        with pytest.raises(AttributeError, match=msg):
+            fs.root_path
 
     def test_file_id_missing(self, ct):
         """Test RecordNode._file_id if no Referenced File ID."""
@@ -754,7 +843,7 @@ class TestRecordNode:
         del instance.node._record.ReferencedFileID
         msg = r"No 'Referenced File ID' in the directory record"
         with pytest.raises(AttributeError, match=msg):
-            instance.node._file_id
+            instance.node.file_id_path(Path("/dicom_data"))
 
 
 class TestFileInstance:
@@ -1673,7 +1762,7 @@ class TestFileSet:
         assert "ISO 1" == fs.descriptor_character_set
         assert [] != fs._instances
         assert fs._id is not None
-        assert fs._path is not None
+        assert fs.root_path is not None
         uid = fs._uid
         assert fs._uid is not None
         assert fs._ds is not None
@@ -1684,7 +1773,7 @@ class TestFileSet:
         fs.clear()
         assert [] == fs._instances
         assert fs._id is None
-        assert fs._path is None
+        assert fs._root_path is None
         assert uid != fs._uid
         assert fs._uid.is_valid
         assert fs._ds == Dataset()
@@ -2328,14 +2417,14 @@ class TestFileSet_Modify:
         tdir, ds = dicomdir_copy
         assert 52 == len(ds.DirectoryRecordSequence)
         fs = FileSet(ds)
-        orig_paths = [p for p in fs._path.glob("**/*") if p.is_file()]
+        orig_paths = [p for p in fs.root_path.glob("**/*") if p.is_file()]
         instance = fs._instances[0]
         assert Path(instance.path) in orig_paths
         fs.remove(instance)
         orig_file_ids = [ii.ReferencedFileID for ii in fs]
         fs.write(use_existing=True)
         assert 50 == len(fs._ds.DirectoryRecordSequence)
-        paths = [p for p in fs._path.glob("**/*") if p.is_file()]
+        paths = [p for p in fs.root_path.glob("**/*") if p.is_file()]
         assert orig_file_ids == [ii.ReferencedFileID for ii in fs]
         assert Path(instance.path) not in paths
         assert sorted(orig_paths)[1:] == sorted(paths)
@@ -2486,6 +2575,14 @@ class TestFileSet_Copy:
 
     def teardown_method(self):
         FileSet.__len__ = self.orig
+
+    def test_constrained_to_fileset_root(self, fileset_fs):
+        """Ensure files cannot be copied outside the FileSet root"""
+        with pytest.raises(
+            PermissionError,
+            match=r"ReferencedFileID .* must be inside the DICOMDIR root path",
+        ):
+            FileSet(Path(FILESET_ROOT) / "DICOMDIR2")
 
     def test_copy(self, dicomdir, tdir):
         """Test FileSet.copy()"""
