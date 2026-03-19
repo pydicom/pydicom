@@ -15,6 +15,7 @@
    
       ~RecordNode.__init__
       ~RecordNode.add
+      ~RecordNode.file_id_path
       ~RecordNode.prettify
       ~RecordNode.remove
       ~RecordNode.reverse

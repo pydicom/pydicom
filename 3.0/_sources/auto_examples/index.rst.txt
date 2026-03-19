@@ -24,7 +24,7 @@ Somewhere to start
   .. image:: /auto_examples/images/thumb/sphx_glr_plot_dicom_difference_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_plot_dicom_difference.py`
+  :doc:`/auto_examples/plot_dicom_difference`
 
 .. raw:: html
 
@@ -41,7 +41,7 @@ Somewhere to start
   .. image:: /auto_examples/images/thumb/sphx_glr_show_charset_name_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_show_charset_name.py`
+  :doc:`/auto_examples/show_charset_name`
 
 .. raw:: html
 
@@ -58,7 +58,7 @@ Somewhere to start
   .. image:: /auto_examples/images/thumb/sphx_glr_dicomtree_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_dicomtree.py`
+  :doc:`/auto_examples/dicomtree`
 
 .. raw:: html
 
@@ -75,7 +75,7 @@ Somewhere to start
   .. image:: /auto_examples/images/thumb/sphx_glr_memory_dataset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_memory_dataset.py`
+  :doc:`/auto_examples/memory_dataset`
 
 .. raw:: html
 
@@ -122,7 +122,7 @@ be applied to DICOM images.
   .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_downsize_image_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py`
+  :doc:`/auto_examples/image_processing/plot_downsize_image`
 
 .. raw:: html
 
@@ -139,7 +139,7 @@ be applied to DICOM images.
   .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_waveforms_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py`
+  :doc:`/auto_examples/image_processing/plot_waveforms`
 
 .. raw:: html
 
@@ -156,7 +156,7 @@ be applied to DICOM images.
   .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_reslice_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_image_processing_reslice.py`
+  :doc:`/auto_examples/image_processing/reslice`
 
 .. raw:: html
 
@@ -193,7 +193,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_rtplan_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py`
+  :doc:`/auto_examples/input_output/plot_read_rtplan`
 
 .. raw:: html
 
@@ -210,7 +210,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py`
+  :doc:`/auto_examples/input_output/plot_read_dicom`
 
 .. raw:: html
 
@@ -227,7 +227,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_printing_dataset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py`
+  :doc:`/auto_examples/input_output/plot_printing_dataset`
 
 .. raw:: html
 
@@ -244,7 +244,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_write_dicom_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py`
+  :doc:`/auto_examples/input_output/plot_write_dicom`
 
 .. raw:: html
 
@@ -261,7 +261,7 @@ These examples illustrate the use of pydicom to read DICOM data.
   .. image:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_fileset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py`
+  :doc:`/auto_examples/input_output/plot_read_fileset`
 
 .. raw:: html
 
@@ -299,7 +299,7 @@ metadata of DICOM data.
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_anonymize_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py`
+  :doc:`/auto_examples/metadata_processing/plot_anonymize`
 
 .. raw:: html
 
@@ -316,7 +316,7 @@ metadata of DICOM data.
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
+  :doc:`/auto_examples/metadata_processing/plot_sequences`
 
 .. raw:: html
 
@@ -333,7 +333,7 @@ metadata of DICOM data.
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_add_dict_entries_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py`
+  :doc:`/auto_examples/metadata_processing/plot_add_dict_entries`
 
 .. raw:: html
 

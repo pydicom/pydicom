@@ -38,5 +38,6 @@
       ~FileSet.descriptor_file_id
       ~FileSet.is_staged
       ~FileSet.path
+      ~FileSet.root_path
    
    

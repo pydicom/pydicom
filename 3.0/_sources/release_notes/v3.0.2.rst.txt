@@ -1,0 +1,8 @@
+3.0.2
+=====
+
+Fixes
+-----
+
+* Fixed a security issue: a crafted DICOMDIR could set ``ReferencedFileID`` to a path outside the File-set root.
+  This addresses CVE-2026-32711.

@@ -1,11 +1,13 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pixel Data Utilities (pydicom.pixels.utils) &mdash; pydicom 3.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+  <title>Pixel Data Utilities (pydicom.pixels.utils) &mdash; pydicom 3.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
@@ -16,17 +18,13 @@
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=08bfcbec"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3f474186"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,9 +44,6 @@
             pydicom
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                3.0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -178,7 +173,7 @@
 <td><p>Return the expected length (in terms of bytes or pixels) of the <em>Pixel Data</em>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.get_image_pixel_ids.html#pydicom.pixels.utils.get_image_pixel_ids" title="pydicom.pixels.utils.get_image_pixel_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_image_pixel_ids</span></code></a>(ds)</p></td>
-<td><p>Return a dict of the pixel data affecting element's <a class="reference external" href="https://docs.python.org/3/library/functions.html#id" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">id()</span></code></a> values.</p></td>
+<td><p>Return a dict of the pixel data affecting element's <a class="reference external" href="https://docs.python.org/3/library/functions.html#id" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">id()</span></code></a> values.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.get_j2k_parameters.html#pydicom.pixels.utils.get_j2k_parameters" title="pydicom.pixels.utils.get_j2k_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_j2k_parameters</span></code></a>(codestream)</p></td>
 <td><p>Return a dict containing JPEG 2000 component parameters.</p></td>
@@ -187,22 +182,22 @@
 <td><p>Return NumberOfFrames or 1 if NumberOfFrames is None or 0.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.iter_pixels.html#pydicom.pixels.utils.iter_pixels" title="pydicom.pixels.utils.iter_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_pixels</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
-<td><p>Yield decoded pixel data frames from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
+<td><p>Yield decoded pixel data frames from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.pack_bits.html#pydicom.pixels.utils.pack_bits" title="pydicom.pixels.utils.pack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack_bits</span></code></a>(arr[, pad])</p></td>
-<td><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p></td>
+<td><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.pixel_array.html#pydicom.pixels.utils.pixel_array" title="pydicom.pixels.utils.pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_array</span></code></a>(src, *[, ds_out, specific_tags, ...])</p></td>
-<td><p>Return decoded pixel data from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
+<td><p>Return decoded pixel data from <cite>src</cite> as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.pixel_dtype.html#pydicom.pixels.utils.pixel_dtype" title="pydicom.pixels.utils.pixel_dtype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_dtype</span></code></a>(ds[, as_float])</p></td>
-<td><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> for the pixel data in <cite>ds</cite>.</p></td>
+<td><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> for the pixel data in <cite>ds</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.reshape_pixel_array.html#pydicom.pixels.utils.reshape_pixel_array" title="pydicom.pixels.utils.reshape_pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reshape_pixel_array</span></code></a>(ds, arr)</p></td>
-<td><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p></td>
+<td><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.set_pixel_data.html#pydicom.pixels.utils.set_pixel_data" title="pydicom.pixels.utils.set_pixel_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_pixel_data</span></code></a>(ds, arr, ...[, ...])</p></td>
-<td><p>Use an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to set a dataset's <em>Pixel Data</em> and related Image Pixel module elements.</p></td>
+<td><p>Use an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to set a dataset's <em>Pixel Data</em> and related Image Pixel module elements.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.pixels.utils.unpack_bits.html#pydicom.pixels.utils.unpack_bits" title="pydicom.pixels.utils.unpack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_bits</span></code></a>(src[, as_array])</p></td>
 <td><p>Unpack the bit-packed data in <cite>src</cite>.</p></td>
@@ -222,7 +217,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2024, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
