@@ -2195,9 +2195,10 @@ class FileSet:
             )
 
         for instance in self:
-            dst = self._path / instance.FileID
+            dst = root / instance.FileID
             dst.parent.mkdir(parents=True, exist_ok=True)
             fn: Callable
+            src: Path | str
             if instance.SOPInstanceUID in self._stage["+"]:
                 src = instance.path
                 fn = shutil.copyfile
