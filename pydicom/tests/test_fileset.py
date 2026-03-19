@@ -789,7 +789,7 @@ class TestRecordNode:
         ds = dcmread(p / "DICOMDIR")
         item = ds.DirectoryRecordSequence[-1]
         item.ReferencedFileID = "/01"
-        ds.save_as(p / "DICOMDIR", overwrite=True)
+        ds.save_as(p / "DICOMDIR")
         with pytest.raises(
             PermissionError,
             match=r"ReferencedFileID .* must be inside the DICOMDIR root path",
