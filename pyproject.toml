@@ -17,9 +17,6 @@ classifiers=[
     "Intended Audience :: Science/Research",
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Operating System :: OS Independent",
@@ -34,8 +31,8 @@ keywords = ["dicom, python, medical, imaging"]
 license = {text = "MIT"}
 name = "pydicom"
 readme = "README.md"
-requires-python = ">=3.7"
-version = "2.4.4"
+requires-python = ">=3.10"
+version = "2.4.5"
 
 
 [project.optional-dependencies]
