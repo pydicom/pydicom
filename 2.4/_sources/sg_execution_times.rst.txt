@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.950** total execution time for 16 files **from all galleries**:
+**00:00.680** total execution time for 16 files **from all galleries**:
 
 .. container::
 
@@ -32,40 +32,40 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``../examples/image_processing/plot_waveforms.py``)
-     - 00:00.419
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py` (``../examples/input_output/plot_read_fileset.py``)
-     - 00:00.271
+     - 00:00.231
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
-     - 00:00.113
+   * - :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``../examples/image_processing/plot_waveforms.py``)
+     - 00:00.226
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``../examples/input_output/plot_read_dicom.py``)
-     - 00:00.099
+     - 00:00.096
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``../examples/plot_dicom_difference.py``)
+     - 00:00.085
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py` (``../examples/input_output/plot_read_dicom_directory.py``)
-     - 00:00.014
+     - 00:00.011
      - 0.0
    * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``../examples/metadata_processing/plot_anonymize.py``)
-     - 00:00.009
+     - 00:00.010
      - 0.0
    * - :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` (``../examples/image_processing/plot_downsize_image.py``)
      - 00:00.007
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py` (``../examples/input_output/plot_printing_dataset.py``)
-     - 00:00.006
+     - 00:00.005
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``../examples/input_output/plot_write_dicom.py``)
-     - 00:00.006
+     - 00:00.005
      - 0.0
    * - :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``../examples/input_output/plot_read_rtplan.py``)
      - 00:00.003
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py` (``../examples/metadata_processing/plot_sequences.py``)
+   * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``../examples/metadata_processing/plot_add_dict_entries.py``)
      - 00:00.001
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``../examples/metadata_processing/plot_add_dict_entries.py``)
+   * - :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py` (``../examples/metadata_processing/plot_sequences.py``)
      - 00:00.001
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dicomtree.py` (``../examples/dicomtree.py``)

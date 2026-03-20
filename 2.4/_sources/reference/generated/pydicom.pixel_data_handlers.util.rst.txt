@@ -4,11 +4,6 @@
 .. automodule:: pydicom.pixel_data_handlers.util
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -30,15 +25,3 @@
       reshape_pixel_array
       unpack_bits
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

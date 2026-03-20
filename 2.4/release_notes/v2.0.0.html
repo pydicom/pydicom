@@ -1,30 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Version 2.0.0 &mdash; pydicom 2.4.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+  <title>Version 2.0.0 &mdash; pydicom 2.4.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=93989379"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -42,9 +40,6 @@
             pydicom
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                2.4.4
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -104,9 +99,9 @@
            <div itemprop="articleBody">
              
   <section id="version-2-0-0">
-<h1>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Permalink to this heading">¶</a></h1>
+<h1>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Link to this heading">¶</a></h1>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Dropped support for Python 2 (only Python 3.5+ supported)</p></li>
 <li><p>Changes to <cite>Dataset.file_meta</cite></p>
@@ -128,41 +123,41 @@ are deprecated and will be removed in version 2.1</p></li>
 Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</p></li>
 </ul>
 <section id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this heading">¶</a></h3>
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Allow PathLike objects for filename argument in <cite>dcmread</cite>, <cite>dcmwrite</cite> and
-<cite>Dataset.save_as</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1047">#1047</a>)</p></li>
+<cite>Dataset.save_as</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1047">#1047</a>)</p></li>
 <li><p>Deflate post-file meta information data when writing a dataset with the
-Deflated Explicit VR Little Endian transfer syntax UID (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1086">#1086</a>)</p></li>
+Deflated Explicit VR Little Endian transfer syntax UID (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1086">#1086</a>)</p></li>
 <li><p>Added <cite>config.replace_un_with_known_vr</cite> to be able to switch off automatic
-VR conversion for known tags with VR “UN” (see <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1067">#1067</a>)</p></li>
+VR conversion for known tags with VR “UN” (see <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1067">#1067</a>)</p></li>
 <li><p>Added <cite>config.use_DS_numpy</cite> and <cite>config.use_IS_numpy</cite> to have multi-valued
-data elements with VR of <strong>DS</strong> or <strong>IS</strong> return a numpy array (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/623">#623</a>)
+data elements with VR of <strong>DS</strong> or <strong>IS</strong> return a numpy array (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/623">#623</a>)
 (much faster for bigger arrays).  Both default to False to preserve previous
 behavior</p></li>
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h3>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed reading of datasets with an empty <cite>Specific Character Set</cite> tag
-(regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
+(regression, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
 <li><p>Fixed failure to parse dataset with an empty <em>LUT Descriptor</em> or
-<em>Red/Green/Blue Palette Color LUT Descriptor</em> element. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1049">#1049</a>)</p></li>
-<li><p>Made <cite>Dataset.save_as</cite> a wrapper for <cite>dcmwrite</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1042">#1042</a>) rather than
+<em>Red/Green/Blue Palette Color LUT Descriptor</em> element. (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1049">#1049</a>)</p></li>
+<li><p>Made <cite>Dataset.save_as</cite> a wrapper for <cite>dcmwrite</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1042">#1042</a>) rather than
 having different checks in each</p></li>
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.70</span></code> - JPEG Lossless (Process 14, SV1) from
 the Pillow pixel data handler as Pillow doesn’t support JPEG Lossless.
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1053">#1053</a>)</p></li>
-<li><p>Fixed error when writing elements with a VR of <strong>OF</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1053">#1053</a>)</p></li>
+<li><p>Fixed error when writing elements with a VR of <strong>OF</strong> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
 <li><p>Fixed improper conversion when reading elements with a VR of <strong>OF</strong>
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> not handling
-(0028,3006) <em>LUT Data</em> with a VR of <strong>OW</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1073">#1073</a>)</p></li>
-<li><p>Fixed access to private creator tag in raw datasets (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1078">#1078</a>)</p></li>
-<li><p>Fixed description of newly added known private tag (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1082">#1082</a>)</p></li>
-<li><p>Fixed update of private blocks after deleting private creator (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1097">#1097</a>)</p></li>
+(0028,3006) <em>LUT Data</em> with a VR of <strong>OW</strong> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1073">#1073</a>)</p></li>
+<li><p>Fixed access to private creator tag in raw datasets (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1078">#1078</a>)</p></li>
+<li><p>Fixed description of newly added known private tag (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1082">#1082</a>)</p></li>
+<li><p>Fixed update of private blocks after deleting private creator (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1097">#1097</a>)</p></li>
 <li><p>Fixed bug in updating <cite>pydicom.config.use_DS_Decimal</cite> flag
 in <a class="reference internal" href="../reference/generated/pydicom.config.DS_decimal.html#pydicom.config.DS_decimal" title="pydicom.config.DS_decimal"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS_decimal()</span></code></a></p></li>
 </ul>
@@ -178,7 +173,7 @@ in <a class="reference internal" href="../reference/generated/pydicom.config.DS_
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_image_processing_plot_downsize_image.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -24,7 +24,7 @@ Downsize MRI image using pydicom
 
 This example shows how to downsize an MR image from :math:`512  imes 512` to
 :math:`64       imes 64`. The downsizing is performed by taking the central section
-instead of averagin the pixels. Finally, the image is store as a dicom image.
+instead of averaging the pixels. Finally, the image is store as a dicom image.
 
 .. note::
 
@@ -186,6 +186,10 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_downsize_image.py <plot_downsize_image.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_downsize_image.zip <plot_downsize_image.zip>`
 
 
 .. only:: html

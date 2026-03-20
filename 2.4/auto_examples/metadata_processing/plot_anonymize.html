@@ -1,30 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anonymize DICOM data &mdash; pydicom 2.4.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+  <title>Anonymize DICOM data &mdash; pydicom 2.4.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=93989379"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -44,9 +42,6 @@
             pydicom
               <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                2.4.4
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -123,10 +118,10 @@
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-auto-examples-metadata-processing-plot-anonymize-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="anonymize-dicom-data">
-<span id="sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"></span><h1>Anonymize DICOM data<a class="headerlink" href="#anonymize-dicom-data" title="Permalink to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"></span><h1>Anonymize DICOM data<a class="headerlink" href="#anonymize-dicom-data" title="Link to this heading">¶</a></h1>
 <p>This example is a starting point to anonymize DICOM data.</p>
 <p>It shows how to read data and replace tags: person names, patient id,
 optionally remove curves and private tags, and write the results in a new file.</p>
@@ -134,16 +129,16 @@ optionally remove curves and private tags, and write the results in a new file.<
 <span class="c1"># license : MIT</span>
 
 
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydicom</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.data</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="anonymize-a-single-file">
-<h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Permalink to this heading">¶</a></h2>
+<h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Link to this heading">¶</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 
@@ -160,12 +155,12 @@ optionally remove curves and private tags, and write the results in a new file.<
 <p>We can define a callback function to find all tags corresponding to a person
 names inside the dataset. We can also define a callback function to remove
 curves tags.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">person_names_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">person_names_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
         <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;anonymous&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">curves_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">curves_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a><span class="o">.</span><span class="n">group</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">==</span> <span class="mh">0x5000</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">dataset</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tag</span></a><span class="p">]</span>
 </pre></div>
@@ -211,13 +206,16 @@ blank string.</p>
 (0010, 0030) Patient&#39;s Birth Date                DA: &#39;19000101&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.009 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.010 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-metadata-processing-plot-anonymize-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/de1da3fdb216bd623a5999980785f16d/plot_anonymize.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_anonymize.ipynb</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cdbc1bcbae90b5ff13fdc9b19581006e/plot_anonymize.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_anonymize.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/1d888e734237e2fb4f2774fff9629522/plot_anonymize.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_anonymize.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -235,7 +233,7 @@ blank string.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

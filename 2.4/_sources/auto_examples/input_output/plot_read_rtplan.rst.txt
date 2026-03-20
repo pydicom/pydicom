@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_input_output_plot_read_rtplan.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -93,6 +93,10 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_read_rtplan.py <plot_read_rtplan.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_read_rtplan.zip <plot_read_rtplan.zip>`
 
 
 .. only:: html

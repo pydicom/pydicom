@@ -4,11 +4,6 @@
 .. automodule:: pydicom.pixel_data_handlers.pylibjpeg_handler
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -21,15 +16,3 @@
       should_change_PhotometricInterpretation_to_RGB
       supports_transfer_syntax
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

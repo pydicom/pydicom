@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -163,7 +163,7 @@ This example illustrates how to print the data set in your own format.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.006 seconds)
+   **Total running time of the script:** (0 minutes 0.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:
@@ -179,6 +179,10 @@ This example illustrates how to print the data set in your own format.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_printing_dataset.py <plot_printing_dataset.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_printing_dataset.zip <plot_printing_dataset.zip>`
 
 
 .. only:: html

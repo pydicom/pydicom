@@ -1,30 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Version 1.0.0 &mdash; pydicom 2.4.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+  <title>Version 1.0.0 &mdash; pydicom 2.4.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=93989379"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -42,9 +40,6 @@
             pydicom
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                2.4.4
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -104,13 +99,13 @@
            <div itemprop="articleBody">
              
   <section id="version-1-0-0">
-<h1>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this heading">¶</a></h1>
+<h1>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Link to this heading">¶</a></h1>
 <p>This is a major release, with major changes, including backwards-incompatible
 changes.</p>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
 <section id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this heading">¶</a></h3>
+<h3>Major changes<a class="headerlink" href="#major-changes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>full Python 3 compatibility - one code base for both Python 2 and Python 3</p></li>
 <li><p>package name and import name now match – use <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code>
@@ -118,7 +113,7 @@ rather than <code class="docutils literal notranslate"><span class="pre">import<
 <li><p>added handlers for converting (7fe0,0010) <em>Pixel Data</em> to a <cite>numpy.ndarray</cite></p>
 <ul>
 <li><p>optional GDCM support for reading files with compressed pixel data
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/18">#18</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/18">#18</a>)</p></li>
 <li><p>optional Pillow and jpeg_ls support for reading some compressed pixel data
 files</p></li>
 <li><p>support for decompressing a compressed dataset in-place</p></li>
@@ -129,17 +124,17 @@ files</p></li>
 </ul>
 </section>
 <section id="other-enhancements">
-<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this heading">¶</a></h3>
+<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>added <code class="docutils literal notranslate"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
 values before exceptions thrown</p></li>
 <li><p>added context management methods to <code class="docutils literal notranslate"><span class="pre">Dataset</span></code></p></li>
 <li><p>added <code class="docutils literal notranslate"><span class="pre">misc.is_dicom()</span></code> function to check for DICOM file format</p></li>
-<li><p>added date/time converters (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</p></li>
-<li><p>added option to attempt other VRs if translate fails (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</p></li>
+<li><p>added date/time converters (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</p></li>
+<li><p>added option to attempt other VRs if translate fails (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</p></li>
 <li><p>added heuristics to read files that have no preamble or file meta
 information</p></li>
-<li><p>support for multi-valued DA, DT, TM data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</p></li>
+<li><p>support for multi-valued DA, DT, TM data elements (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DataElement</span></code>: added <code class="docutils literal notranslate"><span class="pre">keyword</span></code> and <code class="docutils literal notranslate"><span class="pre">is_retired</span></code> properties</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datadict</span></code>: added <code class="docutils literal notranslate"><span class="pre">dictionary_is_retired()</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">datadict</span></code>: added ability to add custom DICOM dictionary items via
@@ -151,8 +146,8 @@ information</p></li>
 <li><p>add/update TransferSyntaxUID when writing standard</p></li>
 <li><p>renamed <code class="docutils literal notranslate"><span class="pre">UID</span></code> package to <code class="docutils literal notranslate"><span class="pre">uid</span></code> (conforms to Python standard)</p></li>
 <li><p>added property <code class="docutils literal notranslate"><span class="pre">uid.is_private</span></code></p></li>
-<li><p>added definitions for storage SOP Class UIDs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</p></li>
-<li><p>added possibility to read only specific tags (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</p></li>
+<li><p>added definitions for storage SOP Class UIDs (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</p></li>
+<li><p>added possibility to read only specific tags (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</p></li>
 <li><p>added missing meta elements when writing DICOM file</p></li>
 <li><p>added <code class="docutils literal notranslate"><span class="pre">encaps</span></code> generator functions to access compressed frames</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">read_file</span></code> changed to <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>, <code class="docutils literal notranslate"><span class="pre">write_file</span></code> to <code class="docutils literal notranslate"><span class="pre">dcmwrite</span></code> for
@@ -160,7 +155,7 @@ greater clarity. Previous names still available for backwards compatibility.</p>
 </ul>
 </section>
 <section id="infrastructure">
-<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this heading">¶</a></h3>
+<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
 <a class="reference external" href="https://ci.appveyor.com/project/pydicom/pydicom">AppVeyor</a> builds for
@@ -175,12 +170,12 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h3>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
-<li><p>updated uid generation to ensure uniqueness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</p></li>
+<li><p>correctly handle PlanarConfiguration==0 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
+<li><p>updated uid generation to ensure uniqueness (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</p></li>
 <li><p>handle missing patient data in <code class="docutils literal notranslate"><span class="pre">show_dicomdir</span></code></p></li>
-<li><p>assume default transfer syntax if none in file meta  (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</p></li>
+<li><p>assume default transfer syntax if none in file meta  (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</p></li>
 <li><p>fixed reading/writing of empty tags and tags with bad VR</p></li>
 <li><p>fixed reading AE elements with leading or trailing spaces</p></li>
 <li><p>fixed handling of ambiguous VR elements</p></li>
@@ -200,7 +195,7 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_show_charset_name.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -78,6 +78,10 @@ Very simple app to display unicode person names.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: show_charset_name.py <show_charset_name.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: show_charset_name.zip <show_charset_name.zip>`
 
 
 .. only:: html

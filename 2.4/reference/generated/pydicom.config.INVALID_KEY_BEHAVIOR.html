@@ -1,30 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom.config.INVALID_KEY_BEHAVIOR &mdash; pydicom 2.4.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+  <title>pydicom.config.INVALID_KEY_BEHAVIOR &mdash; pydicom 2.4.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=93989379"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -44,9 +42,6 @@
             pydicom
               <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                2.4.4
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -157,23 +152,23 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-config-invalid-key-behavior">
-<h1>pydicom.config.INVALID_KEY_BEHAVIOR<a class="headerlink" href="#pydicom-config-invalid-key-behavior" title="Permalink to this heading">¶</a></h1>
+<h1>pydicom.config.INVALID_KEY_BEHAVIOR<a class="headerlink" href="#pydicom-config-invalid-key-behavior" title="Link to this heading">¶</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.config.INVALID_KEY_BEHAVIOR">
-<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">INVALID_KEY_BEHAVIOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'WARN'</span></em><a class="headerlink" href="#pydicom.config.INVALID_KEY_BEHAVIOR" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">INVALID_KEY_BEHAVIOR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'WARN'</span></span><a class="headerlink" href="#pydicom.config.INVALID_KEY_BEHAVIOR" title="Link to this definition">¶</a></dt>
 <dd><p>Control the behavior when invalid keys are used with
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">__contains__()</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">'invalid'</span> <span class="pre">in</span> <span class="pre">ds</span></code>).</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.1.</span></p>
+<p><span class="versionmodified added">Added in version 2.1.</span></p>
 </div>
 <p>Invalid keys are objects that cannot be converted to a
 <a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a>, such as unknown element keywords or invalid
 element tags like <code class="docutils literal notranslate"><span class="pre">0x100100010</span></code>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">&quot;WARN&quot;</span></code> (default), then warn when an invalid key is used, if <code class="docutils literal notranslate"><span class="pre">&quot;RAISE&quot;</span></code>
-then raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception. If <code class="docutils literal notranslate"><span class="pre">&quot;IGNORE&quot;</span></code> then neither warn
+then raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception. If <code class="docutils literal notranslate"><span class="pre">&quot;IGNORE&quot;</span></code> then neither warn
 nor raise.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">INVALID_KEY_BEHAVIOR</span> <span class="o">=</span> <span class="s2">&quot;RAISE&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;PatientName&#39;</span> <span class="ow">in</span> <span class="n">ds</span>  <span class="c1"># OK</span>
@@ -182,7 +177,7 @@ nor raise.</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">494</span>, in <span class="n">__contains__</span>
-<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <span class="gr">ValueError</span>: <span class="n">Invalid value used with the &#39;in&#39; operator: must be an</span>
 <span class="x">element tag as a 2-tuple or int, or an element keyword</span>
 </pre></div>
@@ -202,7 +197,7 @@ nor raise.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

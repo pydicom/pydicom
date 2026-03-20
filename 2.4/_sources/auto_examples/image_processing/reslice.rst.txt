@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_image_processing_reslice.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -120,6 +120,10 @@ location, building a 3D image and reslicing it in different planes.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: reslice.py <reslice.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: reslice.zip <reslice.zip>`
 
 
 .. only:: html

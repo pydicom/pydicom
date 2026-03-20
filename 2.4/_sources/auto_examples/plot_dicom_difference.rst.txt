@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_dicom_difference.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -749,7 +749,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.113 seconds)
+   **Total running time of the script:** (0 minutes 0.085 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:
@@ -765,6 +765,10 @@ This examples illustrates how to find the differences between two DICOM files.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_dicom_difference.py <plot_dicom_difference.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_dicom_difference.zip <plot_dicom_difference.zip>`
 
 
 .. only:: html

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_memory_dataset.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -118,6 +118,10 @@ datasets saved as blobs in a database.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: memory_dataset.py <memory_dataset.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: memory_dataset.zip <memory_dataset.zip>`
 
 
 .. only:: html

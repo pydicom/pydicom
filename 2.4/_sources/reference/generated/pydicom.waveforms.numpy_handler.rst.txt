@@ -4,11 +4,6 @@
 .. automodule:: pydicom.waveforms.numpy_handler
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -17,15 +12,3 @@
       is_available
       multiplex_array
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

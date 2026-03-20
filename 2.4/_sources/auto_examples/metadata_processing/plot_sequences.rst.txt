@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_metadata_processing_plot_sequences.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -97,6 +97,10 @@ This examples illustrates how to work with sequences.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_sequences.py <plot_sequences.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_sequences.zip <plot_sequences.zip>`
 
 
 .. only:: html

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_dicomtree.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -126,6 +126,10 @@ python3 dicomtree.py
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: dicomtree.py <dicomtree.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: dicomtree.zip <dicomtree.zip>`
 
 
 .. only:: html

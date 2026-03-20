@@ -1,30 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Version 1.1.0 &mdash; pydicom 2.4.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+  <title>Version 1.1.0 &mdash; pydicom 2.4.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=93989379"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -42,9 +40,6 @@
             pydicom
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                2.4.4
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -104,47 +99,47 @@
            <div itemprop="articleBody">
              
   <section id="version-1-1-0">
-<h1>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Permalink to this heading">¶</a></h1>
+<h1>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Link to this heading">¶</a></h1>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
 <section id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this heading">¶</a></h3>
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">UID.__str__</span></code> no longer returns the UID name (when known). The UID name is
 still available using the <code class="docutils literal notranslate"><span class="pre">UID.name</span></code> property.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Dataset</span></code> equality now only compares the dataset’s <code class="docutils literal notranslate"><span class="pre">DataElements</span></code>
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/464">#464</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/464">#464</a>)</p></li>
 <li><p>the <code class="docutils literal notranslate"><span class="pre">codify</span></code> script now supports VRs OD and OL, and works in Python 3
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/498">#498</a>); documentation has been added for <code class="docutils literal notranslate"><span class="pre">codify</span></code></p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/498">#498</a>); documentation has been added for <code class="docutils literal notranslate"><span class="pre">codify</span></code></p></li>
 <li><p>the performance for reading and writing datasets has been improved to
-be better than in pydicom 0.9.9 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/605">#605</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/512">#512</a>)</p></li>
-<li><p>added support for bit-packed pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/292">#292</a>)</p></li>
+be better than in pydicom 0.9.9 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/605">#605</a>, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/512">#512</a>)</p></li>
+<li><p>added support for bit-packed pixel data (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/292">#292</a>)</p></li>
 <li><p>updated DICOM dictionary for 2018b edition</p></li>
-<li><p>added full API documentation to pydicom documentation (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/649">#649</a>)</p></li>
+<li><p>added full API documentation to pydicom documentation (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/649">#649</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h3>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">UID</span></code> should behave as expected for a python <code class="docutils literal notranslate"><span class="pre">str</span></code> subclass
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/256">#256</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/256">#256</a>)</p></li>
 <li><p>group length elements in groups above 0x0006 removed on writing
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/32">#32</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/32">#32</a>)</p></li>
 <li><p>fixed <code class="docutils literal notranslate"><span class="pre">write_PN</span></code> raising a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> when called with a non-iterable
-encoding parameter (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/489">#489</a>)</p></li>
-<li><p>fixed padding for some odd-sized image data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/599">#599</a>)</p></li>
-<li><p>removed unneeded warning for incorrect date string length (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/597">#597</a>)</p></li>
+encoding parameter (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/489">#489</a>)</p></li>
+<li><p>fixed padding for some odd-sized image data (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/599">#599</a>)</p></li>
+<li><p>removed unneeded warning for incorrect date string length (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/597">#597</a>)</p></li>
 <li><p>fixed <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> not slicing correctly when an (0xFFFF,0xFFFF) element is
-present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/92">#92</a>)</p></li>
-<li><p>use correct VR for unknown private tags and private creators (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/620">#620</a>)</p></li>
-<li><p>fixed crash on reading RGB data with implicit VR (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/620">#620</a>)</p></li>
-<li><p>parent encoding was not used in sequences without own encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/625">#625</a>)</p></li>
-<li><p>fixed error handling for values too large to fit in VR IS (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/640">#640</a>)</p></li>
+present (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/92">#92</a>)</p></li>
+<li><p>use correct VR for unknown private tags and private creators (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/620">#620</a>)</p></li>
+<li><p>fixed crash on reading RGB data with implicit VR (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/620">#620</a>)</p></li>
+<li><p>parent encoding was not used in sequences without own encoding (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/625">#625</a>)</p></li>
+<li><p>fixed error handling for values too large to fit in VR IS (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/640">#640</a>)</p></li>
 </ul>
 </section>
 </section>
 <section id="other">
-<h2>Other<a class="headerlink" href="#other" title="Permalink to this heading">¶</a></h2>
+<h2>Other<a class="headerlink" href="#other" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
 comparing <code class="docutils literal notranslate"><span class="pre">UID</span> <span class="pre">==</span> <span class="pre">[UID</span> <span class="pre">name]</span></code> and <code class="docutils literal notranslate"><span class="pre">UID</span> <span class="pre">!=</span> <span class="pre">[UID</span> <span class="pre">name]</span></code>. Starting in v1.2,
@@ -164,7 +159,7 @@ return False. Use <code class="docutils literal notranslate"><span class="pre">U
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

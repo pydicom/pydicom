@@ -4,11 +4,6 @@
 .. automodule:: pydicom.overlays.numpy_handler
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -18,15 +13,3 @@
       is_available
       reshape_overlay_array
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

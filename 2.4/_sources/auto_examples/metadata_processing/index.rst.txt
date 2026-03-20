@@ -16,17 +16,18 @@ metadata of DICOM data.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add dictionary items to the &#x27;standard&#x27; DICOM dictionary dynami...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add dictionary items to the &#x27;standard&#x27; DICOM dictionary dynamically.">
 
 .. only:: html
 
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_add_dict_entries_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py`
+  :doc:`/auto_examples/metadata_processing/plot_add_dict_entries`
 
 .. raw:: html
 
@@ -43,7 +44,7 @@ metadata of DICOM data.
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
+  :doc:`/auto_examples/metadata_processing/plot_sequences`
 
 .. raw:: html
 
@@ -60,13 +61,15 @@ metadata of DICOM data.
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_anonymize_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py`
+  :doc:`/auto_examples/metadata_processing/plot_anonymize`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Anonymize DICOM data</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

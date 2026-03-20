@@ -1,30 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Working with Overlay Data &mdash; pydicom 2.4.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+  <title>Working with Overlay Data &mdash; pydicom 2.4.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0279de7d" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=93989379"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=ccdb6887"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -44,9 +42,6 @@
             pydicom
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                2.4.4
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -124,20 +119,20 @@
            <div itemprop="articleBody">
              
   <section id="working-with-overlay-data">
-<span id="id1"></span><h1>Working with Overlay Data<a class="headerlink" href="#working-with-overlay-data" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>Working with Overlay Data<a class="headerlink" href="#working-with-overlay-data" title="Link to this heading">¶</a></h1>
 <p class="rubric">How to work with overlay data in pydicom.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.9.2.html">Overlays</a> in DICOM are present in what’s called
-a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.6.html">Repeating Group</a>, where the group number of the
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p><a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.9.2.html">Overlays</a> in DICOM are present in what’s called
+a <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.6.html">Repeating Group</a>, where the group number of the
 element tags are defined over a range rather than a specific value. For
 example, the tag’s group number for (60xx,3000) <em>Overlay Data</em> may be (in hex)
 <code class="docutils literal notranslate"><span class="pre">6000</span></code>, <code class="docutils literal notranslate"><span class="pre">6002</span></code>, or any even value up to <code class="docutils literal notranslate"><span class="pre">601E</span></code>. This allows a dataset to
 include multiple overlays, where the related elements for each overlay use the
 same group number. Because of this, the only way to access a particular
 element from an overlay is to use the <code class="docutils literal notranslate"><span class="pre">Dataset[group,</span> <span class="pre">elem]</span></code> method:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_testdata_files</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;MR-SIEMENS-DICOM-WithOverlays.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">]</span>  <span class="c1"># returns a DataElement</span>
@@ -147,13 +142,13 @@ element from an overlay is to use the <code class="docutils literal notranslate"
 </div>
 <p>pydicom tends to be “lazy” in interpreting DICOM data. For example, by default
 it doesn’t do anything with overlay data except read in the raw bytes:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">value</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span><span class="o">.</span><span class="n">value</span>
 <span class="go">b&#39;\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...</span>
 </pre></div>
 </div>
 </section>
 <section id="dataset-overlay-array">
-<h2><code class="docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code><a class="headerlink" href="#dataset-overlay-array" title="Permalink to this heading">¶</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code><a class="headerlink" href="#dataset-overlay-array" title="Link to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a>
@@ -162,9 +157,9 @@ requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
 <p>The <em>Overlay Data</em> element contains the raw bytes exactly as found in the file
 as bit-packed data. To unpack and get an overlay in a more useful form you
 can use the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">overlay_array()</span></code></a> method to return a
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>. To use it you simply pass the group number of the
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>. To use it you simply pass the group number of the
 overlay elements you’re interested in:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">overlay_array</span><span class="p">(</span><span class="mh">0x6000</span><span class="p">)</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">overlay_array</span><span class="p">(</span><span class="mh">0x6000</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
 <span class="go">array([[ 0, 0, 0, ...,  0,  0,  0],</span>
 <span class="go">       [ 0, 0, 0, ...,  0,  0,  0],</span>
@@ -191,7 +186,7 @@ back to the correct element:</p>
 <span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Pack the data</span>
-<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.numpy_handler</span> <span class="kn">import</span> <span class="n">pack_bits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.pixel_data_handlers.numpy_handler</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack_bits</span>
 <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pack_bits</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
 <span class="c1"># Update the element value</span>
@@ -218,7 +213,7 @@ explicitly set these yourself; pydicom does not do so automatically.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2026, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
