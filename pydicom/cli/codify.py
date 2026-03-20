@@ -24,7 +24,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         ),
     )
 
-    # Codify existed before as a stand-alone before, re-use it here
+    # Codify existed before as a stand-alone before, reuse it here
     pydicom.util.codify.set_parser_arguments(
         codify_parser, default_exclude_size
     )

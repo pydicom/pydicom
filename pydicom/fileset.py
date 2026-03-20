@@ -2176,7 +2176,7 @@ class FileSet:
         root = self.root_path
         p = root / "DICOMDIR"
 
-        # Re-use the existing directory structure if only moves or removals
+        # Reuse the existing directory structure if only moves or removals
         #   are required and `use_existing` is True
         major_change = bool(self._stage['+'])
         if use_existing and major_change:

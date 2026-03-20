@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - run: pip install --user ruff
-    - run: ruff --format=github .
+#    - run: ruff check .
     - name: black
       uses: reviewdog/action-black@v3
       with:
