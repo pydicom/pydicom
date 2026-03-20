@@ -6,11 +6,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - run: pip install --user ruff
     - run: ruff --format=github .
     - name: black
-      uses: reviewdog/action-black@v2
+      uses: reviewdog/action-black@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         level: warning

@@ -2,7 +2,8 @@ name: pr-unit-tests
 
 on:
   pull_request:
-    branches: [ master ]
+    branches:
+        - '2.4.X'
 
 jobs:
   test-pypy:
@@ -13,9 +14,9 @@ jobs:
         os: [ubuntu-latest]
         python-version: [pypy-3.7]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Initial test environment setup
@@ -43,12 +44,12 @@ jobs:
             send-coverage: true
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -97,12 +98,12 @@ jobs:
             pytest-args: --cov=pydicom --cov-append
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
