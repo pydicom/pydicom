@@ -25,7 +25,7 @@ jobs:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -51,7 +51,7 @@ jobs:
     - name: Initial test environment setup
       run: |
         python -m pip install --editable .
-        python -m pip install --upgrade wheel pytest pytest-cov
+        python -m pip install --upgrade wheel pytest pytest-cov pyfakefs
 
     # Core library tests
     - name: Test core library

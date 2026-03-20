@@ -16,13 +16,13 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: Initial test environment setup
       run: |
         python -m pip install --editable .
-        python -m pip install --upgrade wheel pytest
+        python -m pip install --upgrade wheel pytest pyfakefs
     - name: Test with no external libraries
       run: |
         pytest
@@ -49,7 +49,7 @@ jobs:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -75,7 +75,7 @@ jobs:
     - name: Initial test environment setup
       run: |
         python -m pip install --editable .
-        python -m pip install wheel pytest pytest-cov
+        python -m pip install wheel pytest pytest-cov pyfakefs
 
     - name: Test core library
       run: |
@@ -103,7 +103,7 @@ jobs:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
 
