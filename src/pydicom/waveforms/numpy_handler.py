@@ -125,7 +125,7 @@ def generate_multiplex(
         # C1S1, C2S1, ..., CnS1, C1S2, ..., CnS2, ..., C1Sm, ..., CnSm
         dtype = WAVEFORM_DTYPES[(bits_allocated, sample_interpretation)]
         arr = np.frombuffer(cast(bytes, item.WaveformData)[:expected_len], dtype=dtype)
-        # Reshape to (samples, channels) and make writeable
+        # Reshape to (samples, channels) and make writable
         arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
         if not as_raw:
@@ -200,7 +200,7 @@ def multiplex_array(ds: "Dataset", index: int, as_raw: bool = True) -> "np.ndarr
     # C1S1, C2S1, ..., CnS1, C1S2, ..., CnS2, ..., C1Sm, ..., CnSm
     dtype = WAVEFORM_DTYPES[(bits_allocated, sample_interpretation)]
     arr = np.frombuffer(cast(bytes, item.WaveformData)[:expected_len], dtype=dtype)
-    # Reshape to (samples, channels) and make writeable
+    # Reshape to (samples, channels) and make writable
     arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
     if not as_raw:

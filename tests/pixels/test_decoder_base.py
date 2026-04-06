@@ -868,9 +868,9 @@ class TestDecodeRunner_Reshape:
         # Test reshape to (rows, cols) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
-        assert not out.flags.writeable
+        assert not out.flags.writable
         out = self.runner.reshape(out, None)
-        assert not out.flags.writeable
+        assert not out.flags.writable
 
     def test_1frame_3sample_0conf(self, _1frame_3sample_0config):
         """Test reshaping 1 frame, 3 sample/pixel for 0 planar config."""
@@ -887,9 +887,9 @@ class TestDecodeRunner_Reshape:
         # Test reshape to (rows, cols, planes) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
-        assert not out.flags.writeable
+        assert not out.flags.writable
         out = self.runner.reshape(out, None)
-        assert not out.flags.writeable
+        assert not out.flags.writable
 
     def test_1frame_3sample_1conf(self, _1frame_3sample_1config):
         """Test reshaping 1 frame, 3 sample/pixel for 1 planar config."""
@@ -906,9 +906,9 @@ class TestDecodeRunner_Reshape:
         # Test reshape to (rows, cols, planes) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
-        assert not out.flags.writeable
+        assert not out.flags.writable
         out = self.runner.reshape(out, None)
-        assert not out.flags.writeable
+        assert not out.flags.writable
 
     def test_2frame_1sample(self, _1frame_1sample, _2frame_1sample):
         """Test reshaping 2 frame, 1 sample/pixel."""
@@ -921,9 +921,9 @@ class TestDecodeRunner_Reshape:
         # Test reshape to (frames, rows, cols) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
-        assert not out.flags.writeable
+        assert not out.flags.writable
         out = self.runner.reshape(out, None)
-        assert not out.flags.writeable
+        assert not out.flags.writable
 
         arr = self.runner.reshape(_1frame_1sample, 0)
         assert (4, 5) == arr.shape
@@ -946,9 +946,9 @@ class TestDecodeRunner_Reshape:
         # Test reshape to (frames, rows, cols, planes) is view-only
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
-        assert not out.flags.writeable
+        assert not out.flags.writable
         out = self.runner.reshape(out, None)
-        assert not out.flags.writeable
+        assert not out.flags.writable
 
         arr = self.runner.reshape(_1frame_3sample_0config, 0)
         assert (4, 5, 3) == arr.shape
@@ -975,9 +975,9 @@ class TestDecodeRunner_Reshape:
         self.runner.set_option("planar_configuration", 1)
         buffer = arr.tobytes()
         out = np.frombuffer(buffer, arr.dtype)
-        assert not out.flags.writeable
+        assert not out.flags.writable
         out = self.runner.reshape(out, None)
-        assert not out.flags.writeable
+        assert not out.flags.writable
 
         self.runner._frame_meta = {}
         self.runner.set_option("planar_configuration", 1)
@@ -1162,7 +1162,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert meta["bits_stored"] == 12
 
     def test_native_view_only(self):
@@ -1176,7 +1176,7 @@ class TestDecoder_Array:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert not arr.flags.writeable  # read-only
+        assert not arr.flags.writable  # read-only
         assert meta["photometric_interpretation"] == PI.YBR_FULL
 
         # Also tests buffer-like `src`
@@ -1203,7 +1203,7 @@ class TestDecoder_Array:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable  # not read-only
+        assert arr.flags.writable  # not read-only
 
         arr, _ = decoder.as_array(
             memoryview(ds.PixelData),  # view of an immutable
@@ -1214,7 +1214,7 @@ class TestDecoder_Array:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert not arr.flags.writeable  # read-only
+        assert not arr.flags.writable  # read-only
 
         arr, _ = decoder.as_array(
             memoryview(bytearray(ds.PixelData)),  # view of a mutable
@@ -1225,7 +1225,7 @@ class TestDecoder_Array:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable  # not read-only
+        assert arr.flags.writable  # not read-only
 
         # BinaryIO
         with open(reference.path, "rb") as f:
@@ -1240,7 +1240,7 @@ class TestDecoder_Array:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert not arr.flags.writeable  # read-only
+        assert not arr.flags.writable  # read-only
 
     def test_native_excess_frames(self):
         """Test returning excess frame data"""
@@ -1279,7 +1279,7 @@ class TestDecoder_Array:
             EXPL_16_1_10F.test(arr, index=index)
             assert arr.shape == EXPL_16_1_10F.shape[1:]
             assert arr.dtype == EXPL_16_1_10F.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert meta["bits_stored"] == 12
 
     def test_encapsulated_index(self):
@@ -1294,7 +1294,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert meta["bits_stored"] == 12
 
     def test_encapsulated_plugin(self):
@@ -1306,7 +1306,7 @@ class TestDecoder_Array:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["bits_stored"] == 12
 
     def test_encapsulated_excess_frames(self):
@@ -1427,7 +1427,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert meta["bits_stored"] == 12
 
     def test_processing_colorspace(self):
@@ -1446,7 +1446,7 @@ class TestDecoder_Array:
         reference.test(arr, as_rgb=True)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["photometric_interpretation"] == PI.RGB
         assert not isinstance(meta["photometric_interpretation"], PI)
 
@@ -1556,7 +1556,7 @@ class TestDecoder_Array:
         for idx, (arr, meta) in enumerate(func):
             reference.test(arr, index=indices[idx])
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert arr.shape == reference.shape[1:]
             assert meta["bits_stored"] == 12
             assert meta["number_of_frames"] == 1
@@ -1585,14 +1585,14 @@ class TestDecoder_Array:
             reference.test(arr, index=0)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable  # not a view due to bit-shift
+            assert arr.flags.writable  # not a view due to bit-shift
             assert msg in caplog.text
 
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index + 1)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable  # not a view due to bit-shift
+            assert arr.flags.writable  # not a view due to bit-shift
 
         func = decoder.iter_array(
             ds, view_only=True, raw=True, correct_unused_bits=False
@@ -1601,7 +1601,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert not arr.flags.writeable  # read-only
+            assert not arr.flags.writable  # read-only
 
         func = decoder.iter_array(
             bytearray(ds.PixelData),  # mutable
@@ -1622,7 +1622,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable  # not read-only
+            assert arr.flags.writable  # not read-only
 
         func = decoder.iter_array(
             memoryview(ds.PixelData),  # view of an immutable
@@ -1644,7 +1644,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert not arr.flags.writeable  # read-only
+            assert not arr.flags.writable  # read-only
 
         func = decoder.iter_array(
             memoryview(bytearray(ds.PixelData)),  # view of a mutable
@@ -1665,7 +1665,7 @@ class TestDecoder_Array:
             reference.test(arr, index=index)
             assert arr.shape == reference.shape[1:]
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable  # not read-only
+            assert arr.flags.writable  # not read-only
 
     def test_iter_encapsulated_indices(self):
         """Test the `indices` argument with encapsulated data."""
@@ -1679,7 +1679,7 @@ class TestDecoder_Array:
         for idx, (arr, meta) in enumerate(func):
             reference.test(arr, index=indices[idx])
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert arr.shape == reference.shape[1:]
             assert meta["bits_stored"] == 12
             assert meta["number_of_frames"] == 1
@@ -1695,7 +1695,7 @@ class TestDecoder_Array:
         for index, (arr, _) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert arr.shape == reference.shape[1:]
 
     def test_iter_processing(self):
@@ -1715,7 +1715,7 @@ class TestDecoder_Array:
         reference.test(arr, as_rgb=True)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["photometric_interpretation"] == PI.RGB
 
         # force_rgb

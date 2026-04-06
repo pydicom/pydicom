@@ -187,13 +187,13 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls:
         a = self.jpeg_ls_lossless.pixel_array
         b = self.mr_small.pixel_array
         assert b.mean() == a.mean()
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_emri_JPEG_LS_PixelArray(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
         assert b.mean() == a.mean()
-        assert a.flags.writeable
+        assert a.flags.writable
 
     @pytest.mark.parametrize("handler_name", SUPPORTED_HANDLER_NAMES)
     def test_decompress_using_handler(self, handler_name):

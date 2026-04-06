@@ -73,7 +73,7 @@ class TestDecoding:
         reference.test(arr, plugin="gdcm")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGExtended12Bit], ids=name)
     def test_jpg_extended(self, reference):
@@ -92,7 +92,7 @@ class TestDecoding:
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLossless], ids=name)
     def test_jpg_lossless(self, reference):
@@ -102,7 +102,7 @@ class TestDecoding:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLosslessSV1], ids=name)
     def test_jpg_lossless_sv1(self, reference):
@@ -130,7 +130,7 @@ class TestDecoding:
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless], ids=name)
     def test_jls_lossy(self, reference):
@@ -140,7 +140,7 @@ class TestDecoding:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000Lossless], ids=name)
     def test_j2k_lossless(self, reference):
@@ -150,7 +150,7 @@ class TestDecoding:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000], ids=name)
     def test_j2k(self, reference):
@@ -160,7 +160,7 @@ class TestDecoding:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_bits_allocated_mismatch(self):
         """Test the result when bits stored <= 8 and bits allocated 16"""
@@ -177,7 +177,7 @@ class TestDecoding:
         assert arr.shape == JLSN_08_01_1_0_1F.shape
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
         assert arr.dtype == "<u2"
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_bits_allocated_mismatch_as_buffer(self):
         """Test the result when bits stored <= 8 and bits allocated 16"""
@@ -233,7 +233,7 @@ class TestDecoding:
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["photometric_interpretation"] == "RGB"
 
     def test_jfif(self):
@@ -253,7 +253,7 @@ class TestDecoding:
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["photometric_interpretation"] == "YBR_FULL_422"
 
     @pytest.mark.skipif(sys.byteorder != "little", reason="Running on BE system")
@@ -382,7 +382,7 @@ class TestDecoding:
         arr, _ = decoder.as_array(reference.ds, index=0, decoding_plugin="gdcm")
         reference.test(arr)
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_j2k_sign_correction_iter(self):
         """Test that sign correction works as expected with iter_array()"""
@@ -391,7 +391,7 @@ class TestDecoding:
         for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="gdcm"):
             reference.test(arr)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
     @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
     def test_j2k_singlebit_as_buffer(self, path):

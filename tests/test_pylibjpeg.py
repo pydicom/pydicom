@@ -488,7 +488,7 @@ class TestJPEG:
 
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
@@ -589,7 +589,7 @@ class TestJPEGLS:
 
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
@@ -636,7 +636,7 @@ class TestJPEG2K:
         else:
             arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
@@ -647,7 +647,7 @@ class TestJPEG2K:
         else:
             arr = as_array(ds)
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
@@ -811,7 +811,7 @@ class TestJPEG2K:
         assert 1 == ds.PixelRepresentation
         assert "int16" == arr.dtype
         assert (512, 512) == arr.shape
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         assert -2000 == arr[0, 0]
         assert [621, 412, 138, -193, -520, -767, -907, -966, -988, -995] == (
@@ -884,7 +884,7 @@ class TestRLE:
 
         # Check Dataset.pixel_array
         arr = ds.pixel_array
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[4] == arr.shape
         assert arr.dtype == data[5]
 
@@ -892,7 +892,7 @@ class TestRLE:
         ds = dcmread(fpath)
         ds.pixel_array_options(use_v2_backend=True)
         arr = as_array(ds)
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[4] == arr.shape
         assert arr.dtype == data[5]
 

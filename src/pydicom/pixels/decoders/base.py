@@ -147,7 +147,7 @@ def _process_color_space(
         raise ValueError("'force_ybr' and 'force_rgb' cannot both be True")
 
     if force_ybr:
-        if not arr.flags.writeable:
+        if not arr.flags.writable:
             if runner.is_native and runner.get_option("view_only", False):
                 LOGGER.warning(
                     "Unable to return an ndarray that's a view on the original "
@@ -179,7 +179,7 @@ def _process_color_space(
         if not (runner.photometric_interpretation in ybr and as_rgb) and not force_rgb:
             return arr
 
-        if not arr.flags.writeable:
+        if not arr.flags.writable:
             if runner.get_option("view_only", False):
                 LOGGER.warning(
                     "Unable to return an ndarray that's a view on the original "
@@ -253,7 +253,7 @@ def _correct_unused_bits(
         log_warning
         and runner.get_option("view_only", False)
         and not runner.is_encapsulated
-        and not arr.flags.writeable
+        and not arr.flags.writable
     ):
         LOGGER.warning(
             "Unable to return an ndarray that's a view on the original buffer when "
@@ -263,7 +263,7 @@ def _correct_unused_bits(
             "array is equivalent to the corrected one."
         )
 
-    if not arr.flags.writeable:
+    if not arr.flags.writable:
         arr = arr.copy()
 
     bit_shift = runner.bits_allocated - runner.bits_stored
@@ -1345,7 +1345,7 @@ class Decoder(CoderBase):
             :attr:`~numpy.dtype.itemsize` sufficient to contain pixels of at
             least :ref:`bits allocated<bits_allocated>`.
 
-            A writeable :class:`~numpy.ndarray` is returned by default. For
+            A writable :class:`~numpy.ndarray` is returned by default. For
             native transfer syntaxes with ``view_only=True``, a read-only
             :class:`~numpy.ndarray` will be returned if `src` is immutable.
         dict[str, str | int]
@@ -1384,10 +1384,10 @@ class Decoder(CoderBase):
 
         if self.is_native:
             arr = self._as_array_native(runner, index)
-            as_writeable = not runner.get_option("view_only", False)
+            as_writable = not runner.get_option("view_only", False)
         else:
             arr = self._as_array_encapsulated(runner, index)
-            as_writeable = True
+            as_writable = True
 
         if runner._test_for("j2k_corrections"):
             # Performs both sign and shift corrections, if needed
@@ -1400,11 +1400,11 @@ class Decoder(CoderBase):
             arr = _correct_unused_bits(arr, runner)
 
         if not raw:
-            # Processing may give us a new writeable array anyway, so do
+            # Processing may give us a new writable array anyway, so do
             #   it first to avoid an unnecessary ndarray.copy()
             arr, _ = runner.process(arr, index)
 
-        arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
+        arr = arr.copy() if not arr.flags.writable and as_writable else arr
 
         return arr, runner.pixel_properties(index)
 
@@ -1427,7 +1427,7 @@ class Decoder(CoderBase):
         Returns
         -------
         numpy.ndarray
-            A writeable 2D, 3D or 4D array with the expected output dtype containing
+            A writable 2D, 3D or 4D array with the expected output dtype containing
             the pixel data. For single bit images (*Bits Allocated* of 1), pixels are
             always returned "unpacked", with a single pixel in each byte.
         """
@@ -1456,7 +1456,7 @@ class Decoder(CoderBase):
             # Upscale if the frame's dtype is smaller than the required output dtype
             # Only create a new array if the frame is read-only or if the frame's
             #   dtype doesn't match the output dtype
-            frame = frame.astype(runner.pixel_dtype, copy=not frame.flags.writeable)
+            frame = frame.astype(runner.pixel_dtype, copy=not frame.flags.writable)
             runner.set_frame_option(index, "bits_allocated", bits_allocated)
 
             return runner.reshape(frame, index)
@@ -1546,7 +1546,7 @@ class Decoder(CoderBase):
         -------
         numpy.ndarray
             A 2D, 3D or 4D array of the expected output dtype containing the pixel
-            data. May or may not be writeable.
+            data. May or may not be writable.
         """
         length_bytes = runner.frame_length(unit="bytes")
         length_pixels = int(runner.frame_length(unit="pixels"))
@@ -2129,7 +2129,7 @@ class Decoder(CoderBase):
             :attr:`~numpy.dtype.itemsize` sufficient to contain pixels of at
             least :ref:`bits allocated<bits_allocated>`.
 
-            A writeable :class:`~numpy.ndarray` is returned by default. For
+            A writable :class:`~numpy.ndarray` is returned by default. For
             native transfer syntaxes with ``view_only=True`` a read-only
             :class:`~numpy.ndarray` will be yielded if `src` is immutable.
         dict[str, str | int]
@@ -2165,10 +2165,10 @@ class Decoder(CoderBase):
 
         if self.is_native:
             func = self._as_array_native
-            as_writeable = not runner.get_option("view_only", False)
+            as_writable = not runner.get_option("view_only", False)
         else:
             func = self._as_array_encapsulated
-            as_writeable = True
+            as_writable = True
 
         log_warning = True
         # Encapsulated: all frames, separated out to allow for including excess frames
@@ -2187,7 +2187,7 @@ class Decoder(CoderBase):
 
                 # The `copy` arg will only create a new array if the frame is read-only
                 #   or if the frame's dtype doesn't match the output dtype
-                arr = arr.astype(pixel_dtype, copy=not arr.flags.writeable)
+                arr = arr.astype(pixel_dtype, copy=not arr.flags.writable)
                 runner.set_frame_option(idx, "bits_allocated", bits_allocated)
 
                 arr = runner.reshape(arr, idx)
@@ -2225,7 +2225,7 @@ class Decoder(CoderBase):
             if not raw:
                 arr, _ = runner.process(arr, idx)
 
-            arr = arr.copy() if not arr.flags.writeable and as_writeable else arr
+            arr = arr.copy() if not arr.flags.writable and as_writable else arr
 
             yield arr, runner.pixel_properties(idx)
 

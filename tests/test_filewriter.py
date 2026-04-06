@@ -1508,7 +1508,7 @@ class TestDCMWrite:
         with pytest.raises(
             TypeError,
             match=(
-                "dcmwrite: Expected a file path, file-like or writeable "
+                "dcmwrite: Expected a file path, file-like or writable "
                 "buffer, but got NoneType"
             ),
         ):
@@ -1516,7 +1516,7 @@ class TestDCMWrite:
         with pytest.raises(
             TypeError,
             match=(
-                "dcmwrite: Expected a file path, file-like or writeable "
+                "dcmwrite: Expected a file path, file-like or writable "
                 "buffer, but got int"
             ),
         ):

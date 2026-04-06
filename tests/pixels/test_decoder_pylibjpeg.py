@@ -79,7 +79,7 @@ class TestLibJpegDecoder:
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGExtended12Bit], ids=name)
     def test_jpg_extended(self, reference):
@@ -93,7 +93,7 @@ class TestLibJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLossless], ids=name)
     def test_jpg_lossless(self, reference):
@@ -103,7 +103,7 @@ class TestLibJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLosslessSV1], ids=name)
     def test_jpg_lossless_sv1(self, reference):
@@ -122,7 +122,7 @@ class TestLibJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless], ids=name)
     def test_jls_lossy(self, reference):
@@ -132,7 +132,7 @@ class TestLibJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_jpg_extended_invalid_se_raises(self):
         """Test invalid scan stop raises an exception."""
@@ -162,7 +162,7 @@ class TestLibJpegDecoder:
         assert arr.shape == JLSN_08_01_1_0_1F.shape
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
         assert arr.dtype == "<u2"
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["bits_allocated"] == 16
         assert meta["bits_stored"] == 8
 
@@ -202,7 +202,7 @@ class TestLibJpegDecoder:
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["photometric_interpretation"] == "RGB"
 
     def test_jfif(self):
@@ -222,7 +222,7 @@ class TestLibJpegDecoder:
         reference.test(arr, plugin="pylibjpeg")
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["photometric_interpretation"] == "YBR_FULL_422"
 
     def test_mixed_container_sizes(self):
@@ -314,7 +314,7 @@ class TestOpenJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEG2000], ids=name)
     def test_j2k(self, reference):
@@ -324,7 +324,7 @@ class TestOpenJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[HTJ2KLossless], ids=name)
     def test_htj2k_lossless(self, reference):
@@ -334,7 +334,7 @@ class TestOpenJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[HTJ2KLosslessRPCL], ids=name)
     def test_htj2k_lossless_rpcl(self, reference):
@@ -344,7 +344,7 @@ class TestOpenJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[HTJ2K], ids=name)
     def test_htj2k(self, reference):
@@ -354,7 +354,7 @@ class TestOpenJpegDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_iter_array(self):
         """Test J2k corrections are applied when using iter_array()"""
@@ -367,7 +367,7 @@ class TestOpenJpegDecoder:
         for arr, _ in frame_gen:
             reference.test(arr)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -381,7 +381,7 @@ class TestOpenJpegDecoder:
         for arr, _ in frame_gen:
             reference.test(arr)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -395,7 +395,7 @@ class TestOpenJpegDecoder:
         arr, meta = decoder.as_array(reference.ds, index=0, decoding_plugin="pylibjpeg")
         reference.test(arr)
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_j2k_sign_correction_iter(self):
         """Test that sign correction works as expected with iter_array()"""
@@ -404,7 +404,7 @@ class TestOpenJpegDecoder:
         for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="pylibjpeg"):
             reference.test(arr)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
     @pytest.mark.parametrize("path", [J2KR_1_1_3F.path, J2KR_1_1_3F_NONALIGNED.path])
     def test_j2k_singlebit_as_buffer(self, path):
@@ -517,7 +517,7 @@ class TestRleDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         if meta["samples_per_pixel"] > 1:
             assert meta["planar_configuration"] == 0

@@ -2270,7 +2270,7 @@ class TestFileDataset:
         assert arr[0].PatientName == ds.PatientName
         assert arr.dtype == object
         assert arr.shape == (1,)
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         arr[0].PatientName = "Citizen^Jan"
         assert arr[0].PatientName == "Citizen^Jan"

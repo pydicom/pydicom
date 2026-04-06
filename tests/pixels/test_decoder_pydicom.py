@@ -57,7 +57,7 @@ class TestAsArray:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         for index in range(reference.number_of_frames):
             arr, meta = self.decoder.as_array(
@@ -65,7 +65,7 @@ class TestAsArray:
             )
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -102,7 +102,7 @@ class TestAsArray:
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             for index in range(reference.number_of_frames):
                 arr, _ = self.decoder.as_array(
@@ -110,7 +110,7 @@ class TestAsArray:
                 )
                 reference.test(arr, index=index)
                 assert arr.dtype == reference.dtype
-                assert arr.flags.writeable
+                assert arr.flags.writable
 
                 if reference.number_of_frames == 1:
                     assert arr.shape == reference.shape
@@ -144,7 +144,7 @@ class TestAsArray:
         )
         reference.test(arr, index=9)
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.shape == reference.shape[1:]
 
 
@@ -164,7 +164,7 @@ class TestIterArray:
         for index, (arr, meta) in enumerate(func):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -201,7 +201,7 @@ class TestIterArray:
             for index, (arr, _) in enumerate(func):
                 reference.test(arr, index=index)
                 assert arr.dtype == reference.dtype
-                assert arr.flags.writeable
+                assert arr.flags.writable
 
                 if reference.number_of_frames == 1:
                     assert arr.shape == reference.shape
@@ -219,7 +219,7 @@ class TestIterArray:
         for idx, (arr, _) in enumerate(func):
             RLE_16_1_10F.test(arr, index=indices[idx])
             assert arr.dtype == RLE_16_1_10F.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert arr.shape == RLE_16_1_10F.shape[1:]
 
         assert idx == 2

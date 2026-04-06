@@ -1226,7 +1226,7 @@ def iter_pixels(
         * (rows, columns) for single sample data
         * (rows, columns, samples) for multi-sample data
 
-        A writeable :class:`~numpy.ndarray` is yielded by default. For
+        A writable :class:`~numpy.ndarray` is yielded by default. For
         native transfer syntaxes with ``view_only=True`` a read-only
         :class:`~numpy.ndarray` will be yielded.
     """
@@ -1561,7 +1561,7 @@ def pixel_array(
         * (frames, rows, columns) for multi-frame, single sample data
         * (frames, rows, columns, samples) for multi-frame, multi-sample data
 
-        A writeable :class:`~numpy.ndarray` is returned by default. For
+        A writable :class:`~numpy.ndarray` is returned by default. For
         native transfer syntaxes with ``view_only=True`` a read-only
         :class:`~numpy.ndarray` will be returned.
     """

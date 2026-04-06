@@ -72,7 +72,7 @@ class TestAsArray:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         for index in range(reference.number_of_frames):
             if reference == EXPL_16_1_1F_PAD:
@@ -86,7 +86,7 @@ class TestAsArray:
                 arr, _ = decoder.as_array(reference.ds, raw=True, index=index)
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -125,13 +125,13 @@ class TestAsArray:
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             for index in range(reference.number_of_frames):
                 arr, _ = decoder.as_array(f, raw=True, index=index, **opts)
                 reference.test(arr, index=index)
                 assert arr.dtype == reference.dtype
-                assert arr.flags.writeable
+                assert arr.flags.writable
                 assert f.tell() == file_offset
 
                 if reference.number_of_frames == 1:
@@ -149,13 +149,13 @@ class TestAsArray:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         for index in range(reference.number_of_frames):
             arr, _ = decoder.as_array(reference.ds, raw=True, index=index)
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -172,13 +172,13 @@ class TestAsArray:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         for index in range(reference.number_of_frames):
             arr, _ = decoder.as_array(reference.ds, raw=True, index=index)
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -195,13 +195,13 @@ class TestAsArray:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         for index in range(reference.number_of_frames):
             arr, _ = decoder.as_array(reference.ds, raw=True, index=index)
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -237,13 +237,13 @@ class TestAsArray:
             reference.test(arr)
             assert arr.shape == reference.shape
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             for index in range(reference.number_of_frames):
                 arr, _ = decoder.as_array(f, raw=True, index=index, **opts)
                 reference.test(arr, index=index)
                 assert arr.dtype == reference.dtype
-                assert arr.flags.writeable
+                assert arr.flags.writable
                 assert f.tell() == file_offset
 
                 if reference.number_of_frames == 1:
@@ -275,7 +275,7 @@ class TestIterArray:
 
         reference.test(arr, index=0)
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         if reference.number_of_frames == 1:
             assert arr.shape == reference.shape
@@ -285,7 +285,7 @@ class TestIterArray:
         for index, (arr, _) in enumerate(frame_generator):
             reference.test(arr, index=index + 1)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -325,7 +325,7 @@ class TestIterArray:
 
             reference.test(arr, index=0)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -335,7 +335,7 @@ class TestIterArray:
             for index, (arr, _) in enumerate(frame_generator):
                 reference.test(arr, index=index + 1)
                 assert arr.dtype == reference.dtype
-                assert arr.flags.writeable
+                assert arr.flags.writable
 
                 if reference.number_of_frames == 1:
                     assert arr.shape == reference.shape
@@ -353,7 +353,7 @@ class TestIterArray:
         for index, (arr, _) in enumerate(decoder.iter_array(reference.ds, raw=True)):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -369,7 +369,7 @@ class TestIterArray:
         for index, (arr, _) in enumerate(decoder.iter_array(reference.ds, raw=True)):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -385,7 +385,7 @@ class TestIterArray:
         for index, (arr, _) in enumerate(decoder.iter_array(reference.ds, raw=True)):
             reference.test(arr, index=index)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             if reference.number_of_frames == 1:
                 assert arr.shape == reference.shape
@@ -419,7 +419,7 @@ class TestIterArray:
             for index, (arr, _) in enumerate(decoder.iter_array(f, raw=True, **opts)):
                 reference.test(arr, index=index)
                 assert arr.dtype == reference.dtype
-                assert arr.flags.writeable
+                assert arr.flags.writable
 
                 if reference.number_of_frames == 1:
                     assert arr.shape == reference.shape

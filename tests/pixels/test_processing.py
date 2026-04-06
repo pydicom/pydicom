@@ -380,7 +380,7 @@ class TestModalityLUT:
         assert -1024 == ds.RescaleIntercept
         arr = ds.pixel_array
         out = apply_modality_lut(arr, ds)
-        assert out.flags.writeable
+        assert out.flags.writable
         assert np.float64 == out.dtype
 
         assert np.array_equal(arr - 1024, out)
@@ -404,7 +404,7 @@ class TestModalityLUT:
         assert 2047 == arr.max()
 
         out = apply_modality_lut(arr, ds)
-        assert out.flags.writeable
+        assert out.flags.writable
         assert out.dtype == np.uint16
         assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])
         assert [65535, 0, 0, 65535, 65535] == list(out[50, 50:55])
@@ -460,7 +460,7 @@ class TestModalityLUT:
         assert 2047 == arr.max()
 
         out = apply_modality_lut(arr, ds)
-        assert out.flags.writeable
+        assert out.flags.writable
         assert out.dtype == np.uint16
         assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])
         assert [65535, 0, 0, 65535, 65535] == list(out[50, 50:55])

@@ -122,7 +122,7 @@ def _decode_frame(src: bytes, runner: DecodeRunner) -> bytes:
 
     # Pillow converts N-bit signed/unsigned data to 8- or 16-bit unsigned data
     #   See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
-    buffer = bytearray(image.tobytes())  # so the array is writeable
+    buffer = bytearray(image.tobytes())  # so the array is writable
     del image
     dtype = runner.frame_dtype(runner.index)
     arr = np.frombuffer(buffer, dtype=f"<u{dtype.itemsize}")

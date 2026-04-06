@@ -125,7 +125,7 @@ class TestNumpy_NumpyHandler:
         ds = dcmread(EXPL_1_1_1F)
         arr = ds.overlay_array(0x6000)
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.max() == 1
         assert arr.min() == 0
         assert 29 == sum(arr[422, 393:422])
@@ -137,7 +137,7 @@ class TestNumpy_NumpyHandler:
         assert 0 == arr[0, 0]
         arr[0, 0] = 1
         assert 1 == arr[0, 0]
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_bad_group_raises(self):
         """Test that using a bad group raises exception."""

@@ -64,7 +64,7 @@ Changes
   instead.
 * A dataset's :attr:`~pydicom.dataset.FileDataset.file_meta` elements are no longer
   modified when writing.
-* :class:`~pydicom.filebase.DicomIO` now requires a readable or writeable buffer
+* :class:`~pydicom.filebase.DicomIO` now requires a readable or writable buffer
   during initialisation and :class:`~pydicom.filebase.DicomBytesIO` directly
   inherits from it.
 * The ``pydicom.encoders`` module has been moved to :mod:`pydicom.pixels.encoders

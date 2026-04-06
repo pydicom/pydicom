@@ -25,7 +25,7 @@ class ReadableBuffer(Protocol):
     def tell(self) -> int: ...  # pragma: no cover
 
 
-class WriteableBuffer(Protocol):
+class WritableBuffer(Protocol):
     def seek(self, offset: int, whence: int = ..., /) -> int: ...  # pragma: no cover
 
     def tell(self) -> int: ...  # pragma: no cover
@@ -40,7 +40,7 @@ class DicomIO:
     DICOM datasets.
     """
 
-    def __init__(self, buffer: ReadableBuffer | WriteableBuffer) -> None:
+    def __init__(self, buffer: ReadableBuffer | WritableBuffer) -> None:
         """Create a new ``DicomIO`` instance.
 
         Parameters
@@ -163,7 +163,7 @@ class DicomIO:
         self._name = name
 
     @property
-    def parent(self) -> ReadableBuffer | WriteableBuffer:
+    def parent(self) -> ReadableBuffer | WritableBuffer:
         """Return the buffer object being wrapped."""
         return self._buffer
 

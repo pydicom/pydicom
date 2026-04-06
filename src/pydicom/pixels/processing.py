@@ -472,7 +472,7 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
         # Set any unused bits to an appropriate value
         if bit_shift := itemsize - bit_depth:
-            if not lut.flags.writeable:
+            if not lut.flags.writable:
                 lut = lut.copy()
 
             np.left_shift(lut, bit_shift, out=lut)

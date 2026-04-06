@@ -553,7 +553,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert (600, 800) == arr.shape
             assert 244 == arr[0].min() == arr[0].max()
@@ -569,7 +569,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert (2, 600, 800) == arr.shape
             # Frame 1
@@ -637,7 +637,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert (255, 0, 0) == tuple(arr[5, 50, :])
             assert (255, 128, 128) == tuple(arr[15, 50, :])
@@ -659,7 +659,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             # Frame 1
             frame = arr[0]
@@ -715,7 +715,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert arr.max() == 1
             assert arr.min() == 0
@@ -734,7 +734,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert arr.max() == 1
             assert arr.min() == 0
@@ -778,7 +778,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert (422, 319, 361) == tuple(arr[0, 31:34])
             assert (366, 363, 322) == tuple(arr[31, :3])
@@ -813,7 +813,7 @@ class TestNumpy_NumpyHandler:
         assert (64, 64) == arr.shape
         assert arr.dtype == "<i2"
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         assert (422, 319, 361) == tuple(arr[0, 31:34])
         assert (366, 363, 322) == tuple(arr[31, :3])
@@ -830,7 +830,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             # Frame 1
             assert (206, 197, 159) == tuple(arr[0, 0, 31:34])
@@ -854,7 +854,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert (65535, 0, 0) == tuple(arr[5, 50, :])
             assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
@@ -876,7 +876,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             # Frame 1
             assert (65535, 0, 0) == tuple(arr[0, 5, 50, :])
@@ -901,7 +901,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
             assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
@@ -916,7 +916,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             # Frame 1
             assert (1249000, 1249000, 1250000) == tuple(arr[0, 0, :3])
@@ -940,7 +940,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             ar = ds.pixel_array
 
-            assert ar.flags.writeable
+            assert ar.flags.writable
 
             assert (4294967295, 0, 0) == tuple(ar[5, 50, :])
             assert (4294967295, 2155905152, 2155905152) == tuple(ar[15, 50, :])
@@ -962,7 +962,7 @@ class TestNumpy_NumpyHandler:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
 
             # Frame 1
             assert (4294967295, 0, 0) == tuple(arr[0, 5, 50, :])
@@ -989,7 +989,7 @@ class TestNumpy_NumpyHandler:
 
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert (10, 10) == arr.shape
             assert 1.75e-39 == pytest.approx(arr[0, 0], abs=0.01e-39)
             assert 1.44e-39 == pytest.approx(arr[4, 3], abs=0.01e-39)
@@ -1006,7 +1006,7 @@ class TestNumpy_NumpyHandler:
 
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert (15, 10, 10) == arr.shape
             assert 1.75e-39 == pytest.approx(arr[0, 0, 0], abs=0.01e-39)
             assert 1.44e-39 == pytest.approx(arr[0, 4, 3], abs=0.01e-39)
@@ -1024,7 +1024,7 @@ class TestNumpy_NumpyHandler:
 
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert (10, 10) == arr.shape
             assert 2.65e-308 == pytest.approx(arr[0, 0], abs=0.01e-308)
             assert 1.80e-308 == pytest.approx(arr[4, 3], abs=0.01e-308)
@@ -1042,7 +1042,7 @@ class TestNumpy_NumpyHandler:
 
             arr = ds.pixel_array
 
-            assert arr.flags.writeable
+            assert arr.flags.writable
             assert (15, 10, 10) == arr.shape
             assert 2.65e-308 == pytest.approx(arr[0, 0, 0], abs=0.01e-308)
             assert 1.80e-308 == pytest.approx(arr[0, 4, 3], abs=0.01e-308)
@@ -1087,7 +1087,7 @@ class TestNumpy_NumpyHandler:
         assert 0 != arr[0, 0]
         arr[0, 0] = 0
         assert 0 == arr[0, 0]
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
 
 # Tests for numpy_handler module with Numpy available
@@ -1245,13 +1245,13 @@ class TestNumpy_GetPixelData:
         ds = dcmread(EXPL_8_1_1F)
         ds.pixel_array_options(use_v2_backend=True)
         arr = get_pixeldata(ds, read_only=False)
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert 0 != arr[10]
         arr[10] = 0
         assert 0 == arr[10]
 
         arr = get_pixeldata(ds, read_only=True)
-        assert not arr.flags.writeable
+        assert not arr.flags.writable
         with pytest.raises(ValueError, match="is read-only"):
             arr[10] = 0
 
@@ -1260,10 +1260,10 @@ class TestNumpy_GetPixelData:
         ds = dcmread(EXPL_1_1_1F)
         ds.pixel_array_options(use_v2_backend=True)
         arr = get_pixeldata(ds, read_only=False)
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         arr = get_pixeldata(ds, read_only=True)
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_ybr422_excess_padding(self):
         """Test YBR data with excess padding."""

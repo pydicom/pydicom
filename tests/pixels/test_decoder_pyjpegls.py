@@ -39,7 +39,7 @@ class TestPyJpegLSDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     @pytest.mark.parametrize("reference", PIXEL_REFERENCE[JPEGLSNearLossless], ids=name)
     def test_jls_lossy(self, reference):
@@ -49,7 +49,7 @@ class TestPyJpegLSDecoder:
         reference.test(arr)
         assert arr.shape == reference.shape
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_bits_allocated_mismatch_as_array(self):
         """Test the result when bits stored <= 8 and bits allocated 16"""
@@ -66,7 +66,7 @@ class TestPyJpegLSDecoder:
         assert arr.shape == JLSN_08_01_1_0_1F.shape
         assert arr.dtype != JLSN_08_01_1_0_1F.dtype
         assert arr.dtype == "<u2"
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert meta["bits_allocated"] == 16
         assert meta["bits_stored"] == 8
 
@@ -97,7 +97,7 @@ class TestPyJpegLSDecoder:
         arr, meta = decoder.as_array(reference.ds, index=0, decoding_plugin="pyjpegls")
         reference.test(arr)
         assert arr.dtype == reference.dtype
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_sign_correction_iter(self):
         """Test that sign correction works as expected with iter_array()"""
@@ -106,4 +106,4 @@ class TestPyJpegLSDecoder:
         for arr, _ in decoder.iter_array(reference.ds, decoding_plugin="pyjpegls"):
             reference.test(arr)
             assert arr.dtype == reference.dtype
-            assert arr.flags.writeable
+            assert arr.flags.writable

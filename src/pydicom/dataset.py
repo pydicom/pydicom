@@ -65,7 +65,7 @@ from pydicom.datadict import (
     get_private_entry,
 )
 from pydicom.dataelem import DataElement, convert_raw_data_element, RawDataElement
-from pydicom.filebase import ReadableBuffer, WriteableBuffer
+from pydicom.filebase import ReadableBuffer, WritableBuffer
 from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.misc import warn_and_log, find_keyword_candidates
 from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
@@ -2571,7 +2571,7 @@ class Dataset:  # noqa: PLW1641
 
     def save_as(
         self,
-        filename: str | os.PathLike[AnyStr] | BinaryIO | WriteableBuffer,
+        filename: str | os.PathLike[AnyStr] | BinaryIO | WritableBuffer,
         /,
         __write_like_original: bool | None = None,
         *,
@@ -2614,7 +2614,7 @@ class Dataset:  # noqa: PLW1641
         Parameters
         ----------
         filename : str | PathLike | BinaryIO
-            The path, file-like or writeable buffer to write the encoded
+            The path, file-like or writable buffer to write the encoded
             dataset to. If using a buffer it must have ``write()``, ``seek()``
             and ``tell()`` methods.
         write_like_original : bool, optional

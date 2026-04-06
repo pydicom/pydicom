@@ -509,7 +509,7 @@ class TestPillowHandler_JPEG2K:
         else:
             arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
@@ -596,7 +596,7 @@ class TestPillowHandler_JPEG2K:
 
         assert "<i2" == arr.dtype
         assert (512, 512) == arr.shape
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         assert -2000 == arr[0, 0]
         assert [621, 412, 138, -193, -520, -767, -907, -966, -988, -995] == (
@@ -660,7 +660,7 @@ class TestPillowHandler_JPEG:
         assert getattr(ds, "NumberOfFrames", 1) == data[4]
 
         arr = ds.pixel_array
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
@@ -704,7 +704,7 @@ class TestPillowHandler_JPEG:
         ds.pixel_array_options(use_v2_backend=True)
         assert "YBR_FULL_422" == ds.PhotometricInterpretation
         arr = ds.pixel_array
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert (120, 480, 640, 3) == arr.shape
         arr = convert_color_space(arr, "YBR_FULL_422", "RGB")
         # this test points were manually identified in Osirix viewer

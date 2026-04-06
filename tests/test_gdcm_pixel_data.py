@@ -416,13 +416,13 @@ class TestsWithGDCM:
         a = jpeg_ls_lossless.pixel_array
         b = mr_small.pixel_array
         assert a.mean() == b.mean()
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_emri_JPEG_LS_PixelArray_with_gdcm(self, emri_jpeg_ls_lossless, emri_small):
         a = emri_jpeg_ls_lossless.pixel_array
         b = emri_small.pixel_array
         assert a.mean() == b.mean()
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_JPEG2000(self, jpeg_2k):
         """JPEG2000: Returns correct values for sample data elements"""
@@ -438,7 +438,7 @@ class TestsWithGDCM:
         a = jpeg_2k_lossless.pixel_array
         b = mr_small.pixel_array
         assert a.mean() == b.mean()
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_decompress_using_gdcm(self, jpeg_2k_lossless, mr_small):
         jpeg_2k_lossless.decompress(handler_name="gdcm")
@@ -450,7 +450,7 @@ class TestsWithGDCM:
         a = emri_jpeg_2k_lossless.pixel_array
         b = emri_small.pixel_array
         assert a.mean() == b.mean()
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_JPEG2000_lossy(
         self, sc_rgb_jpeg2k_gdcm_KY, ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm
@@ -462,7 +462,7 @@ class TestsWithGDCM:
         else:
             assert a.mean() == b.mean()
 
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_JPEGlosslessPixelArray(self, jpeg_lossless):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
@@ -471,7 +471,7 @@ class TestsWithGDCM:
         # this test points were manually identified in Osirix viewer
         assert 227 == a[420, 140]
         assert 105 == a[230, 120]
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_JPEGlossless_odd_data_size(self, jpeg_lossless_odd_data_size):
         pixel_data = jpeg_lossless_odd_data_size.pixel_array
@@ -489,13 +489,13 @@ class TestsWithGDCM:
         # this test points were manually identified in Osirix viewer
         assert 244 == a[420, 140]
         assert 95 == a[230, 120]
-        assert a.flags.writeable
+        assert a.flags.writable
 
     def test_JPEGBaselineColor3DPixelArray(self, color_3d_jpeg):
         assert "YBR_FULL_422" == color_3d_jpeg.PhotometricInterpretation
         a = color_3d_jpeg.pixel_array
 
-        assert a.flags.writeable
+        assert a.flags.writable
         assert (120, 480, 640, 3) == a.shape
         a = _convert_YBR_FULL_to_RGB(a, bit_depth=8)
         # this test points were manually identified in Osirix viewer
@@ -512,7 +512,7 @@ class TestsWithGDCM:
         t.pixel_array_options(use_v2_backend=True)
         a = t.pixel_array
 
-        assert a.flags.writeable
+        assert a.flags.writable
 
         assert (100, 100, 3) == a.shape
         if convert_yuv_to_rgb:
@@ -539,7 +539,7 @@ class TestsWithGDCM:
         ds.pixel_array_options(use_v2_backend=True)
         arr = ds.pixel_array
         assert (1024, 256) == arr.shape
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
     def test_pixel_rep_mismatch(self):
         """Test mismatched j2k sign and Pixel Representation."""
@@ -557,7 +557,7 @@ class TestsWithGDCM:
 
         assert "<i2" == arr.dtype
         assert (512, 512) == arr.shape
-        assert arr.flags.writeable
+        assert arr.flags.writable
 
         assert -2000 == arr[0, 0]
         assert [621, 412, 138, -193, -520, -767, -907, -966, -988, -995] == (

@@ -17,7 +17,7 @@ from pydicom.dataelem import (
     RawDataElement,
 )
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
-from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
+from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WritableBuffer
 from pydicom.fileutil import (
     path_from_pathlike,
     PathType,
@@ -1129,7 +1129,7 @@ def _determine_encoding(
 
 
 def dcmwrite(
-    filename: PathType | BinaryIO | WriteableBuffer,
+    filename: PathType | BinaryIO | WritableBuffer,
     dataset: Dataset,
     /,
     __write_like_original: bool | None = None,
@@ -1142,7 +1142,7 @@ def dcmwrite(
     **kwargs: Any,
 ) -> None:
     """Write `dataset` to `filename`, which can be a path, a file-like or a
-    writeable buffer.
+    writable buffer.
 
     .. versionchanged:: 3.0
 
@@ -1238,9 +1238,9 @@ def dcmwrite(
 
     Parameters
     ----------
-    filename : str, PathLike, file-like or writeable buffer
-        File path, file-like or writeable buffer to write the encoded `dataset`
-        to. If using a writeable buffer it must have ``write()``, ``seek()``
+    filename : str, PathLike, file-like or writable buffer
+        File path, file-like or writable buffer to write the encoded `dataset`
+        to. If using a writable buffer it must have ``write()``, ``seek()``
         and ``tell()`` methods.
     dataset : pydicom.dataset.FileDataset
         The dataset to be encoded.
@@ -1427,7 +1427,7 @@ def dcmwrite(
         # caller provided a file name; we own the file handle
         caller_owns_file = False
     elif isinstance(filename, DicomIO):
-        # A wrapped writeable buffer, don't wrap it again
+        # A wrapped writable buffer, don't wrap it again
         fp = filename
     else:
         # Anything else
@@ -1435,7 +1435,7 @@ def dcmwrite(
             fp = DicomIO(filename)
         except AttributeError as exc:
             raise TypeError(
-                "dcmwrite: Expected a file path, file-like or writeable buffer, "
+                "dcmwrite: Expected a file path, file-like or writable buffer, "
                 f"but got {type(filename).__name__}"
             ) from exc
 

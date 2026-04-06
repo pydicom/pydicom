@@ -418,7 +418,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_8_1_1F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert np.array_equal(arr, ref)
         assert arr.shape == (600, 800)
         assert arr[0].min() == arr[0].max() == 244
@@ -457,7 +457,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_8_1_2F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert np.array_equal(arr, ref)
         assert arr.shape == (2, 600, 800)
         assert 244 == arr[0, 0].min() == arr[0, 0].max() == 244
@@ -479,7 +479,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_8_3_1F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert np.array_equal(arr, ref)
 
         assert tuple(arr[5, 50, :]) == (255, 0, 0)
@@ -505,7 +505,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_8_3_2F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert np.array_equal(arr, ref)
 
         # Frame 1
@@ -536,7 +536,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_16_1_1F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<i2"
         assert np.array_equal(arr, ref)
         assert arr.shape == (64, 64)
@@ -556,7 +556,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_16_1_10F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u2"
         assert np.array_equal(arr, ref)
         assert arr.shape == (10, 64, 64)
@@ -588,7 +588,7 @@ class TestNumpy_RLEHandler:
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_16_3_1F)
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u2"
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -615,7 +615,7 @@ class TestNumpy_RLEHandler:
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_16_3_2F)
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u2"
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -647,7 +647,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_32_1_1F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u4"
         assert np.array_equal(arr, ref)
         assert arr.shape == (10, 10)
@@ -668,7 +668,7 @@ class TestNumpy_RLEHandler:
         ref = _get_pixel_array(EXPL_32_1_15F)
         arr = ds.pixel_array
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u4"
         assert np.array_equal(arr, ref)
         assert arr.shape == (15, 10, 10)
@@ -700,7 +700,7 @@ class TestNumpy_RLEHandler:
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_32_3_1F)
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u4"
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -727,7 +727,7 @@ class TestNumpy_RLEHandler:
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_32_3_2F)
 
-        assert arr.flags.writeable
+        assert arr.flags.writable
         assert arr.dtype == "<u4"
         assert np.array_equal(ds.pixel_array, ref)
 

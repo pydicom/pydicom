@@ -133,11 +133,11 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         resampled to 3 channel data as per Part 3, :dcm:`Annex C.7.6.3.1.2
         <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` of the DICOM Standard.
     read_only : bool, optional
-        If ``False`` (default) then returns a writeable array that no longer
+        If ``False`` (default) then returns a writable array that no longer
         uses the original memory. If ``True`` and the value of (0028,0100)
         *Bits Allocated* > 1 then returns a read-only array that uses the
         original memory buffer of the pixel data. If *Bits Allocated* = 1 then
-        always returns a writeable array.
+        always returns a writable array.
 
     Returns
     -------
