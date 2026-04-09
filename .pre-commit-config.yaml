@@ -1,4 +1,4 @@
-exclude: test_files
+exclude: src/pydicom/data/test_file
 
 ci:
   autoupdate_schedule: "monthly"

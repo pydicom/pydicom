@@ -831,7 +831,7 @@ class TestRecordNode:
     def test_root_path_missing(self, ct):
         """Test RecordNode._file_id if no Referenced File ID."""
         fs = FileSet()
-        instance = fs.add(ct)
+        instance = fs.add(ct)  # noqa: F841
         # del instance.node._record.ReferencedFileID
         msg = r"No root path set in the File-set"
         with pytest.raises(AttributeError, match=msg):
@@ -2559,8 +2559,10 @@ class TestFileSet_Copy:
     def teardown_method(self):
         FileSet.__len__ = self.orig
 
-    @pytest.mark.skipif(platform.python_implementation() == "PyPy",
-                        reason="pyfakefs does not work with generate_uid() in PyPy")
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="pyfakefs does not work with generate_uid() in PyPy",
+    )
     def test_constrained_to_fileset_root(self, fileset_fs):
         """Ensure files cannot be copied outside the FileSet root"""
         with pytest.raises(
