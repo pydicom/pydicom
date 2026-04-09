@@ -376,13 +376,13 @@ class RecordNode(Iterable["RecordNode"]):
             else:
                 path = Path(*cast(list[str], self._record.ReferencedFileID))
 
-            if path is not None:
-                if path.anchor or not (
-                    (root_path / path).resolve().is_relative_to(root_path)
-                ):
-                    raise PermissionError(
-                        f"ReferencedFileID ('{path}') must be inside the DICOMDIR root path"
-                    )
+            if path is not None and (
+                path.anchor
+                or not (root_path / path).resolve().is_relative_to(root_path)
+            ):
+                raise PermissionError(
+                    f"ReferencedFileID ('{path}') must be inside the DICOMDIR root path"
+                )
             return path
 
         raise AttributeError("No 'Referenced File ID' in the directory record")
