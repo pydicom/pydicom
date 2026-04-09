@@ -906,11 +906,11 @@ class EncapsulatedBuffer(BufferedIOBase):
         elif whence == os.SEEK_CUR:
             # relative to current buffer position
             new_offset = self._offset + offset
-            new_offset = 0 if new_offset < 0 else new_offset
+            new_offset = max(new_offset, 0)
         elif whence == os.SEEK_END:
             # relative to end of the buffer
             new_offset = self.encapsulated_length + offset
-            new_offset = 0 if new_offset < 0 else new_offset
+            new_offset = max(new_offset, 0)
 
         self._offset = new_offset
 
@@ -1120,7 +1120,7 @@ def encapsulate(
     output.extend(b"\xfe\xff\x00\xe0")
     if has_bot:
         # Check that the 2**32 - 1 limit in BOT item lengths won't be exceeded
-        total = (nr_frames - 1) * 8 + sum([len(f) for f in frames[:-1]])
+        total = (nr_frames - 1) * 8 + sum(len(f) for f in frames[:-1])
         if total > 2**32 - 1:
             raise ValueError(
                 f"The total length of the encapsulated frame data ({total} "

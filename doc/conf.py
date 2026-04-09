@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 import sys
 
-import pydata_sphinx_theme
+import pydata_sphinx_theme  # noqa: F401
 
 import pydicom
 
@@ -45,7 +45,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(os.fspath(BASE_DIR))
 
 
-from github_link import make_linkcode_resolve
+from github_link import make_linkcode_resolve  # noqa: E402
 
 
 # If your documentation needs a minimal Sphinx version, state it here.

@@ -103,7 +103,11 @@ exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
 
 [tool.ruff.lint]
 extend-select = [
-    "C90",
+    "C4",
+    "ISC",
+    "PIE",
+    "UP",
+    "C9",
     "PERF",
     "E501",
     "W",
@@ -111,11 +115,14 @@ extend-select = [
     "UP",
 ]
 ignore = [
+    "PIE808",
+    "PIE790",
     "PERF203",
     "PLC0415",
     "PLC1901",
     "PLR2004",
     "PLR5501",
+    "PLW0177",
     "PLW0603",
     "PLW2901",
 ]

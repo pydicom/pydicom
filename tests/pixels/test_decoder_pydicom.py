@@ -493,7 +493,7 @@ class TestIterBuffer:
             arr_func = self.decoder.iter_array(
                 f, raw=True, decoding_plugin="pydicom", **opts
             )
-            arrays = [arr for arr in arr_func]
+            arrays = list(arr_func)
             assert f.tell() == file_offset
             buf_func = self.decoder.iter_buffer(
                 f, raw=True, decoding_plugin="pydicom", **opts

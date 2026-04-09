@@ -831,7 +831,7 @@ class TestRecordNode:
     def test_root_path_missing(self, ct):
         """Test RecordNode._file_id if no Referenced File ID."""
         fs = FileSet()
-        instance = fs.add(ct)
+        instance = fs.add(ct)  # noqa: F841
         # del instance.node._record.ReferencedFileID
         msg = r"No root path set in the File-set"
         with pytest.raises(AttributeError, match=msg):
@@ -941,7 +941,7 @@ class TestFileInstance:
         assert isinstance(instance.path, str)
         sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
 
-        nodes = [node for node in instance.node.ancestors]
+        nodes = list(instance.node.ancestors)
         assert 3 == len(nodes)
         assert nodes[0].record_type == "SERIES"
         assert nodes[1].record_type == "STUDY"
@@ -1417,7 +1417,7 @@ class TestFileSet:
         )
         assert "SERIES: Modality=CT, SeriesNumber=1" in s
         assert 1 == len(fs)
-        instances = [ii for ii in fs]
+        instances = list(fs)
         file_id = Path("PT000000", "ST000000", "SE000000", "IM000000")
         assert os.fspath(file_id) == instances[0].FileID
 
@@ -1609,7 +1609,7 @@ class TestFileSet:
     def test_file_ids_unique(self, dicomdir):
         """That that the File IDs are all unique within the File-set."""
         fs = FileSet(dicomdir)
-        ids = set([ii.FileID for ii in fs])
+        ids = {ii.FileID for ii in fs}
         assert len(fs._instances) == len(ids)
 
     def test_add_custom(self, ct, tdir, custom_leaf):
@@ -2559,8 +2559,10 @@ class TestFileSet_Copy:
     def teardown_method(self):
         FileSet.__len__ = self.orig
 
-    @pytest.mark.skipif(platform.python_implementation() == "PyPy",
-                        reason="pyfakefs does not work with generate_uid() in PyPy")
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="pyfakefs does not work with generate_uid() in PyPy",
+    )
     def test_constrained_to_fileset_root(self, fileset_fs):
         """Ensure files cannot be copied outside the FileSet root"""
         with pytest.raises(

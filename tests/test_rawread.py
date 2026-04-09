@@ -406,7 +406,7 @@ class TestRawSequence:
             " 08 00 00 00"  # length 8
             " fe ff 00 e0"  # (FFFE,E000) Item Tag
             " 00 00 00 00"  # length = 0
-        ) + (  # --------------- end of Sequence
+            # --------------- end of Sequence
             " 08 00 3e 10"  # (0008,103E) LO "Series Description"  nopep8
             " 0c 00 00 00"  # length     nopep8
             " 52 20 41 44 44 20 56 49 45 57 53 20"  # value     nopep8

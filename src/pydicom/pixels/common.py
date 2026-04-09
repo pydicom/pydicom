@@ -495,7 +495,7 @@ class RunnerBase:
             if len(set(values)) == 1:
                 return values[0]
 
-            values_str = ", ".join([str(v) for v in sorted(list(set(values)))])
+            values_str = ", ".join([str(v) for v in sorted(set(values))])
             raise ValueError(
                 f"Multiple inconsistent inter-frame values found for '{name}': "
                 f"{values_str}"

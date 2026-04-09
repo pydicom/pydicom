@@ -399,7 +399,7 @@ class DataElement:  # noqa: PLW1641
                     value = self.value
                 else:
                     value = [self.value]
-                json_element["Value"] = [v for v in value]
+                json_element["Value"] = list(value)
         if "Value" in json_element:
             json_element["Value"] = jsonrep.convert_to_python_number(
                 json_element["Value"], self.VR
@@ -665,7 +665,7 @@ class DataElement:  # noqa: PLW1641
 
         return result
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -708,7 +708,7 @@ class DataElement:  # noqa: PLW1641
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
