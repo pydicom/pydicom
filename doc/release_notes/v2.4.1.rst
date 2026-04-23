@@ -1,0 +1,7 @@
+Version 2.4.1
+==============
+
+Fixes
+-----
+
+* Fixed deepcopy of :class:`~pydicom.dataset.Dataset` and :class:`~pydicom.sequence.Sequence` (:issue:`1814`)

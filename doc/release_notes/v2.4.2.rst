@@ -1,0 +1,8 @@
+Version 2.4.2
+==============
+
+Fixes
+-----
+
+* Handle :class:`~pydicom.sequence.Sequence` having ``None`` for
+  parent :class:`~pydicom.dataset.Dataset` (:issue:`1842`)
