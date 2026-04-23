@@ -84,7 +84,7 @@ docs = [
 
 dev = [
     "pydicom-data",
-    "pyfakefs>=6.1.6",
+    "pyfakefs>=6.2.0",
     "pytest",
     "pytest-cov",
     "types-requests",
