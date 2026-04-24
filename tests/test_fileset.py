@@ -2559,8 +2559,6 @@ class TestFileSet_Copy:
     def teardown_method(self):
         FileSet.__len__ = self.orig
 
-    @pytest.mark.skipif(platform.python_implementation() == "PyPy",
-                        reason="pyfakefs does not work with generate_uid() in PyPy")
     def test_constrained_to_fileset_root(self, fileset_fs):
         """Ensure files cannot be copied outside the FileSet root"""
         with pytest.raises(

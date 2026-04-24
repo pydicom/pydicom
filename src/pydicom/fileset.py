@@ -384,7 +384,8 @@ class RecordNode(Iterable["RecordNode"]):
                     (root_path / path).resolve().is_relative_to(root_path)
                 ):
                     raise PermissionError(
-                        f"ReferencedFileID ('{path}') must be inside the DICOMDIR root path"
+                        f"ReferencedFileID ('{path}') must be "
+                        "inside the DICOMDIR root path"
                     )
             return path
 

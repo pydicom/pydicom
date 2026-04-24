@@ -1,0 +1,7 @@
+2.4.4
+=====
+
+Fixes
+-----
+
+* Fixed broken documentation search (:issue:`1969`)
