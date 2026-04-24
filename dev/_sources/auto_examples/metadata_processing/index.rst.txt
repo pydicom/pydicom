@@ -11,6 +11,10 @@ These examples illustrates the processing available in pydicom to modify the
 metadata of DICOM data.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
