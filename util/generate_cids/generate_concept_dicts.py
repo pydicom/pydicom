@@ -437,7 +437,7 @@ def keyword_from_meaning(name):
 
     # Python variables must not begin with a number.
     if re.match(r"[0-9]", kw):
-        kw = "_" + kw
+        kw = f"_{kw}"
 
     if kw == "None":
         kw = "None_"

@@ -2,6 +2,7 @@
 """
 Create UIDs for the Storage SOP Classes taken from the generated ``_uids.py``.
 """
+
 from pathlib import Path
 import re
 
@@ -9,8 +10,7 @@ from pydicom._uid_dict import UID_dictionary
 
 
 STORAGE_REGEX = re.compile(
-    ".*(Storage|Storage SOP Class|Storage - For Presentation|Storage - For "
-    "Processing)$"
+    ".*(Storage|Storage SOP Class|Storage - For Presentation|Storage - For Processing)$"
 )
 
 AUTOGEN_COMMENT = "# Only auto-generated Storage SOP Class UIDs below"
@@ -27,7 +27,7 @@ def is_storage_class(attributes):
 
 def uid_line(uid, keyword):
     """Return the UID class definition line to be written to the file."""
-    return f"{keyword} = UID('{uid}')\n"
+    return f'{keyword} = UID("{uid}")\n'
 
 
 def update_uids(path: Path) -> None:

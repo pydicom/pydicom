@@ -3,6 +3,7 @@
 
 Sequence is a list of pydicom Dataset objects.
 """
+
 from typing import cast, Any, TypeVar
 from collections.abc import Iterable
 

@@ -45,8 +45,7 @@ TEST_BIG_ENDIAN = sys.byteorder == "little" and HAVE_NP and HAVE_GDCM
 gdcm_present_message = "GDCM is being tested"
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_im_missing_message = (
-    "GDCM is not available or in-memory decoding "
-    "not supported with this GDCM version"
+    "GDCM is not available or in-memory decoding not supported with this GDCM version"
 )
 
 

@@ -1156,7 +1156,8 @@ def create_icc_transform(
     ----------
     ds : pydicom.dataset.Dataset, optional
         Required if `icc_profile` is not supplied, a :class:`~pydicom.dataset.Dataset`
-        containing elements from the :dcm:`ICC Profile<part03/sect_C.11.15.html>` module.
+        containing elements from the :dcm:`ICC Profile<part03/sect_C.11.15.html>`
+        module.
     icc_profile : bytes, optional
         Required if `ds` is not supplied, an ICC profile encoded as :class:`bytes`.
     intent : int, optional

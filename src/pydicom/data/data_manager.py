@@ -6,9 +6,9 @@ External Data Sources
 ---------------------
 
 *pydicom* can also search third-party data sources for matching data. To do so
-your project should register its entry points in its `pyproject.toml` or `setup.py` file. For
-example, a project named "mydata" using `setup.py` with the interface class ``MyInterface``
-should register:
+your project should register its entry points in its `pyproject.toml` or `setup.py`
+file. For example, a project named "mydata" using `setup.py` with the interface class
+``MyInterface`` should register:
 
 .. codeblock: python
 
@@ -188,7 +188,7 @@ def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
 
     msg = ["The following exception(s) occurred trying to download the data files"]
     for err, filenames in errors.items():
-        err_msg = f"  '{err}' for " + ", ".join(filenames[:2])
+        err_msg = f"  '{err}' for {', '.join(filenames[:2])}"
         if len(filenames) > 2:
             err_msg += f" and {len(filenames) - 2} others"
 
@@ -394,8 +394,7 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
                 return os.fspath(data_path_with_download(filename))
             except Exception:
                 warn_and_log(
-                    f"A download failure occurred while attempting to "
-                    f"retrieve {name}"
+                    f"A download failure occurred while attempting to retrieve {name}"
                 )
 
     return None

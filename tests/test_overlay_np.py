@@ -25,7 +25,6 @@ There are the following possibilities:
 * OverlayColumns
 """
 
-
 import pytest
 
 import pydicom

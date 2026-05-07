@@ -4,6 +4,7 @@
 The 4 bytes of the DICOM tag are stored as an 'int'. Tags are
 stored as a single number and separated to (group, element) as required.
 """
+
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
 #       (e.g. in filewriter.write_AT) checks if a value is a multi-value
 #       element

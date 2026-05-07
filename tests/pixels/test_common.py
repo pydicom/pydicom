@@ -22,7 +22,7 @@ from .pixels_reference import RLE_16_1_10F, EXPL_8_3_1F_YBR
 
 
 REFERENCE_FRAME_LENGTHS = [
-    # (rows, cols, samples), bit depth, result in (bytes (native), bytes(encapsulated), pixels, ybr_bytes)
+    # (rows, cols, samples), bit depth, result in (bytes (native), bytes(encapsulated), pixels, ybr_bytes)  # noqa: E501
     # YBR can only be 3 samples/px and > 1 bit depth
     ((0, 0, 0), 1, (0, 0, 0, None)),
     ((1, 1, 1), 1, (0.125, 1, 1, None)),  # 1 bit -> 1/8 byte
@@ -592,7 +592,10 @@ class TestCoderBase:
     def test_add_plugin_function_missing(self):
         """Test decoding function missing when adding a plugin."""
         coder = CoderBase(RLELossless, decoder=True)
-        msg = r"module 'pydicom.pixels.decoders.native' has no attribute 'bad_function_name'"
+        msg = (
+            "module 'pydicom.pixels.decoders.native' "
+            "has no attribute 'bad_function_name'"
+        )
         with pytest.raises(AttributeError, match=msg):
             coder.add_plugin(
                 "foo", ("pydicom.pixels.decoders.native", "bad_function_name")
@@ -662,8 +665,9 @@ class TestCoderBase:
         coder._available = {}
         coder._unavailable["foo"] = ("numpy", "pylibjpeg", "gdcm")
         msg = (
-            "Unable to decompress 'RLE Lossless' pixel data because the specified "
-            "plugin is missing dependencies:\n\tfoo - requires numpy, pylibjpeg and gdcm"
+            "Unable to decompress 'RLE Lossless' pixel data because the "
+            "specified plugin is missing dependencies:\n\tfoo - requires "
+            "numpy, pylibjpeg and gdcm"
         )
         with pytest.raises(RuntimeError, match=msg):
             coder._validate_plugins("foo")

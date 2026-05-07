@@ -26,7 +26,6 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
-
 import pytest
 
 from pydicom import config

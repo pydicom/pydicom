@@ -35,28 +35,6 @@ version = "3.1.0.dev0"
 
 
 [project.optional-dependencies]
-docs = [
-    "numpy",
-    "numpydoc",
-    "matplotlib",
-    "pillow",
-    "pydata-sphinx-theme",
-    "sphinx",
-    "sphinx-gallery",
-    "sphinxcontrib-napoleon",
-    "sphinx-copybutton",
-    "sphinx_design",
-]
-
-dev = [
-    "pydicom-data",
-    "pyfakefs",
-    "pytest",
-    "pytest-cov",
-    "types-requests",
-    "pre-commit",
-]
-
 basic = ["numpy", "types-pydicom"]
 
 pixeldata = [
@@ -81,7 +59,6 @@ homepage = "https://github.com/pydicom/pydicom"
 repository = "https://github.com/pydicom/pydicom"
 
 
-
 [project.scripts]
 pydicom = "pydicom.cli.main:main"
 
@@ -91,34 +68,56 @@ codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
 
 
+[dependency-groups]
+docs = [
+    "numpy",
+    "numpydoc",
+    "matplotlib",
+    "pillow",
+    "pydata-sphinx-theme",
+    "sphinx",
+    "sphinx-gallery",
+    "sphinxcontrib-napoleon",
+    "sphinx-copybutton",
+    "sphinx_design",
+]
+
+dev = [
+    "pydicom-data",
+    "pyfakefs>=6.2.0",
+    "pytest",
+    "pytest-cov",
+    "types-requests",
+    "pre-commit",
+]
+
+
 [tool.black]
 exclude = ".venv|build|/_.*_dict.py$"
 force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]
-src = ["src"]
-line-length = 214
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
+exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
 
 [tool.ruff.lint]
-select = [
-    "UP",
-    "C9",
-    "E",
-    "F",
+extend-select = [
+    "C90",
     "PERF",
-    "PL",
+    "E501",
     "W",
+    "PL",
+    "UP",
 ]
 ignore = [
     "PERF203",
+    "PLC0415",
     "PLC1901",
     "PLR2004",
     "PLR5501",
     "PLW0603",
     "PLW2901",
-    "PLC0415",
 ]
 
 [tool.ruff.lint.mccabe]

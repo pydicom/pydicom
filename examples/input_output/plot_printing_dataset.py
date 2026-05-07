@@ -30,7 +30,7 @@ def myprint(ds, indent=0):
             print(indent_string, elem.name)
             for sequence_item in elem.value:
                 myprint(sequence_item, indent + 1)
-                print(next_indent_string + "---------")
+                print(f"{next_indent_string}---------")
         else:
             if elem.name in dont_print:
                 print("""<item not printed -- in the "don't print" list>""")

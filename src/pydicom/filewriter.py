@@ -470,8 +470,7 @@ def _default_encoded(val: str, *, settings: config.SettingsType) -> bytes:
         if settings.writing_validation_mode == config.ValidationMode.RAISE:
             raise
         warn_and_log(
-            "Not a valid ASCII string "
-            "- using replacement characters in encoded string"
+            "Not a valid ASCII string - using replacement characters in encoded string"
         )
         return val.encode(default_encoding, errors="replace")
 
@@ -836,8 +835,8 @@ def write_dataset(
         or dataset.original_character_set != dataset._character_set
     ):
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
-        # Use __getitem__ instead or get_item to force parsing of RawDataElements into DataElements,
-        # so we can re-encode them with the correct charset and encoding
+        # Use __getitem__ instead or get_item to force parsing of RawDataElements into
+        # DataElements, so we can re-encode them with the correct charset and encoding
         get_item = dataset.__getitem__
 
     dataset_encoding = cast(
@@ -1124,8 +1123,7 @@ def _determine_encoding(
 
     if not tsyntax.is_transfer_syntax:
         raise ValueError(
-            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid "
-            "transfer syntax"
+            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid transfer syntax"
         )
 
     # Check that supplied args match transfer syntax

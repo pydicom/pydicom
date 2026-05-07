@@ -160,7 +160,6 @@ class UID(str):
     def is_compressed(self) -> bool:
         """Return ``True`` if a compressed transfer syntax UID."""
         if self.is_transfer_syntax:
-
             if self in self._NATIVE_ENCODING:
                 return False
 

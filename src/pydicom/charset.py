@@ -349,8 +349,7 @@ def decode_bytes(
             # IGNORE is handled as WARN here, as this is
             # not an optional validation check
             warn_and_log(
-                f"Unknown encoding '{first_encoding}' - using default "
-                "encoding instead"
+                f"Unknown encoding '{first_encoding}' - using default encoding instead"
             )
             first_encoding = default_encoding
             return value.decode(first_encoding)
@@ -755,10 +754,10 @@ def _python_encoding_for_corrected_encoding(encoding: str, *, settings: config.S
     # standard encodings
     patched = None
     if re.match("^ISO[^_]IR", encoding) is not None:
-        patched = "ISO_IR" + encoding[6:]
+        patched = f"ISO_IR{encoding[6:]}"
     # encodings with code extensions
     elif re.match("^(?=ISO.2022.IR.)(?!ISO 2022 IR )", encoding) is not None:
-        patched = "ISO 2022 IR " + encoding[12:]
+        patched = f"ISO 2022 IR {encoding[12:]}"
 
     if patched:
         # handle encoding patched for common spelling errors

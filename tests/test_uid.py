@@ -477,7 +477,10 @@ class TestRegisterTransferSyntax:
         with pytest.raises(ValueError, match=msg):
             register_transfer_syntax(pydicom.uid.ExplicitVRLittleEndian)
 
-        msg = "'name' and 'keyword' are required when registering a public transfer syntax"
+        msg = (
+            "'name' and 'keyword' are required when registering "
+            "a public transfer syntax"
+        )
         with pytest.raises(ValueError, match=msg):
             register_transfer_syntax("1.2.840.10008.99.99.99.99")
 

@@ -1,0 +1,7 @@
+2.4.3
+=====
+
+Fixes
+-----
+
+* Fixed pydicom codify error when relative path did not exist (:issue:`1867`)

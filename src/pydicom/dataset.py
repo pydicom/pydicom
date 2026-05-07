@@ -14,6 +14,7 @@ Dataset (dict subclass)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
+
 import copy
 import io
 import json
@@ -1165,7 +1166,7 @@ class Dataset:  # noqa: PLW1641
             raise ValueError("Tag must be private if private creator is given")
 
         # find block with matching private creator
-        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        block = self[(group, 0x10) : (group, 0x100)]  # type: ignore[misc]
         data_el = next((elem for elem in block if elem.value == private_creator), None)
         if data_el is not None:
             return new_block(data_el.tag.element)
@@ -1212,7 +1213,7 @@ class Dataset:  # noqa: PLW1641
         if group % 2 == 0:
             raise ValueError("Group must be an odd number")
 
-        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        block = self[(group, 0x10) : (group, 0x100)]  # type: ignore[misc]
         return [x.value for x in block]
 
     def get_private_item(
@@ -2042,7 +2043,7 @@ class Dataset:  # noqa: PLW1641
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
-        """
+        """  # noqa: E501
         compress(
             self,
             transfer_syntax_uid,
@@ -2483,7 +2484,7 @@ class Dataset:  # noqa: PLW1641
             and pydicom.config.show_file_meta
         ):
             strings.append(f"{'Dataset.file_meta ':-<49}")
-            strings.extend(indent_str + repr(elem) for elem in self.file_meta)
+            strings.extend(f"{indent_str}{elem!r}" for elem in self.file_meta)
             strings.append(f"{'':-<49}")
 
         for elem in self:
@@ -2495,9 +2496,9 @@ class Dataset:  # noqa: PLW1641
                 if not top_level_only:
                     for dataset in elem.value:
                         strings.append(dataset._pretty_str(indent + 1))
-                        strings.append(nextindent_str + "---------")
+                        strings.append(f"{nextindent_str}---------")
             else:
-                strings.append(indent_str + repr(elem))
+                strings.append(f"{indent_str}{elem!r}")
         return "\n".join(strings)
 
     @property
@@ -3728,7 +3729,8 @@ def _path_to(target: Any, node: Any) -> str | None:
     -------
     str | None:
         The path to the target object from the node.
-        During recursion, returns ``None`` if a leaf node is reached without finding target.
+        During recursion, returns ``None`` if a leaf node is reached without
+        finding target.
 
     Examples
     --------
@@ -3772,7 +3774,7 @@ def _path_to(target: Any, node: Any) -> str | None:
                 f"{node.__class__.__name__}" if isinstance(node, FileDataset) else ""
             )
 
-            return f"{cls_name}{details}{meta}{kw_or_tag}" + path
+            return f"{cls_name}{details}{meta}{kw_or_tag}{path}"
         case DataElement(VR="SQ") as elem:
             # Check Sequence object itself:
             if elem.value is target:
@@ -3780,7 +3782,7 @@ def _path_to(target: Any, node: Any) -> str | None:
             # Recurse into Sequence items
             for i, subnode in enumerate(node.value):
                 if (path := _path_to(target, subnode)) is not None:
-                    return f"[{i}]" + path
+                    return f"[{i}]{path}"
         case DataElement(value=ns.target):  # Match a data element value
             return ""
 
@@ -3823,11 +3825,14 @@ def _trace_from(
         if elem is base:
             break
         if path := _path_to(elem, base):
-            note = "Error occurred at " + path
+            note = f"Error occurred at {path}"
             if new_elem:
                 note += "\n   with DataElement not yet assigned"
             if raw_elem:
-                note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
+                note += (
+                    f"\n  Converting RawDataElement(vr='{elem.VR}', "
+                    f"value={elem.value!r}) "
+                )
             break
         else:
             new_elem = filename == "dataelem.py"

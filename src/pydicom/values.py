@@ -252,8 +252,9 @@ def convert_DS_string(
     ImportError
         If :data:`~pydicom.config.use_DS_numpy` is ``True`` and numpy is not
         available
-    """
+    """  # noqa: E501
     settings = settings or config.settings
+
     num_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance
     # rather than factory DS, but need to
@@ -357,7 +358,7 @@ def convert_IS_string(
     ImportError
         If :data:`~pydicom.config.use_IS_numpy` is ``True`` and numpy is not
         available
-    """
+    """  # noqa: E501
     settings = settings or config.settings
     num_string = byte_string.decode(default_encoding)
 
@@ -414,13 +415,13 @@ def convert_numbers(
     endianChar = "><"[is_little_endian]
 
     # "=" means use 'standard' size, needed on 64-bit systems.
-    bytes_per_value = calcsize("=" + struct_format)
+    bytes_per_value = calcsize(f"={struct_format}")
     length = len(byte_string)
 
     if length % bytes_per_value != 0:
         raise BytesLengthException(
             "Expected total bytes to be an even multiple of bytes per value. "
-            f"Instead received "
+            "Instead received "
             f"{repr(byte_string) if len(byte_string) <= 256 else 'bytes'} "
             f"with length {length} and "
             f"struct format '{struct_format}' which corresponds to bytes per "

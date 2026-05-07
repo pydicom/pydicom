@@ -576,9 +576,12 @@ class TestRawSequence:
         """Raw read: Tolerate VR in meta data written as Implicit Little Endian"""
         # issue 2290
         hexstr = (
-            "02 00 16 00 41 45 0A 00 41 4C 49 5A 41 4D 53 41 45 20 "  # SourceApplicationEntityTitle
-            "02 00 16 00 06 00 00 00 48 4C 37 5F 41 45"  # SourceApplicationEntityTitle encoded implicit
-            "02 00 99 00 06 00 00 00 41 42 43 44 45 46"  # unknown meta tag encoded implicit
+            # SourceApplicationEntityTitle
+            "02 00 16 00 41 45 0A 00 41 4C 49 5A 41 4D 53 41 45 20 "
+            # SourceApplicationEntityTitle encoded implicit
+            "02 00 16 00 06 00 00 00 48 4C 37 5F 41 45 "
+            # unknown meta tag encoded implicit
+            "02 00 99 00 06 00 00 00 41 42 43 44 45 46"
         )
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(

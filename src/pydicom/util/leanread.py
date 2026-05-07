@@ -93,11 +93,11 @@ def data_element_generator(
     endian_chr = "<" if is_little_endian else ">"
 
     if is_implicit_VR:
-        element_struct = Struct(endian_chr + "HHL")
+        element_struct = Struct(f"{endian_chr}HHL")
     else:  # Explicit VR
         # tag, VR, 2-byte length (or 0 if special VRs)
-        element_struct = Struct(endian_chr + "HH2sH")
-        extra_length_struct = Struct(endian_chr + "L")  # for special VRs
+        element_struct = Struct(f"{endian_chr}HH2sH")
+        extra_length_struct = Struct(f"{endian_chr}L")  # for special VRs
         extra_length_unpack = extra_length_struct.unpack  # for lookup speed
 
     # Make local variables so have faster lookup
@@ -162,7 +162,7 @@ def data_element_generator(
                     next_tag = TupleTag(
                         cast(
                             tuple[int, int],
-                            unpack(endian_chr + "HH", fp_read(4)),
+                            unpack(f"{endian_chr}HH", fp_read(4)),
                         )
                     )
                     # Rewind the file
