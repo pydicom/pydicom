@@ -214,23 +214,25 @@ enforce_valid_values = False
 """
     .. deprecated:: 4.0
 
-        Use :attr:`~pydicom.config.Settings.reading_validation_mode` 
+        Use :attr:`~pydicom.config.Settings.reading_validation_mode`
         and/or :attr:`~pydicom.config.Settings.writing_validation_mode`.
 """
 
 
 class ValidationMode(IntEnum):
     """An IntEnum for validation modes.
-    
+
     See also
     --------
-    :attr:`~pydicom.config.Settings.reading_validation_mode`    
-    :attr:`~pydicom.config.Settings.writing_validation_mode`    
-    
+    :attr:`~pydicom.config.Settings.reading_validation_mode`
+    :attr:`~pydicom.config.Settings.writing_validation_mode`
+
     """
+
     IGNORE = 0
     WARN = 1
     RAISE = 2
+
 
 # For backwards compatibility, define the bare validation modes
 IGNORE = ValidationMode.IGNORE
@@ -253,8 +255,8 @@ class Settings:
     """Collection of several configuration values.
 
     Instances of this class can be passed to various functions
-    to change behavior.  
-    
+    to change behavior.
+
     Examples
     --------
     Use `settings` to tell pydicom not to ignore badly formed DICOM,
@@ -275,7 +277,9 @@ class Settings:
         self._reading_validation_mode: ValidationMode | None = None
         # in future version, writing invalid values will raise by default,
         # currently the default value depends on enforce_valid_values
-        self._writing_validation_mode: ValidationMode | None = ValidationMode.RAISE if _use_future else None
+        self._writing_validation_mode: ValidationMode | None = (
+            ValidationMode.RAISE if _use_future else None
+        )
         self._infer_sq_for_un_vr: bool = True
 
         # Chunk size to use when reading from buffered DataElement values
@@ -305,7 +309,7 @@ class Settings:
 
         Default ``False``.
 
-        .. versionadded:: 3.1        
+        .. versionadded:: 3.1
 
             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
         """
@@ -323,14 +327,14 @@ class Settings:
 
         .. versionadded:: 3.1
 
-             Added to :class:`~pydicom.config.Settings` in preference to the global variable.       
+             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
 
         If ``True`` (default), when reading an explicit VR file,
         if a VR is encountered that is not a valid two bytes within A-Z,
         then assume the original writer switched to implicit VR.  This has been
         seen in particular in some sequences.  This does not test that
         the VR is a valid DICOM VR, just that it has valid characters.
-        """        
+        """
         if self._assume_implicit_vr_switch is None:
             return _config.assume_implicit_vr_switch
         return self._assume_implicit_vr_switch
@@ -347,7 +351,7 @@ class Settings:
 
         .. versionadded:: 3.1
 
-             Added to :class:`~pydicom.config.Settings` in preference to the global variable.  
+             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
 
         """
         if self._convert_wrong_length_to_UN is None:
@@ -375,7 +379,7 @@ class Settings:
 
         .. versionadded:: 3.1
 
-             Added to :class:`~pydicom.config.Settings` in preference to the global variable.  
+             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
         """
         if self._datetime_conversion is None:
             return _config.datetime_conversion
@@ -387,14 +391,14 @@ class Settings:
 
     @property
     def replace_un_with_known_vr(self) -> bool:
-        """ If ``True``, and the VR of a known data element is encoded as **UN** in
+        """If ``True``, and the VR of a known data element is encoded as **UN** in
         an explicit encoding, the VR is changed to the known value.
         Can be set to ``False`` where the content of the tag shown as **UN** is
         not DICOM conformant and would lead to a failure if accessing it.
 
         .. versionadded:: 3.1
 
-             Added to :class:`~pydicom.config.Settings` in preference to the global variable. 
+             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
         """
         if self._replace_un_with_known_vr is None:
             return _config.replace_un_with_known_vr
@@ -413,7 +417,7 @@ class Settings:
 
         .. versionadded:: 3.1
 
-             Added to :class:`~pydicom.config.Settings` in preference to the global variable.  
+             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
 
         """
         if self._show_file_meta is None:
@@ -426,7 +430,7 @@ class Settings:
 
     @property
     def use_none_as_empty_text_VR_value(self) -> bool:
-        """ If ``True``, the value of a decoded empty data element with
+        """If ``True``, the value of a decoded empty data element with
         a text VR is ``None``, otherwise (the default), it is is an empty string.
         For all other VRs the behavior does not change - the value is en empty
         list for VR **SQ** and ``None`` for all other VRs.
@@ -434,7 +438,7 @@ class Settings:
 
         .. versionadded:: 3.1
 
-             Added to :class:`~pydicom.config.Settings` in preference to the global variable.  
+             Added to :class:`~pydicom.config.Settings` in preference to the global variable.
         """
         if self._use_none_as_empty_text_VR_value is None:
             return _config.use_none_as_empty_text_VR_value
@@ -518,7 +522,9 @@ class _ThreadLocalStore(threading.local):
     def __init__(self) -> None:
         self.thread_settings = deepcopy(_default_settings)
 
+
 _storage = _ThreadLocalStore()
+
 
 class _SettingsProxy:
     def __getattr__(self, name) -> Any:
@@ -543,7 +549,7 @@ of the settings.
 .. deprecated:: 4.0
 
     ``config.settings`` will be removed in v4.0, instead
-    pass a :class:`~pydicom.config.Settings` instance in 
+    pass a :class:`~pydicom.config.Settings` instance in
     `settings` arguments of function calls or class creation.
 
 """
@@ -643,8 +649,6 @@ use the component precision and sign to correct the returned ndarray when
 using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
-
-
 
 
 INVALID_KEYWORD_BEHAVIOR = "WARN"
@@ -760,8 +764,9 @@ class _DeprecatedGlobal:
         "'pydicom.config.{attr}' is deprecated and will be removed "
         "in v4.0, please use a :class:`~pydicom.config.Settings` instance "
         "passed to a `settings` function/class argument. \n"
-        "\nSee :attr:`pydicom.config.Settings.{attr}`" 
+        "\nSee :attr:`pydicom.config.Settings.{attr}`"
     )
+
     def __init__(self, default, doc=""):
         self.default = default
         self.__doc__ = None
@@ -776,8 +781,7 @@ class _DeprecatedGlobal:
     def _set_doc(self):
         if self.__doc__:
             return
-        self.__doc__ = self.msg.format(attr=self.name) 
-
+        self.__doc__ = self.msg.format(attr=self.name)
 
     def __get__(self, obj, objtype=None):
         if obj is None:
@@ -792,22 +796,22 @@ class _DeprecatedGlobal:
                 f"pydicom.config.{self.name} has been removed. "
                 "Instead, set it in a config.Settings class instance "
                 "and pass it to functions through the `settings` argument"
-            )   
+            )
         warn_and_log(self.msg.format(attr=self.name), DeprecationWarning)
         setattr(obj, self.internal_name, value)
 
 
 # Handle deprecated global config flags, etc.
 # https://docs.python.org/3/reference/datamodel.html#customizing-module-attribute-access
-# and 
+# and
 class _HandleDeprecationModule(ModuleType):
     """Module class wrapper to intercept deprecated globals"""
 
     allow_DS_float = _DeprecatedGlobal(False)
     """.. deprecated:: 3.0
 
-    ``allow_DS_float will be removed in v4.0, use a 
-    :class:`~pydicom.config.Settings` instance passed via 
+    ``allow_DS_float will be removed in v4.0, use a
+    :class:`~pydicom.config.Settings` instance passed via
     a `settings` argument.
     """
     assume_implicit_vr_switch = _DeprecatedGlobal(True)
@@ -816,15 +820,15 @@ class _HandleDeprecationModule(ModuleType):
     replace_un_with_known_vr = _DeprecatedGlobal(True)
     show_file_meta = _DeprecatedGlobal(True)
     use_none_as_empty_text_VR_value = _DeprecatedGlobal(False)
-    
+
     msg = (
         "'pydicom.config.{attr}' is deprecated and will be removed "
         "in v4.0, please use the `settings` argument to functions or "
         "classes.  See :class:`~pydicom.config.Settings`"
     )
-    
+
     def __repr__(self):
-        return f'Deprecation Handling {self.__name__}'
+        return f"Deprecation Handling {self.__name__}"
 
 
 sys.modules[__name__].__class__ = _HandleDeprecationModule

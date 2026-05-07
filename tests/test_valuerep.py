@@ -49,7 +49,9 @@ def enforce_valid_both_fixture(request):
     and ensure it is reset afterwards regardless of whether test succeeds.
     """
     orig_reading_validation_mode = settings.reading_validation_mode
-    settings.reading_validation_mode = config.ValidationMode.RAISE if request.param else config.ValidationMode.WARN
+    settings.reading_validation_mode = (
+        config.ValidationMode.RAISE if request.param else config.ValidationMode.WARN
+    )
     yield
     settings.reading_validation_mode = orig_reading_validation_mode
 
@@ -607,13 +609,17 @@ class TestDSfloat:
     def test_enforce_valid_values_length(self):
         """Test that errors are raised when length is too long."""
         with pytest.raises(OverflowError):
-            valuerep.DSfloat("3.141592653589793", validation_mode=config.ValidationMode.RAISE)
+            valuerep.DSfloat(
+                "3.141592653589793", validation_mode=config.ValidationMode.RAISE
+            )
 
     def test_handle_missing_leading_zero(self):
         """Test that no error is raised with maximum length DS string
         without leading zero."""
         # Regression test for #1632
-        valuerep.DSfloat(".002006091181818", validation_mode=config.ValidationMode.RAISE)
+        valuerep.DSfloat(
+            ".002006091181818", validation_mode=config.ValidationMode.RAISE
+        )
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""

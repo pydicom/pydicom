@@ -1376,7 +1376,10 @@ class IS(int):
             newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -(2**31) <= newval < 2**31 and validation_mode == config.ValidationMode.RAISE:
+        if (
+            not -(2**31) <= newval < 2**31
+            and validation_mode == config.ValidationMode.RAISE
+        ):
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set "
@@ -1431,7 +1434,10 @@ def _verify_encodings(encodings: str | Sequence[str] | None) -> tuple[str, ...] 
 
 
 def _decode_personname(
-    components: Sequence[bytes], encodings: Sequence[str], *, settings: config.SettingsType
+    components: Sequence[bytes],
+    encodings: Sequence[str],
+    *,
+    settings: config.SettingsType,
 ) -> tuple[str, ...]:
     """Return a list of decoded person name components.
 
@@ -1452,7 +1458,9 @@ def _decode_personname(
     """
     from pydicom.charset import decode_bytes
 
-    comps = [decode_bytes(c, encodings, PN_DELIMS, settings=settings) for c in components]
+    comps = [
+        decode_bytes(c, encodings, PN_DELIMS, settings=settings) for c in components
+    ]
 
     # Remove empty elements from the end to avoid trailing '='
     while comps and not comps[-1]:
@@ -1461,7 +1469,12 @@ def _decode_personname(
     return tuple(comps)
 
 
-def _encode_personname(components: Sequence[str], encodings: Sequence[str], *, settings: config.SettingsType) -> bytes:
+def _encode_personname(
+    components: Sequence[str],
+    encodings: Sequence[str],
+    *,
+    settings: config.SettingsType,
+) -> bytes:
     """Encode a list of text string person name components.
 
     Parameters
@@ -1483,7 +1496,10 @@ def _encode_personname(components: Sequence[str], encodings: Sequence[str], *, s
 
     encoded_comps = []
     for comp in components:
-        groups = [encode_string(group, encodings, settings=settings) for group in comp.split("^")]
+        groups = [
+            encode_string(group, encodings, settings=settings)
+            for group in comp.split("^")
+        ]
         encoded_comp = b"^".join(groups)
         encoded_comps.append(encoded_comp)
 
@@ -1536,21 +1552,18 @@ class PersonName:
         # `validation_mode` argument for backwards compatibility
         if settings is None:
             settings: config._SettingsProxy | config.Settings = (
-                config.settings
-                if validation_mode is None
-                else config.Settings()
+                config.settings if validation_mode is None else config.Settings()
             )
 
         if validation_mode is not None:
-            settings.reading_validation_mode=validation_mode
-            settings.writing_validation_mode=validation_mode  # for encoding strings
+            settings.reading_validation_mode = validation_mode
+            settings.writing_validation_mode = validation_mode  # for encoding strings
 
         self.settings = settings
 
         self.original_string: bytes
         self._components: tuple[str, ...] | None = None
         self.encodings: tuple[str, ...] | None
-
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -1569,7 +1582,9 @@ class PersonName:
             # if we don't have the byte string at this point, we at least
             # validate the length of the string components
             validate_value(
-                "PN", original_string if original_string else val, settings.reading_validation_mode
+                "PN",
+                original_string if original_string else val,
+                settings.reading_validation_mode,
             )
             components = val.split("=")
             # Remove empty elements from the end to avoid trailing '='
@@ -1610,7 +1625,9 @@ class PersonName:
         if self._components is None:
             groups = self.original_string.split(b"=")
             encodings = self.encodings or [default_encoding]
-            self._components = _decode_personname(groups, encodings, settings=self.settings)
+            self._components = _decode_personname(
+                groups, encodings, settings=self.settings
+            )
 
         return self._components
 
@@ -1718,7 +1735,12 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Sequence[str] | None = None, *, settings: config.SettingsType | None = None) -> "PersonName":
+    def decode(
+        self,
+        encodings: Sequence[str] | None = None,
+        *,
+        settings: config.SettingsType | None = None,
+    ) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1752,7 +1774,12 @@ class PersonName:
 
         return PersonName(self.original_string, encodings, settings=settings)
 
-    def encode(self, encodings: Sequence[str] | None = None, *, settings: config.SettingsType | None = None) -> bytes:
+    def encode(
+        self,
+        encodings: Sequence[str] | None = None,
+        *,
+        settings: config.SettingsType | None = None,
+    ) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1775,7 +1802,9 @@ class PersonName:
         # if the encoding is not the original encoding, we have to return
         # a re-encoded string (without updating the original string)
         if encodings != self.encodings and self.encodings is not None:
-            return _encode_personname(self.components, cast(Sequence[str], encodings), settings=settings)
+            return _encode_personname(
+                self.components, cast(Sequence[str], encodings), settings=settings
+            )
 
         if self.original_string is None:
             # if the original encoding was not set, we set it now
@@ -1844,7 +1873,9 @@ class PersonName:
             return encode_string(s, encodings or [default_encoding], settings=settings)
 
         def dec(s: bytes) -> str:
-            return decode_bytes(s, encodings or [default_encoding], set(), settings=settings)
+            return decode_bytes(
+                s, encodings or [default_encoding], set(), settings=settings
+            )
 
         encoded_component_sep = enc("^")
         encoded_group_sep = enc("=")
@@ -1904,7 +1935,7 @@ class PersonName:
         name_suffix_phonetic: str | bytes = "",
         encodings: list[str] | None = None,
         *,
-        settings: config.SettingsType | None = None
+        settings: config.SettingsType | None = None,
     ) -> "PersonName":
         """Construct a PersonName from explicit named components.
 
@@ -2118,7 +2149,11 @@ class PersonName:
         ]
 
         encoded_value: bytes = cls._encode_component_groups(
-            alphabetic_group, ideographic_group, phonetic_group, encodings, settings=settings
+            alphabetic_group,
+            ideographic_group,
+            phonetic_group,
+            encodings,
+            settings=settings,
         )
 
         return cls(encoded_value, encodings=encodings)

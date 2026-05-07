@@ -295,7 +295,9 @@ class RecordNode(Iterable["RecordNode"]):
         "Return the number of nodes to the level below the tree root"
         return len(list(self.reverse())) - 1
 
-    def _encode_record(self, force_implicit: bool = False, *, settings: config.SettingsType) -> int:
+    def _encode_record(
+        self, force_implicit: bool = False, *, settings: config.SettingsType
+    ) -> int:
         """Encode the node's directory record.
 
         * Encodes the record as explicit VR little endian
@@ -976,7 +978,12 @@ DSPathType = Dataset | str | os.PathLike
 class FileSet:
     """Representation of a DICOM File-set."""
 
-    def __init__(self, ds: DSPathType | None = None, *, settings: config.SettingsType | None = None) -> None:
+    def __init__(
+        self,
+        ds: DSPathType | None = None,
+        *,
+        settings: config.SettingsType | None = None,
+    ) -> None:
         """Create or load a File-set.
 
         Parameters
@@ -987,9 +994,9 @@ class FileSet:
         """
         # The nominal path to the root of the File-set
         self._root_path: Path | None = None
-        
+
         self.settings = settings or config.settings
-   
+
         # The root node of the record tree used to fill out the DICOMDIR's
         #   *Directory Record Sequence*.
         # The tree for instances currently in the File-set
@@ -1028,7 +1035,9 @@ class FileSet:
             # New File-set
             self.UID = generate_uid()
 
-    def add(self, ds_or_path: DSPathType, *, settings: config.SettingsType | None = None) -> FileInstance:
+    def add(
+        self, ds_or_path: DSPathType, *, settings: config.SettingsType | None = None
+    ) -> FileInstance:
         """Stage an instance for addition to the File-set.
 
         If the instance has been staged for removal then calling
@@ -1100,7 +1109,13 @@ class FileSet:
 
         return cast(FileInstance, instance)
 
-    def add_custom(self, ds_or_path: DSPathType, leaf: RecordNode, *, settings: config.SettingsType | None = None) -> FileInstance:
+    def add_custom(
+        self,
+        ds_or_path: DSPathType,
+        leaf: RecordNode,
+        *,
+        settings: config.SettingsType | None = None,
+    ) -> FileInstance:
         """Stage an instance for addition to the File-set using custom records.
 
         This method allows you to add a SOP instance and customize the
@@ -1304,7 +1319,9 @@ class FileSet:
         p = path / "DICOMDIR"
         with open(p, "wb") as fp:
             f = DicomFileLike(fp)
-            self._write_dicomdir(f, copy_safe=True, force_implicit=force_implicit, settings=self.settings)
+            self._write_dicomdir(
+                f, copy_safe=True, force_implicit=force_implicit, settings=self.settings
+            )
 
         # Reset the *Referenced File ID* values
         # The order here doesn't matter because removed instances aren't
@@ -2181,7 +2198,9 @@ class FileSet:
         if use_existing and not major_change:
             with open(p, "wb") as fp:
                 f = DicomFileLike(fp)
-                self._write_dicomdir(f, force_implicit=force_implicit, settings=settings)
+                self._write_dicomdir(
+                    f, force_implicit=force_implicit, settings=settings
+                )
 
             self.load(p, raise_orphans=True)
 
@@ -2233,7 +2252,12 @@ class FileSet:
         self.load(p, raise_orphans=True)
 
     def _write_dicomdir(
-        self, fp: DicomFileLike, copy_safe: bool = False, force_implicit: bool = False, *, settings: config.SettingsType
+        self,
+        fp: DicomFileLike,
+        copy_safe: bool = False,
+        force_implicit: bool = False,
+        *,
+        settings: config.SettingsType,
     ) -> None:
         """Encode and write the File-set's DICOMDIR dataset.
 

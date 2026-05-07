@@ -70,7 +70,13 @@ def multi_string(
     return valtype(items[0]) if len(items) == 1 else MultiValue(valtype, items)
 
 
-def convert_tag(byte_string: bytes, is_little_endian: bool, offset: int = 0, *, settings: config.SettingsType | None = None) -> BaseTag:
+def convert_tag(
+    byte_string: bytes,
+    is_little_endian: bool,
+    offset: int = 0,
+    *,
+    settings: config.SettingsType | None = None,
+) -> BaseTag:
     """Return a decoded :class:`BaseTag<pydicom.tag.BaseTag>` from the encoded
     `byte_string`. `byte_string` must be at least 4 bytes long.
 
@@ -101,7 +107,11 @@ def convert_tag(byte_string: bytes, is_little_endian: bool, offset: int = 0, *, 
 
 
 def convert_AE_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | MutableSequence[str]:
     """Return a decoded 'AE' value.
 
@@ -131,7 +141,11 @@ def convert_AE_string(
 
 
 def convert_ATvalue(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> BaseTag | MutableSequence[BaseTag]:
     """Return a decoded 'AT' value.
 
@@ -175,7 +189,11 @@ def _DA_from_str(value: str) -> DA:
 
 
 def convert_DA_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | DA | MutableSequence[str] | MutableSequence[DA]:
     """Return a decoded 'DA' value.
 
@@ -204,11 +222,17 @@ def convert_DA_string(
 
         return MultiValue(_DA_from_str, splitup)
 
-    return convert_string(byte_string, is_little_endian, struct_format, settings=settings)
+    return convert_string(
+        byte_string, is_little_endian, struct_format, settings=settings
+    )
 
 
 def convert_DS_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> Union[
     pydicom.valuerep.DSclass,
     MutableSequence[pydicom.valuerep.DSclass],
@@ -290,7 +314,11 @@ def _DT_from_str(value: str) -> DT:
 
 
 def convert_DT_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | DT | MutableSequence[str] | MutableSequence[DT]:
     """Return a decoded 'DT' value.
 
@@ -323,7 +351,11 @@ def convert_DT_string(
 
 
 def convert_IS_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> Union[IS, MutableSequence[IS], "numpy.int64", "numpy.ndarray"]:
     """Return a decoded 'IS' value.
 
@@ -383,7 +415,11 @@ def convert_IS_string(
 
 
 def convert_numbers(
-    byte_string: bytes, is_little_endian: bool, struct_format: str, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | int | float | MutableSequence[int] | MutableSequence[float]:
     """Return a decoded numerical VR value.
 
@@ -444,14 +480,22 @@ def convert_numbers(
 
 
 def convert_OBvalue(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> bytes:
     """Return encoded 'OB' value as :class:`bytes`."""
     return byte_string
 
 
 def convert_OWvalue(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> bytes:
     """Return the encoded 'OW' value as :class:`bytes`.
 
@@ -462,7 +506,11 @@ def convert_OWvalue(
 
 
 def convert_OVvalue(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None,  *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> bytes:
     """Return the encoded 'OV' value as :class:`bytes`.
 
@@ -503,7 +551,9 @@ def convert_PN(
         return person_name.decode()
 
     stripped_string = byte_string.rstrip(b"\x00 ")
-    decoded_value = decode_bytes(stripped_string, encodings, TEXT_VR_DELIMS, settings=settings)
+    decoded_value = decode_bytes(
+        stripped_string, encodings, TEXT_VR_DELIMS, settings=settings
+    )
     value_split = decoded_value.split("\\")
     if len(value_split) == 1:
         return get_valtype(value_split[0])
@@ -511,7 +561,11 @@ def convert_PN(
 
 
 def convert_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | MutableSequence[str]:
     """Return a decoded string VR value.
 
@@ -537,7 +591,11 @@ def convert_string(
 
 
 def convert_text(
-    byte_string: bytes, encodings: list[str] | None = None, vr: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    encodings: list[str] | None = None,
+    vr: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | MutableSequence[str]:
     """Return a decoded text VR value.
 
@@ -565,7 +623,9 @@ def convert_text(
         return v.rstrip("\0 ")
 
     encodings = encodings or [default_encoding]
-    decoded_string = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS, settings=settings)
+    decoded_string = decode_bytes(
+        byte_string, encodings, TEXT_VR_DELIMS, settings=settings
+    )
     values = decoded_string.split("\\")
     as_strings = [handle_value(value) for value in values]
     if len(as_strings) == 1:
@@ -612,7 +672,7 @@ def convert_SQ(
     encoding: list[str] | None = None,
     offset: int = 0,
     *,
-    settings: config.SettingsType | None = None
+    settings: config.SettingsType | None = None,
 ) -> Sequence:
     """Return a decoded 'SQ' value.
 
@@ -640,7 +700,13 @@ def convert_SQ(
     encodings = encoding or [default_encoding]
     fp = BytesIO(byte_string)
     seq = read_sequence(
-        fp, is_implicit_VR, is_little_endian, len(byte_string), encodings, offset, settings=settings
+        fp,
+        is_implicit_VR,
+        is_little_endian,
+        len(byte_string),
+        encodings,
+        offset,
+        settings=settings,
     )
     return seq
 
@@ -655,7 +721,11 @@ def _TM_from_str(value: str) -> TM:
 
 
 def convert_TM_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str | TM | MutableSequence[str] | MutableSequence[TM]:
     """Return a decoded 'TM' value.
 
@@ -689,7 +759,11 @@ def convert_TM_string(
 
 
 def convert_UI(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> pydicom.uid.UID | MutableSequence[pydicom.uid.UID]:
     """Return a decoded 'UI' value.
 
@@ -717,14 +791,22 @@ def convert_UI(
 
 
 def convert_UN(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> bytes:
     """Return the encoded 'UN' value as :class:`bytes`."""
     return byte_string
 
 
 def convert_UR_string(
-    byte_string: bytes, is_little_endian: bool, struct_format: str | None = None, *, settings: config.SettingsType | None = None
+    byte_string: bytes,
+    is_little_endian: bool,
+    struct_format: str | None = None,
+    *,
+    settings: config.SettingsType | None = None,
 ) -> str:
     """Return a decoded 'UR' value.
 
@@ -753,7 +835,7 @@ def convert_value(
     raw_data_element: RawDataElement,
     encodings: str | MutableSequence[str] | None = None,
     *,
-    settings: config.SettingsType | None = None
+    settings: config.SettingsType | None = None,
 ) -> Any | MutableSequence[Any]:
     """Return the element value decoded using the appropriate decoder.
 
@@ -815,7 +897,9 @@ def convert_value(
             return converter(byte_string, encodings, VR, settings=settings)
 
         if VR != VR_.SQ:
-            return converter(byte_string, is_little_endian, num_format, settings=settings)
+            return converter(
+                byte_string, is_little_endian, num_format, settings=settings
+            )
 
         # SQ
         return converter(

@@ -104,7 +104,7 @@ def _array_common(
     specific_tags: list[BaseTag | int],
     *,
     settings: config.SettingsType,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> tuple["Dataset", dict[str, Any]]:
     """Return a dataset from `f` and a corresponding decoding options dict.
 

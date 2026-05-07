@@ -637,7 +637,9 @@ class Dataset:  # noqa: PLW1641
                     dset._parent_encoding = dicom_character_set
                     dset.decode()
             else:
-                decode_data_element(data_element, dicom_character_set, settings=self.settings)
+                decode_data_element(
+                    data_element, dicom_character_set, settings=self.settings
+                )
 
         self.walk(decode_callback, recursive=False)
 
@@ -1094,7 +1096,9 @@ class Dataset:  # noqa: PLW1641
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = convert_raw_data_element(elem, encoding=character_set, ds=self, settings=self.settings)
+            self[tag] = convert_raw_data_element(
+                elem, encoding=character_set, ds=self, settings=self.settings
+            )
 
             # On initial read of the dataset, propagate the pixel representation
             #   (if any) to child datasets in any sequences.
@@ -1675,7 +1679,10 @@ class Dataset:  # noqa: PLW1641
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if self.settings.writing_validation_mode == config.ValidationMode.RAISE:
+                    if (
+                        self.settings.writing_validation_mode
+                        == config.ValidationMode.RAISE
+                    ):
                         raise KeyError(f"Unknown DICOM tag {tag}")
 
                     vr = VR_.UN

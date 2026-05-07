@@ -56,7 +56,8 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def empty_value_for_VR(
-    VR: str | None, raw: bool = False,
+    VR: str | None,
+    raw: bool = False,
     *,
     settings: config.SettingsType | None = None,
 ) -> bytes | list[str] | str | None | PersonName:
@@ -183,7 +184,8 @@ class DataElement:  # noqa: PLW1641
         file_value_tell: int | None = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: config.ValidationMode | None = None,  # deprecate for v4.0, use settings?
+        validation_mode: config.ValidationMode
+        | None = None,  # deprecate for v4.0, use settings?
         *,
         settings: config.SettingsType | None = None,
     ) -> None:
@@ -224,9 +226,7 @@ class DataElement:  # noqa: PLW1641
         # `validation_mode` argument for backwards compatibility
         if settings is None:
             settings: config.SettingsType = (
-                config.settings
-                if validation_mode is None
-                else config.Settings()
+                config.settings if validation_mode is None else config.Settings()
             )
 
         if validation_mode is not None:
@@ -643,22 +643,38 @@ class DataElement:  # noqa: PLW1641
             return pydicom.valuerep.IS(val, self.settings.reading_validation_mode)
 
         if self.VR == VR_.DA and config.datetime_conversion:
-            return pydicom.valuerep.DA(val, validation_mode=self.settings.reading_validation_mode)
+            return pydicom.valuerep.DA(
+                val, validation_mode=self.settings.reading_validation_mode
+            )
 
         if self.VR == VR_.DS:
-            return pydicom.valuerep.DS(val, False, self.settings.reading_validation_mode)
+            return pydicom.valuerep.DS(
+                val, False, self.settings.reading_validation_mode
+            )
 
         if self.VR == VR_.DT and config.datetime_conversion:
-            return pydicom.valuerep.DT(val, validation_mode=self.settings.reading_validation_mode)
+            return pydicom.valuerep.DT(
+                val, validation_mode=self.settings.reading_validation_mode
+            )
 
         if self.VR == VR_.TM and config.datetime_conversion:
-            return pydicom.valuerep.TM(val, validation_mode=self.settings.reading_validation_mode)
+            return pydicom.valuerep.TM(
+                val, validation_mode=self.settings.reading_validation_mode
+            )
 
         if self.VR == VR_.UI:
-            return UID(val, self.settings.reading_validation_mode) if val is not None else None
+            return (
+                UID(val, self.settings.reading_validation_mode)
+                if val is not None
+                else None
+            )
 
         if self.VR == VR_.PN:
-            return PersonName(val, validation_mode=self.settings.reading_validation_mode, settings=self.settings)
+            return PersonName(
+                val,
+                validation_mode=self.settings.reading_validation_mode,
+                settings=self.settings,
+            )
 
         if self.VR == VR_.AT and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
@@ -944,7 +960,7 @@ def convert_raw_data_element(
             raw, data, encoding=encoding, ds=ds, **hooks.raw_element_kwargs
         )
     else:
-        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds, settings = settings)
+        hooks.raw_element_vr(raw, data, encoding=encoding, ds=ds, settings=settings)
         hooks.raw_element_value(raw, data, encoding=encoding, ds=ds, settings=settings)
 
     return DataElement(

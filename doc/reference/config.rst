@@ -15,7 +15,7 @@ Configuration Options (:mod:`pydicom.config`)
    :undoc-members:
    :show-inheritance:
    :inherited-members:
-   :member-order: groupwise    
+   :member-order: groupwise
    :toctree: generated/
 
    ValidationMode
@@ -27,7 +27,7 @@ Configuration Options (:mod:`pydicom.config`)
    future_behavior
    pixel_data_handlers
    reset_data_element_callback
-   
+
    DS_decimal
    DS_numpy
    use_DS_decimal

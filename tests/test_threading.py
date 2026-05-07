@@ -1,13 +1,14 @@
 import threading
 from pydicom import config
 
+
 def test_settings_thread_safety():
     """Different threads can adjust config settings without conflict"""
     barrier = threading.Barrier(3)
     errors = []
     mode_name = {
         config.ValidationMode.IGNORE: "IGNORE",
-        config.ValidationMode.WARN:  "WARN",
+        config.ValidationMode.WARN: "WARN",
         config.ValidationMode.RAISE: "RAISE",
     }
 

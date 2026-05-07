@@ -57,7 +57,7 @@ def data_element_generator(
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.SettingsType | None = None, # | None = None,
+    settings: config.SettingsType | None = None,  # | None = None,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -250,7 +250,10 @@ def data_element_generator(
                 value = (
                     fp_read(length)
                     if length > 0
-                    else cast(bytes | None, empty_value_for_VR(vr, raw=True, settings=settings))
+                    else cast(
+                        bytes | None,
+                        empty_value_for_VR(vr, raw=True, settings=settings),
+                    )
                 )
                 if debugging:
                     dotdot = "..." if length > 20 else "   "
@@ -263,7 +266,9 @@ def data_element_generator(
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == 0x00080005:
                 # *Specific Character String* is b'' for empty value
-                encoding = convert_string(cast(bytes, value) or b"", is_little_endian, settings=settings)
+                encoding = convert_string(
+                    cast(bytes, value) or b"", is_little_endian, settings=settings
+                )
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding, settings=settings)
@@ -310,13 +315,23 @@ def data_element_generator(
                     )
 
                 seq = read_sequence(
-                    fp, is_implicit_VR, is_little_endian, length, encoding, settings=settings
+                    fp,
+                    is_implicit_VR,
+                    is_little_endian,
+                    length,
+                    encoding,
+                    settings=settings,
                 )
                 if has_tag_set and tag not in tag_set:
                     continue
 
                 yield DataElement(
-                    BaseTag(tag), vr, seq, value_tell, is_undefined_length=True, settings=settings
+                    BaseTag(tag),
+                    vr,
+                    seq,
+                    value_tell,
+                    is_undefined_length=True,
+                    settings=settings,
                 )
             else:
                 if debugging:
@@ -348,7 +363,7 @@ def _is_implicit_vr(
     stop_when: Callable[[BaseTag, str | None, int], bool] | None,
     is_sequence: bool,
     *,
-    settings: config.SettingsType
+    settings: config.SettingsType,
 ) -> bool:
     """Check if the real VR is explicit or implicit.
 
@@ -426,7 +441,7 @@ def read_dataset(
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
     *,
-    settings: config.SettingsType | None = None  # xxx | None = None
+    settings: config.SettingsType | None = None,  # xxx | None = None
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
@@ -473,7 +488,12 @@ def read_dataset(
     fp_tell = fp.tell
     fp_start = fp.tell()
     is_implicit_VR = _is_implicit_vr(
-        fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=not at_top_level, settings=settings
+        fp,
+        is_implicit_VR,
+        is_little_endian,
+        stop_when,
+        is_sequence=not at_top_level,
+        settings=settings,
     )
     fp.seek(fp_start)
     de_gen = data_element_generator(
@@ -484,7 +504,7 @@ def read_dataset(
         defer_size,
         parent_encoding,
         specific_tags,
-        settings=settings
+        settings=settings,
     )
     try:
         if bytelength is None:
@@ -528,7 +548,7 @@ def read_sequence(
     encoding: str | MutableSequence[str],
     offset: int = 0,
     *,
-    settings: config.SettingsType | None = None
+    settings: config.SettingsType | None = None,
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
@@ -546,7 +566,11 @@ def read_sequence(
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
             file_tell = fp_tell()
             dataset = read_sequence_item(
-                fp, is_implicit_VR, is_little_endian, encoding, offset,
+                fp,
+                is_implicit_VR,
+                is_little_endian,
+                encoding,
+                offset,
                 settings=settings,
             )
             if dataset is None:  # None is returned if hit Sequence Delimiter
@@ -641,7 +665,7 @@ def _read_command_set_elements(
     fp: BinaryIO,
     *,
     settings: config.SettingsType,
-    ) -> Dataset:
+) -> Dataset:
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
 
@@ -667,15 +691,17 @@ def _read_command_set_elements(
         return tag >> 16 != 0
 
     return read_dataset(
-        fp, is_implicit_VR=True, is_little_endian=True, stop_when=_not_group_0000, settings=settings
+        fp,
+        is_implicit_VR=True,
+        is_little_endian=True,
+        stop_when=_not_group_0000,
+        settings=settings,
     )
 
 
 def _read_file_meta_info(
-        fp: BinaryIO,
-    *,
-    settings: config.SettingsType
-    ) -> FileMetaDataset:
+    fp: BinaryIO, *, settings: config.SettingsType
+) -> FileMetaDataset:
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
     File Meta elements are always Explicit VR Little Endian (DICOM Standard,
@@ -703,9 +729,13 @@ def _read_file_meta_info(
     start_file_meta = fp.tell()
     file_meta = FileMetaDataset(
         read_dataset(
-            fp, is_implicit_VR=False, is_little_endian=True, stop_when=_not_group_0002, settings=settings
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            stop_when=_not_group_0002,
+            settings=settings,
         ),
-        settings=settings
+        settings=settings,
     )
     file_meta.set_original_encoding(
         is_implicit_vr=False, is_little_endian=True, character_encoding=default_encoding
@@ -755,8 +785,8 @@ def _read_file_meta_info(
 def read_file_meta_info(
     filename: PathType,
     *,
-    settings: config.SettingsType | None = None  # xxx | None = None
-    ) -> FileMetaDataset:
+    settings: config.SettingsType | None = None,  # xxx | None = None
+) -> FileMetaDataset:
     """Read and return the DICOM file meta information only.
 
     This function is meant to be used in user code, for quickly going through
@@ -843,7 +873,7 @@ def read_partial(
     force: bool = False,
     specific_tags: list[BaseTag | int] | None = None,
     *,
-    settings: config.SettingsType | None = None  # xxx | None = None
+    settings: config.SettingsType | None = None,  # xxx | None = None
 ) -> FileDataset:
     """Parse a DICOM file until a condition is met.
 

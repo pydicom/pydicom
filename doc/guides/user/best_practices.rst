@@ -15,26 +15,26 @@ There are some features of *pydicom* that allow you to help check your code
 for more strict DICOM practices, and to future-proof against major
 *pydicom* version changes.
 
-One area of *pydicom* that is changing is how settings are used 
+One area of *pydicom* that is changing is how settings are used
 to control behavior. Settings are key to two best practice recommendations:
-enforcement of valid DICOM, and a "future" flag for your code to 
+enforcement of valid DICOM, and a "future" flag for your code to
 behave as if it was running in the next *pydicom* major version.
 
 Settings: Fine-tuning *pydicom* behavior
 ----------------------------
 
 *pydicom* has changed the way it handles settings.  Settings have been
-used, for example, to change how *pydicom* reacts to non-standard DICOM 
+used, for example, to change how *pydicom* reacts to non-standard DICOM
 files, or how it writes files.
 
 In the past *pydicom* used global settings in the :mod:`~pydicom.config` module.
 This is not thread-safe, so the maintainers have been moving
 *pydicom* to better methods, while preserving backwards-compatibility.
 This means that until *pydicom* v4.0, there will be several ways to handle
-these settings, and you will still see all these in the documention.
+these settings, and you will still see all these in the documentation.
 
 The correct method to use now is to create :class:`~pydicom.config.Settings`
-instances, and pass those to functions like :func:`~pydicom.dcmread` and 
+instances, and pass those to functions like :func:`~pydicom.dcmread` and
 :func:`~pydicom.dcmwrite`.
 
 Some examples will be shown in the section below.
@@ -55,7 +55,7 @@ the second about validation of newly created and written values.
 
 Both can be set using the enum :attr:`~pydicom.config.ValidationMode`,
 with values :attr:`~pydicom.config.ValidationMode.IGNORE`,
-:attr:`~pydicom.config.ValidationMode.WARN` 
+:attr:`~pydicom.config.ValidationMode.WARN`
 and :attr:`~pydicom.config.ValidationMode.RAISE`.
 
 As the name suggests, some non-standard DICOM datasets may result in a warning
@@ -67,7 +67,7 @@ cases where you want to avoid the validation.
 In the following example, without the optional `settings`
 argument, a UserWarning is issued.  With these `settings`,
 an error is raised instead:
-    
+
     >>> from pydicom.config import Settings, RAISE
     >>> from pydicom.data.data_manager import get_testdata_file
     >>> filename = get_testdata_file("emri_small_jpeg_2k_lossless_too_short.dcm")

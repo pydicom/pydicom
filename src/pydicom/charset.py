@@ -516,7 +516,7 @@ def encode_string(
     encodings: Sequence[str],
     *,
     settings: config.SettingsType | None = None,
-    ) -> bytes:
+) -> bytes:
     """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
     Parameters
@@ -734,7 +734,9 @@ def convert_encodings(
         try:
             py_encodings.append(python_encoding[encoding])
         except KeyError:
-            py_encodings.append(_python_encoding_for_corrected_encoding(encoding, settings=settings))
+            py_encodings.append(
+                _python_encoding_for_corrected_encoding(encoding, settings=settings)
+            )
 
     if len(encodings) > 1:
         py_encodings = _handle_illegal_standalone_encodings(encodings, py_encodings)
@@ -742,7 +744,9 @@ def convert_encodings(
     return py_encodings
 
 
-def _python_encoding_for_corrected_encoding(encoding: str, *, settings: config.SettingsType) -> str:
+def _python_encoding_for_corrected_encoding(
+    encoding: str, *, settings: config.SettingsType
+) -> str:
     """Try to replace the given invalid encoding with a valid encoding by
     checking for common spelling errors, and return the correct Python
     encoding for that encoding. Otherwise check if the
@@ -865,10 +869,15 @@ def decode_element(
     if elem.VR == VR.PN:
         if elem.VM == 1:
             # elem.value: PersonName |  bytes
-            elem.value = cast(PersonName, elem.value).decode(encodings, settings=settings)
+            elem.value = cast(PersonName, elem.value).decode(
+                encodings, settings=settings
+            )
         else:
             # elem.value: Iterable[PersonName |  bytes]
-            elem.value = [cast(PersonName, vv).decode(encodings, settings=settings) for vv in elem.value]
+            elem.value = [
+                cast(PersonName, vv).decode(encodings, settings=settings)
+                for vv in elem.value
+            ]
     elif elem.VR in CUSTOMIZABLE_CHARSET_VR:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
