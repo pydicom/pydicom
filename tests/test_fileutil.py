@@ -17,7 +17,9 @@ from pydicom.fileutil import (
     buffer_remaining,
     buffer_length,
     buffer_equality,
+    read_undefined_length_value,
 )
+from pydicom.tag import SequenceDelimiterTag
 
 
 IS_WINDOWS = platform.system() == "Windows"
@@ -194,3 +196,93 @@ class TestBufferFunctions:
     def test_equality_not_buffer(self):
         """Test equality if 'other' is not a buffer or bytes"""
         assert buffer_equality(b"", None) is False
+
+
+class TestReadUndefinedLengthValueMaxBytes:
+    """Regression tests for #2324 — an undefined-length value contained
+    inside an explicit-length parent must not scan past the parent's
+    declared boundary.
+    """
+
+    @staticmethod
+    def _encap(payload: bytes) -> bytes:
+        from struct import pack
+
+        return (
+            pack("<HHI", 0xFFFE, 0xE000, len(payload))
+            + payload
+            + pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        )
+
+    def test_byte_scan_truncates_at_max_bytes(self):
+        """The byte-scan fallback path stops at max_bytes and warns."""
+        # The byte-scan path is exercised by injecting a stream that does
+        # NOT look like a valid encapsulated pixel data structure (the
+        # optimized path bails out and falls through to the byte scanner).
+        payload = b"\xAB" * 16
+        # Single sequence delimiter at the end; no leading Item tag, so the
+        # optimized parser will reject this and fall through.
+        from struct import pack
+
+        encap = payload + pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        trailing = b"TRAILING-DATA-MUST-NOT-BE-CONSUMED"
+        stream = encap + trailing
+        # max_bytes is short — delimiter is OUT of bounds.
+        max_bytes = len(payload) - 4
+
+        fp = BytesIO(stream)
+        with pytest.warns(UserWarning, match="not found within"):
+            value = read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+                max_bytes=max_bytes,
+            )
+
+        assert fp.tell() == max_bytes
+        assert value is not None
+        assert len(value) <= max_bytes
+        # The remaining bytes in fp must include the trailing marker
+        rest = fp.read()
+        assert b"TRAILING-DATA-MUST-NOT-BE-CONSUMED" in rest
+
+    def test_encapsulated_path_bails_when_item_extends_past_max_bytes(self):
+        """The optimized encapsulated-pixel-data parser must refuse to
+        skip past max_bytes; the fallback then truncates and warns."""
+        # Encapsulated stream whose delimiter sits beyond a too-short
+        # max_bytes window. Tot bytes = 8 (item header) + 16 (payload)
+        # + 8 (delimiter+len) = 32.
+        encap = self._encap(b"\xCD" * 16)
+        trailing = b"OUTER-PIXEL-DATA-HERE"
+        stream = encap + trailing
+        max_bytes = 8 + 4  # not enough room for the 16-byte item payload
+
+        fp = BytesIO(stream)
+        with pytest.warns(UserWarning, match="not found within"):
+            value = read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+                max_bytes=max_bytes,
+            )
+        assert fp.tell() == max_bytes
+        assert value is not None
+        # The trailing bytes (which would be a sibling element in a real
+        # dataset) must remain available to the parent reader.
+        rest = fp.read()
+        assert rest.startswith(b"\xCD")  # untouched payload tail
+        assert b"OUTER-PIXEL-DATA-HERE" in rest
+
+    def test_well_formed_stream_within_max_bytes_unchanged(self):
+        """If the delimiter fits inside max_bytes, behavior is identical
+        to the unbounded read."""
+        encap = self._encap(b"\xEF" * 8)
+        fp = BytesIO(encap)
+        value = read_undefined_length_value(
+            fp,
+            is_little_endian=True,
+            delimiter_tag=SequenceDelimiterTag,
+            max_bytes=len(encap),
+        )
+        assert value is not None
+        assert fp.tell() == len(encap)

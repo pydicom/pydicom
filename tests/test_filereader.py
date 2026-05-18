@@ -12,6 +12,7 @@ from struct import unpack
 import sys
 import tempfile
 import time
+import warnings
 
 import pytest
 
@@ -1810,6 +1811,202 @@ class TestDataElementGenerator:
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == convert_raw_data_element(next(gen), encoding="ISO_IR 100")
+
+
+class TestMalformedExplicitLengthItemEncapsulated:
+    """Regression for pydicom/pydicom#2324.
+
+    A sequence item with explicit length that contains an undefined-length
+    encapsulated element (e.g. an IconImageSequence whose item carries
+    encapsulated icon PixelData) must not consume bytes past the item's
+    declared boundary, even if the inner sequence delimiter is missing or
+    the item under-declares its length.
+    """
+
+    @staticmethod
+    def _encap_value(payload: bytes) -> bytes:
+        """Build encapsulated-pixel-data bytes: Item + payload + delimiter."""
+        from struct import pack
+
+        return (
+            pack("<HHI", 0xFFFE, 0xE000, len(payload))
+            + payload
+            + pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        )
+
+    def _build_dataset_bytes(self, item_shortfall: int) -> bytes:
+        """Return explicit-VR LE bytes for a top-level dataset shaped like
+        the issue repro: IconImageSequence with one explicit-length item
+        containing undefined-length OB PixelData, followed by an outer
+        marker element. ``item_shortfall`` bytes are shaved off the item
+        length only (the SQ length stays truthful, which matches the way
+        real-world buggy writers under-declare just the inner item).
+        """
+        from struct import pack
+
+        # Inner encapsulated PixelData value for the icon (16-byte payload).
+        inner_value = self._encap_value(b"\xAA" * 16)
+        # PixelData header: tag (7FE0,0010), VR OB, reserved 2 bytes, len FFFFFFFF
+        inner_elem = (
+            pack("<HH", 0x7FE0, 0x0010)
+            + b"OB\x00\x00"
+            + pack("<I", 0xFFFFFFFF)
+            + inner_value
+        )
+        item_len = len(inner_elem) - item_shortfall
+        item = pack("<HHI", 0xFFFE, 0xE000, item_len) + inner_elem
+        # IconImageSequence (0088,0200) SQ — declared length covers the
+        # full item bytes (i.e. truthful at the SQ level).
+        seq_len = len(item)
+        sq = (
+            pack("<HH", 0x0088, 0x0200)
+            + b"SQ\x00\x00"
+            + pack("<I", seq_len)
+            + item
+        )
+        # Outer marker element so we can prove the parent reader resumed
+        # at the right position: a short PN element.
+        outer = (
+            pack("<HH", 0x0010, 0x0010)
+            + b"PN"
+            + pack("<H", 6)
+            + b"ABCDEF"
+        )
+        return sq + outer
+
+    def test_short_item_does_not_eat_outer_element(self):
+        """Reader must stop at the explicit item boundary and the outer
+        PatientName element must come through untouched, and parsing the
+        truncated SQ value must surface a warning instead of silently
+        swallowing bytes."""
+        data = self._build_dataset_bytes(item_shortfall=8)
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        # Outer marker element must still be present — the inner OB
+        # over-read must not have consumed past the SQ value's declared
+        # length, which is what would happen if the SQ were eagerly parsed
+        # at the top level without max_bytes plumbing.
+        assert 0x00100010 in ds, "outer PatientName swallowed by inner OB read"
+        assert ds[0x00100010].value == "ABCDEF"
+        # Lazily parsing the SQ must now warn — and must NOT raise — and
+        # the inner OB element must be present (truncated) in the item.
+        assert 0x00880200 in ds, "IconImageSequence missing"
+        with pytest.warns(UserWarning, match="not found within"):
+            sq = ds[0x00880200].value
+            item = sq[0]
+            inner_pd = item[0x7FE00010]
+            assert inner_pd is not None
+
+    def test_well_formed_item_unchanged(self):
+        """Identical structure with truthful lengths still parses cleanly."""
+        data = self._build_dataset_bytes(item_shortfall=0)
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        assert 0x00880200 in ds
+        assert 0x00100010 in ds
+
+    def test_short_sq_and_short_item_real_repro(self):
+        """User's actual malformation: BOTH the IconImageSequence (0088,0200)
+        and its single item declare lengths that are short by the same number
+        of bytes (here 24), leaving the tail of the inner encapsulated
+        PixelData stream as orphaned bytes at the top-level dataset position
+        that immediately precedes the outer PixelData. Without the post-SQ
+        resync the outer PixelData is silently lost on read and save_as."""
+        from struct import pack
+
+        # Inner encap stream — Item + payload + SequenceDelimiterTag + 0 len
+        inner_value = self._encap_value(b"\xAA" * 16)
+        inner_elem = (
+            pack("<HH", 0x7FE0, 0x0010)
+            + b"OB\x00\x00"
+            + pack("<I", 0xFFFFFFFF)
+            + inner_value
+        )
+        # Both the SQ and item declare 24 fewer bytes than truth.
+        SHORTFALL = 24
+        item_actual = inner_elem
+        item_declared_len = len(item_actual) - SHORTFALL
+        item = pack("<HHI", 0xFFFE, 0xE000, item_declared_len) + item_actual
+        sq_value_actual = item
+        sq_declared_len = len(sq_value_actual) - SHORTFALL
+        sq = (
+            pack("<HH", 0x0088, 0x0200)
+            + b"SQ\x00\x00"
+            + pack("<I", sq_declared_len)
+            + sq_value_actual
+        )
+        # Outer encapsulated PixelData (so we exercise the exact pattern
+        # from #2324). One-item BOT + one-item fragment + delimiter.
+        outer_pd_value = self._encap_value(b"\xCC" * 12)
+        outer = (
+            pack("<HH", 0x7FE0, 0x0010)
+            + b"OB\x00\x00"
+            + pack("<I", 0xFFFFFFFF)
+            + outer_pd_value
+        )
+        data = sq + outer
+
+        fp = BytesIO(data)
+        with pytest.warns(UserWarning, match="Skipped .* malformed data"):
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        # Both elements must be present and well-formed
+        assert 0x00880200 in ds, "IconImageSequence missing"
+        assert 0x7FE00010 in ds, "outer PixelData was lost to leftover bytes"
+        # The IconImageSequence access triggers the lazy SQ parse — it must
+        # also warn (inner OB truncation) and not raise.
+        with pytest.warns(UserWarning, match="not found within"):
+            list(ds[0x00880200].value)
+
+    def test_short_sq_no_recovery_target_falls_through(self):
+        """If after an explicit-length SQ we can't find any plausible
+        next-element header within the resync window, the resync makes no
+        change and normal parsing continues. (Sanity check that the scan
+        never blindly skips bytes when it shouldn't.)"""
+        from struct import pack
+
+        # Trivial well-formed SQ followed by a plain element. No resync
+        # should trigger; behavior matches the unmodified parser.
+        sq = (
+            pack("<HH", 0x0088, 0x0200)
+            + b"SQ\x00\x00"
+            + pack("<I", 0)  # empty SQ value
+        )
+        outer = (
+            pack("<HH", 0x0010, 0x0010)
+            + b"PN"
+            + pack("<H", 6)
+            + b"ABCDEF"
+        )
+        data = sq + outer
+
+        fp = BytesIO(data)
+        # No warning expected.
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        assert 0x00880200 in ds
+        assert 0x00100010 in ds
+        assert ds[0x00100010].value == "ABCDEF"
 
 
 def test_read_file_meta_info():
