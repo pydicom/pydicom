@@ -76,16 +76,16 @@ def _scan_for_next_top_level_element(
     if len(buf) < 8:
         return -1
     if is_little_endian:
-        delim_seq = b"\xFE\xFF\xDD\xE0\x00\x00\x00\x00"
-        delim_item = b"\xFE\xFF\x0D\xE0\x00\x00\x00\x00"
+        delim_seq = b"\xfe\xff\xdd\xe0\x00\x00\x00\x00"
+        delim_item = b"\xfe\xff\x0d\xe0\x00\x00\x00\x00"
     else:
-        delim_seq = b"\xFF\xFE\xE0\xDD\x00\x00\x00\x00"
-        delim_item = b"\xFF\xFE\xE0\x0D\x00\x00\x00\x00"
+        delim_seq = b"\xff\xfe\xe0\xdd\x00\x00\x00\x00"
+        delim_item = b"\xff\xfe\xe0\x0d\x00\x00\x00\x00"
     # 2-byte aligned scan — DICOM tags are always 2-byte aligned
     for off in range(0, len(buf) - 7, 2):
         chunk = buf[off : off + 8]
         # Stray delimiter from a truncated inner encapsulated stream
-        if chunk == delim_seq or chunk == delim_item:
+        if chunk in (delim_seq, delim_item):
             return off + 8
         # Plausible element header
         if is_little_endian:
@@ -213,11 +213,7 @@ def data_element_generator(
         # stream leak out into the parent dataset. Detect that situation
         # *before* misinterpreting the leftover bytes as a sibling
         # element (which can swallow the real outer ``PixelData``).
-        if (
-            prev_was_defined_length_sq
-            and at_top_level
-            and bytelength is None
-        ):
+        if prev_was_defined_length_sq and at_top_level and bytelength is None:
             skipped = _scan_for_next_top_level_element(
                 fp, is_implicit_VR, is_little_endian
             )
@@ -431,8 +427,7 @@ def data_element_generator(
                 max_bytes: int | None = None
                 if bytelength is not None:
                     max_bytes = bytelength - (fp_tell() - fp_start)
-                    if max_bytes < 0:
-                        max_bytes = 0
+                    max_bytes = max(max_bytes, 0)
 
                 value = read_undefined_length_value(
                     fp,

@@ -1845,7 +1845,7 @@ class TestMalformedExplicitLengthItemEncapsulated:
         from struct import pack
 
         # Inner encapsulated PixelData value for the icon (16-byte payload).
-        inner_value = self._encap_value(b"\xAA" * 16)
+        inner_value = self._encap_value(b"\xaa" * 16)
         # PixelData header: tag (7FE0,0010), VR OB, reserved 2 bytes, len FFFFFFFF
         inner_elem = (
             pack("<HH", 0x7FE0, 0x0010)
@@ -1858,20 +1858,10 @@ class TestMalformedExplicitLengthItemEncapsulated:
         # IconImageSequence (0088,0200) SQ — declared length covers the
         # full item bytes (i.e. truthful at the SQ level).
         seq_len = len(item)
-        sq = (
-            pack("<HH", 0x0088, 0x0200)
-            + b"SQ\x00\x00"
-            + pack("<I", seq_len)
-            + item
-        )
+        sq = pack("<HH", 0x0088, 0x0200) + b"SQ\x00\x00" + pack("<I", seq_len) + item
         # Outer marker element so we can prove the parent reader resumed
         # at the right position: a short PN element.
-        outer = (
-            pack("<HH", 0x0010, 0x0010)
-            + b"PN"
-            + pack("<H", 6)
-            + b"ABCDEF"
-        )
+        outer = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
         return sq + outer
 
     def test_short_item_does_not_eat_outer_element(self):
@@ -1925,7 +1915,7 @@ class TestMalformedExplicitLengthItemEncapsulated:
         from struct import pack
 
         # Inner encap stream — Item + payload + SequenceDelimiterTag + 0 len
-        inner_value = self._encap_value(b"\xAA" * 16)
+        inner_value = self._encap_value(b"\xaa" * 16)
         inner_elem = (
             pack("<HH", 0x7FE0, 0x0010)
             + b"OB\x00\x00"
@@ -1947,7 +1937,7 @@ class TestMalformedExplicitLengthItemEncapsulated:
         )
         # Outer encapsulated PixelData (so we exercise the exact pattern
         # from #2324). One-item BOT + one-item fragment + delimiter.
-        outer_pd_value = self._encap_value(b"\xCC" * 12)
+        outer_pd_value = self._encap_value(b"\xcc" * 12)
         outer = (
             pack("<HH", 0x7FE0, 0x0010)
             + b"OB\x00\x00"
@@ -1986,12 +1976,7 @@ class TestMalformedExplicitLengthItemEncapsulated:
             + b"SQ\x00\x00"
             + pack("<I", 0)  # empty SQ value
         )
-        outer = (
-            pack("<HH", 0x0010, 0x0010)
-            + b"PN"
-            + pack("<H", 6)
-            + b"ABCDEF"
-        )
+        outer = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
         data = sq + outer
 
         fp = BytesIO(data)

@@ -140,7 +140,7 @@ def read_undefined_length_value(
         position. Used when the undefined-length element is contained inside
         an explicit-length parent (e.g. a sequence item) and must not bleed
         past it. If the delimiter is not found within this window, a
-        :class:`UserWarning` is issued, the file is seeked to
+        :class:`UserWarning` is issued, the file is sought to
         ``data_start + max_bytes``, and the bytes collected up to that point
         are returned as the element value.
 
@@ -236,10 +236,7 @@ def read_undefined_length_value(
             # If we're up against the max_bytes boundary, stop here without
             # rewinding — the parent reader will resume at data_start +
             # max_bytes.
-            if (
-                max_bytes is not None
-                and (fp.tell() - data_start) >= max_bytes
-            ):
+            if max_bytes is not None and (fp.tell() - data_start) >= max_bytes:
                 new_bytes = bytes_read
                 byte_count += len(new_bytes)
                 if defer_size is None or byte_count < defer_size:

@@ -219,7 +219,7 @@ class TestReadUndefinedLengthValueMaxBytes:
         # The byte-scan path is exercised by injecting a stream that does
         # NOT look like a valid encapsulated pixel data structure (the
         # optimized path bails out and falls through to the byte scanner).
-        payload = b"\xAB" * 16
+        payload = b"\xab" * 16
         # Single sequence delimiter at the end; no leading Item tag, so the
         # optimized parser will reject this and fall through.
         from struct import pack
@@ -252,7 +252,7 @@ class TestReadUndefinedLengthValueMaxBytes:
         # Encapsulated stream whose delimiter sits beyond a too-short
         # max_bytes window. Tot bytes = 8 (item header) + 16 (payload)
         # + 8 (delimiter+len) = 32.
-        encap = self._encap(b"\xCD" * 16)
+        encap = self._encap(b"\xcd" * 16)
         trailing = b"OUTER-PIXEL-DATA-HERE"
         stream = encap + trailing
         max_bytes = 8 + 4  # not enough room for the 16-byte item payload
@@ -270,13 +270,13 @@ class TestReadUndefinedLengthValueMaxBytes:
         # The trailing bytes (which would be a sibling element in a real
         # dataset) must remain available to the parent reader.
         rest = fp.read()
-        assert rest.startswith(b"\xCD")  # untouched payload tail
+        assert rest.startswith(b"\xcd")  # untouched payload tail
         assert b"OUTER-PIXEL-DATA-HERE" in rest
 
     def test_well_formed_stream_within_max_bytes_unchanged(self):
         """If the delimiter fits inside max_bytes, behavior is identical
         to the unbounded read."""
-        encap = self._encap(b"\xEF" * 8)
+        encap = self._encap(b"\xef" * 8)
         fp = BytesIO(encap)
         value = read_undefined_length_value(
             fp,
