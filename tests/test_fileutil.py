@@ -286,3 +286,73 @@ class TestReadUndefinedLengthValueMaxBytes:
         )
         assert value is not None
         assert fp.tell() == len(encap)
+
+    def test_byte_scan_eof_with_max_bytes_truncates_not_raises(self):
+        """When EOF is reached before the delimiter AND max_bytes is set,
+        the reader must NOT raise EOFError — it must warn and truncate at
+        whatever bytes it could collect. Without max_bytes the same input
+        still raises EOFError (legacy behavior)."""
+        # Stream too short for any delimiter; ends in EOF mid-scan.
+        payload = b"\xab" * 4
+        fp = BytesIO(payload)
+        with pytest.warns(UserWarning, match="not found within"):
+            value = read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+                max_bytes=64,  # > payload, so EOF hits first
+            )
+        # value is non-None (we collected the partial bytes)
+        assert value is not None
+
+    def test_byte_scan_eof_without_max_bytes_still_raises(self):
+        """Legacy EOFError path is preserved when no max_bytes is given."""
+        payload = b"\xab" * 4
+        fp = BytesIO(payload)
+        with pytest.raises(EOFError):
+            read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+            )
+
+    def test_byte_scan_truncates_with_defer_size_returns_none(self):
+        """When the bounded recovery fires and the collected bytes are
+        above defer_size, the value is dropped (returns None) — same
+        contract as the normal defer_size path on a successful read."""
+        payload = b"\xab" * 64
+        fp = BytesIO(payload)
+        with pytest.warns(UserWarning, match="not found within"):
+            value = read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+                max_bytes=32,
+                defer_size=16,  # 32 collected bytes >= 16 deferred limit
+            )
+        assert value is None
+
+    def test_encapsulated_path_max_bytes_big_endian(self):
+        """The optimized encapsulated parser honours max_bytes in big-endian
+        mode too — covers the big-endian struct-format branch."""
+        from struct import pack
+
+        # Big-endian encapsulated stream: item header + payload + delim
+        payload = b"\xcd" * 16
+        encap = (
+            pack(">HHI", 0xFFFE, 0xE000, len(payload))
+            + payload
+            + pack(">HHI", 0xFFFE, 0xE0DD, 0)
+        )
+        fp = BytesIO(encap)
+        # max_bytes too small for the item; optimized path bails, falls
+        # through to byte-scan, which then warns and truncates.
+        with pytest.warns(UserWarning, match="not found within"):
+            value = read_undefined_length_value(
+                fp,
+                is_little_endian=False,
+                delimiter_tag=SequenceDelimiterTag,
+                max_bytes=8 + 4,
+            )
+        assert value is not None
+        assert fp.tell() == 8 + 4

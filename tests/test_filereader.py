@@ -1994,6 +1994,157 @@ class TestMalformedExplicitLengthItemEncapsulated:
         assert ds[0x00100010].value == "ABCDEF"
 
 
+class TestScanForNextTopLevelElement:
+    """Direct unit tests for filereader._scan_for_next_top_level_element,
+    the helper that backs the top-level resync after a malformed
+    defined-length SQ. Covers the big-endian, implicit-VR, reserved-group,
+    and not-found branches that the integration tests don't exercise."""
+
+    def test_finds_stray_sequence_delimiter_little_endian(self):
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        garbage = b"\xa5" * 6
+        delim = b"\xfe\xff\xdd\xe0\x00\x00\x00\x00"
+        fp = BytesIO(garbage + delim + b"AFTER")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == len(garbage) + 8
+        )
+        # fp must be restored to its original position
+        assert fp.tell() == 0
+
+    def test_finds_stray_item_delimiter_little_endian(self):
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        garbage = b"\xa5" * 4
+        delim = b"\xfe\xff\x0d\xe0\x00\x00\x00\x00"
+        fp = BytesIO(garbage + delim + b"AFTER")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == len(garbage) + 8
+        )
+
+    def test_finds_stray_delimiter_big_endian(self):
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        garbage = b"\xa5" * 6
+        delim = b"\xff\xfe\xe0\xdd\x00\x00\x00\x00"
+        fp = BytesIO(garbage + delim + b"AFTER")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=False
+            )
+            == len(garbage) + 8
+        )
+
+    def test_finds_plausible_explicit_element_header(self):
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # Two bytes of garbage, then a valid PN element header
+        prefix = b"\xa5\xa5"
+        elem = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6)
+        fp = BytesIO(prefix + elem + b"ABCDEF")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == 2
+        )
+
+    def test_finds_plausible_implicit_element_header(self):
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # Implicit VR: no VR bytes; only the group/element ranges are
+        # validated. (0010,0010) is in the standard range and triggers the
+        # implicit-VR plausibility branch.
+        prefix = b"\xa5\xa5\xa5\xa5"
+        elem = pack("<HHI", 0x0010, 0x0010, 6) + b"ABCDEF"
+        fp = BytesIO(prefix + elem)
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=True, is_little_endian=True
+            )
+            == 4
+        )
+
+    def test_skips_reserved_groups(self):
+        """Group 0x0000 (command-set) and 0xFFFE (item/delim) at byte
+        offsets must be skipped — they aren't legitimate top-level dataset
+        starts."""
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # At offset 0: group 0x0000 with garbage payload — not a valid
+        # top-level start. At offset 8: a legit PN element header.
+        bad = pack("<HH", 0x0000, 0x0001) + b"\xa5\xa5\xa5\xa5"
+        elem = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
+        fp = BytesIO(bad + elem)
+        # Should skip group 0x0000 candidates and land at offset 8
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == 8
+        )
+
+    def test_returns_minus_one_when_nothing_plausible(self):
+        """Pure-garbage stream with no stray delimiters and no plausible
+        ASCII VR pattern must return -1 (no recovery target)."""
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # All 0xA5 bytes — never form a valid VR (`A5A5` < `b"AA"`) and
+        # never form a stray delimiter pattern.
+        fp = BytesIO(b"\xa5" * 256)
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == -1
+        )
+        # fp position must be preserved
+        assert fp.tell() == 0
+
+    def test_short_buffer_returns_minus_one(self):
+        """Less than 8 bytes available — no scan possible."""
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        fp = BytesIO(b"\xa5\xa5\xa5")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == -1
+        )
+
+    def test_implicit_vr_out_of_range_group_continues(self):
+        """In implicit-VR mode, groups outside [0x0008, 0x7FE0] don't
+        match the plausibility heuristic — covers the `continue` branch."""
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # Group 0x0001 (below the standard range) — should be skipped
+        bad = pack("<HHI", 0x0001, 0x0001, 4) + b"\x00\x00\x00\x00"
+        # Then a valid implicit-VR element
+        good = pack("<HHI", 0x0010, 0x0010, 6) + b"ABCDEF"
+        fp = BytesIO(bad + good)
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=True, is_little_endian=True
+            )
+            == 12  # length of `bad`
+        )
+
+
 def test_read_file_meta_info():
     """Test read_file_meta_info()"""
     ds = read_file_meta_info(rtplan_name)
