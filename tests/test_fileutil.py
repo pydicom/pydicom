@@ -356,3 +356,23 @@ class TestReadUndefinedLengthValueMaxBytes:
             )
         assert value is not None
         assert fp.tell() == 8 + 4
+
+    def test_byte_scan_max_bytes_zero_bails_immediately(self):
+        """``max_bytes=0`` means the parent has no remaining budget — the
+        reader must not consume any bytes and must still warn-and-recover
+        rather than raise. Reachable in production when
+        ``data_element_generator`` finds the file pointer already at or past
+        the enclosing item's declared end (e.g. a malformed item that under-
+        declared even the inner element header)."""
+        fp = BytesIO(b"SOMETHING-THAT-MUST-NOT-BE-CONSUMED")
+        with pytest.warns(UserWarning, match="not found within"):
+            value = read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+                max_bytes=0,
+            )
+        # fp stayed at position 0 (data_start + max_bytes == 0)
+        assert fp.tell() == 0
+        # No bytes collected
+        assert value == b""
