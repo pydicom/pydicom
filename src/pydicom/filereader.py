@@ -48,6 +48,65 @@ ENCODED_VR = {vr.encode(default_encoding) for vr in VR_}
 # ruff: noqa: C901, PLR0912, PLR0915
 
 
+def _scan_for_next_top_level_element(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    max_scan: int = 4096,
+) -> int:
+    """Scan forward from ``fp.tell()`` looking for either a stray sequence
+    or item delimiter (``(FFFE,E0DD)`` / ``(FFFE,E00D)`` followed by four
+    zero bytes — leftover from a truncated inner encapsulated stream) or a
+    plausible-looking element header (group not reserved, VR ASCII upper
+    when explicit), and return the number of bytes to skip from the current
+    position to that location.
+
+    For stray delimiters, the returned offset points *past* the delimiter +
+    its zero-length field (8 bytes), so the reader can resume cleanly. For
+    plausible element headers, the offset points *to* the header so it can
+    be read normally.
+
+    Returns ``-1`` if nothing plausible is found within ``max_scan`` bytes.
+    Always restores ``fp`` to the original position before returning; the
+    caller is responsible for seeking forward by the returned amount.
+    """
+    pos = fp.tell()
+    buf = fp.read(max_scan)
+    fp.seek(pos)
+    if len(buf) < 8:
+        return -1
+    if is_little_endian:
+        delim_seq = b"\xfe\xff\xdd\xe0\x00\x00\x00\x00"
+        delim_item = b"\xfe\xff\x0d\xe0\x00\x00\x00\x00"
+    else:
+        delim_seq = b"\xff\xfe\xe0\xdd\x00\x00\x00\x00"
+        delim_item = b"\xff\xfe\xe0\x0d\x00\x00\x00\x00"
+    # 2-byte aligned scan — DICOM tags are always 2-byte aligned
+    for off in range(0, len(buf) - 7, 2):
+        chunk = buf[off : off + 8]
+        # Stray delimiter from a truncated inner encapsulated stream
+        if chunk in (delim_seq, delim_item):
+            return off + 8
+        # Plausible element header
+        if is_little_endian:
+            group = chunk[0] | (chunk[1] << 8)
+        else:
+            group = (chunk[0] << 8) | chunk[1]
+        if group in (0x0000, 0xFFFE):
+            continue
+        if is_implicit_VR:
+            # In implicit VR mode we cannot validate VR bytes; rely on the
+            # standard group range as a weak signal.
+            if 0x0008 <= group <= 0x7FE0:
+                return off
+            continue
+        vr_bytes = chunk[4:6]
+        # All valid DICOM VRs are exactly two ASCII uppercase letters
+        if b"AA" <= vr_bytes <= b"ZZ":
+            return off
+    return -1
+
+
 def data_element_generator(
     fp: BinaryIO,
     is_implicit_VR: bool,
@@ -56,6 +115,8 @@ def data_element_generator(
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
+    bytelength: int | None = None,
+    at_top_level: bool = True,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -126,6 +187,7 @@ def data_element_generator(
     fp_read = fp.read
     fp_seek = fp.seek
     fp_tell = fp.tell
+    fp_start = fp.tell()
     logger_debug = logger.debug
     debugging = config.debugging
     defer_size = size_in_bytes(defer_size)
@@ -135,9 +197,40 @@ def data_element_generator(
     if has_tag_set:
         tag_set.add(0x00080005)  # Specific Character Set
 
+    # Tracks whether the previously yielded element was an explicit-length
+    # SQ — used as a trigger for the malformed-encapsulation resync below.
+    prev_was_defined_length_sq = False
+
     while True:
         # VR: str | None
         # Read tag, VR, length, get ready to read value
+        header_tell = fp_tell()
+
+        # Recovery for issue #2324: when an explicit-length sequence
+        # under-declares its bytes and contains an undefined-length
+        # encapsulated element whose actual data extends past the
+        # sequence's declared end, the trailing bytes of the encapsulated
+        # stream leak out into the parent dataset. Detect that situation
+        # *before* misinterpreting the leftover bytes as a sibling
+        # element (which can swallow the real outer ``PixelData``).
+        if prev_was_defined_length_sq and at_top_level and bytelength is None:
+            skipped = _scan_for_next_top_level_element(
+                fp, is_implicit_VR, is_little_endian
+            )
+            if skipped > 0:
+                fp_seek(header_tell + skipped)
+                warn_and_log(
+                    f"Skipped {skipped} byte(s) of malformed data at "
+                    f"position 0x{header_tell:X} while reading the "
+                    "top-level dataset (likely leftover from a truncated "
+                    "encapsulated stream inside the preceding sequence). "
+                    "The file appears to be malformed; the bytes were "
+                    "discarded so reading could continue.",
+                    UserWarning,
+                )
+                header_tell = fp_tell()
+        prev_was_defined_length_sq = False
+
         if len(bytes_read := fp_read(8)) < 8:
             return  # at end of file
 
@@ -264,6 +357,12 @@ def data_element_generator(
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
 
+            # Flag explicit-length SQ values so the next iteration can
+            # detect and recover from leftover encapsulated-stream bytes
+            # at the top level (see resync block above).
+            if vr == VR_.SQ:
+                prev_was_defined_length_sq = True
+
             yield RawDataElement(
                 BaseTag(tag),
                 vr,
@@ -318,8 +417,24 @@ def data_element_generator(
                 if debugging:
                     logger_debug("Reading undefined length data element")
 
+                # If we're inside an explicit-length container (e.g. a
+                # sequence item with a fixed length), don't let the
+                # undefined-length scan bleed past it. The container's
+                # remaining-byte budget acts as a hard ceiling — when the
+                # delimiter is missing or the parent under-declared its
+                # length, the reader will warn and truncate at the boundary
+                # rather than silently swallowing subsequent elements.
+                max_bytes: int | None = None
+                if bytelength is not None:
+                    max_bytes = bytelength - (fp_tell() - fp_start)
+                    max_bytes = max(max_bytes, 0)
+
                 value = read_undefined_length_value(
-                    fp, is_little_endian, SequenceDelimiterTag, defer_size
+                    fp,
+                    is_little_endian,
+                    SequenceDelimiterTag,
+                    defer_size,
+                    max_bytes=max_bytes,
                 )
 
                 # tags with undefined length are skipped after read
@@ -474,6 +589,8 @@ def read_dataset(
         defer_size,
         parent_encoding,
         specific_tags,
+        bytelength=bytelength,
+        at_top_level=at_top_level,
     )
     try:
         if bytelength is None:

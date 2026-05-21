@@ -49,6 +49,15 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Bound undefined-length value reads by the enclosing sequence item's explicit length, and
+  recover from leftover encapsulation-stream bytes that follow a malformed defined-length
+  sequence at the top-level dataset. Previously such files (typically an *Icon Image Sequence*
+  whose writer under-declared the inner encapsulation header bytes) silently lost the outer
+  *Pixel Data* on read and raised ``TypeError`` from :func:`~pydicom.dataset.Dataset.save_as`
+  (:issue:`2324`).
+* Coerce ``elem.VR`` to ``str`` in :func:`~pydicom.filewriter.write_data_element` so the
+  oversize-value fallback that reassigns ``vr = VR.UN`` cannot raise ``TypeError`` when
+  encoding the VR bytes (:issue:`2324`).
 
 Enhancements
 ------------

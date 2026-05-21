@@ -728,7 +728,11 @@ def write_data_element(
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
-        vr = cast(str, vr)
+        # `vr` may be a VR enum instance here (e.g. after the oversize-value
+        # fallback above reassigns `vr = VR.UN`). bytes(enum, encoding) raises
+        # TypeError because the bytes constructor doesn't unwrap the str-Enum,
+        # so coerce explicitly.
+        vr = str(vr)
         fp.write(bytes(vr, default_encoding))
 
         if vr in EXPLICIT_VR_LENGTH_32:
