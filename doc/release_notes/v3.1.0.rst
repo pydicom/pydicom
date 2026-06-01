@@ -49,6 +49,9 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Fixed :func:`~pydicom.pixels.apply_modality_lut` raising for a *Modality LUT* with 10 to 16
+  bits per entry (such as 12-bit), now handled as 16-bit to match
+  :func:`~pydicom.pixels.apply_voi` (:issue:`2317`).
 
 Enhancements
 ------------
