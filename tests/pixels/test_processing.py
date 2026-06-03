@@ -446,6 +446,20 @@ class TestModalityLUT:
         with pytest.raises(NotImplementedError, match=msg):
             apply_modality_lut(ds.pixel_array, ds)
 
+    def test_lut_sequence_8_bit(self):
+        """Test an 8-bit LUT entry depth is handled as 8-bit (#2317)."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4, 0, 8]
+        seq.LUTData = [0, 85, 170, 255]
+
+        # IVs below `first_map` (0) map to the first entry, IVs at or beyond
+        # the number of entries (4) map to the last entry
+        arr = np.asarray([-1, 0, 1, 2, 3, 9])
+        out = apply_modality_lut(arr, ds)
+        assert out.dtype == np.uint8
+        assert [0, 0, 85, 170, 255, 255] == list(out)
+
     def test_lut_sequence_zero_entries(self):
         """Test that 0 entries is interpreted correctly."""
         # LUTDescriptor[0] of 0 -> 65536, but only 4096 entries so any
