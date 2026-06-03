@@ -385,6 +385,12 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # The third LUT Descriptor value (bits per entry) may be 8 or 10-16;
         # map 10-16 to 16-bit as apply_voi() does
         if nominal_depth in list(range(10, 17)):
+            if nominal_depth != 16:
+                # For the Modality LUT the third value shall be 16 (PS3.3 C.11.1.1)
+                warn_and_log(
+                    f"Invalid value '{nominal_depth}' for the third value of the "
+                    "Modality LUT Descriptor - assuming 16"
+                )
             dtype = "uint16"
         elif nominal_depth == 8:
             dtype = "uint8"

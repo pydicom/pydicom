@@ -425,7 +425,14 @@ class TestModalityLUT:
         seq = ds.ModalityLUTSequence[0]
         seq.LUTDescriptor = [4096, -2048, 12]
 
-        out = apply_modality_lut(ds.pixel_array, ds)
+        # For the Modality LUT the third value shall be 16, so a non-16 value
+        # is invalid and warns while still being assumed to be 16-bit
+        msg = (
+            r"Invalid value '12' for the third value of the Modality LUT "
+            r"Descriptor - assuming 16"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            out = apply_modality_lut(ds.pixel_array, ds)
         assert out.dtype == np.uint16
         # LUTData is unchanged so the mapping matches the 16-bit case
         assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])

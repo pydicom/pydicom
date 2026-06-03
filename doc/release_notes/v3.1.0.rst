@@ -51,7 +51,8 @@ Fixes
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 * Fixed :func:`~pydicom.pixels.apply_modality_lut` raising for a *Modality LUT* with 10 to 16
   bits per entry (such as 12-bit), now handled as 16-bit to match
-  :func:`~pydicom.pixels.apply_voi` (:issue:`2317`).
+  :func:`~pydicom.pixels.apply_voi`; a value other than 16 (invalid for the *Modality LUT*)
+  now warns instead (:issue:`2317`).
 
 Enhancements
 ------------
