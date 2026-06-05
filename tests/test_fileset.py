@@ -152,7 +152,7 @@ def fileset_fs(request, fs, ignore_reading_invalid_values):
 
     # Write modified DICOMDIR file
     with open(dicomdir_root / "DICOMDIR2", "wb") as fp:
-        fset._write_dicomdir(DicomFileLike(fp))
+        fset._write_dicomdir(DicomFileLike(fp), settings=config.settings)
 
     yield fs
 
