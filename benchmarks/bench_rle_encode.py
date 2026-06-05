@@ -4,12 +4,11 @@
 from asv_runner.benchmarks.mark import skip_benchmark
 
 
-
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
+
 # from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
 from pydicom.uid import RLELossless
-
 
 
 # 8/8-bit, 1 sample/pixel, 1 frame
@@ -24,6 +23,7 @@ EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
 EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
 # 32/32-bit, 3 sample/pixel, 1 frame
 EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
+
 
 # Need to update API for this - rle_encode_frame was removed in 3.0
 @skip_benchmark
