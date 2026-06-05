@@ -3242,6 +3242,30 @@ class TestWriteUndefinedLengthPixelData:
         ds = read_dataset(self.fp, False, False)
         assert "UN" == ds[0x30040058].VR
 
+    def test_write_data_element_with_vr_enum(self):
+        """Regression for #2324: write_data_element must not raise
+        TypeError when ``elem.VR`` is a ``valuerep.VR`` enum member rather
+        than a plain ``str``. Some upstream code paths (notably the
+        oversize-value fallback) reassign ``vr = VR.UN``; without explicit
+        str coercion ``bytes(vr, encoding)`` can fail on some Python
+        versions where the str-Enum subclass does not unwrap cleanly."""
+        from pydicom.valuerep import VR as VR_enum
+
+        self.fp = DicomBytesIO()
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        # Construct an element whose VR is the enum, not a plain string.
+        elem = DataElement(0x00100010, VR_enum.PN, "Test^Patient")
+        # Sanity: VR truly is the enum instance
+        assert isinstance(elem.VR, VR_enum)
+        # Must not raise
+        write_data_element(self.fp, elem)
+        # Round-trip
+        self.fp.seek(0)
+        ds = read_dataset(self.fp, False, True)
+        assert ds[0x00100010].VR == "PN"
+        assert ds[0x00100010].value == "Test^Patient"
+
 
 def test_all_writers():
     """Test that the VR writer functions are complete"""

@@ -17,7 +17,9 @@ from pydicom.fileutil import (
     buffer_remaining,
     buffer_length,
     buffer_equality,
+    read_undefined_length_value,
 )
+from pydicom.tag import SequenceDelimiterTag
 
 
 IS_WINDOWS = platform.system() == "Windows"
@@ -194,3 +196,41 @@ class TestBufferFunctions:
     def test_equality_not_buffer(self):
         """Test equality if 'other' is not a buffer or bytes"""
         assert buffer_equality(b"", None) is False
+
+
+class TestReadUndefinedLengthValueUnbounded:
+    """Guard for #2324: ``read_undefined_length_value`` is unbounded — it
+    reads until the delimiter or raises ``EOFError``. The boundary recovery
+    for malformed explicit-length containers lives in ``read_dataset``
+    (overrun seek-back), not in this shared hot-path utility.
+    """
+
+    def test_missing_delimiter_raises_eoferror(self):
+        """No delimiter before EOF must raise EOFError (no silent truncation
+        and no ``max_bytes`` bounding sneaking back in)."""
+        payload = b"\xab" * 16  # no sequence delimiter anywhere
+        fp = BytesIO(payload)
+        with pytest.raises(EOFError):
+            read_undefined_length_value(
+                fp,
+                is_little_endian=True,
+                delimiter_tag=SequenceDelimiterTag,
+            )
+
+    def test_well_formed_encapsulated_stream(self):
+        """A well-formed encapsulated stream reads through to its delimiter."""
+        from struct import pack
+
+        encap = (
+            pack("<HHI", 0xFFFE, 0xE000, 8)
+            + b"\xef" * 8
+            + pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        )
+        fp = BytesIO(encap)
+        value = read_undefined_length_value(
+            fp,
+            is_little_endian=True,
+            delimiter_tag=SequenceDelimiterTag,
+        )
+        assert value is not None
+        assert fp.tell() == len(encap)
