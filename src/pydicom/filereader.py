@@ -107,6 +107,60 @@ def _scan_for_next_top_level_element(
     return -1
 
 
+def _header_is_plausible(
+    bytes_read: bytes, is_implicit_VR: bool, is_little_endian: bool
+) -> bool:
+    """Return whether the 8 header bytes look like a genuine element header.
+
+    Used only to decide whether to invoke
+    :func:`_scan_for_next_top_level_element` after a top-level explicit-length
+    sequence (issue #2324). A header is implausible if its group is reserved
+    (``0x0000``) or a delimiter (``0xFFFE``), or — in explicit VR — if the VR
+    bytes are not two ASCII uppercase letters.
+    """
+    if len(bytes_read) < 8:
+        return True  # let the normal end-of-file check handle short reads
+    if is_little_endian:
+        group = bytes_read[0] | (bytes_read[1] << 8)
+    else:
+        group = (bytes_read[0] << 8) | bytes_read[1]
+    if group in (0x0000, 0xFFFE):
+        return False
+    if is_implicit_VR:
+        # Cannot validate VR bytes in implicit VR; the group check is all we have
+        return True
+    return b"AA" <= bytes_read[4:6] <= b"ZZ"
+
+
+def _resync_top_level_after_sq(
+    fp: BinaryIO,
+    header_tell: int,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+) -> bool:
+    """Skip leftover encapsulated-stream bytes that leaked out of a preceding
+    top-level explicit-length sequence (issue #2324).
+
+    ``fp`` must be positioned at ``header_tell``. Scans forward for the next
+    stray delimiter or plausible element header; if one is found past the
+    current position, seeks there, emits a :class:`UserWarning`, and returns
+    ``True``. Returns ``False`` (leaving ``fp`` unmoved) if nothing is found.
+    """
+    skipped = _scan_for_next_top_level_element(fp, is_implicit_VR, is_little_endian)
+    if skipped <= 0:
+        return False
+    fp.seek(header_tell + skipped)
+    warn_and_log(
+        f"Skipped {skipped} byte(s) of malformed data at position "
+        f"0x{header_tell:X} while reading the top-level dataset (likely "
+        "leftover from a truncated encapsulated stream inside the preceding "
+        "sequence). The file appears to be malformed; the bytes were "
+        "discarded so reading could continue.",
+        UserWarning,
+    )
+    return True
+
+
 def data_element_generator(
     fp: BinaryIO,
     is_implicit_VR: bool,
@@ -187,7 +241,6 @@ def data_element_generator(
     fp_read = fp.read
     fp_seek = fp.seek
     fp_tell = fp.tell
-    fp_start = fp.tell()
     logger_debug = logger.debug
     debugging = config.debugging
     defer_size = size_in_bytes(defer_size)
@@ -197,42 +250,39 @@ def data_element_generator(
     if has_tag_set:
         tag_set.add(0x00080005)  # Specific Character Set
 
-    # Tracks whether the previously yielded element was an explicit-length
-    # SQ — used as a trigger for the malformed-encapsulation resync below.
+    # Recovery for issue #2324 only fires on the first header read after a
+    # top-level explicit-length SQ (see below). Pre-compute the enabling
+    # condition once so the hot loop pays nothing inside sequences or for
+    # bounded reads.
+    do_top_level_resync = at_top_level and bytelength is None
     prev_was_defined_length_sq = False
 
     while True:
         # VR: str | None
         # Read tag, VR, length, get ready to read value
-        header_tell = fp_tell()
-
-        # Recovery for issue #2324: when an explicit-length sequence
-        # under-declares its bytes and contains an undefined-length
-        # encapsulated element whose actual data extends past the
-        # sequence's declared end, the trailing bytes of the encapsulated
-        # stream leak out into the parent dataset. Detect that situation
-        # *before* misinterpreting the leftover bytes as a sibling
-        # element (which can swallow the real outer ``PixelData``).
-        if prev_was_defined_length_sq and at_top_level and bytelength is None:
-            skipped = _scan_for_next_top_level_element(
-                fp, is_implicit_VR, is_little_endian
-            )
-            if skipped > 0:
-                fp_seek(header_tell + skipped)
-                warn_and_log(
-                    f"Skipped {skipped} byte(s) of malformed data at "
-                    f"position 0x{header_tell:X} while reading the "
-                    "top-level dataset (likely leftover from a truncated "
-                    "encapsulated stream inside the preceding sequence). "
-                    "The file appears to be malformed; the bytes were "
-                    "discarded so reading could continue.",
-                    UserWarning,
-                )
-                header_tell = fp_tell()
-        prev_was_defined_length_sq = False
-
         if len(bytes_read := fp_read(8)) < 8:
             return  # at end of file
+
+        # Recovery for issue #2324: when a top-level explicit-length sequence
+        # under-declares its bytes and contains an undefined-length
+        # encapsulated element, the trailing bytes of that stream can leak out
+        # into the parent dataset and swallow the real outer ``PixelData``.
+        # Only the first header after such an SQ is examined, and only when it
+        # is implausible (a stray delimiter or a non-element header) — so
+        # well-formed files read straight through with no scan.
+        if prev_was_defined_length_sq:
+            prev_was_defined_length_sq = False
+            if do_top_level_resync and not _header_is_plausible(
+                bytes_read, is_implicit_VR, is_little_endian
+            ):
+                header_tell = fp_tell() - 8
+                fp_seek(header_tell)
+                if _resync_top_level_after_sq(
+                    fp, header_tell, is_implicit_VR, is_little_endian
+                ):
+                    # Re-read the header from the recovered position
+                    if len(bytes_read := fp_read(8)) < 8:
+                        return  # at end of file
 
         if debugging:
             debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
@@ -357,11 +407,11 @@ def data_element_generator(
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
 
-            # Flag explicit-length SQ values so the next iteration can
-            # detect and recover from leftover encapsulated-stream bytes
-            # at the top level (see resync block above).
+            # Arm the issue #2324 resync for the next iteration after an
+            # explicit-length SQ. Only meaningful at the top level, so gate on
+            # ``do_top_level_resync`` to keep the flag False inside sequences.
             if vr == VR_.SQ:
-                prev_was_defined_length_sq = True
+                prev_was_defined_length_sq = do_top_level_resync
 
             yield RawDataElement(
                 BaseTag(tag),
@@ -417,24 +467,8 @@ def data_element_generator(
                 if debugging:
                     logger_debug("Reading undefined length data element")
 
-                # If we're inside an explicit-length container (e.g. a
-                # sequence item with a fixed length), don't let the
-                # undefined-length scan bleed past it. The container's
-                # remaining-byte budget acts as a hard ceiling — when the
-                # delimiter is missing or the parent under-declared its
-                # length, the reader will warn and truncate at the boundary
-                # rather than silently swallowing subsequent elements.
-                max_bytes: int | None = None
-                if bytelength is not None:
-                    max_bytes = bytelength - (fp_tell() - fp_start)
-                    max_bytes = max(max_bytes, 0)
-
                 value = read_undefined_length_value(
-                    fp,
-                    is_little_endian,
-                    SequenceDelimiterTag,
-                    defer_size,
-                    max_bytes=max_bytes,
+                    fp, is_little_endian, SequenceDelimiterTag, defer_size
                 )
 
                 # tags with undefined length are skipped after read
@@ -609,6 +643,24 @@ def read_dataset(
         warn_and_log(msg, UserWarning)
     except NotImplementedError as details:
         logger.error(details)
+
+    # Recovery for issue #2324: an undefined-length element inside this
+    # explicit-length container may have scanned past the declared boundary
+    # (missing inner delimiter, or the parent under-declared its length). The
+    # declared byte budget is authoritative for resuming the parent, so snap
+    # back to it and warn rather than letting the overrun corrupt sibling
+    # elements ("ask forgiveness": let the over-read happen, then correct).
+    if bytelength is not None:
+        overrun = (fp_tell() - fp_start) - bytelength
+        if overrun > 0:
+            fp.seek(fp_start + bytelength)
+            warn_and_log(
+                f"Element value(s) overran the {bytelength} byte(s) declared "
+                f"for the enclosing item/sequence by {overrun} byte(s); the "
+                "source file appears to be malformed. Truncating at the "
+                "declared boundary so reading can continue.",
+                UserWarning,
+            )
 
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:

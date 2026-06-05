@@ -1886,7 +1886,7 @@ class TestMalformedExplicitLengthItemEncapsulated:
         # Lazily parsing the SQ must now warn — and must NOT raise — and
         # the inner OB element must be present (truncated) in the item.
         assert 0x00880200 in ds, "IconImageSequence missing"
-        with pytest.warns(UserWarning, match="not found within"):
+        with pytest.warns(UserWarning, match="overran|End of file"):
             sq = ds[0x00880200].value
             item = sq[0]
             inner_pd = item[0x7FE00010]
@@ -1957,9 +1957,10 @@ class TestMalformedExplicitLengthItemEncapsulated:
         # Both elements must be present and well-formed
         assert 0x00880200 in ds, "IconImageSequence missing"
         assert 0x7FE00010 in ds, "outer PixelData was lost to leftover bytes"
-        # The IconImageSequence access triggers the lazy SQ parse — it must
-        # also warn (inner OB truncation) and not raise.
-        with pytest.warns(UserWarning, match="not found within"):
+        # The IconImageSequence access triggers the lazy SQ parse — the inner
+        # delimiter was cut off with the SQ tail, so it must warn (overrun or
+        # end-of-file recovery) and not raise.
+        with pytest.warns(UserWarning, match="overran|End of file"):
             list(ds[0x00880200].value)
 
     def test_short_sq_no_recovery_target_falls_through(self):
@@ -1992,6 +1993,27 @@ class TestMalformedExplicitLengthItemEncapsulated:
         assert 0x00880200 in ds
         assert 0x00100010 in ds
         assert ds[0x00100010].value == "ABCDEF"
+
+    def test_orphaned_delimiter_at_eof_after_sq(self):
+        """An explicit-length SQ followed only by an orphaned sequence
+        delimiter (and then EOF) must resync past the delimiter and stop
+        cleanly without raising."""
+        from struct import pack
+
+        # Empty defined-length SQ, then a stray delimiter, then nothing.
+        sq = pack("<HH", 0x0088, 0x0200) + b"SQ\x00\x00" + pack("<I", 0)
+        orphan = pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        data = sq + orphan
+
+        fp = BytesIO(data)
+        with pytest.warns(UserWarning, match="Skipped .* malformed data"):
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        assert 0x00880200 in ds
 
 
 class TestScanForNextTopLevelElement:
@@ -2143,6 +2165,60 @@ class TestScanForNextTopLevelElement:
             )
             == 12  # length of `bad`
         )
+
+
+class TestHeaderIsPlausible:
+    """Direct unit tests for filereader._header_is_plausible, the cheap gate
+    that decides whether the #2324 top-level resync should scan at all."""
+
+    def test_short_buffer_is_plausible(self):
+        """Fewer than 8 bytes: defer to the normal end-of-file check."""
+        from pydicom.filereader import _header_is_plausible
+
+        assert _header_is_plausible(b"\x10\x00", False, True) is True
+
+    def test_valid_explicit_header_little_endian(self):
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HH", 0x0010, 0x0010) + b"PN" + b"\x06\x00"
+        assert _header_is_plausible(header, False, True) is True
+
+    def test_valid_explicit_header_big_endian(self):
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack(">HH", 0x0010, 0x0010) + b"PN" + b"\x00\x06"
+        assert _header_is_plausible(header, False, False) is True
+
+    def test_reserved_group_is_implausible(self):
+        """A stray (FFFE,xxxx) delimiter header must be flagged implausible."""
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        assert _header_is_plausible(header, False, True) is False
+
+    def test_non_ascii_vr_is_implausible(self):
+        """Explicit VR bytes that are not two ASCII uppercase letters."""
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HH", 0x0010, 0x0010) + b"\xaa\xaa" + b"\x06\x00"
+        assert _header_is_plausible(header, False, True) is False
+
+    def test_implicit_vr_only_checks_group(self):
+        """Implicit VR cannot validate VR bytes — a non-reserved group passes."""
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HHI", 0x0010, 0x0010, 6)
+        assert _header_is_plausible(header, True, True) is True
 
 
 def test_read_file_meta_info():

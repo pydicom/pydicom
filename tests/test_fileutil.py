@@ -198,116 +198,17 @@ class TestBufferFunctions:
         assert buffer_equality(b"", None) is False
 
 
-class TestReadUndefinedLengthValueMaxBytes:
-    """Regression tests for #2324 — an undefined-length value contained
-    inside an explicit-length parent must not scan past the parent's
-    declared boundary.
+class TestReadUndefinedLengthValueUnbounded:
+    """Guard for #2324: ``read_undefined_length_value`` is unbounded — it
+    reads until the delimiter or raises ``EOFError``. The boundary recovery
+    for malformed explicit-length containers lives in ``read_dataset``
+    (overrun seek-back), not in this shared hot-path utility.
     """
 
-    @staticmethod
-    def _encap(payload: bytes) -> bytes:
-        from struct import pack
-
-        return (
-            pack("<HHI", 0xFFFE, 0xE000, len(payload))
-            + payload
-            + pack("<HHI", 0xFFFE, 0xE0DD, 0)
-        )
-
-    def test_byte_scan_truncates_at_max_bytes(self):
-        """The byte-scan fallback path stops at max_bytes and warns."""
-        # The byte-scan path is exercised by injecting a stream that does
-        # NOT look like a valid encapsulated pixel data structure (the
-        # optimized path bails out and falls through to the byte scanner).
-        payload = b"\xab" * 16
-        # Single sequence delimiter at the end; no leading Item tag, so the
-        # optimized parser will reject this and fall through.
-        from struct import pack
-
-        encap = payload + pack("<HHI", 0xFFFE, 0xE0DD, 0)
-        trailing = b"TRAILING-DATA-MUST-NOT-BE-CONSUMED"
-        stream = encap + trailing
-        # max_bytes is short — delimiter is OUT of bounds.
-        max_bytes = len(payload) - 4
-
-        fp = BytesIO(stream)
-        with pytest.warns(UserWarning, match="not found within"):
-            value = read_undefined_length_value(
-                fp,
-                is_little_endian=True,
-                delimiter_tag=SequenceDelimiterTag,
-                max_bytes=max_bytes,
-            )
-
-        assert fp.tell() == max_bytes
-        assert value is not None
-        assert len(value) <= max_bytes
-        # The remaining bytes in fp must include the trailing marker
-        rest = fp.read()
-        assert b"TRAILING-DATA-MUST-NOT-BE-CONSUMED" in rest
-
-    def test_encapsulated_path_bails_when_item_extends_past_max_bytes(self):
-        """The optimized encapsulated-pixel-data parser must refuse to
-        skip past max_bytes; the fallback then truncates and warns."""
-        # Encapsulated stream whose delimiter sits beyond a too-short
-        # max_bytes window. Tot bytes = 8 (item header) + 16 (payload)
-        # + 8 (delimiter+len) = 32.
-        encap = self._encap(b"\xcd" * 16)
-        trailing = b"OUTER-PIXEL-DATA-HERE"
-        stream = encap + trailing
-        max_bytes = 8 + 4  # not enough room for the 16-byte item payload
-
-        fp = BytesIO(stream)
-        with pytest.warns(UserWarning, match="not found within"):
-            value = read_undefined_length_value(
-                fp,
-                is_little_endian=True,
-                delimiter_tag=SequenceDelimiterTag,
-                max_bytes=max_bytes,
-            )
-        assert fp.tell() == max_bytes
-        assert value is not None
-        # The trailing bytes (which would be a sibling element in a real
-        # dataset) must remain available to the parent reader.
-        rest = fp.read()
-        assert rest.startswith(b"\xcd")  # untouched payload tail
-        assert b"OUTER-PIXEL-DATA-HERE" in rest
-
-    def test_well_formed_stream_within_max_bytes_unchanged(self):
-        """If the delimiter fits inside max_bytes, behavior is identical
-        to the unbounded read."""
-        encap = self._encap(b"\xef" * 8)
-        fp = BytesIO(encap)
-        value = read_undefined_length_value(
-            fp,
-            is_little_endian=True,
-            delimiter_tag=SequenceDelimiterTag,
-            max_bytes=len(encap),
-        )
-        assert value is not None
-        assert fp.tell() == len(encap)
-
-    def test_byte_scan_eof_with_max_bytes_truncates_not_raises(self):
-        """When EOF is reached before the delimiter AND max_bytes is set,
-        the reader must NOT raise EOFError — it must warn and truncate at
-        whatever bytes it could collect. Without max_bytes the same input
-        still raises EOFError (legacy behavior)."""
-        # Stream too short for any delimiter; ends in EOF mid-scan.
-        payload = b"\xab" * 4
-        fp = BytesIO(payload)
-        with pytest.warns(UserWarning, match="not found within"):
-            value = read_undefined_length_value(
-                fp,
-                is_little_endian=True,
-                delimiter_tag=SequenceDelimiterTag,
-                max_bytes=64,  # > payload, so EOF hits first
-            )
-        # value is non-None (we collected the partial bytes)
-        assert value is not None
-
-    def test_byte_scan_eof_without_max_bytes_still_raises(self):
-        """Legacy EOFError path is preserved when no max_bytes is given."""
-        payload = b"\xab" * 4
+    def test_missing_delimiter_raises_eoferror(self):
+        """No delimiter before EOF must raise EOFError (no silent truncation
+        and no ``max_bytes`` bounding sneaking back in)."""
+        payload = b"\xab" * 16  # no sequence delimiter anywhere
         fp = BytesIO(payload)
         with pytest.raises(EOFError):
             read_undefined_length_value(
@@ -316,63 +217,20 @@ class TestReadUndefinedLengthValueMaxBytes:
                 delimiter_tag=SequenceDelimiterTag,
             )
 
-    def test_byte_scan_truncates_with_defer_size_returns_none(self):
-        """When the bounded recovery fires and the collected bytes are
-        above defer_size, the value is dropped (returns None) — same
-        contract as the normal defer_size path on a successful read."""
-        payload = b"\xab" * 64
-        fp = BytesIO(payload)
-        with pytest.warns(UserWarning, match="not found within"):
-            value = read_undefined_length_value(
-                fp,
-                is_little_endian=True,
-                delimiter_tag=SequenceDelimiterTag,
-                max_bytes=32,
-                defer_size=16,  # 32 collected bytes >= 16 deferred limit
-            )
-        assert value is None
-
-    def test_encapsulated_path_max_bytes_big_endian(self):
-        """The optimized encapsulated parser honours max_bytes in big-endian
-        mode too — covers the big-endian struct-format branch."""
+    def test_well_formed_encapsulated_stream(self):
+        """A well-formed encapsulated stream reads through to its delimiter."""
         from struct import pack
 
-        # Big-endian encapsulated stream: item header + payload + delim
-        payload = b"\xcd" * 16
         encap = (
-            pack(">HHI", 0xFFFE, 0xE000, len(payload))
-            + payload
-            + pack(">HHI", 0xFFFE, 0xE0DD, 0)
+            pack("<HHI", 0xFFFE, 0xE000, 8)
+            + b"\xef" * 8
+            + pack("<HHI", 0xFFFE, 0xE0DD, 0)
         )
         fp = BytesIO(encap)
-        # max_bytes too small for the item; optimized path bails, falls
-        # through to byte-scan, which then warns and truncates.
-        with pytest.warns(UserWarning, match="not found within"):
-            value = read_undefined_length_value(
-                fp,
-                is_little_endian=False,
-                delimiter_tag=SequenceDelimiterTag,
-                max_bytes=8 + 4,
-            )
+        value = read_undefined_length_value(
+            fp,
+            is_little_endian=True,
+            delimiter_tag=SequenceDelimiterTag,
+        )
         assert value is not None
-        assert fp.tell() == 8 + 4
-
-    def test_byte_scan_max_bytes_zero_bails_immediately(self):
-        """``max_bytes=0`` means the parent has no remaining budget — the
-        reader must not consume any bytes and must still warn-and-recover
-        rather than raise. Reachable in production when
-        ``data_element_generator`` finds the file pointer already at or past
-        the enclosing item's declared end (e.g. a malformed item that under-
-        declared even the inner element header)."""
-        fp = BytesIO(b"SOMETHING-THAT-MUST-NOT-BE-CONSUMED")
-        with pytest.warns(UserWarning, match="not found within"):
-            value = read_undefined_length_value(
-                fp,
-                is_little_endian=True,
-                delimiter_tag=SequenceDelimiterTag,
-                max_bytes=0,
-            )
-        # fp stayed at position 0 (data_start + max_bytes == 0)
-        assert fp.tell() == 0
-        # No bytes collected
-        assert value == b""
+        assert fp.tell() == len(encap)
