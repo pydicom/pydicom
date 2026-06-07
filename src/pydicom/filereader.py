@@ -56,6 +56,7 @@ def data_element_generator(
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
+    _depth: int = 0,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -306,7 +307,12 @@ def data_element_generator(
                     )
 
                 seq = read_sequence(
-                    fp, is_implicit_VR, is_little_endian, length, encoding
+                    fp,
+                    is_implicit_VR,
+                    is_little_endian,
+                    length,
+                    encoding,
+                    _depth=_depth,
                 )
                 if has_tag_set and tag not in tag_set:
                     continue
@@ -418,6 +424,7 @@ def read_dataset(
     parent_encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
+    _depth: int = 0,
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
@@ -447,6 +454,11 @@ def read_dataset(
     at_top_level: bool
         If dataset is top level (not within a sequence).
         Used to turn off explicit VR heuristic within sequences
+    _depth : int
+        Internal: current sequence nesting depth. Bounded by
+        :attr:`pydicom.config.Settings.max_sequence_depth` to convert a
+        ``RecursionError`` on adversarial input into a clean
+        :class:`~pydicom.errors.InvalidDicomError`.
 
     Returns
     -------
@@ -474,6 +486,7 @@ def read_dataset(
         defer_size,
         parent_encoding,
         specific_tags,
+        _depth=_depth,
     )
     try:
         if bytelength is None:
@@ -516,6 +529,7 @@ def read_sequence(
     bytelength: int,
     encoding: str | MutableSequence[str],
     offset: int = 0,
+    _depth: int = 0,
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
@@ -532,7 +546,7 @@ def read_sequence(
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
             file_tell = fp_tell()
             dataset = read_sequence_item(
-                fp, is_implicit_VR, is_little_endian, encoding, offset
+                fp, is_implicit_VR, is_little_endian, encoding, offset, _depth
             )
             if dataset is None:  # None is returned if hit Sequence Delimiter
                 break
@@ -551,6 +565,7 @@ def read_sequence_item(
     is_little_endian: bool,
     encoding: str | MutableSequence[str],
     offset: int = 0,
+    _depth: int = 0,
 ) -> Dataset | None:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
@@ -589,6 +604,17 @@ def read_sequence_item(
                 "Found Item tag (start of item)"
             )
 
+    # Bound nesting depth before recursing into the contained dataset --
+    # otherwise an adversarially-deep SQ chain exhausts Python's stack and
+    # surfaces as RecursionError instead of a meaningful parse failure.
+    max_depth = config.settings.max_sequence_depth
+    if _depth + 1 > max_depth:
+        raise InvalidDicomError(
+            f"Sequence nesting depth ({_depth + 1}) exceeds the configured "
+            f"maximum ({max_depth}). Increase "
+            f"`pydicom.config.settings.max_sequence_depth` to read this file."
+        )
+
     if length == 0xFFFFFFFF:
         ds = read_dataset(
             fp,
@@ -597,6 +623,7 @@ def read_sequence_item(
             bytelength=None,
             parent_encoding=encoding,
             at_top_level=False,
+            _depth=_depth + 1,
         )
         ds.is_undefined_length_sequence_item = True
     else:
@@ -607,6 +634,7 @@ def read_sequence_item(
             length,
             parent_encoding=encoding,
             at_top_level=False,
+            _depth=_depth + 1,
         )
         ds.is_undefined_length_sequence_item = False
 

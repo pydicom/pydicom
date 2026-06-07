@@ -1722,6 +1722,146 @@ class TestReadTruncatedFile:
             mr.pixel_array
 
 
+class TestMaxSequenceDepth:
+    """Bound parser nesting depth so adversarial input raises a
+    meaningful ``InvalidDicomError`` instead of ``RecursionError``.
+    """
+
+    @staticmethod
+    def _nested_sq_file(tmp_path, depth: int) -> str:
+        """Build a minimal Explicit-VR-LE DICOM file with ``depth`` levels
+        of nested ContentSequence (0040,A730).
+
+        Uses raw bytes to avoid pydicom's own writer recursing on us.
+        """
+        import struct
+
+        preamble = b"\x00" * 128 + b"DICM"
+
+        # File Meta Information
+        sop_class = b"1.2.840.10008.5.1.4.1.1.88.11\x00"
+        sop_instance = b"1.2.3.4.5.6.7\x00"
+        tsuid = b"1.2.840.10008.1.2.1\x00"
+        impl_class = b"1.2.3\x00"
+        fmi_body = (
+            struct.pack("<HH", 0x0002, 0x0001) + b"OB\x00\x00"
+            + struct.pack("<I", 2) + b"\x00\x01"
+            + struct.pack("<HH", 0x0002, 0x0002) + b"UI"
+            + struct.pack("<H", len(sop_class)) + sop_class
+            + struct.pack("<HH", 0x0002, 0x0003) + b"UI"
+            + struct.pack("<H", len(sop_instance)) + sop_instance
+            + struct.pack("<HH", 0x0002, 0x0010) + b"UI"
+            + struct.pack("<H", len(tsuid)) + tsuid
+            + struct.pack("<HH", 0x0002, 0x0012) + b"UI"
+            + struct.pack("<H", len(impl_class)) + impl_class
+        )
+        fmi = (
+            struct.pack("<HH", 0x0002, 0x0000) + b"UL"
+            + struct.pack("<H", 4) + struct.pack("<I", len(fmi_body))
+            + fmi_body
+        )
+
+        # Minimal identifying tags before the nested SQ
+        dataset_prefix = (
+            struct.pack("<HH", 0x0008, 0x0016) + b"UI"
+            + struct.pack("<H", len(sop_class)) + sop_class
+            + struct.pack("<HH", 0x0008, 0x0018) + b"UI"
+            + struct.pack("<H", len(sop_instance)) + sop_instance
+        )
+
+        # depth nested ContentSequence (0040,A730) blocks
+        sq_header = (
+            struct.pack("<HH", 0x0040, 0xA730) + b"SQ\x00\x00"
+            + struct.pack("<I", 0xFFFFFFFF)
+        )
+        item_header = (
+            struct.pack("<HH", 0xFFFE, 0xE000) + struct.pack("<I", 0xFFFFFFFF)
+        )
+        item_delim = struct.pack("<HH", 0xFFFE, 0xE00D) + struct.pack("<I", 0)
+        seq_delim = struct.pack("<HH", 0xFFFE, 0xE0DD) + struct.pack("<I", 0)
+        value_type = b"CONTAINER\x00"
+        inner_elem = (
+            struct.pack("<HH", 0x0040, 0xA040) + b"CS"
+            + struct.pack("<H", len(value_type)) + value_type
+        )
+        open_block = sq_header + item_header + inner_elem
+        close_block = item_delim + seq_delim
+        nested_sq = (open_block * depth) + (close_block * depth)
+
+        path = tmp_path / f"nested_{depth}.dcm"
+        path.write_bytes(preamble + fmi + dataset_prefix + nested_sq)
+        return str(path)
+
+    def test_default_setting_value(self):
+        """Default is conservatively bounded under Python's recursion limit."""
+        assert pydicom.config.settings.max_sequence_depth == 100
+
+    def test_setter_rejects_non_positive(self):
+        with pytest.raises(ValueError, match="must be greater than 0"):
+            pydicom.config.settings.max_sequence_depth = 0
+        with pytest.raises(ValueError, match="must be greater than 0"):
+            pydicom.config.settings.max_sequence_depth = -1
+
+    def test_setter_round_trip(self):
+        original = pydicom.config.settings.max_sequence_depth
+        try:
+            pydicom.config.settings.max_sequence_depth = 500
+            assert pydicom.config.settings.max_sequence_depth == 500
+        finally:
+            pydicom.config.settings.max_sequence_depth = original
+
+    def test_shallow_file_parses_normally(self, tmp_path):
+        """A file at depth = max - 1 parses without error."""
+        path = self._nested_sq_file(tmp_path, depth=20)
+        ds = dcmread(path, force=True)
+        # Walk into the sequence to confirm the structure exists.
+        assert (0x0040, 0xA730) in ds
+
+    def test_depth_at_limit_parses(self, tmp_path):
+        """A file at exactly the limit parses (boundary is exclusive)."""
+        original = pydicom.config.settings.max_sequence_depth
+        try:
+            pydicom.config.settings.max_sequence_depth = 50
+            path = self._nested_sq_file(tmp_path, depth=50)
+            ds = dcmread(path, force=True)
+            assert (0x0040, 0xA730) in ds
+        finally:
+            pydicom.config.settings.max_sequence_depth = original
+
+    def test_depth_one_past_limit_raises(self, tmp_path):
+        """A file one level past the limit raises InvalidDicomError."""
+        original = pydicom.config.settings.max_sequence_depth
+        try:
+            pydicom.config.settings.max_sequence_depth = 50
+            path = self._nested_sq_file(tmp_path, depth=51)
+            with pytest.raises(InvalidDicomError, match="nesting depth"):
+                dcmread(path, force=True)
+        finally:
+            pydicom.config.settings.max_sequence_depth = original
+
+    def test_adversarial_depth_does_not_recursionerror(self, tmp_path):
+        """The whole point: deep input raises InvalidDicomError, NOT
+        ``RecursionError``. Uses default max=100 against a depth=300 file."""
+        path = self._nested_sq_file(tmp_path, depth=300)
+        with pytest.raises(InvalidDicomError, match="nesting depth"):
+            dcmread(path, force=True)
+
+    def test_error_message_includes_actual_and_limit(self, tmp_path):
+        """Error message must surface both numbers so the user can act."""
+        original = pydicom.config.settings.max_sequence_depth
+        try:
+            pydicom.config.settings.max_sequence_depth = 50
+            path = self._nested_sq_file(tmp_path, depth=51)
+            with pytest.raises(InvalidDicomError) as excinfo:
+                dcmread(path, force=True)
+            msg = str(excinfo.value)
+            assert "51" in msg
+            assert "50" in msg
+            assert "max_sequence_depth" in msg
+        finally:
+            pydicom.config.settings.max_sequence_depth = original
+
+
 class TestFileLike:
     """Test that can read DICOM files with file-like object rather than
     filename
