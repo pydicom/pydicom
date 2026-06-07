@@ -1744,45 +1744,62 @@ class TestMaxSequenceDepth:
         tsuid = b"1.2.840.10008.1.2.1\x00"
         impl_class = b"1.2.3\x00"
         fmi_body = (
-            struct.pack("<HH", 0x0002, 0x0001) + b"OB\x00\x00"
-            + struct.pack("<I", 2) + b"\x00\x01"
-            + struct.pack("<HH", 0x0002, 0x0002) + b"UI"
-            + struct.pack("<H", len(sop_class)) + sop_class
-            + struct.pack("<HH", 0x0002, 0x0003) + b"UI"
-            + struct.pack("<H", len(sop_instance)) + sop_instance
-            + struct.pack("<HH", 0x0002, 0x0010) + b"UI"
-            + struct.pack("<H", len(tsuid)) + tsuid
-            + struct.pack("<HH", 0x0002, 0x0012) + b"UI"
-            + struct.pack("<H", len(impl_class)) + impl_class
+            struct.pack("<HH", 0x0002, 0x0001)
+            + b"OB\x00\x00"
+            + struct.pack("<I", 2)
+            + b"\x00\x01"
+            + struct.pack("<HH", 0x0002, 0x0002)
+            + b"UI"
+            + struct.pack("<H", len(sop_class))
+            + sop_class
+            + struct.pack("<HH", 0x0002, 0x0003)
+            + b"UI"
+            + struct.pack("<H", len(sop_instance))
+            + sop_instance
+            + struct.pack("<HH", 0x0002, 0x0010)
+            + b"UI"
+            + struct.pack("<H", len(tsuid))
+            + tsuid
+            + struct.pack("<HH", 0x0002, 0x0012)
+            + b"UI"
+            + struct.pack("<H", len(impl_class))
+            + impl_class
         )
         fmi = (
-            struct.pack("<HH", 0x0002, 0x0000) + b"UL"
-            + struct.pack("<H", 4) + struct.pack("<I", len(fmi_body))
+            struct.pack("<HH", 0x0002, 0x0000)
+            + b"UL"
+            + struct.pack("<H", 4)
+            + struct.pack("<I", len(fmi_body))
             + fmi_body
         )
 
         # Minimal identifying tags before the nested SQ
         dataset_prefix = (
-            struct.pack("<HH", 0x0008, 0x0016) + b"UI"
-            + struct.pack("<H", len(sop_class)) + sop_class
-            + struct.pack("<HH", 0x0008, 0x0018) + b"UI"
-            + struct.pack("<H", len(sop_instance)) + sop_instance
+            struct.pack("<HH", 0x0008, 0x0016)
+            + b"UI"
+            + struct.pack("<H", len(sop_class))
+            + sop_class
+            + struct.pack("<HH", 0x0008, 0x0018)
+            + b"UI"
+            + struct.pack("<H", len(sop_instance))
+            + sop_instance
         )
 
         # depth nested ContentSequence (0040,A730) blocks
         sq_header = (
-            struct.pack("<HH", 0x0040, 0xA730) + b"SQ\x00\x00"
+            struct.pack("<HH", 0x0040, 0xA730)
+            + b"SQ\x00\x00"
             + struct.pack("<I", 0xFFFFFFFF)
         )
-        item_header = (
-            struct.pack("<HH", 0xFFFE, 0xE000) + struct.pack("<I", 0xFFFFFFFF)
-        )
+        item_header = struct.pack("<HH", 0xFFFE, 0xE000) + struct.pack("<I", 0xFFFFFFFF)
         item_delim = struct.pack("<HH", 0xFFFE, 0xE00D) + struct.pack("<I", 0)
         seq_delim = struct.pack("<HH", 0xFFFE, 0xE0DD) + struct.pack("<I", 0)
         value_type = b"CONTAINER\x00"
         inner_elem = (
-            struct.pack("<HH", 0x0040, 0xA040) + b"CS"
-            + struct.pack("<H", len(value_type)) + value_type
+            struct.pack("<HH", 0x0040, 0xA040)
+            + b"CS"
+            + struct.pack("<H", len(value_type))
+            + value_type
         )
         open_block = sq_header + item_header + inner_elem
         close_block = item_delim + seq_delim
