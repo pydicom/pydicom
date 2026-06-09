@@ -996,6 +996,28 @@ class TestReader:
             "Expected sequence item with tag (FFFE,E000) at file position 0x22"
         ) in caplog.text
 
+    def test_sequence_item_truncated_raises_invaliddicom(self):
+        """SQ with undefined length but no item header before EOF must raise
+        ``InvalidDicomError``, not the legacy bare ``OSError``.
+
+        The previous implementation caught ``BaseException`` (so
+        ``KeyboardInterrupt`` / ``SystemExit`` were also swallowed) and re-raised
+        as ``OSError`` -- an exception type ``dcmread``'s docstring does not
+        promise to raise. Callers had no single type to ``except`` to handle
+        malformed-DICOM input.
+        """
+        # Implicit VR LE: CS "ISO_IR 100", then an undefined-length SQ at
+        # (0008,0006) with NO item header, NO sequence delimiter, EOF.
+        # read_sequence_item's `fp.read(8)` returns < 8 bytes and `unpack`
+        # raises struct.error -> we should land on InvalidDicomError.
+        truncated_sq = (
+            b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+            b"\x08\x00\x06\x00SQ\x00\x00\xff\xff\xff\xff"
+        )
+
+        with pytest.raises(InvalidDicomError, match="No tag to read at file position"):
+            read_dataset(BytesIO(truncated_sq), False, True)
+
     def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
         """Test reading a dataset with a registered private transfer syntax"""
         uid = UID("1.2.3.4")

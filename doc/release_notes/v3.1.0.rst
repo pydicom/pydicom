@@ -49,6 +49,11 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Translate a truncated sequence item header in
+  :func:`~pydicom.filereader.read_sequence_item` to
+  :class:`~pydicom.errors.InvalidDicomError` instead of the legacy bare
+  ``OSError``. Also narrows the surrounding ``except BaseException`` so
+  ``KeyboardInterrupt`` and ``SystemExit`` are no longer swallowed.
 
 Enhancements
 ------------
