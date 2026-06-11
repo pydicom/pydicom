@@ -16,7 +16,7 @@ from tempfile import TemporaryFile
 from typing import cast
 import zlib
 
-from pydicom.errors import InvalidDicomError
+from pydicom.errors import BytesLengthException, InvalidDicomError
 
 try:
     import resource
@@ -1359,6 +1359,18 @@ class TestCorrectAmbiguousVRElement:
         ds = dcmread(fp, force=True)
         assert ds.ModalityLUTSequence[0]["LUTDescriptor"].VR == "US"
         assert ds.ModalityLUTSequence[0]["LUTData"].VR == "OW"
+
+    def test_invalid_value_length(self):
+        """Regression test for #2168: the error message includes the tag."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.SmallestImagePixelValue = b"\x00\x01\x02"
+        msg = (
+            r"Failed to resolve ambiguous VR for tag \(0028,0106\): Expected "
+            r"total bytes to be an even multiple of bytes per value"
+        )
+        with pytest.raises(BytesLengthException, match=msg):
+            correct_ambiguous_vr_element(ds[0x00280106], ds, True)
 
 
 class TestWriteAmbiguousVR:
