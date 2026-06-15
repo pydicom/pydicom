@@ -1223,6 +1223,91 @@ class TestUnknownVR:
 
         assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
 
+    # ----- Regression: dcmread exception contract for unknown VR (#2336) -----
+
+    # 144-byte File-Meta-Information-only fixture: 128-byte zero preamble +
+    # ``DICM`` + (0002,0000) FileMetaInformationGroupLength encoded with the
+    # invented VR 'ZZ'. Lifts to NotImplementedError from convert_value, which
+    # the public dcmread API must surface as InvalidDicomError per its
+    # documented ``Raises`` contract. Inline rather than a fixture so each
+    # test is self-contained for the maintainer reading the diff.
+    _UNKNOWN_VR_FMI_BYTES = bytes.fromhex(
+        "00" * 128
+        + "4449434d"  # 'DICM'
+        + "02000000"  # tag (0002,0000)
+        + "5a5a"      # VR 'ZZ'
+        + "0400"      # length 4
+        + "00000000"  # value
+    )
+
+    def test_dcmread_raises_invaliddicom_on_unknown_vr(self):
+        """Unknown VR via ``dcmread(force=True)`` must raise
+        :class:`InvalidDicomError`, not :class:`NotImplementedError`.
+
+        ``dcmread``'s docstring promises ``InvalidDicomError`` for malformed
+        DICOM input. Prior to #2336, unknown VRs leaked
+        ``NotImplementedError`` through the public API, leaving callers
+        with no single exception type to handle malformed input.
+
+        Same shape as the contract narrowing in PR #2331 (``RecursionError``
+        on deep SQ nesting) and PR #2333 (bare ``OSError`` on truncated SQ
+        item header).
+        """
+        with pytest.raises(InvalidDicomError) as excinfo:
+            dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
+
+        assert "Unknown Value Representation 'ZZ'" in str(excinfo.value)
+        assert "(0002,0000)" in str(excinfo.value)
+        # The chain is preserved for diagnosability.
+        assert isinstance(excinfo.value.__cause__, NotImplementedError)
+
+    def test_dcmread_unknown_vr_recovers_when_config_set(self):
+        """``config.convert_unknown_vr_to_UN = True`` parses the file with a
+        warning instead of raising.
+
+        Mirrors :data:`config.convert_wrong_length_to_UN` -- callers handling
+        in-flight studies with a single bad tag can opt in to a permissive
+        parse instead of losing the whole file. Default stays strict (the
+        previous test pins that).
+        """
+        original = config.convert_unknown_vr_to_UN
+        config.convert_unknown_vr_to_UN = True
+        try:
+            with pytest.warns(UserWarning, match="Setting VR to 'UN'"):
+                ds = dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
+        finally:
+            config.convert_unknown_vr_to_UN = original
+
+        # The file parsed; the offending element is reachable on the file
+        # meta dataset (its VR may have been resolved from the dictionary
+        # after the UN fall-back, since (0002,0000) is a known tag -- the
+        # invariant we pin is "the file parsed", not "VR stays UN").
+        assert 0x00020000 in ds.file_meta
+
+    def test_read_partial_still_raises_notimplemented_on_unknown_vr(self):
+        """Internal callers below the public ``dcmread`` boundary continue
+        to see :class:`NotImplementedError` unchanged.
+
+        The translation in :func:`dcmread` is scoped to the public-API
+        boundary so internal callers (``read_partial``, ``read_dataset``,
+        ``read_file_meta_info``, the #503 implicit-VR retry inside
+        ``_read_file_meta_info``, ``util.fixer``) can keep relying on
+        catching ``NotImplementedError`` specifically.
+
+        Defends against a future regression where someone moves the
+        translation lower in the call stack and accidentally narrows the
+        exception type for those internal callers.
+        """
+        from pydicom.filereader import read_partial
+
+        with pytest.raises(NotImplementedError, match="'ZZ'"):
+            read_partial(
+                BytesIO(self._UNKNOWN_VR_FMI_BYTES),
+                stop_when=None,
+                defer_size=None,
+                force=True,
+            )
+
 
 class TestReadDataElement:
     def setup_method(self):

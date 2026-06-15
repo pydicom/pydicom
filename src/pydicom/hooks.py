@@ -246,7 +246,25 @@ def raw_element_value(
     try:
         value = convert_value(vr, raw, encoding)
     except NotImplementedError as exc:
-        raise NotImplementedError(f"{exc} in tag {raw.tag}")
+        # An unknown VR ('ZZ', 'XX', etc.) reaches us as NotImplementedError
+        # from convert_value. Mirror convert_wrong_length_to_UN: either keep
+        # the original exception (so the dcmread boundary can translate it
+        # to InvalidDicomError per the documented contract), or fall back
+        # to a UN-VR parse and continue. We do NOT translate here because
+        # internal callers (read_partial, read_dataset, the #503
+        # implicit-VR retry inside _read_file_meta_info, util.fixer) rely
+        # on catching NotImplementedError specifically.
+        msg = f"{exc} in tag {raw.tag}"
+        if not config.convert_unknown_vr_to_UN:
+            raise NotImplementedError(
+                f"{msg}. To replace this error with a warning and parse the "
+                "element as 'UN', set "
+                "pydicom.config.convert_unknown_vr_to_UN = True."
+            ) from exc
+
+        warn_and_log(f"{msg}. Setting VR to 'UN'.")
+        data["VR"] = VR.UN
+        value = raw.value
     except BytesLengthException as exc:
         # Failed conversion, either raise or convert to a UN VR
         msg = (
