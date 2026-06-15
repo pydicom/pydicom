@@ -1235,8 +1235,8 @@ class TestUnknownVR:
         "00" * 128
         + "4449434d"  # 'DICM'
         + "02000000"  # tag (0002,0000)
-        + "5a5a"      # VR 'ZZ'
-        + "0400"      # length 4
+        + "5a5a"  # VR 'ZZ'
+        + "0400"  # length 4
         + "00000000"  # value
     )
 
