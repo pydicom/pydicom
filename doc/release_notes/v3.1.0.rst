@@ -49,6 +49,9 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Bound sequence nesting depth in :func:`~pydicom.filereader.dcmread` so adversarially-deep
+  ``SQ`` chains raise :class:`~pydicom.errors.InvalidDicomError` instead of ``RecursionError``
+  (:issue:`2330`).
 
 Enhancements
 ------------
@@ -82,3 +85,6 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` where applicable (:issue:`2228`)
 * Take the color space information from an Adobe APP14 marker into account when decoding
   pixel data for JPEG transfer syntaxes.
+* Added :attr:`pydicom.config.Settings.max_sequence_depth` (default ``100``) to bound the
+  maximum sequence nesting depth allowed during reading. Exceeding the bound raises
+  :class:`~pydicom.errors.InvalidDicomError` instead of ``RecursionError`` (:issue:`2330`).

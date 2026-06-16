@@ -423,7 +423,6 @@ def read_dataset(
     defer_size: str | int | float | None = None,
     parent_encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
-    at_top_level: bool = True,
     _depth: int = 0,
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
@@ -451,13 +450,13 @@ def read_dataset(
         Character Set* isn't specified.
     specific_tags : list of BaseTag, optional
         See :func:`dcmread` for parameter info.
-    at_top_level: bool
-        If dataset is top level (not within a sequence).
-        Used to turn off explicit VR heuristic within sequences
     _depth : int
-        Internal: current sequence nesting depth. Bounded by
-        :attr:`pydicom.config.Settings.max_sequence_depth` to convert a
-        ``RecursionError`` on adversarial input into a clean
+        Internal: current sequence nesting depth. ``0`` at the top level;
+        incremented by :func:`read_sequence_item` before recursing. Used both
+        to disable the explicit-VR heuristic inside sequences (only top-level
+        datasets get the heuristic) and to bound nesting via
+        :attr:`pydicom.config.Settings.max_sequence_depth`, converting
+        ``RecursionError`` on adversarial input into
         :class:`~pydicom.errors.InvalidDicomError`.
 
     Returns
@@ -475,7 +474,7 @@ def read_dataset(
     fp_tell = fp.tell
     fp_start = fp.tell()
     is_implicit_VR = _is_implicit_vr(
-        fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=not at_top_level
+        fp, is_implicit_VR, is_little_endian, stop_when, is_sequence=(_depth > 0)
     )
     fp.seek(fp_start)
     de_gen = data_element_generator(
@@ -622,7 +621,6 @@ def read_sequence_item(
             is_little_endian,
             bytelength=None,
             parent_encoding=encoding,
-            at_top_level=False,
             _depth=_depth + 1,
         )
         ds.is_undefined_length_sequence_item = True
@@ -633,7 +631,6 @@ def read_sequence_item(
             is_little_endian,
             length,
             parent_encoding=encoding,
-            at_top_level=False,
             _depth=_depth + 1,
         )
         ds.is_undefined_length_sequence_item = False
