@@ -8,7 +8,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from struct import unpack
+from struct import error as struct_error, unpack
 import sys
 import tempfile
 import time
@@ -1015,8 +1015,15 @@ class TestReader:
             b"\x08\x00\x06\x00SQ\x00\x00\xff\xff\xff\xff"
         )
 
-        with pytest.raises(InvalidDicomError, match="No tag to read at file position"):
+        with pytest.raises(
+            InvalidDicomError, match="No tag to read at file position"
+        ) as excinfo:
             read_dataset(BytesIO(truncated_sq), False, True)
+
+        # The PR sells `raise ... from exc` as a diagnosability benefit; pin
+        # the chain so a future refactor that drops the `from` clause fails
+        # CI instead of silently losing the underlying cause.
+        assert isinstance(excinfo.value.__cause__, struct_error)
 
     def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
         """Test reading a dataset with a registered private transfer syntax"""

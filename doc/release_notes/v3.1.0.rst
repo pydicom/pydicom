@@ -53,7 +53,8 @@ Fixes
   :func:`~pydicom.filereader.read_sequence_item` to
   :class:`~pydicom.errors.InvalidDicomError` instead of the legacy bare
   ``OSError``. Also narrows the surrounding ``except BaseException`` so
-  ``KeyboardInterrupt`` and ``SystemExit`` are no longer swallowed.
+  ``KeyboardInterrupt`` and ``SystemExit`` are no longer swallowed
+  (:issue:`2332`).
 
 Enhancements
 ------------
