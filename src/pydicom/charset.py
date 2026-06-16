@@ -733,13 +733,26 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
     try:
         codecs.lookup(encoding)
         return encoding
-    except LookupError:
-        _warn_about_invalid_encoding(encoding)
+    except (LookupError, ValueError) as exc:
+        # ``LookupError`` is the normal "unknown encoding" signal.
+        # ``ValueError`` covers names that CPython's encoding-name
+        # normalisation rejects before lookup -- notably
+        # ``ValueError("embedded null character")`` for a NUL-bearing
+        # ``SpecificCharacterSet`` value. Both funnel into the same
+        # warn-and-use-default path so the public ``dcmread`` API does not
+        # surface an undocumented exception. The original exception is
+        # shown in the message so a ``ValueError`` from a third-party codec
+        # registered via ``codecs.register`` stays diagnosable rather than
+        # being silently swallowed.
+        _warn_about_invalid_encoding(encoding, cause=exc)
         return default_encoding
 
 
 def _warn_about_invalid_encoding(
-    encoding: str, patched_encoding: str | None = None
+    encoding: str,
+    patched_encoding: str | None = None,
+    *,
+    cause: Exception | None = None,
 ) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the
@@ -747,12 +760,18 @@ def _warn_about_invalid_encoding(
     If no replacement encoding is given, and
     :attr:`~pydicom.config.settings.reading_validation_mode` is set to
     ``RAISE``, `LookupError` is raised.
+    If cause is given, its message is appended for clarity -- e.g. the
+    ``ValueError`` raised by ``codecs.lookup`` for a NUL-bearing name.
     """
     if patched_encoding is None:
+        detail = f" ({cause})" if cause is not None else ""
         if config.settings.reading_validation_mode == config.RAISE:
-            raise LookupError(f"Unknown encoding '{encoding}'")
+            raise LookupError(f"Unknown encoding '{encoding}'{detail}")
 
-        msg = f"Unknown encoding '{encoding}' - using default encoding instead"
+        msg = (
+            f"Unknown encoding '{encoding}' - using default encoding "
+            f"instead{detail}"
+        )
     else:
         msg = (
             f"Incorrect value for Specific Character Set '{encoding}' - "

@@ -49,6 +49,11 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Stopped :func:`~pydicom.filereader.dcmread` leaking ``ValueError("embedded null
+  character")`` when *Specific Character Set* (0008,0005) contains an embedded NUL byte;
+  such values now take the same warn-and-fall-back path as unknown encodings (or raise
+  :class:`LookupError` under ``RAISE`` validation), with the original exception message
+  included for clarity (:issue:`2338`)
 
 Enhancements
 ------------

@@ -229,6 +229,63 @@ class TestCharset:
         encodings = None
         assert ["iso8859"] == pydicom.charset.convert_encodings(encodings)
 
+    @pytest.mark.parametrize(
+        "encoding",
+        ["\x00ISO_IR 100", "ISO\x00_IR 100", "ISO_IR 100\x00\x00", "X\x00Y"],
+        ids=["leading_null", "middle_null", "trailing_nulls", "minimal_middle"],
+    )
+    def test_convert_encoding_with_embedded_null(
+        self, encoding, allow_reading_invalid_values
+    ):
+        """Encoding names containing a NUL byte must funnel into the
+        same warn-and-fall-back path as unknown encodings rather than
+        leaking ``ValueError("embedded null character")`` from
+        ``codecs.lookup``. Parametrised over leading, middle, and
+        trailing NUL positions because each reaches the malformed-name
+        branch (the trailing case happens to be absorbed earlier by
+        ``valuerep.MultiString`` for the ``CS`` VR when reaching
+        ``convert_encodings`` via ``dcmread``, but the unit-level
+        contract on ``convert_encodings`` must still hold).
+        """
+        with pytest.warns(UserWarning, match="Unknown encoding"):
+            assert ["iso8859"] == pydicom.charset.convert_encodings(encoding)
+
+    @pytest.mark.parametrize(
+        "encoding",
+        ["\x00ISO_IR 100", "ISO\x00_IR 100", "ISO_IR 100\x00\x00", "X\x00Y"],
+        ids=["leading_null", "middle_null", "trailing_nulls", "minimal_middle"],
+    )
+    def test_convert_encoding_with_embedded_null_strict(
+        self, encoding, enforce_valid_values
+    ):
+        """Same NUL-bearing encodings under RAISE-mode validation
+        surface ``LookupError`` via ``_warn_about_invalid_encoding``
+        (the documented strict-mode contract for unknown encodings),
+        not the ``ValueError`` that ``codecs.lookup`` raises
+        internally for NUL-containing strings.
+        """
+        with pytest.raises(LookupError, match="Unknown encoding"):
+            pydicom.charset.convert_encodings(encoding)
+
+    def test_convert_encoding_null_surfaces_original_message(
+        self, allow_reading_invalid_values
+    ):
+        """The warning surfaces the original ``codecs.lookup`` exception
+        message so a malformed name -- or a ``ValueError`` from a
+        third-party codec registered via ``codecs.register`` -- stays
+        diagnosable rather than being silently swallowed by the widened
+        ``except (LookupError, ValueError)``.
+        """
+        with pytest.warns(UserWarning, match="embedded null character"):
+            assert ["iso8859"] == pydicom.charset.convert_encodings("ISO\x00_IR 100")
+
+    def test_convert_encoding_null_surfaces_original_message_strict(
+        self, enforce_valid_values
+    ):
+        """RAISE-mode ``LookupError`` likewise carries the original message."""
+        with pytest.raises(LookupError, match="embedded null character"):
+            pydicom.charset.convert_encodings("ISO\x00_IR 100")
+
     def test_bad_decoded_multi_byte_encoding(self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(
