@@ -730,6 +730,13 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
             return default_encoding
 
     # fallback: assume that it is already a python encoding
+    # Pre-check for embedded NUL characters: codecs.lookup raises ValueError
+    # (not LookupError) on NUL-containing strings, which would leak out of
+    # dcmread's public contract.  See #2338.
+    if "\x00" in encoding:
+        _warn_about_invalid_encoding(encoding)
+        return default_encoding
+
     try:
         codecs.lookup(encoding)
         return encoding
