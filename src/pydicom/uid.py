@@ -572,12 +572,16 @@ def generate_uid(
         a prefix of ``'2.25.'`` will be used with the integer form of a UUID
         generated using the :func:`uuid.uuid4` algorithm.
     entropy_srcs : list of str, optional
-        If `prefix` is used then the `prefix` will be appended with a
-        SHA512 hash of the supplied :class:`list` which means the result is
-        deterministic and should make the original data unrecoverable. If
-        `entropy_srcs` isn't used then a random number from
-        :func:`secrets.randbelow` will be appended to the `prefix`. If `prefix`
-        is ``None`` then `entropy_srcs` has no effect.
+        If `prefix` is used then it is appended with a SHA512 hash of the
+        supplied :class:`list`. The result is *deterministic* -- the same
+        input always produces the same UID, which is useful for stable
+        remapping. Separately, SHA512 is a one-way hash, but note that it is
+        used here *unsalted*, so it offers no protection against brute-force
+        or dictionary recovery of low-entropy inputs and should not be relied
+        on as an irreversible de-identification mechanism. If `entropy_srcs`
+        isn't used then a random number from :func:`secrets.randbelow` will be
+        appended to the `prefix`. If `prefix` is ``None`` then `entropy_srcs`
+        has no effect.
 
     Returns
     -------
