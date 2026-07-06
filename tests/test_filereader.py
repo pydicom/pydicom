@@ -1270,15 +1270,11 @@ class TestSpecificCharacterSetWithEmbeddedNull:
         preamble = b"\x00" * 128 + b"DICM"
         meta = b""
         meta += explicit(0x0002, 0x0001, b"OB", b"\x00\x01")
-        meta += explicit(
-            0x0002, 0x0002, b"UI", b"1.2.840.10008.5.1.4.1.1.7\x00"
-        )
+        meta += explicit(0x0002, 0x0002, b"UI", b"1.2.840.10008.5.1.4.1.1.7\x00")
         meta += explicit(0x0002, 0x0003, b"UI", b"1.2.3.4\x00")
         meta += explicit(0x0002, 0x0010, b"UI", b"1.2.840.10008.1.2\x00")
         meta += explicit(0x0002, 0x0012, b"UI", b"1.2.3\x00")
-        group_length = explicit(
-            0x0002, 0x0000, b"UL", struct.pack("<I", len(meta))
-        )
+        group_length = explicit(0x0002, 0x0000, b"UL", struct.pack("<I", len(meta)))
         ds_elements = implicit(0x0008, 0x0005, scs_value)
         return preamble + group_length + meta + ds_elements
 

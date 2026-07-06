@@ -768,10 +768,7 @@ def _warn_about_invalid_encoding(
         if config.settings.reading_validation_mode == config.RAISE:
             raise LookupError(f"Unknown encoding '{encoding}'{detail}")
 
-        msg = (
-            f"Unknown encoding '{encoding}' - using default encoding "
-            f"instead{detail}"
-        )
+        msg = f"Unknown encoding '{encoding}' - using default encoding instead{detail}"
     else:
         msg = (
             f"Incorrect value for Specific Character Set '{encoding}' - "
