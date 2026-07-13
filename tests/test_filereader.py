@@ -1821,6 +1821,11 @@ class TestMalformedExplicitLengthItemEncapsulated:
     encapsulated icon PixelData) must not consume bytes past the item's
     declared boundary, even if the inner sequence delimiter is missing or
     the item under-declares its length.
+
+    On detecting the malformation the reader follows
+    ``config.settings.sq_item_defined_length_mismatch``: raise
+    ``InvalidDicomError`` (the default), warn and recover, or recover
+    silently.
     """
 
     @staticmethod
@@ -1864,7 +1869,9 @@ class TestMalformedExplicitLengthItemEncapsulated:
         outer = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
         return sq + outer
 
-    def test_short_item_does_not_eat_outer_element(self):
+    def test_short_item_does_not_eat_outer_element(
+        self, warn_on_sq_item_length_mismatch
+    ):
         """Reader must stop at the explicit item boundary and the outer
         PatientName element must come through untouched, and parsing the
         truncated SQ value must surface a warning instead of silently
@@ -1905,13 +1912,13 @@ class TestMalformedExplicitLengthItemEncapsulated:
         assert 0x00880200 in ds
         assert 0x00100010 in ds
 
-    def test_short_sq_and_short_item_real_repro(self):
-        """User's actual malformation: BOTH the IconImageSequence (0088,0200)
-        and its single item declare lengths that are short by the same number
-        of bytes (here 24), leaving the tail of the inner encapsulated
-        PixelData stream as orphaned bytes at the top-level dataset position
-        that immediately precedes the outer PixelData. Without the post-SQ
-        resync the outer PixelData is silently lost on read and save_as."""
+    def _build_double_short_bytes(self) -> bytes:
+        """Return explicit-VR LE bytes for the user's actual malformation:
+        BOTH the IconImageSequence (0088,0200) and its single item declare
+        lengths that are short by the same number of bytes (here 24), leaving
+        the tail of the inner encapsulated PixelData stream as orphaned bytes
+        at the top-level dataset position that immediately precedes the outer
+        PixelData."""
         from struct import pack
 
         # Inner encap stream — Item + payload + SequenceDelimiterTag + 0 len
@@ -1944,9 +1951,14 @@ class TestMalformedExplicitLengthItemEncapsulated:
             + pack("<I", 0xFFFFFFFF)
             + outer_pd_value
         )
-        data = sq + outer
+        return sq + outer
 
-        fp = BytesIO(data)
+    def test_short_sq_and_short_item_real_repro(self, warn_on_sq_item_length_mismatch):
+        """User's actual malformation: with the mismatch setting at WARN the
+        reader must skip the leaked bytes with a warning and preserve both
+        the IconImageSequence and the outer PixelData. Without the post-SQ
+        resync the outer PixelData is silently lost on read and save_as."""
+        fp = BytesIO(self._build_double_short_bytes())
         with pytest.warns(UserWarning, match="Skipped .* malformed data"):
             ds = read_dataset(
                 fp,
@@ -1994,7 +2006,7 @@ class TestMalformedExplicitLengthItemEncapsulated:
         assert 0x00100010 in ds
         assert ds[0x00100010].value == "ABCDEF"
 
-    def test_orphaned_delimiter_at_eof_after_sq(self):
+    def test_orphaned_delimiter_at_eof_after_sq(self, warn_on_sq_item_length_mismatch):
         """An explicit-length SQ followed only by an orphaned sequence
         delimiter (and then EOF) must resync past the delimiter and stop
         cleanly without raising."""
@@ -2013,6 +2025,92 @@ class TestMalformedExplicitLengthItemEncapsulated:
                 is_little_endian=True,
                 bytelength=None,
             )
+        assert 0x00880200 in ds
+
+    def test_leaked_bytes_raise_by_default(self):
+        """Default mode is RAISE: leaked encapsulated-stream bytes after a
+        defined-length SQ raise InvalidDicomError at read time instead of
+        being skipped."""
+        assert config.settings.sq_item_defined_length_mismatch == config.RAISE
+        fp = BytesIO(self._build_double_short_bytes())
+        with pytest.raises(InvalidDicomError, match="malformed data"):
+            read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+
+    def test_item_overrun_raises_by_default(self):
+        """Default mode is RAISE: an element value that overruns its item's
+        declared length raises InvalidDicomError when the sequence value is
+        parsed."""
+        data = self._build_dataset_bytes(item_shortfall=8)
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        with pytest.raises(InvalidDicomError, match="overran"):
+            ds[0x00880200].value
+
+    def test_leaked_bytes_ignored_recovers_silently(
+        self, ignore_sq_item_length_mismatch
+    ):
+        """IGNORE mode recovers exactly like WARN but without the warning."""
+        fp = BytesIO(self._build_double_short_bytes())
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        assert 0x00880200 in ds
+        assert 0x7FE00010 in ds, "outer PixelData was lost to leftover bytes"
+
+    def test_item_overrun_ignored_recovers_silently(
+        self, ignore_sq_item_length_mismatch
+    ):
+        """IGNORE mode truncates the over-read item at its declared boundary
+        without a warning; the outer element still parses."""
+        data = self._build_dataset_bytes(item_shortfall=8)
+        fp = BytesIO(data)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+            sq = ds[0x00880200].value
+            assert sq[0][0x7FE00010] is not None
+        assert 0x00100010 in ds
+        assert ds[0x00100010].value == "ABCDEF"
+
+    def test_unscannable_garbage_after_sq_falls_through(self):
+        """If the bytes after an explicit-length SQ are implausible but the
+        scan finds no resync target either, the reader must fall through to
+        normal parsing unchanged — even in the default RAISE mode, which
+        only fires once a recovery target confirms the leak."""
+        from struct import pack
+
+        sq = pack("<HH", 0x0088, 0x0200) + b"SQ\x00\x00" + pack("<I", 0)
+        # 0xA5A5 group with 0xA5A5 VR bytes: fails the plausibility gate and
+        # never matches a delimiter or valid VR pattern during the scan.
+        data = sq + b"\xa5" * 32
+
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
         assert 0x00880200 in ds
 
 
@@ -2175,7 +2273,7 @@ class TestHeaderIsPlausible:
         """Fewer than 8 bytes: defer to the normal end-of-file check."""
         from pydicom.filereader import _header_is_plausible
 
-        assert _header_is_plausible(b"\x10\x00", False, True) is True
+        assert _header_is_plausible(b"\x10\x00", False, True)
 
     def test_valid_explicit_header_little_endian(self):
         from struct import pack
@@ -2183,7 +2281,7 @@ class TestHeaderIsPlausible:
         from pydicom.filereader import _header_is_plausible
 
         header = pack("<HH", 0x0010, 0x0010) + b"PN" + b"\x06\x00"
-        assert _header_is_plausible(header, False, True) is True
+        assert _header_is_plausible(header, False, True)
 
     def test_valid_explicit_header_big_endian(self):
         from struct import pack
@@ -2191,7 +2289,7 @@ class TestHeaderIsPlausible:
         from pydicom.filereader import _header_is_plausible
 
         header = pack(">HH", 0x0010, 0x0010) + b"PN" + b"\x00\x06"
-        assert _header_is_plausible(header, False, False) is True
+        assert _header_is_plausible(header, False, False)
 
     def test_reserved_group_is_implausible(self):
         """A stray (FFFE,xxxx) delimiter header must be flagged implausible."""
@@ -2200,7 +2298,7 @@ class TestHeaderIsPlausible:
         from pydicom.filereader import _header_is_plausible
 
         header = pack("<HHI", 0xFFFE, 0xE0DD, 0)
-        assert _header_is_plausible(header, False, True) is False
+        assert not _header_is_plausible(header, False, True)
 
     def test_non_ascii_vr_is_implausible(self):
         """Explicit VR bytes that are not two ASCII uppercase letters."""
@@ -2209,7 +2307,7 @@ class TestHeaderIsPlausible:
         from pydicom.filereader import _header_is_plausible
 
         header = pack("<HH", 0x0010, 0x0010) + b"\xaa\xaa" + b"\x06\x00"
-        assert _header_is_plausible(header, False, True) is False
+        assert not _header_is_plausible(header, False, True)
 
     def test_implicit_vr_only_checks_group(self):
         """Implicit VR cannot validate VR bytes — a non-reserved group passes."""
@@ -2218,7 +2316,7 @@ class TestHeaderIsPlausible:
         from pydicom.filereader import _header_is_plausible
 
         header = pack("<HHI", 0x0010, 0x0010, 6)
-        assert _header_is_plausible(header, True, True) is True
+        assert _header_is_plausible(header, True, True)
 
 
 def test_read_file_meta_info():

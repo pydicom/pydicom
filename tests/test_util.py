@@ -407,8 +407,10 @@ class TestDataElementCallbackTests:
         else:
             assert expected == got
 
-    def test_null_value_for_fixed_vr(self):
-        # Wipe first Contour Data, mark as length 0
+    def test_null_value_for_fixed_vr(self, ignore_sq_item_length_mismatch):
+        # Wipe first Contour Data, mark as length 0. The byte surgery leaves
+        # the enclosing item's declared length stale, so recovery from the
+        # length mismatch must be enabled for the dataset to parse.
         null_ds_bytes = self.ds_bytes.replace(b"\x08\x00\x00\x00", b"\x00\x00\x00\x00")
         contour_data = b"\x32\x2c\x34\x2c\x38\x2c\x31\x36"
         null_ds_bytes = null_ds_bytes.replace(contour_data, b"")

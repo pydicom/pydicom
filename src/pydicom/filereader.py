@@ -134,31 +134,58 @@ def _header_is_plausible(
 
 def _resync_top_level_after_sq(
     fp: BinaryIO,
-    header_tell: int,
     is_implicit_VR: bool,
     is_little_endian: bool,
-) -> bool:
-    """Skip leftover encapsulated-stream bytes that leaked out of a preceding
-    top-level explicit-length sequence (issue #2324).
+) -> None:
+    """Detect and skip leftover encapsulated-stream bytes that leaked out of
+    a preceding top-level explicit-length sequence (issue #2324).
 
-    ``fp`` must be positioned at ``header_tell``. Scans forward for the next
-    stray delimiter or plausible element header; if one is found past the
-    current position, seeks there, emits a :class:`UserWarning`, and returns
-    ``True``. Returns ``False`` (leaving ``fp`` unmoved) if nothing is found.
+    Must be called with ``fp`` positioned just past the value of a top-level
+    defined-length SQ element. Peeks at the next 8 bytes and returns with
+    ``fp`` unmoved when they could be a genuine element header (or fewer
+    than 8 bytes remain) — the well-formed path costs one read and one seek.
+
+    An implausible header means the sequence under-declared its length and
+    the tail of an inner encapsulated stream leaked past its value. Scan for
+    the next stray delimiter or plausible element header and handle the
+    malformation per
+    :attr:`~pydicom.config.Settings.sq_item_defined_length_mismatch`: raise
+    :class:`~pydicom.errors.InvalidDicomError` (``RAISE``, the default), or
+    seek past the leaked bytes with (``WARN``) or without (``IGNORE``) a
+    warning. If the scan finds no resync target, ``fp`` is left unmoved so
+    the existing heuristics for unusual-but-parseable headers (e.g. a
+    mid-dataset switch to implicit VR) keep applying.
     """
+    header_tell = fp.tell()
+    bytes_read = fp.read(8)
+    fp.seek(header_tell)
+    if _header_is_plausible(bytes_read, is_implicit_VR, is_little_endian):
+        return
+
     skipped = _scan_for_next_top_level_element(fp, is_implicit_VR, is_little_endian)
     if skipped <= 0:
-        return False
+        return
+
+    if config.settings.sq_item_defined_length_mismatch == config.RAISE:
+        raise InvalidDicomError(
+            f"Found {skipped} byte(s) of malformed data at position "
+            f"0x{header_tell:X} in the top-level dataset (likely leftover "
+            "from a truncated encapsulated stream inside the preceding "
+            "defined-length sequence). Set "
+            "config.settings.sq_item_defined_length_mismatch to config.WARN "
+            "or config.IGNORE to skip the malformed bytes and continue "
+            "reading."
+        )
     fp.seek(header_tell + skipped)
-    warn_and_log(
-        f"Skipped {skipped} byte(s) of malformed data at position "
-        f"0x{header_tell:X} while reading the top-level dataset (likely "
-        "leftover from a truncated encapsulated stream inside the preceding "
-        "sequence). The file appears to be malformed; the bytes were "
-        "discarded so reading could continue.",
-        UserWarning,
-    )
-    return True
+    if config.settings.sq_item_defined_length_mismatch == config.WARN:
+        warn_and_log(
+            f"Skipped {skipped} byte(s) of malformed data at position "
+            f"0x{header_tell:X} while reading the top-level dataset (likely "
+            "leftover from a truncated encapsulated stream inside the "
+            "preceding sequence). The file appears to be malformed; the "
+            "bytes were discarded so reading could continue.",
+            UserWarning,
+        )
 
 
 def data_element_generator(
@@ -250,39 +277,11 @@ def data_element_generator(
     if has_tag_set:
         tag_set.add(0x00080005)  # Specific Character Set
 
-    # Recovery for issue #2324 only fires on the first header read after a
-    # top-level explicit-length SQ (see below). Pre-compute the enabling
-    # condition once so the hot loop pays nothing inside sequences or for
-    # bounded reads.
-    do_top_level_resync = at_top_level and bytelength is None
-    prev_was_defined_length_sq = False
-
     while True:
         # VR: str | None
         # Read tag, VR, length, get ready to read value
         if len(bytes_read := fp_read(8)) < 8:
             return  # at end of file
-
-        # Recovery for issue #2324: when a top-level explicit-length sequence
-        # under-declares its bytes and contains an undefined-length
-        # encapsulated element, the trailing bytes of that stream can leak out
-        # into the parent dataset and swallow the real outer ``PixelData``.
-        # Only the first header after such an SQ is examined, and only when it
-        # is implausible (a stray delimiter or a non-element header) — so
-        # well-formed files read straight through with no scan.
-        if prev_was_defined_length_sq:
-            prev_was_defined_length_sq = False
-            if do_top_level_resync and not _header_is_plausible(
-                bytes_read, is_implicit_VR, is_little_endian
-            ):
-                header_tell = fp_tell() - 8
-                fp_seek(header_tell)
-                if _resync_top_level_after_sq(
-                    fp, header_tell, is_implicit_VR, is_little_endian
-                ):
-                    # Re-read the header from the recovered position
-                    if len(bytes_read := fp_read(8)) < 8:
-                        return  # at end of file
 
         if debugging:
             debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
@@ -407,11 +406,13 @@ def data_element_generator(
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
 
-            # Arm the issue #2324 resync for the next iteration after an
-            # explicit-length SQ. Only meaningful at the top level, so gate on
-            # ``do_top_level_resync`` to keep the flag False inside sequences.
-            if vr == VR_.SQ:
-                prev_was_defined_length_sq = do_top_level_resync
+            # Issue #2324: an under-declared explicit-length SQ can leak the
+            # tail of an inner encapsulated stream past its value. Peek at
+            # the next header and resync if it cannot be one. Nested and
+            # bounded reads short-circuit, so only top-level defined-length
+            # SQ elements pay for the peek.
+            if vr == VR_.SQ and at_top_level and bytelength is None:
+                _resync_top_level_after_sq(fp, is_implicit_VR, is_little_endian)
 
             yield RawDataElement(
                 BaseTag(tag),
@@ -647,20 +648,32 @@ def read_dataset(
     # Recovery for issue #2324: an undefined-length element inside this
     # explicit-length container may have scanned past the declared boundary
     # (missing inner delimiter, or the parent under-declared its length). The
-    # declared byte budget is authoritative for resuming the parent, so snap
-    # back to it and warn rather than letting the overrun corrupt sibling
-    # elements ("ask forgiveness": let the over-read happen, then correct).
+    # declared byte budget is authoritative for resuming the parent, so
+    # rather than letting the overrun corrupt sibling elements, raise or snap
+    # back to the boundary per the ``sq_item_defined_length_mismatch``
+    # setting ("ask forgiveness": let the over-read happen, then correct).
     if bytelength is not None:
         overrun = (fp_tell() - fp_start) - bytelength
         if overrun > 0:
+            if config.settings.sq_item_defined_length_mismatch == config.RAISE:
+                raise InvalidDicomError(
+                    f"Element value(s) overran the {bytelength} byte(s) "
+                    f"declared for the enclosing item/sequence by {overrun} "
+                    "byte(s); the source file appears to be malformed. Set "
+                    "config.settings.sq_item_defined_length_mismatch to "
+                    "config.WARN or config.IGNORE to truncate at the "
+                    "declared boundary and continue reading."
+                )
             fp.seek(fp_start + bytelength)
-            warn_and_log(
-                f"Element value(s) overran the {bytelength} byte(s) declared "
-                f"for the enclosing item/sequence by {overrun} byte(s); the "
-                "source file appears to be malformed. Truncating at the "
-                "declared boundary so reading can continue.",
-                UserWarning,
-            )
+            if config.settings.sq_item_defined_length_mismatch == config.WARN:
+                warn_and_log(
+                    f"Element value(s) overran the {bytelength} byte(s) "
+                    f"declared for the enclosing item/sequence by "
+                    f"{overrun} byte(s); the source file appears to be "
+                    "malformed. Truncating at the declared boundary so "
+                    "reading can continue.",
+                    UserWarning,
+                )
 
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:
