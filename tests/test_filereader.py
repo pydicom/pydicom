@@ -6,6 +6,7 @@ import io
 from io import BytesIO
 import logging
 import os
+import platform
 import shutil
 from pathlib import Path
 from struct import unpack
@@ -1224,6 +1225,14 @@ class TestUnknownVR:
         assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
 
 
+@pytest.mark.skipif(
+    platform.python_implementation() == "PyPy",
+    reason=(
+        "codecs.lookup raises ValueError for a NUL-bearing encoding name "
+        "only on CPython; PyPy strips the NUL during name normalisation, "
+        "so the guarded ValueError never reaches dcmread"
+    ),
+)
 class TestSpecificCharacterSetWithEmbeddedNull:
     """End-to-end contract: ``dcmread(force=True)`` must not leak
     ``ValueError("embedded null character")`` from ``codecs.lookup`` when
