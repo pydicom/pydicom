@@ -30,7 +30,7 @@ filespec_glob_help = (
 )
 
 
-def filespec_glob_parser(filespec_glob: str):
+def filespec_glob_parser(filespec_glob: str) -> list[str]:
     """Utility to return a list of filespecs that match a file glob pattern.
 
     Note: this is used as an argparse 'type' for adding parsing arguments.
