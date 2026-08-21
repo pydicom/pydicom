@@ -49,6 +49,9 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Fixed :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` raising
+  :class:`AttributeError` when :func:`~pydicom.config.future_behavior` is enabled
+  (:issue:`2354`).
 
 Enhancements
 ------------
