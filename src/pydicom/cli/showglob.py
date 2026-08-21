@@ -14,7 +14,8 @@ filespec_glob_help = (
     "test file with that name. If `element` is given, "
     "use only that data element within the file. "
     "The filename_glob can contain python glob patterns to match multiple files."
-    "The globs should be protected from shell interpolation and ensure processing by showglob."
+    "The globs should be protected from shell interpolation"
+    "to ensure processing by showglob."
     "Showglob only accepts one glob pattern and applies the same"
     "prefix and element to the result file list."
     "Examples: "
@@ -69,7 +70,7 @@ def filespec_glob_parser(filespec_glob: str):
     ----
         This function is meant to be used in a call to an `argparse` library's
         `add_argument` call for subparsers, with name="filespec_glob" and
-        `type=filespec_glob_parser`. When used that way, the resulting args.filespec_glob
+        `type=filespec_glob_parser`. The resulting args.filespec_glob
         will contain the return values of this function
         (e.g. use `ds, element_val = filespec_parser(filespec)` after parsing arguments)
         See the `pydicom.cli.show` module for an example.
@@ -94,7 +95,7 @@ def filespec_glob_parser(filespec_glob: str):
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     subparser = subparsers.add_parser(
         "showglob",
-        description="Display all or part of a set of DICOM files specified by a glob pattern",
+        description="Display all or part of a set of DICOM files matching glob pattern",
     )
     subparser.add_argument(
         "filespec_glob", help=filespec_glob_help, type=filespec_glob_parser
