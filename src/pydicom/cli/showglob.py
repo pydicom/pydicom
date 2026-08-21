@@ -6,7 +6,7 @@ from glob import glob
 from collections.abc import Callable
 
 from pydicom.dataset import Dataset
-from pydicom.cli.main import filespec_help, filespec_parser, filespec_parts
+from pydicom.cli.main import filespec_parser, filespec_parts
 
 filespec_glob_help = (
     "File specification, in format [pydicom::]filename_glob[::element]. "
@@ -86,16 +86,19 @@ def filespec_glob_parser(filespec_glob: str):
     if any(char in filename for char in special_chars):
         file_names = glob(filename)
     else:
-        file_names = [ filename ]
+        file_names = [filename]
 
-    return [ "::".join([prefix, filename, element]) for filename in file_names]
+    return ["::".join([prefix, filename, element]) for filename in file_names]
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     subparser = subparsers.add_parser(
-        "showglob", description="Display all or part of a set of DICOM files specified by a glob pattern"
+        "showglob",
+        description="Display all or part of a set of DICOM files specified by a glob pattern",
     )
-    subparser.add_argument("filespec_glob", help=filespec_glob_help, type=filespec_glob_parser)
+    subparser.add_argument(
+        "filespec_glob", help=filespec_glob_help, type=filespec_glob_parser
+    )
     subparser.add_argument(
         "-x",
         "--exclude-private",
