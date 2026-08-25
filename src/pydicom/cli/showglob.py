@@ -121,7 +121,9 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 def do_command(args: argparse.Namespace) -> None:
 
-    for filespec in args.filespec_glob:
+    # ensure consistent file order with sorted()
+    # allows separate queries to be aligned
+    for filespec in sorted(args.filespec_glob):
         ds, element_val = filespec_parser(filespec)[0]
 
         if not element_val:
