@@ -27,8 +27,9 @@ from pydicom.filereader import (
     read_file_meta_info,
 )
 from pydicom.dataelem import DataElement, convert_raw_data_element
-from pydicom.errors import InvalidDicomError
+from pydicom.errors import InvalidDicomError, UnknownVRError
 from pydicom.filebase import DicomBytesIO
+from pydicom.hooks import hooks
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -1301,6 +1302,83 @@ class TestUnknownVR:
         from pydicom.filereader import read_partial
 
         with pytest.raises(NotImplementedError, match="'ZZ'"):
+            read_partial(
+                BytesIO(self._UNKNOWN_VR_FMI_BYTES),
+                stop_when=None,
+                defer_size=None,
+                force=True,
+            )
+
+    def test_dcmread_does_not_translate_callback_notimplementederror(self):
+        """A ``NotImplementedError`` raised by a registered callback reaches
+        the caller unchanged.
+
+        :mod:`pydicom.hooks` is a documented extension point, and a callback
+        failing is not the same event as the file being malformed -- reporting
+        it as :class:`~pydicom.errors.InvalidDicomError` would send someone
+        debugging their own plugin off to inspect a valid file instead.
+
+        The translation is therefore keyed on
+        :class:`~pydicom.errors.UnknownVRError` rather than on
+        ``NotImplementedError``. Reading a *valid* dataset keeps the two
+        causes cleanly separated: nothing about this input is malformed, so
+        the callback's own failure is the only exception in play.
+        """
+
+        class _CallbackFailure(NotImplementedError):
+            """Stands in for an extension signalling its own failure."""
+
+        def _raising_callback(raw, data, *, encoding=None, ds=None, **kwargs):
+            raise _CallbackFailure("callback-sentinel")
+
+        original = hooks.raw_element_value
+        hooks.register_callback("raw_element_value", _raising_callback)
+        try:
+            with pytest.raises(_CallbackFailure, match="callback-sentinel"):
+                dcmread(mr_name)
+        finally:
+            hooks.register_callback("raw_element_value", original)
+
+    def test_dcmread_translates_unknown_vr_via_legacy_element_callback(self):
+        """The translation also covers callers that bypass the hook.
+
+        :func:`~pydicom.util.fixer.fix_mismatch` installs the legacy
+        ``config.data_element_callback``, which runs *before* the
+        ``raw_element_value`` hook in
+        :func:`~pydicom.dataelem.convert_raw_data_element` and calls
+        ``convert_value`` itself, catching only ``ValueError``. An unknown VR
+        therefore escapes that callback without ever reaching the hook.
+
+        Raising :class:`~pydicom.errors.UnknownVRError` from ``convert_value``
+        -- the single point the unknown VR is actually detected -- is what
+        keeps this path covered. Pinned because it would otherwise silently
+        revert to leaking ``NotImplementedError``, which is the exact defect
+        #2336 reports.
+        """
+        from pydicom.util.fixer import fix_mismatch
+
+        fix_mismatch()
+        try:
+            with pytest.raises(InvalidDicomError, match="'ZZ'"):
+                dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
+        finally:
+            config.reset_data_element_callback()
+
+    def test_unknown_vr_error_is_a_notimplementederror(self):
+        """:class:`~pydicom.errors.UnknownVRError` stays catchable as
+        ``NotImplementedError``.
+
+        The subclassing is what keeps ``read_dataset``, the #503 implicit-VR
+        retry and ``util.fixer`` working untouched, and keeps downstream code
+        written against pydicom < 3.1 working. Pinned explicitly because
+        breaking it would be silent -- those call sites swallow the exception
+        rather than propagate it.
+        """
+        assert issubclass(UnknownVRError, NotImplementedError)
+
+        from pydicom.filereader import read_partial
+
+        with pytest.raises(UnknownVRError):
             read_partial(
                 BytesIO(self._UNKNOWN_VR_FMI_BYTES),
                 stop_when=None,

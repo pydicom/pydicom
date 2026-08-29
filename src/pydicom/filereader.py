@@ -19,7 +19,7 @@ from pydicom.dataelem import (
     empty_value_for_VR,
 )
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
-from pydicom.errors import InvalidDicomError
+from pydicom.errors import InvalidDicomError, UnknownVRError
 from pydicom.filebase import ReadableBuffer, DicomBytesIO
 from pydicom.fileutil import (
     read_undefined_length_value,
@@ -1088,20 +1088,26 @@ def dcmread(
                 force=force,
                 specific_tags=specific_tags,
             )
-        except NotImplementedError as exc:
+        except UnknownVRError as exc:
             # An unknown VR ('ZZ' / 'XX' / etc.) at any nesting depth
-            # bubbles up here as NotImplementedError from
-            # ``raw_element_value`` (see issue #2336). Per dcmread's
-            # documented ``Raises`` contract, malformed DICOM input must
-            # surface as ``InvalidDicomError``; translate at the public
-            # API boundary and chain the original cause for
+            # bubbles up here from ``raw_element_value`` (see issue #2336).
+            # Per dcmread's documented ``Raises`` contract, malformed DICOM
+            # input must surface as ``InvalidDicomError``; translate at the
+            # public API boundary and chain the original cause for
             # diagnosability. Internal callers (``read_partial``,
             # ``read_dataset``, ``read_file_meta_info``, the #503
             # implicit-VR retry inside ``_read_file_meta_info``,
-            # ``util.fixer``) continue to see ``NotImplementedError``
-            # unchanged. To recover and parse the unknown element as
-            # ``UN`` instead of failing here, set
-            # ``pydicom.config.convert_unknown_vr_to_UN = True``.
+            # ``util.fixer``) catch ``NotImplementedError``, which
+            # ``UnknownVRError`` subclasses, so they are unchanged.
+            #
+            # Catching the subclass rather than ``NotImplementedError`` keeps
+            # this narrow: a callback registered on the ``raw_element_value``
+            # hook may raise ``NotImplementedError`` for its own reasons, and
+            # an extension failing is not the file being malformed.
+            #
+            # To recover and parse the unknown element as ``UN`` instead of
+            # failing here, set ``pydicom.config.convert_unknown_vr_to_UN``
+            # to ``True``.
             raise InvalidDicomError(str(exc)) from exc
     finally:
         if not caller_owns_file:

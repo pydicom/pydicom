@@ -59,6 +59,13 @@ Fixes
   to opt in to a permissive parse where the offending element's VR is replaced
   with ``UN`` and a warning is logged, mirroring
   :data:`~pydicom.config.convert_wrong_length_to_UN` (:issue:`2336`).
+  The unknown VR is now signalled by the new
+  :class:`~pydicom.errors.UnknownVRError`, which subclasses
+  ``NotImplementedError`` so existing handlers are unaffected. Keying the
+  translation on that type keeps it from capturing an unrelated
+  ``NotImplementedError`` raised by a callback registered through
+  :mod:`pydicom.hooks`, which would otherwise report an extension's failure
+  as malformed input.
 
 Enhancements
 ------------

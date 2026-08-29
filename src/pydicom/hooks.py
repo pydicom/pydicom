@@ -5,7 +5,7 @@ from collections.abc import MutableSequence, Callable
 
 from pydicom import config
 from pydicom.datadict import dictionary_VR, private_dictionary_VR
-from pydicom.errors import BytesLengthException
+from pydicom.errors import BytesLengthException, UnknownVRError
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import BaseTag, _LUT_DESCRIPTOR_TAGS
@@ -245,18 +245,21 @@ def raw_element_value(
     vr = data["VR"]
     try:
         value = convert_value(vr, raw, encoding)
-    except NotImplementedError as exc:
-        # An unknown VR ('ZZ', 'XX', etc.) reaches us as NotImplementedError
-        # from convert_value. Mirror convert_wrong_length_to_UN: either keep
-        # the original exception (so the dcmread boundary can translate it
-        # to InvalidDicomError per the documented contract), or fall back
-        # to a UN-VR parse and continue. We do NOT translate here because
-        # internal callers (read_partial, read_dataset, the #503
-        # implicit-VR retry inside _read_file_meta_info, util.fixer) rely
-        # on catching NotImplementedError specifically.
+    except UnknownVRError as exc:
+        # An unknown VR ('ZZ', 'XX', etc.) reaches us as UnknownVRError from
+        # convert_value. Mirror convert_wrong_length_to_UN: either raise, or
+        # fall back to a UN-VR parse and continue.
+        #
+        # Re-raise the same type (it subclasses NotImplementedError, so
+        # read_dataset, the #503 implicit-VR retry inside
+        # _read_file_meta_info and util.fixer keep catching it unchanged).
+        # Carrying the distinct type all the way up is what lets the dcmread
+        # boundary translate *this* failure to InvalidDicomError without also
+        # swallowing an unrelated NotImplementedError raised by a callback
+        # registered on this hook.
         msg = f"{exc} in tag {raw.tag}"
         if not config.convert_unknown_vr_to_UN:
-            raise NotImplementedError(
+            raise UnknownVRError(
                 f"{msg}. To replace this error with a warning and parse the "
                 "element as 'UN', set "
                 "pydicom.config.convert_unknown_vr_to_UN = True."
