@@ -15,6 +15,7 @@ from pydicom.charset import default_encoding, decode_bytes
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException, UnknownVRError
+from pydicom._version import __version__, __dicom_version__
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
@@ -758,7 +759,16 @@ def convert_value(
         # ``raw_element_value`` hook, such as the legacy
         # ``config.data_element_callback`` installed by
         # :func:`~pydicom.util.fixer.fix_mismatch`.
-        raise UnknownVRError(f"Unknown Value Representation '{VR}'")
+        #
+        # The DICOM Standard edition is named because "unknown" only means
+        # unknown to this release: a VR added to the Standard later than the
+        # edition this release implements is valid DICOM that pydicom cannot
+        # convert yet, and the remedy (upgrade pydicom) differs from the
+        # remedy for a corrupt file.
+        raise UnknownVRError(
+            f"Unknown Value Representation '{VR}' (pydicom {__version__} "
+            f"implements DICOM Standard {__dicom_version__})"
+        )
 
     if raw_data_element.length == 0:
         return empty_value_for_VR(VR)

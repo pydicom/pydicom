@@ -27,6 +27,7 @@ from pydicom.filereader import (
     read_file_meta_info,
 )
 from pydicom.dataelem import DataElement, convert_raw_data_element
+from pydicom._version import __dicom_version__
 from pydicom.errors import InvalidDicomError, UnknownVRError
 from pydicom.filebase import DicomBytesIO
 from pydicom.hooks import hooks
@@ -1191,7 +1192,12 @@ class TestUnknownVR:
             False,
             True,
         )
-        msg = r"Unknown Value Representation '{}' in tag \(0008,0006\)"
+        # The parenthetical names the DICOM Standard edition this release
+        # implements, because an unrecognised VR may simply postdate it.
+        msg = (
+            r"Unknown Value Representation '{}' \(pydicom .+ implements "
+            r"DICOM Standard .+\) in tag \(0008,0006\)"
+        )
         msg = msg.format(str_output)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
@@ -1259,6 +1265,10 @@ class TestUnknownVR:
 
         assert "Unknown Value Representation 'ZZ'" in str(excinfo.value)
         assert "(0002,0000)" in str(excinfo.value)
+        # The message names the DICOM Standard edition this release implements,
+        # since an unrecognised VR may simply postdate it -- the reader then
+        # knows whether "upgrade pydicom" is the remedy.
+        assert __dicom_version__ in str(excinfo.value)
         # The chain is preserved for diagnosability.
         assert isinstance(excinfo.value.__cause__, NotImplementedError)
 

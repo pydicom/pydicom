@@ -65,7 +65,8 @@ Fixes
   translation on that type keeps it from capturing an unrelated
   ``NotImplementedError`` raised by a callback registered through
   :mod:`pydicom.hooks`, which would otherwise report an extension's failure
-  as malformed input.
+  as malformed input. The error message now names the DICOM Standard edition
+  this release implements, since an unrecognised VR may simply postdate it.
 
 Enhancements
 ------------
