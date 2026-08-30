@@ -373,6 +373,19 @@ class TestConvertColorSpace:
 class TestModalityLUT:
     """Tests for apply_modality_lut()."""
 
+    @staticmethod
+    def _get_functional_group(slope, intercept):
+        """Return a functional group with a pixel value transformation."""
+        transform = Dataset()
+        transform.RescaleSlope = slope
+        transform.RescaleIntercept = intercept
+        transform.RescaleType = "US"
+
+        group = Dataset()
+        group.PixelValueTransformationSequence = [transform]
+
+        return group
+
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
         ds = dcmread(MOD_16)
@@ -389,6 +402,100 @@ class TestModalityLUT:
         ds.RescaleIntercept = -2048
         out = apply_modality_lut(arr, ds)
         assert np.array_equal(arr * 2.5 - 2048, out)
+
+    def test_shared_functional_group(self):
+        """Test rescale using a shared functional group."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.SharedFunctionalGroupsSequence = [self._get_functional_group(2, -1)]
+        arr = np.asarray([[[1, 2]], [[3, 4]]], dtype=np.int16)
+        original = arr.copy()
+
+        out = apply_modality_lut(arr, ds)
+
+        assert out.flags.writeable
+        assert np.float64 == out.dtype
+        assert np.array_equal(original, arr)
+        assert np.array_equal(arr * 2 - 1, out)
+
+    def test_per_frame_functional_groups(self):
+        """Test rescale using per-frame functional groups."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        # Shared functional groups may contain unrelated macros
+        ds.SharedFunctionalGroupsSequence = [Dataset()]
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(3, -1),
+            self._get_functional_group(7, -3),
+        ]
+        arr = np.asarray([[[1]], [[1]]], dtype=np.int16)
+        original = arr.copy()
+
+        out = apply_modality_lut(arr, ds)
+
+        assert out.flags.writeable
+        assert np.float64 == out.dtype
+        assert np.array_equal(original, arr)
+        assert np.array_equal([[[2]], [[4]]], out)
+
+    def test_missing_per_frame_functional_group(self):
+        """Test a missing per-frame transform leaves that frame unchanged."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [
+            Dataset(),
+            self._get_functional_group(2, -1),
+        ]
+        arr = np.asarray([[[1, 2]], [[3, 4]]], dtype=np.int16)
+
+        out = apply_modality_lut(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[[1, 2]], [[5, 7]]], out)
+
+    def test_single_frame_functional_group(self):
+        """Test a per-frame transform for a single-frame array."""
+        ds = Dataset()
+        ds.NumberOfFrames = 1
+        ds.PerFrameFunctionalGroupsSequence = [self._get_functional_group(2, -1)]
+        arr = np.asarray([[1, 2], [3, 4]], dtype=np.int16)
+
+        out = apply_modality_lut(arr, ds)
+
+        assert np.array_equal([[1, 3], [5, 7]], out)
+
+    def test_per_frame_functional_group_mismatch(self):
+        """Test mismatched frame count raises an exception."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(3, -1),
+            self._get_functional_group(7, -3),
+        ]
+        # The issue's original reproducer uses this shape, which is one frame
+        # under pydicom's frame-first ndarray convention, not two frames
+        arr = np.atleast_3d([1, 1])
+
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"number of frames in the array \(1\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_modality_lut(arr, ds)
+
+    def test_per_frame_functional_group_dataset_mismatch(self):
+        """Test mismatched Number of Frames raises an exception."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [self._get_functional_group(2, -1)]
+        arr = np.ones((2, 2, 2), dtype=np.int16)
+
+        msg = (
+            r"The number of frame functional groups \(1\) does not match the "
+            r"dataset's Number of Frames \(2\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_modality_lut(arr, ds)
 
     def test_lut_sequence(self):
         """Test the LUT Sequence transform."""
@@ -444,6 +551,10 @@ class TestModalityLUT:
         assert arr is out
 
         ds.ModalityLUTSequence = []
+        out = apply_modality_lut(arr, ds)
+        assert arr is out
+
+        ds.PerFrameFunctionalGroupsSequence = [Dataset()]
         out = apply_modality_lut(arr, ds)
         assert arr is out
 

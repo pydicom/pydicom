@@ -39,6 +39,26 @@ _CMS_INTENTS = {
 }
 
 
+def _get_rescale_parameters(ds: "Dataset") -> tuple[float, float] | None:
+    """Return the rescale slope and intercept in `ds`, if present."""
+    if "RescaleSlope" in ds and "RescaleIntercept" in ds:
+        return cast(float, ds.RescaleSlope), cast(float, ds.RescaleIntercept)
+
+    return None
+
+
+def _get_functional_group_rescale(
+    group: "Dataset",
+) -> tuple[float, float] | None:
+    """Return rescale parameters from a Pixel Value Transformation macro."""
+    sequence = group.get("PixelValueTransformationSequence")
+    if not sequence:
+        return None
+
+    item = cast(list["Dataset"], sequence)[0]
+    return _get_rescale_parameters(item)
+
+
 def apply_color_lut(
     arr: "np.ndarray", ds: "Dataset | None" = None, palette: str | UID | None = None
 ) -> "np.ndarray":
@@ -348,7 +368,9 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         operation to.
     ds : dataset.Dataset
         A dataset containing a :dcm:`Modality LUT Module
-        <part03/sect_C.11.html#sect_C.11.1>`.
+        <part03/sect_C.11.html#sect_C.11.1>` or a :dcm:`Pixel Value
+        Transformation Functional Group
+        <part03/sect_C.7.6.16.2.html#sect_C.7.6.16.2.9>`.
 
     Returns
     -------
@@ -357,9 +379,17 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         (0028,3000) *Modality LUT Sequence* is present then returns an array
         of ``np.uint8`` or ``np.uint16``, depending on the 3rd value of
         (0028,3002) *LUT Descriptor*. If (0028,1052) *Rescale Intercept* and
-        (0028,1053) *Rescale Slope* are present then returns an array of
-        ``np.float64``. If neither are present then `arr` will be returned
-        unchanged.
+        (0028,1053) *Rescale Slope* are present, either at the dataset level
+        or in a shared or per-frame *Pixel Value Transformation Sequence*,
+        then returns an array of ``np.float64``. If none are present then
+        `arr` will be returned unchanged.
+
+    Raises
+    ------
+    ValueError
+        If per-frame rescale parameters are present and the number of frame
+        functional groups does not match (0028,0008) *Number of Frames* or
+        the number of frames in `arr`.
 
     Notes
     -----
@@ -369,10 +399,15 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     max. pixel value are determined from (0028,0101) *Bits Stored* and
     (0028,0103) *Pixel Representation*.
 
+    For multi-frame pixel data, `arr` should use the pydicom convention of
+    ``(frames, rows, columns)`` or ``(frames, rows, columns, samples)``.
+
     References
     ----------
     * DICOM Standard, Part 3, :dcm:`Annex C.11.1
       <part03/sect_C.11.html#sect_C.11.1>`
+    * DICOM Standard, Part 3, :dcm:`Section C.7.6.16.2.9
+      <part03/sect_C.7.6.16.2.html#sect_C.7.6.16.2.9>`
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
@@ -417,9 +452,60 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
         return lut_data[clipped_iv]
-    elif "RescaleSlope" in ds and "RescaleIntercept" in ds:
-        arr = arr.astype(np.float64) * cast(float, ds.RescaleSlope)
-        arr += cast(float, ds.RescaleIntercept)
+    rescale = _get_rescale_parameters(ds)
+    if rescale is not None:
+        slope, intercept = rescale
+        arr = arr.astype(np.float64) * slope
+        arr += intercept
+        return arr
+
+    shared = cast(list["Dataset"], ds.get("SharedFunctionalGroupsSequence", []))
+    if shared:
+        rescale = _get_functional_group_rescale(shared[0])
+        if rescale is not None:
+            slope, intercept = rescale
+            arr = arr.astype(np.float64) * slope
+            arr += intercept
+            return arr
+
+    per_frame = cast(list["Dataset"], ds.get("PerFrameFunctionalGroupsSequence", []))
+    if not per_frame:
+        return arr
+
+    transforms = [_get_functional_group_rescale(group) for group in per_frame]
+    if not any(transform is not None for transform in transforms):
+        return arr
+
+    nr_frames = len(per_frame)
+    declared_frames = ds.get("NumberOfFrames")
+    if declared_frames is not None and int(declared_frames) != nr_frames:
+        raise ValueError(
+            f"The number of frame functional groups ({nr_frames}) does not "
+            f"match the dataset's Number of Frames ({declared_frames})"
+        )
+
+    if nr_frames > 1:
+        arr_frames = arr.shape[0] if arr.ndim >= 3 else 1
+        if nr_frames != arr_frames:
+            raise ValueError(
+                f"The number of frame functional groups ({nr_frames}) does not "
+                f"match the number of frames in the array ({arr_frames})"
+            )
+
+    arr = arr.astype(np.float64)
+    if nr_frames == 1:
+        slope, intercept = cast(tuple[float, float], transforms[0])
+        arr *= slope
+        arr += intercept
+        return arr
+
+    for idx, transform in enumerate(transforms):
+        if transform is None:
+            continue
+
+        slope, intercept = transform
+        arr[idx] *= slope
+        arr[idx] += intercept
 
     return arr
 
