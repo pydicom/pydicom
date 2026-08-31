@@ -41,8 +41,10 @@ _CMS_INTENTS = {
 
 def _get_rescale_parameters(ds: "Dataset") -> tuple[float, float] | None:
     """Return the rescale slope and intercept in `ds`, if present."""
-    if "RescaleSlope" in ds and "RescaleIntercept" in ds:
-        return cast(float, ds.RescaleSlope), cast(float, ds.RescaleIntercept)
+    slope = ds.get("RescaleSlope", None)
+    intercept = ds.get("RescaleIntercept", None)
+    if slope is not None and intercept is not None:
+        return cast(float, slope), cast(float, intercept)
 
     return None
 
@@ -57,6 +59,23 @@ def _get_functional_group_rescale(
 
     item = cast(list["Dataset"], sequence)[0]
     return _get_rescale_parameters(item)
+
+
+def _get_functional_group_voi(group: "Dataset") -> "Dataset | None":
+    """Return the Frame VOI LUT macro item in `group`, if present."""
+    sequence = group.get("FrameVOILUTSequence")
+    if not sequence:
+        return None
+
+    return cast(list["Dataset"], sequence)[0]
+
+
+def _has_windowing(ds: "Dataset") -> bool:
+    """Return ``True`` if `ds` contains valid windowing parameters."""
+    return None not in [
+        ds.get("WindowCenter", None),
+        ds.get("WindowWidth", None),
+    ]
 
 
 def apply_color_lut(
@@ -358,7 +377,9 @@ def apply_icc_profile(
     return arr
 
 
-def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
+def apply_modality_lut(
+    arr: "np.ndarray", ds: "Dataset", slice_number: int | None = None
+) -> "np.ndarray":
     """Apply a modality lookup table or rescale operation to `arr`.
 
     Parameters
@@ -371,6 +392,10 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         <part03/sect_C.11.html#sect_C.11.1>` or a :dcm:`Pixel Value
         Transformation Functional Group
         <part03/sect_C.7.6.16.2.html#sect_C.7.6.16.2.9>`.
+    slice_number : int, optional
+        The zero-based frame number whose per-frame transformation should be
+        applied to `arr`. If not supplied then all per-frame transformations
+        are applied in frame order.
 
     Returns
     -------
@@ -484,6 +509,22 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
             f"match the dataset's Number of Frames ({declared_frames})"
         )
 
+    if slice_number is not None:
+        if slice_number < 0 or slice_number >= nr_frames:
+            raise IndexError(
+                f"The slice number ({slice_number}) is outside the available "
+                f"frame range (0 to {nr_frames - 1})"
+            )
+
+        transform = transforms[slice_number]
+        if transform is None:
+            return arr
+
+        slope, intercept = transform
+        arr = arr.astype(np.float64) * slope
+        arr += intercept
+        return arr
+
     if nr_frames > 1:
         arr_frames = arr.shape[0] if arr.ndim >= 3 else 1
         if nr_frames != arr_frames:
@@ -590,7 +631,11 @@ apply_rescale = apply_modality_lut
 
 
 def apply_voi_lut(
-    arr: "np.ndarray", ds: "Dataset", index: int = 0, prefer_lut: bool = True
+    arr: "np.ndarray",
+    ds: "Dataset",
+    index: int = 0,
+    prefer_lut: bool = True,
+    slice_number: int | None = None,
 ) -> "np.ndarray":
     """Apply a VOI lookup table or windowing operation to `arr`.
 
@@ -618,6 +663,10 @@ def apply_voi_lut(
         When the VOI LUT Module contains both *Window Width*/*Window Center*
         and *VOI LUT Sequence*, if ``True`` (default) then apply the VOI LUT,
         otherwise apply the windowing operation.
+    slice_number : int, optional
+        The zero-based frame number whose per-frame Frame VOI LUT parameters
+        should be applied to `arr`. If not supplied then all per-frame
+        parameters are applied in frame order.
 
     Returns
     -------
@@ -652,22 +701,32 @@ def apply_voi_lut(
             ds.VOILUTSequence[0].get("LUTDescriptor", None),
             ds.VOILUTSequence[0].get("LUTData", None),
         ]
-    valid_windowing = None not in [
-        ds.get("WindowCenter", None),
-        ds.get("WindowWidth", None),
-    ]
+    valid_windowing = _has_windowing(ds)
+    if not valid_windowing:
+        shared = cast(list["Dataset"], ds.get("SharedFunctionalGroupsSequence", []))
+        shared_voi = _get_functional_group_voi(shared[0]) if shared else None
+        valid_windowing = shared_voi is not None and _has_windowing(shared_voi)
+
+    if not valid_windowing:
+        per_frame = cast(
+            list["Dataset"], ds.get("PerFrameFunctionalGroupsSequence", [])
+        )
+        valid_windowing = any(
+            voi is not None and _has_windowing(voi)
+            for voi in (_get_functional_group_voi(group) for group in per_frame)
+        )
 
     if valid_voi and valid_windowing:
         if prefer_lut:
             return apply_voi(arr, ds, index)
 
-        return apply_windowing(arr, ds, index)
+        return apply_windowing(arr, ds, index, slice_number)
 
     if valid_voi:
         return apply_voi(arr, ds, index)
 
     if valid_windowing:
-        return apply_windowing(arr, ds, index)
+        return apply_windowing(arr, ds, index, slice_number)
 
     return arr
 
@@ -773,53 +832,14 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     return cast("np.ndarray", lut_data[clipped_iv])
 
 
-def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
-    """Apply a windowing operation to `arr`.
-
-    .. versionadded:: 2.1
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        The :class:`~numpy.ndarray` to apply the windowing operation to.
-    ds : dataset.Dataset
-        A dataset containing a :dcm:`VOI LUT Module<part03/sect_C.11.2.html>`.
-        If (0028,1050) *Window Center* and (0028,1051) *Window Width* are
-        present then returns an array of ``np.float64``, otherwise `arr` will
-        be returned unchanged.
-    index : int, optional
-        When the VOI LUT Module contains multiple alternative views, this is
-        the index of the view to return (default ``0``).
-
-    Returns
-    -------
-    numpy.ndarray
-        An array with applied windowing operation.
-
-    Notes
-    -----
-    When the dataset requires a modality LUT or rescale operation as part of
-    the Modality LUT module then that must be applied before any windowing
-    operation.
-
-    See Also
-    --------
-    :func:`~pydicom.pixels.processing.apply_modality_lut`
-    :func:`~pydicom.pixels.processing.apply_voi`
-    :func:`~pydicom.pixels.processing.apply_voi_lut`
-
-    References
-    ----------
-    * DICOM Standard, Part 3, :dcm:`Annex C.11.2
-      <part03/sect_C.11.html#sect_C.11.2>`
-    * DICOM Standard, Part 3, :dcm:`Annex C.8.11.3.1.5
-      <part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5>`
-    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
-      <part04/sect_N.2.html#sect_N.2.1.1>`
-    """
-    if "WindowWidth" not in ds and "WindowCenter" not in ds:
-        return arr
-
+def _apply_windowing(
+    arr: "np.ndarray",
+    ds: "Dataset",
+    voi: "Dataset",
+    index: int,
+    rescale: tuple[float, float] | None,
+) -> "np.ndarray":
+    """Apply windowing using `voi` and image metadata from `ds`."""
     if ds.PhotometricInterpretation not in ["MONOCHROME1", "MONOCHROME2"]:
         raise ValueError(
             "When performing a windowing operation only 'MONOCHROME1' and "
@@ -828,18 +848,18 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
         )
 
     # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
-    voi_func = cast(str, getattr(ds, "VOILUTFunction", "LINEAR")).upper()
+    voi_func = cast(str, getattr(voi, "VOILUTFunction", "LINEAR")).upper()
     # VR DS, VM 1-n
-    elem = ds["WindowCenter"]
+    elem = voi["WindowCenter"]
     center = cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
     center = cast(float, center)
-    elem = ds["WindowWidth"]
+    elem = voi["WindowWidth"]
     width = cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
     width = cast(float, width)
 
     # The output range depends on whether or not a modality LUT or rescale
-    #   operation has been applied
-    ds.BitsStored = cast(int, ds.BitsStored)
+    # operation has been applied
+    bits_stored = cast(int, ds.BitsStored)
     y_min: float
     y_max: float
     if ds.get("ModalityLUTSequence"):
@@ -851,20 +871,16 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
     elif ds.PixelRepresentation == 0:
         # Unsigned
         y_min = 0
-        y_max = 2**ds.BitsStored - 1
+        y_max = 2**bits_stored - 1
     else:
         # Signed
-        y_min = -(2 ** (ds.BitsStored - 1))
-        y_max = 2 ** (ds.BitsStored - 1) - 1
+        y_min = -(2 ** (bits_stored - 1))
+        y_max = 2 ** (bits_stored - 1) - 1
 
-    slope = ds.get("RescaleSlope", None)
-    intercept = ds.get("RescaleIntercept", None)
-    if slope is not None and intercept is not None:
-        ds.RescaleSlope = cast(float, ds.RescaleSlope)
-        ds.RescaleIntercept = cast(float, ds.RescaleIntercept)
-        # Otherwise its the actual data range
-        y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
-        y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
+    if rescale is not None:
+        slope, intercept = rescale
+        y_min = y_min * slope + intercept
+        y_max = y_max * slope + intercept
 
     y_range = y_max - y_min
     arr = arr.astype("float64")
@@ -906,6 +922,154 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
         raise ValueError(f"Unsupported (0028,1056) VOI LUT Function value '{voi_func}'")
 
     return arr
+
+
+def apply_windowing(
+    arr: "np.ndarray",
+    ds: "Dataset",
+    index: int = 0,
+    slice_number: int | None = None,
+) -> "np.ndarray":
+    """Apply a windowing operation to `arr`.
+
+    .. versionadded:: 2.1
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`~numpy.ndarray` to apply the windowing operation to.
+    ds : dataset.Dataset
+        A dataset containing a :dcm:`VOI LUT Module<part03/sect_C.11.2.html>`.
+        If (0028,1050) *Window Center* and (0028,1051) *Window Width* are
+        present then returns an array of ``np.float64``, otherwise `arr` will
+        be returned unchanged.
+    index : int, optional
+        When the VOI LUT Module contains multiple alternative views, this is
+        the index of the view to return (default ``0``).
+    slice_number : int, optional
+        The zero-based frame number whose per-frame Frame VOI LUT parameters
+        should be applied to `arr`. If not supplied then all per-frame
+        parameters are applied in frame order.
+
+    Returns
+    -------
+    numpy.ndarray
+        An array with applied windowing operation.
+
+    Notes
+    -----
+    When the dataset requires a modality LUT or rescale operation as part of
+    the Modality LUT module then that must be applied before any windowing
+    operation.
+
+    See Also
+    --------
+    :func:`~pydicom.pixels.processing.apply_modality_lut`
+    :func:`~pydicom.pixels.processing.apply_voi`
+    :func:`~pydicom.pixels.processing.apply_voi_lut`
+
+    References
+    ----------
+    * DICOM Standard, Part 3, :dcm:`Annex C.11.2
+      <part03/sect_C.11.html#sect_C.11.2>`
+    * DICOM Standard, Part 3, :dcm:`Annex C.8.11.3.1.5
+      <part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5>`
+    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
+      <part04/sect_N.2.html#sect_N.2.1.1>`
+    """
+    top_voi = ds if _has_windowing(ds) else None
+    top_rescale = _get_rescale_parameters(ds)
+
+    shared = cast(list["Dataset"], ds.get("SharedFunctionalGroupsSequence", []))
+    shared_group = shared[0] if shared else None
+    shared_voi = (
+        _get_functional_group_voi(shared_group) if shared_group is not None else None
+    )
+    if shared_voi is not None and not _has_windowing(shared_voi):
+        shared_voi = None
+    shared_rescale = (
+        _get_functional_group_rescale(shared_group)
+        if shared_group is not None
+        else None
+    )
+
+    per_frame = cast(list["Dataset"], ds.get("PerFrameFunctionalGroupsSequence", []))
+    frame_voi = [_get_functional_group_voi(group) for group in per_frame]
+    frame_voi = [
+        voi if voi is not None and _has_windowing(voi) else None for voi in frame_voi
+    ]
+    frame_rescale = [_get_functional_group_rescale(group) for group in per_frame]
+
+    base_voi = top_voi or shared_voi
+    base_rescale = top_rescale or shared_rescale
+    if base_voi is None and not any(voi is not None for voi in frame_voi):
+        return arr
+
+    uses_per_frame = bool(per_frame) and (
+        (base_voi is None and any(voi is not None for voi in frame_voi))
+        or (base_rescale is None and any(value is not None for value in frame_rescale))
+    )
+
+    if slice_number is not None and per_frame:
+        nr_frames = len(per_frame)
+        declared_frames = ds.get("NumberOfFrames")
+        if declared_frames is not None and int(declared_frames) != nr_frames:
+            raise ValueError(
+                f"The number of frame functional groups ({nr_frames}) does not "
+                f"match the dataset's Number of Frames ({declared_frames})"
+            )
+        if slice_number < 0 or slice_number >= nr_frames:
+            raise IndexError(
+                f"The slice number ({slice_number}) is outside the available "
+                f"frame range (0 to {nr_frames - 1})"
+            )
+
+        voi = base_voi or frame_voi[slice_number]
+        if voi is None:
+            return arr
+
+        rescale = base_rescale or frame_rescale[slice_number]
+        return _apply_windowing(arr, ds, voi, index, rescale)
+
+    if not uses_per_frame:
+        if base_voi is None:
+            return arr
+
+        return _apply_windowing(arr, ds, base_voi, index, base_rescale)
+
+    nr_frames = len(per_frame)
+    declared_frames = ds.get("NumberOfFrames")
+    if declared_frames is not None and int(declared_frames) != nr_frames:
+        raise ValueError(
+            f"The number of frame functional groups ({nr_frames}) does not "
+            f"match the dataset's Number of Frames ({declared_frames})"
+        )
+
+    if nr_frames > 1:
+        arr_frames = arr.shape[0] if arr.ndim >= 3 else 1
+        if nr_frames != arr_frames:
+            raise ValueError(
+                f"The number of frame functional groups ({nr_frames}) does not "
+                f"match the number of frames in the array ({arr_frames})"
+            )
+
+    if nr_frames == 1:
+        voi = base_voi or frame_voi[0]
+        if voi is None:
+            return arr
+
+        return _apply_windowing(arr, ds, voi, index, base_rescale or frame_rescale[0])
+
+    out = arr.astype("float64")
+    for frame_number in range(nr_frames):
+        voi = base_voi or frame_voi[frame_number]
+        if voi is None:
+            continue
+
+        rescale = base_rescale or frame_rescale[frame_number]
+        out[frame_number] = _apply_windowing(arr[frame_number], ds, voi, index, rescale)
+
+    return out
 
 
 def convert_color_space(
