@@ -363,6 +363,20 @@ convert_wrong_length_to_UN = False
 Default ``False``.
 """
 
+convert_unknown_vr_to_UN = False
+"""Convert a field VR to "UN" and return its raw bytes if the encoded VR is
+not recognised. Default ``False``.
+
+When ``False``, an unknown VR encountered during value conversion raises
+:class:`NotImplementedError` from the lower-level converter, which
+:func:`~pydicom.filereader.dcmread` then surfaces as
+:class:`~pydicom.errors.InvalidDicomError` per its documented exception
+contract. When ``True``, a warning is logged instead and the offending
+element's VR is silently switched to ``UN`` so the rest of the file can
+be parsed -- useful when an in-flight study with a single bad tag would
+otherwise be unreadable. Mirrors :data:`convert_wrong_length_to_UN`.
+"""
+
 datetime_conversion = False
 """Set to ``True`` to convert the value(s) of elements with a VR of DA, DT and
 TM to :class:`datetime.date`, :class:`datetime.datetime` and

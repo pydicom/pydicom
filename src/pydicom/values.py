@@ -14,7 +14,8 @@ from pydicom import config
 from pydicom.charset import default_encoding, decode_bytes
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
-from pydicom.errors import BytesLengthException
+from pydicom.errors import BytesLengthException, UnknownVRError
+from pydicom._version import __version__, __dicom_version__
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
@@ -751,7 +752,23 @@ def convert_value(
         # If the VR characters are outside that range then print hex values
         if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
             VR = " ".join([f"0x{ord(ch):02x}" for ch in VR])
-        raise NotImplementedError(f"Unknown Value Representation '{VR}'")
+        # UnknownVRError subclasses NotImplementedError, so existing handlers
+        # are unaffected. Raising it at the single point the unknown VR is
+        # actually detected means every route into this function carries the
+        # distinct type -- including callers that bypass the
+        # ``raw_element_value`` hook, such as the legacy
+        # ``config.data_element_callback`` installed by
+        # :func:`~pydicom.util.fixer.fix_mismatch`.
+        #
+        # The DICOM Standard edition is named because "unknown" only means
+        # unknown to this release: a VR added to the Standard later than the
+        # edition this release implements is valid DICOM that pydicom cannot
+        # convert yet, and the remedy (upgrade pydicom) differs from the
+        # remedy for a corrupt file.
+        raise UnknownVRError(
+            f"Unknown Value Representation '{VR}' (pydicom {__version__} "
+            f"implements DICOM Standard {__dicom_version__})"
+        )
 
     if raw_data_element.length == 0:
         return empty_value_for_VR(VR)

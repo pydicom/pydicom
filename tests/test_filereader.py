@@ -27,8 +27,10 @@ from pydicom.filereader import (
     read_file_meta_info,
 )
 from pydicom.dataelem import DataElement, convert_raw_data_element
-from pydicom.errors import InvalidDicomError
+from pydicom._version import __dicom_version__
+from pydicom.errors import InvalidDicomError, UnknownVRError
 from pydicom.filebase import DicomBytesIO
+from pydicom.hooks import hooks
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -1190,7 +1192,12 @@ class TestUnknownVR:
             False,
             True,
         )
-        msg = r"Unknown Value Representation '{}' in tag \(0008,0006\)"
+        # The parenthetical names the DICOM Standard edition this release
+        # implements, because an unrecognised VR may simply postdate it.
+        msg = (
+            r"Unknown Value Representation '{}' \(pydicom .+ implements "
+            r"DICOM Standard .+\) in tag \(0008,0006\)"
+        )
         msg = msg.format(str_output)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
@@ -1222,6 +1229,172 @@ class TestUnknownVR:
             )
 
         assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
+
+    # ----- Regression: dcmread exception contract for unknown VR (#2336) -----
+
+    # 144-byte File-Meta-Information-only fixture: 128-byte zero preamble +
+    # ``DICM`` + (0002,0000) FileMetaInformationGroupLength encoded with the
+    # invented VR 'ZZ'. Lifts to NotImplementedError from convert_value, which
+    # the public dcmread API must surface as InvalidDicomError per its
+    # documented ``Raises`` contract. Inline rather than a fixture so each
+    # test is self-contained for the maintainer reading the diff.
+    _UNKNOWN_VR_FMI_BYTES = bytes.fromhex(
+        "00" * 128
+        + "4449434d"  # 'DICM'
+        + "02000000"  # tag (0002,0000)
+        + "5a5a"  # VR 'ZZ'
+        + "0400"  # length 4
+        + "00000000"  # value
+    )
+
+    def test_dcmread_raises_invaliddicom_on_unknown_vr(self):
+        """Unknown VR via ``dcmread(force=True)`` must raise
+        :class:`InvalidDicomError`, not :class:`NotImplementedError`.
+
+        ``dcmread``'s docstring promises ``InvalidDicomError`` for malformed
+        DICOM input. Prior to #2336, unknown VRs leaked
+        ``NotImplementedError`` through the public API, leaving callers
+        with no single exception type to handle malformed input.
+
+        Same shape as the contract narrowing in PR #2331 (``RecursionError``
+        on deep SQ nesting) and PR #2333 (bare ``OSError`` on truncated SQ
+        item header).
+        """
+        with pytest.raises(InvalidDicomError) as excinfo:
+            dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
+
+        assert "Unknown Value Representation 'ZZ'" in str(excinfo.value)
+        assert "(0002,0000)" in str(excinfo.value)
+        # The message names the DICOM Standard edition this release implements,
+        # since an unrecognised VR may simply postdate it -- the reader then
+        # knows whether "upgrade pydicom" is the remedy.
+        assert __dicom_version__ in str(excinfo.value)
+        # The chain is preserved for diagnosability.
+        assert isinstance(excinfo.value.__cause__, NotImplementedError)
+
+    def test_dcmread_unknown_vr_recovers_when_config_set(self):
+        """``config.convert_unknown_vr_to_UN = True`` parses the file with a
+        warning instead of raising.
+
+        Mirrors :data:`config.convert_wrong_length_to_UN` -- callers handling
+        in-flight studies with a single bad tag can opt in to a permissive
+        parse instead of losing the whole file. Default stays strict (the
+        previous test pins that).
+        """
+        original = config.convert_unknown_vr_to_UN
+        config.convert_unknown_vr_to_UN = True
+        try:
+            with pytest.warns(UserWarning, match="Setting VR to 'UN'"):
+                ds = dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
+        finally:
+            config.convert_unknown_vr_to_UN = original
+
+        # The file parsed; the offending element is reachable on the file
+        # meta dataset (its VR may have been resolved from the dictionary
+        # after the UN fall-back, since (0002,0000) is a known tag -- the
+        # invariant we pin is "the file parsed", not "VR stays UN").
+        assert 0x00020000 in ds.file_meta
+
+    def test_read_partial_still_raises_notimplemented_on_unknown_vr(self):
+        """Internal callers below the public ``dcmread`` boundary continue
+        to see :class:`NotImplementedError` unchanged.
+
+        The translation in :func:`dcmread` is scoped to the public-API
+        boundary so internal callers (``read_partial``, ``read_dataset``,
+        ``read_file_meta_info``, the #503 implicit-VR retry inside
+        ``_read_file_meta_info``, ``util.fixer``) can keep relying on
+        catching ``NotImplementedError`` specifically.
+
+        Defends against a future regression where someone moves the
+        translation lower in the call stack and accidentally narrows the
+        exception type for those internal callers.
+        """
+        from pydicom.filereader import read_partial
+
+        with pytest.raises(NotImplementedError, match="'ZZ'"):
+            read_partial(
+                BytesIO(self._UNKNOWN_VR_FMI_BYTES),
+                stop_when=None,
+                defer_size=None,
+                force=True,
+            )
+
+    def test_dcmread_does_not_translate_callback_notimplementederror(self):
+        """A ``NotImplementedError`` raised by a registered callback reaches
+        the caller unchanged.
+
+        :mod:`pydicom.hooks` is a documented extension point, and a callback
+        failing is not the same event as the file being malformed -- reporting
+        it as :class:`~pydicom.errors.InvalidDicomError` would send someone
+        debugging their own plugin off to inspect a valid file instead.
+
+        The translation is therefore keyed on
+        :class:`~pydicom.errors.UnknownVRError` rather than on
+        ``NotImplementedError``. Reading a *valid* dataset keeps the two
+        causes cleanly separated: nothing about this input is malformed, so
+        the callback's own failure is the only exception in play.
+        """
+
+        class _CallbackFailure(NotImplementedError):
+            """Stands in for an extension signalling its own failure."""
+
+        def _raising_callback(raw, data, *, encoding=None, ds=None, **kwargs):
+            raise _CallbackFailure("callback-sentinel")
+
+        original = hooks.raw_element_value
+        hooks.register_callback("raw_element_value", _raising_callback)
+        try:
+            with pytest.raises(_CallbackFailure, match="callback-sentinel"):
+                dcmread(mr_name)
+        finally:
+            hooks.register_callback("raw_element_value", original)
+
+    def test_dcmread_translates_unknown_vr_via_legacy_element_callback(self):
+        """The translation also covers callers that bypass the hook.
+
+        :func:`~pydicom.util.fixer.fix_mismatch` installs the legacy
+        ``config.data_element_callback``, which runs *before* the
+        ``raw_element_value`` hook in
+        :func:`~pydicom.dataelem.convert_raw_data_element` and calls
+        ``convert_value`` itself, catching only ``ValueError``. An unknown VR
+        therefore escapes that callback without ever reaching the hook.
+
+        Raising :class:`~pydicom.errors.UnknownVRError` from ``convert_value``
+        -- the single point the unknown VR is actually detected -- is what
+        keeps this path covered. Pinned because it would otherwise silently
+        revert to leaking ``NotImplementedError``, which is the exact defect
+        #2336 reports.
+        """
+        from pydicom.util.fixer import fix_mismatch
+
+        fix_mismatch()
+        try:
+            with pytest.raises(InvalidDicomError, match="'ZZ'"):
+                dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
+        finally:
+            config.reset_data_element_callback()
+
+    def test_unknown_vr_error_is_a_notimplementederror(self):
+        """:class:`~pydicom.errors.UnknownVRError` stays catchable as
+        ``NotImplementedError``.
+
+        The subclassing is what keeps ``read_dataset``, the #503 implicit-VR
+        retry and ``util.fixer`` working untouched, and keeps downstream code
+        written against pydicom < 3.1 working. Pinned explicitly because
+        breaking it would be silent -- those call sites swallow the exception
+        rather than propagate it.
+        """
+        assert issubclass(UnknownVRError, NotImplementedError)
+
+        from pydicom.filereader import read_partial
+
+        with pytest.raises(UnknownVRError):
+            read_partial(
+                BytesIO(self._UNKNOWN_VR_FMI_BYTES),
+                stop_when=None,
+                defer_size=None,
+                force=True,
+            )
 
 
 class TestReadDataElement:

@@ -5,7 +5,7 @@ from collections.abc import MutableSequence, Callable
 
 from pydicom import config
 from pydicom.datadict import dictionary_VR, private_dictionary_VR
-from pydicom.errors import BytesLengthException
+from pydicom.errors import BytesLengthException, UnknownVRError
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import BaseTag, _LUT_DESCRIPTOR_TAGS
@@ -245,8 +245,29 @@ def raw_element_value(
     vr = data["VR"]
     try:
         value = convert_value(vr, raw, encoding)
-    except NotImplementedError as exc:
-        raise NotImplementedError(f"{exc} in tag {raw.tag}")
+    except UnknownVRError as exc:
+        # An unknown VR ('ZZ', 'XX', etc.) reaches us as UnknownVRError from
+        # convert_value. Mirror convert_wrong_length_to_UN: either raise, or
+        # fall back to a UN-VR parse and continue.
+        #
+        # Re-raise the same type (it subclasses NotImplementedError, so
+        # read_dataset, the #503 implicit-VR retry inside
+        # _read_file_meta_info and util.fixer keep catching it unchanged).
+        # Carrying the distinct type all the way up is what lets the dcmread
+        # boundary translate *this* failure to InvalidDicomError without also
+        # swallowing an unrelated NotImplementedError raised by a callback
+        # registered on this hook.
+        msg = f"{exc} in tag {raw.tag}"
+        if not config.convert_unknown_vr_to_UN:
+            raise UnknownVRError(
+                f"{msg}. To replace this error with a warning and parse the "
+                "element as 'UN', set "
+                "pydicom.config.convert_unknown_vr_to_UN = True."
+            ) from exc
+
+        warn_and_log(f"{msg}. Setting VR to 'UN'.")
+        data["VR"] = VR.UN
+        value = raw.value
     except BytesLengthException as exc:
         # Failed conversion, either raise or convert to a UN VR
         msg = (

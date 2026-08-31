@@ -49,6 +49,24 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Translate an unknown VR encountered through :func:`~pydicom.filereader.dcmread`
+  to :class:`~pydicom.errors.InvalidDicomError` -- the documented public-API
+  failure mode -- instead of the legacy ``NotImplementedError``. Internal
+  callers (``read_partial``, ``read_dataset``, ``read_file_meta_info``, the
+  implicit-VR retry inside ``_read_file_meta_info``, ``util.fixer``) continue
+  to see ``NotImplementedError`` unchanged. Added the new
+  :data:`~pydicom.config.convert_unknown_vr_to_UN` setting (default ``False``)
+  to opt in to a permissive parse where the offending element's VR is replaced
+  with ``UN`` and a warning is logged, mirroring
+  :data:`~pydicom.config.convert_wrong_length_to_UN` (:issue:`2336`).
+  The unknown VR is now signalled by the new
+  :class:`~pydicom.errors.UnknownVRError`, which subclasses
+  ``NotImplementedError`` so existing handlers are unaffected. Keying the
+  translation on that type keeps it from capturing an unrelated
+  ``NotImplementedError`` raised by a callback registered through
+  :mod:`pydicom.hooks`, which would otherwise report an extension's failure
+  as malformed input. The error message now names the DICOM Standard edition
+  this release implements, since an unrecognised VR may simply postdate it.
 
 Enhancements
 ------------
