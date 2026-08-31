@@ -3,7 +3,7 @@
 
 # Need zlib and io.BytesIO for deflate-compressed file
 import os
-from struct import Struct, unpack
+from struct import Struct, error as struct_error, unpack
 from typing import BinaryIO, Any, cast
 from collections.abc import Callable, MutableSequence, Iterator
 import zlib
@@ -561,8 +561,17 @@ def read_sequence_item(
     try:
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
-    except BaseException:
-        raise OSError(f"No tag to read at file position {fp.tell() + offset:X}")
+    except (EOFError, OSError, struct_error) as exc:
+        # A truncated stream or a short read leaves us unable to recover
+        # the next sequence item header. Translate to InvalidDicomError
+        # (the documented dcmread failure mode) so callers can rely on a
+        # single exception type for malformed-DICOM input, and chain the
+        # underlying cause for diagnosability. The previous `except
+        # BaseException` was too broad -- it would have swallowed
+        # KeyboardInterrupt / SystemExit and re-raised them as OSError.
+        raise InvalidDicomError(
+            f"No tag to read at file position {fp.tell() + offset:X}"
+        ) from exc
 
     tag = (group, element)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
