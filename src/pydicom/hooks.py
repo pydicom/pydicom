@@ -251,8 +251,15 @@ def raw_element_value(
         # Failed conversion, either raise or convert to a UN VR
         msg = (
             f"{exc} This occurred while trying to parse {raw.tag} according "
-            f"to VR '{raw.VR}'."
+            f"to VR '{vr}'."
         )
+        if raw.VR in (None, VR.UN) and vr != VR.UN:
+            msg += (
+                " The VR was determined from a data dictionary lookup and "
+                "may not match the actual value; Dataset.update_raw_element() "
+                "can be used to set the correct VR before the element is "
+                "converted."
+            )
         if not config.convert_wrong_length_to_UN:
             raise BytesLengthException(
                 f"{msg} To replace this error with a warning set "

@@ -735,6 +735,51 @@ class TestRawDataElement:
             assert "UN" == raw_elem.VR
             assert value == raw_elem.value
 
+    @pytest.mark.parametrize("accept_wrong_length", [False], indirect=True)
+    def test_wrong_bytes_length_guessed_vr_hint(self, accept_wrong_length):
+        """Regression test for #2170: hint at the dictionary-determined VR."""
+        ds = Dataset()
+        ds.set_original_encoding(True, True)
+        ds._dict[Tag(0x01F10010)] = RawDataElement(
+            Tag(0x01F10010), None, 8, b"ELSCINT1", 0, True, True
+        )
+        ds._dict[Tag(0x01F11026)] = RawDataElement(
+            Tag(0x01F11026), None, 6, b"0.264 ", 0, True, True
+        )
+        msg = (
+            r"to parse \(01F1,1026\) according to VR 'FD'. The VR was "
+            r"determined from a data dictionary lookup and may not match the "
+            r"actual value; Dataset.update_raw_element\(\) can be used to set "
+            r"the correct VR before the element is converted."
+        )
+        with pytest.raises(BytesLengthException, match=msg):
+            convert_raw_data_element(ds._dict[Tag(0x01F11026)], ds=ds)
+
+    @pytest.mark.parametrize("accept_wrong_length", [True], indirect=True)
+    def test_wrong_bytes_length_guessed_vr_hint_warns(self, accept_wrong_length):
+        """The dictionary lookup hint is also present when converting to UN."""
+        ds = Dataset()
+        ds.set_original_encoding(True, True)
+        ds._dict[Tag(0x01F10010)] = RawDataElement(
+            Tag(0x01F10010), None, 8, b"ELSCINT1", 0, True, True
+        )
+        ds._dict[Tag(0x01F11026)] = RawDataElement(
+            Tag(0x01F11026), None, 6, b"0.264 ", 0, True, True
+        )
+        msg = (
+            r"to parse \(01F1,1026\) according to VR 'FD'. The VR was "
+            r"determined from a data dictionary lookup .* Setting VR to 'UN'."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            raw_elem = convert_raw_data_element(ds._dict[Tag(0x01F11026)], ds=ds)
+            assert "UN" == raw_elem.VR
+            assert b"0.264 " == raw_elem.value
+
+        # The suggested fix resolves the element correctly
+        ds.update_raw_element(0x01F11026, vr="DS")
+        assert ds[0x01F11026].VR == "DS"
+        assert ds[0x01F11026].value == 0.264
+
     def test_read_known_private_tag_implicit(self):
         fp = DicomBytesIO()
         ds = Dataset()

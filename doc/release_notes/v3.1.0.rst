@@ -49,6 +49,9 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* When parsing fails because a value's length doesn't match the VR determined from a data
+  dictionary lookup, report that VR in the error message (previously ``None``) and suggest
+  :meth:`~pydicom.dataset.Dataset.update_raw_element` (:issue:`2170`)
 
 Enhancements
 ------------
