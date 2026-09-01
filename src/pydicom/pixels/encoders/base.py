@@ -23,6 +23,7 @@ from pydicom.pixels.common import (
 from pydicom.pixels.utils import get_packed_frame
 from pydicom.uid import (
     UID,
+    ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
@@ -318,7 +319,7 @@ class EncodeRunner(RunnerBase):
 
         if isinstance(src, Dataset):
             self._set_options_ds(src)
-            self._src = src.PixelData
+            self._src = self._pixel_data_as_little_endian(src)
             self._src_type = "Dataset"
         elif isinstance(src, (bytes | bytearray | memoryview)):
             self._src = src
@@ -342,6 +343,45 @@ class EncodeRunner(RunnerBase):
                 "'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
                 f"not '{src.__class__.__name__}'"
             )
+
+    def _pixel_data_as_little_endian(self, ds: "Dataset") -> Buffer:
+        """Return `ds`'s *Pixel Data* as little-endian ordered bytes.
+
+        Encoders require little-endian input, so *Pixel Data* read from an
+        *Explicit VR Big Endian* dataset has to be byte swapped first. Without
+        this the encoder reads every sample byte-reversed and encodes corrupt
+        pixel data without raising - a 16-bit value of 1 becomes 256.
+
+        Parameters
+        ----------
+        ds : pydicom.dataset.Dataset
+            The dataset supplying the pixel data.
+
+        Returns
+        -------
+        bytes | bytearray | memoryview
+            The pixel data, byte swapped if the dataset is big-endian encoded.
+        """
+        src = ds.PixelData
+        file_meta = getattr(ds, "file_meta", None)
+        if getattr(file_meta, "TransferSyntaxUID", None) != ExplicitVRBigEndian:
+            return src
+
+        # Bits allocated of 1 is bit-packed and 8 is a single byte, neither swaps
+        nr_bytes = self.bits_allocated // 8
+        if nr_bytes < 2 or len(src) % nr_bytes:
+            return src
+
+        # Swap symmetric byte positions within each sample
+        buffer = bytearray(src)
+        for left in range(nr_bytes // 2):
+            right = nr_bytes - 1 - left
+            buffer[left::nr_bytes], buffer[right::nr_bytes] = (
+                buffer[right::nr_bytes],
+                buffer[left::nr_bytes],
+            )
+
+        return bytes(buffer)
 
     @property
     def src(self) -> "Buffer | np.ndarray":

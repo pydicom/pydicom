@@ -49,6 +49,8 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Fixed :meth:`~pydicom.dataset.Dataset.compress` silently producing byte swapped pixel
+  data when the source dataset uses *Explicit VR Big Endian* (:issue:`2340`).
 
 Enhancements
 ------------
