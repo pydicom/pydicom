@@ -1527,6 +1527,96 @@ class TestApplyWindowing:
         out = apply_windowing(arr[0], ds, slice_number=1)
         assert np.array_equal([[0]], out)
 
+    def test_window_per_frame_slice_errors(self):
+        """Test invalid per-frame metadata and slice numbers."""
+        ds = Dataset()
+        ds.NumberOfFrames = 3
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(0, 1),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[0]], dtype=np.uint8)
+
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"dataset's Number of Frames \(3\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_windowing(arr, ds, slice_number=0)
+
+        ds.NumberOfFrames = 2
+        msg = r"The slice number \(-1\) is outside the available frame range"
+        with pytest.raises(IndexError, match=msg):
+            apply_windowing(arr, ds, slice_number=-1)
+
+        ds.PerFrameFunctionalGroupsSequence[0] = Dataset()
+        out = apply_windowing(arr, ds, slice_number=0)
+        assert arr is out
+
+    def test_window_per_frame_mismatch(self):
+        """Test mismatched per-frame metadata and array frame counts."""
+        ds = Dataset()
+        ds.NumberOfFrames = 3
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(0, 1),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[[0]], [[0]]], dtype=np.uint8)
+
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"dataset's Number of Frames \(3\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_windowing(arr, ds)
+
+        ds.NumberOfFrames = 2
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"number of frames in the array \(1\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_windowing(arr[0], ds)
+
+    def test_window_single_frame_functional_group(self):
+        """Test per-frame windowing with a single-frame array."""
+        ds = Dataset()
+        ds.NumberOfFrames = 1
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [self._get_functional_group(0, 1)]
+        arr = np.asarray([[0]], dtype=np.uint8)
+
+        out = apply_windowing(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[255]], out)
+
+    def test_window_missing_per_frame_functional_group(self):
+        """Test a missing per-frame VOI leaves that frame unchanged."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            Dataset(),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[[1]], [[1]]], dtype=np.uint8)
+
+        out = apply_windowing(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[[1]], [[0]]], out)
+
     def test_window_shared_functional_group(self):
         """Test windowing using shared Frame VOI LUT parameters."""
         ds = Dataset()
@@ -1655,6 +1745,12 @@ class TestApplyWindowing:
         ds.ModalityLUTSequence = []
         out = apply_windowing(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+        group = Dataset()
+        group.FrameVOILUTSequence = [Dataset()]
+        ds.SharedFunctionalGroupsSequence = [group]
+        out = apply_windowing(arr, ds)
+        assert arr is out
 
         transform = Dataset()
         transform.RescaleSlope = 2

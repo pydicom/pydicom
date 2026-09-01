@@ -1032,10 +1032,7 @@ def apply_windowing(
         return _apply_windowing(arr, ds, voi, index, rescale)
 
     if not uses_per_frame:
-        if base_voi is None:
-            return arr
-
-        return _apply_windowing(arr, ds, base_voi, index, base_rescale)
+        return _apply_windowing(arr, ds, cast("Dataset", base_voi), index, base_rescale)
 
     nr_frames = len(per_frame)
     declared_frames = ds.get("NumberOfFrames")
@@ -1054,10 +1051,7 @@ def apply_windowing(
             )
 
     if nr_frames == 1:
-        voi = base_voi or frame_voi[0]
-        if voi is None:
-            return arr
-
+        voi = cast("Dataset", base_voi or frame_voi[0])
         return _apply_windowing(arr, ds, voi, index, base_rescale or frame_rescale[0])
 
     out = arr.astype("float64")
