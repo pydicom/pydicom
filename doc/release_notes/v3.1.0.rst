@@ -47,6 +47,11 @@ Fixes
 * Correctly handle meta data tags incorrectly written in implicit transfer syntax (:issue:`2290`)
 * Made debugging of :func:`~pydicom.filereader.read_dataset` a bit more robust (:pr:`2292`).
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
+* Fixed :attr:`UID.is_deflated<pydicom.uid.UID.is_deflated>` returning ``False`` for
+  *JPIP Referenced Deflate* and *JPIP HTJ2K Referenced Deflate*, and fixed
+  :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite` not
+  inflating/deflating the dataset for those two transfer syntaxes (PS3.5 Sections A.7
+  and A.12).
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 
@@ -67,6 +72,7 @@ Enhancements
   * :attr:`~pydicom.uid.JPEGXLJPEGRecompression`
   * :attr:`~pydicom.uid.JPEGXL`
   * :attr:`~pydicom.uid.DeflatedImageFrameCompression`
+  * :attr:`~pydicom.uid.JPIPReferencedDeflate`
 * Added ability to specify tag numbers in the CLI commands (allows private tags to be specified)
 * Removed `exec` and `eval` from tests, CLI, and scripts for improved security (:issue:`2193`)
 * Added support for up to 16-bit input images to :func:`~pydicom.pixels.convert_color_space`
