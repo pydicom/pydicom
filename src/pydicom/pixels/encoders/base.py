@@ -362,7 +362,7 @@ class EncodeRunner(RunnerBase):
         bytes | bytearray | memoryview
             The pixel data, byte swapped if the dataset is big-endian encoded.
         """
-        src = ds.PixelData
+        src = cast(Buffer, ds.PixelData)
         file_meta = getattr(ds, "file_meta", None)
         if getattr(file_meta, "TransferSyntaxUID", None) != ExplicitVRBigEndian:
             return src
