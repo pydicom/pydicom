@@ -48,6 +48,146 @@ ENCODED_VR = {vr.encode(default_encoding) for vr in VR_}
 # ruff: noqa: C901, PLR0912, PLR0915
 
 
+def _scan_for_next_top_level_element(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    max_scan: int = 4096,
+) -> int:
+    """Scan forward from ``fp.tell()`` looking for either a stray sequence
+    or item delimiter (``(FFFE,E0DD)`` / ``(FFFE,E00D)`` followed by four
+    zero bytes — leftover from a truncated inner encapsulated stream) or a
+    plausible-looking element header (group not reserved, VR ASCII upper
+    when explicit), and return the number of bytes to skip from the current
+    position to that location.
+
+    For stray delimiters, the returned offset points *past* the delimiter +
+    its zero-length field (8 bytes), so the reader can resume cleanly. For
+    plausible element headers, the offset points *to* the header so it can
+    be read normally.
+
+    Returns ``-1`` if nothing plausible is found within ``max_scan`` bytes.
+    Always restores ``fp`` to the original position before returning; the
+    caller is responsible for seeking forward by the returned amount.
+    """
+    pos = fp.tell()
+    buf = fp.read(max_scan)
+    fp.seek(pos)
+    if len(buf) < 8:
+        return -1
+    if is_little_endian:
+        delim_seq = b"\xfe\xff\xdd\xe0\x00\x00\x00\x00"
+        delim_item = b"\xfe\xff\x0d\xe0\x00\x00\x00\x00"
+    else:
+        delim_seq = b"\xff\xfe\xe0\xdd\x00\x00\x00\x00"
+        delim_item = b"\xff\xfe\xe0\x0d\x00\x00\x00\x00"
+    # 2-byte aligned scan — DICOM tags are always 2-byte aligned
+    for off in range(0, len(buf) - 7, 2):
+        chunk = buf[off : off + 8]
+        # Stray delimiter from a truncated inner encapsulated stream
+        if chunk in (delim_seq, delim_item):
+            return off + 8
+        # Plausible element header
+        if is_little_endian:
+            group = chunk[0] | (chunk[1] << 8)
+        else:
+            group = (chunk[0] << 8) | chunk[1]
+        if group in (0x0000, 0xFFFE):
+            continue
+        if is_implicit_VR:
+            # In implicit VR mode we cannot validate VR bytes; rely on the
+            # standard group range as a weak signal.
+            if 0x0008 <= group <= 0x7FE0:
+                return off
+            continue
+        vr_bytes = chunk[4:6]
+        # All valid DICOM VRs are exactly two ASCII uppercase letters
+        if b"AA" <= vr_bytes <= b"ZZ":
+            return off
+    return -1
+
+
+def _header_is_plausible(
+    bytes_read: bytes, is_implicit_VR: bool, is_little_endian: bool
+) -> bool:
+    """Return whether the 8 header bytes look like a genuine element header.
+
+    Used only to decide whether to invoke
+    :func:`_scan_for_next_top_level_element` after a top-level explicit-length
+    sequence (issue #2324). A header is implausible if its group is reserved
+    (``0x0000``) or a delimiter (``0xFFFE``), or — in explicit VR — if the VR
+    bytes are not two ASCII uppercase letters.
+    """
+    if len(bytes_read) < 8:
+        return True  # let the normal end-of-file check handle short reads
+    if is_little_endian:
+        group = bytes_read[0] | (bytes_read[1] << 8)
+    else:
+        group = (bytes_read[0] << 8) | bytes_read[1]
+    if group in (0x0000, 0xFFFE):
+        return False
+    if is_implicit_VR:
+        # Cannot validate VR bytes in implicit VR; the group check is all we have
+        return True
+    return b"AA" <= bytes_read[4:6] <= b"ZZ"
+
+
+def _resync_top_level_after_sq(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+) -> None:
+    """Detect and skip leftover encapsulated-stream bytes that leaked out of
+    a preceding top-level explicit-length sequence (issue #2324).
+
+    Must be called with ``fp`` positioned just past the value of a top-level
+    defined-length SQ element. Peeks at the next 8 bytes and returns with
+    ``fp`` unmoved when they could be a genuine element header (or fewer
+    than 8 bytes remain) — the well-formed path costs one read and one seek.
+
+    An implausible header means the sequence under-declared its length and
+    the tail of an inner encapsulated stream leaked past its value. Scan for
+    the next stray delimiter or plausible element header and handle the
+    malformation per
+    :attr:`~pydicom.config.Settings.sq_item_defined_length_mismatch`: raise
+    :class:`~pydicom.errors.InvalidDicomError` (``RAISE``, the default), or
+    seek past the leaked bytes with (``WARN``) or without (``IGNORE``) a
+    warning. If the scan finds no resync target, ``fp`` is left unmoved so
+    the existing heuristics for unusual-but-parseable headers (e.g. a
+    mid-dataset switch to implicit VR) keep applying.
+    """
+    header_tell = fp.tell()
+    bytes_read = fp.read(8)
+    fp.seek(header_tell)
+    if _header_is_plausible(bytes_read, is_implicit_VR, is_little_endian):
+        return
+
+    skipped = _scan_for_next_top_level_element(fp, is_implicit_VR, is_little_endian)
+    if skipped <= 0:
+        return
+
+    if config.settings.sq_item_defined_length_mismatch == config.RAISE:
+        raise InvalidDicomError(
+            f"Found {skipped} byte(s) of malformed data at position "
+            f"0x{header_tell:X} in the top-level dataset (likely leftover "
+            "from a truncated encapsulated stream inside the preceding "
+            "defined-length sequence). Set "
+            "config.settings.sq_item_defined_length_mismatch to config.WARN "
+            "or config.IGNORE to skip the malformed bytes and continue "
+            "reading."
+        )
+    fp.seek(header_tell + skipped)
+    if config.settings.sq_item_defined_length_mismatch == config.WARN:
+        warn_and_log(
+            f"Skipped {skipped} byte(s) of malformed data at position "
+            f"0x{header_tell:X} while reading the top-level dataset (likely "
+            "leftover from a truncated encapsulated stream inside the "
+            "preceding sequence). The file appears to be malformed; the "
+            "bytes were discarded so reading could continue.",
+            UserWarning,
+        )
+
+
 def data_element_generator(
     fp: BinaryIO,
     is_implicit_VR: bool,
@@ -56,6 +196,8 @@ def data_element_generator(
     defer_size: int | str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
+    bytelength: int | None = None,
+    at_top_level: bool = True,
 ) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
@@ -263,6 +405,14 @@ def data_element_generator(
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
+
+            # Issue #2324: an under-declared explicit-length SQ can leak the
+            # tail of an inner encapsulated stream past its value. Peek at
+            # the next header and resync if it cannot be one. Nested and
+            # bounded reads short-circuit, so only top-level defined-length
+            # SQ elements pay for the peek.
+            if vr == VR_.SQ and at_top_level and bytelength is None:
+                _resync_top_level_after_sq(fp, is_implicit_VR, is_little_endian)
 
             yield RawDataElement(
                 BaseTag(tag),
@@ -474,6 +624,8 @@ def read_dataset(
         defer_size,
         parent_encoding,
         specific_tags,
+        bytelength=bytelength,
+        at_top_level=at_top_level,
     )
     try:
         if bytelength is None:
@@ -492,6 +644,36 @@ def read_dataset(
         warn_and_log(msg, UserWarning)
     except NotImplementedError as details:
         logger.error(details)
+
+    # Recovery for issue #2324: an undefined-length element inside this
+    # explicit-length container may have scanned past the declared boundary
+    # (missing inner delimiter, or the parent under-declared its length). The
+    # declared byte budget is authoritative for resuming the parent, so
+    # rather than letting the overrun corrupt sibling elements, raise or snap
+    # back to the boundary per the ``sq_item_defined_length_mismatch``
+    # setting ("ask forgiveness": let the over-read happen, then correct).
+    if bytelength is not None:
+        overrun = (fp_tell() - fp_start) - bytelength
+        if overrun > 0:
+            if config.settings.sq_item_defined_length_mismatch == config.RAISE:
+                raise InvalidDicomError(
+                    f"Element value(s) overran the {bytelength} byte(s) "
+                    f"declared for the enclosing item/sequence by {overrun} "
+                    "byte(s); the source file appears to be malformed. Set "
+                    "config.settings.sq_item_defined_length_mismatch to "
+                    "config.WARN or config.IGNORE to truncate at the "
+                    "declared boundary and continue reading."
+                )
+            fp.seek(fp_start + bytelength)
+            if config.settings.sq_item_defined_length_mismatch == config.WARN:
+                warn_and_log(
+                    f"Element value(s) overran the {bytelength} byte(s) "
+                    f"declared for the enclosing item/sequence by "
+                    f"{overrun} byte(s); the source file appears to be "
+                    "malformed. Truncating at the declared boundary so "
+                    "reading can continue.",
+                    UserWarning,
+                )
 
     encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:

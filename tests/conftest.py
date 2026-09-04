@@ -30,6 +30,22 @@ def ignore_reading_invalid_values():
 
 
 @pytest.fixture
+def warn_on_sq_item_length_mismatch():
+    value = config.settings.sq_item_defined_length_mismatch
+    config.settings.sq_item_defined_length_mismatch = config.WARN
+    yield
+    config.settings.sq_item_defined_length_mismatch = value
+
+
+@pytest.fixture
+def ignore_sq_item_length_mismatch():
+    value = config.settings.sq_item_defined_length_mismatch
+    config.settings.sq_item_defined_length_mismatch = config.IGNORE
+    yield
+    config.settings.sq_item_defined_length_mismatch = value
+
+
+@pytest.fixture
 def enforce_writing_invalid_values():
     value = config.settings.writing_validation_mode
     config.settings.writing_validation_mode = config.RAISE

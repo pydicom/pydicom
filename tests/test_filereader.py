@@ -12,6 +12,7 @@ from struct import unpack
 import sys
 import tempfile
 import time
+import warnings
 
 import pytest
 
@@ -1810,6 +1811,512 @@ class TestDataElementGenerator:
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == convert_raw_data_element(next(gen), encoding="ISO_IR 100")
+
+
+class TestMalformedExplicitLengthItemEncapsulated:
+    """Regression for pydicom/pydicom#2324.
+
+    A sequence item with explicit length that contains an undefined-length
+    encapsulated element (e.g. an IconImageSequence whose item carries
+    encapsulated icon PixelData) must not consume bytes past the item's
+    declared boundary, even if the inner sequence delimiter is missing or
+    the item under-declares its length.
+
+    On detecting the malformation the reader follows
+    ``config.settings.sq_item_defined_length_mismatch``: raise
+    ``InvalidDicomError`` (the default), warn and recover, or recover
+    silently.
+    """
+
+    @staticmethod
+    def _encap_value(payload: bytes) -> bytes:
+        """Build encapsulated-pixel-data bytes: Item + payload + delimiter."""
+        from struct import pack
+
+        return (
+            pack("<HHI", 0xFFFE, 0xE000, len(payload))
+            + payload
+            + pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        )
+
+    def _build_dataset_bytes(self, item_shortfall: int) -> bytes:
+        """Return explicit-VR LE bytes for a top-level dataset shaped like
+        the issue repro: IconImageSequence with one explicit-length item
+        containing undefined-length OB PixelData, followed by an outer
+        marker element. ``item_shortfall`` bytes are shaved off the item
+        length only (the SQ length stays truthful, which matches the way
+        real-world buggy writers under-declare just the inner item).
+        """
+        from struct import pack
+
+        # Inner encapsulated PixelData value for the icon (16-byte payload).
+        inner_value = self._encap_value(b"\xaa" * 16)
+        # PixelData header: tag (7FE0,0010), VR OB, reserved 2 bytes, len FFFFFFFF
+        inner_elem = (
+            pack("<HH", 0x7FE0, 0x0010)
+            + b"OB\x00\x00"
+            + pack("<I", 0xFFFFFFFF)
+            + inner_value
+        )
+        item_len = len(inner_elem) - item_shortfall
+        item = pack("<HHI", 0xFFFE, 0xE000, item_len) + inner_elem
+        # IconImageSequence (0088,0200) SQ — declared length covers the
+        # full item bytes (i.e. truthful at the SQ level).
+        seq_len = len(item)
+        sq = pack("<HH", 0x0088, 0x0200) + b"SQ\x00\x00" + pack("<I", seq_len) + item
+        # Outer marker element so we can prove the parent reader resumed
+        # at the right position: a short PN element.
+        outer = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
+        return sq + outer
+
+    def test_short_item_does_not_eat_outer_element(
+        self, warn_on_sq_item_length_mismatch
+    ):
+        """Reader must stop at the explicit item boundary and the outer
+        PatientName element must come through untouched, and parsing the
+        truncated SQ value must surface a warning instead of silently
+        swallowing bytes."""
+        data = self._build_dataset_bytes(item_shortfall=8)
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        # Outer marker element must still be present — the inner OB
+        # over-read must not have consumed past the SQ value's declared
+        # length, which is what would happen if the SQ were eagerly parsed
+        # at the top level without max_bytes plumbing.
+        assert 0x00100010 in ds, "outer PatientName swallowed by inner OB read"
+        assert ds[0x00100010].value == "ABCDEF"
+        # Lazily parsing the SQ must now warn — and must NOT raise — and
+        # the inner OB element must be present (truncated) in the item.
+        assert 0x00880200 in ds, "IconImageSequence missing"
+        with pytest.warns(UserWarning, match="overran|End of file"):
+            sq = ds[0x00880200].value
+            item = sq[0]
+            inner_pd = item[0x7FE00010]
+            assert inner_pd is not None
+
+    def test_well_formed_item_unchanged(self):
+        """Identical structure with truthful lengths still parses cleanly."""
+        data = self._build_dataset_bytes(item_shortfall=0)
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        assert 0x00880200 in ds
+        assert 0x00100010 in ds
+
+    def _build_double_short_bytes(self) -> bytes:
+        """Return explicit-VR LE bytes for the user's actual malformation:
+        BOTH the IconImageSequence (0088,0200) and its single item declare
+        lengths that are short by the same number of bytes (here 24), leaving
+        the tail of the inner encapsulated PixelData stream as orphaned bytes
+        at the top-level dataset position that immediately precedes the outer
+        PixelData."""
+        from struct import pack
+
+        # Inner encap stream — Item + payload + SequenceDelimiterTag + 0 len
+        inner_value = self._encap_value(b"\xaa" * 16)
+        inner_elem = (
+            pack("<HH", 0x7FE0, 0x0010)
+            + b"OB\x00\x00"
+            + pack("<I", 0xFFFFFFFF)
+            + inner_value
+        )
+        # Both the SQ and item declare 24 fewer bytes than truth.
+        SHORTFALL = 24
+        item_actual = inner_elem
+        item_declared_len = len(item_actual) - SHORTFALL
+        item = pack("<HHI", 0xFFFE, 0xE000, item_declared_len) + item_actual
+        sq_value_actual = item
+        sq_declared_len = len(sq_value_actual) - SHORTFALL
+        sq = (
+            pack("<HH", 0x0088, 0x0200)
+            + b"SQ\x00\x00"
+            + pack("<I", sq_declared_len)
+            + sq_value_actual
+        )
+        # Outer encapsulated PixelData (so we exercise the exact pattern
+        # from #2324). One-item BOT + one-item fragment + delimiter.
+        outer_pd_value = self._encap_value(b"\xcc" * 12)
+        outer = (
+            pack("<HH", 0x7FE0, 0x0010)
+            + b"OB\x00\x00"
+            + pack("<I", 0xFFFFFFFF)
+            + outer_pd_value
+        )
+        return sq + outer
+
+    def test_short_sq_and_short_item_real_repro(self, warn_on_sq_item_length_mismatch):
+        """User's actual malformation: with the mismatch setting at WARN the
+        reader must skip the leaked bytes with a warning and preserve both
+        the IconImageSequence and the outer PixelData. Without the post-SQ
+        resync the outer PixelData is silently lost on read and save_as."""
+        fp = BytesIO(self._build_double_short_bytes())
+        with pytest.warns(UserWarning, match="Skipped .* malformed data"):
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        # Both elements must be present and well-formed
+        assert 0x00880200 in ds, "IconImageSequence missing"
+        assert 0x7FE00010 in ds, "outer PixelData was lost to leftover bytes"
+        # The IconImageSequence access triggers the lazy SQ parse — the inner
+        # delimiter was cut off with the SQ tail, so it must warn (overrun or
+        # end-of-file recovery) and not raise.
+        with pytest.warns(UserWarning, match="overran|End of file"):
+            list(ds[0x00880200].value)
+
+    def test_short_sq_no_recovery_target_falls_through(self):
+        """If after an explicit-length SQ we can't find any plausible
+        next-element header within the resync window, the resync makes no
+        change and normal parsing continues. (Sanity check that the scan
+        never blindly skips bytes when it shouldn't.)"""
+        from struct import pack
+
+        # Trivial well-formed SQ followed by a plain element. No resync
+        # should trigger; behavior matches the unmodified parser.
+        sq = (
+            pack("<HH", 0x0088, 0x0200)
+            + b"SQ\x00\x00"
+            + pack("<I", 0)  # empty SQ value
+        )
+        outer = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
+        data = sq + outer
+
+        fp = BytesIO(data)
+        # No warning expected.
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        assert 0x00880200 in ds
+        assert 0x00100010 in ds
+        assert ds[0x00100010].value == "ABCDEF"
+
+    def test_orphaned_delimiter_at_eof_after_sq(self, warn_on_sq_item_length_mismatch):
+        """An explicit-length SQ followed only by an orphaned sequence
+        delimiter (and then EOF) must resync past the delimiter and stop
+        cleanly without raising."""
+        from struct import pack
+
+        # Empty defined-length SQ, then a stray delimiter, then nothing.
+        sq = pack("<HH", 0x0088, 0x0200) + b"SQ\x00\x00" + pack("<I", 0)
+        orphan = pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        data = sq + orphan
+
+        fp = BytesIO(data)
+        with pytest.warns(UserWarning, match="Skipped .* malformed data"):
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        assert 0x00880200 in ds
+
+    def test_leaked_bytes_raise_by_default(self):
+        """Default mode is RAISE: leaked encapsulated-stream bytes after a
+        defined-length SQ raise InvalidDicomError at read time instead of
+        being skipped."""
+        assert config.settings.sq_item_defined_length_mismatch == config.RAISE
+        fp = BytesIO(self._build_double_short_bytes())
+        with pytest.raises(InvalidDicomError, match="malformed data"):
+            read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+
+    def test_item_overrun_raises_by_default(self):
+        """Default mode is RAISE: an element value that overruns its item's
+        declared length raises InvalidDicomError when the sequence value is
+        parsed."""
+        data = self._build_dataset_bytes(item_shortfall=8)
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        with pytest.raises(InvalidDicomError, match="overran"):
+            ds[0x00880200].value
+
+    def test_leaked_bytes_ignored_recovers_silently(
+        self, ignore_sq_item_length_mismatch
+    ):
+        """IGNORE mode recovers exactly like WARN but without the warning."""
+        fp = BytesIO(self._build_double_short_bytes())
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+        assert 0x00880200 in ds
+        assert 0x7FE00010 in ds, "outer PixelData was lost to leftover bytes"
+
+    def test_item_overrun_ignored_recovers_silently(
+        self, ignore_sq_item_length_mismatch
+    ):
+        """IGNORE mode truncates the over-read item at its declared boundary
+        without a warning; the outer element still parses."""
+        data = self._build_dataset_bytes(item_shortfall=8)
+        fp = BytesIO(data)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ds = read_dataset(
+                fp,
+                is_implicit_VR=False,
+                is_little_endian=True,
+                bytelength=None,
+            )
+            sq = ds[0x00880200].value
+            assert sq[0][0x7FE00010] is not None
+        assert 0x00100010 in ds
+        assert ds[0x00100010].value == "ABCDEF"
+
+    def test_unscannable_garbage_after_sq_falls_through(self):
+        """If the bytes after an explicit-length SQ are implausible but the
+        scan finds no resync target either, the reader must fall through to
+        normal parsing unchanged — even in the default RAISE mode, which
+        only fires once a recovery target confirms the leak."""
+        from struct import pack
+
+        sq = pack("<HH", 0x0088, 0x0200) + b"SQ\x00\x00" + pack("<I", 0)
+        # 0xA5A5 group with 0xA5A5 VR bytes: fails the plausibility gate and
+        # never matches a delimiter or valid VR pattern during the scan.
+        data = sq + b"\xa5" * 32
+
+        fp = BytesIO(data)
+        ds = read_dataset(
+            fp,
+            is_implicit_VR=False,
+            is_little_endian=True,
+            bytelength=None,
+        )
+        assert 0x00880200 in ds
+
+
+class TestScanForNextTopLevelElement:
+    """Direct unit tests for filereader._scan_for_next_top_level_element,
+    the helper that backs the top-level resync after a malformed
+    defined-length SQ. Covers the big-endian, implicit-VR, reserved-group,
+    and not-found branches that the integration tests don't exercise."""
+
+    def test_finds_stray_sequence_delimiter_little_endian(self):
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        garbage = b"\xa5" * 6
+        delim = b"\xfe\xff\xdd\xe0\x00\x00\x00\x00"
+        fp = BytesIO(garbage + delim + b"AFTER")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == len(garbage) + 8
+        )
+        # fp must be restored to its original position
+        assert fp.tell() == 0
+
+    def test_finds_stray_item_delimiter_little_endian(self):
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        garbage = b"\xa5" * 4
+        delim = b"\xfe\xff\x0d\xe0\x00\x00\x00\x00"
+        fp = BytesIO(garbage + delim + b"AFTER")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == len(garbage) + 8
+        )
+
+    def test_finds_stray_delimiter_big_endian(self):
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        garbage = b"\xa5" * 6
+        delim = b"\xff\xfe\xe0\xdd\x00\x00\x00\x00"
+        fp = BytesIO(garbage + delim + b"AFTER")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=False
+            )
+            == len(garbage) + 8
+        )
+
+    def test_finds_plausible_explicit_element_header(self):
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # Two bytes of garbage, then a valid PN element header
+        prefix = b"\xa5\xa5"
+        elem = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6)
+        fp = BytesIO(prefix + elem + b"ABCDEF")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == 2
+        )
+
+    def test_finds_plausible_implicit_element_header(self):
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # Implicit VR: no VR bytes; only the group/element ranges are
+        # validated. (0010,0010) is in the standard range and triggers the
+        # implicit-VR plausibility branch.
+        prefix = b"\xa5\xa5\xa5\xa5"
+        elem = pack("<HHI", 0x0010, 0x0010, 6) + b"ABCDEF"
+        fp = BytesIO(prefix + elem)
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=True, is_little_endian=True
+            )
+            == 4
+        )
+
+    def test_skips_reserved_groups(self):
+        """Group 0x0000 (command-set) and 0xFFFE (item/delim) at byte
+        offsets must be skipped — they aren't legitimate top-level dataset
+        starts."""
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # At offset 0: group 0x0000 with garbage payload — not a valid
+        # top-level start. At offset 8: a legit PN element header.
+        bad = pack("<HH", 0x0000, 0x0001) + b"\xa5\xa5\xa5\xa5"
+        elem = pack("<HH", 0x0010, 0x0010) + b"PN" + pack("<H", 6) + b"ABCDEF"
+        fp = BytesIO(bad + elem)
+        # Should skip group 0x0000 candidates and land at offset 8
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == 8
+        )
+
+    def test_returns_minus_one_when_nothing_plausible(self):
+        """Pure-garbage stream with no stray delimiters and no plausible
+        ASCII VR pattern must return -1 (no recovery target)."""
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # All 0xA5 bytes — never form a valid VR (`A5A5` < `b"AA"`) and
+        # never form a stray delimiter pattern.
+        fp = BytesIO(b"\xa5" * 256)
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == -1
+        )
+        # fp position must be preserved
+        assert fp.tell() == 0
+
+    def test_short_buffer_returns_minus_one(self):
+        """Less than 8 bytes available — no scan possible."""
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        fp = BytesIO(b"\xa5\xa5\xa5")
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=False, is_little_endian=True
+            )
+            == -1
+        )
+
+    def test_implicit_vr_out_of_range_group_continues(self):
+        """In implicit-VR mode, groups outside [0x0008, 0x7FE0] don't
+        match the plausibility heuristic — covers the `continue` branch."""
+        from struct import pack
+
+        from pydicom.filereader import _scan_for_next_top_level_element
+
+        # Group 0x0001 (below the standard range) — should be skipped
+        bad = pack("<HHI", 0x0001, 0x0001, 4) + b"\x00\x00\x00\x00"
+        # Then a valid implicit-VR element
+        good = pack("<HHI", 0x0010, 0x0010, 6) + b"ABCDEF"
+        fp = BytesIO(bad + good)
+        assert (
+            _scan_for_next_top_level_element(
+                fp, is_implicit_VR=True, is_little_endian=True
+            )
+            == 12  # length of `bad`
+        )
+
+
+class TestHeaderIsPlausible:
+    """Direct unit tests for filereader._header_is_plausible, the cheap gate
+    that decides whether the #2324 top-level resync should scan at all."""
+
+    def test_short_buffer_is_plausible(self):
+        """Fewer than 8 bytes: defer to the normal end-of-file check."""
+        from pydicom.filereader import _header_is_plausible
+
+        assert _header_is_plausible(b"\x10\x00", False, True)
+
+    def test_valid_explicit_header_little_endian(self):
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HH", 0x0010, 0x0010) + b"PN" + b"\x06\x00"
+        assert _header_is_plausible(header, False, True)
+
+    def test_valid_explicit_header_big_endian(self):
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack(">HH", 0x0010, 0x0010) + b"PN" + b"\x00\x06"
+        assert _header_is_plausible(header, False, False)
+
+    def test_reserved_group_is_implausible(self):
+        """A stray (FFFE,xxxx) delimiter header must be flagged implausible."""
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HHI", 0xFFFE, 0xE0DD, 0)
+        assert not _header_is_plausible(header, False, True)
+
+    def test_non_ascii_vr_is_implausible(self):
+        """Explicit VR bytes that are not two ASCII uppercase letters."""
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HH", 0x0010, 0x0010) + b"\xaa\xaa" + b"\x06\x00"
+        assert not _header_is_plausible(header, False, True)
+
+    def test_implicit_vr_only_checks_group(self):
+        """Implicit VR cannot validate VR bytes — a non-reserved group passes."""
+        from struct import pack
+
+        from pydicom.filereader import _header_is_plausible
+
+        header = pack("<HHI", 0x0010, 0x0010, 6)
+        assert _header_is_plausible(header, True, True)
 
 
 def test_read_file_meta_info():

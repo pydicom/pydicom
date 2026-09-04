@@ -250,6 +250,7 @@ class Settings:
         # currently the default value depends on enforce_valid_values
         self._writing_validation_mode: int | None = RAISE if _use_future else None
         self._infer_sq_for_un_vr: bool = True
+        self._sq_item_defined_length_mismatch: int = RAISE
 
         # Chunk size to use when reading from buffered DataElement values
         self._buffered_read_size = 8192
@@ -319,6 +320,28 @@ class Settings:
     @infer_sq_for_un_vr.setter
     def infer_sq_for_un_vr(self, value: bool) -> None:
         self._infer_sq_for_un_vr = value
+
+    @property
+    def sq_item_defined_length_mismatch(self) -> int:
+        """Defines behavior when the content of a defined-length sequence or
+        sequence item does not fit the declared length while reading, e.g.
+        because an undefined-length element inside it read past the declared
+        boundary, or because leftover bytes of a truncated encapsulated
+        stream follow the sequence in the top-level dataset (issue #2324).
+
+        * :attr:`RAISE` will raise an
+          :class:`~pydicom.errors.InvalidDicomError` (default)
+        * :attr:`WARN` will emit a warning and recover, discarding the
+          malformed bytes
+        * :attr:`IGNORE` will recover silently
+
+        .. versionadded:: 3.1
+        """
+        return self._sq_item_defined_length_mismatch
+
+    @sq_item_defined_length_mismatch.setter
+    def sq_item_defined_length_mismatch(self, value: int) -> None:
+        self._sq_item_defined_length_mismatch = value
 
 
 settings = Settings()
