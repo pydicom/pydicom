@@ -573,11 +573,15 @@ def generate_uid(
         generated using the :func:`uuid.uuid4` algorithm.
     entropy_srcs : list of str, optional
         If `prefix` is used then the `prefix` will be appended with a
-        SHA512 hash of the supplied :class:`list` which means the result is
-        deterministic and should make the original data unrecoverable. If
-        `entropy_srcs` isn't used then a random number from
-        :func:`secrets.randbelow` will be appended to the `prefix`. If `prefix`
-        is ``None`` then `entropy_srcs` has no effect.
+        SHA512 hash of the supplied :class:`list`. The result is deterministic
+        (the same input always produces the same UID), which is useful for
+        stable remapping. SHA512 is a one-way hash, but it is applied here
+        without a salt, so it provides no protection against brute-force or
+        dictionary attacks on low-entropy inputs and should not be relied upon
+        as an irreversible de-identification mechanism. If `entropy_srcs`
+        isn't used then a random number from :func:`secrets.randbelow` will be
+        appended to the `prefix`. If `prefix` is ``None`` then `entropy_srcs`
+        has no effect.
 
     Returns
     -------
