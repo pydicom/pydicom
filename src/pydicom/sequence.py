@@ -4,12 +4,11 @@
 Sequence is a list of pydicom Dataset objects.
 """
 
-from typing import cast, Any, TypeVar
 from collections.abc import Iterable
+from typing import Any, TypeVar, cast
 
 from pydicom.dataset import Dataset
 from pydicom.multival import ConstrainedList
-
 
 # Python 3.11 adds typing.Self, until then...
 Self = TypeVar("Self", bound="Sequence")

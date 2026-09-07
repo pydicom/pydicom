@@ -3,9 +3,8 @@
 or any list of items that must all be the same type.
 """
 
-from typing import overload, Any, cast, TypeVar
-from collections.abc import Iterable, Callable, MutableSequence, Iterator
-
+from collections.abc import Callable, Iterable, Iterator, MutableSequence
+from typing import Any, TypeVar, cast, overload
 
 T = TypeVar("T")
 Self = TypeVar("Self", bound="ConstrainedList")
@@ -42,7 +41,7 @@ class ConstrainedList(MutableSequence[T]):  # noqa: PLW1641
 
         self._list.extend([self._validate(item) for item in val])
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Return ``True`` if `other` is equal to self."""
         return self._list == other
 
@@ -78,7 +77,7 @@ class ConstrainedList(MutableSequence[T]):  # noqa: PLW1641
         """Return the number of contained items."""
         return len(self._list)
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         """Return ``True`` if `other` is not equal to self."""
         return self._list != other
 

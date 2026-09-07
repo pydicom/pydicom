@@ -1,12 +1,12 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Pixel data decoding."""
 
-from collections.abc import Callable, Iterator, Iterable
 import logging
+import sys
+from collections.abc import Callable, Iterable, Iterator
 from io import BufferedIOBase
 from math import ceil, floor
-import sys
-from typing import Any, BinaryIO, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, BinaryIO, cast
 
 try:
     import numpy as np
@@ -16,15 +16,17 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom import config
-from pydicom.encaps import get_frame, generate_frames
+from pydicom.encaps import generate_frames, get_frame
 from pydicom.misc import warn_and_log
 from pydicom.pixels.common import (
     Buffer,
+    CoderBase,
+    FrameOptions,
     RunnerBase,
     RunnerOptions,
-    CoderBase,
+)
+from pydicom.pixels.common import (
     PhotometricInterpretation as PI,
-    FrameOptions,
 )
 from pydicom.pixels.processing import convert_color_space
 from pydicom.pixels.utils import (
@@ -36,27 +38,27 @@ from pydicom.pixels.utils import (
     unpack_bits,
 )
 from pydicom.uid import (
-    ImplicitVRLittleEndian,
-    ExplicitVRLittleEndian,
-    ExplicitVRBigEndian,
+    HTJ2K,
+    JPEG2000,
+    UID,
     DeflatedExplicitVRLittleEndian,
+    DeflatedImageFrameCompression,
+    ExplicitVRBigEndian,
+    ExplicitVRLittleEndian,
+    HTJ2KLossless,
+    HTJ2KLosslessRPCL,
+    ImplicitVRLittleEndian,
+    JPEG2000Lossless,
+    JPEG2000TransferSyntaxes,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
-    JPEG2000Lossless,
-    JPEG2000,
-    HTJ2KLossless,
-    HTJ2KLosslessRPCL,
-    HTJ2K,
-    RLELossless,
-    UID,
-    JPEG2000TransferSyntaxes,
     JPEGLSTransferSyntaxes,
     JPEGTransferSyntaxes,
-    DeflatedImageFrameCompression,
+    RLELossless,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -330,12 +332,10 @@ def _apply_j2k_corrections(
             meta.get("j2k_precision", bits_stored)
             for meta in runner._frame_meta.values()
         ]
-        precisions = [
-            bits_stored if prec > bits_stored else prec for prec in precisions
-        ]
+        precisions = [min(prec, bits_stored) for prec in precisions]
     else:
         precision = runner.get_frame_option(index, "j2k_precision", bits_stored)
-        precisions = [bits_stored if precision > bits_stored else precision]
+        precisions = [min(precision, bits_stored)]
 
     container_size = 8 * arr.dtype.itemsize
     bit_shifts = [container_size - prec for prec in precisions]
@@ -379,12 +379,10 @@ def _apply_jls_sign_correction(
             meta.get("jls_precision", bits_stored)
             for meta in runner._frame_meta.values()
         ]
-        precisions = [
-            bits_stored if prec > bits_stored else prec for prec in precisions
-        ]
+        precisions = [min(prec, bits_stored) for prec in precisions]
     else:
         prec = runner.get_frame_option(index, "jls_precision", bits_stored)
-        precisions = [bits_stored if prec > bits_stored else prec]
+        precisions = [min(prec, bits_stored)]
 
     # Single or multi-framed with consistent precision values
     container_size = 8 * arr.dtype.itemsize

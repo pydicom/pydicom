@@ -1,58 +1,57 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-from collections.abc import Sequence, MutableSequence, Iterable
+import zlib
+from collections.abc import Callable, Iterable, MutableSequence, Sequence
 from copy import deepcopy
 from io import BufferedIOBase
 from struct import pack
-from typing import BinaryIO, Any, cast
-from collections.abc import Callable
-import zlib
+from typing import Any, BinaryIO, cast
 
 from pydicom import config
-from pydicom.charset import default_encoding, convert_encodings, encode_string
+from pydicom.charset import convert_encodings, default_encoding, encode_string
 from pydicom.dataelem import (
-    convert_raw_data_element,
     DataElement,
     RawDataElement,
+    convert_raw_data_element,
 )
-from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
+from pydicom.dataset import Dataset, FileMetaDataset, validate_file_meta
 from pydicom.errors import BytesLengthException
-from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
+from pydicom.filebase import DicomBytesIO, DicomFile, DicomIO, WriteableBuffer
 from pydicom.fileutil import (
-    path_from_pathlike,
     PathType,
     buffer_remaining,
+    path_from_pathlike,
     read_buffer,
     reset_buffer_position,
 )
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
 from pydicom.tag import (
-    Tag,
-    BaseTag,
-    ItemTag,
-    ItemDelimiterTag,
-    SequenceDelimiterTag,
     _LUT_DESCRIPTOR_TAGS,
+    BaseTag,
+    ItemDelimiterTag,
+    ItemTag,
+    SequenceDelimiterTag,
+    Tag,
 )
 from pydicom.uid import (
-    DeflatedExplicitVRLittleEndian,
     UID,
-    ImplicitVRLittleEndian,
+    DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
+    ImplicitVRLittleEndian,
 )
 from pydicom.valuerep import (
-    PersonName,
-    IS,
-    DSclass,
-    DA,
-    DT,
-    TM,
-    EXPLICIT_VR_LENGTH_32,
-    VR,
     AMBIGUOUS_VR,
     CUSTOMIZABLE_CHARSET_VR,
+    DA,
+    DT,
+    EXPLICIT_VR_LENGTH_32,
+    IS,
+    TM,
+    VR,
+    DSclass,
+    PersonName,
 )
 from pydicom.values import convert_numbers
 
@@ -1335,7 +1334,7 @@ def dcmwrite(
         enforce_file_format = not write_like_original
 
     # Ensure kwargs only contains `write_like_original`
-    keys = [x for x in kwargs.keys() if x != "write_like_original"]
+    keys = [x for x in kwargs if x != "write_like_original"]
     if keys:
         raise TypeError(
             f"Invalid keyword argument(s) for dcmwrite(): {', '.join(keys)}"

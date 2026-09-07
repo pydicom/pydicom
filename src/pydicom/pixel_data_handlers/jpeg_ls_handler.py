@@ -20,9 +20,9 @@ try:
 except ImportError:
     HAVE_JPEGLS = False
 
-from pydicom.encaps import generate_frames
-from pydicom.pixels.utils import pixel_dtype, get_nr_frames
 import pydicom.uid
+from pydicom.encaps import generate_frames
+from pydicom.pixels.utils import get_nr_frames, pixel_dtype
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

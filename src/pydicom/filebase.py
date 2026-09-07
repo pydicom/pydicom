@@ -1,11 +1,11 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 
-from io import BytesIO
 import os
+from io import BytesIO
 from struct import Struct
 from types import TracebackType
-from typing import TYPE_CHECKING, cast, Any, TypeVar, Protocol
+from typing import TYPE_CHECKING, Any, Protocol, TypeVar, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
@@ -97,12 +97,11 @@ class DicomIO:
 
     def close(self, *args: Any, **kwargs: Any) -> Any:
         """Close the buffer (if possible)"""
-        pass
 
     def __enter__(self: Self) -> Self:
         return self
 
-    def __exit__(self, *exc_info: ExitException) -> None:
+    def __exit__(self, *exc_info: object) -> None:
         self.close()
 
     @property
@@ -275,8 +274,6 @@ class DicomFileLike(DicomIO):
     :class:`~pydicom.filebase.DicomIO`
     :class:`~pydicom.filebase.DicomBytesIO`
     """
-
-    pass
 
 
 def DicomFile(*args: Any, **kwargs: Any) -> DicomFileLike:

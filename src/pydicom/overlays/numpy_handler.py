@@ -28,7 +28,7 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING, cast, Any
+from typing import TYPE_CHECKING, Any, cast
 
 try:
     import numpy as np
@@ -41,8 +41,8 @@ from pydicom.misc import warn_and_log
 from pydicom.pixels.utils import unpack_bits
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset
     from pydicom.dataelem import DataElement
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = "Numpy Overlay"
