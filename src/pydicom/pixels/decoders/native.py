@@ -4,13 +4,12 @@
 This module is not intended to be used directly.
 """
 
-from struct import unpack
 import zlib
+from struct import unpack
 
 from pydicom.misc import warn_and_log
 from pydicom.pixels.decoders.base import DecodeRunner
-from pydicom.uid import RLELossless, DeflatedImageFrameCompression
-
+from pydicom.uid import DeflatedImageFrameCompression, RLELossless
 
 DECODER_DEPENDENCIES = {
     RLELossless: (),

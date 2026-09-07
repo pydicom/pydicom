@@ -11,9 +11,10 @@ from pydicom.uid import UID
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
+
     from pydicom.dataset import Dataset
-    from pydicom.pixels.decoders.base import DecodeOptions, DecodeFunction
-    from pydicom.pixels.encoders.base import EncodeOptions, EncodeFunction
+    from pydicom.pixels.decoders.base import DecodeFunction, DecodeOptions
+    from pydicom.pixels.encoders.base import EncodeFunction, EncodeOptions
 
 
 Buffer = bytes | bytearray | memoryview

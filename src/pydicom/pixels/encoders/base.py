@@ -1,11 +1,11 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Pixel data encoding."""
 
-from collections.abc import Callable, Iterator, Iterable
 import logging
 import math
 import sys
-from typing import Any, cast, TYPE_CHECKING
+from collections.abc import Callable, Iterable, Iterator
+from typing import TYPE_CHECKING, Any, cast
 
 try:
     import numpy as np
@@ -15,25 +15,25 @@ except ImportError:
 from pydicom import config
 from pydicom.pixels.common import (
     Buffer,
-    RunnerBase,
     CoderBase,
-    RunnerOptions,
     FrameOptions,
+    RunnerBase,
+    RunnerOptions,
 )
 from pydicom.pixels.utils import get_packed_frame
 from pydicom.uid import (
+    JPEG2000,
     UID,
+    DeflatedImageFrameCompression,
+    JPEG2000Lossless,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
-    JPEG2000Lossless,
-    JPEG2000,
-    RLELossless,
     JPEGLSTransferSyntaxes,
-    DeflatedImageFrameCompression,
+    RLELossless,
 )
 
 if TYPE_CHECKING:  # pragma: no cover

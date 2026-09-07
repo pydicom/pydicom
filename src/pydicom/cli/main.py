@@ -8,11 +8,11 @@ attributes, and calls set_defaults(func=callback_function)
 """
 
 import argparse
-from importlib.metadata import entry_points
 import re
 import sys
-from typing import cast, Any
 from collections.abc import Callable
+from importlib.metadata import entry_points
+from typing import Any, cast
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_charset_files, get_testdata_file
@@ -20,7 +20,6 @@ from pydicom.datadict import tag_for_keyword
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import UID
 from pydicom.valuerep import PersonName
-
 
 subparsers: argparse._SubParsersAction | None = None
 
@@ -130,7 +129,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
                 obj = obj[int(index)]  # type: ignore
             except (IndexError, TypeError) as e:
                 raise argparse.ArgumentTypeError(
-                    f"'{index}' gave an index error: {str(e)}"
+                    f"'{index}' gave an index error: {e!s}"
                 )
 
     return obj

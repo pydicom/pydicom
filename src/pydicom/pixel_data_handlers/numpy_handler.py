@@ -59,13 +59,13 @@ try:
 except ImportError:
     HAVE_NP = False
 
+import pydicom.uid
 from pydicom.misc import warn_and_log
 from pydicom.pixels.utils import (
-    pixel_dtype,
     get_expected_length,
+    pixel_dtype,
     unpack_bits,
 )
-import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

@@ -5,9 +5,9 @@
 
 import logging
 import os
-from contextlib import contextmanager
-from typing import Optional, Any, TYPE_CHECKING
 from collections.abc import Generator
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any, Optional
 
 have_numpy = True
 try:
@@ -16,8 +16,9 @@ except ImportError:
     have_numpy = False
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataelem import RawDataElement
     from typing import Protocol
+
+    from pydicom.dataelem import RawDataElement
 
     class ElementCallback(Protocol):
         def __call__(
@@ -407,7 +408,7 @@ displaying the file meta information data elements
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
 import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
 import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
-import pydicom.pixel_data_handlers.jpeg_ls_handler as jpegls_handler  # noqa
+import pydicom.pixel_data_handlers.jpeg_ls_handler as jpegls_handler
 import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler  # noqa
 import pydicom.pixel_data_handlers.pylibjpeg_handler as pylibjpeg_handler  # noqa
 

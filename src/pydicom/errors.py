@@ -22,5 +22,3 @@ class InvalidDicomError(Exception):
 
 class BytesLengthException(Exception):
     """Exception that is raised for an unexpected number of bytes."""
-
-    pass

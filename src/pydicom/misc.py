@@ -2,10 +2,9 @@
 """Miscellaneous helper functions"""
 
 import logging
+import warnings
 from itertools import groupby
 from pathlib import Path
-import warnings
-
 
 LOGGER = logging.getLogger("pydicom")
 
@@ -20,7 +19,7 @@ _size_factors = {
 }
 
 
-def size_in_bytes(expr: int | float | str | None) -> None | float | int:
+def size_in_bytes(expr: float | str | None) -> None | float | int:
     """Return the number of bytes for `defer_size` argument in
     :func:`~pydicom.filereader.dcmread`.
     """

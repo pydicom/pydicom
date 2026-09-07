@@ -3,9 +3,7 @@
 
 from typing import TYPE_CHECKING, Any
 
-from pydicom import config
-from pydicom import datadict
-from pydicom import values
+from pydicom import config, datadict, values
 from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover

@@ -3,13 +3,13 @@
 
 from typing import cast
 
-from pydicom.pixels.encoders.base import EncodeRunner
-from pydicom.pixels.common import PhotometricInterpretation as PI
-from pydicom.pixels.utils import _passes_version_check, unpack_bits
 from pydicom import uid
+from pydicom.pixels.common import PhotometricInterpretation as PI
+from pydicom.pixels.encoders.base import EncodeRunner
+from pydicom.pixels.utils import _passes_version_check, unpack_bits
 
 try:
-    from pylibjpeg.utils import get_pixel_data_encoders, Encoder
+    from pylibjpeg.utils import Encoder, get_pixel_data_encoders
 
     _ENCODERS = get_pixel_data_encoders()
 except ImportError:
