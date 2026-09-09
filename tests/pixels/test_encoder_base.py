@@ -14,13 +14,14 @@ except ImportError:
 
 from pydicom import config, examples
 from pydicom.data import get_testdata_file
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.encoders.base import Encoder, EncodeRunner
 from pydicom.pixels.utils import get_expected_length, unpack_bits
 from pydicom.uid import (
     UID,
+    ExplicitVRBigEndian,
     RLELossless,
     JPEGLSLossless,
     JPEG2000MC,
@@ -92,6 +93,49 @@ class TestEncodeRunner:
         assert runner.rows == 8
         assert runner.samples_per_pixel == 3
         assert runner.planar_configuration == 1
+
+    def test_set_source_dataset_big_endian(self):
+        """Big-endian Pixel Data is byte swapped for the encoder."""
+        runner = EncodeRunner(RLELossless)
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        ds.Rows = 1
+        ds.Columns = 3
+        ds.SamplesPerPixel = 1
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.BitsAllocated = 16
+        ds.NumberOfFrames = 1
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        # Samples 1, 2, 3 as big-endian
+        ds.PixelData = b"\x00\x01\x00\x02\x00\x03"
+        runner.set_source(ds)
+        assert runner.src == b"\x01\x00\x02\x00\x03\x00"
+
+        # 32-bit swaps all four bytes of each sample
+        ds.BitsStored = 32
+        ds.BitsAllocated = 32
+        ds.PixelData = b"\x00\x00\x00\x01\x00\x00\x00\x02"
+        runner.set_source(ds)
+        assert runner.src == b"\x01\x00\x00\x00\x02\x00\x00\x00"
+
+        # One byte per sample, nothing to swap
+        ds.BitsStored = 8
+        ds.BitsAllocated = 8
+        ds.PixelData = b"\x01\x02\x03"
+        runner.set_source(ds)
+        assert runner.src == b"\x01\x02\x03"
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_compress_big_endian_roundtrip(self):
+        """Compressing a big-endian dataset is lossless. Regression test for #2340."""
+        ds = get_testdata_file("MR_small_expb.dcm", read=True)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
+        expected = ds.pixel_array.copy()
+
+        ds.compress(RLELossless)
+        assert np.array_equal(ds.pixel_array, expected)
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_set_source_ndarray(self):
