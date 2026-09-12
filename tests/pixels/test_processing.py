@@ -416,6 +416,50 @@ class TestModalityLUT:
         assert 52428 == out[228, 385]
         assert 58974 == out[291, 385]
 
+    def test_lut_sequence_12_bit(self):
+        """Test a 12-bit LUT entry depth is handled as 16-bit (#2317)."""
+        # The third LUT Descriptor value (bits per entry) of 10-16 should be
+        # read as 16-bit; previously a value such as 12 raised because of the
+        # invalid "uint12" dtype
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4096, -2048, 12]
+
+        # For the Modality LUT the third value shall be 16, so a non-16 value
+        # is invalid and warns while still being assumed to be 16-bit
+        msg = (
+            r"Invalid value '12' for the third value of the Modality LUT "
+            r"Descriptor - assuming 16"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            out = apply_modality_lut(ds.pixel_array, ds)
+        assert out.dtype == np.uint16
+        # LUTData is unchanged so the mapping matches the 16-bit case
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])
+
+    def test_lut_sequence_unsupported_depth_raises(self):
+        """Test an unsupported LUT entry bit depth raises (#2317)."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4096, -2048, 4]
+        msg = r"'4' bits per LUT entry is not supported"
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_modality_lut(ds.pixel_array, ds)
+
+    def test_lut_sequence_8_bit(self):
+        """Test an 8-bit LUT entry depth is handled as 8-bit (#2317)."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4, 0, 8]
+        seq.LUTData = [0, 85, 170, 255]
+
+        # IVs below `first_map` (0) map to the first entry, IVs at or beyond
+        # the number of entries (4) map to the last entry
+        arr = np.asarray([-1, 0, 1, 2, 3, 9])
+        out = apply_modality_lut(arr, ds)
+        assert out.dtype == np.uint8
+        assert [0, 0, 85, 170, 255, 255] == list(out)
+
     def test_lut_sequence_zero_entries(self):
         """Test that 0 entries is interpreted correctly."""
         # LUTDescriptor[0] of 0 -> 65536, but only 4096 entries so any
