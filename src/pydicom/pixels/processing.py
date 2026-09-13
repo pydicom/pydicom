@@ -881,6 +881,9 @@ def _apply_windowing(
         slope, intercept = rescale
         y_min = y_min * slope + intercept
         y_max = y_max * slope + intercept
+        # A negative slope reverses the transformed pixel value bounds.
+        if y_min > y_max:
+            y_min, y_max = y_max, y_min
 
     y_range = y_max - y_min
     arr = arr.astype("float64")

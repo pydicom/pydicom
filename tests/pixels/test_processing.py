@@ -1662,6 +1662,126 @@ class TestApplyWindowing:
         assert 4455.6 == pytest.approx(out[326, 130], abs=0.1)
         assert 4914.0 == pytest.approx(out[316, 481], abs=0.1)
 
+    @pytest.mark.parametrize("pixel_representation", [0, 1])
+    @pytest.mark.parametrize(
+        "sequence",
+        [None, "SharedFunctionalGroupsSequence", "PerFrameFunctionalGroupsSequence"],
+    )
+    @pytest.mark.parametrize(
+        "voi_function, center, width, expected",
+        [
+            ("LINEAR", 4.5, 9, [10, 10, -117.5, -245, -372.5, -500, -500]),
+            ("LINEAR_EXACT", 4, 8, [10, 10, -117.5, -245, -372.5, -500, -500]),
+            (
+                "SIGMOID",
+                4,
+                8,
+                [
+                    -14.187195321,
+                    -50.793490231,
+                    -127.160124899,
+                    -245,
+                    -362.839875101,
+                    -439.206509769,
+                    -475.812804679,
+                ],
+            ),
+        ],
+    )
+    def test_window_negative_rescale(
+        self, pixel_representation, sequence, voi_function, center, width, expected
+    ):
+        """Test ordered windowing bounds after a negative rescale slope."""
+        ds = Dataset()
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = pixel_representation
+        ds.BitsStored = 8
+
+        if sequence is None:
+            voi = transform = ds
+        else:
+            ds.NumberOfFrames = 1
+            group = self._get_functional_group(center, width)
+            voi = group.FrameVOILUTSequence[0]
+            transform = Dataset()
+            group.PixelValueTransformationSequence = [transform]
+            setattr(ds, sequence, [group])
+
+        voi.WindowCenter = center
+        voi.WindowWidth = width
+        voi.VOILUTFunction = voi_function
+        transform.RescaleSlope = -2
+        transform.RescaleIntercept = 10
+
+        dtype = "int8" if pixel_representation else "uint8"
+        arr = np.arange(7, dtype=dtype).reshape(1, 7)
+        original = arr.copy()
+        rescaled = apply_modality_lut(arr, ds)
+        assert np.array_equal([[10, 8, 6, 4, 2, 0, -2]], rescaled)
+
+        # Unsigned 8-bit values rescale to [-500, 10]; signed to [-244, 266].
+        expected = np.asarray([expected]) + 256 * pixel_representation
+        out = apply_windowing(rescaled, ds)
+        np.testing.assert_allclose(out, expected, rtol=0, atol=1e-8)
+        assert out.dtype == np.float64
+        assert np.array_equal(original, arr)
+        assert np.array_equal([[10, 8, 6, 4, 2, 0, -2]], rescaled)
+
+    @pytest.mark.parametrize("windowing", [apply_windowing, apply_voi_lut])
+    @pytest.mark.parametrize(
+        "voi_function, center, width, expected",
+        [
+            ("LINEAR", 0.5, 5, [[[-10, 245, 500]], [[-500, -245, 10]]]),
+            ("LINEAR_EXACT", 0, 4, [[[-10, 245, 500]], [[-500, -245, 10]]]),
+            (
+                "SIGMOID",
+                0,
+                4,
+                [
+                    [[50.793490231, 245, 439.206509769]],
+                    [[-439.206509769, -245, -50.793490231]],
+                ],
+            ),
+        ],
+    )
+    def test_window_mixed_rescale_per_frame(
+        self, windowing, voi_function, center, width, expected
+    ):
+        """Test positive and negative slopes with shared VOI and slice selection."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        shared = self._get_functional_group(center, width)
+        shared.FrameVOILUTSequence[0].VOILUTFunction = voi_function
+        ds.SharedFunctionalGroupsSequence = [shared]
+        ds.PerFrameFunctionalGroupsSequence = []
+        for slope, intercept in [(2, -10), (-2, 10)]:
+            transform = Dataset()
+            transform.RescaleSlope = slope
+            transform.RescaleIntercept = intercept
+            group = Dataset()
+            group.PixelValueTransformationSequence = [transform]
+            ds.PerFrameFunctionalGroupsSequence.append(group)
+
+        arr = np.asarray([[[4, 5, 6]], [[6, 5, 4]]], dtype=np.uint8)
+        original = arr.copy()
+        rescaled = apply_modality_lut(arr, ds)
+        assert np.array_equal([[[-2, 0, 2]], [[-2, 0, 2]]], rescaled)
+        out = windowing(rescaled, ds)
+        np.testing.assert_allclose(out, expected, rtol=0, atol=1e-8)
+
+        for idx in range(2):
+            frame = apply_modality_lut(arr[idx], ds, slice_number=idx)
+            np.testing.assert_allclose(
+                windowing(frame, ds, slice_number=idx), expected[idx], rtol=0, atol=1e-8
+            )
+
+        assert out.dtype == np.float64
+        assert np.array_equal(original, arr)
+        assert np.array_equal([[[-2, 0, 2]], [[-2, 0, 2]]], rescaled)
+
     def test_window_modality_lut(self):
         """Test windowing after a modality LUT operation."""
         ds = dcmread(MOD_16_SEQ)
