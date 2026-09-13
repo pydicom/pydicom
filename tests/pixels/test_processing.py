@@ -373,6 +373,19 @@ class TestConvertColorSpace:
 class TestModalityLUT:
     """Tests for apply_modality_lut()."""
 
+    @staticmethod
+    def _get_functional_group(slope, intercept):
+        """Return a functional group with a pixel value transformation."""
+        transform = Dataset()
+        transform.RescaleSlope = slope
+        transform.RescaleIntercept = intercept
+        transform.RescaleType = "US"
+
+        group = Dataset()
+        group.PixelValueTransformationSequence = [transform]
+
+        return group
+
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
         ds = dcmread(MOD_16)
@@ -389,6 +402,119 @@ class TestModalityLUT:
         ds.RescaleIntercept = -2048
         out = apply_modality_lut(arr, ds)
         assert np.array_equal(arr * 2.5 - 2048, out)
+
+    def test_shared_functional_group(self):
+        """Test rescale using a shared functional group."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.SharedFunctionalGroupsSequence = [self._get_functional_group(2, -1)]
+        arr = np.asarray([[[1, 2]], [[3, 4]]], dtype=np.int16)
+        original = arr.copy()
+
+        out = apply_modality_lut(arr, ds)
+
+        assert out.flags.writeable
+        assert np.float64 == out.dtype
+        assert np.array_equal(original, arr)
+        assert np.array_equal(arr * 2 - 1, out)
+
+    def test_per_frame_functional_groups(self):
+        """Test rescale using per-frame functional groups."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        # Shared functional groups may contain unrelated macros
+        ds.SharedFunctionalGroupsSequence = [Dataset()]
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(3, -1),
+            self._get_functional_group(7, -3),
+        ]
+        arr = np.asarray([[[1]], [[1]]], dtype=np.int16)
+        original = arr.copy()
+
+        out = apply_modality_lut(arr, ds)
+
+        assert out.flags.writeable
+        assert np.float64 == out.dtype
+        assert np.array_equal(original, arr)
+        assert np.array_equal([[[2]], [[4]]], out)
+
+    def test_per_frame_functional_group_slice_number(self):
+        """Test selecting one per-frame transformation."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(3, -1),
+            self._get_functional_group(7, -3),
+        ]
+        arr = np.asarray([[1]], dtype=np.int16)
+
+        out = apply_modality_lut(arr, ds, slice_number=1)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[4]], out)
+
+        msg = r"The slice number \(2\) is outside the available frame range"
+        with pytest.raises(IndexError, match=msg):
+            apply_modality_lut(arr, ds, slice_number=2)
+
+    def test_missing_per_frame_functional_group(self):
+        """Test a missing per-frame transform leaves that frame unchanged."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [
+            Dataset(),
+            self._get_functional_group(2, -1),
+        ]
+        arr = np.asarray([[[1, 2]], [[3, 4]]], dtype=np.int16)
+
+        out = apply_modality_lut(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[[1, 2]], [[5, 7]]], out)
+
+    def test_single_frame_functional_group(self):
+        """Test a per-frame transform for a single-frame array."""
+        ds = Dataset()
+        ds.NumberOfFrames = 1
+        ds.PerFrameFunctionalGroupsSequence = [self._get_functional_group(2, -1)]
+        arr = np.asarray([[1, 2], [3, 4]], dtype=np.int16)
+
+        out = apply_modality_lut(arr, ds)
+
+        assert np.array_equal([[1, 3], [5, 7]], out)
+
+    def test_per_frame_functional_group_mismatch(self):
+        """Test mismatched frame count raises an exception."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(3, -1),
+            self._get_functional_group(7, -3),
+        ]
+        # The issue's original reproducer uses this shape, which is one frame
+        # under pydicom's frame-first ndarray convention, not two frames
+        arr = np.atleast_3d([1, 1])
+
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"number of frames in the array \(1\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_modality_lut(arr, ds)
+
+    def test_per_frame_functional_group_dataset_mismatch(self):
+        """Test mismatched Number of Frames raises an exception."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PerFrameFunctionalGroupsSequence = [self._get_functional_group(2, -1)]
+        arr = np.ones((2, 2, 2), dtype=np.int16)
+
+        msg = (
+            r"The number of frame functional groups \(1\) does not match the "
+            r"dataset's Number of Frames \(2\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_modality_lut(arr, ds)
 
     def test_lut_sequence(self):
         """Test the LUT Sequence transform."""
@@ -444,6 +570,10 @@ class TestModalityLUT:
         assert arr is out
 
         ds.ModalityLUTSequence = []
+        out = apply_modality_lut(arr, ds)
+        assert arr is out
+
+        ds.PerFrameFunctionalGroupsSequence = [Dataset()]
         out = apply_modality_lut(arr, ds)
         assert arr is out
 
@@ -1077,6 +1207,17 @@ class TestExpandSegmentedLUT:
 class TestApplyWindowing:
     """Tests for apply_windowing()."""
 
+    @staticmethod
+    def _get_functional_group(center, width):
+        """Return a functional group containing Frame VOI LUT parameters."""
+        voi = Dataset()
+        voi.WindowCenter = center
+        voi.WindowWidth = width
+
+        group = Dataset()
+        group.FrameVOILUTSequence = [voi]
+        return group
+
     def test_window_single_view(self):
         """Test windowing with a single view."""
         # 12-bit unsigned
@@ -1365,6 +1506,131 @@ class TestApplyWindowing:
         assert 3046.6 == pytest.approx(out[0, 326, 130], abs=0.1)
         assert 4095.0 == pytest.approx(out[1, 326, 130], abs=0.1)
 
+    def test_window_per_frame_functional_groups(self):
+        """Test windowing using per-frame Frame VOI LUT parameters."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(0, 1),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[[0]], [[0]]], dtype=np.uint8)
+
+        out = apply_windowing(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[[255]], [[0]]], out)
+
+        out = apply_windowing(arr[0], ds, slice_number=1)
+        assert np.array_equal([[0]], out)
+
+    def test_window_per_frame_slice_errors(self):
+        """Test invalid per-frame metadata and slice numbers."""
+        ds = Dataset()
+        ds.NumberOfFrames = 3
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(0, 1),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[0]], dtype=np.uint8)
+
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"dataset's Number of Frames \(3\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_windowing(arr, ds, slice_number=0)
+
+        ds.NumberOfFrames = 2
+        msg = r"The slice number \(-1\) is outside the available frame range"
+        with pytest.raises(IndexError, match=msg):
+            apply_windowing(arr, ds, slice_number=-1)
+
+        ds.PerFrameFunctionalGroupsSequence[0] = Dataset()
+        out = apply_windowing(arr, ds, slice_number=0)
+        assert arr is out
+
+    def test_window_per_frame_mismatch(self):
+        """Test mismatched per-frame metadata and array frame counts."""
+        ds = Dataset()
+        ds.NumberOfFrames = 3
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            self._get_functional_group(0, 1),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[[0]], [[0]]], dtype=np.uint8)
+
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"dataset's Number of Frames \(3\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_windowing(arr, ds)
+
+        ds.NumberOfFrames = 2
+        msg = (
+            r"The number of frame functional groups \(2\) does not match the "
+            r"number of frames in the array \(1\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_windowing(arr[0], ds)
+
+    def test_window_single_frame_functional_group(self):
+        """Test per-frame windowing with a single-frame array."""
+        ds = Dataset()
+        ds.NumberOfFrames = 1
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [self._get_functional_group(0, 1)]
+        arr = np.asarray([[0]], dtype=np.uint8)
+
+        out = apply_windowing(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[255]], out)
+
+    def test_window_missing_per_frame_functional_group(self):
+        """Test a missing per-frame VOI leaves that frame unchanged."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = [
+            Dataset(),
+            self._get_functional_group(255, 1),
+        ]
+        arr = np.asarray([[[1]], [[1]]], dtype=np.uint8)
+
+        out = apply_windowing(arr, ds)
+
+        assert np.float64 == out.dtype
+        assert np.array_equal([[[1]], [[0]]], out)
+
+    def test_window_shared_functional_group(self):
+        """Test windowing using shared Frame VOI LUT parameters."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.SharedFunctionalGroupsSequence = [self._get_functional_group(0, 1)]
+        arr = np.asarray([[[0]], [[0]]], dtype=np.uint8)
+
+        out = apply_windowing(arr, ds)
+
+        assert np.array_equal([[[255]], [[255]]], out)
+
     def test_window_rescale(self):
         """Test windowing after a rescale operation."""
         ds = dcmread(WIN_12_1F)
@@ -1395,6 +1661,126 @@ class TestApplyWindowing:
         assert 0 == pytest.approx(out[16, 60], abs=0.1)
         assert 4455.6 == pytest.approx(out[326, 130], abs=0.1)
         assert 4914.0 == pytest.approx(out[316, 481], abs=0.1)
+
+    @pytest.mark.parametrize("pixel_representation", [0, 1])
+    @pytest.mark.parametrize(
+        "sequence",
+        [None, "SharedFunctionalGroupsSequence", "PerFrameFunctionalGroupsSequence"],
+    )
+    @pytest.mark.parametrize(
+        "voi_function, center, width, expected",
+        [
+            ("LINEAR", 4.5, 9, [10, 10, -117.5, -245, -372.5, -500, -500]),
+            ("LINEAR_EXACT", 4, 8, [10, 10, -117.5, -245, -372.5, -500, -500]),
+            (
+                "SIGMOID",
+                4,
+                8,
+                [
+                    -14.187195321,
+                    -50.793490231,
+                    -127.160124899,
+                    -245,
+                    -362.839875101,
+                    -439.206509769,
+                    -475.812804679,
+                ],
+            ),
+        ],
+    )
+    def test_window_negative_rescale(
+        self, pixel_representation, sequence, voi_function, center, width, expected
+    ):
+        """Test ordered windowing bounds after a negative rescale slope."""
+        ds = Dataset()
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = pixel_representation
+        ds.BitsStored = 8
+
+        if sequence is None:
+            voi = transform = ds
+        else:
+            ds.NumberOfFrames = 1
+            group = self._get_functional_group(center, width)
+            voi = group.FrameVOILUTSequence[0]
+            transform = Dataset()
+            group.PixelValueTransformationSequence = [transform]
+            setattr(ds, sequence, [group])
+
+        voi.WindowCenter = center
+        voi.WindowWidth = width
+        voi.VOILUTFunction = voi_function
+        transform.RescaleSlope = -2
+        transform.RescaleIntercept = 10
+
+        dtype = "int8" if pixel_representation else "uint8"
+        arr = np.arange(7, dtype=dtype).reshape(1, 7)
+        original = arr.copy()
+        rescaled = apply_modality_lut(arr, ds)
+        assert np.array_equal([[10, 8, 6, 4, 2, 0, -2]], rescaled)
+
+        # Unsigned 8-bit values rescale to [-500, 10]; signed to [-244, 266].
+        expected = np.asarray([expected]) + 256 * pixel_representation
+        out = apply_windowing(rescaled, ds)
+        np.testing.assert_allclose(out, expected, rtol=0, atol=1e-8)
+        assert out.dtype == np.float64
+        assert np.array_equal(original, arr)
+        assert np.array_equal([[10, 8, 6, 4, 2, 0, -2]], rescaled)
+
+    @pytest.mark.parametrize("windowing", [apply_windowing, apply_voi_lut])
+    @pytest.mark.parametrize(
+        "voi_function, center, width, expected",
+        [
+            ("LINEAR", 0.5, 5, [[[-10, 245, 500]], [[-500, -245, 10]]]),
+            ("LINEAR_EXACT", 0, 4, [[[-10, 245, 500]], [[-500, -245, 10]]]),
+            (
+                "SIGMOID",
+                0,
+                4,
+                [
+                    [[50.793490231, 245, 439.206509769]],
+                    [[-439.206509769, -245, -50.793490231]],
+                ],
+            ),
+        ],
+    )
+    def test_window_mixed_rescale_per_frame(
+        self, windowing, voi_function, center, width, expected
+    ):
+        """Test positive and negative slopes with shared VOI and slice selection."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        shared = self._get_functional_group(center, width)
+        shared.FrameVOILUTSequence[0].VOILUTFunction = voi_function
+        ds.SharedFunctionalGroupsSequence = [shared]
+        ds.PerFrameFunctionalGroupsSequence = []
+        for slope, intercept in [(2, -10), (-2, 10)]:
+            transform = Dataset()
+            transform.RescaleSlope = slope
+            transform.RescaleIntercept = intercept
+            group = Dataset()
+            group.PixelValueTransformationSequence = [transform]
+            ds.PerFrameFunctionalGroupsSequence.append(group)
+
+        arr = np.asarray([[[4, 5, 6]], [[6, 5, 4]]], dtype=np.uint8)
+        original = arr.copy()
+        rescaled = apply_modality_lut(arr, ds)
+        assert np.array_equal([[[-2, 0, 2]], [[-2, 0, 2]]], rescaled)
+        out = windowing(rescaled, ds)
+        np.testing.assert_allclose(out, expected, rtol=0, atol=1e-8)
+
+        for idx in range(2):
+            frame = apply_modality_lut(arr[idx], ds, slice_number=idx)
+            np.testing.assert_allclose(
+                windowing(frame, ds, slice_number=idx), expected[idx], rtol=0, atol=1e-8
+            )
+
+        assert out.dtype == np.float64
+        assert np.array_equal(original, arr)
+        assert np.array_equal([[[-2, 0, 2]], [[-2, 0, 2]]], rescaled)
 
     def test_window_modality_lut(self):
         """Test windowing after a modality LUT operation."""
@@ -1479,6 +1865,21 @@ class TestApplyWindowing:
         ds.ModalityLUTSequence = []
         out = apply_windowing(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+        group = Dataset()
+        group.FrameVOILUTSequence = [Dataset()]
+        ds.SharedFunctionalGroupsSequence = [group]
+        out = apply_windowing(arr, ds)
+        assert arr is out
+
+        transform = Dataset()
+        transform.RescaleSlope = 2
+        transform.RescaleIntercept = -1
+        group = Dataset()
+        group.PixelValueTransformationSequence = [transform]
+        ds.PerFrameFunctionalGroupsSequence = [group]
+        out = apply_windowing(arr, ds)
+        assert arr is out
 
     def test_rescale_empty(self):
         """Test RescaleSlope and RescaleIntercept being empty."""
@@ -1778,6 +2179,27 @@ class TestApplyVOILUT:
         ds.WindowWidth = 1
         ds.WindowCenter = 0
         assert [255, 255, 255, 255, 255] == apply_voi_lut(arr, ds).tolist()
+
+    def test_per_frame_windowing(self):
+        """Test Frame VOI LUT parameters are used for each frame."""
+        ds = Dataset()
+        ds.NumberOfFrames = 2
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.PerFrameFunctionalGroupsSequence = []
+        for center in (0, 255):
+            voi = Dataset()
+            voi.WindowCenter = center
+            voi.WindowWidth = 1
+            group = Dataset()
+            group.FrameVOILUTSequence = [voi]
+            ds.PerFrameFunctionalGroupsSequence.append(group)
+
+        arr = np.asarray([[[0]], [[0]]], dtype=np.uint8)
+        out = apply_voi_lut(arr, ds)
+
+        assert np.array_equal([[[255]], [[0]]], out)
 
     def test_only_voi(self):
         """Test only LUT operation elements present."""
