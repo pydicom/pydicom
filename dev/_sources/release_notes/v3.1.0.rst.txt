@@ -49,6 +49,7 @@ Fixes
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
+* Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
 
 Enhancements
 ------------
