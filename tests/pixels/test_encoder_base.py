@@ -120,12 +120,19 @@ class TestEncodeRunner:
         runner.set_source(ds)
         assert runner.src == b"\x01\x00\x00\x00\x02\x00\x00\x00"
 
-        # One byte per sample, nothing to swap
+        # One byte per sample as OB, nothing to swap
         ds.BitsStored = 8
         ds.BitsAllocated = 8
         ds.PixelData = b"\x01\x02\x03"
         runner.set_source(ds)
         assert runner.src == b"\x01\x02\x03"
+
+        # 8-bit OW packs two samples per 16-bit word, so each pair swaps. The
+        # whole value is swapped before framing, as a frame may end mid word.
+        ds.NumberOfFrames = 2
+        ds.add_new(0x7FE00010, "OW", b"\x02\x01\x04\x03\x06\x05")
+        runner.set_source(ds)
+        assert runner.src == b"\x01\x02\x03\x04\x05\x06"
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_big_endian_roundtrip(self):
