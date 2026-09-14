@@ -2029,12 +2029,12 @@ class FileSet:
         return "\n".join(s)
 
     @property
-    def UID(self) -> UID:
+    def UID(self) -> sop.UID:
         """Return the File-set's UID."""
-        return cast(UID, self._uid)
+        return cast(sop.UID, self._uid)
 
     @UID.setter
-    def UID(self, uid: UID) -> None:
+    def UID(self, uid: sop.UID) -> None:
         """Set the File-set UID.
 
         Parameters
