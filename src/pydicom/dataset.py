@@ -1738,6 +1738,13 @@ class Dataset:  # noqa: PLW1641
                 f"'{type(self).__name__}' object has no attribute 'convert_pixel_data'"
             )
 
+        self._convert_pixel_data(handler_name)
+
+    def _convert_pixel_data(self, handler_name: str = "") -> None:
+        """Convert pixel data to a :class:`numpy.ndarray` internally.
+
+        See :meth:`~Dataset.convert_pixel_data` for more information.
+        """
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
@@ -2239,7 +2246,7 @@ class Dataset:  # noqa: PLW1641
             Similar to :func:`pydicom.pixels.pixel_array` but returns a generator
             that iterates through the image frames.
         """
-        self.convert_pixel_data()
+        self._convert_pixel_data()
         return cast("numpy.ndarray", self._pixel_array)
 
     def pixel_array_options(

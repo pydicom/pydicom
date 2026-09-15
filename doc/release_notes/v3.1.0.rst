@@ -50,6 +50,9 @@ Fixes
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
+* Fixed :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` raising
+  :class:`AttributeError` when :func:`~pydicom.config.future_behavior` is enabled
+  (:issue:`2354`).
 
 Enhancements
 ------------

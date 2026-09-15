@@ -38,6 +38,7 @@ from pydicom.dataset import (
 from pydicom.encaps import encapsulate
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
+from pydicom.pixels import pixel_array
 from pydicom.pixels.utils import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
@@ -3123,6 +3124,16 @@ class TestFuture:
         msg = "'Dataset' object has no attribute 'convert_pixel_data'"
         with pytest.raises(AttributeError, match=msg):
             Dataset().convert_pixel_data()
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+    def test_pixel_array(self, use_future):
+        """Test Dataset.pixel_array is unaffected by the removal of
+        Dataset.convert_pixel_data()"""
+        fpath = get_testdata_file("CT_small.dcm")
+        ds = dcmread(fpath)
+        assert numpy.array_equal(ds.pixel_array, pixel_array(fpath))
+        # The decoded array is cached
+        assert ds.pixel_array is ds.pixel_array
 
     def test_pixel_array_options(self, use_future):
         msg = (
