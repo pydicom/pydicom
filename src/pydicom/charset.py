@@ -161,7 +161,7 @@ def _encode_to_jis_x_0201(value: str, errors: str = "strict") -> bytes:
         except UnicodeEncodeError as e:
             e.start = i
             e.end = len(value)
-            raise e
+            raise
         if len(b) != 1 or ((ord(b) & 0x80) ^ msb) != 0:
             character_set = "ISO IR 14" if msb == 0 else "ISO IR 13"
             msg = f"Given character is out of {character_set}"
@@ -235,7 +235,7 @@ def _encode_to_given_charset(
         except UnicodeEncodeError as e:
             e.start = i
             e.end = len(value)
-            raise e
+            raise
         if b[:1] == ESC:
             raise UnicodeEncodeError(
                 encoding,
