@@ -3363,9 +3363,6 @@ class Dataset:  # noqa: PLW1641
     __repr__ = __str__
 
 
-_FileDataset = TypeVar("_FileDataset", bound="FileDataset")
-
-
 class FileDataset(Dataset):
     """An extension of :class:`Dataset` to make reading and writing to
     file-like easier.
