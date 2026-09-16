@@ -906,11 +906,11 @@ class EncapsulatedBuffer(BufferedIOBase):
         elif whence == os.SEEK_CUR:
             # relative to current buffer position
             new_offset = self._offset + offset
-            new_offset = 0 if new_offset < 0 else new_offset
+            new_offset = max(new_offset, 0)
         elif whence == os.SEEK_END:
             # relative to end of the buffer
             new_offset = self.encapsulated_length + offset
-            new_offset = 0 if new_offset < 0 else new_offset
+            new_offset = max(new_offset, 0)
 
         self._offset = new_offset
 
