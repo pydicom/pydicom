@@ -106,16 +106,28 @@ extend-select = [
     "C90",
     "PERF",
     "E501",
-    "W",
+    "PGH",
     "PL",
     "UP",
 ]
 ignore = [
+    "S110",
+    "BLE001",
+    "DTZ001",
+    "DTZ005",
+    "PIE790",
+    "PIE808",
+    "PYI041",
+    "PT031",
+    "SIM102",
+    "SIM115",
+    "SIM117",
     "PERF203",
     "PLC0415",
     "PLC1901",
     "PLR2004",
     "PLR5501",
+    "PLW0177",
     "PLW0603",
     "PLW2901",
 ]
@@ -135,7 +147,7 @@ max-statements = 108
 "src/pydicom/config.py" = ["PLW0602"]
 "src/pydicom/uid.py" = ["E501"]
 "src/pydicom/sr/_concepts_dict.py" = ["F601"]
-"tests/*.py" = ["F401"]
+"tests/*.py" = ["B015", "B018", "SIM201", "SIM202", "N999", "D419", "F401", "F841", "RUF032", "RUF059"]
 
 [tool.mypy]
 python_version = "3.10"
