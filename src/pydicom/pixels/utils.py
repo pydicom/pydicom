@@ -6,7 +6,8 @@ from collections.abc import Iterable, Iterator
 try:
     from collections.abc import Buffer  # type: ignore[attr-defined]
 except ImportError:
-    from collections.abc import ByteString as Buffer  # Python 3.10, 3.11
+    from collections.abc import ByteString as Buffer  # Python <= 3.11  # noqa: PYI057
+
 import math
 import importlib
 import logging
