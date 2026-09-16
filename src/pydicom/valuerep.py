@@ -993,7 +993,7 @@ def format_number_as_ds(val: float | Decimal) -> str:
     else:
         if logval >= 1.0:
             # chars remaining for digits after sign, digits left of '.' and '.'
-            remaining_chars = 14 - sign_chars - int(floor(logval))
+            remaining_chars = 14 - sign_chars - floor(logval)
         else:
             remaining_chars = 14 - sign_chars
         return f"{val:.{remaining_chars}f}"
