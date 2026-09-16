@@ -3224,7 +3224,7 @@ class Dataset:  # noqa: PLW1641
                 except Exception as exc:
                     if not suppress_invalid_tags:
                         logger.error(f"Error while processing tag {json_key}")
-                        raise exc
+                        raise
 
                     logger.warning(f"Error while processing tag {json_key}: {exc}")
 
