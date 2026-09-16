@@ -392,7 +392,7 @@ class TestDataElementCallbackTests:
         )
         contour = ds.ROIContourSequence[0].ContourSequence[0]
         with pytest.raises(ValueError):
-            getattr(contour, "ContourData")
+            contour.ContourData
 
     def test_impl_vr_comma(self):
         """util.fix_separator: Able to replace comma in Implicit VR dataset.."""
