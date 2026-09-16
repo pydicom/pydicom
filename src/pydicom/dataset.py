@@ -423,7 +423,7 @@ class Dataset:  # noqa: PLW1641
         #   ambiguous VR correction function
         self._pixel_rep: int
 
-    def __enter__(self) -> "Dataset":
+    def __enter__(self) -> "Dataset":  # noqa: PYI034
         """Method invoked on entry to a with statement."""
         return self
 
