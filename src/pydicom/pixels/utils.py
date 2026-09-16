@@ -175,10 +175,10 @@ def _array_common(
     endianness = "><"[tsyntax.is_little_endian]
     if tsyntax.is_implicit_VR:
         vr = None
-        group, elem, length = unpack(f"{endianness}HHL", data)
+        group, elem, _length = unpack(f"{endianness}HHL", data)
     else:
         # Is always 32-bit extended length for pixel data VRs
-        group, elem, vr, length = unpack(f"{endianness}HH2sH", data)
+        group, elem, vr, _length = unpack(f"{endianness}HH2sH", data)
         opts["pixel_vr"] = vr.decode(default_encoding)
         unpack(f"{endianness}L", f.read(4))
 

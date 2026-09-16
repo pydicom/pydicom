@@ -214,7 +214,7 @@ class Collection:
             )
 
         code = next(iter(entries.keys()))  # get first and only
-        meaning, cids = entries[code]
+        meaning, _cids = entries[code]
 
         return Code(value=code, meaning=meaning, scheme_designator=self.name)
 
