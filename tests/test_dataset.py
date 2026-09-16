@@ -1419,7 +1419,7 @@ class TestDataset:
                 raise ValueError("Random ex message!")
 
         with pytest.raises(ValueError, match="Random ex message!"):
-            getattr(DSException(), "test")
+            DSException().test
 
     def test_pixel_array_already_have(self):
         """Test Dataset._get_pixel_array when we already have the array"""
