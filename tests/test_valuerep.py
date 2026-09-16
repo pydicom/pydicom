@@ -423,11 +423,7 @@ class TestTruncateFloatForDS:
 
         # Disallow floats ending in '.' since this may not be correctly
         # interpreted
-        if s.endswith("."):
-            return False
-
-        # Otherwise return True
-        return True
+        return not s.endswith(".")
 
     @pytest.mark.parametrize(
         "val,expected_str",
