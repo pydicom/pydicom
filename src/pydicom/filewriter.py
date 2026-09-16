@@ -370,7 +370,7 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     try:
         try:
             # works only if list, not if string or number
-            value.append
+            value.append  # noqa: B018
         except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
