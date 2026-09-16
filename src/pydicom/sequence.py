@@ -4,7 +4,7 @@
 Sequence is a list of pydicom Dataset objects.
 """
 
-from typing import cast, Any, TypeVar
+from typing import cast, Any
 from collections.abc import Iterable
 
 try:

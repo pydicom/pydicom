@@ -5,7 +5,7 @@ from io import BytesIO
 import os
 from struct import Struct
 from types import TracebackType
-from typing import TYPE_CHECKING, cast, Any, TypeVar, Protocol
+from typing import TYPE_CHECKING, cast, Any, Protocol
 
 try:
     from typing import Self  # type: ignore[attr-defined]
