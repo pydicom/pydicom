@@ -29,7 +29,7 @@ from collections.abc import (
     Callable,
     MutableSequence,
     MutableMapping,
-    Set,
+    Set as AbstractSet,
 )
 from contextlib import nullcontext
 from importlib.util import find_spec as have_package
@@ -871,7 +871,7 @@ class Dataset:  # noqa: PLW1641
         except KeyError:
             return default
 
-    def items(self) -> Set[tuple[BaseTag, _DatasetValue]]:
+    def items(self) -> AbstractSet[tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -883,7 +883,7 @@ class Dataset:  # noqa: PLW1641
         """
         return self._dict.items()
 
-    def keys(self) -> Set[BaseTag]:
+    def keys(self) -> AbstractSet[BaseTag]:
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns
