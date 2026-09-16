@@ -1091,7 +1091,7 @@ class DSfloat(float):
                     f'Value "{self}" is not valid for elements with a VR of DS'
                 )
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1103,7 +1103,7 @@ class DSfloat(float):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1232,7 +1232,7 @@ class DSdecimal(Decimal):
                     raise ValueError(msg)
                 warn_and_log(msg)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1249,7 +1249,7 @@ class DSdecimal(Decimal):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1405,7 +1405,7 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, "original_string"):
             self.original_string = val.original_string
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1415,7 +1415,7 @@ class IS(int):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1680,11 +1680,11 @@ class PersonName:
         except IndexError:
             return ""
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return ``True`` if `other` equals the current name."""
         return bool(str(self) == other)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 
