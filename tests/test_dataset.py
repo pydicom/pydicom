@@ -3169,19 +3169,17 @@ class TestDatasetContextManager:
         """Setting a bad value gives error message with location info"""
         msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1].CumulativeMetersetWeight"  # noqa: E501
         # Give a bad value for existing element
-        with pytest.raises(ValueError) as excinfo:
-            with self.file_ds as ds:
-                ds.BeamSequence[0].ControlPointSequence[
-                    1
-                ].CumulativeMetersetWeight = "hello"
+        with pytest.raises(ValueError) as excinfo, self.file_ds as ds:
+            ds.BeamSequence[0].ControlPointSequence[
+                1
+            ].CumulativeMetersetWeight = "hello"
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
 
         # Bad value for new element
         msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence[1]"
-        with pytest.raises(ValueError) as excinfo:
-            with self.file_ds as ds:
-                ds.BeamSequence[0].ControlPointSequence[1].GantryAngle = "hello"
+        with pytest.raises(ValueError) as excinfo, self.file_ds as ds:
+            ds.BeamSequence[0].ControlPointSequence[1].GantryAngle = "hello"
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
 
@@ -3205,9 +3203,8 @@ class TestDatasetContextManager:
         ds = Dataset()
         elem = RawDataElement(Tag(0x01F11026), "FD", 6, b"0.264 ", 0, True, True)
         ds[0x1F11026] = elem
-        with pytest.raises(BytesLengthException) as excinfo:
-            with ds:
-                str(ds)
+        with pytest.raises(BytesLengthException) as excinfo, ds:
+            str(ds)
         assert hasattr(excinfo.value, "__notes__")
         msg = "at [(01F1,1026)]\n  Converting RawDataElement(vr='FD', value=b'0.264 '"
         assert any(msg in note for note in excinfo.value.__notes__)
@@ -3258,17 +3255,15 @@ class TestDatasetContextManager:
 
         # Repeat but adding our own layer of context management
         # in addition to builtin `walk` context management
-        with pytest.raises(ValueError) as excinfo:
-            with ds:
-                ds.walk(callback)  # walk uses `with self` to catch errors
+        with pytest.raises(ValueError) as excinfo, ds:
+            ds.walk(callback)  # walk uses `with self` to catch errors
         assert hasattr(excinfo.value, "__notes__")
         assert any(msg in note for note in excinfo.value.__notes__)
 
     def test_exception_index_error(self):
         """Test that path shown to Sequence when index error occurs."""
-        with pytest.raises(IndexError) as excinfo:
-            with self.file_ds:
-                self.file_ds.BeamSequence[0].ControlPointSequence[99]
+        with pytest.raises(IndexError) as excinfo, self.file_ds:
+            self.file_ds.BeamSequence[0].ControlPointSequence[99]
         assert hasattr(excinfo.value, "__notes__")
         msg = "FileDataset(filename='test.dcm').BeamSequence[0].ControlPointSequence"
         assert any(msg in note for note in excinfo.value.__notes__)

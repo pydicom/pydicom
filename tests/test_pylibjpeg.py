@@ -765,9 +765,8 @@ class TestJPEG2K:
             r"2000 data. It's recommended that you change the  Samples per "
             r"Pixel value to produce the correct output"
         )
-        with pytest.warns(UserWarning, match=msg):
-            with pytest.raises(ValueError):
-                ds.pixel_array
+        with pytest.warns(UserWarning, match=msg), pytest.raises(ValueError):
+            ds.pixel_array
 
         # JP2 header
         ds = dcmread(J2KR_08_08_3_0_1F_YBR_RCT)

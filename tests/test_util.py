@@ -523,10 +523,9 @@ class TestLeanRead:
     def test_UN_sequence(self):
         p = get_testdata_file("UN_sequence.dcm")
         msg = "This reader does not handle undefined length except for SQ"
-        with dicomfile(p) as ds:
-            with pytest.raises(NotImplementedError, match=msg):
-                for elem in ds:
-                    pass
+        with dicomfile(p) as ds, pytest.raises(NotImplementedError, match=msg):
+            for elem in ds:
+                pass
 
 
 @contextmanager
