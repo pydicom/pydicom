@@ -1,6 +1,6 @@
 <!--
 PLEASE NOTE: We do not accept AI-only PRs - they will be closed.  We expect
-a human-written (and easily human-readable) summary which is succinct 
+a human-written (and easily human-readable) summary which is succinct
 and explains the PR.
 
 We expect authors to have fully reviewed any AI-generated code line by
@@ -15,7 +15,7 @@ Non-AI-generated paragraph succinctly explaining what bug fix or enhancement the
 addresses.  Include the related pydicom issue number(s) if any exist.
 
 #### Further details
-If necessary, more details about the rationale or technical aspects of the changes.  
+If necessary, more details about the rationale or technical aspects of the changes.
 Long AI-generated details will be rejected unless reduced to reasonable
 human-readable levels.
 
