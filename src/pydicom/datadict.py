@@ -135,7 +135,7 @@ def add_dict_entries(
 
     """
 
-    if any([BaseTag(tag).is_private for tag in new_entries_dict]):
+    if any(BaseTag(tag).is_private for tag in new_entries_dict):
         raise ValueError(
             'Private tags cannot be added using "add_dict_entries" - '
             'use "add_private_dict_entries" instead'
@@ -218,7 +218,7 @@ def add_private_dict_entries(
     >>> add_private_dict_entry("ACME LTD 1.3", 0x00410001, "US", "Test Three")
     """
 
-    if not all([BaseTag(tag).is_private for tag in new_entries_dict]):
+    if not all(BaseTag(tag).is_private for tag in new_entries_dict):
         raise ValueError(
             "Non-private tags cannot be added using "
             "'add_private_dict_entries()' - use 'add_dict_entries()' instead"
