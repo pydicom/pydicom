@@ -43,7 +43,6 @@ from typing import (
     AnyStr,
     cast,
     BinaryIO,
-    TypeVar,
     overload,
 )
 
