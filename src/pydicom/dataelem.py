@@ -661,7 +661,7 @@ class DataElement:  # noqa: PLW1641
 
         return result
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -704,7 +704,7 @@ class DataElement:  # noqa: PLW1641
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
