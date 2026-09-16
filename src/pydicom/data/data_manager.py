@@ -159,7 +159,7 @@ def online_test_file_dummy_paths() -> dict[str, str]:
     return dummy_path_map
 
 
-def fetch_data_files(data_dir: Path = get_data_dir()) -> None:
+def fetch_data_files(data_dir: Path = get_data_dir()) -> None:  # noqa: B008
     """Download missing test files to the local cache.
 
     ..versionchanged:: 3.1
