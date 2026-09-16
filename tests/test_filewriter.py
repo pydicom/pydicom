@@ -91,10 +91,9 @@ IS_WINDOWS = platform.system() == "Windows"
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
-    with open(a, "rb") as A:
-        with open(b, "rb") as B:
-            a_bytes = A.read()
-            b_bytes = B.read()
+    with open(a, "rb") as A, open(b, "rb") as B:
+        a_bytes = A.read()
+        b_bytes = B.read()
 
     return bytes_identical(a_bytes, b_bytes)
 
