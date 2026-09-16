@@ -227,10 +227,10 @@ def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
     """
     return (
         len(a) == len(b)
-        and all(key in b for key in a.keys())
+        and all(key in b for key in a.keys())  # noqa: SIM118
         and all(
             a[key] == b[key]
-            for key in a.keys()
+            for key in a.keys()  # noqa: SIM118
             if exclude is None or key not in exclude
         )
     )
@@ -782,7 +782,7 @@ class Dataset:  # noqa: PLW1641
             The matching element keywords in the dataset. If no
             filters are used then all element keywords are returned.
         """
-        allnames = [keyword_for_tag(tag) for tag in self._dict.keys()]
+        allnames = [keyword_for_tag(tag) for tag in self._dict]
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
@@ -3636,7 +3636,7 @@ class FileMetaDataset(Dataset):
                 f"Argument must be a dict or Dataset, not {type(init_value)}"
             )
 
-        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]
+        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]  # noqa: SIM118
         if non_group2:
             raise ValueError(
                 "File meta datasets may only contain group 2 elements but the "

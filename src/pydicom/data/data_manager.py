@@ -387,7 +387,7 @@ def _get_testdata_file(name: str, download: bool = True) -> str | None:
 
     # Try online
     if download:
-        for filename in get_url_map().keys():
+        for filename in get_url_map():
             if filename != name:
                 continue
             try:
