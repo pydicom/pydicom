@@ -6,9 +6,12 @@ or any list of items that must all be the same type.
 from typing import overload, Any, cast, TypeVar
 from collections.abc import Iterable, Callable, MutableSequence, Iterator
 
+try:
+    from typing import Self  # type: ignore[attr-defined]
+except ImportError:
+    from typing_extensions import Self  # Python <= 3.10
 
 T = TypeVar("T")
-Self = TypeVar("Self", bound="ConstrainedList")
 
 
 class ConstrainedList(MutableSequence[T]):  # noqa: PLW1641
