@@ -7,6 +7,11 @@ from types import TracebackType
 from typing import cast, BinaryIO
 from collections.abc import Iterator, Callable
 
+try:
+    from typing import Self  # type: ignore[attr-defined]
+except ImportError:
+    from typing_extensions import Self  # Python <= 3.10
+
 from pydicom.misc import size_in_bytes
 from pydicom.datadict import dictionary_VR
 from pydicom.tag import TupleTag, ItemTag
@@ -37,7 +42,7 @@ class dicomfile:
             self.preamble = None
             fobj.seek(0)
 
-    def __enter__(self) -> "dicomfile":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(
