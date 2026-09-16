@@ -73,7 +73,7 @@ def calculate_file_hash(fpath: pathlib.Path, blocksize: int = 65536) -> str:
     return hasher.hexdigest()
 
 
-def get_config_dir(path: pathlib.Path = pathlib.Path.home()) -> pathlib.Path:
+def get_config_dir(path: pathlib.Path = pathlib.Path.home()) -> pathlib.Path:  # noqa: B008
     """Return the path to the ``.pydicom`` configuration directory, creating it if
     required.
 
@@ -145,7 +145,7 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
             urllib.request.urlretrieve(url, filename)
 
 
-def get_data_dir(config_dir: pathlib.Path = get_config_dir()) -> pathlib.Path:
+def get_data_dir(config_dir: pathlib.Path = get_config_dir()) -> pathlib.Path:  # noqa: B008
     """Return the path to the data cache directory, creating it if required.
 
     ..versionchanged:: 3.1
@@ -211,7 +211,7 @@ def data_path_with_download(
     redownload_on_hash_mismatch: bool = True,
     url: str | None = None,
     quiet: bool = True,
-    data_dir: pathlib.Path = get_data_dir(),
+    data_dir: pathlib.Path = get_data_dir(),  # noqa: B008
 ) -> pathlib.Path:
     """Return the absolute path to the cached file with `filename`.
 
@@ -307,7 +307,8 @@ def get_cached_filehash(filename: str) -> str:
 
 
 def data_file_hash_check(
-    filename: str, data_dir: pathlib.Path = get_data_dir()
+    filename: str,
+    data_dir: pathlib.Path = get_data_dir(),  # noqa: B008
 ) -> bool:
     """Return ``True`` if the SHA256 checksum of the cached file is correct.
 
