@@ -127,7 +127,7 @@ class EncodeRunner(RunnerBase):
             try:
                 return func(self.get_frame(index), self)
             except Exception as exc:
-                LOGGER.exception(exc)
+                LOGGER.exception(name)
                 failure_messages.append(f"{name}: {exc}")
 
         messages = "\n  ".join(failure_messages)
