@@ -62,7 +62,7 @@ _IMAGE_PIXEL = {
     0x00280103: "pixel_representation",
 }
 # Default tags to look for with pixel_array() and iter_pixels()
-_DEFAULT_TAGS = {k for k in _IMAGE_PIXEL.keys()} | {0x7FE00001, 0x7FE00002}
+_DEFAULT_TAGS = {k for k in _IMAGE_PIXEL} | {0x7FE00001, 0x7FE00002}
 _PIXEL_KEYWORDS = {
     (0x7FE0, 0x0008): "FloatPixelData",
     (0x7FE0, 0x0009): "DoubleFloatPixelData",
