@@ -797,7 +797,7 @@ class Dataset:  # noqa: PLW1641
 
         return sorted(allnames)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -1563,7 +1563,7 @@ class Dataset:  # noqa: PLW1641
         """Return the number of elements in the top level of the dataset."""
         return len(self._dict)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Compare `self` and `other` for inequality."""
         return not self == other
 
