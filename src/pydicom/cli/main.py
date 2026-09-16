@@ -129,9 +129,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
             try:
                 obj = obj[int(index)]  # type: ignore
             except (IndexError, TypeError) as e:
-                raise argparse.ArgumentTypeError(
-                    f"'{index}' gave an index error: {str(e)}"
-                )
+                raise argparse.ArgumentTypeError(f"'{index}' gave an index error: {e}")
 
     return obj
 
