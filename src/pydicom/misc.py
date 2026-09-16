@@ -44,7 +44,7 @@ def size_in_bytes(expr: int | float | str | None) -> None | float | int:
 
 def _double_edits(keyword: str) -> set[str]:
     """Return candidates that are two edits away from `keyword`."""
-    return set(e2 for e1 in _single_edits(keyword) for e2 in _single_edits(e1))
+    return {e2 for e1 in _single_edits(keyword) for e2 in _single_edits(e1)}
 
 
 def find_keyword_candidates(
