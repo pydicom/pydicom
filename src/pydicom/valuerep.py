@@ -236,7 +236,7 @@ def validate_length_and_type_and_regex(vr: str, value: Any) -> tuple[bool, str]:
         return valid, msg
     is_valid_len, msg1 = validate_vr_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value)
-    msg = " ".join([msg1, msg2]).strip()
+    msg = f"{msg1} {msg2}".strip()
     if msg:
         msg += (
             " Please see <https://dicom.nema.org/medical/dicom/current/output"
