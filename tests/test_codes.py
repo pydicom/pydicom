@@ -89,7 +89,7 @@ class TestCode:
             meaning=self._meaning,
         )
         d = {c: 1}
-        assert c in d.keys()
+        assert c in d
 
     def test_construction_kwargs_optional(self):
         version = "v1.0"
