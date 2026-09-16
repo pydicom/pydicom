@@ -613,7 +613,7 @@ class RecordNode(Iterable["RecordNode"]):
         self._record = ds
 
         try:
-            self.key
+            self.key  # noqa: B018
         except (AttributeError, ValueError) as exc:
             raise ValueError(f"{msg} a required element") from exc
 
