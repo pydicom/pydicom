@@ -575,7 +575,7 @@ class DecodeRunner(RunnerBase):
                 self._previous = (name, func)
                 return frame
             except Exception as exc:
-                LOGGER.exception(exc)
+                LOGGER.exception(name)
                 failure_messages.append(f"{name}: {exc}")
 
         messages = "\n  ".join(failure_messages)
