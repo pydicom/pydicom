@@ -51,12 +51,12 @@ class UID(str):
     """
 
     _PRIVATE_TS_ENCODING: tuple[bool, bool]
-    _NATIVE_ENCODING = [
+    _NATIVE_ENCODING = (
         "1.2.840.10008.1.2",  # Explicit VR Little Endian
         "1.2.840.10008.1.2.1",  # Implicit VR Little Endian
         "1.2.840.10008.1.2.2",  # Explicit VR Big Endian
         "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
-    ]
+    )
 
     def __new__(  # noqa: PYI034
         cls: type["UID"], val: str, validation_mode: int | None = None
