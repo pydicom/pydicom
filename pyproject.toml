@@ -22,7 +22,7 @@ classifiers=[
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Software Development :: Libraries"
 ]
-dependencies = []
+dependencies = ["typing-extensions; python_version<='3.10'"]
 description = "A pure Python package for reading and writing DICOM data"
 # dynamic = ["version"]
 keywords = ["dicom", "python", "medical", "imaging"]

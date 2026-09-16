@@ -7,6 +7,11 @@ from struct import Struct
 from types import TracebackType
 from typing import TYPE_CHECKING, cast, Any, TypeVar, Protocol
 
+try:
+    from typing import Self  # type: ignore[attr-defined]
+except ImportError:
+    from typing_extensions import Self  # Python <= 3.10
+
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
@@ -14,7 +19,6 @@ if TYPE_CHECKING:  # pragma: no cover
 ExitException = tuple[
     type[BaseException] | None, BaseException | None, TracebackType | None
 ]
-Self = TypeVar("Self", bound="DicomIO")
 
 
 class ReadableBuffer(Protocol):
