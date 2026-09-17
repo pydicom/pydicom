@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -586,6 +586,8 @@ pixel data for JPEG 2000 and JPEG-LS (<a class="extlink-issue reference external
 <li><p>Make float data elements with <cite>NaN</cite> value compare as equal - this is semantically better suited
 then the mathematical comparison, where <cite>NaN != NaN</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2273">#2273</a>)</p></li>
 <li><p>Fixed fileset-uid-property-annotation with Python 3.14 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2358">#2358</a>)</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> silently producing byte swapped pixel
+data when the source dataset uses <em>Explicit VR Big Endian</em> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2340">#2340</a>).</p></li>
 </ul>
 </section>
 <section id="enhancements">

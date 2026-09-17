@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -538,80 +538,79 @@ to download the full example code.</p>
 <p>Show how to write a DICOM dataset into a byte array and to read
 it back from a byte array. This can be helpful for example if working with
 datasets saved as blobs in a database.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BytesIO</span></a>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">dcmwrite</span><span class="p">,</span> <span class="n">Dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.filebase</span><span class="w"> </span><span class="kn">import</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DicomFileLike</span></a>
-
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
-
-<span class="n">usage</span> <span class="o">=</span> <span class="s2">"Usage: python memory_dataset.py dicom_filename"</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">write_dataset_to_bytes</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-    <span class="c1"># create a buffer</span>
-    <span class="k">with</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BytesIO</span></a><span class="p">()</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span>
-        <span class="c1"># create a DicomFileLike object that has some properties of DataSet</span>
-        <span class="n">memory_dataset</span> <span class="o">=</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DicomFileLike</span></a><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
-        <span class="c1"># write the dataset to the DicomFileLike object</span>
-        <span class="n">dcmwrite</span><span class="p">(</span><span class="n">memory_dataset</span><span class="p">,</span> <span class="n">ds</span><span class="p">)</span>
-        <span class="c1"># to read from the object, you have to rewind it</span>
-        <span class="n">memory_dataset</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="c1"># read the contents as bytes</span>
-        <span class="k">return</span> <span class="n">memory_dataset</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-    <span class="c1"># you can just read the dataset from the byte array</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BytesIO</span></a><span class="p">(</span><span class="n">blob</span><span class="p">))</span>
-    <span class="c1"># do some interesting stuff</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s2">"Bond^James"</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">"007"</span>
-    <span class="k">return</span> <span class="n">dataset</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">DummyDataBase</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">blob</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">blob</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Please supply a dicom file name:</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
-        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">file_path</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="n">DummyDataBase</span><span class="p">()</span>
-
-    <span class="c1"># Convert a dataset to a byte array:</span>
-    <span class="c1"># - read the dataset from a file</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="c1"># - convert the dataset to bytes</span>
-    <span class="n">ds_bytes</span> <span class="o">=</span> <span class="n">write_dataset_to_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="c1"># - save the bytes in some storage</span>
-    <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"dataset"</span><span class="p">,</span> <span class="n">ds_bytes</span><span class="p">)</span>
-
-    <span class="c1"># Convert a byte array to a dataset:</span>
-    <span class="c1"># - get the bytes from storage</span>
-    <span class="n">read_bytes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"dataset"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">read_bytes</span><span class="p">:</span>
-        <span class="c1"># - convert the bytes into a dataset and do something interesting with it</span>
-        <span class="n">read_dataset</span> <span class="o">=</span> <span class="n">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">read_bytes</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">read_dataset</span><span class="p">)</span>
-        <span class="c1"># - you can write your dataset to a file if wanted</span>
-        <span class="n">dcmwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">_new"</span><span class="p">,</span> <span class="n">read_dataset</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">BytesIO</span></a><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">dcmwrite</span><span class="p">,</span> <span class="n">Dataset</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="nn">.</span><span class="nn">filebase</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__doc__</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">usage</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">Usage: python memory_dataset.py dicom_filename</span><span class="s2">&quot;</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">write_dataset_to_bytes</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <span class="nb">bytes</span><span class="p">:</span><span class="w">
+</span>    <span class="c1"># create a buffer</span><span class="w">
+</span>    <span class="k">with</span> <a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">BytesIO</span></a><span class="p">(</span><span class="p">)</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span><span class="w">
+</span>        <span class="c1"># create a DicomFileLike object that has some properties of DataSet</span><span class="w">
+</span>        <span class="n">memory_dataset</span> <span class="o">=</span> <a class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a><span class="p">(</span><span class="n">buffer</span><span class="p">)</span><span class="w">
+</span>        <span class="c1"># write the dataset to the DicomFileLike object</span><span class="w">
+</span>        <span class="n">dcmwrite</span><span class="p">(</span><span class="n">memory_dataset</span><span class="p">,</span> <span class="n">ds</span><span class="p">)</span><span class="w">
+</span>        <span class="c1"># to read from the object, you have to rewind it</span><span class="w">
+</span>        <span class="n">memory_dataset</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">
+</span>        <span class="c1"># read the contents as bytes</span><span class="w">
+</span>        <span class="k">return</span> <span class="n">memory_dataset</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <span class="n">Dataset</span><span class="p">:</span><span class="w">
+</span>    <span class="c1"># you can just read the dataset from the byte array</span><span class="w">
+</span>    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">BytesIO</span></a><span class="p">(</span><span class="n">blob</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># do some interesting stuff</span><span class="w">
+</span>    <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span><span class="w">
+</span>    <span class="n">dataset</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">Bond^James</span><span class="s2">&quot;</span><span class="w">
+</span>    <span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">007</span><span class="s2">&quot;</span><span class="w">
+</span>    <span class="k">return</span> <span class="n">dataset</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">class</span><span class="w"> </span><span class="nc">DummyDataBase</span><span class="p">:</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">blob</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">blob</span><span class="w">
+</span><span class="w">
+</span>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">if</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">__main__</span><span class="s2">&quot;</span><span class="p">:</span><span class="w">
+</span>    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="w">
+</span><span class="w">
+</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span><span class="w">
+</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Please supply a dicom file name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>        <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span><span class="w">
+</span>        <a class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span>    <span class="n">file_path</span> <span class="o">=</span> <a class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w">
+</span>    <span class="n">db</span> <span class="o">=</span> <span class="n">DummyDataBase</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Convert a dataset to a byte array:</span><span class="w">
+</span>    <span class="c1"># - read the dataset from a file</span><span class="w">
+</span>    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="w">
+</span>    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># - convert the dataset to bytes</span><span class="w">
+</span>    <span class="n">ds_bytes</span> <span class="o">=</span> <span class="n">write_dataset_to_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># - save the bytes in some storage</span><span class="w">
+</span>    <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">dataset</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ds_bytes</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Convert a byte array to a dataset:</span><span class="w">
+</span>    <span class="c1"># - get the bytes from storage</span><span class="w">
+</span>    <span class="n">read_bytes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">dataset</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="k">if</span> <span class="n">read_bytes</span><span class="p">:</span><span class="w">
+</span>        <span class="c1"># - convert the bytes into a dataset and do something interesting with it</span><span class="w">
+</span>        <span class="n">read_dataset</span> <span class="o">=</span> <span class="n">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">read_bytes</span><span class="p">)</span><span class="w">
+</span>        <span class="nb">print</span><span class="p">(</span><span class="n">read_dataset</span><span class="p">)</span><span class="w">
+</span>        <span class="c1"># - you can write your dataset to a file if wanted</span><span class="w">
+</span>        <span class="n">dcmwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">_new</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">read_dataset</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-memory-dataset-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/db21a1451d697e3d74e5f18e170717b7/memory_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">memory_dataset.ipynb</span></code></a></p>

@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -536,80 +536,79 @@ to download the full example code.</p>
 <section class="sphx-glr-example-title" id="show-a-dicom-file-using-hierarchical-tree">
 <span id="sphx-glr-auto-examples-dicomtree-py"></span><h1>Show a dicom file using hierarchical tree<a class="headerlink" href="#show-a-dicom-file-using-hierarchical-tree" title="Link to this heading">#</a></h1>
 <p>Show a dicom file using a hierarchical tree in a graphical window.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Path</span></a>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttk</span><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">pydicom</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__doc__</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">build_tree</span><span class="p">(</span><span class="w">
+</span>    <span class="n">tree</span><span class="p">:</span> <a class="sphx-glr-backref-module-tkinter-ttk sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Treeview" title="tkinter.ttk.Treeview"><span class="n">ttk</span><span class="o">.</span><span class="n">Treeview</span></a><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="w">
+</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <span class="kc">None</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build out the tree.
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttk</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">pydicom</span>
-
-
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">build_tree</span><span class="p">(</span>
-    <span class="n">tree</span><span class="p">:</span> <a href="https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Treeview" title="tkinter.ttk.Treeview" class="sphx-glr-backref-module-tkinter-ttk sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ttk</span><span class="o">.</span><span class="n">Treeview</span></a><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Build out the tree.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    tree : ttk.Treeview</span>
-<span class="sd">        The treeview object.</span>
-<span class="sd">    ds : pydicom.dataset.Dataset</span>
-<span class="sd">        The dataset object to add to the `tree`.</span>
-<span class="sd">    parent : str | None</span>
-<span class="sd">        The item ID of the parent item in the tree (if any), default ``None``.</span>
-<span class="sd">    """</span>
-    <span class="c1"># For each DataElement in the current Dataset</span>
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
-        <span class="n">tree_item</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.END" title="tkinter.END" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-data"><span class="n">tk</span><span class="o">.</span><span class="n">END</span></a><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">elem</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
-            <span class="n">tree</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tree_item</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">"SQ"</span><span class="p">:</span>
-            <span class="c1"># DataElement is a sequence, containing 0 or more Datasets</span>
-            <span class="k">for</span> <span class="n">seq_idx</span><span class="p">,</span> <span class="n">seq_item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
-                <span class="n">tree_seq_item</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
-                    <span class="s2">""</span><span class="p">,</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.END" title="tkinter.END" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-data"><span class="n">tk</span><span class="o">.</span><span class="n">END</span></a><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">elem</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> Item </span><span class="si">{</span><span class="n">seq_idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">"</span>
-                <span class="p">)</span>
-                <span class="n">tree</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tree_seq_item</span><span class="p">,</span> <span class="n">tree_item</span><span class="p">,</span> <span class="n">seq_idx</span><span class="p">)</span>
-
-                <span class="c1"># Recurse into the sequence item(s)</span>
-                <span class="n">build_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">seq_item</span><span class="p">,</span> <span class="n">tree_seq_item</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Please supply the path to a DICOM file: python dicomtree.py path"</span><span class="p">)</span>
-        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># Read the supplied DICOM dataset</span>
-    <span class="n">path</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Path</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-
-    <span class="c1"># Create the root Tk widget</span>
-    <span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="tkinter.Tk" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tk</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">"1200x900"</span><span class="p">)</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"DICOM tree viewer - </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">rowconfigure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">columnconfigure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># Use a monospaced font</span>
-    <span class="n">s</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Style" title="tkinter.ttk.Style" class="sphx-glr-backref-module-tkinter-ttk sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ttk</span><span class="o">.</span><span class="n">Style</span></a><span class="p">()</span>
-    <span class="n">s</span><span class="o">.</span><span class="n">theme_use</span><span class="p">(</span><span class="s2">"clam"</span><span class="p">)</span>
-    <span class="n">s</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="s2">"Treeview"</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">"Courier"</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
-
-    <span class="c1"># Create the tree and populate it</span>
-    <span class="n">tree</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Treeview" title="tkinter.ttk.Treeview" class="sphx-glr-backref-module-tkinter-ttk sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ttk</span><span class="o">.</span><span class="n">Treeview</span></a><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-    <span class="n">build_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">tree</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><a href="https://docs.python.org/3/library/tkinter.html#tkinter.NSEW" title="tkinter.NSEW" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-data"><span class="n">tk</span><span class="o">.</span><span class="n">NSEW</span></a><span class="p">)</span>
-
-    <span class="c1"># Start the DICOM tree widget</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
-</pre></div>
-</div>
+    Parameters
+    ----------
+    tree : ttk.Treeview
+        The treeview object.
+    ds : pydicom.dataset.Dataset
+        The dataset object to add to the `tree`.
+    parent : str | None
+        The item ID of the parent item in the tree (if any), default ``None``.
+    &quot;&quot;&quot;</span><span class="w">
+</span>    <span class="c1"># For each DataElement in the current Dataset</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>        <span class="n">tree_item</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">&quot;</span><span class="p">,</span> <a class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/tkinter.html#tkinter.END" title="tkinter.END"><span class="n">tk</span><span class="o">.</span><span class="n">END</span></a><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span>        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span><span class="w">
+</span>            <span class="n">tree</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tree_item</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">SQ</span><span class="s2">&quot;</span><span class="p">:</span><span class="w">
+</span>            <span class="c1"># DataElement is a sequence, containing 0 or more Datasets</span><span class="w">
+</span>            <span class="k">for</span> <span class="n">seq_idx</span><span class="p">,</span> <span class="n">seq_item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>                <span class="n">tree_seq_item</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="w">
+</span>                    <span class="s2">&quot;</span><span class="s2">&quot;</span><span class="p">,</span> <a class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/tkinter.html#tkinter.END" title="tkinter.END"><span class="n">tk</span><span class="o">.</span><span class="n">END</span></a><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">elem</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> Item </span><span class="si">{</span><span class="n">seq_idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w">
+</span>                <span class="p">)</span><span class="w">
+</span>                <span class="n">tree</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tree_seq_item</span><span class="p">,</span> <span class="n">tree_item</span><span class="p">,</span> <span class="n">seq_idx</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>                <span class="c1"># Recurse into the sequence item(s)</span><span class="w">
+</span>                <span class="n">build_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">seq_item</span><span class="p">,</span> <span class="n">tree_seq_item</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">if</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">__main__</span><span class="s2">&quot;</span><span class="p">:</span><span class="w">
+</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span><span class="w">
+</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Please supply the path to a DICOM file: python dicomtree.py path</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>        <a class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Read the supplied DICOM dataset</span><span class="w">
+</span>    <span class="n">path</span> <span class="o">=</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="p">(</span><a class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Create the root Tk widget</span><span class="w">
+</span>    <span class="n">root</span> <span class="o">=</span> <a class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="tkinter.Tk"><span class="n">tk</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span>    <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">1200x900</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">DICOM tree viewer - </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">root</span><span class="o">.</span><span class="n">rowconfigure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span>    <span class="n">root</span><span class="o">.</span><span class="n">columnconfigure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Use a monospaced font</span><span class="w">
+</span>    <span class="n">s</span> <span class="o">=</span> <a class="sphx-glr-backref-module-tkinter-ttk sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Style" title="tkinter.ttk.Style"><span class="n">ttk</span><span class="o">.</span><span class="n">Style</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span>    <span class="n">s</span><span class="o">.</span><span class="n">theme_use</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">clam</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">s</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Treeview</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Courier</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Create the tree and populate it</span><span class="w">
+</span>    <span class="n">tree</span> <span class="o">=</span> <a class="sphx-glr-backref-module-tkinter-ttk sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Treeview" title="tkinter.ttk.Treeview"><span class="n">ttk</span><span class="o">.</span><span class="n">Treeview</span></a><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="w">
+</span>    <span class="n">build_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="w">
+</span>    <span class="n">tree</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><a class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-data reference external" href="https://docs.python.org/3/library/tkinter.html#tkinter.NSEW" title="tkinter.NSEW"><span class="n">tk</span><span class="o">.</span><span class="n">NSEW</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># Start the DICOM tree widget</span><span class="w">
+</span>    <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-dicomtree-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ed6f1c20c1095e9847d76669a78b69c3/dicomtree.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">dicomtree.ipynb</span></code></a></p>

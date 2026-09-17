@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -557,75 +557,74 @@ Output with registered private tags:
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Darcy Mason and pydicom contributors</span>
-<span class="c1"># license : MIT</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.datadict</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries" class="sphx-glr-backref-module-pydicom-datadict sphx-glr-backref-type-py-function"><span class="n">add_private_dict_entries</span></a>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.valuerep</span><span class="w"> </span><span class="kn">import</span> <span class="n">VR</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
-
-<span class="c1"># create a dataset with some private tags for demonstration</span>
-<span class="c1"># we create the dataset with Implicit VR Little Endian transfer syntax,</span>
-<span class="c1"># so that the VR of the private tags will not be saved</span>
-
-<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-
-<span class="c1"># add private tags by creating a new private block and add elements to it</span>
-<a href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">block</span></a> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">private_block</span><span class="p">(</span><span class="mh">0x1001</span><span class="p">,</span> <span class="s2">"ACME 3.1"</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.add_new" title="pydicom.dataset.PrivateBlock.add_new" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-method"><span class="n">block</span><span class="o">.</span><span class="n">add_new</span></a><span class="p">(</span><span class="mh">0x01</span><span class="p">,</span> <a href="../../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VR</span><span class="o">.</span><span class="n">UL</span></a><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
-<a href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.add_new" title="pydicom.dataset.PrivateBlock.add_new" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-method"><span class="n">block</span><span class="o">.</span><span class="n">add_new</span></a><span class="p">(</span><span class="mh">0x02</span><span class="p">,</span> <a href="../../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VR</span><span class="o">.</span><span class="n">SH</span></a><span class="p">,</span> <span class="s2">"Hello World"</span><span class="p">)</span>
-<a href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.add_new" title="pydicom.dataset.PrivateBlock.add_new" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-method"><span class="n">block</span><span class="o">.</span><span class="n">add_new</span></a><span class="p">(</span><span class="mh">0x03</span><span class="p">,</span> <a href="../../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VR</span><span class="o">.</span><span class="n">UI</span></a><span class="p">,</span> <span class="s2">"1.2.3.4.5"</span><span class="p">)</span>
-
-<span class="c1"># write the dataset into a memory file and read it back</span>
-<span class="c1"># this simulates reading from a normal DICOM file</span>
-<a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class"><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span></a><span class="p">()</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">)</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Output for unknown private tags:"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-
-<span class="c1"># Creates output:</span>
-<span class="c1"># (1001,0010) Private Creator                     LO: 'ACME 3.1'</span>
-<span class="c1"># (1001,1001) Private tag data                    UN: b'*\x00\x00\x00'</span>
-<span class="c1"># (1001,1002) Private tag data                    UN: b'Hello World '</span>
-<span class="c1"># (1001,1003) Private tag data                    UN: b'1.2.3.4.5\x00'</span>
-
-
-<span class="c1"># Add the private tags to the private tag dictionary</span>
-
-<span class="c1"># Define items as (VR, VM, description, is_retired flag)</span>
-<span class="c1"># Leave is_retired flag blank.</span>
-<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">new_dict_items</span></a> <span class="o">=</span> <span class="p">{</span>
-    <span class="mh">0x10011001</span><span class="p">:</span> <span class="p">(</span><span class="s2">"UL"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span> <span class="s2">"Test One"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
-    <span class="mh">0x10011002</span><span class="p">:</span> <span class="p">(</span><span class="s2">"SH"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span> <span class="s2">"Test Two"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
-    <span class="mh">0x10011003</span><span class="p">:</span> <span class="p">(</span><span class="s2">"UI"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span> <span class="s2">"Test Three"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
-<span class="p">}</span>
-
-<span class="c1"># add the entries to the private dictionary, using the correct private creator string</span>
-<a href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries" class="sphx-glr-backref-module-pydicom-datadict sphx-glr-backref-type-py-function"><span class="n">add_private_dict_entries</span></a><span class="p">(</span><span class="n">private_creator</span><span class="o">=</span><span class="s2">"ACME 3.1"</span><span class="p">,</span> <span class="n">new_entries_dict</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">new_dict_items</span></a><span class="p">)</span>
-
-<span class="c1"># re-read the dataset for the new dictionary entries to be applied</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Output with registered private tags:"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-
-<span class="c1"># Creates output:</span>
-<span class="c1"># (1001,0010) Private Creator                     LO: 'ACME 3.1'</span>
-<span class="c1"># (1001,1001) [Test One]                          UL: 42</span>
-<span class="c1"># (1001,1002) [Test Two]                          SH: 'Hello World'</span>
-<span class="c1"># (1001,1003) [Test Three]                        UI: 1.2.3.4.5</span>
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.002 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="c1"># authors : Darcy Mason and pydicom contributors</span><span class="w">
+</span><span class="c1"># license : MIT</span><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcmread</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="nn">.</span><span class="nn">datadict</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pydicom-datadict sphx-glr-backref-type-py-function reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><span class="n">add_private_dict_entries</span></a><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="nn">.</span><span class="nn">dataset</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.Dataset"><span class="n">Dataset</span></a><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="nn">.</span><span class="nn">valuerep</span><span class="w"> </span><span class="kn">import</span> <span class="n">VR</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__doc__</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># create a dataset with some private tags for demonstration</span><span class="w">
+</span><span class="c1"># we create the dataset with Implicit VR Little Endian transfer syntax,</span><span class="w">
+</span><span class="c1"># so that the VR of the private tags will not be saved</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.Dataset"><span class="n">Dataset</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-property reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.is_implicit_VR" title="pydicom.FileDataset.is_implicit_VR"><span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span></a> <span class="o">=</span> <span class="kc">True</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-property reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.is_little_endian" title="pydicom.FileDataset.is_little_endian"><span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span></a> <span class="o">=</span> <span class="kc">True</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># add private tags by creating a new private block and add elements to it</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock"><span class="n">block</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-method reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.private_block" title="pydicom.FileDataset.private_block"><span class="n">ds</span><span class="o">.</span><span class="n">private_block</span></a><span class="p">(</span><span class="mh">0x1001</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">ACME 3.1</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-method reference internal" href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.add_new" title="pydicom.dataset.PrivateBlock.add_new"><span class="n">block</span><span class="o">.</span><span class="n">add_new</span></a><span class="p">(</span><span class="mh">0x01</span><span class="p">,</span> <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><span class="n">VR</span><span class="o">.</span><span class="n">UL</span></a><span class="p">,</span> <span class="mi">42</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-method reference internal" href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.add_new" title="pydicom.dataset.PrivateBlock.add_new"><span class="n">block</span><span class="o">.</span><span class="n">add_new</span></a><span class="p">(</span><span class="mh">0x02</span><span class="p">,</span> <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><span class="n">VR</span><span class="o">.</span><span class="n">SH</span></a><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">Hello World</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-method reference internal" href="../../reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.add_new" title="pydicom.dataset.PrivateBlock.add_new"><span class="n">block</span><span class="o">.</span><span class="n">add_new</span></a><span class="p">(</span><span class="mh">0x03</span><span class="p">,</span> <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><span class="n">VR</span><span class="o">.</span><span class="n">UI</span></a><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">1.2.3.4.5</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># write the dataset into a memory file and read it back</span><span class="w">
+</span><span class="c1"># this simulates reading from a normal DICOM file</span><span class="w">
+</span><a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">fp</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-method reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.save_as" title="pydicom.FileDataset.save_as"><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span></a><span class="p">(</span><a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">fp</span></a><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Output for unknown private tags:</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Creates output:</span><span class="w">
+</span><span class="c1"># (1001,0010) Private Creator                     LO: 'ACME 3.1'</span><span class="w">
+</span><span class="c1"># (1001,1001) Private tag data                    UN: b'*\x00\x00\x00'</span><span class="w">
+</span><span class="c1"># (1001,1002) Private tag data                    UN: b'Hello World '</span><span class="w">
+</span><span class="c1"># (1001,1003) Private tag data                    UN: b'1.2.3.4.5\x00'</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Add the private tags to the private tag dictionary</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Define items as (VR, VM, description, is_retired flag)</span><span class="w">
+</span><span class="c1"># Leave is_retired flag blank.</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">new_dict_items</span></a> <span class="o">=</span> <span class="p">{</span><span class="w">
+</span>    <span class="mh">0x10011001</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;</span><span class="s2">UL</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">1</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">Test One</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="mh">0x10011002</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;</span><span class="s2">SH</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">1</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">Test Two</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="mh">0x10011003</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;</span><span class="s2">UI</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">1</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">Test Three</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># add the entries to the private dictionary, using the correct private creator string</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom-datadict sphx-glr-backref-type-py-function reference internal" href="../../reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><span class="n">add_private_dict_entries</span></a><span class="p">(</span><span class="n">private_creator</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">ACME 3.1</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">new_entries_dict</span><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">new_dict_items</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># re-read the dataset for the new dictionary entries to be applied</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO"><span class="n">fp</span></a><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Output with registered private tags:</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Creates output:</span><span class="w">
+</span><span class="c1"># (1001,0010) Private Creator                     LO: 'ACME 3.1'</span><span class="w">
+</span><span class="c1"># (1001,1001) [Test One]                          UL: 42</span><span class="w">
+</span><span class="c1"># (1001,1002) [Test Two]                          SH: 'Hello World'</span><span class="w">
+</span><span class="c1"># (1001,1003) [Test Three]                        UI: 1.2.3.4.5</span><span class="w">
+</span></pre></div></div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.003 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-metadata-processing-plot-add-dict-entries-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/54be3151aaa6e43d8757c4eaeb691675/plot_add_dict_entries.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_add_dict_entries.ipynb</span></code></a></p>

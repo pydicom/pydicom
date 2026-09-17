@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -617,44 +617,43 @@ to download the full example code.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
-<span class="c1"># license : MIT</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58&#64;gmail.com&gt;</span><span class="w">
+</span><span class="c1"># license : MIT</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__doc__</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">myprint</span><span class="p">(</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Go through all items in the dataset and print them with custom format
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="w"> </span><span class="kn">import</span> <span class="n">examples</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Go through all items in the dataset and print them with custom format</span>
-
-<span class="sd">    Modelled after Dataset._pretty_str()</span>
-<span class="sd">    """</span>
-    <span class="n">dont_print</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Pixel Data"</span><span class="p">,</span> <span class="s2">"File Meta Information Version"</span><span class="p">]</span>
-
-    <span class="n">indent_string</span> <span class="o">=</span> <span class="s2">"   "</span> <span class="o">*</span> <span class="n">indent</span>
-    <span class="n">next_indent_string</span> <span class="o">=</span> <span class="s2">"   "</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">"SQ"</span><span class="p">:</span>  <span class="c1"># a sequence</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">sequence_item</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                <span class="n">myprint</span><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">next_indent_string</span><span class="si">}</span><span class="s2">---------"</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">dont_print</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">"""&lt;item not printed -- in the "don't print" list&gt;"""</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">repr_value</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repr_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
-                    <span class="n">repr_value</span> <span class="o">=</span> <span class="n">repr_value</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">indent_string</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">elem</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">repr_value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-
-<span class="n">ds</span> <span class="o">=</span> <span class="n">examples</span><span class="o">.</span><span class="n">mr</span>
-<span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-</pre></div>
-</div>
+    Modelled after Dataset._pretty_str()
+    &quot;&quot;&quot;</span><span class="w">
+</span>    <span class="n">dont_print</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="s2">Pixel Data</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">File Meta Information Version</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span>    <span class="n">indent_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">   </span><span class="s2">&quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="w">
+</span>    <span class="n">next_indent_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">   </span><span class="s2">&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a><span class="p">:</span><span class="w">
+</span>        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">SQ</span><span class="s2">&quot;</span><span class="p">:</span>  <span class="c1"># a sequence</span><span class="w">
+</span>            <span class="nb">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="w">
+</span>            <span class="k">for</span> <span class="n">sequence_item</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">:</span><span class="w">
+</span>                <span class="n">myprint</span><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="w">
+</span>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">next_indent_string</span><span class="si">}</span><span class="s2">---------</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>        <span class="k">else</span><span class="p">:</span><span class="w">
+</span>            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">dont_print</span><span class="p">:</span><span class="w">
+</span>                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="s2">&lt;item not printed -- in the </span><span class="s2">&quot;</span><span class="s2">don</span><span class="s2">'</span><span class="s2">t print</span><span class="s2">&quot;</span><span class="s2"> list&gt;</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span><span class="w">
+</span>            <span class="k">else</span><span class="p">:</span><span class="w">
+</span>                <span class="n">repr_value</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="w">
+</span>                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repr_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span><span class="w">
+</span>                    <span class="n">repr_value</span> <span class="o">=</span> <span class="n">repr_value</span><span class="p">[</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="s2">...</span><span class="s2">&quot;</span><span class="w">
+</span>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indent_string</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">elem</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">repr_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">examples</span><span class="o">.</span><span class="n">mr</span></a><span class="w">
+</span><span class="n">myprint</span><span class="p">(</span><a class="sphx-glr-backref-module-pydicom sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.FileDataset"><span class="n">ds</span></a><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.005 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">

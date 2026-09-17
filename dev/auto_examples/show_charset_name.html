@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -536,49 +536,48 @@ to download the full example code.</p>
 <section class="sphx-glr-example-title" id="display-unicode-person-names">
 <span id="sphx-glr-auto-examples-show-charset-name-py"></span><h1>Display unicode person names<a class="headerlink" href="#display-unicode-person-names" title="Link to this heading">#</a></h1>
 <p>Very simple app to display unicode person names.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
-<span class="c1"># license : MIT</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydicom.valuerep</span><span class="w"> </span><span class="kn">import</span> <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
-
-<span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">"iso8859"</span>
-
-<span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="tkinter.Tk" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
-
-
-<span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
-        <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span>
-        <span class="sa">b</span><span class="s2">"Yamada^Tarou=</span><span class="se">\033</span><span class="s2">$B;3ED</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$BB@O:"</span>
-        <span class="sa">b</span><span class="s2">"</span><span class="se">\033</span><span class="s2">(B=</span><span class="se">\033</span><span class="s2">$B$d$^$@</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$B$?$m$&amp;</span><span class="se">\033</span><span class="s2">(B"</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">"iso2022_jp"</span><span class="p">],</span>
-    <span class="p">),</span>
-    <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
-        <span class="sa">b</span><span class="s2">"Wang^XiaoDong=</span><span class="se">\xcd\xf5\x5e\xd0\xa1\xb6\xab</span><span class="s2">="</span><span class="p">,</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">"GB18030"</span><span class="p">]</span>
-    <span class="p">),</span>
-    <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
-        <span class="sa">b</span><span class="s2">"Wang^XiaoDong=</span><span class="se">\xe7\x8e\x8b\x5e\xe5\xb0\x8f\xe6\x9d\xb1</span><span class="s2">="</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">"UTF-8"</span><span class="p">],</span>
-    <span class="p">),</span>
-    <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PersonName</span></a><span class="p">(</span>
-        <span class="sa">b</span><span class="s2">"Hong^Gildong=</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\373\363</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\321\316\324\327</span><span class="s2">="</span>
-        <span class="sa">b</span><span class="s2">"</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\310\253</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\261\346\265\277</span><span class="s2">"</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">"euc_kr"</span><span class="p">],</span>
-    <span class="p">),</span>
-<span class="p">]</span>
-<span class="k">for</span> <span class="n">person_name</span> <span class="ow">in</span> <span class="n">person_names</span><span class="p">:</span>
-    <span class="n">label</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Label" title="tkinter.Label" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter</span><span class="o">.</span><span class="n">Label</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">person_name</span><span class="p">)</span>
-    <span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-<span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58&#64;gmail.com&gt;</span><span class="w">
+</span><span class="c1"># license : MIT</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pydicom</span><span class="nn">.</span><span class="nn">valuerep</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><span class="n">PersonName</span></a><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__doc__</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">iso8859</span><span class="s2">&quot;</span><span class="w">
+</span><span class="w">
+</span><span class="n">root</span> <span class="o">=</span> <a class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="tkinter.Tk"><span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><span class="n">PersonName</span></a><span class="p">(</span><span class="w">
+</span>        <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span><span class="w">
+</span>        <span class="sa">b</span><span class="s2">&quot;</span><span class="s2">Yamada^Tarou=</span><span class="se">\033</span><span class="s2">$B;3ED</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$BB&#64;O:</span><span class="s2">&quot;</span><span class="w">
+</span>        <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">(B=</span><span class="se">\033</span><span class="s2">$B$d$^$&#64;</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$B$?$m$&amp;</span><span class="se">\033</span><span class="s2">(B</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">iso2022_jp</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><span class="n">PersonName</span></a><span class="p">(</span><span class="w">
+</span>        <span class="sa">b</span><span class="s2">&quot;</span><span class="s2">Wang^XiaoDong=</span><span class="se">\xcd</span><span class="se">\xf5</span><span class="se">\x5e</span><span class="se">\xd0</span><span class="se">\xa1</span><span class="se">\xb6</span><span class="se">\xab</span><span class="s2">=</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">GB18030</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span>    <span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><span class="n">PersonName</span></a><span class="p">(</span><span class="w">
+</span>        <span class="sa">b</span><span class="s2">&quot;</span><span class="s2">Wang^XiaoDong=</span><span class="se">\xe7</span><span class="se">\x8e</span><span class="se">\x8b</span><span class="se">\x5e</span><span class="se">\xe5</span><span class="se">\xb0</span><span class="se">\x8f</span><span class="se">\xe6</span><span class="se">\x9d</span><span class="se">\xb1</span><span class="s2">=</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">UTF-8</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><span class="n">PersonName</span></a><span class="p">(</span><span class="w">
+</span>        <span class="sa">b</span><span class="s2">&quot;</span><span class="s2">Hong^Gildong=</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\373</span><span class="se">\363</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\321</span><span class="se">\316</span><span class="se">\324</span><span class="se">\327</span><span class="s2">=</span><span class="s2">&quot;</span><span class="w">
+</span>        <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\310</span><span class="se">\253</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\261</span><span class="se">\346</span><span class="se">\265</span><span class="se">\277</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">euc_kr</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="p">,</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span><span class="k">for</span> <span class="n">person_name</span> <span class="ow">in</span> <span class="n">person_names</span><span class="p">:</span><span class="w">
+</span>    <span class="n">label</span> <span class="o">=</span> <a class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/tkinter.html#tkinter.Label" title="tkinter.Label"><span class="n">tkinter</span><span class="o">.</span><span class="n">Label</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">person_name</span><span class="p">)</span><span class="w">
+</span>    <span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-show-charset-name-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/bb021fd9386c2d9fad526c267d8726d5/show_charset_name.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">show_charset_name.ipynb</span></code></a></p>
