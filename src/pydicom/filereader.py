@@ -893,8 +893,8 @@ def read_partial(
     elif transfer_syntax == pydicom.uid.ExplicitVRBigEndian:
         is_implicit_VR = False
         is_little_endian = False
-    elif transfer_syntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
-        # See PS3.5 section A.5
+    elif transfer_syntax in pydicom.uid.DeflatedTransferSyntaxes:
+        # See PS3.5 sections A.5, A.7 and A.12
         # when written, the entire dataset following
         #     the file metadata was prepared the normal way,
         #     then "deflate" compression applied.

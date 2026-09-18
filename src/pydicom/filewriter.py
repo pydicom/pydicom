@@ -37,7 +37,7 @@ from pydicom.tag import (
     _LUT_DESCRIPTOR_TAGS,
 )
 from pydicom.uid import (
-    DeflatedExplicitVRLittleEndian,
+    DeflatedTransferSyntaxes,
     UID,
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
@@ -1454,8 +1454,8 @@ def dcmwrite(
         if file_meta:  # May be empty
             write_file_meta_info(fp, file_meta, enforce_standard=enforce_file_format)
 
-        if tsyntax == DeflatedExplicitVRLittleEndian:
-            # See PS3.5 section A.5
+        if tsyntax in DeflatedTransferSyntaxes:
+            # See PS3.5 sections A.5, A.7 and A.12
             # When writing, the entire dataset following the file meta data
             #   is encoded normally, then "deflate" compression applied
             buffer = DicomBytesIO()
