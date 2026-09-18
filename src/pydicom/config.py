@@ -405,11 +405,11 @@ displaying the file meta information data elements
 """
 
 import pydicom.pixel_data_handlers.numpy_handler as np_handler
-import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
-import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
+import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa: PLR0402
+import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa: PLR0402
 import pydicom.pixel_data_handlers.jpeg_ls_handler as jpegls_handler
-import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler  # noqa
-import pydicom.pixel_data_handlers.pylibjpeg_handler as pylibjpeg_handler  # noqa
+import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler  # noqa: PLR0402
+import pydicom.pixel_data_handlers.pylibjpeg_handler as pylibjpeg_handler  # noqa: PLR0402
 
 pixel_data_handlers = [
     np_handler,
