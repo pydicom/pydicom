@@ -1869,7 +1869,7 @@ class Dataset:  # noqa: PLW1641
             "Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
             "be able to decode the data".format(
-                ", ".join([str(hh) for hh in available_handlers])
+                ", ".join(str(hh) for hh in available_handlers)
             )
         )
         raise last_exception  # type: ignore[misc]
