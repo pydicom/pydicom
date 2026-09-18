@@ -454,7 +454,7 @@ def write_PN(
     else:
         val = cast(list[PersonName], elem.value)
 
-    enc = b"\\".join([elem.encode(encodings) for elem in val])
+    enc = b"\\".join(elem.encode(encodings) for elem in val)
     if len(enc) % 2 != 0:
         enc += b" "
 
@@ -501,10 +501,10 @@ def write_text(
             val = cast(Sequence[bytes] | Sequence[str], val)
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
-                val = b"\\".join([encode_string(val, encodings) for val in val])
+                val = b"\\".join(encode_string(val, encodings) for val in val)
             else:
                 val = cast(Sequence[bytes], val)
-                val = b"\\".join([val for val in val])
+                val = b"\\".join(val for val in val)
         else:
             val = cast(bytes | str, val)
             if isinstance(val, str):
