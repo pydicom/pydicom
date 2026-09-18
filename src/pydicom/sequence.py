@@ -4,15 +4,16 @@
 Sequence is a list of pydicom Dataset objects.
 """
 
-from typing import cast, Any, TypeVar
+from typing import cast, Any
 from collections.abc import Iterable
+
+try:
+    from typing import Self  # type: ignore[attr-defined]
+except ImportError:
+    from typing_extensions import Self  # Python <= 3.10
 
 from pydicom.dataset import Dataset
 from pydicom.multival import ConstrainedList
-
-
-# Python 3.11 adds typing.Self, until then...
-Self = TypeVar("Self", bound="Sequence")
 
 
 class Sequence(ConstrainedList[Dataset]):
@@ -69,7 +70,7 @@ class Sequence(ConstrainedList[Dataset]):
 
     def __str__(self) -> str:
         """String description of the Sequence."""
-        return f"[{''.join([str(x) for x in self])}]"
+        return f"[{''.join(str(x) for x in self)}]"
 
     def __repr__(self) -> str:
         """String representation of the Sequence."""

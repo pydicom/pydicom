@@ -29,7 +29,7 @@ from collections.abc import (
     Callable,
     MutableSequence,
     MutableMapping,
-    Set,
+    Set as AbstractSet,
 )
 from contextlib import nullcontext
 from importlib.util import find_spec as have_package
@@ -43,7 +43,6 @@ from typing import (
     AnyStr,
     cast,
     BinaryIO,
-    TypeVar,
     overload,
 )
 
@@ -227,10 +226,10 @@ def _dict_equal(a: "Dataset", b: Any, exclude: list[str] | None = None) -> bool:
     """
     return (
         len(a) == len(b)
-        and all(key in b for key in a.keys())
+        and all(key in b for key in a.keys())  # noqa: SIM118
         and all(
             a[key] == b[key]
-            for key in a.keys()
+            for key in a.keys()  # noqa: SIM118
             if exclude is None or key not in exclude
         )
     )
@@ -423,7 +422,7 @@ class Dataset:  # noqa: PLW1641
         #   ambiguous VR correction function
         self._pixel_rep: int
 
-    def __enter__(self) -> "Dataset":
+    def __enter__(self) -> "Dataset":  # noqa: PYI034
         """Method invoked on entry to a with statement."""
         return self
 
@@ -782,7 +781,7 @@ class Dataset:  # noqa: PLW1641
             The matching element keywords in the dataset. If no
             filters are used then all element keywords are returned.
         """
-        allnames = [keyword_for_tag(tag) for tag in self._dict.keys()]
+        allnames = [keyword_for_tag(tag) for tag in self._dict]
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
@@ -797,7 +796,7 @@ class Dataset:  # noqa: PLW1641
 
         return sorted(allnames)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -871,7 +870,7 @@ class Dataset:  # noqa: PLW1641
         except KeyError:
             return default
 
-    def items(self) -> Set[tuple[BaseTag, _DatasetValue]]:
+    def items(self) -> AbstractSet[tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -883,7 +882,7 @@ class Dataset:  # noqa: PLW1641
         """
         return self._dict.items()
 
-    def keys(self) -> Set[BaseTag]:
+    def keys(self) -> AbstractSet[BaseTag]:
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns
@@ -1563,7 +1562,7 @@ class Dataset:  # noqa: PLW1641
         """Return the number of elements in the top level of the dataset."""
         return len(self._dict)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Compare `self` and `other` for inequality."""
         return not self == other
 
@@ -1741,9 +1740,7 @@ class Dataset:  # noqa: PLW1641
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
-        if not hasattr(self, "_pixel_array"):
-            already_have = False
-        elif self._pixel_array is None:
+        if not hasattr(self, "_pixel_array") or self._pixel_array is None:
             already_have = False
 
         # Checking `_pixel_id` may sometimes give a false result if the pixel
@@ -1872,7 +1869,7 @@ class Dataset:  # noqa: PLW1641
             "Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
             "be able to decode the data".format(
-                ", ".join([str(hh) for hh in available_handlers])
+                ", ".join(str(hh) for hh in available_handlers)
             )
         )
         raise last_exception  # type: ignore[misc]
@@ -2847,7 +2844,7 @@ class Dataset:  # noqa: PLW1641
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
             if not isinstance(elem.value, pydicom.Sequence):
-                elem.value = pydicom.Sequence(elem.value)  # type: ignore
+                elem.value = pydicom.Sequence(elem.value)
 
             # Update the `_pixel_rep` attribute when nested sequences
             #   containing RawDataElements are being added to a different
@@ -3227,7 +3224,7 @@ class Dataset:  # noqa: PLW1641
                 except Exception as exc:
                     if not suppress_invalid_tags:
                         logger.error(f"Error while processing tag {json_key}")
-                        raise exc
+                        raise
 
                     logger.warning(f"Error while processing tag {json_key}: {exc}")
 
@@ -3361,9 +3358,6 @@ class Dataset:  # noqa: PLW1641
         self._dict[tag] = raw._replace(VR=vr, value=value)
 
     __repr__ = __str__
-
-
-_FileDataset = TypeVar("_FileDataset", bound="FileDataset")
 
 
 class FileDataset(Dataset):
@@ -3641,7 +3635,7 @@ class FileMetaDataset(Dataset):
                 f"Argument must be a dict or Dataset, not {type(init_value)}"
             )
 
-        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]
+        non_group2 = [str(Tag(tag)) for tag in init_value.keys() if Tag(tag).group != 2]  # noqa: SIM118
         if non_group2:
             raise ValueError(
                 "File meta datasets may only contain group 2 elements but the "

@@ -677,7 +677,7 @@ class TestRawDataElement:
         raw = RawDataElement(Tag(0x00090001), vr, 8, b"42\\43 ", 0, False, True)
         value = convert_raw_data_element(raw).value
         assert isinstance(value, MultiValue)
-        assert len(value), 2
+        assert len(value) == 2
         assert value == ["42", "43"]
 
     @pytest.mark.parametrize(
@@ -701,7 +701,7 @@ class TestRawDataElement:
         )
         value = convert_raw_data_element(raw).value
         assert isinstance(value, MultiValue)
-        assert len(value), 2
+        assert len(value) == 2
         assert value == [42, 42]
 
     @pytest.fixture

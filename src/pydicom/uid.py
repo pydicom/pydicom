@@ -51,14 +51,14 @@ class UID(str):
     """
 
     _PRIVATE_TS_ENCODING: tuple[bool, bool]
-    _NATIVE_ENCODING = [
+    _NATIVE_ENCODING = (
         "1.2.840.10008.1.2",  # Explicit VR Little Endian
         "1.2.840.10008.1.2.1",  # Implicit VR Little Endian
         "1.2.840.10008.1.2.2",  # Explicit VR Big Endian
         "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
-    ]
+    )
 
-    def __new__(
+    def __new__(  # noqa: PYI034
         cls: type["UID"], val: str, validation_mode: int | None = None
     ) -> "UID":
         """Setup new instance of the class.
@@ -95,7 +95,7 @@ class UID(str):
         if self.is_transfer_syntax:
             if not self.is_private:
                 # Implicit VR Little Endian
-                if self == "1.2.840.10008.1.2":
+                if self == "1.2.840.10008.1.2":  # noqa: SIM103
                     return True
 
                 # Explicit VR Little Endian
@@ -114,7 +114,7 @@ class UID(str):
         if self.is_transfer_syntax:
             if not self.is_private:
                 # Explicit VR Big Endian
-                if self == "1.2.840.10008.1.2.2":
+                if self == "1.2.840.10008.1.2.2":  # noqa: SIM103
                     return False
 
                 # Explicit VR Little Endian
@@ -140,7 +140,7 @@ class UID(str):
         """Return ``True`` if a deflated transfer syntax UID."""
         if self.is_transfer_syntax:
             # Deflated Explicit VR Little Endian
-            if self == "1.2.840.10008.1.2.1.99":
+            if self == "1.2.840.10008.1.2.1.99":  # noqa: SIM103
                 return True
 
             # Explicit VR Little Endian
@@ -160,11 +160,7 @@ class UID(str):
     def is_compressed(self) -> bool:
         """Return ``True`` if a compressed transfer syntax UID."""
         if self.is_transfer_syntax:
-            if self in self._NATIVE_ENCODING:
-                return False
-
-            # All encapsulated transfer syntaxes
-            return True
+            return not self in self._NATIVE_ENCODING
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -221,10 +217,7 @@ class UID(str):
     @property
     def is_valid(self) -> bool:
         """Return ``True`` if `self` is a valid UID, ``False`` otherwise."""
-        if len(self) <= 64 and re.match(RE_VALID_UID, self):
-            return True
-
-        return False
+        return len(self) <= 64 and bool(re.match(RE_VALID_UID, self))
 
     def set_private_encoding(self, implicit_vr: bool, little_endian: bool) -> None:
         """Set the corresponding dataset encoding for a privately defined transfer

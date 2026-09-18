@@ -146,23 +146,23 @@ class TestCLIcall:
         """CLI `codify` command prints correct output"""
 
         # With private elements
-        main("codify -p pydicom::nested_priv_SQ.dcm".split())
+        main(["codify", "-p", "pydicom::nested_priv_SQ.dcm"])
         out, _ = capsys.readouterr()
         assert "add_new((0x0001, 0x0001)" in out
 
         # Without private elements
-        main("codify pydicom::nested_priv_SQ.dcm".split())
+        main(["codify", "pydicom::nested_priv_SQ.dcm"])
         out, _ = capsys.readouterr()
         assert "add_new((0x0001, 0x0001)" not in out
 
     def test_codify_data_element(self, capsys):
         """CLI `codify` command raises error if not a Dataset"""
         with pytest.raises(NotImplementedError):
-            main("codify pydicom::rtplan.dcm::RTPlanLabel".split())
+            main(["codify", "pydicom::rtplan.dcm::RTPlanLabel"])
 
     def test_codify_UTF8(self, capsys):
         """CLI `codify` command creates code with utf-8 characters"""
-        main("codify pydicom::chrFren.dcm".split())
+        main(["codify", "pydicom::chrFren.dcm"])
         out, _ = capsys.readouterr()
         assert out.startswith("# -*- coding: utf-8 -*-")
         assert "Buc^Jérôme" in out
@@ -170,7 +170,7 @@ class TestCLIcall:
     def test_help(self, capsys):
         """CLI `help` command gives expected output"""
         # With subcommand
-        main("help show".split())
+        main(["help", "show"])
         out, err = capsys.readouterr()
         assert out.startswith("usage: pydicom show [-h] [")
         assert err == ""
@@ -181,13 +181,13 @@ class TestCLIcall:
         assert "Available subcommands:" in out
 
         # Non-existent subcommand following
-        main("help DoesntExist".split())
+        main(["help", "DoesntExist"])
         out, _ = capsys.readouterr()
         assert "Available subcommands:" in out
 
     def test_show_command(self, capsys):
         """CLI `show` command prints correct output"""
-        main("show pydicom::MR_small_RLE.dcm".split())
+        main(["show", "pydicom::MR_small_RLE.dcm"])
         out, err = capsys.readouterr()
 
         assert "Instance Creation Date              DA: '20040826'" in out
@@ -195,14 +195,14 @@ class TestCLIcall:
         assert err == ""
 
         # Get a specific data element
-        main("show pydicom::MR_small_RLE.dcm::LargestImagePixelValue".split())
+        main(["show", "pydicom::MR_small_RLE.dcm::LargestImagePixelValue"])
         out, _ = capsys.readouterr()
         assert "4000" == out.strip()
 
     def test_show_options(self, capsys):
         """CLI `show` command with options prints correct output"""
         # Quiet option, image file
-        main("show -q pydicom::MR_small_RLE.dcm".split())
+        main(["show", "-q", "pydicom::MR_small_RLE.dcm"])
         out, err = capsys.readouterr()
 
         assert out.startswith("SOPClassUID: MR Image Storage")
@@ -210,7 +210,7 @@ class TestCLIcall:
         assert err == ""
 
         # 'Quiet' option, RTPLAN file
-        main("show -q pydicom::rtplan.dcm".split())
+        main(["show", "-q", "pydicom::rtplan.dcm"])
         out, err = capsys.readouterr()
         assert out.endswith(
             "Beam 1 'Field 1' TREATMENT STATIC PHOTON energy 6.00000000000000 "
@@ -220,14 +220,14 @@ class TestCLIcall:
         assert err == ""
 
         # Top-level-only option, also different file for more variety
-        main("show -t pydicom::nested_priv_SQ.dcm".split())
+        main(["show", "-t", "pydicom::nested_priv_SQ.dcm"])
         out, err = capsys.readouterr()
         assert "(0001,0001)  Private Creator" in out
         assert "UN: b'Nested SQ'" not in out
         assert err == ""
 
         # Exclude private option
-        main("show -x pydicom::nested_priv_SQ.dcm".split())
+        main(["show", "-x", "pydicom::nested_priv_SQ.dcm"])
         out, err = capsys.readouterr()
         assert "(0001,0001)  Private Creator" not in out
         assert err == ""

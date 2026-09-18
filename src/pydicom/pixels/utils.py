@@ -6,7 +6,8 @@ from collections.abc import Iterable, Iterator
 try:
     from collections.abc import Buffer  # type: ignore[attr-defined]
 except ImportError:
-    from collections.abc import ByteString as Buffer  # Python 3.10, 3.11
+    from collections.abc import ByteString as Buffer  # Python <= 3.11  # noqa: PYI057
+
 import math
 import importlib
 import logging
@@ -61,7 +62,7 @@ _IMAGE_PIXEL = {
     0x00280103: "pixel_representation",
 }
 # Default tags to look for with pixel_array() and iter_pixels()
-_DEFAULT_TAGS = {k for k in _IMAGE_PIXEL.keys()} | {0x7FE00001, 0x7FE00002}
+_DEFAULT_TAGS = {k for k in _IMAGE_PIXEL} | {0x7FE00001, 0x7FE00002}
 _PIXEL_KEYWORDS = {
     (0x7FE0, 0x0008): "FloatPixelData",
     (0x7FE0, 0x0009): "DoubleFloatPixelData",
@@ -174,10 +175,10 @@ def _array_common(
     endianness = "><"[tsyntax.is_little_endian]
     if tsyntax.is_implicit_VR:
         vr = None
-        group, elem, length = unpack(f"{endianness}HHL", data)
+        group, elem, _length = unpack(f"{endianness}HHL", data)
     else:
         # Is always 32-bit extended length for pixel data VRs
-        group, elem, vr, length = unpack(f"{endianness}HH2sH", data)
+        group, elem, vr, _length = unpack(f"{endianness}HH2sH", data)
         opts["pixel_vr"] = vr.decode(default_encoding)
         unpack(f"{endianness}L", f.read(4))
 
@@ -404,7 +405,7 @@ def compress(
     uid = UID(transfer_syntax_uid)
     encoder = get_encoder(uid)
     if not encoder.is_available:
-        missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
+        missing = "\n".join(f"    {s}" for s in encoder.missing_dependencies)
         raise RuntimeError(
             f"The pixel data encoder for '{uid.name}' is unavailable because all "
             f"of its plugins are missing dependencies:\n{missing}"
@@ -657,7 +658,7 @@ def decompress(
     else:
         decoder = get_decoder(uid)
         if not decoder.is_available:
-            missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
+            missing = "\n".join(f"    {s}" for s in decoder.missing_dependencies)
             raise RuntimeError(
                 f"Unable to decompress as the plugins for the '{uid.name}' decoder "
                 f"are all missing dependencies:\n{missing}"
