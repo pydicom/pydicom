@@ -95,7 +95,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
     for sub_elem in element.split("."):
         # e.g. match "BeamSequence[1]" --> groups: ['BeamSequence', '1']
         m = re.match(re_kywd_or_item, sub_elem)
-        identifier = m.groups()[0]  # type: ignore
+        identifier = m.groups()[0]  # type: ignore[union-attr]
 
         if tag_for_keyword(identifier) is not None:  # Standard DICOM keyword
             obj = getattr(obj, identifier, None)
@@ -125,9 +125,9 @@ def eval_element(ds: Dataset, element: str) -> Any:
             )
 
         # If here, then have the new object, handle indexing if there
-        if (index := m.groups()[1]) is not None:  # type: ignore
+        if (index := m.groups()[1]) is not None:  # type: ignore[union-attr]
             try:
-                obj = obj[int(index)]  # type: ignore
+                obj = obj[int(index)]  # type: ignore[assignment]
             except (IndexError, TypeError) as e:
                 raise argparse.ArgumentTypeError(f"'{index}' gave an index error: {e}")
 

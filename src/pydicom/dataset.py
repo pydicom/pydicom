@@ -2844,7 +2844,7 @@ class Dataset:  # noqa: PLW1641
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
             if not isinstance(elem.value, pydicom.Sequence):
-                elem.value = pydicom.Sequence(elem.value)  # type: ignore
+                elem.value = pydicom.Sequence(elem.value)
 
             # Update the `_pixel_rep` attribute when nested sequences
             #   containing RawDataElements are being added to a different
