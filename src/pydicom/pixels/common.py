@@ -253,7 +253,7 @@ class CoderBase:
         if self._available:
             return self._available.copy()
 
-        missing = "\n".join([f"\t{s}" for s in self.missing_dependencies])
+        missing = "\n".join(f"\t{s}" for s in self.missing_dependencies)
         if self._decoder:
             raise RuntimeError(
                 f"Unable to decompress '{self.UID.name}' pixel data because all "
@@ -496,7 +496,7 @@ class RunnerBase:
             if len(set(values)) == 1:
                 return values[0]
 
-            values_str = ", ".join([str(v) for v in sorted(set(values))])
+            values_str = ", ".join(str(v) for v in sorted(set(values)))
             raise ValueError(
                 f"Multiple inconsistent inter-frame values found for '{name}': "
                 f"{values_str}"

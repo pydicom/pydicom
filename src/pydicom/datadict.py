@@ -18,7 +18,7 @@ for mask_x in RepeatersDictionary:
     # then AND those out with 0 bits at the "x"
     # ("we don't care") location using mask2
     mask1 = int(mask_x.replace("x", "0"), 16)
-    mask2 = int("".join(["F0"[c == "x"] for c in mask_x]), 16)
+    mask2 = int("".join("F0"[c == "x"] for c in mask_x), 16)
     masks[mask_x] = (mask1, mask2)
 
 
