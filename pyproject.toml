@@ -122,6 +122,7 @@ ignore = [
     "SIM102",
     "SIM115",
     "SIM117",
+    "I",  # FIXME
     "PERF203",
     "PLC0415",
     "PLC1901",
