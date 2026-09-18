@@ -405,7 +405,7 @@ def compress(
     uid = UID(transfer_syntax_uid)
     encoder = get_encoder(uid)
     if not encoder.is_available:
-        missing = "\n".join([f"    {s}" for s in encoder.missing_dependencies])
+        missing = "\n".join(f"    {s}" for s in encoder.missing_dependencies)
         raise RuntimeError(
             f"The pixel data encoder for '{uid.name}' is unavailable because all "
             f"of its plugins are missing dependencies:\n{missing}"
@@ -658,7 +658,7 @@ def decompress(
     else:
         decoder = get_decoder(uid)
         if not decoder.is_available:
-            missing = "\n".join([f"    {s}" for s in decoder.missing_dependencies])
+            missing = "\n".join(f"    {s}" for s in decoder.missing_dependencies)
             raise RuntimeError(
                 f"Unable to decompress as the plugins for the '{uid.name}' decoder "
                 f"are all missing dependencies:\n{missing}"
