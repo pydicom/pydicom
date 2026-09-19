@@ -1,4 +1,4 @@
-# Copyright 2008-2022 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2026 pydicom authors. See LICENSE file for details.
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
 import hashlib
@@ -59,7 +59,7 @@ class UID(str):
     ]
 
     def __new__(
-        cls: type["UID"], val: str, validation_mode: int | None = None
+        cls: type["UID"], val: str, validation_mode: config.ValidationMode | None = None
     ) -> "UID":
         """Setup new instance of the class.
 
