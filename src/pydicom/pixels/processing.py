@@ -799,14 +799,18 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
                 "for a 'LINEAR_EXACT' windowing operation"
             )
 
-        below = arr <= (center - width / 2)
-        above = arr > (center + width / 2)
-        between = np.logical_and(~below, ~above)
-
-        arr[below] = y_min
-        arr[above] = y_max
-        if between.any():
-            arr[between] = ((arr[between] - center) / width + 0.5) * y_range + y_min
+        if width == 0:
+            # Width 0 -> threshold: y_min if x <= center, y_max otherwise
+            arr -= center
+            np.sign(arr, out=arr)
+            np.clip(arr, 0, 1, out=arr)
+            arr *= y_range
+            arr += y_min
+        else:
+            # ((x - center) / width + 0.5) * y_range + y_min as m * x + b
+            arr *= y_range / width
+            arr += y_min + y_range * (0.5 - center / width)
+            np.clip(arr, y_min, y_max, out=arr)
     elif voi_func == "SIGMOID":
         # PS3.3 C.11.2.1.3.1
         if width <= 0:
@@ -815,7 +819,12 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
                 "for a 'SIGMOID' windowing operation"
             )
 
-        arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
+        arr -= center
+        arr *= -4.0 / width
+        np.exp(arr, out=arr)
+        arr += 1.0
+        np.divide(y_range, arr, out=arr)
+        arr += y_min
     else:
         raise ValueError(f"Unsupported (0028,1056) VOI LUT Function value '{voi_func}'")
 
