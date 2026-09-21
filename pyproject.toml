@@ -113,6 +113,7 @@ ignore = [
     "PIE790",
     "PIE808",
     "PYI019",  # remove after dropping Python 3.10
+    "PYI034",  # remove after dropping Python 3.10
     "PYI041",
     "PT031",
     "SIM102",
