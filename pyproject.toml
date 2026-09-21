@@ -22,7 +22,7 @@ classifiers=[
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Software Development :: Libraries"
 ]
-dependencies = ["typing-extensions; python_version<='3.10'"]
+dependencies = []
 description = "A pure Python package for reading and writing DICOM data"
 # dynamic = ["version"]
 keywords = ["dicom", "python", "medical", "imaging"]
@@ -112,6 +112,7 @@ ignore = [
     "DTZ005",
     "PIE790",
     "PIE808",
+    "PYI019",  # remove after dropping Python 3.10
     "PYI041",
     "PT031",
     "SIM102",
