@@ -58,7 +58,7 @@ class UID(str):
         "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
     )
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: type["UID"], val: str, validation_mode: int | None = None
     ) -> "UID":
         """Setup new instance of the class.
