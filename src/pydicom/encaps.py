@@ -1642,7 +1642,7 @@ def _decode_data_sequence(data: bytes) -> list[bytes]:
     with DicomBytesIO(data) as fp:
         # DICOM standard requires this
         fp.is_little_endian = True
-        BasicOffsetTable = _read_item(fp)  # noqa: F841
+        _read_item(fp)  # Basic Offset Table
         seq = []
 
         while True:
