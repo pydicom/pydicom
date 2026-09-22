@@ -1309,6 +1309,23 @@ class TestDecoder_Array:
         assert arr.flags.writeable
         assert meta["bits_stored"] == 12
 
+    def test_encapsulated_missing_frames(self):
+        """Test fewer encoded frames than 'Number of Frames' raises"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        src = encapsulate(frames[:-1])
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "Only 9 frames have been found in the encapsulated pixel data, which "
+            r"is less than the given \(0028,0008\) 'Number of Frames' value of 10"
+        )
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_array(src, **runner.options)
+
     def test_encapsulated_excess_frames(self):
         """Test returning excess frame data"""
         decoder = get_decoder(RLELossless)
@@ -1928,6 +1945,23 @@ class TestDecoder_Buffer:
         )
         with pytest.raises(ValueError, match=msg):
             decoder.as_buffer(reference.ds, index=9)
+
+    def test_encapsulated_missing_frames(self):
+        """Test fewer encoded frames than 'Number of Frames' raises"""
+        decoder = get_decoder(RLELossless)
+        reference = RLE_16_1_10F
+        frames = [x for x in generate_frames(reference.ds.PixelData)]
+        src = encapsulate(frames[:-1])
+
+        runner = DecodeRunner(RLELossless)
+        runner.set_source(reference.ds)
+
+        msg = (
+            "Only 9 frames have been found in the encapsulated pixel data, which "
+            r"is less than the given \(0028,0008\) 'Number of Frames' value of 10"
+        )
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(src, **runner.options)
 
     def test_encapsulated_excess_frames(self):
         """Test returning excess frame data"""
