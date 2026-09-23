@@ -456,7 +456,7 @@ def apply_presentation_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # nr_entries is the number of entries in the LUT
         # first_map is the first input value mapped and shall always be 0
         # bit_depth is number of bits for each entry, up to 16
-        nr_entries, first_map, bit_depth = item.LUTDescriptor
+        nr_entries, _first_map, bit_depth = item.LUTDescriptor
         nr_entries = 2**16 if nr_entries == 0 else nr_entries
 
         itemsize = 8 if bit_depth <= 8 else 16

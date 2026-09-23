@@ -69,7 +69,7 @@ class Sequence(ConstrainedList[Dataset]):
 
     def __str__(self) -> str:
         """String description of the Sequence."""
-        return f"[{''.join([str(x) for x in self])}]"
+        return f"[{''.join(str(x) for x in self)}]"
 
     def __repr__(self) -> str:
         """String representation of the Sequence."""

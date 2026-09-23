@@ -39,7 +39,7 @@ class TestExamples:
 
         # New instance every time the attribute is accessed
         assert examples.ct is not examples.ct
-        assert ct is ct  # noqa
+        assert ct is ct  # noqa: PLR0124
         assert isinstance(ct, FileDataset)
         assert ct.PatientName == "CompressedSamples^CT1"
 

@@ -102,7 +102,7 @@ class DicomIO:
     def __enter__(self: Self) -> Self:
         return self
 
-    def __exit__(self, *exc_info: ExitException) -> None:
+    def __exit__(self, *exc_info: object) -> None:
         self.close()
 
     @property

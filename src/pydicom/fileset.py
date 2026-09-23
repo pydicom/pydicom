@@ -151,7 +151,7 @@ def is_conformant_file_id(path: Path) -> bool:
     """
     # No more than 8 characters per component
     parts = path.parts
-    if any([len(pp) > 8 for pp in parts]):
+    if any(len(pp) > 8 for pp in parts):
         return False
 
     # No more than 8 components
@@ -166,10 +166,7 @@ def is_conformant_file_id(path: Path) -> bool:
         return False
 
     # Characters are in [0-9][A-Z] and _
-    if re.match(_RE_FILE_ID, chars):
-        return True
-
-    return False
+    return bool(re.match(_RE_FILE_ID, chars))
 
 
 class RecordNode(Iterable["RecordNode"]):
@@ -613,7 +610,7 @@ class RecordNode(Iterable["RecordNode"]):
         self._record = ds
 
         try:
-            self.key
+            self.key  # noqa: B018
         except (AttributeError, ValueError) as exc:
             raise ValueError(f"{msg} a required element") from exc
 
@@ -1482,7 +1479,7 @@ class FileSet:
                 ds = ds.load()
 
             # Check that all query elements are present
-            if all([kw in ds for kw in kwargs]):
+            if all(kw in ds for kw in kwargs):
                 has_elements = True
 
             for kw, val in kwargs.items():

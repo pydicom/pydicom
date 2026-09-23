@@ -370,7 +370,7 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     try:
         try:
             # works only if list, not if string or number
-            value.append
+            value.append  # noqa: B018
         except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
@@ -454,7 +454,7 @@ def write_PN(
     else:
         val = cast(list[PersonName], elem.value)
 
-    enc = b"\\".join([elem.encode(encodings) for elem in val])
+    enc = b"\\".join(elem.encode(encodings) for elem in val)
     if len(enc) % 2 != 0:
         enc += b" "
 
@@ -501,10 +501,10 @@ def write_text(
             val = cast(Sequence[bytes] | Sequence[str], val)
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
-                val = b"\\".join([encode_string(val, encodings) for val in val])
+                val = b"\\".join(encode_string(val, encodings) for val in val)
             else:
                 val = cast(Sequence[bytes], val)
-                val = b"\\".join([val for val in val])
+                val = b"\\".join(val for val in val)
         else:
             val = cast(bytes | str, val)
             if isinstance(val, str):
@@ -1335,7 +1335,7 @@ def dcmwrite(
         enforce_file_format = not write_like_original
 
     # Ensure kwargs only contains `write_like_original`
-    keys = [x for x in kwargs.keys() if x != "write_like_original"]
+    keys = [x for x in kwargs if x != "write_like_original"]
     if keys:
         raise TypeError(
             f"Invalid keyword argument(s) for dcmwrite(): {', '.join(keys)}"

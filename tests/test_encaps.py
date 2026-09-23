@@ -2352,9 +2352,11 @@ class TestGenerateFragmentedFrames:
             pytest.raises(StopIteration, next, frames)
 
         eot = (  # unsigned long, 8 bytes
-            b"\x00\x00\x00\x00\x00\x00\x00\x00"
-            b"\x0c\x00\x00\x00\x00\x00\x00\x00"
-            b"\x18\x00\x00\x00\x00\x00\x00\x00",
+            (
+                b"\x00\x00\x00\x00\x00\x00\x00\x00"
+                b"\x0c\x00\x00\x00\x00\x00\x00\x00"
+                b"\x18\x00\x00\x00\x00\x00\x00\x00"
+            ),
             b"\x04\x00\x00\x00\x00\x00\x00\x00" * 3,
         )
         for func in (bytes, as_bytesio):
@@ -2982,9 +2984,11 @@ class TestGetFrame:
                 get_frame(src, 3, extended_offsets=eot)
 
         eot = (  # unsigned long, 8 bytes
-            b"\x00\x00\x00\x00\x00\x00\x00\x00"
-            b"\x0c\x00\x00\x00\x00\x00\x00\x00"
-            b"\x18\x00\x00\x00\x00\x00\x00\x00",
+            (
+                b"\x00\x00\x00\x00\x00\x00\x00\x00"
+                b"\x0c\x00\x00\x00\x00\x00\x00\x00"
+                b"\x18\x00\x00\x00\x00\x00\x00\x00"
+            ),
             b"\x04\x00\x00\x00\x00\x00\x00\x00" * 3,
         )
         for func in (bytes, as_bytesio):
