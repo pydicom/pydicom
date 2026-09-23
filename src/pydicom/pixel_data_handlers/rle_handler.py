@@ -365,7 +365,7 @@ def _rle_decode_segment(data: bytes) -> bytearray:
     bytearray
         The decoded segment.
     """
-    data = bytearray(data)
+    data = bytearray(data)  # type: ignore[assignment]
     result = bytearray()
     pos = 0
     result_extend = result.extend
