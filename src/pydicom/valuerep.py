@@ -20,13 +20,13 @@ default_encoding = "iso8859"
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
-# Note: We use character codes for Python 3
-# because those are the types yielded if iterating over a byte string.
+# Note: We use character codes because iterating over bytes objects
+# yields integers.
 
-# Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
+# Character codes for text VR delimiters: LF, CR, TAB, FF
 TEXT_VR_DELIMS = {0x0D, 0x0A, 0x09, 0x0C}
 
-# Character/Character code for PN delimiter: name part separator '^'
+# Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
 PN_DELIMS = {0x5E}
 
@@ -614,7 +614,6 @@ class _DateTimeBase:
         self.__dict__.update(state)
 
     def __reduce_ex__(self, protocol: int) -> tuple[Any, ...]:  # type: ignore[override]
-        # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
         reduce_ex = cast(tuple[Any, ...], super().__reduce_ex__(protocol))

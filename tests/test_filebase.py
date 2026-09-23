@@ -294,7 +294,5 @@ class TestDicomFile:
         """Test the function"""
         with DicomFile(TEST_FILE, "rb") as fp:
             assert not fp._buffer.closed
-            # Weird issue with Python 3.6 sometimes returning
-            #   lowercase file path on Windows
-            assert "ct_small.dcm" in fp.name.lower()
+            assert "CT_small.dcm" in fp.name
             assert fp.read(2) == b"\x49\x49"

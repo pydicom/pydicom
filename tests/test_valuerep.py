@@ -1256,7 +1256,6 @@ class TestPersonName:
 
     def test_not_equal(self):
         """PN3: Not equal works correctly (issue 121)..."""
-        # Meant to only be used in python 3 but doing simple check here
         from pydicom.valuerep import PersonName
 
         pn = PersonName("John^Doe")
