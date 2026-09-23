@@ -11,7 +11,7 @@ from collections.abc import Generator
 
 have_numpy = True
 try:
-    import numpy  # noqa: F401
+    import numpy as np  # noqa: F401
 except ImportError:
     have_numpy = False
 

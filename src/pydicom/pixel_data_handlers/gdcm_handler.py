@@ -12,7 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 try:
-    import numpy
+    import numpy as np
 
     HAVE_NP = True
 except ImportError:
@@ -175,7 +175,7 @@ def create_image(ds: "Dataset") -> "gdcm.Image":
 _GDCM_MAX_BUFFER_SIZE = 2**31 - 1
 
 
-def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
+def get_pixeldata(ds: "Dataset") -> "np.ndarray":
     """Use the GDCM package to decode *Pixel Data*.
 
     Returns
@@ -277,7 +277,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     if len(pixel_bytearray) > expected_length_bytes:
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[expected_length_bytes:]
-        if numpy.any(numpy.frombuffer(padding, numpy.byte)):
+        if np.any(np.frombuffer(padding, np.byte)):
             pixel_bytearray = pixel_bytearray[:expected_length_bytes]
         else:
             # We revert to the old behavior which should then result
@@ -285,7 +285,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             pass
 
     numpy_dtype = pixel_dtype(ds)
-    arr = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
+    arr = np.frombuffer(pixel_bytearray, dtype=numpy_dtype)
 
     expected_length_pixels = get_expected_length(ds, "pixels")
     if arr.size != expected_length_pixels:
@@ -312,14 +312,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             # Reinterpret values as unsigned values
             arr = arr.astype(pixel_dtype(pixel_module))
             # Bit shift so the sign bit ends up as the MSB
-            numpy.left_shift(arr, shift, out=arr)
+            np.left_shift(arr, shift, out=arr)
             # Reinterpret values as signed to match the dataset
             arr = arr.astype(numpy_dtype)
             # Bit shift back to the original position, which maintains the
             #   sign bit but sets the pixel value back to the original
-            numpy.right_shift(arr, shift, out=arr)
+            np.right_shift(arr, shift, out=arr)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    return cast("numpy.ndarray", arr.copy())
+    return cast("np.ndarray", arr.copy())

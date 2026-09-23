@@ -44,7 +44,7 @@ from ._write_stds import impl_LE_deflen_std_hex
 
 have_numpy = True
 try:
-    import numpy
+    import numpy as np
 except ImportError:
     have_numpy = False
 
@@ -403,7 +403,7 @@ class TestDataElementCallbackTests:
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
         expected = [2.0, 4.0, 8.0, 16.0]
         if have_numpy and config.use_DS_numpy:
-            assert numpy.allclose(expected, got)
+            assert np.allclose(expected, got)
         else:
             assert expected == got
 
@@ -432,7 +432,7 @@ class TestDataElementCallbackTests:
 
         expected = [32.0, 64.0, 128.0, 196.0]
         if have_numpy and config.use_DS_numpy:
-            assert numpy.allclose(expected, got)
+            assert np.allclose(expected, got)
         else:
             assert expected == got
 

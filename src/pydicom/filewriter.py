@@ -57,7 +57,7 @@ from pydicom.valuerep import (
 from pydicom.values import convert_numbers
 
 if config.have_numpy:
-    import numpy
+    import numpy as np
 
 # Ambiguous VR Correction
 # (0018,9810) Zero Velocity Pixel Value
@@ -428,7 +428,7 @@ def write_UI(fp: DicomIO, elem: DataElement) -> None:
 
 def _is_multi_value(val: Any) -> bool:
     """Return True if `val` is a multi-value container."""
-    if config.have_numpy and isinstance(val, numpy.ndarray):
+    if config.have_numpy and isinstance(val, np.ndarray):
         return True
 
     return isinstance(val, MultiValue | list | tuple)

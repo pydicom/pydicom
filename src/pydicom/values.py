@@ -33,7 +33,7 @@ from pydicom.valuerep import (
 )
 
 if have_numpy:
-    import numpy
+    import numpy as np
 
 
 from pydicom.valuerep import PersonName
@@ -209,8 +209,8 @@ def convert_DS_string(
 ) -> Union[
     pydicom.valuerep.DSclass,
     MutableSequence[pydicom.valuerep.DSclass],
-    "numpy.float64",
-    "numpy.ndarray",
+    "np.float64",
+    "np.ndarray",
 ]:
     """Return a decoded 'DS' value.
 
@@ -266,7 +266,7 @@ def convert_DS_string(
                     re.sub(regex[:-2], "", num_string)
                 )
             )
-        value = numpy.fromstring(num_string, dtype="f8", sep="\\")
+        value = np.fromstring(num_string, dtype="f8", sep="\\")
         if len(value) == 1:  # Don't use array for one number
             return value[0]
 
@@ -318,7 +318,7 @@ def convert_DT_string(
 
 def convert_IS_string(
     byte_string: bytes, is_little_endian: bool, struct_format: str | None = None
-) -> Union[IS, MutableSequence[IS], "numpy.int64", "numpy.ndarray"]:
+) -> Union[IS, MutableSequence[IS], "np.int64", "np.ndarray"]:
     """Return a decoded 'IS' value.
 
     .. versionchanged:: 2.0
@@ -366,11 +366,11 @@ def convert_IS_string(
                     re.sub(regex[:-2], "", num_string)
                 )
             )
-        value = numpy.fromstring(num_string, dtype="i8", sep=chr(92))  # 92:'\'
+        value = np.fromstring(num_string, dtype="i8", sep=chr(92))  # 92:'\'
         if len(value) == 1:  # Don't use array for one number
-            return cast("numpy.int64", value[0])
+            return cast("np.int64", value[0])
 
-        return cast("numpy.ndarray", value)
+        return cast("np.ndarray", value)
 
     return multi_string(num_string, valtype=pydicom.valuerep.IS)
 
