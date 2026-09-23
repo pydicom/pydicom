@@ -345,7 +345,7 @@ with disable_value_validation():
     DeflatedImageFrameCompression = UID("1.2.840.10008.1.2.8.1")
     """1.2.840.10008.1.2.8.1"""
 
-AllTransferSyntaxes = [
+AllTransferSyntaxes: list[UID] = [
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
@@ -392,7 +392,7 @@ AllTransferSyntaxes = [
 ]
 """All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
 
-JPEGTransferSyntaxes = [
+JPEGTransferSyntaxes: list[UID] = [
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
@@ -400,10 +400,10 @@ JPEGTransferSyntaxes = [
 ]
 """JPEG (ISO/IEC 10918-1) transfer syntaxes"""
 
-JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
+JPEGLSTransferSyntaxes: list[UID] = [JPEGLSLossless, JPEGLSNearLossless]
 """JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
 
-JPEG2000TransferSyntaxes = [
+JPEG2000TransferSyntaxes: list[UID] = [
     JPEG2000Lossless,
     JPEG2000,
     JPEG2000MCLossless,
@@ -414,10 +414,10 @@ JPEG2000TransferSyntaxes = [
 ]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
-JPEGXLTransferSyntaxes = [JPEGXLLossless, JPEGXLJPEGRecompression, JPEGXL]
+JPEGXLTransferSyntaxes: list[UID] = [JPEGXLLossless, JPEGXLJPEGRecompression, JPEGXL]
 """JPEG XL (ISO/IEC 18181-1) transfer syntaxes."""
 
-MPEGTransferSyntaxes = [
+MPEGTransferSyntaxes: list[UID] = [
     MPEG2MPML,
     MPEG2MPMLF,
     MPEG2MPHL,
@@ -437,10 +437,10 @@ MPEGTransferSyntaxes = [
 ]
 """MPEG transfer syntaxes."""
 
-RLETransferSyntaxes = [RLELossless]
+RLETransferSyntaxes: list[UID] = [RLELossless]
 """RLE transfer syntaxes."""
 
-DeflatedTransferSyntaxes = [
+DeflatedTransferSyntaxes: list[UID] = [
     DeflatedExplicitVRLittleEndian,
     JPIPReferencedDeflate,
     JPIPHTJ2KReferencedDeflate,
@@ -450,7 +450,7 @@ Information* is compressed using the Deflate algorithm, from Sections A.5, A.7
 and A.12 of :dcm:`Part 5 of the DICOM Standard<part05/chapter_A.html>`.
 """
 
-UncompressedTransferSyntaxes = [
+UncompressedTransferSyntaxes: list[UID] = [
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
@@ -458,7 +458,7 @@ UncompressedTransferSyntaxes = [
 ]
 """Uncompressed (native) transfer syntaxes."""
 
-PrivateTransferSyntaxes = []
+PrivateTransferSyntaxes: list[UID] = []
 """Private transfer syntaxes added using the
 :func:`~pydicom.uid.register_transfer_syntax` function.
 """

@@ -206,7 +206,7 @@ class DicomIO:
             return bytes_read
 
         # Use a bytearray because concatenating bytes is expensive
-        bytes_read = bytearray(bytes_read)
+        bytes_read = bytearray(bytes_read)  # type: ignore[assignment]
         attempts = 0
         while (num_bytes := len(bytes_read)) < length and attempts < nr_retries:
             bytes_read += self.read(length - num_bytes)
