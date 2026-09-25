@@ -35,7 +35,11 @@ from pydicom.pixels.processing import (
     apply_presentation_lut,
     create_icc_transform,
 )
-from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian
+from pydicom.uid import (
+    ExplicitVRBigEndian,
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+)
 from .pixels_reference import EXPL_16_3_1F
 
 
@@ -372,6 +376,143 @@ class TestConvertColorSpace:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestModalityLUT:
     """Tests for apply_modality_lut()."""
+
+    @pytest.fixture
+    def modality_lut(self):
+        """An authored Modality LUT for function-level tests."""
+        ds = Dataset()
+        ds.PixelRepresentation = 1
+        ds.BitsAllocated = ds.BitsStored = 16
+        ds.HighBit = 15
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        item = Dataset()
+        item.add_new(0x00283002, "SS", [4, -32768, 16])
+        item.ModalityLUTType = "US"
+        item.add_new(0x00283006, "US", [10, 20, 30, 40])
+        ds.ModalityLUTSequence = [item]
+        return ds
+
+    @pytest.mark.parametrize(
+        "first, values",
+        [
+            (-32768, [-32768, -32767, -32765, -32764, 0, 32767]),
+            (-100, [-32768, -101, -100, -99, -97, -96, 0, 32767]),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "bits, storage, little_endian",
+        [(8, "US", True), (16, "US", True), (16, "OW", True), (16, "OW", False)],
+    )
+    def test_signed_endpoints(
+        self, modality_lut, first, values, bits, storage, little_endian
+    ):
+        """Signed input saturates at both LUT endpoints without wrapping."""
+        ds = modality_lut
+        item = ds.ModalityLUTSequence[0]
+        item.add_new(0x00283002, "SS", [4, first, bits])
+        lut = [1, 3, 29, 251] if bits == 8 else [1, 300, 1024, 65535]
+        data = lut
+        if storage == "OW":
+            ds.file_meta.TransferSyntaxUID = (
+                ExplicitVRLittleEndian if little_endian else ExplicitVRBigEndian
+            )
+            data = pack(f"{'<' if little_endian else '>'}4H", *lut)
+        item.add_new(0x00283006, storage, data)
+        arr = np.asarray(values, dtype="int16").reshape(2, -1)
+        before = arr.tobytes()
+        expected = [lut[min(max(int(v) - first, 0), 3)] for v in values]
+
+        out = apply_modality_lut(arr, ds)
+
+        assert np.array_equal(out, np.asarray(expected).reshape(arr.shape))
+        assert out.shape == arr.shape
+        assert out.dtype == np.dtype(f"uint{bits}")
+        assert out.flags.writeable
+        assert arr.dtype == np.int16
+        assert arr.tobytes() == before
+
+    def test_full_size_signed_lut(self, modality_lut):
+        """A zero entry count selects all 65536 entries of an OW LUT."""
+        item = modality_lut.ModalityLUTSequence[0]
+        item.add_new(0x00283002, "SS", [0, -32768, 16])
+        lut = list(range(65536))
+        item.add_new(0x00283006, "OW", pack("<65536H", *lut))
+        arr = np.asarray([-32768, -32767, -1, 0, 32766, 32767], dtype="int16")
+        expected = [lut[int(v) + 32768] for v in arr]
+
+        out = apply_modality_lut(arr, modality_lut)
+
+        assert np.array_equal(out, expected)
+        assert out.dtype == np.uint16
+
+    def test_strided_input(self, modality_lut):
+        """Preserve the shape and backing data of a noncontiguous input."""
+        base = np.asarray(
+            [[-32768, 99, -32767, 99, -32765, 99], [0, 99, 1, 99, 32767, 99]],
+            dtype="int16",
+        )
+        arr = base[:, ::2]
+        before = base.tobytes()
+
+        out = apply_modality_lut(arr, modality_lut)
+
+        assert np.array_equal(out, [[10, 20, 40], [40, 40, 40]])
+        assert out.shape == arr.shape
+        assert out.dtype == np.uint16
+        assert arr.dtype == np.int16
+        assert base.tobytes() == before
+
+    def test_empty_input(self, modality_lut):
+        """An empty input retains its shape and the LUT output dtype."""
+        arr = np.empty((2, 0, 3), dtype="int16")
+        out = apply_modality_lut(arr, modality_lut)
+        assert out.shape == arr.shape
+        assert out.dtype == np.uint16
+
+    @pytest.mark.parametrize(
+        "dtype, first, values",
+        [
+            ("int8", -128, [-128, -127, -125, -124, 0, 127]),
+            ("int8", -129, [-128, -127, -126, -125, 0, 127]),
+            ("int8", 128, [-128, 0, 127]),
+            ("uint8", -1, [0, 1, 2, 3, 255]),
+            ("uint8", 256, [0, 1, 254, 255]),
+            (
+                "int64",
+                -32768,
+                [-(2**63), -32769, -32768, -32767, -32765, 0, 2**63 - 1],
+            ),
+            ("uint64", 0, [0, 1, 3, 4, 2**63, 2**64 - 1]),
+            ("uint64", -1, [0, 1, 2, 3, 2**63, 2**64 - 1]),
+            ("uint64", 65535, [0, 65534, 65535, 65536, 65538, 2**63, 2**64 - 1]),
+        ],
+    )
+    def test_integer_api_arithmetic(self, modality_lut, dtype, first, values):
+        """API arithmetic coverage, independent of stored-pixel metadata."""
+        ds = modality_lut
+        ds.PixelRepresentation = int(first < 0)
+        item = ds.ModalityLUTSequence[0]
+        item.add_new(0x00283002, "SS" if first < 0 else "US", [4, first, 16])
+        lut = list(item.LUTData)
+        arr = np.asarray(values, dtype=dtype)
+        before = arr.tobytes()
+        expected = [lut[min(max(int(v) - first, 0), 3)] for v in values]
+
+        out = apply_modality_lut(arr, ds)
+
+        assert np.array_equal(out, expected)
+        assert out.shape == arr.shape
+        assert out.dtype == np.uint16
+        assert arr.dtype == np.dtype(dtype)
+        assert arr.tobytes() == before
+
+    @pytest.mark.parametrize("dtype", ["float32", "float64"])
+    def test_float_input_raises(self, modality_lut, dtype):
+        """Retain rejection of floating-point LUT indices."""
+        arr = np.asarray([-32768, -32767, 0], dtype=dtype)
+        with pytest.raises(IndexError, match="arrays used as indices must be"):
+            apply_modality_lut(arr, modality_lut)
 
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
