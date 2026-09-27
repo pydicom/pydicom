@@ -408,13 +408,17 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        # The index range is set by the number of LUT entries, not by `arr`
+        clipped_iv = np.zeros(arr.shape, dtype=np.min_scalar_type(nr_entries - 1))
         # IVs >= `first_map` are mapped by the Modality LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map
-        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-        # IVs > number of entries get set to last entry
-        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+        # IVs > number of entries get set to last entry. Clip before narrowing
+        #   to the index dtype, otherwise `arr - first_map` may overflow and
+        #   wrap around rather than being clamped
+        clipped_iv[mapped_pixels] = np.clip(
+            arr[mapped_pixels].astype("int64") - first_map, 0, nr_entries - 1
+        )
 
         return lut_data[clipped_iv]
     elif "RescaleSlope" in ds and "RescaleIntercept" in ds:
@@ -676,13 +680,18 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-    clipped_iv = np.zeros(arr.shape, dtype=dtype)
+    # The index range is set by the number of LUT entries, not by the depth of
+    #   the entries themselves, so `dtype` is not usable here
+    clipped_iv = np.zeros(arr.shape, dtype=np.min_scalar_type(nr_entries - 1))
     # IVs >= `first_map` are mapped by the VOI LUT
     # `first_map` may be negative, positive or 0
     mapped_pixels = arr >= first_map
-    clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-    # IVs > number of entries get set to last entry
-    np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+    # IVs > number of entries get set to last entry. Clip before narrowing to
+    #   the index dtype, otherwise out-of-range IVs wrap around rather than
+    #   being clamped
+    clipped_iv[mapped_pixels] = np.clip(
+        arr[mapped_pixels].astype("int64") - first_map, 0, nr_entries - 1
+    )
 
     return cast("np.ndarray", lut_data[clipped_iv])
 
