@@ -537,3 +537,41 @@ class TestCharset:
         ):
             encoded = pydicom.charset.encode_string("あaｱア", ["shift_jis"])
             assert b"?a??" == encoded
+
+
+def test_iso_ir_58_gb2312_escape_sequence():
+    """Regression test for GH#2383 (ISO 2022 IR 58 / GB2312).
+
+    ``iso_ir_58`` is only an alias for Python's ``gb2312`` codec, which knows
+    nothing about ISO 2022 escape sequences, so pydicom has to add and remove
+    the ``ESC $ ) A`` designation itself.
+    """
+    from io import BytesIO
+
+    # PS3.5 Annex K.2-1 encoded value for "Zhang^XiaoDong=张^小东="
+    encoded = b"Zhang^XiaoDong=\x1b$)A\xd5\xc5^\x1b$)A\xd0\xa1\xb6\xab="
+    encodings = pydicom.charset.convert_encodings(["", "ISO 2022 IR 58"])
+
+    # decoding must remove the designation escape sequence
+    assert (
+        pydicom.charset.decode_bytes(encoded, encodings, {0x5E, 0x3D})
+        == "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c="
+    )
+    assert str(PersonName(encoded, encodings=encodings)) == "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c"
+
+    # encoding must write the designation escape before each GB2312 part
+    out = PersonName("Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c=").encode(encodings)
+    assert b"\x1b$)A\xd5\xc5" in out
+    assert b"\x1b$)A\xd0\xa1\xb6\xab" in out
+
+    # a full round-trip through a dataset must preserve the Chinese text
+    ds = pydicom.Dataset()
+    ds.SpecificCharacterSet = ["", "ISO 2022 IR 58"]
+    ds.PatientName = "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c="
+    ds.StudyDescription = "\u80f8\u90e8"
+    bio = BytesIO()
+    ds.save_as(bio, implicit_vr=False, little_endian=True)
+    bio.seek(0)
+    ds_out = dcmread(bio, force=True)
+    assert str(ds_out.PatientName) == "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c"
+    assert ds_out.StudyDescription == "\u80f8\u90e8"
