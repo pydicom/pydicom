@@ -557,7 +557,10 @@ def test_iso_ir_58_gb2312_escape_sequence():
         pydicom.charset.decode_bytes(encoded, encodings, {0x5E, 0x3D})
         == "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c="
     )
-    assert str(PersonName(encoded, encodings=encodings)) == "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c"
+    assert (
+        str(PersonName(encoded, encodings=encodings))
+        == "Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c"
+    )
 
     # encoding must write the designation escape before each GB2312 part
     out = PersonName("Zhang^XiaoDong=\u5f20^\u5c0f\u4e1c=").encode(encodings)
