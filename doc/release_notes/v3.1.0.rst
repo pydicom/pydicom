@@ -18,8 +18,6 @@ Changes
 Fixes
 -----
 
-* Fixed integer overflow when calculating indices for
-  :func:`~pydicom.pixels.apply_modality_lut`, which could select an incorrect LUT entry.
 * Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
 * Include all :mod:`~pydicom.examples` module datasets with the package (:issue:`2128`, :issue:`2131`).
 * Fixed an invalid VR value in the private data dictionary (:issue:`2132`).
@@ -44,6 +42,8 @@ Fixes
 * Correctly handle empty values represented as empty strings in json while converting them
   to a dataset (:issue:`2221`).
 * Correctly handle empty LUT data (:issue:`2238`).
+* Fixed integer overflow when calculating indices for
+  :func:`~pydicom.pixels.apply_modality_lut`, which could select an incorrect LUT entry.
 * Fixed data in the "unused" bits above *Bits Stored* sometimes being included in the returned
   pixel data for JPEG 2000 and JPEG-LS (:issue:`2260`).
 * Correctly handle meta data tags incorrectly written in implicit transfer syntax (:issue:`2290`)
