@@ -12,25 +12,49 @@ except ImportError:
 
 from pydicom import config
 from pydicom.misc import warn_and_log
-
-
 from pydicom.pixels.processing import (
     apply_color_lut as _apply_color_lut,
+)
+from pydicom.pixels.processing import (
     apply_modality_lut as _apply_modality_lut,
-    apply_voi_lut as _apply_voi_lut,
+)
+from pydicom.pixels.processing import (
     apply_voi as _apply_voi,
+)
+from pydicom.pixels.processing import (
+    apply_voi_lut as _apply_voi_lut,
+)
+from pydicom.pixels.processing import (
     apply_windowing as _apply_windowing,
+)
+from pydicom.pixels.processing import (
     convert_color_space as _convert_color_space,
 )
 from pydicom.pixels.utils import (
     expand_ybr422 as _expand_ybr422,
+)
+from pydicom.pixels.utils import (
     get_expected_length as _get_expected_length,
+)
+from pydicom.pixels.utils import (
     get_image_pixel_ids as _get_image_pixel_ids,
+)
+from pydicom.pixels.utils import (
     get_j2k_parameters as _get_j2k_parameters,
+)
+from pydicom.pixels.utils import (
     get_nr_frames as _get_nr_frames,
+)
+from pydicom.pixels.utils import (
     pack_bits as _pack_bits,
+)
+from pydicom.pixels.utils import (
     pixel_dtype as _pixel_dtype,
+)
+from pydicom.pixels.utils import (
     reshape_pixel_array as _reshape_pixel_array,
+)
+from pydicom.pixels.utils import (
     unpack_bits as _unpack_bits,
 )
 

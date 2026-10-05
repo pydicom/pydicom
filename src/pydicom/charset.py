@@ -3,15 +3,15 @@
 
 import codecs
 import re
+from collections.abc import MutableSequence, Sequence
 from typing import (
     TYPE_CHECKING,
     cast,
 )
-from collections.abc import MutableSequence, Sequence
 
 from pydicom import config
 from pydicom.misc import warn_and_log
-from pydicom.valuerep import TEXT_VR_DELIMS, PersonName, VR, CUSTOMIZABLE_CHARSET_VR
+from pydicom.valuerep import CUSTOMIZABLE_CHARSET_VR, TEXT_VR_DELIMS, VR, PersonName
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement

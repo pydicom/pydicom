@@ -47,10 +47,10 @@ values given in the table below.
 
 """
 
-from copy import deepcopy
 import logging
-from typing import TYPE_CHECKING, cast
 from collections.abc import Iterable
+from copy import deepcopy
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -70,7 +70,7 @@ except ImportError:
     HAVE_PYLIBJPEG = False
 
 if HAVE_PYLIBJPEG:
-    from pylibjpeg.utils import get_pixel_data_decoders, Decoder
+    from pylibjpeg.utils import Decoder, get_pixel_data_decoders
 
 try:
     import openjpeg  # noqa: F401
@@ -96,25 +96,24 @@ except ImportError:
 from pydicom import config
 from pydicom.encaps import generate_frames as frame_generator
 from pydicom.pixels.utils import (
-    pixel_dtype,
     get_expected_length,
-    reshape_pixel_array,
     get_j2k_parameters,
     get_nr_frames,
+    pixel_dtype,
+    reshape_pixel_array,
 )
 from pydicom.uid import (
+    JPEG2000,
+    UID,
+    JPEG2000Lossless,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
-    JPEG2000Lossless,
-    JPEG2000,
     RLELossless,
-    UID,
 )
-
 
 LOGGER = logging.getLogger("pydicom")
 

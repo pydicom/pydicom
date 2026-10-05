@@ -20,30 +20,30 @@ import io
 import json
 import os
 import os.path
-from pathlib import Path
 import re
+import sys
+import traceback
 from bisect import bisect_left
 from collections.abc import (
-    ValuesView,
-    Iterator,
     Callable,
-    MutableSequence,
+    Iterator,
     MutableMapping,
+    MutableSequence,
     Set,
+    ValuesView,
 )
 from contextlib import nullcontext
 from importlib.util import find_spec as have_package
 from itertools import chain, takewhile
-import sys
-import traceback
+from pathlib import Path
 from types import SimpleNamespace, TracebackType
 from typing import (
-    TypeAlias,
     Any,
     AnyStr,
-    cast,
     BinaryIO,
+    TypeAlias,
     TypeVar,
+    cast,
     overload,
 )
 
@@ -53,33 +53,33 @@ except ImportError:
     pass
 
 import pydicom  # for dcmwrite
-from pydicom import jsonrep, config
+from pydicom import config, jsonrep
 from pydicom._version import __version_info__
-from pydicom.charset import default_encoding, convert_encodings
+from pydicom.charset import convert_encodings, default_encoding
 from pydicom.config import logger
 from pydicom.datadict import (
     dictionary_description,
     dictionary_VR,
-    tag_for_keyword,
+    get_private_entry,
     keyword_for_tag,
     repeater_has_keyword,
-    get_private_entry,
+    tag_for_keyword,
 )
-from pydicom.dataelem import DataElement, convert_raw_data_element, RawDataElement
+from pydicom.dataelem import DataElement, RawDataElement, convert_raw_data_element
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
-from pydicom.fileutil import path_from_pathlike, PathType
-from pydicom.misc import warn_and_log, find_keyword_candidates
+from pydicom.fileutil import PathType, path_from_pathlike
+from pydicom.misc import find_keyword_candidates, warn_and_log
 from pydicom.pixels import compress, convert_color_space, decompress, pixel_array
 from pydicom.pixels.utils import (
-    reshape_pixel_array,
     get_image_pixel_ids,
+    reshape_pixel_array,
     set_pixel_data,
 )
-from pydicom.tag import Tag, BaseTag, TagType, TAG_PIXREP
+from pydicom.tag import TAG_PIXREP, BaseTag, Tag, TagType
 from pydicom.uid import PYDICOM_IMPLEMENTATION_UID, UID
-from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
+from pydicom.valuerep import AMBIGUOUS_VR
+from pydicom.valuerep import VR as VR_
 from pydicom.waveforms import numpy_handler as wave_handler
-
 
 # FloatPixelData, DoubleFloatPixelData, PixelData
 PIXEL_KEYWORDS = {0x7FE00008, 0x7FE00009, 0x7FE00010}
@@ -797,7 +797,7 @@ class Dataset:  # noqa: PLW1641
 
         return sorted(allnames)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -1563,7 +1563,7 @@ class Dataset:  # noqa: PLW1641
         """Return the number of elements in the top level of the dataset."""
         return len(self._dict)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Compare `self` and `other` for inequality."""
         return not self == other
 
@@ -1741,9 +1741,7 @@ class Dataset:  # noqa: PLW1641
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
-        if not hasattr(self, "_pixel_array"):
-            already_have = False
-        elif self._pixel_array is None:
+        if not hasattr(self, "_pixel_array") or self._pixel_array is None:
             already_have = False
 
         # Checking `_pixel_id` may sometimes give a false result if the pixel

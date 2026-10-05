@@ -4,32 +4,35 @@ data elements to proper python types
 """
 
 import re
+from collections.abc import Callable, MutableSequence
 from io import BytesIO
-from struct import unpack, calcsize
-from typing import Union, cast, Any, TypeVar
-from collections.abc import MutableSequence, Callable
+from struct import calcsize, unpack
+from typing import Any, TypeVar, Union, cast
+
+import pydicom.uid
+import pydicom.valuerep  # don't import DS directly as can be changed by config
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.charset import default_encoding, decode_bytes
-from pydicom.config import logger, have_numpy
-from pydicom.dataelem import empty_value_for_VR, RawDataElement
+from pydicom.charset import decode_bytes, default_encoding
+from pydicom.config import have_numpy, logger
+from pydicom.dataelem import RawDataElement, empty_value_for_VR
 from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
-from pydicom.tag import Tag, TupleTag, BaseTag
-import pydicom.uid
-import pydicom.valuerep  # don't import DS directly as can be changed by config
+from pydicom.tag import BaseTag, Tag, TupleTag
 from pydicom.valuerep import (
+    CUSTOMIZABLE_CHARSET_VR,
     DA,
     DT,
-    TM,
-    TEXT_VR_DELIMS,
     IS,
-    CUSTOMIZABLE_CHARSET_VR,
-    VR as VR_,
+    TEXT_VR_DELIMS,
+    TM,
     validate_value,
+)
+from pydicom.valuerep import (
+    VR as VR_,
 )
 
 if have_numpy:
@@ -37,7 +40,6 @@ if have_numpy:
 
 
 from pydicom.valuerep import PersonName
-
 
 _T = TypeVar("_T")
 

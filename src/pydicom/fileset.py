@@ -1,34 +1,33 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
-from collections.abc import Iterator, Iterable, Callable
 import copy
 import os
-from pathlib import Path
 import re
 import shutil
-from tempfile import TemporaryDirectory
-from typing import Optional, Union, Any, cast
 import uuid
+from collections.abc import Callable, Iterable, Iterator
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Any, Optional, Union, cast
 
+import pydicom.uid as sop
 from pydicom.charset import default_encoding
-from pydicom.datadict import tag_for_keyword, dictionary_description
+from pydicom.datadict import dictionary_description, tag_for_keyword
 from pydicom.dataelem import DataElement
-from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.filereader import dcmread
-from pydicom.filewriter import write_dataset, write_data_element, write_file_meta_info
+from pydicom.filewriter import write_data_element, write_dataset, write_file_meta_info
 from pydicom.misc import warn_and_log
-from pydicom.tag import Tag, BaseTag
-import pydicom.uid as sop
+from pydicom.tag import BaseTag, Tag
 from pydicom.uid import (
-    generate_uid,
     UID,
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
     MediaStorageDirectoryStorage,
+    generate_uid,
 )
-
 
 # Regex for conformant File ID paths - PS3.10 Section 8.5
 _RE_FILE_ID = re.compile("^[A-Z0-9_]*$")

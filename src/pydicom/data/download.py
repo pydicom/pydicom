@@ -8,9 +8,9 @@ import hashlib
 import json
 import os
 import pathlib
-from typing import cast
-import urllib.request
 import urllib.error
+import urllib.request
+from typing import cast
 
 try:
     import requests
@@ -36,9 +36,9 @@ try:
 except ImportError:
     USE_PROGRESS_BAR = False
 
-from . import retry
 from pydicom.misc import warn_and_log
 
+from . import retry
 
 HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
@@ -119,15 +119,16 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
             r = requests.get(url, stream=True)
             total_size_in_bytes = int(r.headers.get("content-length", 0))
             with open(fpath, "wb") as f:
-                for data in tqdm.tqdm(
-                    r.iter_content(chunk_size=4096),
-                    total=total_size_in_bytes,
-                    unit="B",
-                    unit_scale=True,
-                    miniters=1,
-                    desc=url.rsplit("/", maxsplit=1)[-1],
-                ):
-                    f.write(data)
+                f.writelines(
+                    tqdm.tqdm(
+                        r.iter_content(chunk_size=4096),
+                        total=total_size_in_bytes,
+                        unit="B",
+                        unit_scale=True,
+                        miniters=1,
+                        desc=url.rsplit("/", maxsplit=1)[-1],
+                    )
+                )
         else:
             r = requests.get(url)
             with open(filename, "wb") as f:

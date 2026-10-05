@@ -1,20 +1,18 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
 
+import os
 from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 from io import BufferedIOBase
-import os
 from struct import pack, unpack
 from typing import BinaryIO, cast
 
-from pydicom.misc import size_in_bytes
-from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
+from pydicom.config import logger, settings
 from pydicom.datadict import dictionary_description
 from pydicom.filebase import ReadableBuffer, WriteableBuffer
-
-from pydicom.config import logger, settings
-
+from pydicom.misc import size_in_bytes
+from pydicom.tag import BaseTag, ItemTag, SequenceDelimiterTag, Tag, TupleTag
 
 PathType = str | bytes | os.PathLike
 
@@ -113,7 +111,7 @@ def read_undefined_length_value(
     fp: BinaryIO,
     is_little_endian: bool,
     delimiter_tag: BaseTag,
-    defer_size: int | float | None = None,
+    defer_size: float | None = None,
     read_size: int = 1024 * 8,
 ) -> bytes | None:
     """Read until `delimiter_tag` and return the value up to that point.
@@ -227,7 +225,7 @@ def read_undefined_length_value(
 def _try_read_encapsulated_pixel_data(
     fp: BinaryIO,
     is_little_endian: bool,
-    defer_size: float | int | None = None,
+    defer_size: float | None = None,
 ) -> tuple[bool, bytes | None]:
     """Attempt to read an undefined length value item as if it were
     encapsulated pixel data as defined in PS3.5 section A.4.

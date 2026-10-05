@@ -1,15 +1,15 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Access code dictionary information"""
 
-from itertools import chain
 import inspect
-from typing import cast, Any
-from collections.abc import KeysView, Iterable
+from collections.abc import Iterable, KeysView
+from itertools import chain
+from typing import Any, cast
 
-from pydicom.sr.coding import Code
+from pydicom.sr._cid_dict import cid_concepts as CID_CONCEPTS
+from pydicom.sr._cid_dict import name_for_cid
 from pydicom.sr._concepts_dict import concepts as CONCEPTS
-from pydicom.sr._cid_dict import name_for_cid, cid_concepts as CID_CONCEPTS
-
+from pydicom.sr.coding import Code
 
 # Reverse lookup for cid names
 cid_for_name = {v: k for k, v in name_for_cid.items()}

@@ -8,10 +8,10 @@ stored as a single number and separated to (group, element) as required.
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
 #       (e.g. in filewriter.write_AT) checks if a value is a multi-value
 #       element
-from contextlib import contextmanager
 import traceback
-from typing import Any, TypeAlias
 from collections.abc import Iterator
+from contextlib import contextmanager
+from typing import Any, TypeAlias
 
 
 @contextmanager
@@ -174,7 +174,7 @@ class BaseTag(int):
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -185,7 +185,7 @@ class BaseTag(int):
 
         return int(self) == int(other)
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 

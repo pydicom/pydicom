@@ -8,44 +8,48 @@ A DataElement has a tag,
 """
 
 import base64
+import copy
+import json
 import math
 from collections.abc import Callable, MutableSequence
-import copy
 from io import BufferedIOBase
-import json
-from typing import Any, TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
-from pydicom import config  # don't import datetime_conversion directly
+import pydicom.valuerep  # don't import DS directly as can be changed by config
+from pydicom import (
+    config,  # don't import datetime_conversion directly
+    jsonrep,
+)
 from pydicom.config import logger
 from pydicom.datadict import (
-    dictionary_has_tag,
     dictionary_description,
-    dictionary_keyword,
+    dictionary_has_tag,
     dictionary_is_retired,
-    private_dictionary_description,
+    dictionary_keyword,
     dictionary_VR,
+    private_dictionary_description,
     repeater_has_tag,
 )
+from pydicom.fileutil import buffer_equality, buffer_length, check_buffer
 from pydicom.hooks import hooks
-from pydicom.jsonrep import JsonDataElementConverter, BulkDataType
+from pydicom.jsonrep import BulkDataType, JsonDataElementConverter
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, BaseTag, _LUT_DESCRIPTOR_TAGS
+from pydicom.tag import _LUT_DESCRIPTOR_TAGS, BaseTag, Tag
 from pydicom.uid import UID
-from pydicom import jsonrep
-from pydicom.fileutil import check_buffer, buffer_length, buffer_equality
-import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    BUFFERABLE_VRS,
-    PersonName,
-    BYTES_VR,
-    AMBIGUOUS_VR,
-    STR_VR,
     ALLOW_BACKSLASH,
+    AMBIGUOUS_VR,
+    BUFFERABLE_VRS,
+    BYTES_VR,
     DEFAULT_CHARSET_VR,
     LONG_VALUE_VR,
-    VR as VR_,
+    STR_VR,
+    PersonName,
     validate_value,
+)
+from pydicom.valuerep import (
+    VR as VR_,
 )
 
 if config.have_numpy:
@@ -665,7 +669,7 @@ class DataElement:  # noqa: PLW1641
 
         return result
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -708,7 +712,7 @@ class DataElement:  # noqa: PLW1641
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 

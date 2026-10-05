@@ -8,12 +8,12 @@ This module is not intended to be used directly.
 from typing import cast
 
 from pydicom import uid
+from pydicom.pixels.common import PhotometricInterpretation as PI
 from pydicom.pixels.decoders.base import DecodeRunner
 from pydicom.pixels.utils import _passes_version_check
-from pydicom.pixels.common import PhotometricInterpretation as PI
 
 try:
-    from pylibjpeg.utils import get_pixel_data_decoders, Decoder
+    from pylibjpeg.utils import Decoder, get_pixel_data_decoders
 
     # {UID: {plugin name: function}}
     _DECODERS = cast(

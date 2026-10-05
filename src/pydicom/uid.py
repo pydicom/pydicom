@@ -2,10 +2,10 @@
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
 import hashlib
-from keyword import iskeyword
 import re
 import secrets
 import uuid
+from keyword import iskeyword
 
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary

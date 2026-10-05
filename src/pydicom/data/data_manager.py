@@ -45,18 +45,18 @@ For a real-life example of an external data source you can look at the
 `pydicom-data <https://github.com/pydicom/pydicom-data>`_ repository.
 """
 
-from enum import IntEnum
 import fnmatch
 import os
+from enum import IntEnum
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from pydicom.data.download import (
-    data_path_with_download,
     calculate_file_hash,
+    data_path_with_download,
     get_cached_filehash,
-    get_url_map,
     get_data_dir,
+    get_url_map,
 )
 from pydicom.misc import warn_and_log
 

@@ -7,14 +7,14 @@ try:
     from collections.abc import Buffer  # type: ignore[attr-defined]
 except ImportError:
     from collections.abc import ByteString as Buffer  # Python 3.10, 3.11
-import math
 import importlib
 import logging
-from pathlib import Path
-from struct import pack, unpack, Struct
-from sys import byteorder
-from typing import BinaryIO, Any, cast, TYPE_CHECKING
+import math
 from collections.abc import Sequence
+from pathlib import Path
+from struct import Struct, pack, unpack
+from sys import byteorder
+from typing import TYPE_CHECKING, Any, BinaryIO, cast
 
 try:
     import numpy as np
@@ -23,22 +23,23 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.charset import default_encoding
 from pydicom._dicom_dict import DicomDictionary
+from pydicom.charset import default_encoding
 from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.misc import warn_and_log
 from pydicom.tag import BaseTag
 from pydicom.uid import (
-    UID,
-    JPEGLSNearLossless,
     JPEG2000,
+    UID,
     ExplicitVRLittleEndian,
+    JPEGLSNearLossless,
     generate_uid,
 )
 from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from os import PathLike
+
     from pydicom.dataset import Dataset
 
 
@@ -61,7 +62,7 @@ _IMAGE_PIXEL = {
     0x00280103: "pixel_representation",
 }
 # Default tags to look for with pixel_array() and iter_pixels()
-_DEFAULT_TAGS = {k for k in _IMAGE_PIXEL.keys()} | {0x7FE00001, 0x7FE00002}
+_DEFAULT_TAGS = {k for k in _IMAGE_PIXEL} | {0x7FE00001, 0x7FE00002}
 _PIXEL_KEYWORDS = {
     (0x7FE0, 0x0008): "FloatPixelData",
     (0x7FE0, 0x0009): "DoubleFloatPixelData",
@@ -123,10 +124,10 @@ def _array_common(
           functions.
     """
     from pydicom.filereader import (
-        read_preamble,
+        _at_pixel_data,
         _read_file_meta_info,
         read_dataset,
-        _at_pixel_data,
+        read_preamble,
     )
 
     # Read preamble (if present)
@@ -525,7 +526,7 @@ def _convert_rle_endianness(
     lengths = []
 
     nr_samples = (len(offsets) - 1) // bytes_per_sample
-    for sample_idx in range(0, nr_samples):
+    for sample_idx in range(nr_samples):
         sample_data = []
         for segment_idx in range(bytes_per_sample - 1, -1, -1):
             # For the 2 sample/3 segment example `idx` will be

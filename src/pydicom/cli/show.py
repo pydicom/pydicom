@@ -4,8 +4,8 @@
 import argparse
 from collections.abc import Callable
 
-from pydicom.dataset import Dataset
 from pydicom.cli.main import filespec_help, filespec_parser
+from pydicom.dataset import Dataset
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:

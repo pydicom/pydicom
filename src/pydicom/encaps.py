@@ -1,17 +1,17 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Functions for working with encapsulated (compressed) pixel data."""
 
-from collections.abc import Iterator
-from io import BytesIO, BufferedIOBase
 import os
+from collections.abc import Iterator
+from io import BufferedIOBase, BytesIO
 from struct import pack, unpack
 from typing import Any
 
 from pydicom import config
-from pydicom.misc import warn_and_log
 from pydicom.filebase import DicomBytesIO, DicomIO, ReadableBuffer
 from pydicom.fileutil import buffer_length, reset_buffer_position
-from pydicom.tag import Tag, ItemTag, SequenceDelimiterTag
+from pydicom.misc import warn_and_log
+from pydicom.tag import ItemTag, SequenceDelimiterTag, Tag
 
 
 # Functions for parsing encapsulated data
@@ -906,11 +906,11 @@ class EncapsulatedBuffer(BufferedIOBase):
         elif whence == os.SEEK_CUR:
             # relative to current buffer position
             new_offset = self._offset + offset
-            new_offset = 0 if new_offset < 0 else new_offset
+            new_offset = max(new_offset, 0)
         elif whence == os.SEEK_END:
             # relative to end of the buffer
             new_offset = self.encapsulated_length + offset
-            new_offset = 0 if new_offset < 0 else new_offset
+            new_offset = max(new_offset, 0)
 
         self._offset = new_offset
 

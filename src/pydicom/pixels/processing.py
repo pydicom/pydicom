@@ -27,6 +27,7 @@ from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterable
+
     from pydicom.dataset import Dataset
 
 

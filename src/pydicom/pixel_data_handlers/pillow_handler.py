@@ -32,18 +32,17 @@ from pydicom import config
 from pydicom.encaps import generate_frames
 from pydicom.misc import warn_and_log
 from pydicom.pixels.utils import (
-    pixel_dtype,
     get_j2k_parameters,
     get_nr_frames,
+    pixel_dtype,
 )
 from pydicom.uid import (
-    UID,
     JPEG2000,
+    UID,
     JPEG2000Lossless,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
 )
-
 
 logger = logging.getLogger("pydicom")
 

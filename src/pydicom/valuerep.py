@@ -3,17 +3,16 @@
 
 import datetime
 import math
+import re
+from collections.abc import Callable, Iterator, Sequence
 from decimal import Decimal
 from enum import Enum, unique
-import re
 from math import floor, isfinite, log10
-from typing import Optional, Any, cast
-from collections.abc import Callable, Sequence, Iterator
+from typing import Any, Optional, cast
 
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.misc import warn_and_log
-
 
 # can't import from charset or get circular import
 default_encoding = "iso8859"
@@ -1020,7 +1019,7 @@ class DSfloat(float):
 
     def __new__(  # type: ignore[misc]
         cls: type["DSfloat"],
-        val: None | str | int | float | Decimal,
+        val: None | str | float | Decimal,
         auto_format: bool = False,
         validation_mode: int | None = None,
     ) -> "str | DSfloat | None":
@@ -1034,7 +1033,7 @@ class DSfloat(float):
 
     def __init__(
         self,
-        val: str | int | float | Decimal,
+        val: str | float | Decimal,
         auto_format: bool = False,
         validation_mode: int | None = None,
     ) -> None:
@@ -1088,7 +1087,7 @@ class DSfloat(float):
                     f'Value "{self}" is not valid for elements with a VR of DS'
                 )
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1100,7 +1099,7 @@ class DSfloat(float):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         return not self == other
 
     def __str__(self) -> str:
@@ -1140,7 +1139,7 @@ class DSdecimal(Decimal):
 
     def __new__(  # type: ignore[misc]
         cls: type["DSdecimal"],
-        val: None | str | int | float | Decimal,
+        val: None | str | float | Decimal,
         auto_format: bool = False,
         validation_mode: int | None = None,
     ) -> "str | DSdecimal | None":
@@ -1170,7 +1169,7 @@ class DSdecimal(Decimal):
 
     def __init__(
         self,
-        val: str | int | float | Decimal,
+        val: str | float | Decimal,
         auto_format: bool = False,
         validation_mode: int | None = None,
     ) -> None:
@@ -1229,7 +1228,7 @@ class DSdecimal(Decimal):
                     raise ValueError(msg)
                 warn_and_log(msg)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1239,7 +1238,7 @@ class DSdecimal(Decimal):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         return not self == other
 
     def __str__(self) -> str:
@@ -1265,7 +1264,7 @@ else:
 
 
 def DS(
-    val: None | str | int | float | Decimal,
+    val: None | str | float | Decimal,
     auto_format: bool = False,
     validation_mode: int | None = None,
 ) -> None | str | DSfloat | DSdecimal:
@@ -1348,7 +1347,7 @@ class IS(int):
 
     def __new__(  # type: ignore[misc]
         cls: type["IS"],
-        val: None | str | int | float | Decimal,
+        val: None | str | float | Decimal,
         validation_mode: int | None = None,
     ) -> "str | IS | ISfloat | None":
         """Create instance if new integer string"""
@@ -1387,7 +1386,7 @@ class IS(int):
         return newval
 
     def __init__(
-        self, val: str | int | float | Decimal, validation_mode: int | None = None
+        self, val: str | float | Decimal, validation_mode: int | None = None
     ) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
@@ -1395,7 +1394,7 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, "original_string"):
             self.original_string = val.original_string
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1405,7 +1404,7 @@ class IS(int):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         return not self == other
 
     def __str__(self) -> str:
@@ -1670,11 +1669,11 @@ class PersonName:
         except IndexError:
             return ""
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
         """Return ``True`` if `other` equals the current name."""
         return str(self) == other
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> Any:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 
@@ -1818,7 +1817,7 @@ class PersonName:
             If any of the input strings contain disallowed characters:
             '\\' (single backslash), '^', '='.
         """
-        from pydicom.charset import encode_string, decode_bytes
+        from pydicom.charset import decode_bytes, encode_string
 
         def enc(s: str) -> bytes:
             return encode_string(s, encodings or [default_encoding])

@@ -1,10 +1,10 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 
 from pydicom.pixels.encoders.base import (
-    RLELosslessEncoder,
+    DeflatedImageFrameCompressionEncoder,
+    JPEG2000Encoder,
+    JPEG2000LosslessEncoder,
     JPEGLSLosslessEncoder,
     JPEGLSNearLosslessEncoder,
-    JPEG2000LosslessEncoder,
-    JPEG2000Encoder,
-    DeflatedImageFrameCompressionEncoder,
+    RLELosslessEncoder,
 )

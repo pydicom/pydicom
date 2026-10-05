@@ -1,8 +1,8 @@
-from functools import wraps
 import logging
 import time
-from typing import Any
 from collections.abc import Callable
+from functools import wraps
+from typing import Any
 
 
 def retry(
