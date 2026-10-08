@@ -97,10 +97,6 @@ ENCODINGS_TO_CODES["shift_jis"] = ESC + b")I"
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
-# Note: ``iso_ir_58`` (GB2312) is *not* included here. It is only an alias for
-# Python's ``gb2312`` codec, which is plain EUC-CN and knows nothing about ISO
-# 2022 escape sequences, so the escape sequence has to be added and removed by
-# pydicom itself (see GH#2383).
 handled_encodings = ("iso2022_jp", "iso2022_jp_2")
 
 

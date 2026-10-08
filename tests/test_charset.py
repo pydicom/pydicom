@@ -540,12 +540,7 @@ class TestCharset:
 
 
 def test_iso_ir_58_gb2312_escape_sequence():
-    """Regression test for GH#2383 (ISO 2022 IR 58 / GB2312).
-
-    ``iso_ir_58`` is only an alias for Python's ``gb2312`` codec, which knows
-    nothing about ISO 2022 escape sequences, so pydicom has to add and remove
-    the ``ESC $ ) A`` designation itself.
-    """
+    """Regression test for GH#2383 (ISO 2022 IR 58 / GB2312)."""
     from io import BytesIO
 
     # PS3.5 Annex K.2-1 encoded value for "Zhang^XiaoDong=张^小东="
