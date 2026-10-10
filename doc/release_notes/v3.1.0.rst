@@ -42,6 +42,8 @@ Fixes
 * Correctly handle empty values represented as empty strings in json while converting them
   to a dataset (:issue:`2221`).
 * Correctly handle empty LUT data (:issue:`2238`).
+* Fixed integer overflow when calculating indices for
+  :func:`~pydicom.pixels.apply_modality_lut`, which could select an incorrect LUT entry.
 * Fixed data in the "unused" bits above *Bits Stored* sometimes being included in the returned
   pixel data for JPEG 2000 and JPEG-LS (:issue:`2260`).
 * Correctly handle meta data tags incorrectly written in implicit transfer syntax (:issue:`2290`)
