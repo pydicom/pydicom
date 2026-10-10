@@ -139,15 +139,7 @@ class UID(str):
     def is_deflated(self) -> bool:
         """Return ``True`` if a deflated transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Deflated Explicit VR Little Endian
-            if self == "1.2.840.10008.1.2.1.99":
-                return True
-
-            # Explicit VR Little Endian
-            # Implicit VR Little Endian
-            # Explicit VR Big Endian
-            # All encapsulated transfer syntaxes
-            return False
+            return self in DeflatedTransferSyntaxes
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -292,6 +284,8 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.92"""
     JPEG2000MC = UID("1.2.840.10008.1.2.4.93")
     """1.2.840.10008.1.2.4.93"""
+    JPIPReferencedDeflate = UID("1.2.840.10008.1.2.4.95")
+    """1.2.840.10008.1.2.4.95"""
     MPEG2MPML = UID("1.2.840.10008.1.2.4.100")
     """1.2.840.10008.1.2.4.100"""
     MPEG2MPMLF = UID("1.2.840.10008.1.2.4.100.1")
@@ -445,6 +439,16 @@ MPEGTransferSyntaxes = [
 
 RLETransferSyntaxes = [RLELossless]
 """RLE transfer syntaxes."""
+
+DeflatedTransferSyntaxes = [
+    DeflatedExplicitVRLittleEndian,
+    JPIPReferencedDeflate,
+    JPIPHTJ2KReferencedDeflate,
+]
+"""Transfer syntaxes where the encoded *Data Set* following the *File Meta
+Information* is compressed using the Deflate algorithm, from Sections A.5, A.7
+and A.12 of :dcm:`Part 5 of the DICOM Standard<part05/chapter_A.html>`.
+"""
 
 UncompressedTransferSyntaxes = [
     ExplicitVRLittleEndian,
