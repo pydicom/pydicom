@@ -6,6 +6,7 @@ import io
 from io import BytesIO
 import logging
 import os
+import platform
 import shutil
 from pathlib import Path
 from struct import unpack
@@ -1222,6 +1223,89 @@ class TestUnknownVR:
             )
 
         assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
+
+
+@pytest.mark.skipif(
+    platform.python_implementation() == "PyPy",
+    reason=(
+        "codecs.lookup raises ValueError for a NUL-bearing encoding name "
+        "only on CPython; PyPy strips the NUL during name normalisation, "
+        "so the guarded ValueError never reaches dcmread"
+    ),
+)
+class TestSpecificCharacterSetWithEmbeddedNull:
+    """End-to-end contract: ``dcmread(force=True)`` must not leak
+    ``ValueError("embedded null character")`` from ``codecs.lookup`` when
+    ``SpecificCharacterSet`` (0008,0005) contains a NUL byte.
+
+    The unit-level invariant is also pinned in
+    :class:`tests.test_charset.TestCharset.test_convert_encoding_with_embedded_null`;
+    this class exercises the public ``dcmread`` API directly so a future
+    refactor of the ``dcmread`` -> ``convert_encodings`` call chain cannot
+    regress the public contract without test failure.
+
+    Note: trailing NULs are absorbed by ``valuerep.MultiString``'s NUL
+    stripping before they reach ``convert_encodings``, so the realistic
+    adversarial cases are NULs in leading or middle positions.
+    """
+
+    @staticmethod
+    def _build_file_with_scs(scs_value: bytes) -> bytes:
+        """Build the minimal forced-read DICOM bytestream with the given
+        raw ``SpecificCharacterSet`` value (Implicit VR Little Endian
+        body so the CS value is stored verbatim without VR-level
+        validation)."""
+        import struct
+
+        def explicit(group: int, elem: int, vr: bytes, value: bytes) -> bytes:
+            if vr in (b"OB",):
+                return (
+                    struct.pack("<HH", group, elem)
+                    + vr
+                    + b"\x00\x00"
+                    + struct.pack("<I", len(value))
+                    + value
+                )
+            return (
+                struct.pack("<HH", group, elem)
+                + vr
+                + struct.pack("<H", len(value))
+                + value
+            )
+
+        def implicit(group: int, elem: int, value: bytes) -> bytes:
+            return struct.pack("<HHI", group, elem, len(value)) + value
+
+        preamble = b"\x00" * 128 + b"DICM"
+        meta = b""
+        meta += explicit(0x0002, 0x0001, b"OB", b"\x00\x01")
+        meta += explicit(0x0002, 0x0002, b"UI", b"1.2.840.10008.5.1.4.1.1.7\x00")
+        meta += explicit(0x0002, 0x0003, b"UI", b"1.2.3.4\x00")
+        meta += explicit(0x0002, 0x0010, b"UI", b"1.2.840.10008.1.2\x00")
+        meta += explicit(0x0002, 0x0012, b"UI", b"1.2.3\x00")
+        group_length = explicit(0x0002, 0x0000, b"UL", struct.pack("<I", len(meta)))
+        ds_elements = implicit(0x0008, 0x0005, scs_value)
+        return preamble + group_length + meta + ds_elements
+
+    @pytest.mark.parametrize(
+        "scs_value",
+        [b"\x00ISO_IR 100", b"ISO\x00_IR 100"],
+        ids=["leading_null", "middle_null"],
+    )
+    def test_dcmread_does_not_leak_value_error(self, scs_value):
+        """Leading- and middle-NUL CS values reach ``codecs.lookup``
+        through ``dcmread`` and previously raised
+        ``ValueError("embedded null character")``. After the fix
+        they fall through to the default encoding with a warning,
+        matching the established behaviour for unknown encodings.
+        """
+        data = self._build_file_with_scs(scs_value)
+        with pytest.warns(UserWarning, match="Unknown encoding"):
+            ds = dcmread(BytesIO(data), force=True)
+        # The file parsed: the dataset is reachable. We do not pin
+        # the exact SCS value (``valuerep`` may strip leading NULs in
+        # the future); only that ``dcmread`` returned without raising.
+        assert ds is not None
 
 
 class TestReadDataElement:

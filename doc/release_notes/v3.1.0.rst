@@ -52,6 +52,11 @@ Fixes
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` silently producing byte swapped pixel
   data when the source dataset uses *Explicit VR Big Endian* (:issue:`2340`).
+* Stopped :func:`~pydicom.filereader.dcmread` leaking ``ValueError("embedded null
+  character")`` when *Specific Character Set* (0008,0005) contains an embedded NUL byte;
+  such values now take the same warn-and-fall-back path as unknown encodings (or raise
+  :class:`LookupError` under ``RAISE`` validation), with the original exception message
+  included for clarity (:issue:`2338`)
 
 Enhancements
 ------------
