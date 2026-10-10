@@ -675,14 +675,31 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
 
     lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
-    # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-    clipped_iv = np.zeros(arr.shape, dtype=dtype)
-    # IVs >= `first_map` are mapped by the VOI LUT
-    # `first_map` may be negative, positive or 0
-    mapped_pixels = arr >= first_map
-    clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-    # IVs > number of entries get set to last entry
-    np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+    if np.issubdtype(arr.dtype, np.integer):
+        # A LUT can have 65536 entries regardless of its output bit depth.
+        clipped_iv = np.full(arr.shape, nr_entries - 1, dtype="uint16")
+        clipped_iv[arr < first_map] = 0
+        mapped_pixels = (arr >= first_map) & (arr < first_map + nr_entries)
+        # At mapped positions the descriptor's 16-bit values ensure that int32
+        # can hold the input and uint16 can hold the resulting index, even for
+        # int64/uint64 inputs. Subtracting in the input dtype could overflow.
+        np.subtract(
+            arr,
+            first_map,
+            out=clipped_iv,
+            where=mapped_pixels,
+            dtype="int32",
+            casting="unsafe",
+        )
+    else:
+        # IVs < `first_map` get set to first LUT entry (i.e. index 0)
+        clipped_iv = np.zeros(arr.shape, dtype=dtype)
+        # IVs >= `first_map` are mapped by the VOI LUT
+        # `first_map` may be negative, positive or 0
+        mapped_pixels = arr >= first_map
+        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+        # IVs > number of entries get set to last entry
+        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
     return cast("np.ndarray", lut_data[clipped_iv])
 

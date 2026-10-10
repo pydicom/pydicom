@@ -18,6 +18,9 @@ Changes
 Fixes
 -----
 
+* Fixed integer overflow when calculating lookup table indices in
+  :func:`~pydicom.pixels.apply_voi`, including 8-bit VOI LUTs with more than 256 entries.
+
 * Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
 * Include all :mod:`~pydicom.examples` module datasets with the package (:issue:`2128`, :issue:`2131`).
 * Fixed an invalid VR value in the private data dictionary (:issue:`2132`).
