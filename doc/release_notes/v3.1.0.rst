@@ -52,6 +52,9 @@ Fixes
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` silently producing byte swapped pixel
   data when the source dataset uses *Explicit VR Big Endian* (:issue:`2340`).
+* Bound sequence nesting depth in :func:`~pydicom.filereader.dcmread` so adversarially-deep
+  ``SQ`` chains raise :class:`~pydicom.errors.InvalidDicomError` instead of ``RecursionError``
+  (:issue:`2330`).
 
 Enhancements
 ------------
@@ -87,3 +90,6 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` where applicable (:issue:`2228`)
 * Take the color space information from an Adobe APP14 marker into account when decoding
   pixel data for JPEG transfer syntaxes.
+* Added :attr:`pydicom.config.Settings.max_sequence_depth` (default ``100``) to bound the
+  maximum sequence nesting depth allowed during reading. Exceeding the bound raises
+  :class:`~pydicom.errors.InvalidDicomError` instead of ``RecursionError`` (:issue:`2330`).
