@@ -52,6 +52,8 @@ Fixes
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` silently producing byte swapped pixel
   data when the source dataset uses *Explicit VR Big Endian* (:issue:`2340`).
+* Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
+  sets (:issue:`2383`).
 
 Enhancements
 ------------
