@@ -52,6 +52,12 @@ Fixes
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` silently producing byte swapped pixel
   data when the source dataset uses *Explicit VR Big Endian* (:issue:`2340`).
+* Translate a truncated sequence item header in
+  :func:`~pydicom.filereader.read_sequence_item` to
+  :class:`~pydicom.errors.InvalidDicomError` instead of the legacy bare
+  ``OSError``. Also narrows the surrounding ``except BaseException`` so
+  ``KeyboardInterrupt`` and ``SystemExit`` are no longer swallowed
+  (:issue:`2332`).
 
 Enhancements
 ------------

@@ -8,7 +8,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from struct import unpack
+from struct import error as struct_error, unpack
 import sys
 import tempfile
 import time
@@ -995,6 +995,35 @@ class TestReader:
         assert (
             "Expected sequence item with tag (FFFE,E000) at file position 0x22"
         ) in caplog.text
+
+    def test_sequence_item_truncated_raises_invaliddicom(self):
+        """SQ with undefined length but no item header before EOF must raise
+        ``InvalidDicomError``, not the legacy bare ``OSError``.
+
+        The previous implementation caught ``BaseException`` (so
+        ``KeyboardInterrupt`` / ``SystemExit`` were also swallowed) and re-raised
+        as ``OSError`` -- an exception type ``dcmread``'s docstring does not
+        promise to raise. Callers had no single type to ``except`` to handle
+        malformed-DICOM input.
+        """
+        # Implicit VR LE: CS "ISO_IR 100", then an undefined-length SQ at
+        # (0008,0006) with NO item header, NO sequence delimiter, EOF.
+        # read_sequence_item's `fp.read(8)` returns < 8 bytes and `unpack`
+        # raises struct.error -> we should land on InvalidDicomError.
+        truncated_sq = (
+            b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+            b"\x08\x00\x06\x00SQ\x00\x00\xff\xff\xff\xff"
+        )
+
+        with pytest.raises(
+            InvalidDicomError, match="No tag to read at file position"
+        ) as excinfo:
+            read_dataset(BytesIO(truncated_sq), False, True)
+
+        # The PR sells `raise ... from exc` as a diagnosability benefit; pin
+        # the chain so a future refactor that drops the `from` clause fails
+        # CI instead of silently losing the underlying cause.
+        assert isinstance(excinfo.value.__cause__, struct_error)
 
     def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
         """Test reading a dataset with a registered private transfer syntax"""
