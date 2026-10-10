@@ -52,6 +52,9 @@ Fixes
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` silently producing byte swapped pixel
   data when the source dataset uses *Explicit VR Big Endian* (:issue:`2340`).
+* Fixed :func:`~pydicom.pixels.apply_voi` and :func:`~pydicom.pixels.apply_modality_lut`
+  wrapping out-of-range LUT indices instead of clamping them to the last entry
+  (:issue:`2381`).
 
 Enhancements
 ------------

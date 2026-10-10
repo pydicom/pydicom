@@ -434,6 +434,20 @@ class TestModalityLUT:
         out = apply_modality_lut(arr, ds)
         assert [0, 0, 0, 1] == list(out)
 
+    def test_lut_sequence_iv_exceeds_input_dtype(self):
+        """Test IVs that overflow the input dtype once shifted are clamped."""
+        # `first_map` of -2048 shifts IVs up by 2048, which overflows int16 for
+        #   IVs near the top of the range - those must clamp to the last entry
+        ds = Dataset()
+        ds.ModalityLUTSequence = [Dataset()]
+        item = ds.ModalityLUTSequence[0]
+        item.LUTDescriptor = [4096, -2048, 16]
+        item.LUTData = list(range(4096))
+        arr = np.asarray([-2049, -2048, 0, 2047, 32767], dtype="int16")
+
+        out = apply_modality_lut(arr, ds)
+        assert [0, 0, 2048, 4095, 4095] == out.tolist()
+
     def test_unchanged(self):
         """Test no modality LUT transform."""
         ds = dcmread(MOD_16)
@@ -1679,6 +1693,23 @@ class TestApplyVOI:
         with pytest.warns(UserWarning, match=msg):
             out = apply_voi(arr, ds)
             assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_voi_8_bit_entries_more_than_256_entries(self):
+        """Test a LUT with 8-bit entries and more than 256 of them."""
+        # The number of entries is independent of the depth of each entry, so
+        #   an IV above 255 must still index the LUT rather than wrap around
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4096, 0, 8]
+        item.LUTData = [idx // 16 for idx in range(4096)]
+        arr = np.asarray([0, 255, 256, 1024, 4095, 60000], dtype="uint16")
+
+        out = apply_voi(arr, ds)
+        assert "uint8" == out.dtype
+        assert [0, 15, 16, 64, 255, 255] == out.tolist()
 
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""
