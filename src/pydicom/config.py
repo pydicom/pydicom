@@ -254,6 +254,17 @@ class Settings:
         # Chunk size to use when reading from buffered DataElement values
         self._buffered_read_size = 8192
 
+        # Maximum allowed nesting depth for sequences during read. Exceeding
+        # this depth raises ``InvalidDicomError`` instead of the
+        # ``RecursionError`` that would otherwise come from exhausting Python's
+        # interpreter stack on adversarially-nested input. The default value
+        # (100) gives a comfortable margin below Python's default
+        # ``sys.recursionlimit`` of 1000 (pydicom's reader uses ~4 frames per
+        # nesting level plus generator/setup overhead, so the practical Python
+        # limit is around depth 240). Real-world DICOM Structured Reports
+        # rarely exceed 10-20 levels of nesting.
+        self._max_sequence_depth: int = 100
+
     @property
     def buffered_read_size(self) -> int:
         """Get or set the chunk size when reading from buffered
@@ -305,6 +316,35 @@ class Settings:
     @writing_validation_mode.setter
     def writing_validation_mode(self, value: int) -> None:
         self._writing_validation_mode = value
+
+    @property
+    def max_sequence_depth(self) -> int:
+        """Maximum allowed nesting depth for sequences during ``dcmread``.
+
+        Reading deeply-nested DICOM sequences recurses through the parser
+        in proportion to the nesting depth. On adversarial or truncated
+        input the recursion can exhaust Python's interpreter stack and
+        raise an unhelpful ``RecursionError``. When the parser is about
+        to descend past this depth, an :class:`~pydicom.errors.InvalidDicomError`
+        is raised instead, so consumers can distinguish "malformed input"
+        from "library bug".
+
+        Default: ``100``. Increase if you legitimately need to parse files
+        with more nesting (and have raised :func:`sys.setrecursionlimit`
+        accordingly). Note that pydicom's reader uses approximately 4 Python
+        stack frames per nesting level plus a small fixed overhead, so the
+        practical ceiling under the default ``sys.recursionlimit`` of 1000 is
+        around depth 240.
+
+        .. versionadded:: 3.1
+        """
+        return self._max_sequence_depth
+
+    @max_sequence_depth.setter
+    def max_sequence_depth(self, depth: int) -> None:
+        if depth <= 0:
+            raise ValueError("max_sequence_depth must be greater than 0")
+        self._max_sequence_depth = depth
 
     @property
     def infer_sq_for_un_vr(self) -> bool:
