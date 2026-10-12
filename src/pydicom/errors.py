@@ -24,3 +24,25 @@ class BytesLengthException(Exception):
     """Exception that is raised for an unexpected number of bytes."""
 
     pass
+
+
+class UnknownVRError(NotImplementedError):
+    """Exception that is raised when an element's encoded VR is not recognised.
+
+    .. versionadded:: 3.1
+
+    Subclasses :class:`NotImplementedError`, so code that already catches that
+    is unaffected -- including :func:`~pydicom.filereader.read_dataset`, the
+    implicit-VR retry inside :func:`~pydicom.filereader.read_file_meta_info`
+    and :func:`~pydicom.util.fixer.fix_mismatch`.
+
+    Its purpose is to let :func:`~pydicom.filereader.dcmread` translate *this*
+    failure to :class:`InvalidDicomError` without also capturing unrelated
+    ``NotImplementedError`` raised by callbacks registered through
+    :mod:`pydicom.hooks`.
+
+    To parse the offending element as **UN** rather than raise, set
+    :attr:`~pydicom.config.convert_unknown_vr_to_UN` to ``True``.
+    """
+
+    pass
