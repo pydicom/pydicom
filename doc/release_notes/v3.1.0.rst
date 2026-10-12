@@ -87,3 +87,5 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` where applicable (:issue:`2228`)
 * Take the color space information from an Adobe APP14 marker into account when decoding
   pixel data for JPEG transfer syntaxes.
+* Added :attr:`~pydicom.config.Settings.auto_format_ds` to enforce valid DS values in case
+  the string representation gets too long.
