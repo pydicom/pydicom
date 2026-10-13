@@ -1477,7 +1477,14 @@ class Decoder(CoderBase):
 
         frame_generator = runner.iter_decode()
         for idx in range(number_of_frames):
-            buffer = next(frame_generator)
+            try:
+                buffer = next(frame_generator)
+            except StopIteration:
+                raise ValueError(
+                    f"Only {idx} frames have been found in the encapsulated pixel "
+                    "data, which is less than the given (0028,0008) 'Number of "
+                    f"Frames' value of {number_of_frames}"
+                ) from None
             if runner._test_for("bit_packed", idx):
                 frame = cast("np.ndarray", unpack_bits(buffer))[:pixels_per_frame]
                 bits_allocated = 8
@@ -1859,7 +1866,14 @@ class Decoder(CoderBase):
         frames = []
         frame_generator = runner.iter_decode()
         for idx in range(runner.number_of_frames):
-            frame = next(frame_generator)
+            try:
+                frame = next(frame_generator)
+            except StopIteration:
+                raise ValueError(
+                    f"Only {idx} frames have been found in the encapsulated pixel "
+                    "data, which is less than the given (0028,0008) 'Number of "
+                    f"Frames' value of {runner.number_of_frames}"
+                ) from None
             length_bytes = runner.frame_length(unit="bytes", index=idx)
             if (actual := len(frame)) != length_bytes:
                 raise ValueError(
