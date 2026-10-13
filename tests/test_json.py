@@ -332,6 +332,27 @@ class TestDataSetToJson:
 
 
 class TestEmptyJsonValues:
+    @pytest.mark.parametrize("vr", ["DS", "IS"])
+    @pytest.mark.parametrize("empty_value", ["", None])
+    def test_multivalue_numeric_to_json(self, vr, empty_value):
+        ds = Dataset()
+        ds.add_new(0x00091001, vr, [1, empty_value, 2])
+
+        result = ds.to_json()
+
+        assert json.loads(result) == {"00091001": {"vr": vr, "Value": [1, None, 2]}}
+        restored = Dataset.from_json(result)
+        assert restored[0x00091001].value == [1, None, 2]
+        assert restored[0x00091001].VM == 3
+
+    @pytest.mark.parametrize("vr", ["DS", "IS"])
+    @pytest.mark.parametrize("empty_value", ["", None])
+    def test_multivalue_numeric_from_json(self, vr, empty_value):
+        ds = Dataset.from_json({"00091001": {"vr": vr, "Value": [1, empty_value, 2]}})
+
+        assert ds[0x00091001].value == [1, None, 2]
+        assert ds[0x00091001].VM == 3
+
     @pytest.fixture
     def test_json(self):
         yield Dataset.from_json(

@@ -55,7 +55,8 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
 
     if isinstance(value, list | tuple):
         return [
-            number_type(v) if v is not None else empty_value_for_VR(vr) for v in value
+            number_type(v) if v not in (None, "") else empty_value_for_VR(vr)
+            for v in value
         ]
 
     return number_type(value)

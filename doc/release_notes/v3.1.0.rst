@@ -41,6 +41,8 @@ Fixes
   values with VRs supporting only ASCII characters (:issue:`2243`).
 * Correctly handle empty values represented as empty strings in json while converting them
   to a dataset (:issue:`2221`).
+* Correctly handle empty components of multi-valued **DS** and **IS** elements when
+  converting to and from JSON.
 * Correctly handle empty LUT data (:issue:`2238`).
 * Fixed data in the "unused" bits above *Bits Stored* sometimes being included in the returned
   pixel data for JPEG 2000 and JPEG-LS (:issue:`2260`).
@@ -55,6 +57,8 @@ Fixes
 * Fixed :func:`~pydicom.pixels.apply_voi` and :func:`~pydicom.pixels.apply_modality_lut`
   wrapping out-of-range LUT indices instead of clamping them to the last entry
   (:issue:`2381`).
+* Fixed compression of packed one-bit pixel data stored as *OW* with
+  *Explicit VR Big Endian* byte ordering, including frames ending within a byte or word.
 
 Enhancements
 ------------
