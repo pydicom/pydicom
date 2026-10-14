@@ -1,9 +1,13 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Encoding benchmarks for the rle_handler module."""
 
+from asv_runner.benchmarks.mark import skip_benchmark
+
+
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
+
+# from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
 from pydicom.uid import RLELossless
 
 
@@ -21,6 +25,8 @@ EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
 EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
 
 
+# Need to update API for this - rle_encode_frame was removed in 3.0
+@skip_benchmark
 class TimeRLEEncodeFrame:
     """Time tests for rle_handler.rle_encode_frame."""
 

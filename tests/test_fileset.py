@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from pydicom import dcmread
+from pydicom import config, dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filebase import DicomBytesIO, DicomFileLike
@@ -152,7 +152,7 @@ def fileset_fs(request, fs, ignore_reading_invalid_values):
 
     # Write modified DICOMDIR file
     with open(dicomdir_root / "DICOMDIR2", "wb") as fp:
-        fset._write_dicomdir(DicomFileLike(fp))
+        fset._write_dicomdir(DicomFileLike(fp), settings=config.settings)
 
     yield fs
 
@@ -1953,7 +1953,7 @@ class TestFileSet_Load:
         out = DicomBytesIO()
         out.is_little_endian = True
         out.is_implicit_VR = False
-        fs._write_dicomdir(out)
+        fs._write_dicomdir(out, settings=config.settings)
         out.seek(0)
 
         new = dcmread(out)
