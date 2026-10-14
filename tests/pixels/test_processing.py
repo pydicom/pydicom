@@ -1650,6 +1650,82 @@ class TestApplyVOI:
         assert "uint16" == out.dtype
         assert [0, 0, 32768, 0, 65535] == out.tolist()
 
+    @pytest.mark.parametrize("bits", [8, 16])
+    @pytest.mark.parametrize(
+        "first, dtype, values",
+        [
+            (0, "uint16", [0, 1, 2, 3, 4, 255, 256, 257, 65535]),
+            (100, "uint16", [0, 99, 100, 101, 103, 104, 355, 356, 357]),
+            (-100, "int16", [-32768, -101, -100, -99, -97, -96, 155, 156, 32767]),
+            (-32768, "int16", [-32768, -32767, -32765, 0, 32767]),
+            (-100, "int64", [-(2**63), -101, -100, -99, -97, 2**63 - 1]),
+            (-1, "int64", [-(2**63), -2, -1, 0, 1, 2, 2**63 - 1]),
+            (100, "uint64", [0, 99, 100, 101, 103, 104, 356, 2**63 + 100, 2**64 - 1]),
+            (65535, "uint8", [0, 255]),
+            (-32768, "uint8", [0, 255]),
+        ],
+    )
+    def test_voi_index_range(self, first, dtype, values, bits):
+        """Clip LUT indices without overflowing the input or output dtype."""
+        item = Dataset()
+        item.add_new(0x00283002, "SS" if first < 0 else "US", [4, first, bits])
+        lut = [10, 20, 30, 40]
+        item.add_new(0x00283006, "US", lut)
+        ds = Dataset()
+        ds.VOILUTSequence = [item]
+        arr = np.asarray(values, dtype=dtype).reshape(1, -1)
+        original = arr.copy()
+        # Use Python integers for the reference to avoid NumPy overflow.
+        expected = [lut[min(max(value - first, 0), 3)] for value in values]
+
+        out = apply_voi(arr, ds)
+
+        assert out.tolist() == [expected]
+        assert out.shape == arr.shape
+        assert out.dtype == ("uint8" if bits == 8 else "uint16")
+        assert np.array_equal(arr, original)
+
+    @pytest.mark.parametrize("count", [512, 65536])
+    @pytest.mark.parametrize("bits", [8, 16])
+    @pytest.mark.parametrize("storage", ["US", "OW"])
+    @pytest.mark.parametrize("first", [0, -32768])
+    def test_voi_long_lut(self, count, bits, storage, first):
+        """The LUT entry count is independent of the output bit depth."""
+        item = Dataset()
+        descriptor = [count if count < 65536 else 0, first, bits]
+        item.add_new(0x00283002, "SS" if first < 0 else "US", descriptor)
+        lut = [value * 255 // (count - 1) for value in range(count)]
+        data = pack(f"<{count}H", *lut) if storage == "OW" else lut
+        item.add_new(0x00283006, storage, data)
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        ds.VOILUTSequence = [item]
+        offsets = [-1, 0, 1, 255, 256, 257, count - 2, count - 1, count]
+        arr = np.asarray([first + value for value in offsets], dtype="int64")
+        original = arr.copy()
+        expected = [lut[min(max(value, 0), count - 1)] for value in offsets]
+
+        out = apply_voi(arr, ds)
+
+        assert out.tolist() == expected
+        assert out.dtype == ("uint8" if bits == 8 else "uint16")
+        assert np.array_equal(arr, original)
+
+    def test_voi_empty_selected_lut(self):
+        """Empty inputs retain their shape and the selected LUT's dtype."""
+        ds = Dataset()
+        ds.VOILUTSequence = [Dataset(), Dataset()]
+        for item, bits in zip(ds.VOILUTSequence, [8, 16]):
+            item.add_new(0x00283002, "US", [4, 0, bits])
+            item.add_new(0x00283006, "US", [10, 20, 30, 40])
+
+        arr = np.empty((2, 0, 3), dtype="uint16")
+        for index, dtype in enumerate(["uint8", "uint16"]):
+            out = apply_voi(arr, ds, index=index)
+            assert out.shape == arr.shape
+            assert out.dtype == dtype
+
     def test_voi_bad_depth(self):
         """Test bad LUT depth raises exception."""
         ds = dcmread(VOI_08_1F)
