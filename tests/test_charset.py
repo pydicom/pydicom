@@ -489,6 +489,35 @@ class TestCharset:
         with pytest.raises(LookupError, match="Unknown encoding 'ISO 2022 IR 146'"):
             pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 146"])
 
+    def test_embedded_null_in_encoding(self, allow_reading_invalid_values):
+        """Test that embedded NUL in SpecificCharacterSet does not raise
+        ValueError. Regression test for #2338."""
+        # leading NUL
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        with pytest.warns(
+            UserWarning,
+            match=r"Unknown encoding .*ISO_IR 100.* using default encoding",
+        ):
+            pydicom.charset.decode_element(elem, ["\x00ISO_IR 100"])
+
+        # middle NUL
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        with pytest.warns(
+            UserWarning,
+            match=r"Unknown encoding .*ISO.*IR 100.* using default encoding",
+        ):
+            pydicom.charset.decode_element(elem, ["ISO\x00_IR 100"])
+
+    def test_embedded_null_in_encoding_strict(self, enforce_valid_values):
+        """Test that embedded NUL in SpecificCharacterSet raises LookupError
+        (not ValueError) when reading_validation_mode is RAISE. #2338."""
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        with pytest.raises(
+            LookupError,
+            match=r"Unknown encoding .*ISO_IR 100",
+        ):
+            pydicom.charset.decode_element(elem, ["\x00ISO_IR 100"])
+
     def test_japanese_multi_byte_personname(self):
         """Test japanese person name which has multi byte strings are
         correctly encoded."""
