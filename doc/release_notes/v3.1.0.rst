@@ -25,6 +25,8 @@ Fixes
   Pixel Data* using the :mod:`~pydicom.pixels` backend (:issue:`2135`).
 * Fixed decoding of pixel data for images with *Bits Allocated* of 1 when frame boundaries
   are not aligned with byte boundaries (:issue:`2134`).
+* Fixed indexed decoding of one-bit native pixel data when a frame starts within
+  a byte and spans more bytes than its packed length.
 * Fixed a number of issues with decoding pixel data on big endian systems such as s390x
   (:issue:`2147`).
 * Fixed being unable to pickle datasets containing LUT descriptor elements such as
