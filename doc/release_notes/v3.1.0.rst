@@ -14,6 +14,10 @@ Changes
   per-frame metadata to help account for inter-frame variations in frame properties
   when decoding.
 * Apply PEP 735 to build environment. It modifies how build dependencies are installed.
+* Clarified the :func:`~pydicom.uid.generate_uid` ``entropy_srcs`` docstring: the
+  hash is deterministic but unsalted, so it provides no protection against
+  brute-force recovery of low-entropy inputs and should not be relied upon as an
+  irreversible de-identification mechanism (:issue:`2341`).
 
 Fixes
 -----
