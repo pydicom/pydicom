@@ -59,6 +59,9 @@ Fixes
 
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
+  **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
+  failing for empty binary elements when excluding large values.
 
 Enhancements
 ------------

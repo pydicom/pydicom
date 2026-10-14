@@ -26,8 +26,9 @@ import pydicom
 from pydicom.datadict import dictionary_keyword
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
+from pydicom.multival import MultiValue
 from pydicom.tag import BaseTag
-from pydicom.valuerep import BYTES_VR, AMBIGUOUS_VR, VR
+from pydicom.valuerep import BYTES_VR, AMBIGUOUS_VR, VR, PersonName
 from pydicom.cli.main import filespec_help, filespec_parser
 
 
@@ -48,6 +49,14 @@ def camel_to_underscore(name: str) -> str:
 def tag_repr(tag: BaseTag) -> str:
     """String of tag value as (0xgggg, 0xeeee)"""
     return f"(0x{tag.group:04X}, 0x{tag.element:04X})"
+
+
+def _multi_value_item_repr(value: object) -> str:
+    """String of a single value of a multi-valued element"""
+    if isinstance(value, str | bytes | PersonName):
+        return repr(value)
+
+    return str(value)
 
 
 def default_name_filter(name: str) -> str:
@@ -121,9 +130,14 @@ def code_dataelem(
     except KeyError:
         have_keyword = False
 
+    # The repr of a MultiValue is not always valid code (e.g. for PN, AT
+    # or empty values), so build the list from the individual values.
     # If the value representation of the data element is AT (Attribute Tag),
-    # then format it as a tag
-    if dataelem.VR == "AT":
+    # then format the value(s) as a tag
+    if isinstance(dataelem.value, MultiValue):
+        item_repr = tag_repr if dataelem.VR == VR.AT else _multi_value_item_repr
+        valuerep = f"[{', '.join(item_repr(val) for val in dataelem.value)}]"
+    elif dataelem.VR == VR.AT and dataelem.value is not None:
         valuerep = tag_repr(dataelem.value)
     else:
         valuerep = repr(dataelem.value)
@@ -131,7 +145,7 @@ def code_dataelem(
     if exclude_size:
         if (
             dataelem.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR.US_SS}
-            and not isinstance(dataelem.value, int | float)
+            and not isinstance(dataelem.value, int | float | None)
             and len(dataelem.value) > exclude_size
         ):
             valuerep = f"# XXX Array of {len(dataelem.value)} bytes excluded"
