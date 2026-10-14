@@ -328,7 +328,10 @@ def test_download_http_error_preserves_destination(
     monkeypatch.setattr(download, "requests", requests, raising=False)
     monkeypatch.setattr(requests, "get", lambda *args, **kwargs: response)
     monkeypatch.setattr(
-        download, "tqdm", SimpleNamespace(tqdm=lambda data, **kwargs: data), raising=False
+        download,
+        "tqdm",
+        SimpleNamespace(tqdm=lambda data, **kwargs: data),
+        raising=False,
     )
     destination = tmp_path / "download.dcm"
     if existing:
