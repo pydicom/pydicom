@@ -91,10 +91,9 @@ IS_WINDOWS = platform.system() == "Windows"
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
-    with open(a, "rb") as A:
-        with open(b, "rb") as B:
-            a_bytes = A.read()
-            b_bytes = B.read()
+    with open(a, "rb") as A, open(b, "rb") as B:
+        a_bytes = A.read()
+        b_bytes = B.read()
 
     return bytes_identical(a_bytes, b_bytes)
 
@@ -118,7 +117,7 @@ def as_assertable(dataset):
     to a set that can be safely compared using pytest's assert.
     (Datasets can't be so compared because DataElements are not
     hashable.)"""
-    safe_dict = dict((f"{elem.tag} {elem.keyword}", elem.value) for elem in dataset)
+    safe_dict = {f"{elem.tag} {elem.keyword}": elem.value for elem in dataset}
     if hasattr(dataset, "file_meta"):
         safe_dict.update(as_assertable(dataset.file_meta))
     return safe_dict
@@ -371,10 +370,10 @@ class TestScratchWriteDateTime(TestWriteFile):
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = dcmread(self.file_out)
-        assert all([a == b for a, b in zip(ds.CalibrationDate, multi_DA_expected)])
+        assert all(a == b for a, b in zip(ds.CalibrationDate, multi_DA_expected))
         assert DA_expected == ds.DateOfLastCalibration
-        assert all([a == b for a, b in zip(ds.ReferencedDateTime, multi_DT_expected)])
-        assert all([a == b for a, b in zip(ds.CalibrationTime, multi_TM_expected)])
+        assert all(a == b for a, b in zip(ds.ReferencedDateTime, multi_DT_expected))
+        assert all(a == b for a, b in zip(ds.CalibrationTime, multi_TM_expected))
         assert TM_expected == ds.TimeOfLastCalibration
 
 

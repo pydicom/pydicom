@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 import sys
 
-import pydata_sphinx_theme
+import pydata_sphinx_theme  # noqa: F401
 
 import pydicom
 

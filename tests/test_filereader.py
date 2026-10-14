@@ -1153,7 +1153,7 @@ class TestUnknownVR:
             (b"\x61\x00", "0x61 0x00"),  # a/-
             (b"\x7a\x00", "0x7a 0x00"),  # z/-
             # Test bad/good
-            (b"\x00\x41", "0x00 0x41"),  # -/A
+            (b"\x00\x41", "0x00 0x41"),  # -/A  # noqa: PT014
             (b"\x00\x5a", "0x00 0x5a"),  # -/Z
             # Test bad/not quite good
             (b"\x00\x61", "0x00 0x61"),  # -/a

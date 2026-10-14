@@ -44,7 +44,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     if value in (None, ""):
         return empty_value_for_VR(vr)
 
-    number_type: type[int] | type[float] | None = None
+    number_type: type[int | float] | None = None
     if vr in (INT_VR - {VR.AT}) | {VR.US_SS}:
         number_type = int
     if vr in FLOAT_VR:

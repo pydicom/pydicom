@@ -89,11 +89,11 @@ def hexdump(
             current.append(f"{offset:0{max_offset_len}X}  ")
 
         # Add hex version of the current line
-        b = " ".join([f"{x:02X}" for x in data])
+        b = " ".join(f"{x:02X}" for x in data)
         current.append(f"{b:<49}")  # if fewer than 16 bytes, pad out to length
 
         # Append the ASCII version of the current line (or . if not ASCII)
-        current.append("".join([print_character(x) for x in data]))
+        current.append("".join(print_character(x) for x in data))
 
         s.append("".join(current))
 

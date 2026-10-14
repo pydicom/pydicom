@@ -151,11 +151,11 @@ class BaseTag(int):
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   https://docs.python.org/3/whatsnew/3.0.html#ordering-comparisons
-    def __le__(self, other: Any) -> Any:
+    def __le__(self, other: Any) -> bool:
         """Return ``True`` if `self`  is less than or equal to `other`."""
-        return self == other or self < other
+        return bool(self == other) or self < other
 
-    def __lt__(self, other: Any) -> Any:
+    def __lt__(self, other: Any) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -166,26 +166,26 @@ class BaseTag(int):
 
         return int(self) < int(other)
 
-    def __ge__(self, other: Any) -> Any:
+    def __ge__(self, other: Any) -> bool:
         """Return ``True`` if `self` is greater than or equal to `other`."""
-        return self == other or self > other
+        return bool(self == other) or self > other
 
-    def __gt__(self, other: Any) -> Any:
+    def __gt__(self, other: Any) -> bool:
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> bool:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
             try:
-                other = Tag(other)
+                other = Tag(other)  # type: ignore[arg-type]
             except Exception:
                 return False
 
         return int(self) == int(other)
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: object) -> bool:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 
