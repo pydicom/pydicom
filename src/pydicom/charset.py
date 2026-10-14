@@ -97,7 +97,7 @@ ENCODINGS_TO_CODES["shift_jis"] = ESC + b")I"
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
-handled_encodings = ("iso2022_jp", "iso2022_jp_2", "iso_ir_58")
+handled_encodings = ("iso2022_jp", "iso2022_jp_2")
 
 
 def _encode_to_jis_x_0201(value: str, errors: str = "strict") -> bytes:

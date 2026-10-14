@@ -57,6 +57,9 @@ Fixes
 * Fixed compression of packed one-bit pixel data stored as *OW* with
   *Explicit VR Big Endian* byte ordering, including frames ending within a byte or word.
 
+* Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
+  sets (:issue:`2383`).
+
 Enhancements
 ------------
 * Python 3.12, 3.13 and 3.14 are now supported.
