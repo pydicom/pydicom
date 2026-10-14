@@ -49,7 +49,7 @@ from pydicom.valuerep import (
 )
 
 if config.have_numpy:
-    import numpy
+    import numpy as np
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -573,11 +573,7 @@ class DataElement:  # noqa: PLW1641
         Uses the element's VR in order to determine the conversion method and
         resulting type.
         """
-        if (
-            self.tag == 0x7FE00010
-            and config.have_numpy
-            and isinstance(val, numpy.ndarray)
-        ):
+        if self.tag == 0x7FE00010 and config.have_numpy and isinstance(val, np.ndarray):
             raise TypeError(
                 "The value for (7FE0,0010) 'Pixel Data' should be set using 'bytes' "
                 "not 'numpy.ndarray'. See the Dataset.set_pixel_data() method for "
@@ -686,8 +682,8 @@ class DataElement:  # noqa: PLW1641
                 return False
 
             # tag and VR match, now check the value
-            if config.have_numpy and isinstance(self.value, numpy.ndarray):
-                return len(self.value) == len(other.value) and numpy.allclose(
+            if config.have_numpy and isinstance(self.value, np.ndarray):
+                return len(self.value) == len(other.value) and np.allclose(
                     self.value, other.value
                 )
 

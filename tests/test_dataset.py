@@ -17,7 +17,7 @@ from pydicom.datadict import add_private_dict_entry
 from .test_helpers import assert_no_warning
 
 try:
-    import numpy
+    import numpy as np
 
     HAVE_NP = True
 except ImportError:
@@ -2266,7 +2266,7 @@ class TestFileDataset:
     def test_with_array(self):
         """Test Dataset within a numpy array"""
         ds = get_testdata_file("CT_small.dcm", read=True)
-        arr = numpy.array([ds])
+        arr = np.array([ds])
         assert arr[0].PatientName == ds.PatientName
         assert arr.dtype == object
         assert arr.shape == (1,)
@@ -2554,7 +2554,7 @@ class TestDatasetOverlayArray:
     @pytest.mark.skipif(not HAVE_NP, reason="numpy is not available")
     def test_possible_available(self):
         """Test with possible and available handlers."""
-        assert isinstance(self.ds.overlay_array(0x6000), numpy.ndarray)
+        assert isinstance(self.ds.overlay_array(0x6000), np.ndarray)
 
 
 class TestFileMeta:

@@ -10,7 +10,7 @@ import shutil
 import pytest
 
 try:
-    import numpy
+    import numpy as np
 
     HAVE_NP = True
 except ImportError:
@@ -457,7 +457,7 @@ class TestsWithGDCM:
         a = sc_rgb_jpeg2k_gdcm_KY.pixel_array
         b = ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm.pixel_array
         if HAVE_NP:
-            assert numpy.array_equal(a, b)
+            assert np.array_equal(a, b)
         else:
             assert a.mean() == b.mean()
 
@@ -593,7 +593,7 @@ class TestsWithGDCM:
         arr = ds.pixel_array
 
         assert arr.shape == (2, 64, 64)
-        assert numpy.array_equal(arr[0], arr[1])
+        assert np.array_equal(arr[0], arr[1])
 
     def test_multi_frame_too_large_multi_frame(self, set_gdcm_max_buffer_size_25k):
         """Test decoding a multi-frame image where the total pixel data is too large
@@ -610,7 +610,7 @@ class TestsWithGDCM:
 
         assert arr.shape == (11, 64, 64)
         for idx in range(11):
-            assert numpy.array_equal(arr[idx], arr[1])
+            assert np.array_equal(arr[idx], arr[1])
 
 
 @pytest.mark.skipif(not HAVE_GDCM, reason="GDCM not available")
