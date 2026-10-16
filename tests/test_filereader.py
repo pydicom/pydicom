@@ -1721,6 +1721,25 @@ class TestReadTruncatedFile:
         with pytest.raises(ValueError, match=msg):
             mr.pixel_array
 
+    @staticmethod
+    def _truncated_inside_element_length():
+        # The first 152 bytes end right after the 8-byte header of a 32-bit
+        # length element, so the length itself is missing.
+        with open(get_testdata_file("693_J2KI.dcm"), "rb") as f:
+            return f.read(152)
+
+    def testTruncatedElementLengthRaisesEOFError(self, enforce_valid_values):
+        """A file that ends inside an element length raises EOFError."""
+        data = self._truncated_inside_element_length()
+        with pytest.raises(EOFError, match="Unexpected end of file"):
+            dcmread(BytesIO(data), force=True)
+
+    def testTruncatedElementLengthWarns(self, allow_reading_invalid_values):
+        """With WARN validation the same file loads with a warning."""
+        data = self._truncated_inside_element_length()
+        with pytest.warns(UserWarning, match="Unexpected end of file"):
+            dcmread(BytesIO(data), force=True)
+
 
 class TestFileLike:
     """Test that can read DICOM files with file-like object rather than
