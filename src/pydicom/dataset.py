@@ -1570,6 +1570,7 @@ class Dataset:  # noqa: PLW1641
     def clear(self) -> None:
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
+        self._private_blocks = {}
 
     def pop(self, key: "BaseTag | TagType", *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
@@ -1606,7 +1607,11 @@ class Dataset:  # noqa: PLW1641
         except Exception:
             pass
 
-        return self._dict.pop(cast(BaseTag, key), *args)
+        elem: _DatasetValue = self._dict.pop(cast(BaseTag, key), *args)
+        if self._private_blocks and isinstance(key, BaseTag) and key.is_private_creator:
+            self._private_blocks = {}
+
+        return elem
 
     def popitem(self) -> tuple[BaseTag, _DatasetValue]:
         """Emulate :meth:`dict.popitem`.
@@ -1615,7 +1620,11 @@ class Dataset:  # noqa: PLW1641
         -------
         tuple of (BaseTag, DataElement)
         """
-        return self._dict.popitem()
+        tag, elem = self._dict.popitem()
+        if self._private_blocks and tag.is_private_creator:
+            self._private_blocks = {}
+
+        return tag, elem
 
     def setdefault(self, key: TagType, default: Any | None = None) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
@@ -2837,6 +2846,10 @@ class Dataset:  # noqa: PLW1641
                         elem, encoding=self._character_set, ds=self
                     )
                 elem.private_creator = self[private_creator_tag].value
+
+        # invalidate private blocks in case a private creator is replaced
+        if self._private_blocks and elem_tag.is_private_creator:
+            self._private_blocks = {}
 
         # Changing pixel data resets the stored array
         if elem_tag in PIXEL_KEYWORDS:

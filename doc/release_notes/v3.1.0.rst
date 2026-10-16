@@ -49,6 +49,11 @@ Fixes
 * Correctly handle meta data tags incorrectly written in implicit transfer syntax (:issue:`2290`)
 * Made debugging of :func:`~pydicom.filereader.read_dataset` a bit more robust (:pr:`2292`).
 * Fixed deepcopy of private blocks in :class:`~pydicom.dataset.Dataset` (:issue:`2294`)
+* Fixed :meth:`~pydicom.dataset.Dataset.private_block` returning an outdated block
+  after the private creator was removed using :meth:`~pydicom.dataset.Dataset.pop`,
+  :meth:`~pydicom.dataset.Dataset.popitem` or :meth:`~pydicom.dataset.Dataset.clear`,
+  or replaced by a different private creator. New private elements could be added
+  without a private creator element.
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
