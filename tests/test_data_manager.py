@@ -2,11 +2,13 @@
 """Unit tests for pydicom.data_manager"""
 
 import json
+from io import BytesIO
 import os
 from os.path import basename
 from pathlib import Path
 import platform
 import shutil
+from types import SimpleNamespace
 
 import pytest
 
@@ -308,6 +310,40 @@ class TestDownload:
         )
         with pytest.warns(UserWarning, match=msg):
             assert [] == get_testdata_files("693_UN*")
+
+
+@pytest.mark.parametrize("progress_bar", [False, True])
+@pytest.mark.parametrize("existing", [False, True])
+def test_download_http_error_preserves_destination(
+    monkeypatch, tmp_path, progress_bar, existing
+):
+    """HTTP error bodies must not create or overwrite downloaded files."""
+    requests = pytest.importorskip("requests")
+    response = requests.Response()
+    response.status_code = 404
+    response.url = "https://example.invalid/data.dcm"
+    response.raw = BytesIO(b"Not Found")
+    monkeypatch.setattr(download, "HAVE_REQUESTS", True)
+    monkeypatch.setattr(download, "USE_PROGRESS_BAR", progress_bar)
+    monkeypatch.setattr(download, "requests", requests, raising=False)
+    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: response)
+    monkeypatch.setattr(
+        download,
+        "tqdm",
+        SimpleNamespace(tqdm=lambda data, **kwargs: data),
+        raising=False,
+    )
+    destination = tmp_path / "download.dcm"
+    if existing:
+        destination.write_bytes(b"existing data")
+
+    with pytest.raises(requests.HTTPError):
+        download.download_with_progress(response.url, destination)
+
+    if existing:
+        assert destination.read_bytes() == b"existing data"
+    else:
+        assert not destination.exists()
 
 
 def test_fetch_data_files(data_fs):
