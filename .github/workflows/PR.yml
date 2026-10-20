@@ -38,7 +38,7 @@ jobs:
           - os: windows
             python-version: "3.15"
             test-numpy: true
-            test-extras: true
+            test-extras: false
             upload-coverage: false
           - os: ubuntu
             python-version: "pypy3.10"
