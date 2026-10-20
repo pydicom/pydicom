@@ -33,6 +33,11 @@ jobs:
           - os: windows
             python-version: "3.14"
             test-numpy: true
+            test-extras: false
+            upload-coverage: false
+          - os: windows
+            python-version: "3.15"
+            test-numpy: true
             test-extras: true
             upload-coverage: false
           - os: ubuntu
