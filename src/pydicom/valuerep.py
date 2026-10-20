@@ -996,7 +996,11 @@ def format_number_as_ds(val: float | Decimal) -> str:
             remaining_chars = 14 - sign_chars - int(floor(logval))
         else:
             remaining_chars = 14 - sign_chars
-        return f"{val:.{remaining_chars}f}"
+        trunc_str = f"{val:.{remaining_chars}f}"
+        if len(trunc_str) > 16:
+            # rounding added a digit before the '.', e.g. 9.999... to 10.000...
+            trunc_str = f"{val:.{remaining_chars - 1}f}"
+        return trunc_str
 
 
 class DSfloat(float):
