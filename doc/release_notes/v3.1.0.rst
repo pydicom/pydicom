@@ -62,6 +62,9 @@ Fixes
 
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed reading files truncated within the 32-bit length of an explicit VR data
+  element raising :class:`struct.error`. These now follow the configured reading
+  validation mode, raising :class:`EOFError` or issuing a warning (:pr:`2394`).
 
 Enhancements
 ------------

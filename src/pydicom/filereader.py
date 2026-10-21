@@ -89,6 +89,12 @@ def data_element_generator(
     RawDataElement or DataElement
         Yields DataElement for undefined length UN or SQ, RawDataElement
         otherwise.
+
+    Raises
+    ------
+    EOFError
+        If the file ends before the complete 32-bit length of an explicit VR
+        data element has been read.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
