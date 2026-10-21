@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=3.12,<4"]
+requires = ["flit_core >=3.12,<5"]
 build-backend = "flit_core.buildapi"
 
 [project]
@@ -90,11 +90,6 @@ dev = [
     "types-requests",
     "pre-commit",
 ]
-
-
-[tool.black]
-exclude = ".venv|build|/_.*_dict.py$"
-force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
 
 
 [tool.ruff]
