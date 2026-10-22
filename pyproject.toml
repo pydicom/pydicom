@@ -44,7 +44,7 @@ pixeldata = [
     "pylibjpeg[openjpeg]",
     "pylibjpeg[rle]",
     "pylibjpeg-libjpeg",
-    "python-gdcm"
+    "python-gdcm; python_version < '3.15'"
 ]
 
 # Consider libjpeg-turbo (BSD-like license) when 12-bit available
