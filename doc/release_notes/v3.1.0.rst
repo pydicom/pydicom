@@ -74,6 +74,9 @@ Enhancements
   convenience property for determining whether a dataset uses a compressed transfer
   syntax or not (:issue:`2155`).
 * Updated UIDs to version 2024d of the DICOM Standard
+* Added six UIDs introduced after version 2024d of the DICOM Standard (up to
+  2026d), including the "For Processing" CT storage, waveform and DICONDE
+  ultrasound waveform SOP Classes
 * The following UID constants have been added:
 
   * :attr:`~pydicom.uid.JPEGXLLossless`
