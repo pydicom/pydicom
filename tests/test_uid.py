@@ -308,6 +308,44 @@ class TestUID:
         assert "ImplicitVRLittleEndian" == self.uid.keyword
 
 
+class TestUIDDictionary:
+    """Test UIDs registered in the UID dictionary"""
+
+    def test_uids_added_since_dicom_2024d(self):
+        """Test that UIDs added to the DICOM Standard after 2024d are known."""
+        expected = {
+            "1.2.840.10008.5.1.4.1.1.2.3": (
+                "CT Image Storage - For Processing",
+                "CTImageStorageForProcessing",
+            ),
+            "1.2.840.10008.5.1.4.1.1.2.4": (
+                "Enhanced CT Image Storage - For Processing",
+                "EnhancedCTImageStorageForProcessing",
+            ),
+            "1.2.840.10008.5.1.4.1.1.2.5": (
+                "Legacy Converted Enhanced CT Image Storage - For Processing",
+                "LegacyConvertedEnhancedCTImageStorageForProcessing",
+            ),
+            "1.2.840.10008.5.1.4.1.1.601.5": (
+                "Ultrasound Waveform Storage",
+                "UltrasoundWaveformStorage",
+            ),
+            "1.2.840.10008.5.1.4.1.1.9.100.1": (
+                "Waveform Presentation State Storage",
+                "WaveformPresentationStateStorage",
+            ),
+            "1.2.840.10008.5.1.4.1.1.9.100.2": (
+                "Waveform Acquisition Presentation State Storage",
+                "WaveformAcquisitionPresentationStateStorage",
+            ),
+        }
+        for uid, (name, keyword) in expected.items():
+            assert UID(uid).name == name
+            assert UID(uid).keyword == keyword
+            assert UID(uid).type == "SOP Class"
+            assert not UID(uid).is_retired
+
+
 class TestUIDPrivate:
     """Test private UIDs"""
 
