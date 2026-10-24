@@ -3,27 +3,27 @@
 
 import json
 import os
-from os.path import basename
-from pathlib import Path
 import platform
 import shutil
+from os.path import basename
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from pydicom.data import (
-    get_charset_files,
-    get_testdata_files,
-    get_palette_files,
+    download,
     fetch_data_files,
+    get_charset_files,
+    get_palette_files,
+    get_testdata_files,
 )
 from pydicom.data.data_manager import (
     DATA_ROOT,
-    get_testdata_file,
     external_data_sources,
+    get_testdata_file,
 )
-from pydicom.data import download
-from pydicom.data.download import get_data_dir, calculate_file_hash, get_cached_filehash
-
+from pydicom.data.download import calculate_file_hash, get_cached_filehash, get_data_dir
 
 EXT_PYDICOM = "pydicom-data" in external_data_sources()
 if EXT_PYDICOM:
@@ -308,6 +308,53 @@ class TestDownload:
         )
         with pytest.warns(UserWarning, match=msg):
             assert [] == get_testdata_files("693_UN*")
+
+
+@pytest.mark.parametrize("progress_bar", [False, True])
+@pytest.mark.parametrize("existing", [False, True])
+def test_download_http_error_preserves_destination(
+    monkeypatch, tmp_path, progress_bar, existing
+):
+    """HTTP error bodies must not create or overwrite downloaded files."""
+
+    class HTTPError(Exception):
+        pass
+
+    def raise_http_error():
+        raise HTTPError("404 Not Found")
+
+    response = SimpleNamespace(
+        url="https://example.invalid/data.dcm",
+        headers={"content-length": "9"},
+        content=b"Not Found",
+        iter_content=lambda **kwargs: (b"Not Found",),
+        raise_for_status=raise_http_error,
+    )
+    monkeypatch.setattr(download, "HAVE_REQUESTS", True)
+    monkeypatch.setattr(download, "USE_PROGRESS_BAR", progress_bar)
+    monkeypatch.setattr(
+        download,
+        "requests",
+        SimpleNamespace(get=lambda *args, **kwargs: response),
+        raising=False,
+    )
+    monkeypatch.setattr(
+        download,
+        "tqdm",
+        SimpleNamespace(tqdm=lambda data, **kwargs: data),
+        raising=False,
+    )
+    destination = tmp_path / "download.dcm"
+    if existing:
+        destination.write_bytes(b"existing data")
+
+    with pytest.raises(HTTPError):
+        download.download_with_progress(response.url, destination)
+
+    if existing:
+        assert destination.read_bytes() == b"existing data"
+    else:
+        assert not destination.exists()
 
 
 def test_fetch_data_files(data_fs):
