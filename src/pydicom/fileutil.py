@@ -472,7 +472,7 @@ def check_buffer(buffer: BufferedIOBase) -> None:
 @contextmanager
 def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
     """Yields the initial position of the buffer and return to that position on exiting
-    the context.
+    the context, including when an exception is raised.
 
     Parameters
     ----------
@@ -487,9 +487,10 @@ def reset_buffer_position(buffer: BufferedIOBase) -> Generator[int, None, None]:
     check_buffer(buffer)
 
     initial_offset = buffer.tell()
-    yield initial_offset
-
-    buffer.seek(initial_offset)
+    try:
+        yield initial_offset
+    finally:
+        buffer.seek(initial_offset)
 
 
 def read_buffer(

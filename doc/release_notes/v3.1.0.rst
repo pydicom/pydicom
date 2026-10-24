@@ -18,6 +18,8 @@ Changes
 Fixes
 -----
 
+* Restore buffered element positions when an operation using
+  :func:`~pydicom.fileutil.reset_buffer_position` raises an exception.
 * Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
 * Include all :mod:`~pydicom.examples` module datasets with the package (:issue:`2128`, :issue:`2131`).
 * Fixed an invalid VR value in the private data dictionary (:issue:`2132`).

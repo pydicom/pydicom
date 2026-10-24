@@ -137,6 +137,18 @@ class TestBufferFunctions:
                 assert idx == 100
                 b.seek(0)
 
+    @pytest.mark.parametrize("exception", [RuntimeError("failed"), KeyboardInterrupt()])
+    def test_reset_buffer_position_on_exception(self, exception):
+        b = BytesIO(b"\x00" * 100)
+        b.seek(13)
+        with pytest.raises(type(exception)):
+            with reset_buffer_position(b) as idx:
+                assert idx == 13
+                b.seek(57)
+                raise exception
+
+        assert b.tell() == 13
+
     def test_read_buffer(self):
         """Test read_buffer()"""
         b = BytesIO()
