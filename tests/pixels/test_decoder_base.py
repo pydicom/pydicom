@@ -1115,6 +1115,35 @@ class TestDecoder_Array:
                 "buffer for bit-packed pixel data"
             ) in caplog.text
 
+    def test_native_single_bit_frame_straddles_bytes(self):
+        """Test `index` with single bit frames that span an extra byte."""
+        # 15 pixels per frame, so frame 1 covers bits 15 to 29 and needs
+        #   bytes 1 to 3 even though a frame is only 2 bytes long
+        rng = np.random.default_rng(0)
+        reference = rng.integers(0, 2, (8, 3, 5), dtype="u1")
+        opts = {
+            "rows": 3,
+            "columns": 5,
+            "number_of_frames": 8,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": "MONOCHROME2",
+            "pixel_keyword": "PixelData",
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+        }
+        src = pack_bits(reference)
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        for index in range(8):
+            arr, _ = decoder.as_array(src, index=index, **opts)
+            assert np.array_equal(arr, reference[index])
+
+            arr, _ = decoder.as_array(BytesIO(src), index=index, **opts)
+            assert np.array_equal(arr, reference[index])
+
+        for index, (arr, _) in enumerate(decoder.iter_array(src, **opts)):
+            assert np.array_equal(arr, reference[index])
+
     def test_native_ybr422_view_warns(self, caplog):
         """Test warning for YBR_FULL_422 data with `view_only`"""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -1883,6 +1912,34 @@ class TestDecoder_Buffer:
 
         assert len(frame_1_buffer) == expected_len
         assert frame_1_buffer == expected
+
+    def test_native_single_bit_frame_straddles_bytes(self):
+        """Test `index` with single bit frames that span an extra byte."""
+        rng = np.random.default_rng(0)
+        reference = rng.integers(0, 2, (8, 3, 5), dtype="u1")
+        opts = {
+            "rows": 3,
+            "columns": 5,
+            "number_of_frames": 8,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": "MONOCHROME2",
+            "pixel_keyword": "PixelData",
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+        }
+        src = pack_bits(reference)
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        for index in range(8):
+            expected = pack_bits(reference[index])
+            buffer, _ = decoder.as_buffer(src, index=index, **opts)
+            assert buffer == expected
+
+            # Pixel data that doesn't start at the beginning of the file
+            fp = BytesIO(b"\x00" * 10 + src)
+            fp.seek(10)
+            buffer, _ = decoder.as_buffer(fp, index=index, **opts)
+            assert buffer == expected
 
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""
