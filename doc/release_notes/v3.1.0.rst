@@ -62,6 +62,10 @@ Fixes
 
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed :meth:`~pydicom.dataset.Dataset.compress` producing corrupted pixel data when
+  the uncompressed dataset has a *Planar Configuration* of 1, and set *Planar
+  Configuration* to 0 for transfer syntaxes other than JPEG-LS and *Deflated Image
+  Frame Compression*.
 
 Enhancements
 ------------
