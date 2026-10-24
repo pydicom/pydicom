@@ -1,6 +1,7 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
 import logging
+from io import BytesIO
 from unittest import mock
 
 import pytest
@@ -409,6 +410,36 @@ class TestSequence:
 
 
 class TestBinary:
+    @pytest.mark.parametrize("vr", ["OB", "OW"])
+    def test_inline_binary_buffered(self, vr):
+        buffer = BytesIO(b"abcdefgh")
+        buffer.seek(3)
+        ds = Dataset()
+        ds.add_new(0x7FE00010, vr, buffer)
+
+        assert json.loads(ds.to_json()) == {
+            "7FE00010": {"vr": vr, "InlineBinary": "YWJjZGVmZ2g="}
+        }
+        assert buffer.tell() == 3
+        assert Dataset.from_json(ds.to_json())[0x7FE00010].value == b"abcdefgh"
+
+    def test_bulk_data_uri_buffered_without_reading(self):
+        class UnreadBuffer(BytesIO):
+            def read(self, *args):
+                raise AssertionError("Bulk data should be handled without reading it")
+
+        buffer = UnreadBuffer(b"abcdefgh")
+        buffer.seek(3)
+        ds = Dataset()
+        ds.add_new(0x7FE00010, "OB", buffer)
+        handler = mock.Mock(return_value="https://example.com/bulk")
+
+        assert ds.to_json_dict(
+            bulk_data_threshold=4, bulk_data_element_handler=handler
+        ) == {"7FE00010": {"vr": "OB", "BulkDataURI": "https://example.com/bulk"}}
+        handler.assert_called_once_with(ds[0x7FE00010])
+        assert buffer.tell() == 3
+
     def test_inline_binary(self):
         ds = Dataset()
         ds.add_new(0x00091002, "OB", b"BinaryContent")
