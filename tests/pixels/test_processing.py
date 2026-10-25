@@ -1410,6 +1410,27 @@ class TestApplyWindowing:
         assert 4455.6 == pytest.approx(out[326, 130], abs=0.1)
         assert 4914.0 == pytest.approx(out[316, 481], abs=0.1)
 
+    def test_window_negative_rescale_slope(self):
+        """Test windowing with a negative rescale slope."""
+        ds = Dataset()
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.RescaleSlope = -1
+        ds.RescaleIntercept = 0
+        ds.WindowCenter = -1000
+        ds.WindowWidth = 2000
+
+        arr = np.asarray([0, 500, 1000, 1500, 2000], dtype="uint16")
+        hu = apply_modality_lut(arr, ds)
+        assert [0.0, -500.0, -1000.0, -1500.0, -2000.0] == hu.tolist()
+        # PS3.3 C.11.2.1.3.1: ymin and ymax are the minimum and maximum
+        # output values, so a negative slope must not invert the output
+        out = apply_windowing(hu, ds)
+        assert [0.0, -16359.16, -32751.11, -49143.05, -65535.0] == pytest.approx(
+            out.tolist(), abs=0.01
+        )
+
     def test_window_modality_lut(self):
         """Test windowing after a modality LUT operation."""
         ds = dcmread(MOD_16_SEQ)

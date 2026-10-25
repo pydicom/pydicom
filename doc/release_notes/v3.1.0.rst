@@ -59,6 +59,9 @@ Fixes
   (:issue:`2381`).
 * Fixed compression of packed one-bit pixel data stored as *OW* with
   *Explicit VR Big Endian* byte ordering, including frames ending within a byte or word.
+* Fixed :func:`~pydicom.pixels.apply_windowing` inverting the output when
+  *Rescale Slope* is negative; ``ymin`` and ``ymax`` are now ordered as the
+  minimum and maximum output values required by PS3.3 C.11.2.1.3.1.
 
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
