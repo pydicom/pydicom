@@ -788,6 +788,11 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
         # Otherwise its the actual data range
         y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
         y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
+        if y_min > y_max:
+            # A negative Rescale Slope reverses the output range, but
+            # PS3.3 C.11.2.1.3.1 defines ymin/ymax as the minimum and
+            # maximum output values, so swap them back.
+            y_min, y_max = y_max, y_min
 
     y_range = y_max - y_min
     arr = arr.astype("float64")
