@@ -1631,7 +1631,9 @@ class Decoder(CoderBase):
                         "frames"
                     )
 
-                frame = runner.get_data(src, start_offset, ceil(length_bytes))
+                # Bit-packed frames may not start or end on a byte boundary
+                end_offset = ceil(file_offset + (index + 1) * length_bytes)
+                frame = runner.get_data(src, start_offset, end_offset - start_offset)
                 arr = np.frombuffer(frame, dtype=dtype)
             else:
                 length_bytes *= runner.number_of_frames
@@ -1655,9 +1657,7 @@ class Decoder(CoderBase):
             else:
                 bit_offset_start = (index * length_pixels) % 8
 
-            unpacked = np.unpackbits(
-                arr, bitorder="little", count=ceil(length_bytes) * 8
-            )
+            unpacked = np.unpackbits(arr, bitorder="little")
 
             # May need to remove bits from the beginning or end if frame
             # boundaries are not byte-aligned
@@ -2015,7 +2015,9 @@ class Decoder(CoderBase):
                     f"There is insufficient pixel data to contain {index + 1} frames"
                 )
 
-            buf = runner.get_data(src, start_offset, ceil(length_bytes))
+            # Bit-packed frames may not start or end on a byte boundary
+            end_offset = ceil(file_offset + (index + 1) * length_bytes)
+            buf = runner.get_data(src, start_offset, end_offset - start_offset)
 
             if runner.bits_allocated == 1:
                 # May need to bit-shift to remove pixels from neighboring frames
@@ -2023,7 +2025,7 @@ class Decoder(CoderBase):
                     buf,
                     index=index,
                     frame_length=int(runner.frame_length("pixels")),
-                    start_offset=start_offset,
+                    start_offset=start_offset - file_offset,
                 )
 
             return buf

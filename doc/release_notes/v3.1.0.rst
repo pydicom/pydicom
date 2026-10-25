@@ -62,6 +62,10 @@ Fixes
 
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed decoding a single frame of pixel data with *Bits Allocated* of 1 when the frame
+  spans one more byte than its length in bytes, and when using
+  :meth:`Decoder.as_buffer()<pydicom.pixels.Decoder.as_buffer>` with a file-like
+  source.
 
 Enhancements
 ------------
