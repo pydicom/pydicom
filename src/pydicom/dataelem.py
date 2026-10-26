@@ -13,7 +13,7 @@ from collections.abc import Callable, MutableSequence
 import copy
 from io import BufferedIOBase
 import json
-from typing import Any, TYPE_CHECKING, NamedTuple
+from typing import Any, TYPE_CHECKING, NamedTuple, cast
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
@@ -665,7 +665,7 @@ class DataElement:  # noqa: PLW1641
 
         return result
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -694,7 +694,7 @@ class DataElement:  # noqa: PLW1641
             if not self.is_buffered and not other.is_buffered:
                 if isinstance(self.value, float) and math.isnan(self.value):
                     return other.value is not None and math.isnan(other.value)
-                return self.value == other.value
+                return cast(bool, self.value == other.value)
 
             try:
                 # `self` is buffered, `other` may or may not be buffered
@@ -708,7 +708,7 @@ class DataElement:  # noqa: PLW1641
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
