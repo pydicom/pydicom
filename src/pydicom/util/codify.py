@@ -113,11 +113,11 @@ def code_dataelem(
             dataelem, dataset_name, exclude_size, include_private, var_names=var_names
         )
 
-    # If in DICOM dictionary, set using the keyword
-    # If not (e.g. is private element), set using add_new method
+    # Use the keyword when available, otherwise use the add_new method.
     have_keyword = True
     try:
         keyword = dictionary_keyword(dataelem.tag)
+        have_keyword = bool(keyword)
     except KeyError:
         have_keyword = False
 
