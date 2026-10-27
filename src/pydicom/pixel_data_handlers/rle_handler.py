@@ -40,7 +40,6 @@ from typing import TYPE_CHECKING, cast
 
 try:
     import numpy as np
-    import numpy  # noqa: F401
 
     HAVE_RLE = True
 except ImportError:
