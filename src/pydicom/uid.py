@@ -454,7 +454,7 @@ UncompressedTransferSyntaxes = [
 ]
 """Uncompressed (native) transfer syntaxes."""
 
-PrivateTransferSyntaxes = []
+PrivateTransferSyntaxes: list[UID] = []
 """Private transfer syntaxes added using the
 :func:`~pydicom.uid.register_transfer_syntax` function.
 """
