@@ -150,6 +150,17 @@ def data_element_generator(
             group, elem, length = element_struct_unpack(bytes_read)
         else:  # explicit VR
             group, elem, vr, length = element_struct_unpack(bytes_read)
+            # VRs are two uppercase letters, but some writers emit them in lower
+            # or mixed case. Normalise only when the uppercased VR is one pydicom
+            # knows: a lowercase VR such as b"cs" is not a member of ``ENCODED_VR``
+            # and also falls outside the b"AA" <= vr <= b"ZZ" test (lowercase
+            # ASCII sorts after uppercase), so it would be mistaken for an
+            # implicit VR switch, its 2 bytes read as part of a 4-byte length,
+            # and every following element lost. Genuinely unknown VRs are left
+            # alone so they keep using the implicit-VR fallback below.
+            if vr.isalpha() and vr.upper() in ENCODED_VR:
+                vr = vr.upper()
+
             # defend against switching to implicit VR, some writer do in SQ's
             # issue 1067, issue 1035
 
