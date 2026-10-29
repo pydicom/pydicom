@@ -626,6 +626,27 @@ class TestApplyColorLUT:
         with pytest.raises(ValueError, match=msg):
             apply_color_lut(ds.pixel_array, ds)
 
+    def test_more_than_256_entries_with_8_bit_entries(self):
+        """An 8-bit-per-entry LUT with more than 256 entries is legal (PS3.3
+        C.7.6.3.1.5/C.7.9.2 bounds entry count and entry depth independently)
+        and must index past entry 255 correctly, not wrap modulo 256."""
+        nr_entries, first_map, bits_per_entry = 4096, 0, 8
+        ds = Dataset()
+        for colour in ("Red", "Green", "Blue"):
+            setattr(
+                ds,
+                f"{colour}PaletteColorLookupTableDescriptor",
+                [nr_entries, first_map, bits_per_entry],
+            )
+        red_lut = bytes([0] * 256 + [200] * (nr_entries - 256))
+        ds.RedPaletteColorLookupTableData = red_lut
+        ds.GreenPaletteColorLookupTableData = bytes(nr_entries)
+        ds.BluePaletteColorLookupTableData = bytes(nr_entries)
+
+        arr = np.asarray([[4095]], dtype="uint16")
+        rgb = apply_color_lut(arr, ds=ds)
+        assert [200, 0, 0] == list(rgb[0, 0, :])
+
     def test_uint08_16(self):
         """Test uint8 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
