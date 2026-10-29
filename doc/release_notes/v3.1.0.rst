@@ -67,6 +67,9 @@ Fixes
 
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed writing *LUT Data* set as a list of integers failing with a ``TypeError``
+  because its ambiguous VR was resolved to **OW**; it is now written as **US**
+  (:issue:`2400`).
 
 Enhancements
 ------------
