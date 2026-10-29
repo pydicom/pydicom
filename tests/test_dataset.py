@@ -1269,6 +1269,41 @@ class TestDataset:
         assert len(ds) == 2
         assert ds[0x000B0010].value == "dog^2"
 
+    def test_create_private_tag_after_pop_and_clear(self):
+        ds = Dataset()
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+
+        ds.pop(0x000B0010)
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x02, "SH", "Poodle")
+        assert len(ds) == 3
+        assert ds[0x000B0010].value == "dog^1"
+
+        ds.clear()
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 2
+        assert ds[0x000B0010].value == "dog^1"
+
+        ds.popitem()
+        ds.popitem()
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 2
+        assert ds[0x000B0010].value == "dog^1"
+
+    def test_private_block_after_replacing_private_creator(self):
+        ds = Dataset()
+        ds.private_block(0x000B, "dog^1", create=True)
+        ds[0x000B0010] = DataElement(0x000B0010, "LO", "cat^1")
+        with pytest.raises(KeyError, match="Private creator 'dog\\^1' not found"):
+            ds.private_block(0x000B, "dog^1")
+
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        assert block.block_start == 0x1100
+        assert ds[0x000B0011].value == "dog^1"
+
     def test_read_invalid_private_tag_number_as_un(self):
         # regression test for #1347
         ds = Dataset()
