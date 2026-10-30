@@ -1625,6 +1625,10 @@ class Decoder(CoderBase):
         else:
             if index is not None:
                 start_offset = floor(file_offset + index * length_bytes)
+                if runner.bits_allocated == 1:
+                    # Include any leading bits from the previous frame
+                    length_bytes += (index * length_pixels % 8) / 8
+
                 if (start_offset + length_bytes) > file_offset + length_source:
                     raise ValueError(
                         f"There is insufficient pixel data to contain {index + 1} "
