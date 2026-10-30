@@ -181,6 +181,15 @@ class TestUID:
         assert not UID("1.2.840.10008.1.2.2").is_deflated
         assert not UID("1.2.840.10008.1.2.4.50").is_deflated
 
+        # '1.2.840.10008.1.2.4.94' JPIP Referenced (PS3.5 A.6)
+        # '1.2.840.10008.1.2.4.95' JPIP Referenced Deflate (PS3.5 A.7)
+        # '1.2.840.10008.1.2.4.204' JPIP HTJ2K Referenced (PS3.5 A.11)
+        # '1.2.840.10008.1.2.4.205' JPIP HTJ2K Referenced Deflate (PS3.5 A.12)
+        assert not UID("1.2.840.10008.1.2.4.94").is_deflated
+        assert UID("1.2.840.10008.1.2.4.95").is_deflated
+        assert not UID("1.2.840.10008.1.2.4.204").is_deflated
+        assert UID("1.2.840.10008.1.2.4.205").is_deflated
+
         with pytest.raises(ValueError):
             UID("1.2.840.10008.5.1.4.1.1.2").is_deflated
 
