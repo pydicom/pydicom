@@ -1034,7 +1034,7 @@ class DSfloat(float):
     def __init__(
         self,
         val: str | int | float | Decimal,
-        auto_format: bool = False,
+        auto_format: bool | None = None,
         validation_mode: int | None = None,
     ) -> None:
         """Store the original string if one given, for exact write-out of same
@@ -1042,6 +1042,8 @@ class DSfloat(float):
         """
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
+        if auto_format is None:
+            auto_format = config.settings.auto_format_ds
 
         self.original_string: str
 

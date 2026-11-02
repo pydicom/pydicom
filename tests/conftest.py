@@ -81,6 +81,14 @@ def dont_replace_un_with_sq_vr():
 
 
 @pytest.fixture
+def use_ds_auto_format():
+    old_value = config.settings.auto_format_ds
+    config.settings.auto_format_ds = True
+    yield
+    config.settings.auto_format_ds = old_value
+
+
+@pytest.fixture
 def dont_raise_on_writing_invalid_value():
     old_value = config.settings.writing_validation_mode
     config.settings.writing_validation_mode = config.WARN

@@ -253,6 +253,7 @@ class Settings:
 
         # Chunk size to use when reading from buffered DataElement values
         self._buffered_read_size = 8192
+        self._auto_format_ds = False
 
     @property
     def buffered_read_size(self) -> int:
@@ -319,6 +320,19 @@ class Settings:
     @infer_sq_for_un_vr.setter
     def infer_sq_for_un_vr(self, value: bool) -> None:
         self._infer_sq_for_un_vr = value
+
+    @property
+    def auto_format_ds(self) -> bool:
+        """If ``True``, string representations of values of type **DS**
+        are automatically formatted to ensure they satisfy the constraints
+        in the DICOM standard.
+        Note that this may lead to loss of precision for some numbers.
+        """
+        return self._auto_format_ds
+
+    @auto_format_ds.setter
+    def auto_format_ds(self, value: bool) -> None:
+        self._auto_format_ds = value
 
 
 settings = Settings()

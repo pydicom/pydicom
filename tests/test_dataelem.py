@@ -128,6 +128,18 @@ class TestDataElement:
         data_element = DataElement((1, 2), "DS", DSfloat(math.pi, auto_format=True))
         assert math.pi == data_element.value
         assert "3.14159265358979" == str(data_element.value)
+        data_element = DataElement((1, 2), "DS", DSfloat(math.pi))
+        assert math.pi == data_element.value
+        assert "3.141592653589793" == str(data_element.value)
+
+    def test_DSFloat_conversion_with_auto_format_setting(self, use_ds_auto_format):
+        """Test that strings are being auto-formatted if the setting is used."""
+        data_element = DataElement((1, 2), "DS", DSfloat(math.pi))
+        assert math.pi == data_element.value
+        assert "3.14159265358979" == str(data_element.value)
+        data_element = DataElement((1, 2), "DS", DSfloat(math.pi, auto_format=False))
+        assert math.pi == data_element.value
+        assert "3.141592653589793" == str(data_element.value)
 
     def test_comparison_with_nan(self):
         nan_value = float("nan")
