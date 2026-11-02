@@ -402,8 +402,8 @@ class TestWriteDataElement:
 
         Returns
         -------
-        str or bytes
-            The encoded element as str (python2) or bytes (python3)
+        bytes
+            The encoded element
         """
         with DicomBytesIO() as fp:
             fp.is_implicit_VR = is_implicit_VR
