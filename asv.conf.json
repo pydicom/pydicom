@@ -19,7 +19,7 @@
 
     // List of branches to benchmark. If not provided, defaults to "main"
     // (for git) or "default" (for mercurial).
-    "branches": ["nested-seq-speed", "main"],
+    "branches": ["theadsafety", "main"],
 
     "environment_type": "virtualenv",
 
