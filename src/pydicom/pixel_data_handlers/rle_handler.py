@@ -39,17 +39,17 @@ from struct import unpack
 from typing import TYPE_CHECKING, cast
 
 try:
-    import numpy as np
     import numpy  # noqa: F401
+    import numpy as np
 
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
 
+import pydicom.uid
 from pydicom.encaps import generate_frames
 from pydicom.misc import warn_and_log
-from pydicom.pixels.utils import pixel_dtype, get_nr_frames
-import pydicom.uid
+from pydicom.pixels.utils import get_nr_frames, pixel_dtype
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

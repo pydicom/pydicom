@@ -2,17 +2,16 @@
 """Read a dicom media file"""
 
 import os
+from collections.abc import Callable, Iterator
 from struct import Struct, unpack
 from types import TracebackType
-from typing import cast, BinaryIO
-from collections.abc import Iterator, Callable
+from typing import BinaryIO, cast
 
-from pydicom.misc import size_in_bytes
 from pydicom.datadict import dictionary_VR
-from pydicom.tag import TupleTag, ItemTag
+from pydicom.misc import size_in_bytes
+from pydicom.tag import ItemTag, TupleTag
 from pydicom.uid import UID
 from pydicom.valuerep import EXPLICIT_VR_LENGTH_32
-
 
 extra_length_VRs_b = tuple(vr.encode("ascii") for vr in EXPLICIT_VR_LENGTH_32)
 ExplicitVRLittleEndian = b"1.2.840.10008.1.2.1"
@@ -85,7 +84,7 @@ def data_element_generator(
     is_implicit_VR: bool,
     is_little_endian: bool,
     stop_when: Callable[[int, int], bool] | None = None,
-    defer_size: str | int | float | None = None,
+    defer_size: str | float | None = None,
 ) -> Iterator[_ElementType]:
     """:return: (tag, VR, length, value, value_tell,
     is_implicit_VR, is_little_endian)

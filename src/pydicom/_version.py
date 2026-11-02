@@ -1,9 +1,9 @@
 """Pure python package for DICOM medical file reading and writing."""
 
 import re
-from typing import cast
-from re import Match
 from importlib.metadata import version
+from re import Match
+from typing import cast
 
 __version__: str = version("pydicom")
 

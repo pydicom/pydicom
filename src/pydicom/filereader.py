@@ -3,13 +3,14 @@
 
 # Need zlib and io.BytesIO for deflate-compressed file
 import os
-from struct import Struct, unpack
-from typing import BinaryIO, Any, cast
-from collections.abc import Callable, MutableSequence, Iterator
 import zlib
+from collections.abc import Callable, Iterator, MutableSequence
+from struct import Struct, unpack
+from typing import Any, BinaryIO, cast
 
+import pydicom.uid
 from pydicom import config
-from pydicom.charset import default_encoding, convert_encodings
+from pydicom.charset import convert_encodings, default_encoding
 from pydicom.config import logger
 from pydicom.datadict import _dictionary_vr_fast
 from pydicom.dataelem import (
@@ -20,27 +21,26 @@ from pydicom.dataelem import (
 )
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import ReadableBuffer, DicomBytesIO
+from pydicom.filebase import DicomBytesIO, ReadableBuffer
 from pydicom.fileutil import (
-    read_undefined_length_value,
-    path_from_pathlike,
     PathType,
     _unpack_tag,
+    path_from_pathlike,
+    read_undefined_length_value,
 )
 from pydicom.misc import size_in_bytes, warn_and_log
 from pydicom.sequence import Sequence
 from pydicom.tag import (
+    BaseTag,
     ItemTag,
     SequenceDelimiterTag,
     Tag,
-    BaseTag,
     TagListType,
     TupleTag,
 )
-import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
-from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR as VR_
-
+from pydicom.valuerep import EXPLICIT_VR_LENGTH_32
+from pydicom.valuerep import VR as VR_
 
 ENCODED_VR = {vr.encode(default_encoding) for vr in VR_}
 
@@ -53,7 +53,7 @@ def data_element_generator(
     is_implicit_VR: bool,
     is_little_endian: bool,
     stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
-    defer_size: int | str | float | None = None,
+    defer_size: str | float | None = None,
     encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
 ) -> Iterator[RawDataElement | DataElement]:
@@ -414,7 +414,7 @@ def read_dataset(
     is_little_endian: bool,
     bytelength: int | None = None,
     stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
-    defer_size: str | int | float | None = None,
+    defer_size: str | float | None = None,
     parent_encoding: str | MutableSequence[str] = default_encoding,
     specific_tags: list[BaseTag | int] | None = None,
     at_top_level: bool = True,
@@ -804,7 +804,7 @@ def _at_pixel_data(tag: BaseTag, vr: str | None, length: int) -> bool:
 def read_partial(
     fileobj: BinaryIO,
     stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
-    defer_size: int | str | float | None = None,
+    defer_size: str | float | None = None,
     force: bool = False,
     specific_tags: list[BaseTag | int] | None = None,
 ) -> FileDataset:
@@ -958,7 +958,7 @@ def read_partial(
 
 def dcmread(
     fp: PathType | BinaryIO | ReadableBuffer,
-    defer_size: str | int | float | None = None,
+    defer_size: str | float | None = None,
     stop_before_pixels: bool = False,
     force: bool = False,
     specific_tags: TagListType | None = None,

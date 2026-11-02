@@ -28,8 +28,8 @@ given in the table below.
 
 """
 
-from typing import TYPE_CHECKING, cast
 from collections.abc import Generator
+from typing import TYPE_CHECKING, cast
 
 try:
     import numpy as np

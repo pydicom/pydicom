@@ -1,16 +1,15 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
-from itertools import groupby
 import math
-from struct import pack
 import zlib
+from itertools import groupby
+from struct import pack
 from typing import cast
 
 from pydicom.pixels.encoders.base import EncodeRunner
 from pydicom.pixels.utils import pack_bits, unpack_bits
-from pydicom.uid import RLELossless, DeflatedImageFrameCompression
-
+from pydicom.uid import DeflatedImageFrameCompression, RLELossless
 
 ENCODER_DEPENDENCIES = {
     RLELossless: (),
