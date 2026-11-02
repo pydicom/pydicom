@@ -206,14 +206,14 @@ class DicomIO:
             return bytes_read
 
         # Use a bytearray because concatenating bytes is expensive
-        bytes_read = bytearray(bytes_read)
+        bytearray_read = bytearray(bytes_read)
         attempts = 0
         while (num_bytes := len(bytes_read)) < length and attempts < nr_retries:
             bytes_read += self.read(length - num_bytes)
             attempts += 1
 
         if num_bytes == length:
-            return bytes(bytes_read)
+            return bytes(bytearray_read)
 
         raise EOFError(
             f"Unexpected end of file. Read {num_bytes} bytes of {length} "

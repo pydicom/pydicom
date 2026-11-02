@@ -66,7 +66,7 @@ if TYPE_CHECKING:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 
 
-DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
+DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes]
 
 
 class DecodeOptions(RunnerOptions, total=False):
@@ -670,7 +670,7 @@ class DecodeRunner(RunnerBase):
         """
         if self.is_dataset or self.is_buffer:
             src = cast(Buffer, src)
-            return src[offset : offset + length]
+            return bytes(src[offset : offset + length])
 
         src = cast(BinaryIO, src)
         file_offset = src.tell()
