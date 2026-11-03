@@ -424,11 +424,12 @@ def _warn_duplicate_elem(
     is_implicit_VR : bool
         ``True`` if the elements use implicit VR, ``False`` otherwise.
     """
+    # Get the file offset to the start of the element tag
     value_offset = 8
     if not is_implicit_VR and dupe.VR in EXPLICIT_VR_LENGTH_32:
         value_offset += 4
 
-    # Offset for RawDataElement uses value_tell, DataElement uses file_tell
+    # RawDataElement uses value_tell, DataElement uses file_tell
     attr = "value_tell" if hasattr(dupe, "value_tell") else "file_tell"
     dupe_offset = getattr(dupe, attr) - value_offset
     orig_offset = getattr(orig, attr) - value_offset
