@@ -510,26 +510,21 @@ def read_dataset(
         specific_tags,
     )
 
-    # Track elements in the dataset to enable checking for duplicates
-    element_set = set()
-
     try:
         if bytelength is None:
             for elem in de_gen:
-                if (tag := elem.tag) in element_set:
+                if (tag := elem.tag) in raw_data_elements:
                     _warn_duplicate_elem(elem, raw_data_elements[tag], is_implicit_VR)
                     continue
 
-                element_set.add(tag)
                 raw_data_elements[tag] = elem
         else:
             while fp_tell() - fp_start < bytelength:
                 elem = next(de_gen)
-                if (tag := elem.tag) in element_set:
+                if (tag := elem.tag) in raw_data_elements:
                     _warn_duplicate_elem(elem, raw_data_elements[tag], is_implicit_VR)
                     continue
 
-                element_set.add(tag)
                 raw_data_elements[tag] = elem
     except StopIteration:
         pass
