@@ -1096,6 +1096,24 @@ class TestReader:
             "dataset - initially at offset 0 and again at offset 8"
         ) in caplog.text
 
+    def test_duplicate_elem_read_length(self, caplog):
+        """Test duplicate element detection when reading a specific length."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    ),
+                    False,
+                    True,
+                    bytelength=36,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
 
 class TestIncorrectVR:
     def setup_method(self):

@@ -432,6 +432,7 @@ def _warn_duplicate_elem(
     # RawDataElement uses value_tell, DataElement uses file_tell
     attr = "value_tell" if hasattr(dupe, "value_tell") else "file_tell"
     dupe_offset = getattr(dupe, attr) - value_offset
+    attr = "value_tell" if hasattr(orig, "value_tell") else "file_tell"
     orig_offset = getattr(orig, attr) - value_offset
 
     msg = (
